@@ -1,0 +1,807 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php 
+$this->session = new Zend_Session_Namespace('default');
+$canInsertApplication = false;
+$canEditFAQs = false;
+$isAdminOrManager = false;
+$isNIL = false;
+$isAdmin = false;
+
+if ( ($this->user || $this->session->userid !== null) && ($this->user!==null && $this->user->privs!==null) ) {
+	$this->user->privs->refresh();
+	$canInsertApplication = $this->user->privs->canInsertApplication();
+	$canEditFAQs = $this->user->privs->canEditFAQs();
+	$isAdminOrManager = userIsAdminOrManager($this->user->id);
+	// FIXME: provide for NILs assigned to countries other than their own
+	$isNIL = userIsNIL($this->user->id, $this->user->countryid);
+	$isAdmin = userIsAdmin($this->user->id);
+	$canManageDatasets = $this->user->privs->canManageDatasets();
+}
+
+$wiki = ApplicationConfiguration::app('wiki', ApplicationConfiguration::uiUrl());
+
+$useSaml = ( (ApplicationConfiguration::app('authbackend') !== 'saml')?false:true);
+
+//Browser Handling
+$browserSupported = true;
+$isGtIE10 = (getMSIEVersion()>10)?true:false; 
+if ( browser() == "msie" && isMSIE9()==false && isMSIE10() == false && $isGtIE10 === false) {
+	if (! $this->session->browserWarnAcknol) $browserSupported = false;
+} elseif ( browser() == "konqueror") {
+	if (! $this->session->browserWarnAcknol) $browserSupported = false;
+} elseif (browser() == "firefox") {
+} elseif (browser() == "opera") { 
+	if (! $this->session->browserWarnAcknol) $browserSupported = false;
+} elseif (browser() == "safari") {
+} elseif (browser() == "msie") {
+} elseif (browser() == "chrome") {
+} elseif ( $isGtIE10 === true ) {
+} elseif (browser() == "googlebot"){
+} elseif (browser() == "msnbot"){
+} elseif (browser() == "gecko") {
+	if ( ! ((browserName() == "SeaMonkey") && (browserVersion()>=1.1)) ) if (! $this->session->browserWarnAcknol) $browserSupported = false;
+} else { //unknown browser
+	if (! $this->session->browserWarnAcknol) $browserSupported = false;
+}
+
+if( $browserSupported == false ){
+	echo '<script type="text/javascript">window.location="/supported";</script>';
+}
+?>
+<div class="mainheader">
+	<div class="menucontainer top">
+		<ul class="menu metro">
+			<?php if( $this->session->userid !== null ) { ?>
+			<li>
+				<a href="#">Register New<span class="arrow"></span></a>
+				<ul>
+					<li><a href="/store/register/software/" onclick="appdb.views.Main.showApplication({id: 0},{mainTitle: 'Register New Software', content: 'software'});">New software item</a></li>
+					<li><a href="/store/register/virtualappliance/" onclick="appdb.views.Main.showVirtualAppliance({id: 0},{mainTitle: 'Register New Virtual Appliance', content: 'vappliance'});">New virtual appliance</a></li>
+					<?php if ( Supports::swappliance() ) { ?>
+					<li><a href="/store/register/softwareappliance/" onclick="appdb.views.Main.showSoftwareAppliance({id: 0},{mainTitle: 'Register New Software Appliance', content: 'swappliance'});">New software appliance</a></li>
+					<?php } ?>
+					<?php if ( Supports::datasets() && $canManageDatasets) { ?>
+					<li><a href="/store/register/dataset/" onclick="appdb.views.Main.showDataset({id: 0},{mainTitle: 'Register New Dataset', content: 'dataset'});">New Dataset</a></li>
+					<?php } ?>
+					<?php if( $isAdminOrManager ) { ?><li><a href="/store/person/" onclick="appdb.views.Main.showPerson({id: 0}, {mainTitle: 'Register New User', content: 'person'});">New person profile</a></li><?php } ?>
+				</ul>
+			</li>
+			<?php } ?>
+			<?php if( $this->session->userid != null ) { ?>
+			<li class="">
+				<a href="#">My Items</a>
+				<ul>
+					<li>
+						<a href="#">Software<span class="arrow"></span></a>
+						<ul>
+							<li><a href="#" title="Items you yourself have registered" onclick="appdb.views.Main.showOwned();" data-href="/browse/software/owned">Owned</a></li>
+							<li><a href="#" title="Items for which you have editing permissions" onclick="appdb.views.Main.showEditable();" data-href="/browse/software/editable">Editable</a></li>
+							<li><a href="#" title="Items that have you listed as a contact" onclick="appdb.views.Main.showAssociated();" data-href="/browse/software/associated">Associated</a></li>
+							<li><a href="#" title="Items you have bookmarked" onclick="appdb.views.Main.showBookmarked();" data-href="/browse/software/bookmarked">Bookmarked</a></li>
+							<li><a href="#" title="Items you are following" onclick="appdb.views.Main.showFollowed();" data-href="/browse/software/followed">Followed</a></li>
+							<?php if( $isAdminOrManager ) { ?>
+							<li class="seperator"></li>
+							<li><a href="#" title="Items that have been moderated by a manager or an admin" onclick="appdb.views.Main.showModerated();" data-href="/browse/software/moderated">Moderated</a></li>
+							<li><a href="#" title="Items that have been delete by a user" onclick="appdb.views.Main.showDeleted();" data-href="/browse/software/deleted">Deleted</a></li>
+							<?php } ?>
+						</ul>
+					</li>
+					<li>
+						<a href="#">Virtual Appliances<span class="arrow"></span></a>
+						<ul>
+							<li><a href="#" title="Items you yourself have registered" onclick="appdb.views.Main.showOwned({},{content: 'vappliance'});" data-href="/browse/cloud/vappliances/owned">Owned</a></li>
+							<li><a href="#" title="Items for which you have editing permissions" onclick="appdb.views.Main.showEditable({},{content: 'vappliance'});" data-href="/browse/cloud/vappliances/editable">Editable</a></li>
+							<li><a href="#" title="Items that have you listed as a contact" onclick="appdb.views.Main.showAssociated({},{content: 'vappliance'});" data-href="/browse/cloud/vappliances/associated">Associated</a></li>
+							<li><a href="#" title="Items you have bookmarked" onclick="appdb.views.Main.showBookmarked({},{content: 'vappliance'});" data-href="/browse/cloud/vappliances/bookmarked">Bookmarked</a></li>
+							<li><a href="#" title="Items you are following" onclick="appdb.views.Main.showFollowed({},{content: 'vappliance'});" data-href="/browse/cloud/vappliances/followed">Followed</a></li>
+							<?php if( $isAdminOrManager ) { ?>
+							<li class="seperator"></li>
+							<li><a href="#" title="Items that have been moderated by a manager or an admin" onclick="appdb.views.Main.showModerated({},{content: 'vappliance'});" data-href="/browse/cloud/vappliances/moderated">Moderated</a></li>
+							<li><a href="#" title="Items that have been delete by a user" onclick="appdb.views.Main.showDeleted({},{content: 'vappliance'});" data-href="/browse/cloud/vappliances/deleted">Deleted</a></li>
+							<?php } ?>
+						</ul>
+					</li>
+					<?php if ( Supports::swappliance() ) { ?>
+					<li>
+						<a href="#">Software Appliances<span class="arrow"></span></a>
+						<ul>
+							<li><a href="#" title="Items you yourself have registered" onclick="appdb.views.Main.showOwned({},{content: 'swappliance'});" data-href="/browse/cloud/swappliance/owned">Owned</a></li>
+							<li><a href="#" title="Items for which you have editing permissions" onclick="appdb.views.Main.showEditable({},{content: 'swappliance'});" data-href="/browse/cloud/swappliance/editable">Editable</a></li>
+							<li><a href="#" title="Items that have you listed as a contact" onclick="appdb.views.Main.showAssociated({},{content: 'swappliance'});" data-href="/browse/cloud/swappliance/associated">Associated</a></li>
+							<li><a href="#" title="Items you have bookmarked" onclick="appdb.views.Main.showBookmarked({},{content: 'swappliance'});" data-href="/browse/cloud/swappliance/bookmarked">Bookmarked</a></li>
+							<li><a href="#" title="Items you are following" onclick="appdb.views.Main.showFollowed({},{content: 'swappliance'});" data-href="/browse/cloud/swappliance/followed">Followed</a></li>
+							<?php if( $isAdminOrManager ) { ?>
+							<li class="seperator"></li>
+							<li><a href="#" title="Items that have been moderated by a manager or an admin" onclick="appdb.views.Main.showModerated({},{content: 'swappliance'});" data-href="/browse/cloud/swappliance/moderated">Moderated</a></li>
+							<li><a href="#" title="Items that have been delete by a user" onclick="appdb.views.Main.showDeleted({},{content: 'swappliance'});" data-href="/browse/cloud/swappliance/deleted">Deleted</a></li>
+							<?php } ?>
+						</ul>
+					</li>
+					<?php } ?>
+					<li>
+						<a href="#">Virtual Organizations<span class="arrow"></span></a>
+						<ul>
+							<li><a href="#" title="VOs you are registered as manager" onclick="appdb.views.Main.showVoManager();" data-href="/browse/vos/membership/manager">Manager</a></li>
+							<li><a href="#" title="VOs you are registered as deputy" onclick="appdb.views.Main.showVoDeputy();" data-href="/browse/vos/membership/deputy">Deputy</a></li>
+							<li><a href="#" title="VOs you are registered as expert" onclick="appdb.views.Main.showVoExpert();" data-href="/browse/vos/membership/expert">Expert</a></li>
+							<li><a href="#" title="VOs you are registered as shifter" onclick="appdb.views.Main.showVoShifter();" data-href="/browse/vos/membership/shifter">Shifter</a></li>
+							<li><a href="#" title="VOs you are registered as member" onclick="appdb.views.Main.showVoMember();" data-href="/browse/vos/membership/member">Member</a></li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<?php if ( $this->user && $this->user->privs && $this->user->privs->canUseDisseminationTool() || $isAdminOrManager /*|| $isNIL*/ ) { ?>
+			<li class="">
+				<a href="#">Administrative<span class="arrow"></span></a>
+				<ul>
+					<?php if ( $isAdminOrManager ) { ?>			
+					<li><a id="reportslink" href="/pages/admin/activityreport" onclick="appdb.views.Main.showActivityReport({},{mainTitle : 'Activity Report', content: 'admin'});">Activity report</a></li>
+					<?php } ?>
+					<li><a id="reportsbrokenlink" href="/pages/admin/brokenlinks" onclick="appdb.views.Main.showLinkStatuses({},{mainTitle : 'Broken links report', content: 'admin'});">Broken links report</a></li>
+					<?php if ( $this->user->privs->canUseDisseminationTool() ) { ?>
+					<li class="seperator"></li>
+					<li ><a id="disseminationlink" href="/pages/admin/disseminationtool" onclick="appdb.views.Main.showDisseminationTool({},{mainTitle : 'Dissemination Tool', content: 'admin'});">Dissemination Tool</a></li>
+					<?php } ?>
+					<?php if ( $isAdmin ) { ?>
+					<li class="seperator"></li>
+					<li ><a id="apacheloglink" target="_blank" href="/help/apachelog">Apache Log</a></li>
+					<li ><a id="rebuildsearchcachelink" target="_blank" href="#" onclick="appdb.utils.rebuildSearchCache();">Rebuild Search Cache</a></li>
+					<li ><a id="clearsearchcachelink" target="_blank" href="#" onclick="appdb.utils.clearSearchCache();">Clear Search Cache</a></li>
+					<?php } ?>
+				</ul>
+			</li>
+			<?php } ?>
+			<?php } ?>
+			<li>
+				<a href="#" >About</a>
+				<ul>
+					<li>
+						<a href="<?php echo $wiki; ?>" target="_blank" data-href="/pages/about/usage" id="helpusagelink" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'About > Usage',url:'/help/usage'});">Help</a>
+					</li>
+					<li>
+						<a href="<?php echo $wiki;?>main:faq" target="_blank" data-href="/pages/about/faq" id="helpfaqlink" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'About > Faq',url:'/help/faq'});">FAQ</a>
+					</li>
+					<li>
+						<a href="<?php echo $wiki; ?>main:about:announcements" target="_blank" data-href="/pages/about/announcements" id="helpannouncelink" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'About > Announcements',url:'/help/announcements', callback:'$(\'a.oldannounce\').click();$(\'#main\').find(\'h3\').remove();'});">Announcements</a>
+					</li>
+					<li>
+						<a href="<?php echo $wiki;?>main:about:credits" target="_blank" data-href="/pages/about/credits" id="helpcreditslink" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'About > Credits',url:'/help/credits'});">Credits</a>
+					</li>
+					<li>
+						<a href="<?php echo $wiki;?>main:about:changelog" target="_blank" data-href="/pages/about/changelog" id="helpchangeloglink" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'About > Changelog',url:'/changelog'});">Changelog</a>
+					</li>
+					<?php if( $this->session->userid !== null && $isAdminOrManager) { ?>
+					<li>
+						<a href="https://opsmon.egi.eu/nagios/cgi-bin/status.cgi?servicegroup=SERVICE_egi.AppDB&style=detail" id="helpstatuslink" target="_blank">Status (admins only)</a>
+					</li>
+					<?php } ?>
+					<?php if ( Supports::datasets() ) {?>
+					<li class="seperator"></li>
+					<li>
+						<a href="<?php echo "//" .  $_SERVER['HTTP_HOST'];?>/browse/datasets" target="_blank" data-href="/browse/datasets" id="datasetslink" onclick="appdb.views.Main.showDatasets();return false;">Datasets</a>
+					</li>
+					<?php } ?>
+					<li class="seperator"></li>
+					<li>
+						<a href="#">Integration</a>
+						<ul>
+							<li>
+								<a href="http://wiki.egi.eu/wiki/TNA3.4_Technical_Services#Applications_Database" target="_blank" onclick="return true;">API</a>
+							</li>
+							<li>
+								<a href="<?php echo $wiki;?>main:integration:gadget" data-href="/gadgets/editor" target="_blank" data-onclick="return true;">Gadgets</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li>
+				<a href="#">Contact</a>
+				<ul>
+					<li>
+						<a href="/pages/contact/feedback" class="" onclick="appdb.views.Main.showPage('feedback',{mainTitle:'Contact us',url:'/index/feedback',content: 'pages'});window.scroll(0,0);return false;">Feedback</a>
+					</li>
+					<li>
+						<a href="http://helpdesk.egi.eu/" target="_blank">EGI Helpdesk</a>
+					</li>
+				</ul>
+			</li>
+			<li class="needhelp rightalign">
+				<a href="<?php echo $wiki; ?>" target="_blank" data-href="/pages/about/faq" data-onClick="appdb.views.Main.showPage('about',{mainTitle:'Faq',url:'/help/faq'});return false;"><span>Help</span></a>
+			</li>
+			<?php if( $this->session->userid !== null ) { ?>
+			<li class="profileitem rightalign" ><a href="#"><div  style="display: inline-block; vertical-align: top;"><img src="/people/getimage?id=<?php echo $this->session->userid;?>" alt="" class="profileimage"/><span class="profilename hidden"><?php echo $this->session->fullName; ?></span><span class="arrow"></span></div></a>
+				<ul class="profilemenu leftalign">
+					<li><a href="/store/person/<?php echo $this->user->cname; ?>" title="View profile" onclick="appdb.views.Main.showPerson({id: <?php echo $this->session->userid; ?>, cname: '<?php echo $this->user->cname; ?>'}, {mainTitle: '<?php echo $this->session->fullName; ?>'});"><div class="icontext"><img src="/people/getimage?id=<?php echo $this->session->userid;?>" border="0" style="width:16px;height:16px;" /><span>My profile</span></div></a></li>
+					<li><a href="/store/person/<?php echo $this->user->cname; ?>/preferences" title="View Preferences" onClick="appdb.views.Main.showPerson({id: <?php echo $this->session->userid; ?>, cname: '<?php echo $this->user->cname; ?>',tab:'preferences'}, {mainTitle: '<?php echo $this->session->fullName; ?>',tab:'preferences'});"><div class="icontext"><img class="preferencesimg" src="" /><span>Preferences</span></div></a></li>
+					<li ><a href="/store/person/<?php echo $this->user->cname; ?>/pendingrequests" title="View Pending requests" onClick="appdb.views.Main.showPerson({id: <?php echo $this->session->userid; ?>, cname: '<?php echo $this->user->cname; ?>',tab:'pendingrequests'}, {mainTitle: '<?php echo $this->session->fullName; ?>',tab:'pendingrequests'});"><div class="icontext"><img class="pendingrequestsimg" src="" /><span>Pending Requests <span class="pendingrequestscount"><?php echo ( isnull($this->userRequests) || is_numeric($this->userRequests)===false || $this->userRequests==0)?"":"(".$this->userRequests.")"; ?></span></span></div></a></li>
+					<li><a href="/store/person/<?php echo $this->user->cname; ?>/manageaccounts" title="Manage your accounts" onClick="appdb.views.Main.showPerson({id: <?php echo $this->session->userid; ?>, cname: '<?php echo $this->user->cname; ?>',tab:'manageaccounts'}, {mainTitle: '<?php echo $this->session->fullName; ?>',tab:'manageaccounts'});"><div class="icontext"><img class="connectedaccountsimg" src="/images/browse_roles.png" /><span>Manage Accounts</span></div></a></li>
+					<li class="seperator"></li>
+					<li><a href="#" title="Logout" onclick="logout()"><div class="icontext"><img class="logout" src="" /><span>Sign Out</span></div></a></li>
+				</ul>
+			</li>
+			<li class="inbox rightalign" style="text-align:right;width: 33px;">
+				<a title="Inbox" >
+				<div id="inboxdiv" >
+					<span title="Inbox" onclick="showInbox()" >
+						<img class="notificon" src="" />
+						<span id="unreadCount" ><span class="loadingcount"></span><span class="unreadcount"><img class="ajaxloader-small-orange" height="15px" src="/images/ajax-loader-trans-orange.gif" /></span></span>
+					</span>
+					<form id="formReadAllMsg" name="formReadAllMsg" method="post" action="users/readallmsg"></form>
+					<form id="formGetInbox" name="formGetInbox" method="post" action="users/getinbox" callback="parseInbox"></form>
+					<form name="getinboxcount" id="getinboxcount" method="post" action="users/getunreadmsgcount" callback="setMsgCount"></form>
+					<form id="delinboxmsgform" name="delinboxmsgform" method="post" action="users/delmsg">
+						<input type="text" value="" name="msgid" id="delmsgid" style="display: none"/>
+					</form>
+				</div>
+				</a>
+			</li>
+			<?php } else { ?>
+			<?php if ($useSaml === false ) { ?> 
+			<li class="loginitem rightalign">
+				<a href="#" onclick="login();"><div id="logindiv">Sign In</div></a>
+			</li>
+			<?php } else { ?>
+			<li class="loginitem rightalign">
+				<a href="#" >Sign In</a>
+				<ul class="leftalign">
+					<li class="leftalign"><a class="hidden"></a>
+						<div class="loginselector">
+							<div class="sourcetype egi-sso-login">
+								<a href="https://<?php echo  $_SERVER['HTTP_HOST']; ?>/saml/saml?source=egi-sso-ldap-sp" class="icontext" ><img src="/images/egilogo.png" alt=""/><span>EGI-SSO</span></a>
+								<div class="details">Create an EGI SSO account <a href="http://www.egi.eu/sso" target="_blank">here</a></div>
+							</div>
+							<div class="sourcetype digital-cert-login">
+								<a href="https://<?php echo  $_SERVER['HTTP_HOST']; ?>/saml/saml?source=x509-sp" class="icontext"><img src="/images/certificate.png" alt=""/><span>x509 Digital Certificates</span></a>
+							</div>
+							<div class="sourcetype edugain-login">
+								<a href="https://<?php echo  $_SERVER['HTTP_HOST']; ?>/saml/saml?source=edugain-sp" class="icontext"><img src="/images/edugain_logo.png" alt=""/><span >Federation (eduGAIN)</span></a>
+							</div>
+							<?php if (ApplicationConfiguration::isProductionInstance() === false ) { ?>
+							<div class="sourcetype elixir-login">
+								<a href="https://<?php echo  $_SERVER['HTTP_HOST']; ?>/saml/saml?source=elixir-sp" class="icontext"><img src="/images/elixir.png" alt=""/><span >Elixir</span></a>
+							</div>
+							<div class="sourcetype facebook-login">
+								<a href="https://<?php echo  $_SERVER['HTTP_HOST']; ?>/saml/saml?source=facebook-sp" class="icontext"><img src="/images/social_facebook.png" alt=""/><span>Facebook</span><span class="experimental">experimental</span></a>
+							</div>
+							<div class="sourcetype linkedin-login">
+								<a href="https://<?php echo  $_SERVER['HTTP_HOST']; ?>/saml/saml?source=linkedin-sp" class="icontext"><img src="/images/social_linkedin.png" alt=""/><span>LinkedIn</span><span class="experimental">experimental</span></a>
+							</div>
+							<?php } ?>
+						</div>
+					</li>
+				</ul>
+			</li>
+			<?php } ?>
+			<?php } ?>
+			<?php if ($isAdmin) { ?>
+			<li class="rightalign">
+			<div style="vertical-align: middle"><span><a href="#" onclick="appdb.pages.index.toggleCacheLed();"><img style="margin-top: 16px" class="cacheled" src="/images/close.png" /></a></span></div>
+			</li>
+			<?php } ?>
+			<li class="rightalign">
+				<div class="searchpanel">
+					<div id="mainsearch" style="line-height:auto;"></div>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>
+<div class="mainnavpanel">
+	<div class="mainnavcontents">
+		<div class="selectedcontent">
+			<ul>
+				<li class="contenttypelogo home" data-contenttype="home"><div class="logo"><img src="/images/appdblogo.png" alt=""/><span>Applications <span>Database</span><br/><span class="supporting">Supporting </span><a href="https://www.egi.eu" target="_blank" title="Visit EGI.eu" class="supporting"><img src="/images/EGI-logo_small.png" alt=""/></a></span></div></li>
+				<li class="contenttypelogo software" data-contenttype="software"><div class="logo"><img src='/images/appdblogo.png' alt='' /><span>Applications <span>Database</span><br /><span class="supporting">Supporting </span><a href="https://www.egi.eu" target="_blank" title="Visit EGI.eu" class="supporting"><img src="/images/EGI-logo_small.png" alt=""/></a></span></div></li>
+				<li class="contenttypelogo vappliance" data-contenttype="vappliance"><div class="logo"><img src='/images/appdblogo.png' alt='' /><span>Applications <span>Database</span><br /><span class="supporting">Supporting </span><a href="https://www.egi.eu" target="_blank" title="Visit EGI.eu" class="supporting"><img src="/images/EGI-logo_small.png" alt=""/></a></span></div></li>
+				<li class="contenttypelogo researchers" data-contenttype="researchers"><div class="logo"><img src='/images/appdblogo.png' alt='' /><span>Applications <span>Database</span><br /><span class="supporting">Supporting </span><a href="https://www.egi.eu" target="_blank" title="Visit EGI.eu" class="supporting"><img src="/images/EGI-logo_small.png" alt=""/></a></span></div></li>
+			</ul>
+		</div>
+		<div class="contentlist">
+			<ul>
+				<li class="contenttypelink home"><button class='btn btn-content' data-contenttype="home"><!--<img src='/images/appdblogo.png' alt='' />--><span style="height:25px;">Home</span></button></li>
+				<li class="contenttypelink software" ><button class='btn btn-content' data-contenttype="software"><!--<img src='/images/category1.png' alt='' />--><span style="height:50px;">Software Marketplace</span></button></li>
+				<li class="contenttypelink vappliance"><button class='btn btn-content' data-contenttype="vappliance"><!--<img src='/images/category34.png' alt='' />--><span style="height:50px;">Cloud Marketplace</span></button></li>
+				<li class="contenttypelink researchers"><button class='btn btn-content' data-contenttype="researchers"><!--<img src='/images/person.png' alt='' />--><span style="height:25px;">People</span></button></li>
+			</ul>
+		</div>
+		<?php if (ApplicationConfiguration::isProductionInstance() === false ) { ?>
+		<div class="developmentinstance"><span>Development Instance</span><a href="http://appdb.egi.eu" title='Click here to go to production instance' >[go to production]</a></div>
+		<?php } ?>
+	</div>
+</div>
+<div id="maincontent" align="center" style="display:block;">
+	<div class="logo" style="min-height:120px;height:auto;">
+	</div>
+	<div id="mainNavigation" ></div>
+	<table id="mainbody" border="0" width="100%" cellspacing="0" cellpadding="0">
+	<tbody>
+		<tr>
+			<td id="panetd" valign="top" bgcolor="#ffffff" style="overflow-y:visible;visibility:hidden;" class="menuseperator">
+				<div id="navigationmenu" class="navigation invisible" >
+					<div class="header">
+						<div class="admin" title="Administrative">Administrative</div>
+						<div class="softwaremp" title="Software Marketplace">Software Mp</div>
+						<div class="cloudmp" title="Cloud Marketplace">Cloud Mp</div>
+						<div class="researchers" title="People registry">People</div>
+						<?php if( Supports::datasets() ) { ?>
+						<div class="datasets" title="Dataset registry">Datasets</div>
+						<?php } ?>
+					</div>
+					<div class="menucontents">
+						<div class="menu home">
+							<ul class="list">
+								<li>
+									<a id="homeSoftwareMp" href="/browse/software" title="Browse registered software" onclick="appdb.views.Main.showSoftwareMarketplace();">
+										<div class="homenavlink softwaremp">
+											<img src="/images/softwaremp.png" alt=""/>
+											<span>Software Mp</span>
+										</div>
+									</a>
+								</li>
+								<li>
+									<a id="homeVapplianceMp" href="/browse/cloud" title="Browse registered virtual appliances" onclick="appdb.views.Main.showCloudMarketplace();">
+										<div class="homenavlink cloudmp">
+											<img src="/images/cloudmp.png" alt=""/>
+											<span>Cloud Mp</span>
+										</div>
+									</a>
+								</li>
+								<li>
+									<a id="homeResearchers" href="/browse/people" title="Browse registered people profiles" onclick="appdb.views.Main.showPeopleMarketplace();">
+										<div class="homenavlink researchers">
+											<img src="/images/researchers.png" alt=""/>
+											<span>People</span>
+										</div>
+									</a>
+								</li>
+								<?php if(Supports::datasets()) {?>
+								<li>
+									<a id="homeDatasets" href="/browse/datsets" title="Browse registered datasets" onclick="appdb.views.Main.showDatasets();">
+										<div class="homenavlink datasets">
+											<img src="/images/datasets.png" alt=""/>
+											<span>Datasets</span>
+										</div>
+									</a>
+								</li>
+								<?php } ?>
+							</ul>
+						</div>
+						<div class="menu software charts">
+							<ul class="list">
+								<li><a id="appsTopRatedLink" href="#" title="Click to view the top rated software entries" onclick="appdb.views.Main.showOrderedSoftware('rating');" data-href="/browse/software/toprated" >Top Rated</a></li>
+								<li><a id="appsMostRecentLink" href="#" title="Click to view the most recently added software entries" onclick="appdb.views.Main.showOrderedSoftware('dateadded');" data-href="/browse/software/newest">Newest</a></li>
+								<li><a id="appsMostVisitedLink" href="#" title="Click to view the most visited software entries" onclick="appdb.views.Main.showOrderedSoftware('hitcount');" data-href="/browse/software/mostvisited">Most Visited</a></li>
+								<li><a id="appsLastUpdatedLink" href="#" title="Click to view the last updated software entries" onclick="appdb.views.Main.showOrderedSoftware('lastupdated');" data-href="/browse/software/recentlyupdated">Recently Updated</a></li>
+							</ul>
+						</div>
+						<div class="menu software categorylist">
+							<ul class="list">
+								<li><a id="appsalllink" href="#" onclick="appdb.views.Main.showApplications({flt:'+*&application.metatype:0'},{isBaseQuery: true, filterDisplay:'Search software...',mainTitle : 'Software', content: 'software'});" data-href="/browse/software">All Software</a></li>
+							</ul>
+							<ul class="list">
+								<li><a id="appsvoslink" href="#" onclick="appdb.views.Main.showSwVOs();" data-href="/browse/vos/software">Virtual Organizations</a></li>
+							</ul>
+						</div>
+						<div class="menu software statistics">
+							<div class="subtitle">
+								<img class="browse_statistics" alt="" />
+								<span>Browse graphically</span>
+							</div> 
+							<ul class="list">
+								<li><a href="/pages/statistics/software/category" onclick="appdb.views.Main.showPage('statistics',{mainTitle:'Browse graphically > Software per category',url:'appstats/percategory', content: 'software'});">by Category</a></li>
+								<li><a href="/pages/statistics/software/discipline" onclick="appdb.views.Main.showPage('statistics',{mainTitle:'Browse graphically > Software per discipline',url:'appstats/perdiscipline', content: 'software'});">by Discipline</a></li>
+								<li><a href="/pages/statistics/software/vo" onclick="appdb.views.Main.showPage('statistics',{mainTitle:'Browse graphically > Software per virtual organization',url:'appstats/pervo', content: 'software'});">by Virtual Organization</a></li>
+							</ul>
+						</div>
+						<div class="menu vappliance charts">
+							<ul class="list">
+								<li><a id="vappsTopRatedLink" href="#" title="Click to view the top rated virtual appliance entries" onclick="appdb.views.Main.showOrderedVAppliances('rating');" data-href="/browse/cloud/vappliances/toprated">Top Rated</a></li>
+								<li><a id="vappsMostRecentLink" href="#" title="Click to view the most recently added virtual appliance entries" onclick="appdb.views.Main.showOrderedVAppliances('dateadded');" data-href="/browse/cloud/vappliances/newest">Newest</a></li>
+								<li><a id="vappsMostVisitedLink" href="#" title="Click to view the most visited virtual appliance entries" onclick="appdb.views.Main.showOrderedVAppliances('hitcount');" data-href="/browse/cloud/vappliances/mostvisited">Most Visited</a></li>
+								<li><a id="vappsLastUpdatedLink" href="#" title="Click to view the last updated virtual appliance entries" onclick="appdb.views.Main.showOrderedVAppliances('lastupdated');" data-href="/browse/cloud/vappliances/recentlyupdated">Recently Updated</a></li>
+							</ul>
+						</div>
+						<div class="menu vappliance categorylist">
+							<ul class="list autohide" id="vappscategories"></ul>
+							<ul class="list">
+								<?php if ( Supports::swappliance() ) { ?>
+								<li style="border-bottom: 1px solid #C6C7C9;padding-bottom: 8px;"><a id="swappslink" href="#" onclick="appdb.views.Main.showCloudSoftwareAppliances();" data-href="/browse/swappliances/cloud">Software Appliances</a></li>
+								<?php } ?>
+								<li><a id="vappsvoslink" href="#" onclick="appdb.views.Main.showCloudVOs();" data-href="/browse/vos/cloud">Virtual Organizations</a></li>
+								<li><a id="vappssiteslink" href="#" onclick="appdb.views.Main.showCloudSites({},{content:'vappliance'});" data-href="/browse/sites/cloud">Sites / Resource Providers</a></li>
+							</ul>
+						</div>
+						<div class="menu vappliance statistics">
+							<div class="subtitle">
+								<img class="browse_statistics" alt="" />
+								<span>Browse graphically</span>
+							</div> 
+							<ul class="list">
+								<li><a href="/pages/statistics/vappliance/category" onclick="appdb.views.Main.showPage('statistics',{mainTitle:'Browse graphically > Virtual Appliance per category',url:'appstats/percategory?content=vappliance', content: 'vappliance'});">by Category</a></li>
+								<li><a href="/pages/statistics/vappliance/discipline" onclick="appdb.views.Main.showPage('statistics',{mainTitle:'Browse graphically > Virtual Appliance per discipline',url:'appstats/perdiscipline?content=vappliance', content: 'vappliance'});">by Discipline</a></li>
+								<li class="hidden"><a href="/pages/statistics/vappliance/vo" onclick="appdb.views.Main.showPage('statistics',{mainTitle:'Browse graphically > Virtual Appliance per virtual organization',url:'appstats/pervo?content=vappliance', content: 'vappliance'});">by Virtual Organization</a></li>
+							</ul>
+						</div>
+						<div class="menu people charts">
+							<ul class="list">
+								<li><a id="pplMostRecentLink" href="#" title="Click to view the most recently added people profiles" onclick="appdb.views.Main.showOrderedPeople('dateinclusion');" data-href="/browse/people/newest">Newest</a></li>
+								<li><a id="pplLastUpdatedLink" href="#" title="Click to view the most updated people profiles" onclick="appdb.views.Main.showOrderedPeople('lastupdated');" data-href="/browse/people/recentlyupdated">Recently Updated</a></li>
+							</ul>
+						</div>
+						<div class="menu people">
+							<ul class="list">
+								<li><a id="pplalllink" href="#" onclick="appdb.views.Main.showPeople();" data-href="/browse/people">Everyone</a></li>
+								<?php if ( $isAdmin ) echo '<li><a href="#" onclick="appdb.views.Main.showDeletedPeople();" data-href="/browse/people/deleted">Deleted</a></li>'; ?>
+							</ul>
+						</div>
+						<div class="menu people groups">
+							<ul class="list groups"></ul>
+						</div>
+						<div class="menu people statistics">
+							<div class="subtitle">
+								<img class="browse_statistics" alt="" />
+								<span>Browse graphically</span>
+							</div> 
+							<ul class="list">
+								<li><a href="/pages/statistics/people/country" onclick="appdb.views.Main.showPage('statistics',{mainTitle:'Browse graphically > People per country',url:'pplstats/percountry', content: 'researchers'});">by Country</a></li>
+								<li><a href="/pages/statistics/people/position" onclick="appdb.views.Main.showPage('statistics',{mainTitle:'Browse graphically > People per scientific orientation',url:'pplstats/perposition', content: 'researchers'});">by Scientific Orientation</a></li>
+							</ul>
+						</div>
+						<?php if( Supports::datasets() ) { ?>
+						<div class="menu datasets charts">
+							<ul class="list">
+								<li><a id="datasetsTopRatedLink" href="#" title="Click to view the top rated dataset entries" onclick="appdb.views.Main.showDatasets();" data-href="/browse/datasets" >Top Rated</a></li>
+								<li><a id="datasetsMostRecentLink" href="#" title="Click to view the most recently added dataset entries" onclick="appdb.views.Main.showDatasets();" data-href="/browse/datasets">Newest</a></li>
+								<li><a id="datasetsMostVisitedLink" href="#" title="Click to view the most visited dataset entries" onclick="appdb.views.Main.showDatasets();" data-href="/browse/datasets">Most Visited</a></li>
+								<li><a id="datasetsLastUpdatedLink" href="#" title="Click to view the last updated dataset entries" onclick="appdb.views.Main.showDatasets();" data-href="/browse/datasets">Recently Updated</a></li>
+							</ul>
+						</div>
+						<div class="menu datasets categorylist">
+							<ul class="list">
+								<li><a id="datasetalllink" href="#" onclick="appdb.views.Main.showDatasets();" data-href="/browse/datasets">All Datasets</a></li>
+								<li><div class="row level1"><a class="cell value" onclick="appdb.views.Main.showDatasets();" data-href="/browse/datasets"><span class="textvalue">Applications</span></a><div class="cell id"><span class="textvalue">1</span></div></div></li>
+								<li><div class="row level1"><a class="cell value" onclick="appdb.views.Main.showDatasets();" data-href="/browse/datasets"><span class="textvalue">Middleware products</span></a><div class="cell id"><span class="textvalue">1</span></div></div></li>
+								<li><div class="row level1"><a class="cell value" onclick="appdb.views.Main.showDatasets();" data-href="/browse/datasets"><span class="textvalue">Science Gateways</span></a><div class="cell id"><span class="textvalue">1</span></div></div></li>
+								<li><div class="row level1"><a class="cell value" onclick="appdb.views.Main.showDatasets();" data-href="/browse/datasets"><span class="textvalue">Tools</span></a><div class="cell id"><span class="textvalue">1</span></div></div></li>
+								<li><div class="row level1"><a class="cell value" onclick="appdb.views.Main.showDatasets();" data-href="/browse/datasets"><span class="textvalue">Science Workflows</span></a><div class="cell id"><span class="textvalue">1</span></div></div></li>
+							</ul>
+						</div>
+						<?php } ?>
+					</div>
+				</div>
+				<?php if( $this->session->userid !== null) { ?>
+				<div id="profilemenu" class="profilemenu hidden">
+					<div class="linkcontent">
+						<ul>
+							<li>
+								<a class="profile information" href="/store/person/<?php echo $this->session->usercname; ?>" >
+									<img class="profile" alt="" />
+									<span>View your profile</span>
+								</a>
+							</li>
+							<li>
+								<a class="profile preferences" href="/store/person/<?php echo $this->session->usercname; ?>/preferences" >
+									<img class="preferences" alt="" />
+									<span>Your preferences</span>
+								</a>
+							</li>
+							<li>
+								<a class="profile pendingrequests" href="/store/person/<?php echo $this->session->usercname; ?>/pendingrequests" >
+									<img class="pendingreqs" alt="" />
+									<span>Pending requests</span><span class="pendingrequestscount <?php echo ( isnull($this->userRequests) || is_numeric($this->userRequests)===false || $this->userRequests==0)?"zero":""; ?>"><?php echo ( isnull($this->userRequests) || is_numeric($this->userRequests)===false || $this->userRequests==0)?"0":$this->userRequests; ?></span>
+								</a>
+							</li>
+							<li>
+								<a class="profile manageaccounts" href="/store/person/<?php echo $this->session->usercname; ?>/manageaccounts" >
+									<img class="manageaccountsimg" alt="" />
+									<span>Manage accounts</span>
+								</a>
+							</li>
+							<li>
+								<a href="/pages/contact/feedback" onclick="appdb.views.Main.showPage('feedback',{mainTitle:'Contact us',url:'/index/feedback',content:'pages'});" >
+									<img class="feedback" alt="" />
+									<span>Feedback?</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<?php } ?>
+				<div id="panediv" align="left" style="width: 99%; overflow: auto;">
+				<?php if ( APPLICATION_ENV == "DISABLED-production" ) { //Disable NGIs in production until they are ready ?>
+				<div id="resproviderspane" dojoType="dijit.TitlePane" title="Resource Providers" open="false">
+					<ul>
+						<li><a href="#" onclick="appdb.views.Main.showNgis();">All</a></li>
+						<li><a href="#" onclick="appdb.views.Main.showNgis(1);">NGIs</a></li>
+						<li><a href="#" onclick="appdb.views.Main.showNgis(0);">EIROs</a></li>
+					</ul>
+				</div>
+				<?php } ?>              
+				</div>
+			</td>
+			<td id="maintd" style="display:block; overflow-y: visible; ">
+				<?php echo SEO::getBodyMetaTags(); ?>
+				<div id="main" style=" overflow-y: visible;height:100%;padding-bottom:50px;" >
+				</div>
+				<div id="detailswrapper" >
+				<div id="details" style="width:100%;height:100%; overflow-y: visible; overflow-x: hidden"></div>
+				</div>
+			</td>
+			</tr>
+	</tbody>
+	</table>
+	
+</div>
+<div id="footer" >
+		<div class="content" style="padding-left:0px;">
+			<div class="list">
+				<div class="title"></div>
+				<ul>
+					<li>
+						<a href="#" onclick="appdb.views.Main.showHome();window.scroll(0,0);" title="Home">
+							<span>Home</span>
+						</a>
+					</li>
+					<li>
+						<a href="http://www.egi.eu/about/glossary/" target="_blank" title="Glossary">
+							<span>Glossary</span>
+						</a>
+					</li>
+					<li class="hidden">
+						<a href="http://www.egi.eu/disclaimers.html" target="_blank" title="Disclaimer">
+							<span>Disclaimer</span>
+						</a>
+					</li>
+				</ul>
+			</div>
+			<div class="list hidden">
+				<div class="title"><span>SOCIAL NETWORKS</span></div>
+				<ul>
+					<li>
+						<a href="#" class="disabled" title="Facebook">
+							<img class="social facebook" alt="" />
+							<span>Facebook</span>
+						</a>
+					</li>
+					<li>
+						<a href="#" class="disabled" title="Linked In">
+							<img class="social linkedin" alt="" />
+							<span>LinkedIn</span>
+						</a>
+					</li>
+					<li>
+						<a href="#" class="disabled" title="Google+">
+							<img class="social google" alt="" />
+							<span>Google+</span>
+						</a>
+					</li>
+					<li >
+						<a href="#" class="disabled" title="Twitter">
+							<img class="social twitter" alt="" />
+							<span>Twitter</span>
+						</a>
+					</li>
+				</ul>
+			</div>
+			<div class="list">
+				<div class="title"><span>INTEGRATION</span></div>
+				<ul>
+					<li>
+						<a href="http://wiki.egi.eu/wiki/TNA3.4_Technical_Services#Applications_Database" target="_blank" onclick="return true;">
+							<span>AppDB Rest API</span>
+						</a>
+					</li>
+					<li>
+						<a href="<?php echo $wiki;?>main:integration:gadget" target="_blank" data-href="http://<?php echo $_SERVER['HTTP_HOST'];?>/gadgets/editor" >
+							<span>Gadgets</span>
+						</a>
+					</li>
+				</ul>
+			</div>
+			<div class="list">
+				<div class="title"><span>ABOUT</span></div>
+				<ul>
+					<li>
+						<a href="<?php echo $wiki;?>main:faq:what_is_the_egi_applications_database_appdb" target="_blank" data-href="/pages/about/faq/1" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'Faq', url:'/help/faq/1',callback:'appdb.utils.Faq.scrollTo(1)'});" target="_blank" >
+							<span>About AppDB</span>
+						</a>
+					</li>
+					<li>
+						<a href="<?php echo $wiki;?>main:about:announcements" target="_blank" data-href="/pages/about/announcements" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'Announcements',url:'/help/announcements', callback:'$(\'a.oldannounce\').click();$(\'#main\').find(\'h3\').remove();selectMenuItem(\'helpannouncelink\');'});window.scroll(0,0);">
+							<span>Announcements</span>
+						</a>
+					</li>
+					<li>
+						<a href="<?php echo $wiki;?>main:about:changelog" target="_blank" data-href="/pages/about/changelog" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'Changelog',url:'/changelog',callback:'selectMenuItem(\'helpchangeloglink\');'});window.scroll(0,0);">
+							<span>Changelog</span>
+						</a>
+					</li>
+					<li>
+						<a href="<?php echo $wiki;?>main:about:credits" target="_blank" data-href="/pages/about/credits" id="helpcreditslink" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'About > Credits',url:'/help/credits'});">
+							<span>Credits</span>
+						</a>
+					</li>
+				</ul>
+			</div>
+			<div class="list">
+				<div class="title"><span>HELP</span></div>
+				<ul>
+					<li>
+						<a href="<?php echo $wiki;?>main:faq" target="_blank" data-href="/pages/about/faq" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'Faq',url:'/help/faq', callback:'selectMenuItem(\'helpfaqlink\');'});window.scroll(0,0);">
+							<span>FAQ</span>
+						</a>
+					</li>
+					<li>
+						<a href="/pages/contact/feedback" onclick="appdb.views.Main.showPage('feedback',{mainTitle:'Contact us',url:'/index/feedback',content: 'pages'});window.scroll(0,0);" >
+							<span>Contact Us</span>
+						</a>
+					</li>
+					<li>
+						<a href="/supported"><span>Supported Browsers</span></a>
+					</li>
+				</ul>
+			</div>
+			<div class="list">
+				<div class="title"></div>
+				<ul>
+					<li>
+						<div class="egiacknowledge" style="position: relative;float: none;" >
+						<a href="http://www.europa.eu" title="European Union" target="_balnk"><img src="/images/eu.png" alt="" /></a>
+						<a href="http://www.egi.eu" title="European Grid Infrastructure" target="_balnk"><img src="/images/egi_logo_white.png" alt="" /></a>
+						<span >
+							AppDB is an EGI service provided by <a href="http://www.iasa.gr" title="Institute of Accelerating Systems and Applications" target="_balnk">IASA</a>,<br/>
+							co-funded by <a href="http://go.egi.eu/eng" title="EGI-Engage" target="_balnk">EGI-Engage</a>
+						</span>
+					</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="bottom">			
+			<table cellspacing="0" cellpadding="0" border="0">
+				<tr>
+					<td class="egibody" style="width:20%;"   >
+						<div style="float: left;width:100%;white-space:nowrap">
+							Powered by <a href="http://www.postgresql.org/" target="_blank">PostgreSQL</a> / <a href="http://httpd.apache.org/" target="_blank">Apache</a>
+						</div>
+					</td>
+					<td class="egibody" style="text-align: center;width:auto;">AppDB is developed by the <a href="http://www.iasa.gr/" target="_blank">Institute of Accelerating Systems and Applications</a>, Greece on behalf of <a href='http://www.egi.eu' target='_blank'>EGI.eu</a>.</td>
+					<td class="egibody" style="text-align: right;width:auto;"><div style="float: right"><a href="#" onclick="$('#helpchangeloglink').click();window.scroll(0,0);">v.<?php echo appdbVerInfo();?></a></div></td>
+				</tr>
+			</table>
+		</div>
+		<div id="scratchdiv" style="display:none"></div>
+		<div id="signedoutnotify" class="notifydialog">
+			<div class="shade"></div>
+			<div class="dialog">
+				<div class="title">Signed Out</div>
+				<div class="message">You were signed out of the EGI Application Database. <br/>The page will reload in <span class="remainingtime"></span> seconds.</div>
+				<div class="actions">
+					<a href="" title="Click to reload the page now" class="action reload">Close</a>
+				</div>
+			</div>
+		</div>
+	</div>
+<script type="text/javascript" async="async">
+	<?php
+	if ( APPLICATION_ENV == '' ) {
+		echo 'var APPLICATION_ENV = "'.APPLICATION_ENV.'";';
+	} else echo 'var APPLICATION_ENV = null;';
+	?>
+	$.cookie("cookpass", null);
+	$.cookie("cookname", null);
+	var reqsrc = '<?php 
+		if (isset($_SERVER['HTTP_X_FORWARD_FOR'])) {
+		$ip = $_SERVER['HTTP_X_FORWARD_FOR'];
+		} else {
+		$ip = $_SERVER['REMOTE_ADDR'];
+		}
+		echo base64_encode($ip);
+	?>';
+	window.userID = <?php echo ( trim($this->session->userid)==""?"null":trim($this->session->userid) ); ?>;
+	var apiHostname = '<?php echo $_SERVER['APPLICATION_API_HOSTNAME'];?>';
+	var canEditFAQs = <?php echo ($canEditFAQs==true)?"true":"false"; ?>;
+	var userName = <?php if ($this->session->userid === null) echo 'null'; else echo "'".$this->session->username."'"; ?>;
+	var userCName = <?php if ($this->session->userid === null) echo 'null'; else echo "'".  $this->user->cname."'"; ?>;
+	var userFullname = <?php if ($this->session->userid === null) echo 'null'; else echo "'".$this->session->fullName."'"; ?>;
+	var userRole = <?php if ($this->session->userRole === null) echo 'null'; else echo $this->session->userRole; ?>;
+	var userRequestCount = <?php echo ( isnull($this->userRequests) || is_numeric($this->userRequests)===false )?0:$this->userRequests; ?>;
+	var userCanInsertApplication = <?php echo ($canInsertApplication == false)?'false':'true'; ?>;
+	var userIsAdminOrManager = <?php echo ($isAdminOrManager == false)?'false':'true'; ?>;
+	var userIsAdmin = <?php echo ($isAdmin == false)?'false':'true'; ?>;
+	var userVoMembership = <?php if(trim($this->session->userid)!==null){ 
+		echo html_entity_decode(VoAdmin::getUserMembership(trim($this->session->userid), true));
+	} else { 
+		echo "[]";
+	}?>;
+	var userLogoutUrl = '<?php if( $useSaml) {echo $this->session->logoutUrl;}else{echo '/users/logout';} ?>';
+	var samlLoginUrl = '<?php if( $useSaml) {echo $this->session->LoginUrl;}else{echo '';} ?>';
+	var samlLoginSourceType = '<?php if( $useSaml) {echo $this->session->authSource;}else{echo '';} ?>';
+	<?php if( isset($this->session->currentUserAccount) ) { ?>
+	var userCurrentAccount = <?php echo json_encode($this->session->currentUserAccount); ?>;
+	<?php } ?>
+	<?php if( isset($this->session->currentUserAccounts) ) { ?>
+	var userCurrentAccounts = <?php echo json_encode(SamlAuth::getUserAccountsByUser($this->session->userid, true)); ?>;
+	<?php }?>
+	<?php if( isset($this->session->userWarning) && is_array($this->session->userWarning) ){ ?>
+		var userWarning = <?php echo json_encode($this->session->userWarning); ?>;
+	<?php unset($this->session->userWarning); } ?>
+	<?php if( isset($this->session->userError) && is_array($this->session->userError) ){ ?>
+		var userError = <?php echo json_encode($this->session->userError); ?>;
+	<?php unset($this->session->userError);	} ?>
+	var browser = "<?php echo browser();?>";
+	var hometagcloud;
+	var homesearch;
+	var helpDlg;
+	var focusedDijitItem;
+	var setMsgCountId;
+	var inboxDlg;
+	var inboxDlgCount=0;
+	var docgrid;
+	var bmInfoDlg;
+	var latestVersion;
+	var RelAppIntId = 0;
+	var detailsStyle=0;
+	var detailsStyleAuto = true;
+	var detailsListHtml = null;
+	var remembernewsfeed = false;
+	var newsTimer = null;
+	var newsfilter = null;
+	var newsfilterbox = undefined;
+	var optQueryLen = 15;
+	var ngiCriteria = {
+		'european': '',
+		'filter': ''
+	};
+	var voCriteria = {
+		'name': '',
+		'domainID': ''
+	};
+	var globalSearch = false;
+	var customFilterContents = function(){};
+	var dlgZindex = 0;
+	var ajaxCount = 0;
+	var dialogCount = 0;
+	var appViewMode = 1;
+	var detailsHistory = new Array();
+	var searchDlg;
+	
+	
+	(function() {
+		var _loadIndex = function(){
+			if( appdb && appdb.pages && appdb.pages.index ){
+				appdb.pages.index.init();
+				<?php if( $this->session->userid ){ ?>
+				appdb.pages.index.canManageDatasets(<?php echo ($canManageDatasets)?"true":"false"; ?>);
+				<?php } ?>
+				$("#panetd").css("visibility","visible");
+				$("html").click(function(){
+					$(".menu").find(".active").removeClass("active");
+				});
+			}else{
+				console.log("Waiting for index code to load...");
+				setTimeout(function(){ _loadIndex(); },10);
+			}
+		};
+		//google chrome float bug fix
+		$("ul.metro.menu > li.rightalign").css("float","right");
+		return _loadIndex;
+		
+	}())();
+</script>

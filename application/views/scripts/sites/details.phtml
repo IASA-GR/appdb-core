@@ -1,0 +1,129 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><div align="left" style="height:100%;padding:0px;" >
+	<div id="navdiv" style="width:100%;height:auto;padding:0px;" class="entitysite" >
+	<ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+		<li><a href="#infodiv<?php echo $this->dialogCount;?>">Information</a></li>
+		<a class="reloadentity reloadsite icontext" href="#" onclick="appdb.pages.site.reload();" title="Reload"><img alt="reload" border="0" src="/images/refresh.png"/><span>Reload</span></a>
+	</ul>
+	<div id="infodiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" title="Information" selected="true">
+		<table border="0" width="99%" style="border-bottom: 1px dashed #3a3a3a;padding-top:10px;">
+			<tr>
+				<td width="101px" style="vertical-align:top; padding-top:15px;">
+					<div style="vertical-align:middle;">
+					<center>
+					<img id="siteimg<?php echo $this->dialogCount;?>" border="0" src="/images/site.png" width='110px'>					
+					</center>
+					</div>
+				</td>
+				<td>
+					<table border="0" width="100%" class="site-main-contents">
+						<tr>
+							<td style="width:450px;">
+								<table border="0" style="width:100%;">
+									<tr >
+										<td colspan="2">
+											<div class="entityheader">
+												<span class="site-name"></span>
+												<div class="permalink"><a href="http://<?php echo $_SERVER["HTTP_HOST"];?>" target="_blank" class="site-permalink permalink">[permalink]</a></div>
+												<div class="entityid">(id:<span style="padding-right: 3px" class="site-id" ></span>)</div>
+											</div>
+										</td>
+									</tr>
+									<tr></tr>
+									<tr><td>Country: </td><td><span class="site-country-name"></span><img class="site-country-flag" alt=""/></td></tr>
+									<tr><td style="width:100px;">Name: </td><td><span class="site-officialname"></span></td></tr>
+									<tr style="height: 10px;"><td></td><td></td></tr>
+								</table>
+							</td>
+							<td>
+								<table border="0" style="width:100%;border-left: 1px dashed;" class="viewmode">
+									<tr>
+										<td>
+											<div class="site-group small-group groupcontainer" >
+											<ul>
+												<li class="contactinfo current"><a href="#contactinfo" title="View Contact Information">Contact Information</a></li>
+											</ul>
+											<div id="contactinfo" class="current"></div>
+											</div>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								<table>
+									<tr><td><span class='site-description-field'>Description:</span><span class='site-description-onempty emptyvalue'></span></td></tr>
+									<tr><td><span class="site-description"></span></td></tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								<div class="site-links"></div>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		<br/>
+		<div class="sitecontents"  >
+			<div class="emptycontent ">
+				<div class="content">	
+					<img src="/images/exclam16.png">
+					<span>No items found.</span>
+				</div>
+			</div>
+			<div class="filterdecorator siteitems" data-pagelength="9" style="margin:0 auto;">
+				<div class="header">
+					<div class="title">Offers:</div>
+					<ul class="filter">
+						<li class="vmitems" data-filterclass="vmitems"><a href="" title="View related VM Images"><span>VM Images</span><span class="counter"></span></a></li>
+						<li class="seperator hidden">|</span>
+						<li class="switems hidden" data-filterclass="switems"><a href="" title="View related Software items"><span>Software</span><span class="counter"></span></a></li>
+					</ul>
+				</div>
+				<div class="vmitemsfilter vmitems"></div>
+				<ul class="content itemlist vmitems" >
+					<div class='app-state-panels hidden'>
+						<div class='app-state-panel deleted'>
+							This virtual appliance is deleted from the system.
+						</div>
+						<div class='app-state-panel moderated'>
+							This virtual appliance is moderated.
+						</div>
+						<div class='app-state-panel expired'>
+							This virtual appliance image has expired.
+						</div>
+					</div>
+				</ul>
+				<ul class="content itemlist switems">
+					<div class="emptycontent ">
+						<div class="content">	
+							<img src="/images/exclam16.png">
+							<span>No items found.</span>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+

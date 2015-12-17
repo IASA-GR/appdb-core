@@ -1,0 +1,68 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><script src="/js/appdb.statistics.js" charset="utf-8"></script>
+<!--[if lte IE 8]><script src="/js/r2d3.min.js" charset="utf-8"></script>
+<![endif]-->
+
+
+<div class="aboutpage statistics">
+	<div class="aboutheader">
+		<span><a href="#" target="_blank"></a></span>
+		<h1>
+<?php
+			echo ((trim($this->contentType) === "vapp") ? "Virtual Appliances" : "Software");
+?>  per category</h1>
+		<hr>
+	</div>
+	<div class="content">
+		<span class="hidden">
+			<span class="itemcount"><?php echo $this->itemCount; ?></span>
+			<span class="emptycount"><?php echo $this->emptyCount; ?></span>
+		</span>
+		<div class="chartnavigation"></div>
+		<div class="title">The graph bellow is interactive, you may click on it to <b>zoom in</b>. By clicking the '<b>browse</b>' link, you will be redirected to the list of the <?php echo ( (trim($this->contentType)==="vapp")?"virtual appliance":"software"); ?> solutions that satisfy the selected filters.</div>
+		<div class="chartcontainer"></div>
+		<div class="emptyitemswarning hidden">
+			<span><b>Note: </b><span>There are <?php echo $this->emptyCount; ?> items having no </span><span class="entitytype"></span><span> specified. Click </span><a href='#'>here</a><span> to view these entries.</span></span>
+		</div>
+		<ul class="listtoolbox statistics">
+			<li>
+				<div>
+					<a href='#' class="action export" ><img border="0" id="exportimg" width="30px" title="Export chart" src="/images/export.png"/></a>
+				</div>
+				<div class="description">EXPORT</div>
+			</li>
+			<li>
+				<div>
+					<a href="#" class="exporthelp" ><img alt="help" width="24px" border="0"  src="/images/question_mark.gif"/></a>
+				</div>
+				<div class="description">HELP</div>
+			</li>
+		</ul>
+	</div>
+</div>
+<script type="text/javascript">
+	$(function(){
+            var chartObj = new appdb.statistics.<?php echo ( (trim($this->contentType)==="vapp")?"vappliance":"software"); ?>.category({
+                container: ".aboutpage.statistics .content",
+                entityType: "<?php echo ( (trim($this->contentType)==="vapp")?"vappliance":"software"); ?>", 
+                group: "category",
+                chartType: "sunburst"
+            });
+            chartObj.load();
+	});
+</script>

@@ -1,0 +1,771 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+     The work represented by this source file is partially or entirely funded 
+     by the EGI-InSPIRE project through the European Commission's 7th Framework 
+     Programme (contract # INFSO-RI-261323)
+
+     Copyright 2010 IASA and GRNET
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at [http://www.apache.org/licenses/LICENSE-2.0| Apache License 2.0]
+
+
+     Unless required by applicable law or agreed to in writing, software 
+     distributed under the License is distributed on an "AS IS" BASIS, 
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+     See the License for the specific language governing permissions and 
+     limitations under the License.
+-->
+     
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+    targetNamespace="http://appdb.egi.eu/api/1.0/application"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:application="http://appdb.egi.eu/api/1.0/application"
+    xmlns:discipline="http://appdb.egi.eu/api/1.0/discipline"
+    xmlns:middleware="http://appdb.egi.eu/api/1.0/middleware"
+    xmlns:person="http://appdb.egi.eu/api/1.0/person"
+    xmlns:user="http://appdb.egi.eu/api/1.0/user"
+    xmlns:publication="http://appdb.egi.eu/api/1.0/publication"
+    xmlns:vo="http://appdb.egi.eu/api/1.0/vo"
+    xmlns:dissemination="http://appdb.egi.eu/api/1.0/dissemination"
+    xmlns:rating="http://appdb.egi.eu/api/1.0/rating"
+    xmlns:logistics="http://appdb.egi.eu/api/1.0/logistics"
+    xmlns:category="http://appdb.egi.eu/api/1.0/category"
+    xmlns:license="http://appdb.egi.eu/api/1.0/license"
+    xmlns:regional="http://appdb.egi.eu/api/1.0/regional">
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/license"
+		schemaLocation="license.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/category"
+		schemaLocation="category.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/logistics"
+        schemaLocation="logistics.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/dissemination"
+        schemaLocation="dissemination.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/discipline"
+        schemaLocation="discipline.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/middleware"
+        schemaLocation="middleware.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/rating"
+        schemaLocation="apprating.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/vo"
+        schemaLocation="vo.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/publication"
+        schemaLocation="publication.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/regional"
+        schemaLocation="regional.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/user"
+        schemaLocation="user.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/person"
+        schemaLocation="person.xsd"/>
+
+    <xs:complexType name="statusType" mixed="true">
+		<xs:annotation>
+			<xs:appinfo>
+				Node value Read-only
+			</xs:appinfo>
+			<xs:documentation>
+				XSD type for application status entities. The node value contains the status description
+			</xs:documentation>
+		</xs:annotation>
+        <xs:attribute name="id" type="xs:integer" use="required">
+			<xs:annotation>
+				<xs:documentation>
+					The ID of the application status type. Required when performing PUT/POST operations on application entry resources
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="vapplianceType" mixed="true">
+		<xs:attribute name="identifier" type="xs:string" use="required" />
+	</xs:complexType>
+
+    <xs:complexType name="urlType" mixed="true">
+   		<xs:annotation>
+			<xs:documentation>
+				XSD type for application URL entities. The node value contains the URL. Node value required when performing PUT/POST operations on application entry resources
+			</xs:documentation>
+		</xs:annotation>
+	    <xs:attribute name="id" type="xs:integer" use="optional" >
+   		<xs:annotation>
+			<xs:appinfo>
+				Read-only
+			</xs:appinfo>
+			<xs:documentation>
+				The ID of the application URL entry
+			</xs:documentation>
+		</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="type" type="xs:string" use="optional" >
+			<xs:annotation>
+				<xs:documentation>
+					A string specifying the user-defined type of the URL (e.g. "documentation", "download", etc.)
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="title" type="xs:string" use="optional" >
+			<xs:annotation>
+				<xs:documentation>
+					A string specifying a user-defined tile for the URL. If unspecified, then the node value (i.e. te actual URL) will be used as a title
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="ord" type="xs:integer" use="optional" >
+			<xs:annotation>
+				<xs:documentation>
+					An integer specifying the display priority for the url, to be honored by clients who display URLs in a certain order
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="tagType" mixed="true">
+		<xs:annotation>
+			<xs:documentation>
+				XSD type for application tag entities. The node value contains the tag value
+			</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="system" type="xs:boolean" use="optional" />
+		<xs:attribute name="count" type="xs:integer" use="optional" />
+        <xs:attribute name="ownerid" type="xs:integer" use="optional">
+			<xs:annotation>
+				<xs:appinfo>
+					Read-only
+				</xs:appinfo>
+				<xs:documentation>
+					The ID of the user that submitted the tag. Missing for auto-assigned system tags
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="proglangType" mixed="true">
+		<xs:annotation>
+			<xs:documentation>
+				XSD type for application programming languages entities.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="id" type="xs:integer" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="archType" mixed="true">
+		<xs:annotation>
+			<xs:documentation>
+				XSD type for application CPU architecture entities.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="id" type="xs:integer" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="OStype" mixed="true">
+		<xs:annotation>
+			<xs:documentation>
+				XSD type for application OS entities.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="id" type="xs:integer" use="required" />
+		<xs:attribute name="version" type="xs:string" use="optional" />
+    </xs:complexType>
+
+	<xs:complexType name="categoryType" mixed="true">
+   		<xs:annotation>
+			<xs:appinfo>
+				Node value Read-only
+			</xs:appinfo>
+			<xs:documentation>
+				XSD type for application category entities. The node value contains the category name
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element ref="category:name" minOccurs="0" maxOccurs="1" />
+			<xs:element ref="category:info" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="category" type="application:categoryType" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:integer" use="required" />
+		<xs:attribute name="parentid" type="xs:integer" use="optional" />
+		<xs:attribute name="order" type="xs:integer" use="optional">
+			<xs:annotation>
+				<xs:documentation>	
+					The ID of the application category reference. Required when performing PUT/POST operations on application entry resources
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="primary" type="xs:boolean" use="optional">
+			<xs:annotation>
+				<xs:documentation>	
+                    Whether the category is the primary one, in case of multiple categories. When performing PUT/POST operations, the backend will automatically choose a category as primary if none is specified as such.
+				</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+		<xs:attribute name="name" type="xs:string" use="optional" />
+    </xs:complexType>
+
+	<xs:complexType name="subcategoryType" mixed="true">
+   		<xs:annotation>
+			<xs:appinfo>
+				Node value Read-only
+			</xs:appinfo>
+			<xs:documentation>
+				XSD type for application subcategory entities. The node value contains the subcategory name
+			</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="id" type="xs:integer" use="required">
+			<xs:annotation>
+				<xs:documentation>	
+					The ID of the application subcategory reference. Required when performing PUT/POST operations on application entry resources
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="categoryid" type="xs:integer" use="required">
+			<xs:annotation>
+				<xs:documentation>	
+					The ID of the subcategory parent category reference. Ignored when performing PUT/POST operations on application entry resources
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+    </xs:complexType>
+
+	<xs:complexType name="contactItemType" mixed="true">
+   		<xs:annotation>
+			<xs:documentation>
+				XSD type for annotations to application contact entities. The node value contains the annotation value
+			</xs:documentation>
+		</xs:annotation>
+        <xs:attribute name="id" type="xs:integer">
+			<xs:annotation>
+				<xs:documentation>
+					The ID of the item the annotation referes to, if the "type" attribute is not "other". Required when performing PUT/POST operations on application entry resources, if "type" not "other"
+				</xs:documentation>
+			</xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="type" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					On of "vo", "middleware", "other"
+				</xs:documentation>
+			</xs:annotation>
+        </xs:attribute>
+		<xs:attribute name="note" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>
+					Optional note for annotation entry
+				</xs:documentation>
+			</xs:annotation>
+        </xs:attribute>
+	</xs:complexType>
+    
+    <xs:complexType name="applicationType">
+		<xs:annotation>
+			<xs:documentation>
+				XSD type for application entities
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+            <xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1" >
+                <xs:annotation>
+                    <xs:documentation>
+                        Name for the application entry. Required when performing PUT operations. Must be unique, 3 to 50 characters long, and composed of any combination of alphanumeric characters, spaces, and the following symbols:  +(){}[],*&amp;!#@=^._-
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="description" type="xs:string" minOccurs="1" maxOccurs="1" >
+                <xs:annotation>
+                    <xs:documentation>
+                        Small description for the application entry. Required when performing PUT operations
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="abstract" type="xs:string" minOccurs="1" maxOccurs="1" >
+                <xs:annotation>
+                    <xs:documentation>
+                        An abstract describing in more detail the application entry. Required when performing PUT operations
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="addedOn" type="xs:dateTime" >
+                <xs:annotation>
+                    <xs:appinfo>
+                        Read-only
+                    </xs:appinfo>
+                    <xs:documentation>
+                        Date on which the application entry was created (i.e. registered with the AppDB)
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="lastUpdated" type="xs:dateTime" >
+                <xs:annotation>
+                    <xs:appinfo>
+                        Read-only
+                    </xs:appinfo>
+                    <xs:documentation>
+                        Date on which the application entry was last updated
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element name="owner" type="person:personType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Reference to the owner of the application entry. Defaults to application:addedby if unspecified when creating a new application entry
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element name="addedby" type="person:personType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>
+                        Read-only
+                    </xs:appinfo>
+                    <xs:documentation>
+                        Reference to the user that added this application entry to the AppDB
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element ref="application:category" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        A list of categories that apply to this application entry. At least one element required when performing PUT operations
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element ref="application:subcategory" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        A list of subcategories that apply to this application entry. May be ommited when performing PUT operations
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element ref="discipline:discipline" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        A list of disciplines that this application is intented for. At least one element is required when performing PUT operations
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element ref="discipline:subdiscipline" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        A list of subdiscilpines that this application is intended for
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element ref="application:status" minOccurs="1" maxOccurs="1" >
+                <xs:annotation>
+                    <xs:documentation>
+                        Status of the application with rescpect to its grid readiness
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element ref="vo:vo" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        A list of VOs that support this application
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element ref="regional:region" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:appinfo>
+                        Obsoleted, Read-Only
+                    </xs:appinfo>
+                    <xs:documentation>
+                        A list of regions that this country is related to
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element ref="regional:country" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        A list of countries that this application entry is related to. Application entries inherit countries from the people referenced in their contact list, but more country entries man be appended manually.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element name="contact" type="person:personType" minOccurs="0" maxOccurs="unbounded" nillable="true">
+                <xs:annotation>
+                    <xs:documentation>
+                        A list of people that are associated with the application entry (i.e. its contact list)
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element name="url" type="application:urlType" minOccurs="0" maxOccurs="unbounded" nillable="true">
+                <xs:annotation>
+                    <xs:documentation>
+                        A list of URLs that relate to the application
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element ref="publication:publication" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        A list of scientific publications that are related to the application. Publications may be individualy added/removed through the applications/{id}/publications and applications/{id}/publications/{id} resources respectively, or collectively set here
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element ref="middleware:middleware" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        A list of middlewares that the application works in consort with
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element name="permalink" type="xs:string" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                    <xs:appinfo>
+                        Read-only
+                    </xs:appinfo>
+                    <xs:documentation>
+                        A link for the application entry that can be used by third parties to redirect immediately to the application entry in the AppDB portal
+                    </xs:documentation>
+                </xs:annotation>
+			</xs:element>            
+			<xs:element name="vappliance" type="application:vapplianceType" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="logo" type="xs:string" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                    <xs:documentation>
+                        A logo for the application. 200kb max size, 110x110 pixel natural resolution. Most major image formats supported.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element name="moderatedOn" type="xs:dateTime" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                    <xs:appinfo>
+                        Read-only
+                    </xs:appinfo>
+                    <xs:documentation>
+						The date on which the application entry was moderated, if so. Set when performing a PUT operation under the applications/moderated resource by an administrator
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element name="moderationReason" type="xs:string" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                    <xs:appinfo>
+                        Read-only
+                    </xs:appinfo>
+                    <xs:documentation>
+						The reason why the application entry was moderated, if so. Set when performing a PUT operation under the applications/moderated resource by an administrator
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element name="moderator" type="person:personType" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                    <xs:appinfo>
+                        Read-only
+                    </xs:appinfo>
+                    <xs:documentation>
+						Reference to the user that moderated the application entry, if so. Set when performing a PUT operation under the applications/moderated resource by an administrator
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="deletedOn" type="xs:dateTime" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                    <xs:appinfo>
+                        Read-only
+                    </xs:appinfo>
+                    <xs:documentation>
+                        The date on which the application entry was deleted, if so. Set when performing a DELETE operation on an applications/{id} resource by an administrator
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element name="deleter" type="person:personType" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                    <xs:appinfo>
+                        Read-only
+                    </xs:appinfo>
+                    <xs:documentation>
+                        Reference to the user that deleted the application entry, if so. Set when performing a DELETE operation on an applications/{id} resource by an administrator
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="user:permissions" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                    <xs:appinfo>
+                        Read-only
+                    </xs:appinfo>
+                    <xs:documentation>
+						A list of the permissions the authenticated user has upon the application entry. Present when making authenticated GET calls, else absent
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>            
+            <xs:element name="tag" type="application:tagType" minOccurs="0" maxOccurs="unbounded" nillable="true">
+                <xs:annotation>
+                    <xs:documentation>
+						A list of tags applied to the application entry. Tags may be individualy added/removed through the applications/{id}/tags and applications/{id}/tags/{id} resources respectively, or collectively set here
+                    </xs:documentation>
+                </xs:annotation>
+			</xs:element>
+			<xs:element name="language" type="application:proglangType" minOccurs="0" maxOccurs="unbounded" nillable="true">
+                <xs:annotation>
+					<xs:documentation>
+						A list of programming languages applied to the application entry.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="arch" type="application:archType" minOccurs="0" maxOccurs="unbounded" nillable="true">
+                <xs:annotation>
+                    <xs:documentation>
+						A list of CPU architectures applied to the application entry.
+                    </xs:documentation>
+                </xs:annotation>
+			</xs:element>
+			<xs:element name="os" type="application:OStype" minOccurs="0" maxOccurs="unbounded" nillable="true">
+                <xs:annotation>
+                    <xs:documentation>
+						A list of OSes applied to the application entry.
+                    </xs:documentation>
+                </xs:annotation>
+			</xs:element>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:integer" use="required" >
+			<xs:annotation>
+				<xs:appinfo>
+					Read-only
+				</xs:appinfo>
+				<xs:documentation>
+					The ID off the application entry. Must be present when performing POST requests, in order to specify the application that is being updated
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="tool" type="xs:boolean" use="optional" default="false" >
+   			<xs:annotation>
+				<xs:appinfo>
+					Read-only
+				</xs:appinfo>
+				<xs:documentation>
+					True when the application is listed under the 'Tools' category. Obsoleted.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+   		<xs:attribute name="rating" type="xs:float" use="optional" >
+   			<xs:annotation>
+				<xs:appinfo>
+					Read-only
+				</xs:appinfo>
+				<xs:documentation>
+					The mean rating of the application based on user ratings
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+     	<xs:attribute name="ratingCount" type="xs:integer" use="optional" >
+			<xs:annotation>
+				<xs:appinfo>
+					Read-only
+				</xs:appinfo>
+				<xs:documentation>
+					The number of existing user ratings for the application entry
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="popularity" type="xs:float" use="optional" >
+   			<xs:annotation>
+				<xs:appinfo>
+					Read-only
+				</xs:appinfo>
+				<xs:documentation>
+					A percentage representing the popularity of the application entry compared to all other application entries, based on user hits
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+   		<xs:attribute name="hitcount" type="xs:integer" use="optional" >
+			<xs:annotation>
+				<xs:appinfo>
+					The number of user hits for the application
+				</xs:appinfo>
+				<xs:documentation>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="tagPolicy" type="xs:integer" use="optional" >
+   			<xs:annotation>
+				<xs:documentation>
+					An integer representing the tagging policy for the application. A value of 0 means only the owner can manage tags. A value of 1 means only the owner and associated users (in the application's contact list) can manage tags. A value of 2 means anyone can manage tags
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+   		<xs:attribute name="moderated" type="xs:boolean" use="optional" >
+			<xs:annotation>
+				<xs:appinfo>
+					Read-only
+				</xs:appinfo>
+				<xs:documentation>
+					True if the application entry has been moderated by an administrator due to a filed and accepted user complaint.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="bookmarked" type="xs:boolean" use="optional" default="false" >
+			<xs:annotation>
+				<xs:appinfo>
+					Read-only
+				</xs:appinfo>
+				<xs:documentation>
+					True if the application has been bookmarked by the authenicated user, or else absent
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="validated" type="xs:boolean" use="optional" >
+			<xs:annotation>
+				<xs:appinfo>
+					Read-only
+				</xs:appinfo>
+				<xs:documentation>
+					True if the application has been updated during the past 15 months, or else false
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="deleted" type="xs:boolean" use="optional" >
+			<xs:annotation>
+				<xs:appinfo>
+					Read-only
+				</xs:appinfo>
+				<xs:documentation>
+					True if the application has been deleted
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="cname" type="xs:string" use="required" >
+			<xs:annotation>
+				<xs:appinfo>
+					Read-only
+				</xs:appinfo>
+				<xs:documentation>
+					The application's name representation, used in canonical URLs
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="relcount" type="xs:integer" use="required" >
+			<xs:annotation>
+				<xs:appinfo>
+					Read-only
+				</xs:appinfo>
+				<xs:documentation>
+					The number of software releases for this entry
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="logisticsType">
+		<xs:sequence>
+			<xs:element ref="logistics:country" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="logistics:status" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="logistics:discipline" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="logistics:category" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="logistics:language" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="logistics:arch" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="logistics:os" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="logistics:vo" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="logistics:middleware" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="logistics:validated" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="logistics:phonebook" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="ratingType">
+		<xs:annotation>
+			<xs:documentation>
+				XSD type for application rating entities. Read-only
+			</xs:documentation>
+		</xs:annotation>
+        <xs:sequence>
+            <xs:element ref="rating:rating" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Reference to application rating element
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+            <xs:element ref="rating:comment" minOccurs="0" maxOccurs="1"> 
+				<xs:annotation>
+					<xs:documentation>
+						Reference to application rating comment
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="rating:submittedOn" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Reference to the data the rating was submitted
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="rating:submitter" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Reference to the user that submitted the rating
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:integer" use="required">
+			<xs:annotation>
+				<xs:documentation>
+					The ID for the application rating entry
+				</xs:documentation>
+			</xs:annotation>
+        </xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="relatedApplicationType">
+		<xs:annotation>
+			<xs:documentation>
+				XSD type for relation application entities. Read-only
+			</xs:documentation>
+		</xs:annotation>
+        <xs:sequence>
+            <xs:element ref="application:application" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+						reference to the related application entry
+					</xs:documentation>
+				</xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="rank" type="xs:integer" use="required">
+			<xs:annotation>
+				<xs:documentation>
+					Relation rank (max=1, min=3)
+				</xs:documentation>
+			</xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="parentID" type="xs:integer" use="required">
+			<xs:annotation>
+				<xs:documentation>
+					The name of the application this entry is related to
+				</xs:documentation>
+			</xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="parentName" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>
+					The ID of the application this entry is related to
+				</xs:documentation>
+			</xs:annotation>
+        </xs:attribute>
+	</xs:complexType>
+
+    <xs:element name="rating" type="application:ratingType" />
+    <xs:element name="relatedapp" type="application:relatedApplicationType" />
+    <xs:element name="category" type="application:categoryType" nillable="true"/>
+    <xs:element name="subcategory" type="application:subcategoryType" nillable="true"/>
+    <xs:element name="status" type="application:statusType" />
+    <xs:element name="application" type="application:applicationType" />
+    <xs:element name="contactItem" type="application:contactItemType" nillable="true"/>
+    <xs:element name="logistics" type="application:logisticsType"/>
+    <xs:element name="arch" type="application:archType"/>
+    <xs:element name="language" type="application:proglangType"/>
+    <xs:element name="os" type="application:OStype"/>
+    <xs:element name="license" type="license:licenseType"/>
+    <xs:element name="tag" type="application:tagType"/>
+</xs:schema>

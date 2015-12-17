@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+     The work represented by this source file is partially or entirely funded 
+     by the EGI-InSPIRE project through the European Commission's 7th Framework 
+     Programme (contract # INFSO-RI-261323)
+
+     Copyright 2010 IASA and GRNET
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at [http://www.apache.org/licenses/LICENSE-2.0| Apache License 2.0]
+
+
+     Unless required by applicable law or agreed to in writing, software 
+     distributed under the License is distributed on an "AS IS" BASIS, 
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+     See the License for the specific language governing permissions and 
+     limitations under the License.
+-->
+     
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+    targetNamespace="http://appdb.egi.eu/api/1.0/appdb"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:appdb="http://appdb.egi.eu/api/1.0/appdb"
+    xmlns:history="http://appdb.egi.eu/api/1.0/history"
+    xmlns:application="http://appdb.egi.eu/api/1.0/application"
+    xmlns:discipline="http://appdb.egi.eu/api/1.0/discipline"
+    xmlns:person="http://appdb.egi.eu/api/1.0/person"
+    xmlns:publication="http://appdb.egi.eu/api/1.0/publication"
+    xmlns:vo="http://appdb.egi.eu/api/1.0/vo"
+    xmlns:dissemination="http://appdb.egi.eu/api/1.0/dissemination"
+    xmlns:rating="http://appdb.egi.eu/api/1.0/rating"
+    xmlns:middleware="http://appdb.egi.eu/api/1.0/middleware"
+    xmlns:logistics="http://appdb.egi.eu/api/1.0/logistics"
+    xmlns:resource="http://appdb.egi.eu/api/1.0/resource"
+    xmlns:virtualization="http://appdb.egi.eu/api/1.0/virtualization"
+    xmlns:provider="http://appdb.egi.eu/api/1.0/provider"
+    xmlns:provider_template="http://appdb.egi.eu/api/1.0/provider_template"
+    xmlns:classification="http://appdb.egi.eu/api/1.0/classification"
+    xmlns:privilege="http://appdb.egi.eu/api/1.0/privilege"
+    xmlns:regional="http://appdb.egi.eu/api/1.0/regional">
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/privilege"
+        schemaLocation="privilege.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/classification"
+        schemaLocation="classification.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/virtualization"
+        schemaLocation="virtualization.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/resource"
+        schemaLocation="resource.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/logistics"
+        schemaLocation="logistics.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/history"
+        schemaLocation="history.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/discipline"
+        schemaLocation="discipline.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/dissemination"
+        schemaLocation="dissemination.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/application"
+        schemaLocation="application.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/middleware"
+        schemaLocation="middleware.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/rating"
+        schemaLocation="apprating.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/vo"
+        schemaLocation="vo.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/publication"
+        schemaLocation="publication.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/regional"
+        schemaLocation="regional.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/person"
+        schemaLocation="person.xsd"/>
+
+    <xs:simpleType name="appdbResultType">
+        <xs:annotation>
+            <xs:documentation>
+                XSD type for REST API response types
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="list" />
+            <xs:enumeration value="detailed list" />
+            <xs:enumeration value="entry" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="optionType">
+        <xs:annotation>
+            <xs:documentation>
+                XSD type for REST API response entries to OPTIONS operations
+            </xs:documentation>
+        </xs:annotation>        
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="GET" />
+            <xs:enumeration value="POST" />
+            <xs:enumeration value="PUT" />
+            <xs:enumeration value="DELETE" />
+        </xs:restriction>
+    </xs:simpleType>
+
+	<xs:complexType name="resourceType" mixed="false">
+		<xs:sequence>
+			<xs:element ref="resource:parameter" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="resource:comment" minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+        <xs:attribute name="uri" type="xs:string" use="required"/>
+    </xs:complexType>
+    
+    <xs:complexType name="schemaType" mixed="true">
+        <xs:annotation>
+            <xs:documentation>
+                XSD type for schema entities in API schema list
+            </xs:documentation>
+        </xs:annotation>                
+        <xs:attribute name="uri" type="xs:string" use="required"/>
+    </xs:complexType>
+    
+    <xs:element name="option" type="appdb:optionType"/>
+    <xs:element name="schema" type="appdb:schemaType"/>
+    <xs:element name="resource" type="appdb:resourceType"/>
+
+    <xs:simpleType name="appdbResultDataType">
+        <xs:annotation>
+            <xs:documentation>
+                XSD type for REST API response datatype attribute values
+            </xs:documentation>
+        </xs:annotation>                
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="application" />
+            <xs:enumeration value="person" />
+            <xs:enumeration value="publication" />
+            <xs:enumeration value="middleware" />
+            <xs:enumeration value="regional" />
+            <xs:enumeration value="discipline" />
+            <xs:enumeration value="status" />
+            <xs:enumeration value="role" />
+            <xs:enumeration value="vo" />
+            <xs:enumeration value="history" />
+            <xs:enumeration value="category" />
+            <xs:enumeration value="resource" />
+            <xs:enumeration value="virtualization" />
+            <xs:enumeration value="language" />
+            <xs:enumeration value="arch" />
+            <xs:enumeration value="os" />
+            <xs:enumeration value="license" />
+            <xs:enumeration value="category" />
+            <xs:enumeration value="tag" />
+            <xs:enumeration value="hypervisor" />
+			<xs:enumeration value="logistics" />
+			<xs:enumeration value="contact" />
+			<xs:enumeration value="classification" />
+			<xs:enumeration value="accessgroup" />
+        </xs:restriction>
+    </xs:simpleType>
+
+	<xs:simpleType name="methodType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="GET" />
+            <xs:enumeration value="POST" />
+            <xs:enumeration value="PUT" />
+            <xs:enumeration value="DELETE" />
+            <xs:enumeration value="OPTIONS" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="ID" id="ID">
+		<xs:restriction base="xs:NCName"/>
+	</xs:simpleType>
+
+	<xs:complexType name="requestType">
+		<xs:sequence>
+			<xs:element name="param" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType mixed="true">
+					<xs:attribute name="name" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="id" type="appdb:ID" use="required"/>
+		<xs:attribute name="resource" type="xs:string" use="required"/>
+		<xs:attribute name="method" type="appdb:methodType" use="required"/>
+		<xs:attribute name="userid" type="xs:integer" use="optional"/>
+		<xs:attribute name="username" type="xs:string" use="optional"/>
+		<xs:attribute name="passwd" type="xs:string" use="optional"/>
+		<xs:attribute name="apikey" type="xs:string" use="optional"/>
+	</xs:complexType>
+
+	<xs:complexType name="replyType">
+		<xs:sequence>
+			<xs:element ref="appdb:appdb" minOccurs="1" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="id" type="appdb:ID" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="brokerType">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="reply" type="appdb:replyType" minOccurs="1" maxOccurs="unbounded" />
+				<xs:element name="request" type="appdb:requestType" minOccurs="1" maxOccurs="unbounded" />
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="broker" type="appdb:brokerType">
+		<xs:unique name="reqID">
+			<xs:selector xpath="./appdb:request"/>
+			<xs:field xpath="@id"/>
+		</xs:unique>                
+	</xs:element>
+
+    <xs:element name="appdb">
+        <xs:annotation>
+            <xs:documentation>
+                XSD type for root node of all REST API responses and input representations
+            </xs:documentation>
+        </xs:annotation>                
+        <xs:complexType>
+            <xs:sequence>
+                <xs:choice>
+                    <xs:element ref="appdb:schema" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="appdb:option" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="application:application" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="publication:publication" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="application:relatedapp" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="application:rating" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="person:person" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:group ref="discipline:disciplines" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="middleware:middleware" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="application:status" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:group ref="regional:countries" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="person:role" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="vo:vo" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="dissemination:dissemination" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="application:category" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="application:subcategory" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="history:history" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="appdb:resource" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="virtualization:appliance" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="application:arch" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="application:language" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="application:os" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="application:license" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="application:tag" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="virtualization:hypervisor" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="application:logistics" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="person:logistics" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="person:contact" minOccurs="1" maxOccurs="unbounded" />
+					<xs:element ref="classification:version" minOccurs="1" maxOccurs="unbounded" />
+					<xs:group ref="privilege:personprivs" minOccurs="1" maxOccurs="unbounded" />
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="error" type="xs:string" use="optional" />
+            <xs:attribute name="errornum" type="xs:string" use="optional" />
+            <xs:attribute name="exterror" type="xs:string" use="optional" />
+            <xs:attribute name="count" type="xs:integer" use="optional" />
+            <xs:attribute name="pageoffset" type="xs:integer" use="optional" />
+            <xs:attribute name="pagelength" type="xs:integer" use="optional" />
+            <xs:attribute name="type" type="appdb:appdbResultType" use="required" />
+            <xs:attribute name="datatype" type="appdb:appdbResultDataType" use="required" />
+            <xs:attribute name="version" type="xs:string" use="required" />
+            <xs:attribute name="host" type="xs:string" use="optional" />
+            <xs:attribute name="apihost" type="xs:string" use="optional" />
+            <xs:attribute name="cacheState" type="xs:integer" use="optional" />
+            <xs:attribute name="permsState" type="xs:integer" use="optional" />
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

@@ -1,0 +1,3 @@
+<?php
+class Repository_Model_MetaProductReleaseKeywordsFilter extends Repository_Model_MetaProductReleaseKeywordsFilterBase {
+}

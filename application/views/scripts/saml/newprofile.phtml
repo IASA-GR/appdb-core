@@ -1,0 +1,507 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php
+	$profiles = $this->profiles;
+	$session = $this->session;
+	$positionTypes = $this->positionTypes;
+	$countries = $this->countries;
+	$contacttypes = $this->contactTypes;
+?>
+<style>
+	.profileitem{
+		position: relative;
+		vertical-align: top;
+		min-height: 100px;
+		height: auto;
+		margin: 3px;
+	}
+	.profileitem form{
+		position: relative;
+		vertical-align: top;
+		min-height: 100px;
+		height: auto;
+		padding: 10px 5px;
+		border: 1px solid #e0e0e0;
+		margin: 3px;
+		background-color:  #fafafa;
+		border-radius: 3px;
+	}
+	.profileitem .logocontainer,
+	.profileitem .profiledetails,
+	.profileitem .profilecontacts{
+		display: inline-block;
+		min-width: 300px;
+		max-width: 300px;
+		width: auto;
+		vertical-align: top;
+	}
+	.profileitem .profilecontacts{
+		min-width: 350px;
+		max-width: 350px;
+	}
+	.profileitem .logocontainer{
+		max-width: 100px;
+		min-width: 100px;
+	}
+	.profileitem .profiledetails{
+		
+	}
+	.profileitem .profilecontacts{
+		vertical-align: top;
+		text-align: center;
+		font-family: Arial, sans-serif;
+		font-size: 12px;
+		height: auto;
+		min-height: 135px;
+		border-left: 1px dashed #a0a0a0;
+	}
+	.profileitem .profilecontacts > .contacts{
+		display: block;
+		min-height: 90px;
+	}
+	.profileitem .profilecontacts.empty > .contacts{
+		min-height: 10px;
+	}
+	.profileitem .profilecontacts .field > span{
+		display: inline-block;
+	}
+	.profileitem .profilecontacts .field .name {
+		min-width: 100px;
+		width: auto;
+		text-align: right;
+	}
+	.profileitem .profilecontacts > .header {
+		padding-bottom: 10px;
+		display: block;
+	}
+	.profileitem .profilecontacts .button{
+		display: block;
+		background: #ffffff; /* Old browsers */
+		/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+		background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjQ3JSIgc3RvcC1jb2xvcj0iI2Y2ZjZmNiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNlZGVkZWQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+');
+		background: -moz-linear-gradient(top,  #ffffff 0%, #f6f6f6 47%, #ededed 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(47%,#f6f6f6), color-stop(100%,#ededed)); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* IE10+ */
+		background: linear-gradient(to bottom,  #ffffff 0%,#f6f6f6 47%,#ededed 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ededed',GradientType=0 ); /* IE6-8 */
+		border: 1px solid #ddd;
+		cursor: pointer;
+	}
+	.profileitem .profilecontacts .button.addcontact{
+		padding: 2px 4px;
+		vertical-align: top;
+		max-width: 40px;
+		border-radius: 3px;
+	}
+	.profileitem .profilecontacts .header .actions{
+		display: inline-block;
+	}
+	.profileitem .profilecontacts .empty{
+		display: none;
+	}
+	.profileitem .profilecontacts .empty .message{
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+		max-width: 250px;
+		padding: 5px;
+		background-color: #f0f0f0;
+		border: 1px solid #e0e0e0;
+		border-radius: 3px;
+		color: #777;
+		background: #ffffff; /* Old browsers */
+		/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+		background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjQ3JSIgc3RvcC1jb2xvcj0iI2Y2ZjZmNiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmN2Y3ZjciIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+		background: -moz-linear-gradient(top,  #ffffff 0%, #f6f6f6 47%, #f7f7f7 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(47%,#f6f6f6), color-stop(100%,#f7f7f7)); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#f7f7f7 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#f7f7f7 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#f7f7f7 100%); /* IE10+ */
+		background: linear-gradient(to bottom,  #ffffff 0%,#f6f6f6 47%,#f7f7f7 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f7f7f7',GradientType=0 ); /* IE6-8 */
+		text-align: left;
+	}
+	.profileitem .profilecontacts .empty .message > img {
+		
+	}
+	.profileitem .profilecontacts .empty .message > span {
+		display: inline;
+		padding-left: 0px;
+	}
+	.profileitem .profilecontacts.empty .empty .message a {
+		padding: 1px 6px;
+		margin: 0px 2px;
+		vertical-align: top;
+		display: inline;
+	}
+	.profileitem .profilecontacts.empty .empty{
+		display: block;
+	}
+	.profileitem .profilecontacts.empty > .header .button.addcontact{
+		display: none;
+	}
+	.profileitem .profilecontacts.empty .actions{
+		
+	}
+	.profileitem .profilecontacts .button:hover{
+		border-color: #888;
+	}
+	.profileitem .profilecontacts .removecontact.button img{
+		margin: 1px;
+		margin-top: -1px;
+		margin-left: 3px;
+	}
+	.profileitem .profiledetails .fieldvalue {
+		vertical-align: top;
+		padding: 3px;
+	}
+//	.profiledetails .roleverification{
+//		vertical-align: middle;
+//	}
+	.profiledetails .countryflag{
+		vertical-align: middle;
+		border:1px solid #BFBFBF;
+		height: 12px;
+		width: 16px;
+	}
+	.profileitem .profiledetails .fieldvalue .field,
+	.profileitem .profiledetails .fieldvalue .value{
+		display: inline-block;
+		font-family: Arial, sans-serif;
+		font-size: 12px;
+		max-width: 205px;
+		vertical-align: top;
+	}
+	.profileitem .profiledetails .fieldvalue .field{
+		min-width: 80px;
+	}
+	.profileitem .profilecontacts .contactitem{
+		padding: 2px;
+	}
+	.profileitem .role .popuphelp {
+		display: inline-block;
+	}
+	.profileitem .role .popuphelp > .message{
+		display: none;
+	}
+	.profileitem .role .popuphelp:hover{
+		width:30px;
+	}
+	.profileitem .role .popuphelp:hover > .message{
+		display: block;
+		position: absolute;
+		width: 500px;
+		height: auto;
+		border: 1px solid #0029A3;
+		border-radius: 3px;
+		box-shadow: 0 0 20px #E0E0E0;
+		padding: 10px;
+		background: #fff;
+		right: -115px;
+		bottom: 0px;
+		z-index:5000;
+	}
+	.profileitem .role .popuphelp > img {
+		width: 13px;
+		height: 13px;
+		vertical-align: middle;
+	}
+	.newprofile.actions{
+		padding: 10px 5px;
+		margin: 5px 0px;
+		text-align: right;
+		margin-bottom: -15px;
+	}
+	.newprofile.actions > .action{
+		padding: 5px;
+	}
+	.newprofile.actions > .action.disabled {
+		background: #F0F0F0;
+		color: #888;
+		border-color: #FAFAFA;
+		cursor: default;
+	}
+	.newprofile.actions > .action img.saving {
+		display: none;
+	}
+	.contents.newprofile.saving .newprofile.actions > .action img {
+		display: none;
+	}
+	.contents.newprofile.saving .newprofile.actions > .action img.saving {
+		display: inline-block;
+	}
+	.newprofile.actions > .action.disabled > span{
+		color: #888;
+	}
+	.contents.newprofile{
+		position: relative;
+	}
+	.contents.newprofile.saving .shader {
+		display: none;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 8000;
+		opacity: 0.4;
+		filter: alpha(opacity=40);
+		background: #fff;
+	}
+	.contents.newprofile.saving .shader{
+		display: block;
+	}
+	#profilerolehelp{
+		width: 500px;
+	}
+	
+	.profileitem .validations.icontext {
+		position: absolute;
+		bottom: 10px;
+		padding: 5px;
+		border: 1px solid #AD7A7A;
+		border-radius: 3px;
+		background-color: #FFFEE0;
+		right: 70px;
+	}
+	.profileitem .similarname {
+		min-height: 30px;
+		background: #D9F1DC;
+		border-radius: 3px;
+		padding: 4px;
+		margin: 3px;
+	}
+	.profileitem .similarname img{
+		width: 16px;
+		height: 16px;
+		vertical-align: top;
+		padding: 0px 5px;
+	}
+	.profileitem .fieldvalue.organization > .value {
+		max-width: 300px;
+		width: 300px;
+	}
+	.profileitem .relationlist.editmode > ul.relations > li > .relationtype > .relationtarget {
+		max-width: 165px;
+	}
+	.profileitem .smalltext{
+		display: inline-block;
+		margin-bottom: 1px;
+	}	
+	.profileitem .fieldvalue.organization{
+		min-width: 390px;
+		position: relative;
+		left: -90px;
+		vertical-align: middle;
+		line-height: 22px;
+	}
+	.profileitem .profiledetails .fieldvalue.organization > div{
+		display: inline-block;
+		vertical-align: middle;
+		line-height: 22px;
+	}
+	.profileitem .organization .relationlist input{
+		background-color: #F9F7BA;
+	}
+	.profileitem .organization .relationlist.nofilter input,
+	.profileitem .organization .relationlist.selected input{
+		background-color: white;
+	}
+	.newprofile #profiles .autocompletelist > .emptylist{
+		padding: 0px;
+	}
+	.profileitem .organization .relationlist .emptycontent > .content{
+		background-color: #f5f5f5;
+		padding: 15px 0px;
+	}
+	
+	#maincontent.newprofile #profiles .autocompletelist.loading > .loader{
+		display:block;
+	}
+	#maincontent.newprofile #profiles .autocompletelist .loader{
+		margin: 0px;
+	}
+	
+</style>
+<?php 
+	$i = "0";
+	$profile = $profiles[0];
+	$editable = false;
+	$image = "/images/person.png";
+	$gender = "N/A";
+	$institute = "";
+	$country = $profile->country;
+	$isocodes = array();
+	$contacts = array();
+	
+	if ( isnull($profile->image) === false ) {
+		$image = "/people/getimage?id=".$profile->id."&req=".urlencode($profile->lastUpdated);
+	}
+	
+	if ( !isnull($profile->gender) ) {
+		$gender = $this->escape(substr_replace($profile->gender,strtoupper(substr($profile->gender, 0, 1)), 0, 1));
+	}
+	
+	if ( !isnull($profile->institution) ) {
+		$institute = $this->escape($profile->institution);
+	}
+	
+	if ( $country !== null ) {
+		$isocodes=explode("/",$country->IsoCode);
+	}
+	
+	if ( !isnull($profile->contacts) && count($profile->contacts) > 0 ) {
+		$contacts = $profile->contacts;
+	}else if( $profile->id === $session->userid ){
+		if( $session->userContacts && is_array($session->userContacts) && count($session->userContacts) > 0 ){
+			$contacts = $session->userContacts;
+		}
+	}
+	
+	if ( $profile->id === -1 ){
+		$editable = true;
+	}
+	
+?>
+<div class='profileitem'>
+<div id="detailsdlgcontent<?php echo $i; ?>"  data-id="<?php echo $profile->id; ?>" data-name="<?php echo $profile->firstname . " " . $profile->lastname; ?>" data-canedit="<? echo ($editable)?'true':'false'; ?>" >
+	<div id="infodiv<?php echo $i; ?>" dojoType="dijit.layout.ContentPane" title="" class="information person">
+		<form id="editperson<?php echo $i; ?>" name="editperson<?php echo $i;?>" action="/people/update" method="post" onvalidate="appdb.pages.newprofile.onValidate(<?php echo $i; ?>);" callback="appdb.pages.newprofile.onUpdate" errorcallback="appdb.pages.newprofile.onError" cancelcallback="appdb.views.Main.refresh();">
+			<div class="logocontainer">
+				<div style="vertical-align:middle;">
+					<img alt="profile image" id="pplimg<?php echo $i; ?>" border="0" src="<?php echo $image; ?>" width='100px'>
+				</div>
+			</div>
+			<div class="profiledetails">
+				<div class="fieldvalue name">
+					<div class="field">Name:</div>
+					<div class="value">
+						<span <?php if ($editable ) echo 'class="editable smalltext" edit_type="text" edit_watermark="First name" edit_name="firstName" edit_required="true" edit_style="{\'width\':\'200px\'}"';?>><?php echo($this->escape($profile->firstName));?></span>
+						<span <?php if ($editable ) echo 'class="editable smalltext" edit_type="text" edit_watermark="Last name" edit_name="lastName" edit_required="true" edit_style="{\'width\':\'200px\'}"';?>><?php echo($this->escape($profile->lastName)); ?></span>
+					</div>
+				</div>
+				<div class="fieldvalue gender">
+					<div class="field">Gender:</div>
+					<div class="value">
+						<span <?php if ($editable ) echo 'class="editable" edit_type="combo" edit_data="{ids: [\'male\', \'female\', \'NULL\'], vals: [\'Male\', \'Female\', \'N/A\']}" edit_name="gender" edit_watermark="Select gender" edit_style="{\'width\':\'200px\'}"';?>><?php echo $gender ?></span>
+					</div>
+				</div>
+				<div class="fieldvalue role">
+					<div class="field">Role:</div>
+					<div class="value">
+						<span <? if($editable) { echo 'edit_style="{\'max-width\': \'160px\'}" class="editable" edit_watermark="Select role" edit_type="combo"' /* edit_onchange="appdb.pages.newprofile.positionTypeChanged"*/ . ' edit_name="positionTypeID" edit_data=\''.$positionTypes.'\' edit_style="{\'width\':\'200px\'}"'; } ?>><?php if ($profile->id != '-1') echo($this->escape($profile->positionType->description)); else echo 'Other';?></span>
+					</div>
+				</div>
+				<div class="fieldvalue country">
+					<div class="field">Country</div>
+					<div class="value">
+						<span <?php if ($editable) { echo 'class="editable" edit_watermark="Choose a country"  edit_style="{\'width\': \'200px\'}" edit_type="combo" edit_name="countryID" edit_style="{\'width\':\'200px\'}" edit_onchange="appdb.pages.newprofile.setRegion('.$i.');" edit_data=\'' . $countries . '\''; } ?>><?php 
+						if( $country !== null) {
+							echo $this->escape($country->name);
+						}else{
+							echo "\n";
+						}?></span>
+					</div>
+				</div>
+				<div class="fieldvalue organization">
+					<div class="field">Organization:</div>
+					<div class="value relationlist"></div>
+				</div>
+			</div>
+			<div class="profilecontacts<?php echo ( (count($contacts)==0)?' empty':''); ?>">
+				<div class="header">
+					<b>Contact Information</b>
+					<?php if($editable) { ?>
+					<div class="actions">
+						<a href="#" onclick="appdb.pages.newprofile.addContactInfo();" class="button addcontact icontext" title="Add new profile contact"><img alt="add" border="0" src="/images/addnew.png"/><span>Add</span></a>
+					</div>
+					<?php } ?>
+				</div>
+				<div class="empty">
+					<div class="message icontext">
+						<img src="/images/exclam16.png" alt="" /><span>There must be at least one email profile contact in order to save the profile.<br /><br/>Click <a href="#" onclick="appdb.pages.newprofile.addContactInfo(<?php echo $i;?>);" class="button addcontact icontext" title="Add new profile contact"><img alt="add" border="0" src="/images/addnew.png"/><span>Add</span></a> to insert a new profile contact.</span>
+					</div>
+				</div>
+				<div class="contacts">
+				<?php foreach($contacts as $contact){ ?>
+				<div class="contactitem field"><span class="editable name" <?php if($editable){ echo 'edit_onchange="" edit_name="contactType" edit_type="combo" edit_style="{\'max-width\': \'130px\'}" edit_data=\'' . $contacttypes . '\' edit_group="true" edit_watermark="Contact Type"'; } ?> ><?php echo $this->escape($contact->contactType->description);?></span><span>:</span><span class="editable value" <?php if($editable){ echo 'edit_name="contact" edit_group="true"  edit_type="text" edit_style="{\'max-width\': \'130px\'}" edit_watermark="Provide contact" edit_required="true"'; }?>><?php
+							switch($contact->contactType->Id){
+								case "7":
+									if( $editable ){
+										echo "<a href='mailto:" . $this->escape($contact->data) . "' >" . $this->escape($contact->data) . "</a>";
+									}else{
+										echo "<img style='vertical-align: middle' border='0' src='/texttoimage/personcontact?id=" . $contact->id . "' />";
+									}
+									break;
+								case "6":
+									echo "<a target='_blank' href='" . $this->escape($contact->data) . "' >" . $this->escape($contact->data) . "</a>";
+									break;
+								default:
+									echo $this->escape($contact->data);
+									break;
+							}
+							?></span></div>
+				<?php } ?>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div class='similarname icontext hidden'></div>
+<div class='validations icontext hidden'></div>
+<div class="actions newprofile">
+	<a class="action save editbutton icontext" id="savedetails" title="Save your new profile" href="" >
+		<img src="/images/diskette.gif" alt=''/>
+		<img src="/images/ajax-loader-trans-orange.gif" alt="" class="saving"/>
+		<span>Save</span>
+	</a>
+</div>
+<div class="shader"></div>
+</div>
+<script type="text/javascript">
+var focusedDijitItem;
+var profileCurrentIndex = 0;
+appdb.pages.newprofile.init({
+	contactTypes: '<?php echo $contacttypes; ?>',
+	countries: '<?php echo $countries; ?>',
+	positionTypes: '<?php echo $positionTypes; ?>',
+	profile: {
+		firstName: "<?php echo $profile->firstName; ?>",
+		lastName: "<?php echo $profile->lastName; ?>",
+		gender: "",
+		positionTypeID: '4',
+		positionTypeDescription: 'other',
+		institute: "<?php echo $profile->institution; ?>",
+		country: "<?php echo $profile->countryID; ?>",
+		image: "/images/person.png",
+		contacts :[
+			<?php 
+			$conts= array(); 
+			foreach($contacts as $contact){
+				array_push($conts,'{contactType: { id:"' . $contact->contactType->id . '", description:"' . $contact->contactType->description . '" }, data:"' . $contact->data . '" }');
+			}
+			if( count($conts) > 0 ){
+				echo implode(",", $conts);
+			}
+			?>
+		]
+	}
+});
+appdb.pages.newprofile.editProfile();
+</script>

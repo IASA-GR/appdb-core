@@ -1,0 +1,130 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php $wiki = ApplicationConfiguration::app('wiki', ApplicationConfiguration::uiUrl()); ?>
+<div class="homepage">
+	<div class="supported">
+		<a href="/supported">Supported Browsers</a>
+	</div>
+	<div class="homeitem-container row welcome">
+		<div class="title">
+			<h3 align="center">Welcome to the <span style="color:#0068B3">EGI Applications Database</span></h3>
+		</div>
+		<div class="textcontent about">
+			<div class="text">
+				<span>The EGI Applications Database (AppDB) is a central service that stores and provides to the public information about:</span>
+				<ul >
+					<li><b>software solutions</b>  in the form of native <a href="/browse/software" title="Browse software marketplace" onclick="appdb.views.Main.showSoftwareMarketplace();">software products</a><?php if(Supports::swappliance()){?>, <a href="/browse/cloud" title="Browse cloud marketplace" onclick="appdb.views.Main.showCloudMarketplace();">virtual appliances</a> and/or <a href="/browse/swappliances/cloud" title="Browse software appliances" onclick="appdb.views.Main.showCloudSoftwareAppliances();">software appliances</a>,</li>
+					<?php } else { ?>
+					and/or <a href="/browse/cloud" title="Browse cloud marketplace" onclick="appdb.views.Main.showCloudMarketplace();">virtual appliances</a>,</li>
+					<?php } ?>
+					<li>the <b>programmers</b> and the <b>scientists</b> who are involved, and</li>
+					<li><b>publications</b> derived from the registered solutions</li>
+				</ul>
+				<span>Reusing software products, registered in the AppDB, means that scientists and developers may find a solution that can be directly utilized on the <a href="http://www.egi.eu" target="_blank">European Grid Infrastructure</a>. without reinventing the wheel.<a href="<?php echo $wiki;?>main:faq:what_is_the_egi_applications_database_appdb" target="_blank" data-href="http://<?php echo $_SERVER['HTTP_HOST'];?>/?p=L2hlbHAvZmFxLzEK" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'Faq', url:'/help/faq/1',callback:'appdb.utils.Faq.scrollTo(1)'});" target="_blank" title="Read more about EGI AppDB" class="readmore" style="float: none;" >...read more</a></span>
+			</div>
+		</div>
+		<div class="textcontent register" style="display: none;">
+			<div class="title">Need access to register your software?</div>
+			<div class="text">
+				Read access to AppDB is available to everyone, while users with an <a href="http://www.egi.eu/sso" target="_blank">EGI SSO account</a> can take advantage of the authenticated write-enabled features of the portal, by logging in. After login you can register your own software in the database or you can join as a contact to a software that is already registered.
+			</div>
+		</div>
+		<div class="textcontent feedback" style="display: none;">
+			<div class="title">Feedback:</div>
+			<div class="text">
+				Your feedback is valuable in the continuing development of the AppDB service, so please take note that we always welcome requests for new features via email: <a href="mailto:appdb-support@iasa.gr">appdb-support@iasa.gr</a>.
+			</div>
+		</div>
+		<div class="linkcontent">
+			<ul>
+				<li>
+					<a href="<?php echo $wiki; ?>main:faq:how_to_get_access_to_the_appdb" target="_blank" data-href="/pages/about/faq/2" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'About > Faq', url:'/help/faq/2',callback:'appdb.utils.Faq.scrollTo(2)'});">
+						<img class="needaccess" alt="" />
+						<span>Need access</span>
+					</a>
+				</li>
+				<li>
+					<a href="<?php echo $wiki; ?>main:faq:when_should_i_register_a_software_or_a_virtual_appliance" target="_blank" data-href="/pages/about/faq/4" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'About > Faq', url:'/help/faq/4',callback:'appdb.utils.Faq.scrollTo(4)'});">
+						<img class="register" alt="" />
+						<span>Register your solution</span>
+					</a>
+				</li>
+				<li>
+					<a href="<?php echo $wiki; ?>main:faq:i_want_to_be_included_as_a_contact_in_an_existing_software_solution_contact_list._what_should_i_do" target="_blank" data-href="/pages/about/faq/11" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'About > Faq', url:'/help/faq/11',callback:'appdb.utils.Faq.scrollTo(11)'});">
+						<img class="joinascontact" alt="" />
+						<span>Join as a contact</span>
+					</a>
+				</li>
+				<li>
+					<a href="/pages/contact/feedback" onclick="appdb.views.Main.showPage('feedback',{mainTitle:'Contact us',url:'/index/feedback'});" >
+						<img class="feedback" alt="" />
+						<span>Send us your feedback</span>
+					</a>
+				</li>
+			</ul>
+		</div>
+		
+	</div>
+	<div class="homeitem-container row">
+		<div class="homeitem banner row hidden">
+			<div class="title"><span>Newest / Recently updated Software</span></div>
+			<div  class="content" >
+				<div id="banner_recent" class="recent software mediumitems" data-orderby="lastupdated" data-orderbyop="DESC" data-rows ="1" data-cols="5" data-type="software" data-autoload="true" data-filter="+=metatype:0">
+					<a href="#" class="more">...see more</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="homeitem-container row" >
+		<div class="homeitem banner twothirds hidden">
+			<div class="title"><span>Newest / Recently updated Appliances</span></div>
+			<div  class="content " >
+				<div id="banner_newest" class="newest software mediumitems" data-orderby="lastupdated" data-orderbyop="DESC" data-rows ="2" data-cols="3" data-type="software" data-autoload="true" data-filter="-=metatype:0">
+					<a href="#" class="more">...see more</a>
+				</div>
+			</div>
+		</div>
+		<div id="announcediv" class="homeitem banner">
+			<div class="announcements"></div>
+		</div>
+	</div>
+	
+	<div class="homeitem-container row">
+		<div class="homeitem banner row hidden">
+			<div class="title"><span>Most visited</span></div>
+			<div  class="content" >
+				<div id="banner_toprated" class="toprated software mediumitems" data-orderby="hitcount" data-orderbyop="DESC" data-rows ="1" data-cols="5" data-type="software" data-autoload="true" >
+					<a href="#" class="more">...see more</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="homeitem-container row hidden">
+		<div class="homeitem">
+			<div id="homeeginews"></div>
+		</div>
+		<div class="homeitem">
+			  <div id="homeappdbnews"></div>
+		</div>
+		<div class="homeitem">
+			 <div id="homeanouncements" ></div>
+		</div>
+		<div class="homeitem">
+			 <div style="width:90%; margin-left: 17px" id="tagclouddiv" style="width:40%; display: inline-block; " ></div>
+		</div>
+	</div>
+</div>

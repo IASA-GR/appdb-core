@@ -1,0 +1,49 @@
+<?php if( $this->id == 0 ) { return; }
+	$isLoggedin = ( $this->session->userid === null )?false:true;
+?>
+
+<div class="releaselist<?php echo ( ( ! $this->hasReleases )?' hidden':''); ?>" data-view="appdb.repository.ui.views.ReleaseList">
+	
+	<ul class="repoarealist baselist" >
+	<?php for($i=0; $i<count($this->releases); $i++) { 
+		$base = $this->releases[$i]["base"]; 
+		$updates = $this->releases[$i]["updates"]; ?>
+		<li >
+			<a class="repoarea">
+				<div class="metadata">
+					<div class="id"><?php echo $base["repoId"]; ?></div>
+					<div class="repository"><?php echo $base["repoAreaName"]; ?></div>
+					<div class="displayVersion"><?php echo $base["displayVersion"]; ?></div>
+				</div>
+			</a>
+			<?php if( $isLoggedin ) { ?>
+			<div class="actions" >
+				<div class="action newrelease update" >
+					<a href="#" title="Create new update for this release"><img src="/images/add.png" /><span>new</span></a>
+				</div>
+			</div>
+			<?php } ?>
+			<ul class="updatelist" >
+			<?php for($j=0; $j<count($updates); $j+=1){ $update = $updates[$j]; ?>
+				<li>
+					<a class="updaterelease">
+						<div class="metadata">
+							<div class="id"><?php echo $update["id"]; ?></div>
+							<div class="displayVersion"><?php echo $update["displayVersion"]; ?></div>
+						</div>
+					</a>
+				</li>
+			<?php } ?>
+				<li >
+					<a class="updaterelease initial">
+						<div class="metadata">
+							<div class="id"><?php echo $base["id"]; ?></div>
+							<div class="displayVersion"><?php echo $base["displayVersion"]; ?><span class="base"> (base)</span></div>
+						</div>
+					</a>
+				</li>
+			</ul>
+		</li>
+	<?php } ?>
+	</ul>
+</div> 

@@ -1,0 +1,140 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php if ($this->entry !== null) { ?>
+<script type="text/javascript" src="/js/jquery-ui.js"></script>
+<script type="text/javascript">
+    var toggleRepresentatives = function() {
+        jQuery.fn.center = function () {
+            this.css("position","absolute");
+            this.css("top", ( $(window).height() - this.height() ) / 2+$(window).scrollTop() + "px");
+            this.css("left", ( $(window).width() - this.width() ) / 2+$(window).scrollLeft() + "px");
+            return this;
+        };
+        if ($(".ngireps:last").is(":visible")) {
+            $(".ngireps:last").fadeOut("fast");
+        } else {
+            $(".ngireps:last").fadeIn("fast");
+        };
+        if (detailsStyle == 1) setTimeout(function(){$(".dijitDialog:last").center();},500);
+    };
+
+</script>
+
+<div style="display: none" id="dialog-err-ppl<?php echo $this->dialogCount;?>" title="Warning">
+    <p>
+        <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+        <span id="dialog-err-ppl-msg<?php echo $this->dialogCount;?>"></span>
+    </p>
+</div>
+
+<div align="left" style="height:100%;">
+		<table border="0" width="99%">
+			<tr>
+				<td width="101px" style="vertical-align:middle">
+					<div style="vertical-align:middle;">
+					<center>
+					<img id="ngiimg<?php echo $this->dialogCount;?>" border="0" src="/ngi/getlogo?req=<?php echo rand();?>&id=<?php echo urlencode($this->entry->id); ?>" width='110px'>					
+					</center>
+					</div>
+				</td>
+				<td>
+					<table border="0" width="100%">
+						<tr>
+							<td>
+								<table border="0">
+									<tr>
+									<?php if ($this->entry->id != "") {
+										echo "<td>ID: </td>";
+										echo "<td>".$this->entry->Id;
+                                        echo ' <a href="http://'.$_SERVER["HTTP_HOST"].'?p='.base64_encode('/ngi/details?id='.$this->entry->id).'" target="_blank">(Permalink)</a></td>';
+									} ?>
+									</tr>
+									<tr>
+									<td style="vertical-align:middle">Name: </td><td style="vertical-align:middle">
+										<span style="display:none" class="editable" edit_name="id" edit_type="hidden"><?php echo $this->entry->id;?></span>
+										<span class="editable" edit_type="text" edit_name="name";><?php echo($this->escape($this->entry->name));?></span>
+									</td>
+									</tr>
+									<tr><td>Description: </td><td><span><?php echo($this->escape($this->entry->description)); ?></span></td>
+									</tr>
+									<tr><td>Country: </td><td><span>
+<?php 
+if (! isnull($this->entry->country)) {
+	echo($this->escape($this->entry->country->name)); 
+	$isocode=$this->entry->country->IsoCode;
+	$isocodes = explode("/",$isocode);
+	foreach($isocodes as $isocode) {
+		echo " <img style='vertical-align: middle;border:1px solid #BFBFBF' border='0' src='/images/flags/".strtolower($isocode).".png'/>";
+	}
+} else echo "N/A";?>
+</span></td>
+									</tr>
+								</table>
+							</td>
+							<td style="display:none; min-width:400px; vertical-align:top; border-left: 1px dashed" align="right">
+							</td>
+						</tr>
+					</table>
+
+                                <br/>
+									<div class=".volinksdiv">
+<?php 
+	$s=''; 
+	if ($this->entry->url != null)	$s.='<a href="'.$this->escape($this->entry->url).'" target="_blank">Website</a> | '; 
+	echo substr($s,0,-2);
+?>
+									</div><br/>
+
+				</td>
+			</tr>
+		</table>
+		<br/>
+		<?php 
+		if ($this->entry->id !=0) if ( count($this->entry->representatives) > 0) { ?>
+		<center><span><b><a href="#" title="Toggle Representatives visibility" onclick="toggleRepresentatives()">Representatives</a></b></span></center><p/>
+		<div class="ngireps" style="max-height:300px; overflow:auto">
+			<ul class="mainlist">
+			<?php foreach ($this->entry->representatives as $app) {?>
+			<li><a href='#' title='<?php echo $app->firstname." ".$app->lastname; ?>' onclick='appdb.views.Main.showPerson({id: <?php echo $app->Id;?>}, {mainTitle: "<?php echo str_replace("'","\\'",$app->fullName);?>"});'><img border='0' src='<?php if ( $app->image == '' ) { echo '/images/person.png'; } else { echo '/people/getimage?req='.$app->lastUpdated.'&id='.$app->id; }; ?>' width='100px' height='100px'><?php foreach(ISOCodeToFlag($app->country->ISOCode) as $i) { echo "<img width='16px' src='".$i."'/> "; }; echo $this->escape($app->firstname." ".$app->lastname); ?><span><?php echo $this->escape($app->positionType->description)."<br/>"; echo $this->escape(substr($app->institution,0,80)); if (strlen($app->institution)>80) echo "..."; ?></span></a></li>
+			<?php } ?>
+			</ul>
+		</div>
+		<?php } ?>
+	</div> <!--pplInfo div closes -->
+</div> <!--main div closes -->
+<script type="text/javascript">
+	navpaneclicks($("#resproviderspane")[0]);
+	$("#addcontactinfo<?php echo $this->dialogCount;?>").hide();
+	var docgrid = false;
+		var closeDialog = function () {
+		if (dijit.byId("detailsdlg<?php echo $this->dialogCount;?>") !== undefined) dijit.byId("detailsdlg<?php echo $this->dialogCount;?>").onCancel();
+	};
+	shortcut.add("esc", closeDialog);
+    $(document).ready(function(){
+        if ( detailsStyle == 0 ) {
+            $(".ngireps").css("max-height","");
+		}
+		$(".dijitDialogTitleBar").hide();
+		appdb.views.Main.setNavigationTitle('<?php echo str_replace("'","\\'",$this->entry->name);?>');
+		$("#toolbarContainer").empty();
+		$("#mainNavigation").show();
+    });
+
+</script>
+<?php } else {?>
+<div style="text-align: center"><img width="32px" src="/images/error.png" style="vertical-align: middle"/> <b>Record not found</b></div>
+<?php } ?>

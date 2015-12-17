@@ -1,0 +1,430 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><div class="contentcontainer" >
+	<span class="newapphintcontainer hidden"><div class="newapphint"><div><b>Hint</b>: information about dataset locations will be available for edit after saving...</div></div></span>
+	<div id="navdiv<?php echo $this->dialogCount;?>" style="width:100%;height:auto;padding:0px;" class="entitycontent entitydataset viewmode" >
+	<div class="command-toolbar hidden" >
+		<a class="command cmd-edit hideonedit" href="#" data-permissionid="47" data-action="edit"><img alt="edit" border="0" src="/images/editicon.png"/><span>Edit</span></a>
+		<a class="command cmd-save showonedit" href="#" data-permissionid="47" data-action="save"><img alt="save" border="0" src="/images/diskette.gif"/><span>Save</span><img class="invalid" alt="save" border="0" src="/images/vappliance/warning.png"/><span class="invalid">Please provide valid values in order to be able save</span></a>
+		<a class="command cmd-cancel showonedit" href="#" data-action="cancel"><img alt="cancel" border="0" src="/images/stop.png"/><span>Cancel</span></a>
+		<a class="command cmd-mod hideonedit hidden" href="#" data-permissionrole="admin,manager" data-action="moderate"><img alt="moderate" border="0" src="/images/stop2.png"/><span>Moderate</span></a>
+		<a class="command cmd-del hideonedit" href="#" data-permissionid="46" data-action="delete" ><img alt="delete" border="0" src="/images/cancelicon.png"/><span>Delete</span></a>
+		<a class="command cmd-bm hideonedit hidden" href="#" data-action="bookmark" ><img alt="bookmark" border="0" src="/images/star1.png"/><span>Bookmark</span></a>
+		<a class="command cmd-history hideonedit hidden" href="#" data-action="history"><img alt="history" border="0" src="/images/history.png"/><span>History</span></a>
+	</div>
+	<ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+		<li><a href="#infodiv<?php echo $this->dialogCount;?>">Information</a></li>
+		<a class="reloadentity reloaddataset icontext" href="#" onclick="appdb.pages.dataset.reload();" title="Reload"><img alt="reload" border="0" src="/images/refresh.png"/><span>Reload</span></a>
+	</ul>
+	<div id="infodiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" title="" selected="true">
+		<table border="0" width="99%" class="dataset-metadata" >
+			<tr>
+				<td width="101px" style="vertical-align:top; padding-top:15px;">
+					<div style="vertical-align:middle;">
+					<center>
+					<img id="datasetimg<?php echo $this->dialogCount;?>" border="0" src="/images/dataset.png" width='110px'>					
+					</center>
+					</div>
+				</td>
+				<td>
+					<table border="0" width="100%" class="dataset-main-contents dataset-data-group">
+						<tr >
+							<td style="width:100%;">
+								<table border="0" style="width:100%;" class="hideonedit">
+									<tr >
+										<td colspan="2">
+											<div class="entityheader">
+												<span class="dataset-name value appdb-ui" data-name="name" data-bind="name" ></span>
+												<div class="permalink"><a href="http://<?php echo $_SERVER["HTTP_HOST"];?>" target="_blank" class="dataset-permalink permalink">[permalink]</a></div>
+												<div class="entityid">(id:<span style="padding-right: 3px" class="dataset-id appdb-ui" data-name="id" data-bind="id" ></span>)</div>
+												<div class="dataset-parent appdb-ui richui" data-name="parent" data-bind="parent" data-ui="dataset.parentlink" data-use="view.displayon"></div>
+											</div>
+										</td>
+									</tr>
+									<tr style="height: 10px;"><td></td></tr>
+									<tr><td><span class="dataset-description value appdb-ui" data-name="description" data-bind="description" ></span></td></tr>
+									<tr class="hideonedit"><td>
+											<span class="dataset-homepage dataset-url-type appdb-ui" data-name="homepage" data-bind="url"  data-bind-select="type=homepage" data-ui="link" data-link-type="homepage" data-use="displayon" data-displayon="url.type" data-displayon-value="homeaspage" ></span>
+											<span class="dataset-elixirurl dataset-url-type appdb-ui" data-name="elixirurl" data-bind="url"  data-bind-select="type=elixir" data-ui="link" data-link-type="elixir" data-link-typedisplay="elixir registry" data-displayon="url.type" data-displayon-value="elixir" ></span>
+									</td></tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td >
+								<table class="field-app-maindata">
+									<tr class="showonedit dataset-name-row">
+										<td class="listhandlercontainer fieldnamevalue"><span>Name</span><span class="mandatory-flag" title="Field is mandatory">*</span><span>:</span></td>
+										<td class="propertyvalue"><span class="dataset-name appdb-ui" data-name="name" data-bind="name" data-editor="textbox" data-min="3" data-required="true" placeholder="please provide a name for the dataset" data-check="dataset.checkname" data-editor-use="dataset.namestatus"></span></td>
+									</tr>
+									<tr class="showonedit dataset-description-row">
+										<td class="listhandlercontainer fieldnamevalue"><span>Description</span><span class="mandatory-flag" title="Field is mandatory">*</span><span>:</span></td>
+										<td class="propertyvalue"><span class="dataset-description appdb-ui" data-name="description" data-bind="description" data-editor="textarea" data-editor-use="validation.status,validation.requiredmessage" data-required="true" data-max="5000"></span></td>
+									</tr>
+									<tr class="showonedit dataset-parent-row">
+										<td class="listhandlercontainer fieldnamevalue"><span>Parent Dataset</span><span>:</span></td>
+										<td class="propertyvalue dataset-parent-property">
+											<span class="dataset-parent appdb-ui" data-name="parent" data-bind="parent" data-ui="dataset.parentlink" data-editor="list" data-source="appdb.components.Dataset.availableparents" data-editor-value="id" data-exclude="appdb.components.Dataset.nonparentids()" data-canedit="appdb.components.Dataset.canEditParent" ></span>
+											<span class="hasparent inlinemessage">
+												<span class="message">
+													<img src='/images/info.png' alt=''/><span>The parent property for this dataset is already set and cannot be changed or removed.</span>
+												</span>
+											</span>
+											<span class="noparent inlinemessage">
+												<span class="message">
+													<img src='/images/vappliance/warning.png' alt=''/><span>Once you set the parent property, you won't be able to change or remove it after saving the dataset. <br/> Please leave it blank if you are not sure.</span>
+												</span>
+											</span>
+											<span class="cannotparent inlinemessage">
+												<span class="message">
+													<img src='/images/info.png' alt=''/><span>This dataset cannot have a parent, since other datasets are derived from it.</span>
+												</span>
+											</span>
+										</td>
+									</tr>
+									<tr class="dataset-disciplines-row">
+										<td class="listhandlercontainer fieldnamevalue"><span >Disciplines</span><span class="mandatory-flag" title="Field is mandatory">*</span><span>:</span></td>
+										<td class="propertyvalue">
+											<span class="datasetdisciplines"></span>
+											<span class="showonedit">
+												<span class="hasparent inlinemessage">
+													<span class="message">
+														<img src='/images/info.png' alt=''/><span>Disciplines are inherited from the primary dataset which this dataset is derived from.</span>
+													</span>
+												</span>
+												<span class="setparent inlinemessage">
+													<span class="message">
+														<img src='/images/vappliance/warning.png' alt=''/><span>The disciplines of the dataset will be inherited from the parent dataset and are not editable.</span>
+													</span>
+												</span>
+											</span>
+										</td>
+									</tr>
+									<tr class="dataset-category-row">
+										<td class="listhandlercontainer fieldnamevalue"><span >Category</span><span class="mandatory-flag" title="Field is mandatory">*</span><span>:</span></td>
+										<td class="propertyvalue"><span class="datasetcategories appdb-ui" data-bind="category"></span></td>
+									</tr>
+									<tr class="showonedit dataset-homepage-row">
+										<td class="listhandlercontainer fieldnamevalue"><span>Homepage</span><span class="mandatory-flag" title="Field is mandatory">*</span><span>:</span></td>
+										<td class="propertyvalue"><span class="dataset-homepage-editor appdb-ui" data-group="url" data-name="homepage" data-bind="url" data-bind-select="type=homepage" data-editor="url" data-datatype='url' data-url-type="homepage" data-required="true" data-max="5000"></span></td>
+									</tr>
+									<tr class="showonedit dataset-elixirurl-row">
+										<td class="listhandlercontainer fieldnamevalue"><span>Elixir Url</span>:</span></td>
+										<td class="propertyvalue"><span class="dataset-elixirurl-editor appdb-ui" data-group="url" data-name="elixir" data-bind="url" data-bind-select="type=elixir" data-editor="url" data-datatype='url' data-url-type="elixir" data-max="5000"></span></td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<table style="width: 100%">
+						<tr>
+							<td>
+								<div class="dataset-data-group dataset-group groupcontainer">
+									<ul>
+										<li ><a href="#datasetlicenses"><span>License(s)</span></a></li>
+										<li class="hidden"><a href="#datasetrelationlists"><span>Projects &amp; Organizations</span></a></li>
+										<li class="hideonedit"><a href="#datasetadditionalinformationtab"><span>Additional Info</span></a></li>
+									</ul>
+									<div id="datasetlicenses">
+										<div class="field-title">Dataset Licenses</div>
+										<span class="field-description showonedit"><span> Select licenses applied to this dataset. </span><br/><br/> <span> It is recommended when selecting more than one license to describe in details the cases where each license is applied.</span> <br/><br/><span> If you cannot find the desired license you can always <a href="#" class="customlicenseadder" title="register new custom license" tabindex="-1">register a new one</a>.</span> </span>
+										<div class="dataset-licenses app-licenses">
+											<span class="field-handlers customaddertemplate showonedit hidden" ><a href="#" class="listhandler customadder icontext" title="Register a new dataset license" ><img src="/images/add.png" border="0"><span>Register new</span></a></span>
+											<span class="field-description showonedit"><span> Select licenses applied to this dataset item. </span><br><br> <span> It is recommended when selecting more than one license to describe in details the cases where each license is applied.</span> <br><br><span> If you cannot find the desired license you can always <a href="#" class="customlicenseadder" title="register new custom license" tabindex="-1">register a new one</a>.</span> </span>
+											<span class="field-handlers addertemplate showonedit" ><a href="#" class="listhandler adder editbutton" title="Add a dataset license"><span>Add</span></a></span>
+											<div class="itemtemplate hidden">
+												<div class="header">
+													<span class='field select showonedit'>Select License:</span>
+													<div class="value">
+														<span class="title"></span><span class="name" ></span>
+													</div>
+													<a class="licencelink hidden icontext" href="#" title="View license contents in new window" target="_blank"><img src="/images/search.png" alt=""/><span>View License</span></a>
+													<div class="actions showonedit">
+														<a href="#" title="remove license" class="remove action icontext" tabindex="-1">remove</a>
+													</div>
+												</div>
+												<div class="content">
+													<span class="field">Further details:</span>
+													<span class="comments"></span>
+												</div>
+											</div>
+											<div class="customitemtemplate hidden custom">
+												<div class="header">
+													<span class='field select showonedit'>License Name:</span>
+													<div class="value titlefield">
+														<span class="title"></span>
+														<div class="warning">
+															<div><img src="/images/vappliance/warning.png" alt=""/>The name you provided is already in the list of predefined licenses:</div>
+															<div class="predefinedlicense"><a href="#" title="View license in new window" target="_blank"></a></div>
+															<div>
+																It is recommended to use the predefined licenses instead of registering a new one,
+																and provide further information related to the selected licenses in the details section.
+															</div>
+														</div>
+													</div>
+													<div class="actions showonedit">
+														<a href="#" title="remove license" class="remove action icontext" tabindex="-1">remove</a>
+													</div>
+												</div>
+												<div class="linkcontainer header">
+													<span class='field select showonedit'>License Link:</span>
+													<span class="value linkfield showonedit"><span class="link"></span>
+														<div class="warning">
+															<div><img src="/images/vappliance/warning.png" alt=""/>The link you provided is associated with a predefined license:</div>
+															<div class="predefinedlicense"><a href="#" title="View license in new window" target="_blank"></a></div>
+															<div>
+																It is recommended to use the predefined licenses instead of registering a new one,
+																and provide further information related to the selected licenses in the details section.
+															</div>
+														</div>
+													</span>
+												</div>
+												<div class="content">
+													<span class="field">Further details:</span>
+													<span class="comments"></span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div id="datasetrelationlists" class="entityrelations hiddengroup tabcontent hidden">
+										<div class="field-title">Projects &amp; Organizations</div>
+
+										<span class="field-name dataset-project-relations">Related projects: </span>
+										<span class="field-description">User defined associations with projects:</span>
+										<span class="field-values project-relations">
+											<div class="dataset-project-relations field-lists relationlist isempty viewmode" style="vertical-align: middle;" id="datasetprojectrelationsdiv1"><div class="emptylist">No related projects</div><ul class="relations"></ul><button type="button" class="btn btn-success btn-compact action add" title="add new relation" tabindex="-1">add</button></div><br>
+										</span>
+
+										<span class="field-name dataset-organization-relations">Related organizations: </span>
+										<span class="field-description">User defined associations with organizations</span>
+										<span class="field-values dataset-organization-relations">
+											<div class="dataset-organization-relations field-lists relationlist isempty canedit viewmode" style="vertical-align: middle;" id="datasetorganizationrelationsdiv1"><div class="emptylist">No related organizations</div><ul class="relations"></ul><button type="button" class="btn btn-success btn-compact action add" title="add new relation" tabindex="-1">add</button></div><br>
+										</span>
+									</div>
+									<div id="datasetadditionalinformationtab" class="tabcontent hideonedit">
+										<span class="field-name misc ">Miscellaneous<span class="hideonview showonedit" style="padding-left:3px;">& Ownership</span></span>
+										<span class="field-values misc dataset-addedby-container hideonedit">
+											<span class="field">Added by:</span><span class="value dataset-addedby"></span><span class="textvalue">, on</span><span class="dataset-addedon textvalue" style="padding-left: 5px;"></span>
+										</span>
+									</div>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<div class="dataset-info init" title="Dataset versions" >
+									<div class="emptycontainer">
+										<div class="emptymessage">
+											<span class="message">No dataset versions available yet</span>
+											<span class="showoneditable">Click on the button bellow to create a new dataset version</span>
+											<button class="btn btn-success btn-compact init" type="button">Add New Version</button>
+										</div>
+									</div>
+									<div class="list">
+										<div class="group-version-list">
+											<div class="header">Versions:</div>
+											<div class="toolbar">
+												<button class="btn btn-success btn-compact add" type="button">Add New Version</button>
+											</div>
+											<ul class="versions">
+												<div class="template version-listitem hidden" data-template="dataset.versions.item">
+													<div class="dataset-version-header">
+														<div class="id fieldvalue">
+															<div class="value"></div>
+														</div>
+														<div class="version fieldvalue">
+															<div class="value"></div>
+														</div>
+													</div>
+												</div>
+											</ul>
+											<div class="footer"></div>
+										</div>
+									</div>
+									<div class="main">
+										<div class="notfound">
+											<div class="message-container">
+												<div class="message">
+													<img src="/images/vappliance/warning.png" alt=""/>
+													<span>The dataset version you requested was not found. Please select a version from the list on the left.</span>
+												</div>
+											</div>
+										</div>
+										<div class='version-container'>
+											<div class="toolbar">
+												<button class="action btn btn-primary btn-compact edit" type="button">edit</button>
+												<button class="action btn btn-danger btn-compact remove hideonedit" type="button">remove</button>
+												<button class="action btn btn-primary btn-compact save showonedit" type="button">save</button>
+												<button class="action btn btn-danger btn-compact cancel showonedit" type="button">cancel</button>
+											</div>
+											<div class="version-info">
+												<div class="version-info-version field-title">Version:<span class="appdb-ui" data-name="version" data-bind="version" data-editor="textbox" data-required="true" data-max="50" data-editor-use="validation.status,validation.requiredmessage,dataset.editversion"></span></div>
+												<div class='version-info-derived fieldvalue' data-hideonempty="parent_version">
+													<div class="field">Derived from:</div>
+													<div class="noparentversions-container showonedit">
+														<div class="message">
+															<img src='/images/info.png' alt=''/>
+															<span >no versions defined for dataset </span><span class="parent-dataset-link"></span>
+														</div>
+													</div>
+													<div class="parentversions-container showonedit">
+														<div class="value showonedit">version </div>
+														<div class="value appdb-ui" data-name="derived" data-bind="parent_version" data-ui="dataset.derivedfrom" data-editor="list" placeholder="Select a parent version" data-source="appdb.components.Dataset.parentversions" data-editor-value="id" data-editor-displayvalue='version' data-use="view.displayon" data-displayon="appdb.components.Dataset.cansetderived" ></div>
+														<div class="value showonedit">of parent dataset </div><div class="showonedit value parent-dataset-link"></div>
+													</div>
+												</div>
+												<div class="version-info-addedon fieldvalue hideonedit">
+													<div class="field">Added On:</div>
+													<div class="value appdb-ui" data-name="addedon" data-bind="addedon" data-ui="date"></div>
+												</div>
+												<div class="version-info-notes fieldvalue">
+													<div class="field">Notes:</div>
+													<div class="value appdb-ui" data-name="notes" data-bind="notes" data-editor="textarea" data-editor-use="validation.status,validation.requiredmessage" data-empty="n/a" data-max="1000" placeholder="Notes for the specific dataset version"></div>
+												</div>
+											</div>
+											<div class="dataset-locations-list">
+												<div class="field-title">Dataset Locations<button class="btn btn-success btn-compact addnew" type="button">add</button></div>
+												<div class="empty">No locations specified</div>
+												<div class="template dataset-locations-container hidden" data-template="dataset.versions.item.locations">
+													<div class="dataset-version-locations" >														
+														<div class="dataset-locations empty">
+															<div class="dataset-locations-list-container">
+																<div class="dataset-location-item-template" data-template="dataset.versions.item.locations.item">
+																	<div>
+																	<button class="btn btn-danger btn-compact remove" type="button" tabindex="-1">remove</button>
+																	<div class="ds-location-uri-container fieldvalue">
+																		<div class="field">URL:</div>
+																		<div class="value appdb-ui" data-name="url" data-bind="uri" data-required="true" data-ui="url" data-editor="textbox"></div>
+																	</div>
+																	<div class="ds-location-ismaster-container fieldvalue">
+																		<div class="field">Master:</div>
+																		<div class="value appdb-ui" data-name="master" data-bind="master" data-ui="boolean" data-editor="booleanlist" data-default="false" data-truevalue="master" data-falsevalue="replica"></div>
+																	</div>
+																	<div class="row">
+																	<div class="ds-location-exchangeformat-container fieldvalue column on-edit-inline col-60">
+																		<div class="field vertical-top on-edit-block">Format:</div>
+																		<div class="value appdb-ui vertical-top on-edit-block" data-name="exchange_format" data-bind="exchange_format" data-editor="list" data-source="appdb.model.StaticList.ExchangeFormats" data-required="true"></div>
+																	</div>
+																	<div class="ds-location-connectiontype-container fieldvalue column on-edit-inline col-40">
+																		<div class="field vertical-top on-edit-block">Connection:</div>
+																		<div class="value appdb-ui vertical-top on-edit-block" data-name="interface" data-bind="interface" data-editor="list" data-source="appdb.model.StaticList.Interfaces" data-required="true"></div>
+																	</div>			
+																	</div>
+																	<div class="ds-location-addedby-container fieldvalue">
+																		<div class="field">Added by:</div>
+																		<div class="value appdb-ui" data-name="addedby" data-bind="addedby" data-ui="personlink"></div>
+																	</div>
+																	<div class="row">
+																	<div class="ds-location-organization-container fieldvalue column on-edit-inline col-60" data-hideonempty="organization" data-use="view.displayon">
+																		<div class="field vertical-top on-edit-block">Organization:</div>
+																		<div class="value ds-location-organization-container on-edit-block">
+																			<div class="ds-location-organization-list appdb-ui appdb-ui-collection" data-name="organization-collection" data-bind="organization" data-ui="collection" data-editor="collection" data-use="view.displayon" data-item-name="organization" data-item-bind="organization" data-item-ui="organization" data-item-editor="OrganizationList" placeholder="No organizations associated yet" >
+																				<div class="empty-collection-container">
+																					<span class="empty-message"></span>
+																				</div>
+																				<div class="collection-section header">
+
+																				</div>
+																				<div class="appdb-ui-collection-item-template" >
+																					<div class="collection-item collection-item-inline">
+																						<div class="appdb-ui-collection-item ds-organization-name appdb-ui link-inline" ></div>
+																						<button class="addon btn btn-compact btn-small btn-danger appdb-ui-collection-item-command showonedit" data-command="collection-item-remove">&#10006;</button>
+																					</div>
+																				</div>
+																				<div class="collection-section footer">
+																					<button type="button" class="btn btn-small btn-compact btn-success command showonedit" data-command="collection-item-new">new</button>
+																				</div>
+																			</div>
+																		</div>
+																	</div>
+																	<div class="ds-location-site-container fieldvalue column on-edit-inline col-40" data-hideonempty="site">
+																		<div class="field vertical-top on-edit-block">Site:</div>
+																		<div class="value ds-location-site-container on-edit-block">
+																			<div class="ds-location-site-list appdb-ui appdb-ui-collection" data-name="site-collection" data-bind="site" data-ui="collection" data-editor="collection" data-use="view.displayon" data-item-name="site" data-item-bind="site" data-item-ui="site" data-item-editor="list" data-item-editor-value="id" data-item-editor-displayvalue="name" data-item-source="appdb.model.StaticList.SiteList" placeholder="No sites associated yet" >
+																				<div class="empty-collection-container">
+																					<span class="empty-message"></span>
+																				</div>
+																				<div class="collection-section header">
+																					
+																				</div>
+																				<div class="appdb-ui-collection-item-template" >
+																					<div class="collection-item collection-item-inline">
+																						<div class="appdb-ui-collection-item ds-site-name appdb-ui link-inline" ></div>
+																						<button class="addon btn btn-compact btn-small btn-danger appdb-ui-collection-item-command showonedit" data-command="collection-item-remove">&#10006;</button>
+																					</div>
+																				</div>
+																				<div class="collection-section footer">
+																					<button type="button" class="btn btn-small btn-compact btn-success command showonedit" data-command="collection-item-new">new</button>
+																				</div>
+																			</div>
+																		</div>
+																	</div>
+																	</div>
+																	<div class="ds-location-notes-container fieldvalue">
+																		<div class="field">Notes:</div>
+																		<div class="value appdb-ui" data-name="notes" data-bind="notes" data-editor="textarea" data-editor-use="validation.status" data-empty="n/a" data-max="2000" placeholder="Notes for the specific location"></div>
+																	</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>										
+										</div>
+									</div>
+								</div>
+							</td>
+						</tr>
+						<tr class="hideonedit">
+							<td>
+								<div class='derived-datasets-list-container'>
+									<div class="field-title">Derived Datasets</div>
+									<div class="main">
+										<ul class="derived-datasets-list appdb-ui datasets itemgrid" data-name="deriveddatasets" data-bind="derived" data-ui="dataset.deriveddatasets" ></ul>
+									</div>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		<br/>
+		
+		<br/>
+		<div class="datasetcontents"  >
+			<div class="emptycontent ">
+				<div class="content">	
+					<img src="/images/exclam16.png">
+					<span>No locations found.</span>
+				</div>
+			</div>
+			<div class="datasetlocations datasetcontent">
+				<div class='location-list-container'>
+					<ul class='location-list'></ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+

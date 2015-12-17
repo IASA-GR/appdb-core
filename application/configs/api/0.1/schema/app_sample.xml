@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appdb:appdb
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="application.xsd"
+    xmlns:appdb="http://appdb.egi.eu/api/1.0/appdb"
+    xmlns:application="http://appdb.egi.eu/api/1.0/application"
+    xmlns:person="http://appdb.egi.eu/api/1.0/person"
+    xmlns:publication="http://appdb.egi.eu/api/1.0/publication"
+    xmlns:vo="http://appdb.egi.eu/api/1.0/vo"
+    xmlns:regional="http://appdb.egi.eu/api/1.0/regional"
+    type="list" datatype="application" version="1.0">
+<application:application
+    id="1" tool="true">
+    <application:name>lalala</application:name>
+    <application:description>asfasdf</application:description>
+    <application:abstract>asdfasdf</application:abstract>
+    <application:discipline id="5">lalala</application:discipline>
+    <application:subdiscipline id="5">lalala</application:subdiscipline>
+    <application:status id="5">lalala</application:status>
+    <application:middleware id="5">lalala</application:middleware>
+    <regional:country id="5">lalala</regional:country>
+    <regional:region id="5">lalala</regional:region>
+    <application:addedOn>1979-11-22</application:addedOn>
+    <application:permalink>asdfdfasdf</application:permalink>
+    <publication:publication>
+        <publication:title>test</publication:title>
+        <publication:type>Full Paper</publication:type>
+        <publication:year>2000</publication:year>
+        <publication:author type="internal" main="true">
+            <person:person id="5">
+                <person:lastname>aaa</person:lastname>
+                <person:firstname>aaa</person:firstname>
+                <person:role id="1" type="Manager" />
+                <person:institute>asdfadsf</person:institute>
+                <regional:country id="1">asdfasdf</regional:country>
+                <regional:region id="123">asdfasdf</regional:region>
+                <person:registeredOn>1111-11-11</person:registeredOn>
+            </person:person>
+        </publication:author>
+        <publication:author type="external">
+            <publication:person>Someone</publication:person>
+        </publication:author>
+    </publication:publication>
+</application:application>
+<application:application
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="application.xsd"
+    xmlns:application="http://appdb.egi.eu/api/1.0/application"
+    xmlns:regional="http://appdb.egi.eu/api/1.0/regional"
+    id="1" tool="true">
+    <application:name>lalala</application:name>
+    <application:description>asfasdf</application:description>
+    <application:abstract>asdfasdf</application:abstract>
+    <application:discipline id="5">lalala</application:discipline>
+    <application:subdiscipline id="5">lalala</application:subdiscipline>
+    <application:status id="5">lalala</application:status>
+    <application:middleware id="5">lalala</application:middleware>
+    <vo:vo id="5">lalala</vo:vo>
+    <regional:country id="5">lalala</regional:country>
+    <regional:region id="5">lalala</regional:region>
+    <application:addedOn>1979-11-22</application:addedOn>
+    <application:permalink>asdfdfasdf</application:permalink>
+</application:application>
+</appdb:appdb>

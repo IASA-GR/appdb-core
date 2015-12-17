@@ -1,0 +1,90 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><div class="sitebanner">
+	<div class="topmenubar"></div>
+	<div class="main">
+		<div class="logo"><img src="/images/appdblogo.png" alt=""/><span>Applications <span>Database</span><br/><span class="subtext">Software solutions for research communities</span></span></div>
+		<ul class="contents">
+			<li class="software" ><span>Software<br/>Marketplace</span></li>
+			<li class="vappliance"><span>Cloud<br/>Marketplace</span></li>
+			<li class="researchers"><span>People</span></li>
+		</ul>
+		<?php if ( ApplicationConfiguration::isProductionInstance() === false ) { ?>
+		<div class="developmentinstance"><span>Development Instance</span><a href="http://appdb.egi.eu" title='Click here to go to production instance' >[go to production]</a></div>
+		<?php } ?>
+	</div>
+</div>
+<div id="maincontent" align="center" style="display:block;margin-top:40px;">
+	<div class="logo">
+		<div class="decorator bottomright">
+			<span>Software for research communities</span>
+		</div>
+		<div class="decorator topleft">
+			<a href="#" class="showhome" title="go home"><img class="moto" src="/images/appdb_logo_moto.png" alt=""/></a>
+		</div>
+		<img class="logo" src="/images/appdb-logo-new-small.png" usemap="#appdblogomap" />
+	</div>
+	<div id="mainNavigation" ></div>
+	<table id="mainbody" border="0" width="100%" cellspacing="0" cellpadding="0">
+		<tbody>
+			<tr>
+				<td>
+					<div align="left" style="margin-left:20px">
+					<h1 style="text-align:left">Supported Browsers</h1>
+				<?php if (browserName() === "Default Browser" && browserVersion() == "0" && browser()!== "firefox" && getMSIEVersion() < 0): ?>
+					You appear to be using an unrecognized browser.<br/>
+				<?php elseif(browser() === "firefox" ): ?>
+					You appear to be using: <strong>Firefox</strong><br/>
+				<?php elseif(getMSIEVersion() > 10 ): ?>
+					You appear to be using: <strong>IE, v.<?php echo getMSIEVersion();?></strong><br/>
+				<?php else: ?>
+					You appear to be using: <strong><?php echo browserName();?>, v.<?php echo browserVersion();?></strong><br/>
+				<?php endif ?>
+					This web site works best with one of these supported browsers:
+
+					<ul>
+				<?php readfile(APPLICATION_PATH.'/../public/browserlist.txt');?>
+					</ul>
+					<div style="display:none">
+					while experimental support exists for:
+					<ul>
+						<li>Microsoft Internet Explorer 8.0</li>
+					</ul></div>
+					Please use one the browsers listed above in order to view this site, or else some functionality may be hindered, or broken.<br/>
+					If, however, you believe the browser you are using qualifies for the list above, please use the <a href="http://helpdesk.egi.eu/" target="_blank">EGI Helpdesk</a> to let us know.<p></p>
+					<?php $this->session->browserWarnAcknol=true; ?>
+					<a href="/">Continue</a>
+					</div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<script type="text/javascript">
+if( $.browser.msie ){
+	function showHome(){}
+}
+function showAjaxLoading(){
+	hideAjaxLoading();
+}
+$(".showhome").click(function(){
+	window.location.href = appdb.config.endpoint.base;
+});
+setTimeout( function() {
+	
+});
+</script>

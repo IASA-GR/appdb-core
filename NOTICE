@@ -1,0 +1,126 @@
+This NOTICE file contains certain notices of software components included with this product.
+
+------------------------------------------------
+Attribution for PHP Libraries and Frameworks
+------------------------------------------------
+
+Zend Framework
+http://framework.zend.com
+License: New BSD License
+Copyright (c) 2005-2015, Zend Technologies USA, Inc.
+
+
+------------------------------------------------
+Attribution for JavaScript Libraries and Plugins
+------------------------------------------------
+
+Dojo toolkit provided by The Dojo Foundation
+http://dojotoolkit.org 
+License: New BSD License
+Copyright (c) 2005-2015, The Dojo Foundation.
+
+jQuery Javascript Library provided by John Resig and the jQuery Foundation
+http://jquery.org 
+License: MIT license
+Copyright © 2014, John Resig
+
+jQuery UI Javascript Library provided by jQuery Foundation, Paul Bakaus and other contributors(https://github.com/jquery/jquery-ui/blob/master/AUTHORS.txt)
+http://jqueryui.com 
+License: MIT license 
+Copyright © 2013 jQuery Foundation
+
+jQuery UI Effects provided by jQuery UI author Aaron Eisenberger (aaronchi@gmail.com)
+http://docs.jquery.com/UI/Effects/
+License: MIT license
+Copyright (c) 2008 Aaron Eisenberger (aaronchi@gmail.com)
+
+jQuery UI Effects Slide provided by jQuery Foundation and Aaron Eisenberger (aaronchi@gmail.com)
+http://docs.jquery.com/UI/Effects/Slide
+License: MIT license
+Copyright (c) 2008 Aaron Eisenberger (aaronchi@gmail.com)
+
+jQuery hashchange plugin provided by Ben Alman
+http://benalman.com/projects/jquery-hashchange-plugin 
+License: MIT license
+Copyright (c) 2010 "Cowboy" Ben Alman
+
+jQuery Cookie Plugin provided by Klaus Hartl
+https://github.com/carhartl/jquery-cookie
+License: MIT License
+Copyright 2006 Klaus Hartl
+
+jQuery escape plugin provided by Ian McKellar
+http://ianloic.com/tag/jquery.escape
+License: MIT license
+Copyright 2009 Ian McKellar <http://ian.mckellar.org/>
+
+jQuery Form Plugin provided by M. Alsup
+http://malsup.com/jquery/form/
+License: MIT license
+Copyright 2006-2013 (c) M. Alsup
+
+jQuery outerHTML plugin provided by Ca-Phun Ung
+http://yelotofu.com/labs/jquery/snippets/outerhtml
+License: MIT license
+Copyright (c) 2008 Ca-Phun Ung <caphun at yelotofu dot com>
+
+jQuery ScrollTo plugin provided by Ariel Flesler
+http://flesler.blogspot.com/2007/10/jqueryscrollto.html
+License: MIT license
+Copyright (c) 2007-2009 Ariel Flesler  aflesler(at)gmail(dot)com
+
+jQuery TagCloud plugin provided by Ron Valstar
+License: MIT license
+Copyright (c) 2008 Ron Valstar
+
+jQuery TinySort plugin provided by Ron Valstar
+License: MIT License
+Copyright (c) 2008 Ron Valstar
+
+jQuery Autocomplete plugin provided by Jörn Zaefferer
+License: MIT License
+Copyright (c) 2009 Jörn Zaefferer
+
+TinyMCE provided by https://www.tinymce.com/
+License: LGPL v2 License,
+https://github.com/tinymce
+
+Browser Detection Javascript, provided by Stephen Chapman
+http://www.felgall.com/jstip147.htm
+copyright 1 February 2003, by Stephen Chapman, Felgall Pty Ltd
+
+Json2 parser provided by Douglas Crockford
+http://www.JSON.org/js.html
+License: Public Domain
+
+shortcut provided by Binny V A,
+http://www.openjs.com/scripts/events/keyboard_shortcuts
+License: BSD License
+
+countdown.js provided by Stephen M. McKamey
+http://countdownjs.org
+License: MIT License
+Copyright (c) 2006-2012 Stephen M. McKamey
+
+Plupload provided by Moxiecode Systems AB
+http://www.plupload.com
+License: GPLv2 license
+Copyright 2013, Moxiecode Systems AB
+
+d3 javascript library provided by Michael Bostock
+http://d3js.org
+License: https://github.com/mbostock/d3/blob/master/LICENSE
+Copyright (c) 2010-2015, Michael Bostock
+
+PIE CSS provided by Jason Johnston
+http://css3pie.com
+License: Apache v2
+Copyright 2010 Jason Johnston
+
+------------------------------------------------
+Attribution for Web Font files
+------------------------------------------------
+
+OpenSans designed by Steve Matteson, Type Director of Ascender Corp
+https://www.google.com/fonts/specimen/Open+Sans
+License: Apache v.2

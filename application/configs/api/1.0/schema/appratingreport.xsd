@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+    targetNamespace="http://appdb.egi.eu/api/1.0/ratingreport"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:person="http://appdb.egi.eu/api/1.0/person"
+    xmlns:application="http://appdb.egi.eu/api/1.0/application"
+    xmlns:ratingreport="http://appdb.egi.eu/api/1.0/rating">
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/person" schemaLocation="person.xsd"/>
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/application" schemaLocation="application.xsd"/>
+    <xs:simpleType name="reportTypeType">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="internal" />
+            <xs:enumeration value="external" />
+            <xs:enumeration value="both" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="ratingType">
+        <xs:attribute name="value" type="xs:integer" use="required" />
+        <xs:attribute name="votes" type="xs:integer" use="required" />
+    </xs:complexType>
+    <xs:attribute name="type" type="ratingreport:reportTypeType" use="required" />
+    <xs:attribute name="applicationid" type="xs:integer" use="required" />
+    <xs:element name="rating" type="ratingreport:ratingType" minOccurs="0" maxOccurs="5" />
+</xs:schema>

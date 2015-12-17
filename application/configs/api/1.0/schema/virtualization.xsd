@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+     The work represented by this source file is partially or entirely funded 
+     by the EGI-InSPIRE project through the European Commission's 7th Framework 
+     Programme (contract # INFSO-RI-261323)
+
+     Copyright 2010 IASA and GRNET
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at [http://www.apache.org/licenses/LICENSE-2.0| Apache License 2.0]
+
+
+     Unless required by applicable law or agreed to in writing, software 
+     distributed under the License is distributed on an "AS IS" BASIS, 
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+     See the License for the specific language governing permissions and 
+     limitations under the License.
+-->
+     
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+    targetNamespace="http://appdb.egi.eu/api/1.0/virtualization"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:virtualization="http://appdb.egi.eu/api/1.0/virtualization"
+    xmlns:application="http://appdb.egi.eu/api/1.0/application"
+    xmlns:person="http://appdb.egi.eu/api/1.0/person"
+    xmlns:provider="http://appdb.egi.eu/api/1.0/provider">
+
+	<xs:import namespace="http://appdb.egi.eu/api/1.0/application"
+		schemaLocation="application.xsd"/>
+
+	<xs:import namespace="http://appdb.egi.eu/api/1.0/person"
+		schemaLocation="person.xsd"/>
+
+	<xs:import namespace="http://appdb.egi.eu/api/1.0/provider"
+		schemaLocation="provider.xsd"/>
+
+	<xs:simpleType name="integritycheckStatusType">
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="unchecked" />
+			<xs:enumeration value="checking" />
+			<xs:enumeration value="success" />
+			<xs:enumeration value="error" />
+			<xs:enumeration value="warning" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="integritycheckType" mixed="true">
+		<xs:attribute name="status" type="virtualization:integritycheckStatusType" />		
+	</xs:complexType>
+
+	<xs:complexType name="hypervisorType" mixed="true">
+		<xs:attribute name="id" type="xs:string" />		
+	</xs:complexType>
+
+	<xs:simpleType name="hashType">
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="sha512" />
+			<xs:enumeration value="sha384" />
+			<xs:enumeration value="sha256" />
+			<xs:enumeration value="sha224" />
+			<xs:enumeration value="sha1" />
+			<xs:enumeration value="md5" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="checksumType" mixed="true">
+		<xs:attribute name="hash" type="virtualization:hashType" />		
+	</xs:complexType>
+
+	<xs:complexType name="minmaxType" mixed="false" >
+		<xs:attribute name="minimum" type="xs:string" use="required"/>
+		<xs:attribute name="recommended" type="xs:string" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="urlType" mixed="true">
+		<xs:attribute name="protected" type="xs:boolean" use="optional" />
+	</xs:complexType>
+	
+	<xs:complexType name="ovfType" mixed="true">
+		<xs:attribute name="protected" type="xs:boolean" use="optional" />
+		<xs:attribute name="url" type="xs:string" use="optional" />
+	</xs:complexType>
+	
+	<xs:complexType name="imageInstanceType" mixed="true">
+		<xs:sequence>
+			<xs:element name="integritycheck" type="virtualization:integritycheckType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="arch" type="application:archType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="os" type="application:OStype" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="format" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="hypervisor" type="virtualization:hypervisorType" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="identifier" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="size" type="xs:integer" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="url" type="virtualization:urlType" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="checksum" type="virtualization:checksumType" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="cores" type="virtualization:minmaxType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="ram" type="virtualization:minmaxType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="title" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="notes" type="xs:string" minOccurs="0" maxOccurs="1" />
+			<xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="addedon" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="addedby" type="person:personType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="ovf" type="virtualization:ovfType" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:integer" use="required" />
+		<xs:attribute name="flavourid" type="xs:integer" use="required" />
+		<xs:attribute name="version" type="xs:string" use="required" />
+		<xs:attribute name="integrity" type="xs:boolean" use="required" />
+		<xs:attribute name="enabled" type="xs:boolean" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="personrefType" mixed="true" >
+		<xs:sequence>
+			<xs:element ref="person:person" minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:integer" use="required" />
+		<xs:attribute name="cname" type="xs:string" use="optional" />
+	</xs:complexType>
+
+	<xs:complexType name="imageType" mixed="true">
+		<xs:sequence>
+			<xs:element name="description" type="xs:string" />
+			<xs:element name="group" type="xs:string" />
+			<xs:element name="identifier" type="xs:string" />
+			<xs:element name="notes" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="instance" type="virtualization:imageInstanceType" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:integer" use="required" />
+		<xs:attribute name="name" type="xs:string" use="optional" />
+	</xs:complexType>
+
+	<xs:complexType name="applianceInstanceType" mixed="true">
+		<xs:sequence>
+			<xs:element name="identifier" type="xs:string" />
+			<xs:element name="notes" type="xs:string" minOccurs="0" maxOccurs="1" />
+			<xs:element name="image" type="virtualization:imageType" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:integer" use="required" />
+		<xs:attribute name="version" type="xs:string" use="required" />
+		<xs:attribute name="published" type="xs:boolean" use="required" />
+		<xs:attribute name="createdon" type="xs:dateTime" use="required" />
+		<xs:attribute name="enabled" type="xs:boolean" use="required" />
+		<xs:attribute name="archived" type="xs:boolean" use="required" />
+		<xs:attribute name="archivedon" type="xs:dateTime" use="optional" />
+		<xs:attribute name="status" type="xs:string" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="applianceType" mixed="true">
+		<xs:sequence>
+			<xs:element name="instance" type="virtualization:applianceInstanceType" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:integer" use="required" />
+		<xs:attribute name="imageListsPrivate" type="xs:boolean" use="optional" />
+		<xs:attribute name="appid" type="xs:integer" use="required" />
+		<xs:attribute name="identifier" type="xs:string" use="required" />
+		<xs:attribute name="name" type="xs:string" use="optional" />
+    </xs:complexType>
+
+    <xs:element name="appliance" type="virtualization:applianceType" />
+    <xs:element name="provider" type="provider:providerType" />
+    <xs:element name="hypervisor" type="virtualization:hypervisorType" />
+</xs:schema>

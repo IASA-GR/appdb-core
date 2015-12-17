@@ -1,0 +1,3 @@
+<?php
+class Repository_Model_CommRepoAllowedPlatformCombinationsFilter extends Repository_Model_CommRepoAllowedPlatformCombinationsFilterBase {
+}

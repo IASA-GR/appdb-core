@@ -1,0 +1,476 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><div class="aboutpage statistics">
+	<div class="aboutheader">
+		<span><a href="#" target="_blank"></a></span>
+		<h1>
+			<?php 
+				$this->title = ""; 
+				$this->displayGroupName = $this->groupName;
+				$this->content = "software";
+				
+				switch( strtolower( trim($this->groupName) ) ){
+					case "position":
+						$this->displayGroupName = "Scientific Orientation";
+						break;
+					default:
+						break;
+				}
+			?>
+			<?php 
+				switch($this->contentType) { 
+					case "app": 
+						$this->title = "Software"; 
+						break; 
+					case "vapp": 
+						$this->title = "Virtual Appliances"; 
+						$this->content = "vappliance";
+						break; 
+					case "ppl": 
+						$this->title = "People"; 
+						$this->content = "people";
+						break;
+				}
+			?>
+			<?php
+				$this->groupName = strtolower($this->groupName);
+				$this->chartObject = strtolower($this->chartObject);
+				if ( $this->groupName == "domain" ) {
+					$this->title .=  " per Discipline";
+				} elseif ( $this->groupName == "subdomain" ) {
+					$this->title .=  " per Subdiscipline";
+				} elseif ( $this->groupName == "vo" ) {
+					$this->title .=  " per Virtual Organization";
+				} else {
+					$this->title .=  " per " .$this->displayGroupName;
+				}
+				echo $this->title;
+			?>
+		</h1>
+		<hr>
+	</div>
+<form name="exportimage" method="post" action="/<?php echo strtolower($this->chartObject);?>stats/exportimage">
+	<input type="text" style="display: none;" id="imgtype" name="type"/>
+	<input type="text" style="display: none;" id="svgdata" name="svgdata"/>
+</form>
+<form name="exportdata" method="post" action="/<?php echo strtolower($this->chartObject);?>stats/exportdata">
+	<input type="text" style="display: none;" id="datatype" name="type"/>
+	<input type="text" style="display: none;" id="data" name="data" />
+	<input type="text" style="display: none;" id="labels" name="labels" />
+</form>
+<table border="0" width="97%" style="margin-left: 3px;">
+	<tr>
+		<td style="text-align:center" colspan="3">
+			<div class="statisticstitle" style="display:block;">The graph bellow is interactive and you may click on it to navigate to the corresponding list of entries.</div>
+		</td>
+	</tr>
+	<tr>
+		<?php if ($this->chartType=="Bars") { ?>
+		<td>
+		<div align="center" style="width:8px;text-align: center;">
+		<?php for ($i=0;$i<strlen($this->displayGroupName);$i++){ 
+			$subchar = substr($this->displayGroupName,$i,1);
+			echo "<div style='min-height:7px;text-align: center;width:8px;'>".$subchar."</div>";
+		}?>
+		</div>
+		</td>
+		<?php } ?> 
+		<td>
+			<div dojoType="dojox.charting.widget.Chart2D" id="chart" style="margin-left:0;display:inline-block; vertical-align: middle;<?php echo ($this->chartType=="Bars")?"width: 810px;":"width: 820px;"; ?>height:<?php if ($this->chartType=="Bars") { echo max(count($this->entries)*20,300); } else { echo "650"; } ?>px;top:-300px">
+				<div class="action" type="Tooltip"></div>
+				<div class="action" type="MoveSlice" shift="2"></div>
+			</div>
+		</td>
+		<td align="right" style="vertical-align: top; text-align: right">
+			<ul class="listtoolbox statistics">
+				<li>
+					<div>
+						<a href="#" onclick="appdb.views.Main.showPage('statistics',{mainTitle: 'Browse graphically > <?php echo $this->title; ?>', url: '<?php echo strtolower($this->chartObject)."stats/per".strtolower($this->groupName)."?ct=Pie&content=".$this->content;?>', content: '<?php echo $this->content;?>'});"><img alt='piechart' title='Pie Chart View' border='0' width='30px' src='/images/pie.png'></a>
+					</div>
+					<div class="description">PIE</div>
+				</li>
+				<li>
+					<div>
+						<a href="#" onclick="appdb.views.Main.showPage('statistics',{mainTitle: 'Browse graphically > <?php echo $this->title; ?>', url: '<?php echo strtolower($this->chartObject)."stats/per".strtolower($this->groupName)."?ct=Bars&content=".$this->content;?>', content: '<?php echo $this->content;?>'});"><img alt='barchart' title='Bar Chart View' border='0' width='30px' src='/images/bars.png'></a>
+					</div>
+					<div class="description">BARS</div>
+				</li>
+				<li>
+					<div>
+						<a href='#' onclick="exportChartToggle();"><img border="0" id="exportimg" width="30px" title="Export chart" src="/images/export.png"/></a>
+					</div>
+					<div class="description">EXPORT</div>
+				</li>
+				<li>
+					<div>
+						<a href="#" class="exporthelp" ><img alt="help" width="24px" border="0"  src="/images/question_mark.gif"/></a>
+					</div>
+					<div class="description">HELP</div>
+				</li>
+			</ul>
+		</td>
+	</tr>
+	<?php if ($this->chartType=="Bars") { ?>
+	<tr>
+		<td>
+		</td>
+		<td style="text-align: center">
+		Number of <?php switch($this->contentType) { case "app": echo "Software"; break; case "vapp": echo "Virtual Appliances"; break; case "ppl": echo "People"; break; } ?>
+		</td>
+		<td>
+		</td>
+	</tr>
+	<?php } ?>
+	<?php 
+		$this->displayGroup = "";
+		switch(strtolower($this->groupName)){
+			case "domain":
+				$this->displayGroup = "discipline";
+				break;
+			case "subdomain":
+				$this->displayGroup = "subdiscipline";
+				break;
+			case "vo":
+				$this->displayGroup = "virtual organization";
+				break;
+			case "country":
+				$this->displayGroup = "related country";
+				break;
+		}
+	?>
+	<tr>
+		<td colspan="3">
+			<div class="emptystatistics">
+				<b>Note:</b> <span class="emptycount"></span><span>having no <?php echo $this->displayGroup;?> specified. Click <a href="#" onClick="plotClickDelegate('','N/A');"> here </a> </span>
+			</div>
+		</td>
+	</tr>
+</table>
+<script type="text/javascript">
+	navpaneclicks($("#statisticspane")[0]);
+	ajaxCount++;
+	// the div must be visible before instantiating the chart control
+	// so call fadeIn here instead of during the "complete" event of the caller ajaxLink
+	$("#main").fadeIn();
+	var svghtml = $("#chart").html();
+	
+	var chart1 = new dojox.charting.Chart2D("chart",{margins: {t: 10}});
+	chart1.setTheme(dojox.charting.themes.PlotKit["blue"]);
+	
+	<?php //Removing N/A value from array 
+		$this->emptyCount = 0; $this->emptyObject = null; $this->emptyIndex = -1;
+		for($i=0;$i<count($this->entries);$i++) {
+			if($this->entries[$i][$this->groupName] == "N/A"){
+				$this->emptyCount = $this->entries[$i][$this->chartObject.'count'];
+				unset($this->entries[$i]);
+				$this->entries = array_values($this->entries);
+				break;
+			}
+		}
+	?>
+		
+	var chartData = [ <?php for($i=0;$i<count($this->entries);$i++) {
+		echo $this->entries[$i][$this->chartObject.'count'];
+		if (($i+1)<count($this->entries)) echo ",";
+	} ?> ];
+	var emptyCount = '<?php echo $this->emptyCount; ?>' ;
+	if(emptyCount != '0'){
+		$(".emptystatistics > .emptycount").text(emptyCount);
+		if(emptyCount == 1){
+			$(".emptystatistics > .emptycount").before("<span>There is</span>").after("<span>entry</span>").parent().find("a:first").after("<span>to view this entry.</span>");
+		}else{
+			$(".emptystatistics > .emptycount").before("<span>There are</span>").after("<span>entries</span>").parent().find("a:first").after("<span>to view these entries.</span>");;
+		}
+	} else {
+		$(".emptystatistics").addClass("hidden");
+	}
+	<?php if ( $this->chartType == "Bars" ) { ?>
+	var seriesData = chartData;
+	var seriesLabels = [ <?php for($i=0;$i<count($this->entries);$i++) {
+		echo "'".$this->escape($this->entries[$i][$this->groupName])."'";
+		if (($i+1)<count($this->entries)) echo ",";
+	} ?> ];
+	// dojo chart control line-breaks labels when hypen present in caption and using HTML labels
+	// replace hypen with "modifier minus sign" (U+02D7)
+	chart1.addAxis("y", {vertical: true, majorTickStep:1, minorTickStep:1, microTickStep:1, labels: [ <?php for($i=1;$i<=count($this->entries);$i++) {
+		echo "{value: ".  ($i) . " , id:  '". (trim($this->entries[$i-1]["stid"])==''?'0':$this->entries[$i-1]["stid"]) ."' , textName:'".str_replace("-","˗",$this->entries[$i-1][$this->groupName])."', text: '".str_replace("-","˗",$this->entries[$i-1][$this->groupName])." (".$this->entries[$i-1][$this->chartObject.'count'].")'}";
+		if (($i)<count($this->entries)) echo ",";
+	} ?> ]});
+    chart1.addAxis("x", {vertical: false, min:0, minorLabels: false});
+    chart1.addPlot("default", {
+        type: "Bars",
+        areas: false,
+		ticks: false,
+        htmlLabels: false,
+        gap: 5
+      });
+	<?php } else {
+		$sum = 0;
+		foreach ($this->entries as $entry) {
+			$sum+=$entry[$this->chartObject.'count'];
+		} 	?>
+	var seriesData = [ <?php for($i=0;$i<count($this->entries);$i++) {
+			echo "{ y:".$this->entries[$i][$this->chartObject.'count'];
+			echo ", tooltip: '".str_replace("-","˗",$this->entries[$i][$this->groupName]).": ".$this->entries[$i][$this->chartObject.'count']." (".ceil($this->entries[$i][$this->chartObject.'count']*100/$sum)."%)'";
+			//echo ", stroke: 'black'";
+			echo ", text: '".str_replace("-","˗",$this->entries[$i][$this->groupName]) . " (".$this->entries[$i][$this->chartObject.'count'].")' ";
+			echo ", textName: '".str_replace("-","˗",$this->entries[$i][$this->groupName])."'";
+			echo ", id: '" . (trim($this->entries[$i]["stid"])==''?'':$this->entries[$i]["stid"]) . "'";
+			echo "}";		
+			if ( ($i+1)<count($this->entries)) echo ",";
+	} ?> ];
+	var seriesLabels = [ <?php for($i=0;$i<count($this->entries);$i++) {
+		echo "'".$this->escape($this->entries[$i][$this->groupName])."'";
+		if (($i+1)<count($this->entries)) echo ",";
+	} ?> ];
+
+	if($.browser.msie){
+		chart1.addPlot("default", {
+			type: "Pie",
+			font: "normal normal normal 6pt Arial",
+			fontColor: "#666",
+			precision: 1,
+			labelOffset:-0,
+			labelWiring: "#ccc",
+			labelStyle: "columns",
+			htmlLabels: false,
+			radius: 180,
+			margins: { t:1}
+		});
+	}else{
+		chart1.addPlot("default", {
+			type: "Pie",
+			precision: 1,
+			labelOffset: -0,
+			labelWiring: "#ccc",
+			labelStyle: "columns",
+			htmlLabels: false,
+			radius: 180,
+			margins: { t:1}
+		});
+	}
+	$(document).ready(function(){
+		if($.browser.msie){
+			$("#chart").find(":not(div.action)").css("position","relative");
+		}
+	});
+	<?php }?>	
+    chart1.addSeries("Software per "<?php $this->groupName ?>, seriesData);
+	var anim_a = new dojox.charting.action2d.MoveSlice(chart1, "default");
+    var anim_b = new dojox.charting.action2d.Highlight(chart1, "default");
+    var anim_c = new dojox.charting.action2d.Tooltip(chart1, "default");
+	var plotClickDelegate = function(id, text){
+		var type = '<?php echo $this->groupName; ?>', chartType = '<?php echo $this->chartObject;?>';
+		var delegate = appdb.views.Main.showApplication, query={},ext={};
+		switch(type){
+		case "vo":
+			delegate = appdb.views.Main.showApplicationVO;
+			query.flt = '&=vo.name:"' + (text==='N/A'?'NULL':text) + '"';
+			ext.mainTitle = text==='N/A'?'Without VO':text;
+			break;
+		case "country":
+			if(chartType=="app"){
+				delegate = appdb.views.Main.showApplicationCountry;
+			}else{
+				delegate = appdb.views.Main.showPeople;
+			}		
+			query.flt = "&=country.id:" + (text==='N/A'?'NULL':id);
+			ext.mainTitle = (text==='N/A'?'Without country':text);
+			break;
+		case "subdomain":
+			delegate = appdb.views.Main.showSubdiscipline;
+			query.flt = "&=subdiscipline.id:" + (id===''?'NULL':id);
+			ext.mainTitle = text==='N/A'?'Without subdiscipline':text;
+			break;
+		case "domain":
+			delegate = appdb.views.Main.showDiscipline;
+			query.flt = "&=discipline.id:" + (id===''?'NULL':id);
+			ext.mainTitle = text==='N/A'?'Without discipline':text;
+			break;
+		case "position":
+		case "Scientific Orientation":
+			delegate = appdb.views.Main.showPeople;
+			query.flt = "&=person.roleid:" + id;
+			ext.mainTitle = text;
+			break;
+		}
+		ext.content = '<?php echo $this->content; ?>';
+		$("[id^='dijit__MasterTooltip_']").remove();
+		ext.isBaseQuery = true;
+		ext.baseQuery = query;
+		
+		delegate(query,ext);	
+	};
+	chart1.connectToPlot("default",null,function(o){
+	 if(o.type=="onclick"){
+		 if(o.element=='bar'){
+			id = o.run.chart.axes.y.labels[o.index].id;
+			text = o.run.chart.axes.y.labels[o.index].textName;
+		}else{
+			id = o.run.data[o.index].id;
+			text = o.run.data[o.index].textName;
+		}
+		text = text.replace(/\./g,"dot______dot______dot]]");
+		text = text.replace(/[\u0021-\u002f\u003a-\u0040\u005b-\u005e\u0060\u007b-\u007e]/g,'');
+		text = decodeURI(encodeURI(text).replace(/\%CB\%97/g,'-'));
+		text = text.replace(/dot______dot______dot/g,".");
+		plotClickDelegate(id,text);
+	 }
+	});
+    chart1.render();
+	
+	var exportSvg = function () {
+		document.getElementById("svgdata").value = document.getElementById("chart").innerHTML;
+		document.getElementById("imgtype").value = "svg";
+		document.exportimage.submit();
+	};
+	var exportPng = function () {
+		document.getElementById("svgdata").value = document.getElementById("chart").innerHTML;
+		document.getElementById("imgtype").value = "png";
+		document.exportimage.submit();
+	};
+	var exportPdf = function () {
+		document.getElementById("svgdata").value = document.getElementById("chart").innerHTML;
+		document.getElementById("imgtype").value = "pdf";
+		document.exportimage.submit();
+	};
+	var exportCsv = function () {
+		document.getElementById("data").value = chartData;
+		document.getElementById("labels").value = seriesLabels;
+		document.getElementById("datatype").value = "csv";
+		document.exportdata.submit();
+	};
+
+	var exportDlg = null;
+
+	var exportChartToggle = function() {
+		if ( exportDlg === null ) {
+			exportDlg = new dijit.TooltipDialog({
+				title: 'Export',
+				content: '<table><tr><td>'+
+						'<a title="Export to SVG (Ctrl+Alt+S)" href="#" onclick="exportSvg();"><!--<img src="/images/svg.png" border="0" width="30px"/>--><span style="white-space: nowrap">Image to SVG</span></a>'+
+					'</td></tr><tr><td>'+
+						'<a title="Export to PNG (Ctrl+Alt+P)" href="#" onclick="exportPng();"><!--<img src="/images/png.png" border="0" width="30px"/>--><span style="white-space: nowrap">Image to PNG</span></a>'+
+					'</td></tr><tr><td>'+
+					'</table>'+
+					'<table><tr><td>'+
+						'<a title="Export to CSV (Ctrl+Alt+C)" href="#" onclick="exportCsv();"><!--<img src="/images/csv.png" border="0" width="30px"/>--><span style="white-space: nowrap">Data to CSV</span></a>'+
+					'</td></tr>'+
+					'</table>'
+			});
+			setTimeout(function(){
+				dijit.popup.open({
+					parent: $("#exportimg")[0],
+					popup: exportDlg,
+					around: $("#exportimg")[0],
+					orient: {BR:'TR'}
+				});
+			},250);
+		} else {
+			dijit.popup.close(exportDlg);
+			exportDlg = null;
+		}
+	};
+
+
+	shortcut.add("Ctrl+Alt+S",exportSvg);    
+	shortcut.add("Ctrl+Alt+P",exportPng);    
+	shortcut.add("Ctrl+Alt+F",exportPdf);
+	shortcut.add("Ctrl+Alt+C",exportCsv);
+
+	function makeSVGText(t,x,y) {
+		return '<text fill="rgb(102, 102, 102)" fill-opacity="1" stroke="none" stroke-opacity="0" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="4" x="'+x+'" y="'+y+'" text-anchor="left" text-decoration="none" rotate="0" kerning="auto" text-rendering="optimizeLegibility" font-style="normal" font-variant="normal" font-weight="normal" font-size="7.5pt" font-family="Helvetica,Arial,sans-serif" fill-rule="evenodd">'+t+'</text>';
+	}
+
+	<?php if ($this->chartType=="Bars"){ ?>
+
+	$(document).ready(function(){
+		if($.browser.msie){
+			$("#chart").find(":not(div.action)").css("position","relative");
+		}
+		var r = ($.browser.msie)?$("#chart").find(":not(div.action) g rect"):$("#chart").find("svg g rect");
+		var xr, yr, h, l, s, x, y, t, a = new Array(), b = new Array();
+		//y-axis: Strings
+		$("#chart").find("div div").each(function(){
+			t = $(this).text();
+			if ( isNaN(t) ) {
+				a.push(t.replace(/\s/g," "));
+			}
+		});
+		//x-axis: Numbers
+		$("#chart").find("div div").each(function(){
+			t = $(this).text();
+			if ( ! isNaN(t) ) {
+				l = $(this).position().left - $(this).parent().position().left;
+				b.push({text: t, x: l});
+			}
+		});
+		xr = $("#chart").find("svg rect:last");
+		yr = $($("#chart").find("svg rect")[$("#chart").find("svg rect").length-4]);
+		s = '';
+		for ( i=0; i<r.length; i++ ) {
+			j = r.length - i - 1;
+			x = $($("#chart").find("svg g rect")[i]).attr("x").baseVal.value;
+			y = $($("#chart").find("svg g rect")[i]).attr("y").baseVal.value;
+			h = $($("#chart").find("svg g rect")[i]).attr("height").baseVal.value;
+			s = s + makeSVGText(a[j],10,y+7);
+		};
+		yr.after('<g>'+s+'</g>');
+		s = '';
+		y = $("#chart").find("svg rect:last").attr("y");
+		if(y){
+			y = y.baseVal.value;
+		}
+		for ( i=0; i<b.length; i++ ) {
+			s = s  + makeSVGText(b[i].text, b[i].x, y+10);
+		};
+		xr.after('<g>'+s+'</g>');
+	});
+
+	<?php } ?>
+	$(document).ready(function(){
+		if($.browser.msie){
+			<?php if ($this->chartType=="Bars"){ ?>
+				$("#chart").find(":not(div.action) > group >  roundrect").attr("fillcolor","white");
+				$("#chart").find(":not(div.action) > group > group > roundrect").attr("fillcolor","rgb(127, 148, 182)");
+				try{
+				$("#chart").find(":not(div.action) > group > group > shape > stroke").attr("color","rgb(102,102,102)").attr("opacity","100%").parent().attr("fillcolor","rgb(102,102,102)").attr("strokecolor","rgb(102,102,102)").attr("opacity","100%").append("<v:fill color='red' opacity='100%' ></v:fill>");
+				}catch(ex){}
+			<?php } else { ?>
+				$("#chart").find(":not(div.action) > group > roundrect").attr("fillcolor","white");
+			<?php } ?>
+			
+		} else {
+			$("#chart").find("svg > rect").each(function(index,elem){
+				if($(elem).attr("fill")){
+					$(elem).attr("fill","white");
+				}
+			});
+			$("#chart").find("svg > g > line").each(function(index,elem){
+				if($(elem).attr("fill")){
+					$(elem).attr("stroke","rgb(102,102,102)").attr("stroke-opacity","1");
+				}
+			});
+		}
+	});
+	$(".exporthelp").click(function(e){
+		appdb.views.Main.showPage("about",{mainTitle:"Faq", url:'/help/faq/9',callback:'appdb.utils.Faq.scrollTo(9)'});
+		e.preventDefault();
+		return false;
+	});	
+</script>
+</div>

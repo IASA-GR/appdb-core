@@ -1,0 +1,66 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php 
+	$error = $this->error;
+	$session = $this->session;
+	$expired = $this->expired;
+	$expiredclass = "";
+	if( $expired === true ){
+		$expiredclass = "expired";
+	}
+	$referer = $session->authreferer;
+	if( trim($referer) == "" ){
+		$referer = "https://" . $_SERVER["HTTP_HOST"];
+	}
+	if( $error != null ){
+?>
+<div class='submitconfirmationcode response error notifydialog display <?php echo $expiredclass; ?>'>
+	<div class="shade"></div>
+	<div class="dialog">
+		<div class="title"><img src="/images/vappliance/redwarning.png" alt="" /><span>Failed to confirm</span></div>
+		<div class='message'>
+			<div>Could not match confirmation code:</div>
+			<div>
+				<pre><?php echo $this->error; ?></pre>
+			</div>
+		</div>
+		<div class="actions">
+			<?php if( $expired === true ) { ?>
+			<a class="action close iconttext" title="" href="<?php echo $referer;?>" >Close</a>
+			<?php } else { ?>
+			<a class="action close iconttext" title="" onclick="$(this).closest('.notifydialog').remove();" >Close</a>
+			<?php } ?>
+		</div>
+	</div>
+</div>
+<?php } else { ?>
+<div class='submitconfirmationcode response success notifydialog display'>
+	<div class="shade"></div>
+	<div class="dialog">
+		<div class='title'><img src="/images/tick.png" alt=""><span>Successfully connected to profile</span></div>
+		<div class='message'>
+			<div>
+				Your account is now connected to the profile. Close this dialog to refresh the page.
+			</div>
+		</div>
+		<div class="actions">
+			<a class="action close icontext" href="<?php echo $referer;?>">close</a>
+		</div>
+	</div>
+</div>
+<?php } ?>
+

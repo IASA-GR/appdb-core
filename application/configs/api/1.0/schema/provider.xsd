@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+     The work represented by this source file is partially or entirely funded 
+     by the EGI-InSPIRE project through the European Commission's 7th Framework 
+     Programme (contract # INFSO-RI-261323)
+
+     Copyright 2010 IASA and GRNET
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at [http://www.apache.org/licenses/LICENSE-2.0| Apache License 2.0]
+
+
+     Unless required by applicable law or agreed to in writing, software 
+     distributed under the License is distributed on an "AS IS" BASIS, 
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+     See the License for the specific language governing permissions and 
+     limitations under the License.
+-->
+     
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+    targetNamespace="http://appdb.egi.eu/api/1.0/provider"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:provider="http://appdb.egi.eu/api/1.0/provider"
+    xmlns:regional="http://appdb.egi.eu/api/1.0/regional">
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/regional"
+        schemaLocation="regional.xsd"/>
+
+	<xs:complexType name="osType" mixed="true">
+		<xs:attribute name="id" type="xs:integer" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="archType" mixed="true">
+		<xs:attribute name="id" type="xs:integer" use="required"/>
+	</xs:complexType>
+
+    <xs:complexType name="providerType" mixed="false">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="url" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="gocdb_url" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="dn" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="ip" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="os" type="provider:osType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="arch" type="provider:archType" minOccurs="0" maxOccurs="1"/>
+			<xs:element ref="regional:country" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required" />
+        <xs:attribute name="beta" type="xs:boolean" use="optional" />
+        <xs:attribute name="in_production" type="xs:boolean" use="optional" />
+        <xs:attribute name="node_monitored" type="xs:boolean" use="optional" />
+    </xs:complexType>
+
+    <xs:element name="provider" type="provider:providerType" />
+</xs:schema>

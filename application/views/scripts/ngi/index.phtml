@@ -1,0 +1,125 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><script type="text/javascript">
+navpaneclicks($("#resproviderspane")[0]);
+ngiCriteria.filter = '<?php echo preg_replace("/'/","\\'",$this->ngifilter); ?>';
+ngiCriteria.european = '<?php echo preg_replace("/'/","\\'",$this->european); ?>';
+var clearFilter = function(){
+	ajaxLoad('/ngi/?filter=',"main");
+};
+var filterNGIs = function() {
+	$(":input[name='ngifilter']:last").focus();
+	showAjaxLoading();
+	$("#main").hide();
+	var filter = $(":input[name='ngifilter']:last").val();
+    <? if ( $this->european != null ) echo 'var european = "&eu='.urlencode($this->european).'";'; else echo 'var european="";'; ?>
+	$.get('/ngi/index?filter='+encodeURIComponent(filter)+european, {}, function(data,txtstatus){
+		$("#main").html(data);
+		hideAjaxLoading();
+		$("#main").fadeIn("fast");
+	}, 'html');
+}
+
+</script>
+<div id="metadata" style="display: none;">
+	<input type="text" id="viewtype" value="ngi"/>
+	<input type="text" id="offset" value="<?php echo $this->offset ?>" />
+	<input type="text" id="length" value="<?php echo $this->length ?>" />
+	<input type="text" id="currentPage" value="<?php echo $this->currentPage ?>" />
+</div>
+<table border="0" style="width:100%;height:100%;">
+    <tr style="max-height:30px; height:30px">
+        <td colspan="3" width="100%"><table border="0" width="100%"><tr>
+		<td align="left" style="max-height:50px; height:30px">
+			<span style="white-space: nowrap; margin-left: 0; margin-right: auto"><input name="ngifilter" type="text" dojoType="dijit.form.TextBox" <?php if ($this->ngiFilter != null) echo 'value="'.$this->ngiFilter.'"'; else echo 'value="Search..."';?>/><a href="#" onclick="filterNGIs();"><img src="images/search.png" style="vertical-align: middle" border="0" /></a> <a href="#" title="Clear filter" onclick="clearFilter();"><img alt="clear filter" src="images/cancelicon.png" style="vertical-align: middle" border="0" /></a> <?php if ($this->european != null ) { if ($this->european == '1') echo "(NGIs)"; else echo "(EIROs)"; } ?></span></td><td align="right" style="text-align:right"><?php echo $this->total;?> matches</td>
+		</tr></table></td>
+    </tr>
+	<tr>
+		<td align="left" style="max-height:50px; height:30px">
+		</td>
+		<td align="center" width="99%" style="max-width:99%; text-align: center; ">
+			<?php putPager($this); ?>
+		</td>
+		<td align="right" style="text-align: right; min-width:50px">
+			<table style="margin-left: auto; margin-right: 0" border="0">
+				<tr>
+					<td>
+						<a href="#" onclick="setView(1);">
+							<img id="gridviewimg" border="0" title="Grid view" src="images/gridview.png" alt="grid view" />
+						</a>
+						<a href="#" onclick="setView(2);">
+							<img id="listviewimg" border="0" title="List view" src="images/listview.png" alt="list view" />
+						</a>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3">
+			<ul className="mainlist" class="mainlist" id="ngimainlist">
+				<?php
+					if ($this->total==0) {
+						echo "Nothing to display!";
+					} else {
+						$row=0;
+						$col=0;
+						foreach ($this->entries as $entry) {
+				?>
+				<li>
+						<?php					  
+							if ( strlen($entry->description) > 10 ) {
+								$maxDescLen=60-(strlen($entry->description)-10);
+							} else {
+								$maxDescLen=60;
+							};
+							echo "<a href='#' title='".$this->escape($entry->name)."' onclick='appdb.views.Main.showNgi({id:".$entry->id."},{mainTitle: \"".str_replace("'","\\'",$entry->name)."\"});'><img border='0' src='/ngi/getlogo?id=".urlencode($entry->id)."' height='100px'/>".$this->escape($entry->name)."<span>".$this->escape(substr($entry->description,0,$maxDescLen));
+							if (strlen($entry->description) > $maxDescLen) { echo "..."; };
+							echo "</span><span>".$entry->description;
+							if ( ! isnull($entry->countryID)) echo "<br/>".$entry->country->name;
+							echo "</span></a>";
+							if ( ! isnull($entry->url) ) echo "<br/><div><a target='_blank' href='".$entry->url."'>Website</a></div>";
+						?>
+				</li>
+				<?php
+							$col++;
+						};
+					};
+				?>
+			</ul>
+		</td>
+	</tr>	
+	<tr>
+		<td></td><td style="text-align: center"></td><td></td>
+	</tr>
+</table>
+<script type="text/javascript">
+	ajaxCount++;
+</script>
+<script type="text/javascript">
+	dojo.addOnLoad(function(){
+		initItemView();
+		setTimeout(function(){
+			searchbox($(":input[name='ngifilter']:last"));
+			dojo.connect(dijit.byId($(":input[name='ngifilter']:last").attr("id")), "onKeyPress", function(k) {
+				if (k.keyCode == dojo.keys.ENTER) {
+					filterNGIs();
+				}
+			});
+		},100);
+	});
+</script>

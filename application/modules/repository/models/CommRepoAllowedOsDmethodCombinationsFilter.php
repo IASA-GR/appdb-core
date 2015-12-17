@@ -1,0 +1,3 @@
+<?php
+class Repository_Model_CommRepoAllowedOsDmethodCombinationsFilter extends Repository_Model_CommRepoAllowedOsDmethodCombinationsFilterBase {
+}

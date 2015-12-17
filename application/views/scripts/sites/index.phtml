@@ -1,0 +1,69 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><div class="listcontainer sites">
+<table border="0" id="sites_main_content" style="width:100%;height:100%">
+    <tr >
+        <td style="width:100%;">
+			<div class="listcontainer-header">
+				<div class="simpleFilter">
+					<span  id="sites_filter" style="white-space: nowrap; margin-left: 0; margin-right: auto"></span>
+				</div>
+				<div class="orderby">
+					<div id="sites_orderby"  ></div>
+				</div>
+				
+				<div id="sites_viewbuttons" class="listtypebuttons" ></div>
+				<div id="sites_loading" class="loader" >
+					<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  />
+					<span >Loading...</span>
+				</div>
+			</div>
+        </td>
+	</tr>
+	<tr >
+		<td align="center" >
+			<div class="refinedfiltering">
+				<div id="sites_managedfilters" class="managedfilter" >
+					<span class="title">Filters:</span>
+					<ul></ul>
+					<a href="#" title="Display available filters" class="action display"><span>refine your search</span><span class="collapsed">|&#x25BC;</span><span class="expanded">|&#x25B2;</span></a>
+					<a href="#" title="Clear all filters" class="action reset hidden"><img src="/images/cancelicon.png" alt="" /><span>clear all</span></a>
+				</div>
+				<div id="sites_logisticsselector" class="logisticsselector" style="display: none"></div>
+			</div>
+			<div class="listmetadata">
+				 <div id="sites_result_timer" ></div>
+			</div>
+        </td>
+    </tr>
+	<tr>
+        <td align="center">
+			<div id="sites_paging" class="pager" style=""></div>            
+        </td>
+    </tr>
+    <tr>
+        <td >
+            <ul classname="itemgrid" class="itemgrid sites" classname="itemgrid" id="sitesmainlist"></ul>
+        </td>
+    </tr>
+	<tr>
+        <td align="center">
+			<div id="sites_paging_bottom" class="pager" style=""></div>            
+        </td>
+    </tr>
+</table>
+</div>

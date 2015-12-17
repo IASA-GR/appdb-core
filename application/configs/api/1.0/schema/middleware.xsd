@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+     The work represented by this source file is partially or entirely funded 
+     by the EGI-InSPIRE project through the European Commission's 7th Framework 
+     Programme (contract # INFSO-RI-261323)
+
+     Copyright 2010 IASA and GRNET
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at [http://www.apache.org/licenses/LICENSE-2.0| Apache License 2.0]
+
+
+     Unless required by applicable law or agreed to in writing, software 
+     distributed under the License is distributed on an "AS IS" BASIS, 
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+     See the License for the specific language governing permissions and 
+     limitations under the License.
+-->
+     
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+    targetNamespace="http://appdb.egi.eu/api/1.0/middleware"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:middleware="http://appdb.egi.eu/api/1.0/middleware">
+
+    <xs:complexType name="middlewareType" mixed="true">
+		<xs:annotation>
+			<xs:documentation>
+				XSD type for application middleware entities. Node value required when performing PUT/POST operation on application entry resources
+			</xs:documentation>
+		</xs:annotation>
+        <xs:attribute name="id" type="xs:integer" use="required">
+			<xs:annotation>
+				<xs:appinfo>
+					Read-only
+				</xs:appinfo>
+				<xs:documentation>
+					The middleware id. A value of 5 means the middleware is not registered as officially supported by EGI yet, and is common for all user-defined middlewares
+				</xs:documentation>
+			</xs:annotation>			
+		</xs:attribute>
+        <xs:attribute name="comment" type="xs:string" use="optional" />
+        <xs:attribute name="link" type="xs:string" use="optional" />
+    </xs:complexType>
+
+    <xs:element name="middleware" type="middleware:middlewareType" />
+</xs:schema>

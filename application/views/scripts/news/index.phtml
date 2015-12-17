@@ -1,0 +1,98 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><div style="margin-left: 10px; margin-top: 0px">
+<h3>AppDB News Feed <div style="display:inline; width:40px; border:1px solid #BFBFBF"><a style="margin-left: 5px" href="#"><img title="Refresh AppDB news feed" id="refreshnews" width="13px" border="0" style="margin-right:2px; padding-right:4px; border-right: 1px dashed #BFBFBF; vertical-align:middle" src="" onclick="loadnews();"/></a><a style="margin-right: 5px; color:#5D5D5D" href="#"><span title="Filter AppDB news feed" id="filternews" width="13px" border="0" style="padding-bottom: 2px; vertical-align:middle; font-size:12px" src="" onclick="setTimeout('filternews();',300);"> ▾ </span></a></div></h3>
+<div><table class="bar1" id="appdbnewstable" cellspacing="0" width="100%"><tr height="4px"><td></td></tr></table></div>
+<div id="appdbnewsfeed">
+</div>
+</div>
+<script type="text/javascript">
+var filternews = function() {
+    newsfilterbox = new dijit.TooltipDialog({
+        title: 'Login',
+        content: '<ul class="newsfeeditemfilter" style="margin-right: 30px"><li><a href="#" onclick="loadnews(null);">Everything</a></li><li><a href="#" onclick="loadnews(\'app\');">Software</a></li><li><a href="#" onclick="loadnews(\'ppl\');">People</a></li><li><a href="#" onclick="loadnews(\'doc\');">Publications</a></li></ul>'
+	});
+	setTimeout(function(){
+		dijit.popup.open({
+			parent: document.getElementById("filternews"),
+			popup: newsfilterbox,
+			around: document.getElementById("filternews"),
+			orient: {BL:'TL'}
+		});
+		if (newsfilter !== null) {
+			$(".newsfeeditemfilter").find("li").each(function(){
+				if (($(this).text() == "People") && (newsfilter=="ppl")) { $(this).html('<b>'+$(this).html()+'</b>'); return; }
+				if (($(this).text() == "Software") && (newsfilter=="app")) { $(this).html('<b>'+$(this).html()+'</b>'); return; }
+				if (($(this).text() == "Publications") && (newsfilter=="doc")) { $(this).html('<b>'+$(this).html()+'</b>'); return; }
+			});
+		}
+	}, 200);
+}
+
+if (newsTimer === null) {
+    newsTimer = setInterval(function(){
+        if ( $("#appdbnewsfeed")[0] !== undefined ) loadnews();
+    },5*60000);
+}
+
+var newsoffset=0;
+var newslength=9;
+
+var expandnews = function() {
+	newsoffset = newsoffset + newslength;
+	filter=newsfilter;
+	if (filter === null) filter='';
+	loadImage('/images/ajax-loader-small.gif',"#refreshnews");
+	$("#expandnewsdiv a").hide();
+	$("#expandnewsdiv img").show();
+	$("#main").scrollTop($("#main").attr("scrollHeight"));
+	$.get("/news/news?len="+newslength+"&ofs="+newsoffset+"&filter="+filter, function(d) {
+		if ( $(d).find("li").length > 0) {
+			$(d).find("li").each(function(){
+				$("#appdbnewsfeed ul").append($(this));
+			});
+			$("#expandnewsdiv a").show();
+			$("#main").animate({ scrollTop: $("#main").attr("scrollHeight") }, 3000);
+			postprocessnewssfeed();
+		}
+		loadImage('/images/refresh.png',"#refreshnews");
+		$("#expandnewsdiv img").hide();
+    });
+};
+
+var loadnews = function(filter) {
+	if (filter === undefined) {
+		filter=newsfilter;
+	} else {
+		newsfilter=filter;
+	}
+	if (filter === null) filter='';
+    loadImage('/images/ajax-loader-small.gif',"#refreshnews");
+	var l='';
+	if ( newsoffset !=0 ) l='len='+(newsoffset+newslength)+'&';
+    $.get("/news/news?len="+newslength+"&"+l+"filter="+filter, function(d) {
+		d = d+'<div id="expandnewsdiv" style="float:right;height:14px;margin-right:5px;padding-top:3px;padding-bottom:2px;"><a href="#" onclick="expandnews();">...more</a><img style="display: none;padding:0px;margin:0px;margin-right:5px;padding-top:3px;padding-bottom:2px;" width="13px" src=""/></div>';
+		$("#appdbnewsfeed").html(d);
+        loadImage('/images/refresh.png',"#refreshnews");
+        $("#appdbnewsfeed").fadeIn();
+    });
+}
+$(document).ready(function() {
+	loadnews();
+	$('.bar1').attr('style', "height: 4px; background: url('" + loadImage('bar1.png') + "') repeat;");
+});
+</script>

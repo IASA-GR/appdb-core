@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+     The work represented by this source file is partially or entirely funded 
+     by the EGI-InSPIRE project through the European Commission's 7th Framework 
+     Programme (contract # INFSO-RI-261323)
+
+     Copyright 2010 IASA and GRNET
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at [http://www.apache.org/licenses/LICENSE-2.0| Apache License 2.0]
+
+
+     Unless required by applicable law or agreed to in writing, software 
+     distributed under the License is distributed on an "AS IS" BASIS, 
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+     See the License for the specific language governing permissions and 
+     limitations under the License.
+-->
+     
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" 
+    targetNamespace="http://appdb.egi.eu/api/0.2/user"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    xmlns:user="http://appdb.egi.eu/api/0.2/user"
+    xmlns:person="http://appdb.egi.eu/api/0.2/person"
+    xmlns:application="http://appdb.egi.eu/api/0.2/application"
+    xmlns:publication="http://appdb.egi.eu/api/0.2/publication"
+    xmlns:privilege="http://appdb.egi.eu/api/0.2/privilege"
+    xmlns:regional="http://appdb.egi.eu/api/0.2/regional">
+
+    <xs:import namespace="http://appdb.egi.eu/api/0.2/privilege"
+        schemaLocation="privilege.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/0.2/application"
+        schemaLocation="application.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/0.2/regional"
+        schemaLocation="regional.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/0.2/publication"
+        schemaLocation="publication.xsd"/>
+
+    <xs:complexType name="userType">
+        <xs:sequence>
+			<xs:element ref="user:permissions" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+        <xs:attribute name="userid" type="xs:integer" use="required" />
+    </xs:complexType>
+
+    <xs:element name="user" type="user:userType" />
+	<xs:element name="permissions" type="privilege:privilegesType" />
+</xs:schema>

@@ -1,0 +1,1662 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php if ($this->entry !== null) { ?>
+<?php
+	$canEdit = false;
+	db()->setFetchMode(Zend_Db::FETCH_ASSOC);
+	$theprivs = db()->query("SELECT * FROM user_profile_edit_perms(?, ?) AS p(userisadminormanager boolean, userisnil boolean, entryisadminormanager boolean, entryisnil boolean, caneditprofile boolean)", array($this->session->userid, $this->entry->id))->fetchAll();
+	if (count($theprivs) > 0) {
+		$theprivs = $theprivs[0];
+	} else {
+		$theprivs = array("userisadminormanager" => false, "userisnil" => false, "entryisadminormanager" => false, "entryisnil" => false, "caneditprofile" => false);
+	}
+	debug_log(var_export($theprivs, true));
+	$userIsAdminOrManager = $theprivs["userisadminormanager"];
+	$userIsNil = $theprivs["userisnil"];
+	$entryIsAdminOrManager = $theprivs["entryisadminormanager"];
+	$entryIsNil= $theprivs["entryisnil"];
+	$canEditProfile = $theprivs["caneditprofile"];
+	$checkregister = false;
+	if ((($this->entry->id == "0") || ($this->entry->id == "")) && (($this->session->userid === null) && ($this->session->username != null))) $checkregister = true;
+    function checkRegister($view) {
+		global $checkregister;
+		return $checkregister;
+    }
+
+	function contactTypeData($view) {
+		$ids=array();
+		$vals=array();
+		for ($i=0; $i<$view->contactTypes->count(); $i++) {
+			$ids[]="'".$view->contactTypes->items[$i]->id."'";
+			$vals[]="'".$view->contactTypes->items[$i]->description."'";
+		}
+		$ids="[".implode(",",$ids)."]";
+		$vals="[".implode(",",$vals)."]";
+		$s="{ids: ".$ids.",vals: ".$vals."}";
+		return $s;
+	}
+	$contactTypeData = contactTypeData($this);
+	$wiki = ApplicationConfiguration::app('wiki', ApplicationConfiguration::uiUrl());
+?>
+<div style="display:none" id="dialog-err-ppl<?php echo $this->dialogCount;?>" title="Warning">
+    <p>
+        <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+        <span id="dialog-err-ppl-msg<?php echo $this->dialogCount;?>"></span>
+    </p>
+</div>
+<div style="display:none" id="dialog-ask-ppl<?php echo $this->dialogCount;?>" title="Warning">
+    <p>
+        <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+        <span id="dialog-ask-ppl-msg<?php echo $this->dialogCount;?>"></span>
+    </p>
+</div>
+<?php if ($this->session->userid !== null ) if ( $canEditProfile ) {?>
+<div class="pplviewtoolbar" style="display:none;">
+<a id="editdiv<?php echo $this->dialogCount;?>" href="#" onclick="onEdit();"><img alt="edit" border="0" src="/images/editicon.png"/>Edit</a>
+<?php if ($userIsAdminOrManager) if ( ! $this->entry->deleted && $this->entry->id != '' && $this->entry->id != $this->session->userid) { ?>
+<a  id="deletediv<?php echo $this->dialogCount;?>" href="#" onclick="deleteProfile(<?php echo $this->entry->id;?>);"><img alt="delete" border="0" src="/images/cancelicon.png"/>Delete</a>
+<?php }?>
+</div>
+<?php } ?>
+<div align="left" style="height:100%;">
+	<div id="navdiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" style="width:100%;height:93%;">
+	<ul>
+		<li><a href="#infodiv<?php echo $this->dialogCount;?>">Information</a></li>
+		<li><a href="#docdiv<?php echo $this->dialogCount;?>">Publications</a></li>
+		<?php if ( $this->session->userid == $this->entry->id ) { ?>
+		<li><a href="#privdiv<?php echo $this->dialogCount;?>">Preferences</a></li>
+		<li><a href="#pendingdiv<?php echo $this->dialogCount; ?>">Pending Requests</a></li>
+		<li><a href="#manageaccountsdiv<?php echo $this->dialogCount; ?>">Manage Accounts</a></li>
+		<?php  } ?>
+		<div id="toolbarContainer"></div><div class='closedialog'><a href="#" title="click to close current page" onClick="appdb.views.Main.closeCurrentView();"><img src="/images/closeview.png" border="0" alt="close"></a></div>
+		<a class="reloadentity reloadperson icontext" href="#" onclick="appdb.pages.Person.reload();" title="Reload"><img alt="reload" border="0" src="/images/refresh.png"/><span>Reload</span></a>
+	</ul>
+	<div id="infodiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" title="Information" class="information person">
+	<form id="editperson<?php echo $this->dialogCount;?>" name="editperson<?php echo $this->dialogCount;?>" action="/people/update" method="post" onvalidate="onValidate<?php echo $this->dialogCount;?>();" callback="onUpdate<?php echo $this->dialogCount;?>" errorcallback="onError" <?php if ($this->entry->id == "") { ?>cancelcallback="appdb.views.Main.showPeople({flt:''},{mainTitle: 'People'});"<?php } else {?>cancelcallback="appdb.views.Main.refresh();"<?php } ?>>
+		<table border="0" width="99%">
+			<tr>
+				<td style="vertical-align:top;width:101px;">
+					<div style="vertical-align:middle;">
+					<center class="canzoom">
+					<img alt="profile image" id="pplimg<?php echo $this->dialogCount;?>" onmouseover="showImage('<?php echo $this->entry->Id; ?>',this);" border="0" src="<?php if ($this->image == "") echo '/images/person.png'; else echo $this->image; ?>" width='120px'>
+					</center>
+					<span class="editable" style="display:none" edit_type="hidden" edit_name="newimage"></span>
+					</div>
+					<div class="registeredrow"><span>Since: </span><span id="personregistration">
+					<?php if ( ! ($this->entry->dateInclusion === null)) { echo $this->escape($this->entry->dateInclusion); } else { echo "N/A"; } ?></span>
+					</div>
+				</td>
+				<td>
+					<table border="0" width="99%">
+						<tr>
+							<td style="width:400px;min-width:400px;">
+								<table border="0" style="width: 100%;">
+									<tr class="hideonedit" >
+									<?php if ($this->entry->id != "") { ?>
+										<td colspan="2">
+											<div class="entityheader header">
+												<span style='padding-right: 5px;'><?php echo $this->entry->firstname; ?></span>
+												<span><?php echo $this->entry->lastname; ?></span>
+												<div class="permalink"><a href="http://<?php echo $_SERVER["HTTP_HOST"];?>?p=<?php echo base64_encode('/people/details?id='.$this->entry->id); ?>" target="_blank" class="permalink">[permalink]</a></div>
+												<div class="entityid personid">(id:<span style="padding-right: 3px" ><?php echo $this->entry->Id; ?></span>)</div>
+											</div>
+										</td>
+									<?php } ?>
+									</tr>
+									<tr class="showonedit">
+									<td style="vertical-align:top;min-width:60px;">Name<span style="vertical-align:top;color:red;display:none;" class="mandatoryflag" title="Field is mandatory">*</span>: </td>
+									<td style="vertical-align:middle;position:relative;width:325px;">
+										<span style="display:none" class="editable" edit_name="id" edit_type="hidden"><?php echo $this->entry->id;?></span>
+										<span <?php $canEdit = checkRegister($this); if ($this->session->userid !== null) if ( $canEditProfile ) $canEdit=true; if ($canEdit && $this->entry->accounttype !== 1 ) echo 'class="editable smalltext" edit_type="text" edit_watermark="First name" edit_name="firstName"';?>><?php echo($this->escape($this->entry->firstName));?></span>
+										<span <?php $canEdit = checkRegister($this); if ($this->session->userid !== null) if ($canEditProfile) $canEdit=true; if ($canEdit) echo 'class="editable smalltext" edit_type="text" edit_watermark="' .(($this->entry->accounttype==1)?'Name':'Last name').'" edit_name="lastName"';?>><?php echo($this->escape($this->entry->lastName)); ?></span>
+										<?php $canEdit = checkRegister($this); if ($this->session->userid !== null) if ($canEditProfile) $canEdit=true; if ($canEdit) { ?> 
+											<?php if ($this->entry->id == "") { ?>
+											<span class="namechecking hidden">
+												<img src="/images/ajax-loader-small.gif" alt="" />
+											</span>
+											<div class="namereport">
+												<div class="state error">
+													<img src="/images/exclam16.png" />
+													<span>There is already another user registered with this name. <br/>Please provide a suffix for your personal url.</span>
+													<div class="canonical hidden">
+													<span style='vertical-align:bottom;font-weight:bold;'>../store/person/</span><span class="prefix"/><span id="cnamesuffix" edit_type="text" edit_watermark="suffix" edit_name="cnamesuffix" class="editable" edit_maxlength="10" edit_required="true"/>
+														<span class="suffixchecking hidden">
+															<img src="/images/ajax-loader-small.gif" alt="" />
+														</span>
+													</div>
+													<div class="footnote">
+														<div class="error"></div>
+														<div>Up to 10 alphanumeric characters</div>
+													</div>
+												</div>
+											</div>
+											<?php } ?>
+										<?php } ?>
+										<?php $canEdit = checkRegister($this); if ($this->session->userid !== null) if ($canEditProfile) $canEdit=true; if ($canEdit) echo '';?>
+									</td>
+									</tr>
+									<tr>
+									<td style="vertical-align:middle;width: 120px;">Gender: </td><td style="vertical-align:middle">
+										<span <?php $canEdit = checkRegister($this); if ($this->session->userid !== null) if ( $canEditProfile ) $canEdit=true; if ($canEdit && $this->entry->accounttype !== 1) echo 'class="editable" edit_type="combo" edit_data="{ids: [\'male\', \'female\', \'NULL\'], vals: [\'Male\', \'Female\', \'N/A\']}" edit_name="gender"';?>><?php if (!isnull($this->entry->gender)) echo $this->escape(substr_replace($this->entry->gender,strtoupper(substr($this->entry->gender, 0, 1)), 0, 1)); else echo "N/A"?></span>
+									</td>
+									</tr>
+									<tr><td>Scientific Orientation: </td><td style="vertical-align: middle">
+									<span <?php
+									$canEdit = checkRegister($this); if ($this->session->userid !== null) if ( $canEditProfile ) $canEdit = true; if ($canEdit) {
+										echo 'edit_style="{\'max-width\': \'87%\'}" class="editable" edit_type="combo" edit_onchange="positionTypeChanged" edit_name="positionTypeID"';
+										$ids=array();
+										$vals=array();
+										for ($i=0; $i<$this->positionTypes->count(); $i++) {
+											$ids[]="'".$this->positionTypes->items[$i]->id."'";
+											$vals[]="'".$this->positionTypes->items[$i]->description."'";
+										};
+										$ids="[".implode(",",$ids)."]";
+										$vals="[".implode(",",$vals)."]";
+										$s="{ids: ".$ids.",vals: ".$vals."}";
+										echo ' edit_data="'.$s.'"';
+									}
+									?>><?php if ($this->entry->id != '') echo($this->escape($this->entry->positionType->description)); else echo 'Other';?></span>
+										</td>
+									</tr>
+									<tr style="display: none;"><td>Institute<span style="vertical-align:top;color:red;display:none;" class="mandatoryflag" title="Field is mandatory">*</span>: </td><td>
+									<span <?php $canEdit=checkRegister($this); if ($this->session->userid !== null) if ( $canEditProfile ) $canEdit=true; if ($canEdit) echo 'class="editable" edit_type="text" edit_name="institution"';?>><?php echo($this->escape($this->entry->institution)) ?></span></td>
+									</tr>
+									<tr class="countryrow"><td>Country<span style="vertical-align:top;color:red;display:none;" class="mandatoryflag" title="Field is mandatory">*</span>: </td><td>
+									<span 
+									<?php
+									$canEdit=checkRegister($this); if ($this->session->userid !== null) if ( $canEditProfile ) $canEdit=true; if ($canEdit) {
+										echo 'class="editable" edit_watermark="Choose a country"  edit_style="{\'max-width\': \'80%\'}" edit_type="combo" edit_name="countryID" edit_onchange="setRegion'.$this->dialogCount.'();"';
+										$ids=array();
+										$vals=array();
+										for ($i=0; $i<$this->countries->count(); $i++) {
+											$ids[]="'".$this->countries->items[$i]->id."'";
+											$vals[]="'".str_replace("'","\\'",$this->countries->items[$i]->name)."'";
+										}
+										$ids="[".implode(",",$ids)."]";
+										$vals="[".implode(",",$vals)."]";
+										$s="{ids: ".$ids.",vals: ".$vals."}";
+										echo ' edit_data="'.$s.'"';
+									}
+									?>
+									><?php if ( ! ($this->entry->country === null)) { echo $this->escape($this->entry->country->name); $isocodes=explode("/",$this->entry->country->IsoCode); $i=0; foreach ($isocodes as $isocode) { echo "</span> <span class='editable' edit_type='none'><img style='vertical-align: top;border:1px solid #BFBFBF' id='flag".((string)$i)."_".$this->dialogCount."' border='0' src='/images/flags/".trim(strtolower($isocode)).".png'/> "; $i++;}; } else { echo ($this->entry->id == '')?"Choose a country":"N/A"; }; ?></span>
+									<?php if ( $entryIsNil ) { ?>
+									<span class="nils software"><a href='#' class='nilcountryitems' data-country-id='<?php echo $this->entry->country->id; ?>' data-country-name='<?php echo $this->entry->country->name; ?>' >View country's related items </a></span>
+									<?php } ?>
+									</td>
+									</tr>
+<?php if ( APPLICATION_ENV == 'DISABLED-production' ) { ?>
+									<tr class="ngirow"><td>Resource Provider: </td><td>
+									<span id="ngi<?php echo $this->dialogCount;?>"><?php if ( ! ($this->entry->ngis === null)) { $s=''; foreach( $this->entry->ngis as $ngi ) $s.='<a href="#" onclick="appdb.views.Main.showNgi({id: '.$ngi->id.'}, {mainTitle: \''.str_replace("'","\\'",$ngi->name).'\'});">'.$this->escape($ngi->name)."</a> <img style='display: none; vertical-align: middle;border:1px solid #BFBFBF' src='/ngi/getlogo?id=".$ngi->id."' width='22px'/> | "; echo substr($s,0,-2);} else { echo "N/A"; }; ?></span></td>
+									</tr>
+<?php } ?>
+									<tr style="display: none"><td>Region: </td><td>
+									<span id="region<?php echo $this->dialogCount;?>"><?php if ( ! ($this->entry->region === null)) { echo $this->escape($this->entry->region->name); } else { echo "N/A"; }; ?></span></td>
+									</tr>
+									<?php if ($this->entry->id != "") { 
+									$gg = array();					
+									foreach($this->entry->actorGroups as $g) {
+										if ( ($g->group->id > 0) || ($g->group->id === -1) || ($g->group->id === -2) || ($g->group->id === -3) || ($g->group->id === -8) || ($g->group->id === -19) /*|| ($g->group->id === -5)*/ ) {
+											$gg[] = $g->group->name;
+										} 
+									}?>
+									<tr class="accessgroupcontainer <?php echo ((count($gg)>0)?"hasgroups":""); ?> hideonedit">
+										<td >Access Groups: <a class='accessgrouphelp' title='Learn more about access groups' target='_blank'>?</a></td>
+										<td style="vertical-align: top">
+											<div class="accessgroupsviewer">
+											<?php echo implode($gg, ", "); ?>
+											</div><a href='' class="action editgroups" >edit groups</a>
+											<div class="accessgroupeditor submit" data-action="submit">
+												<div class="header">Edit access groups <a class="accessgrouphelp" title="Learn more about editing access groups" target="_blank" href="<?php echo $wiki; ?>main:faq:what_are_the_different_access_groups_for">?</a></div>
+												<div class="main">
+													<div class='currentgroups'></div>
+												</div>
+												<div class="footer">
+													<button class="btn btn-compact btn-danger action save showonchanges" data-action="save">submit</button>
+													<button class="btn btn-compact btn-primary action cancel" data-action="cancel">cancel</button>
+												</div>
+											</div>
+										</td>
+									</tr>
+									<tr><td class='rowseperator' colspan='2'><div class='seperator hideonedit'/></td></tr>
+									<tr class="relationrow organizationrow hideonedit">
+										<td>Organizations:</td>
+										<td >
+											<div class="relationlist person-organization viewer"></div>
+										</td>
+									</tr>
+									<tr class="relationrow projectrow hideonedit">
+										<td>Projects:</td>
+										<td >
+											<div class="relationlist person-project viewer"></div>
+										</td>
+									</tr>
+									<?php } ?>
+									<?php if ($this->entry->deleted) { ?>
+                                    <tr class="app-delrow">
+                                    <td colspan="2"><br/><b>Deleted by <a href="#" onclick="appdb.views.Main.showPerson({id: <?php echo $this->entry->delInfo->deleter->id;?>},{mainTitle: '<?php echo $this->entry->delInfo->deleter->name;?>'});"><?php echo $this->entry->delInfo->deleter->name;?></a> on <?php echo date("d F Y", strtotime($this->entry->delInfo->deletedOn));?></b></td>
+                                    </tr>
+                                    <?php } ?>
+								</table>
+							</td>
+							<td style="min-width:280px; vertical-align:top; border-left:1px dashed;padding-top: 5px;" align="right" class="viewmode">
+								<div class="person-group small-group groupcontainer">
+									<ul class="hideonedit">
+										<li class="vomembershiplist"><a href="#vomembershiplist" title="View Virtual Organization Membership">Virtual Organization Membership</a></li>
+										<li class="contactinfo current"><a href="#contactinfo" title="View Contact Information">Contact Information</a></li>
+									</ul>
+									<div id="vomembershiplist" class="hideonedit">
+									   <div class="vomembership"></div>
+									</div>
+									<div id="contactinfo" style="text-align:center;">
+										<table border="0" width="101%" id="contactInfoTable<?php echo $this->dialogCount;?>">
+											<tr class="showonedit">
+												<td colspan="2" align="center" style="text-align:center;">
+												<b>Contact Information<span style="vertical-align:top;color:red;display:none;" class="mandatoryflag" title="Field is mandatory. Please provide at least one valid e-mail address.">*</span></b><div id="addcontactinfo<?php echo $this->dialogCount;?>"><a href="#" onclick="addContactInfo();"><img alt="add" border="0" src="/images/plus.png"/></a><a href="#" onclick="remContactInfo();"><img alt="remove" border="0" src="/images/minus.png"/></a></div>
+												</td>
+											</tr>
+										<?php if ( count($this->entry->contacts) > 0 ) {?>
+											<?php if ($this->entry->id != 0) { foreach ($this->entry->contacts as $contact) { ?> 
+											<tr>
+												<td align="right" style="text-align: right;width:48%;">
+													<img width="15" height="15" style="vertical-align: middle; max-width: 60px;" class="hideonedit" title="e-mail" alt="e-mail" src="/images/contacts/<?php echo $contact->contactType->description; ?>.png">
+													<span class="editable" edit_onchange="setContactType" edit_name="contactType" edit_type="combo" edit_style="{'max-width': '130px', 'text-align':'right'}" edit_data="<?php echo $contactTypeData; ?>" edit_group="true"><?php echo $this->escape($contact->contactType->description);?></span>
+												</td>
+												<td align="left" style="text-align: left;">
+													<?php $echoContactData = true; ?>
+													<span class="editable" edit_name="contact" edit_group="true"  edit_type="text" edit_style="{'max-width': '130px', 'text-align':'left'}"><?php if ($contact->contactType->Id == 7) {
+														if ( $this->session->userid !== null ) {
+															echo "<a href='mailto:".$this->escape($contact->data)."'>";
+														} else {
+															echo "<img style='vertical-align: middle' border='0' src='/texttoimage/personcontact?id=".$contact->id."' />";
+															$echoContactData = false;
+														}
+													}
+													if ($contact->contactType->Id == 6) {
+														$website = trim($this->escape($contact->data));
+														if ( !preg_match("~^(?:f|ht)tps?://~i", $website) ){
+															$website = "http://" . $website;
+														}
+														echo "<a target='_blank' href='".$website."'>";
+													}
+													if ( $echoContactData ) echo $this->escape($contact->data);
+													if (($contact->contactType->Id == 7) or ($contact->contactType->Id == 6)) echo "</a>";
+													?></span>
+												</td>
+											</tr>
+										<?php } } ?>
+										<?php }?>
+										</table>
+									</div>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		<div class='relations viewmode'>
+		<div class="entityrelations showonedit groupcontainer person-group">
+			<ul>
+				<li class="relatedorganizationslist person-organization-relation current"><a href="#relatedorganizationslist" title="Relate organizations">My Organizations</a></li>
+				<li class="relatedprojectsslist person-project-relation"><a href="#relatedprojectsslist" title="Relate projects">My Projects</a></li>
+			</ul>
+			<div id="relatedorganizationslist" class="person-organization-relation current" style='padding-top:20px;'>
+				<div class="title"><span>Organizations:</span></div>
+				<div class="relationlist person-organization editor"></div>
+			</div>
+			<div id="relatedprojectsslist" class="person-project-relation" style="padding-top:20px;">
+				<div class="title"><span>Projects:</span></div>
+				<div class="relationlist person-project editor"></div>
+			</div>
+		</div></div>
+		<div id="msgdiv<?php echo $this->dialogCount;?>" class="hideonedit leavemsg">
+		<?php if ($this->entry->id != '') { if ( $this->session->userid != $this->entry->id ) { if ( $this->session->userid !== null && $this->entry->accounttype!==1 ) { ?>
+		<a href="#" onclick="sendUserMessage()" class="icontext"><img src="/images/feedback.png" alt=""/><span>Leave a message</span></a>
+		<?php } } }?>
+		</div>
+		<br/>
+		<?php 
+		if ($this->entry->id != '') { if ( count($this->entry->applications) > 0) { ?>
+		    <table><tr><td>
+			<div id="relatedappsdiv<?php echo $this->dialogCount;?>" style="min-height:300px; overflow:visible;">
+				<div class="filterdecorator personitems" data-pagelength="9">
+					<div class="header">
+						<div class="title">Related items:</div>
+						<ul class="filter">
+							<li class="filterselector all current" data-filterclass="itemcontainer"><a href="" title="View all related items"><span>All</span><span class="counter"></span></a></li>
+							<li class="seperator">|</li>
+							<li class="filterselector switems" data-filterclass="switem"><a href="" title="View related software"><span>Software</span><span class="counter"></span></a></li>
+							<li class="seperator">|</li>
+							<li class="filterselector vappitems" data-filterclass="vappitem"><a href="" title="View related virtual appliances"><span>Virtual Appliances</span><span class="counter"></span></a></li>
+							<?php if ( Supports::swappliance() ) { ?>
+							<li class="seperator">|</li>
+							<li class="filterselector swappitems" data-filterclass="swappitem"><a href="" title="View related software appliances"><span>Software Appliances</span><span class="counter"></span></a></li>
+							<?php } ?>
+						</ul>
+					</div>
+				<ul class="itemgrid filteredlist">
+				<?php foreach ($this->entry->applications as $app) { 
+					$content = "software";
+					$cls = "switem";
+					switch(trim($app->metatype)){
+						case "1":
+							$content = "vappliance";
+							$cls = "vappitem";
+							break;
+						case "2":
+							$content = "swappliance";
+							$cls = "swappitem";
+							break;
+						case "0":
+						default:
+							break;
+					}
+					if( $content === "swappliance" && !Supports::swappliance() ){
+						continue;
+					}
+					$applogo = $app->logo;
+					if ( $applogo == '' ) { 
+						if( $content === 'swappliance'){
+							$applogo = '/images/swapp.png';
+						} else if ( $app->primaryCategory ) { 
+							$applogo = '/images/category' . $app->primaryCategory->id . '.png';
+						} else {
+							$applogo = '/images/category1.gif'; 
+						}
+					} else { 
+						$applogo = '/apps/getlogo?req='.$app->lastUpdated.'&id='.$app->id; 
+					}
+				?>
+				<li class='itemcontainer <?php echo $cls; ?>'>
+					<div class='item'>
+						<a href='/store/software/<?php echo $app->cname; ?>' title='<?php echo $app->name; ?>' data-cname='<?php echo $app->cname; ?>' onclick='appdb.views.Main.showApplication({id: <?php echo $app->id;?>, name:"<?php echo $app->name; ?>", cname: "<?php echo $app->cname; ?>"}, {mainTitle: "<?php echo $app->name;?>", content:"<?php echo $content; ?>"});' class='itemlink'>
+							<img alt="app logo" border='0' src='<?php echo $applogo; ?>' width='100px' height='100px' class='itemimage' />
+							<span class='itemname'><?php echo $this->escape($app->Name); ?></span><span class="itemsorttext"><?php echo $this->escape(substr($app->description,0,80)); if (strlen($app->description)>80) echo "..."; ?></span>
+						<?php if($app->rating>0){ ?>
+							<div class='rating'></div>
+							<div class='ratingcount'><?php echo $app->rating;?></div>
+							<div class='ratingvotes'><span class='votes'><?php echo $app->ratingCount; ?></span><span class='datatype'>vote<?php echo ( ($app->ratingCount>1)?"s":"" ); ?></span></div>
+						<?php }?>
+						<?php if($app->hitcount>0){ ?>
+							<div class='ratinginfo'>
+								<div class="field">
+									<span class="description">
+										<span class="hits"><?php echo $app->hitcount; ?></span>
+										<span class="datatype">visit<?php echo (($app->hitcount>1)?"s":""); ?></span>
+									</span>
+								</div>
+							</div>
+						<?php  } ?>
+						</a>
+						<div class='categoriescontainer'>
+							<a href="#" class="shortcut">member of<span class="urllistarrow">▼</span></a>
+							<ul class="categories">
+							<?php foreach($app->categories as $cat){ if( !isnull($cat->category->parentid) ){ continue; } $catname = $cat->category->name; $catid = $cat->category->id; ?>
+								<li class="category<?php echo (($cat->isPrimary)?" primary":""); ?>">
+									<a <?php echo (($cat->isPrimary)?"class='primary'":""); ?> href="#" title="Click to view software in category <?php echo $catname; ?>" onClick="appdb.views.Main.showApplications({flt:'+=category.id:<?php echo $catid;?>'},{isBaseQuery:true,mainTitle:'<?php echo $catname;?>',filterDisplay:'Search in <?php echo $catname;?>...', content:'<?php echo $content ?>'})">
+										<img src="/images/app.png" border="0" />
+										<span class="name"><?php echo $catname;?></span>
+									</a>
+								</li>
+							<?php }?>
+							</ul>
+						</div>
+						</div>
+				</li>
+				<?php } ?>
+				</ul>
+				<div class="filterpager">
+					<button class="action btn btn-light" onclick="return false;">
+						<span class="pagermessage">show more</span>
+					</button>
+				</div>
+				<div class="emptycontent" >
+					<div class="content">	
+						<img src="/images/exclam16.png">
+						<span>No related items found.</span>
+					</div>
+				</div>
+				</div>
+			</div>
+			</td></tr></table>
+		<?php } else { ?>
+		<div style="display: block;" class="emptycontent">
+			<div class="content">	
+				<img src="/images/exclam16.png">
+				<span>No related items found.</span>
+			</div>
+		</div>
+		<?php } } ?>
+		</form>
+	</div> <!--pplInfo div closes -->
+	<div id="docdiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" title="Publications" class="publication publicationcontainer" >
+		<div class="emptycontent">
+			<div class="content">	
+				<img src="/images/exclam16.png">
+				<span>No associated publications found.</span>
+			</div>
+		</div>
+		<div id="docgrid<?php echo $this->dialogCount; ?>" style="width:100%"></div>
+	</div> <!-- pplDoc div closes -->
+	<?php if ( $this->session->userid == $this->entry->id ) { ?>
+	<div class="prefsdiv"  id="privdiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" title="Preferences" >
+        <div style="height:95%;">
+            <br/>
+            <table border="0" style="width:100%;">
+                <tr>
+                    <td colspan="3"><span style="display:inline-block;width:100%;border-bottom: gray 1px solid;font-weight: bold;padding-top:5px;">e-mail settings</span></td>
+                </tr>
+                <tr >
+                    <td >Primary e-mail<div style="width:160px;white-space: pre-wrap;font-size:10px;">(this contact will be used for your subscriptions to the e-mail notification service)</div></td>
+                    <td style="width:50px;"></td>
+                    <td>
+                        <div >
+                            <?php if ( count($this->entry->contacts) > 0 ) {?>
+									<?php if ($this->entry->id != 0) { ?>
+                                        <select id="primarycontact<?php echo $this->dialogCount;?>" dojoType="dijit.form.FilteringSelect" autoComplete="true" onchange="appdb.components.Person.setPrimaryContact(this.attr('value'),$('span.primarycontactresult'));" >
+                                            <?php foreach ($this->entry->contacts as $contact) { if($contact->contactType->Id != 7){continue;} ?>
+                                            <option value="<?php echo $contact->id; ?>" <?php echo ($contact->isprimary==true)?"selected='selected'":"";?> ><?php echo $contact->data; ?></option>
+                                            <?php } ?>
+                                        </select>
+                                        <span class="primarycontactresult"></span>
+                                    <?php } ?>
+                            <?php  } else { ?>
+                                        <span class="noprimarycontact">No e-mail contact found.</span>
+                                <?php }?>
+                        </div>
+                    </td>
+                </tr>
+				<tr>
+                    <td colspan="3"><span style="display:inline-block;width:100%;border-bottom: gray 1px solid;font-weight: bold;padding-top:5px;">Dissemination & Communication</span></td>
+                </tr>
+				<tr><td colspan="10"></td></tr>
+                <tr id="nodisseminationholder">
+                    <td><div style="width:160px;border-bottom: #d9d9d9  1px dashed;white-space: pre-wrap;">Receive e-mail messages about dissemination material</div></td>
+                    <td>
+                        <input id="nodissemination"  type="checkbox" title="Click to enable/disable e-mail messages about dissemination material" style="vertical-align: middle;"/>
+                    </td>
+                    <td><span class="nodisseminationresult" style="padding-left:5px;vertical-align: bottom"></span></td>
+                </tr>
+                <tr><td colspan="10"></td></tr>
+				 <tr id="inboxnotificationholder">
+                    <td ><div style="width:160px;white-space: pre-wrap;">Receive e-mail message when a user leaves a message in your <b>inbox</b></div></td>
+                    <td>
+                        <input id="inboxnotification"  type="checkbox" title="Click to enable/disable e-mail messages about dissemination material" style="vertical-align: middle;"/>
+                    </td>
+                    <td><span class="inboxnotificationresult" style="padding-left:5px;vertical-align: bottom"></span></td>
+                </tr>
+				<tr><td colspan="10"></td></tr>
+				<tr>
+                    <td colspan="3"><span style="display:inline-block;width:100%;border-bottom: gray 1px solid;font-weight: bold;padding-top:5px;">Notifications</span></td>
+                </tr>
+				<?php  
+				// FIXME: provide for NILs assigned to countries other than their own
+				if ($entryIsAdminOrManager || $entryIsNil ) { ?>
+                <tr id="defaultnotificationholder">
+                    <td  style="width:80px;border-bottom: #d9d9d9  1px dashed;"><div style="width:160px;white-space: pre-wrap;">Receive e-mail notifications for <b><?php /*FIXME: NIL thing*/ echo ($entryIsNil)?"".$this->entry->country->name."'s":"all";?></b> software activities</div></td>
+                    <td >
+                        <input id="defaultnotification"  type="checkbox" title="Click to enable/disable e-mail notifications" style="vertical-align: middle;"/>
+                    </td>
+                    <td >
+                        <select id="defaultdelivery<?php echo $this->dialogCount;?>" dojoType="dijit.form.FilteringSelect" autoComplete="true" disabled="true">
+                            <option value="2">Daily</option>
+                            <option value="4" selected="selected">Weekly</option>
+                            <option value="8">Monthly</option>
+                        </select>
+                        <span class="defaultnotificationresult" style="padding-left:5px;vertical-align: middle;"></span>
+                    </td>
+                </tr>
+                <tr id="rolenotificationholder">
+					<td style="border-bottom: #d9d9d9  1px dashed;"><div style="width:160px;white-space: pre-wrap;">Receive e-mail notifications about <b>role verification</b> requests<?php /*FIXME: NIL thing*/ echo ($entryIsNil?" from <b>" . $this->entry->country->name."</b>":"");?></div></td>
+                    <td>
+                        <input id="rolenotification"  type="checkbox" title="Click to enable/disable e-mail notifications about role verification requests" style="vertical-align: middle;"/>
+                    </td>
+                    <td><span class="rolenotificationresult" style="padding-left:5px;vertical-align: bottom"></span></td>
+                </tr>
+                <?php } ?>
+		
+                <tr id="ownednotificationholder">
+                    <td style="border-bottom: #d9d9d9  1px dashed;"><div style="width:160px;white-space: pre-wrap;">Receive e-mail notifications about your <b>own</b> software items</div></td>
+                    <td>
+                        <input id="ownednotification"  type="checkbox" title="Click to enable/disable e-mail notifications about dissemination material" style="vertical-align: middle;"/>
+                    </td>
+                    <td>
+                     <select id="owneddelivery<?php echo $this->dialogCount;?>" dojoType="dijit.form.FilteringSelect" autoComplete="true" disabled="true">
+                         <option value="2">Daily</option>
+                         <option value="4" selected="selected">Weekly</option>
+                         <option value="8">Monthly</option>
+                     </select>
+                     <span class="ownednotificationresult" style="padding-left:5px;vertical-align: bottom"></span>
+                    </td>
+                </tr>
+				<tr><td colspan="10"></td></tr>
+                <tr id="relatednotificationholder">
+                    <td ><div style="width:160px;white-space: pre-wrap;">Receive e-mail notifications about software items which you are <b>related to as a contact</b></div></td>
+                    <td>
+                        <input id="relatednotification"  type="checkbox" title="Click to enable/disable e-mail notifications about dissemination material" style="vertical-align: middle;"/>
+                    </td>
+                    <td>
+                     <select id="relateddelivery<?php echo $this->dialogCount;?>" dojoType="dijit.form.FilteringSelect" autoComplete="true" disabled="true">
+                         <option value="2">Daily</option>
+                         <option value="4" selected="selected">Weekly</option>
+                         <option value="8">Monthly</option>
+                     </select>
+                     <span class="relatednotificationresult" style="padding-left:5px;vertical-align: bottom"></span>
+                    </td>
+                </tr>
+		<tr><td colspan="10"></td></tr>
+		<tr >
+		    <td colspan="3"><span style="display:inline-block;width:100%;border-bottom: gray 1px solid;font-weight: bold;padding-top:15px;">API access management<span style="font-weight: normal;font-size:8pt; float:right;clear:both;"></span></span></td>
+		</tr>
+		<tr >
+			<td colspan="3">
+				<table>
+					<tr >
+						<td colspan="3">
+							<div class="apiaccessmanagement subsection accessmanagement">
+								<ul>
+									<li><a href="#accesstokentab" class="accesstokenlink selected"><span >Personal Access Token</span></a></li>
+									<li><a href="#webapikeytab" class="webkeylink"><span >API Key</span></a></li>
+								</ul>
+								
+								<div id="accesstokentab" class="apiaccesstab selected">
+									<span class="section description">In this section you can generate and manage your personal access tokens. Personal access tokens are part of a lightweight mechanism for making authoritative API calls to the AppDB platform, such as editing items from external applications on your behalf. In contrast to API keys, this mechanism does not require an EGI SSO account or creating a local authentication account.</span><br/>
+									<div id="accesstokenhandler" class="profilekeymanagement"></div>
+								</div>
+								<div id="webapikeytab" class="apiaccesstab">
+									<span class="section description">In this section you can generate and manage your API keys. API keys are needed for authoritative API calls to the AppDB platform, such as editing items from external applications or web portals. To learn how to make use of the API keys visit the <a target="_blank" href="http://wiki.egi.eu/wiki/EGI_AppDB_REST_API_v<?php echo $_SERVER['APILatestVersion']; ?>#Authenticated_Access">authenticated access</a> section of the <a target="_blank" href="http://wiki.egi.eu/wiki/EGI_AppDB_REST_API_v<?php echo $_SERVER['APILatestVersion']; ?>">AppDB rest API</a> documentation. </span><br/>
+									<div id="webapikeyhandler" class="profilekeymanagement"></div>
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="3"></td>
+					</tr>
+					<tr >
+						<td style="width:180px;" colspan="3">
+							
+						</td>
+					</tr>
+					<tr >
+						<td colspan="3"></td>
+					</tr>
+					<tr>
+						<td colspan="3"></td>
+					</tr>
+					<tr >
+						<td style="width:180px;" colspan="3">
+							
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		</table>
+        </div>
+		<div style="display:none; width:100%"> <!-- Permissions div -->
+            <div style="width:100%; height:270px; overflow-y: scroll">
+            <table border="1" width="100%">
+            <tr>
+            <td style="max-width:40%"><b>Action</b></td>
+            <td style="width:60%"><b>Target</b></td>
+            </tr>
+            </table>
+            </div>
+            <div style="width:100%; height:30px;">
+            <button dojoType="dijit.form.Button" onclick="requestPermissions();">Request permissions...</button>
+            <div id="permreqdlg"></div>
+            </div>
+		</div>
+	</div> <!-- pplPriv div closes -->
+	<div id="pendingdiv<?php echo $this->dialogCount; ?>" dojoType="dijit.layout.ContentPane" title="Pending Requests" >
+		<div class="pendingrequests" >
+			<div class="header">
+				<div class="description"><ul><li>This page displays requests submitted by other users, concerning software related to you. As a software entry owner you are entitled to either <b>accept</b> or <b>reject</b> these requests.</li><li>Once you choose to accept a request, then the requestor will be automatically added in the software contact list. <i><u>Please note that adding a user to the contact list of one of your software entries may grant him/her <b>elevated acess rights</b> upon the entry, depending on the user's role, as described in <a href="#" onclick="appdb.utils.ToggleFaq(3);">the FAQs</a></u></i></li><li>Either way, the submitter will be informed via e-mail.</li></ul></div>
+			</div>
+			<div class="main">
+				<ul class="list"></ul>
+			</div>
+			<div class="footer"></div>
+		</div>
+	</div>
+	<div id="manageaccountsdiv<?php echo $this->dialogCount; ?>" dojoType="dijit.layout.ContentPane" title="Manage your accounts" >
+		<div class="connectedaccounts">
+			<div class="header">
+				<div class="description"></div>
+			</div>
+			<div class="actions">
+				
+			</div>
+			<div class="contents">
+				<div class="useraccounts">
+				</div>
+			</div>
+		</div>
+	</div>
+	<?php } ?>
+	</div> <!-- dojo tab div closes -->
+</div> <!--main div closes -->
+<script type="text/javascript">
+	navpaneclicks($("#peoplepane")[0]);
+	var uploader;
+    var rebuildContactData = function() {
+		var ed = "<?php echo $contactTypeData;?>";
+        $("input[name^=contactType]").each(function(e){
+			var v=$(this).prev().val();
+            $(this).parent().parent().parent().parent().html(
+                '<span class="editable" edit_type="combo" edit_data="'+ed+'" edit_style="{\'max-width\': \'130px\'}" edit_onchange="setContactType" edit_name="contactType" edit_group="true">'+v+'</span>'
+            );
+        });
+    };
+
+	var setContactType = function() {
+        if (focusedDijitItem.find(':input:last').prev()[0] !== undefined) {
+    		focusedDijitItem.find(':input:last').prev()[0].setAttribute('value',focusedDijitItem.find(':input:last').prev().val());
+        }
+	};
+	
+	var addContactInfo = function() {
+		if( window.event ) window.event.returnValue = false;
+		rebuildContactData();
+		var ed = "<?php echo $contactTypeData;?>";
+		$("#contactInfoTable<?php echo $this->dialogCount;?> tbody").append('<tr><td style="text-align: right;width:46%;"><span class="editable" edit_type="combo" edit_data="'+ed+'" edit_style="{\'max-width\': \'130px\'}" edit_onkeyup="setContactType" edit_name="contactType" edit_group="true">e-mail</span></td><td><span class="editable" edit_name="contact" edit_group="true"  edit_type="text" edit_style="{\'max-width\': \'130px\', \'text-align\':\'left\'}"></span></td></tr>');
+		var e=new editForm('editperson<?php echo $this->dialogCount;?>');
+		return false;
+	};
+	
+	var remContactInfo = function() {
+		if( window.event ) window.event.returnValue = false;
+		if ( focusedDijitItem !== undefined ) {
+			var p=focusedDijitItem.parent().parent();
+			if ( Left(focusedDijitItem.find("input:last").attr('name'),7) == "contact" ) p.remove();
+		};
+		return false;
+	};
+
+	var $errDlg= $("#dialog-err-ppl<?php echo $this->dialogCount;?>").dialog({
+		dialogClass: 'alert',
+		autoOpen: false,
+		resizable: false,
+		modal: true,
+		buttons: {
+			OK: function() {
+				$errDlg.dialog('close');
+			}
+		}
+	});
+
+    var askResult='no';
+
+	var $askDlg= $("#dialog-ask-ppl<?php echo $this->dialogCount;?>").dialog({
+		dialogClass: 'alert',
+		autoOpen: false,
+		resizable: false,
+		height:160,
+		modal: true,
+		buttons: {
+			Yes: function() {
+                askResult='yes';
+				$askDlg.dialog('close');
+				$("#savedetails").click();
+			},
+            No: function() {
+                askResult='no';
+				$askDlg.dialog('close');
+            }
+		}
+	});
+
+	var showErr = function(msg) {
+        if(typeof msg === "string"){
+			$("#dialog-err-ppl-msg<?php echo $this->dialogCount;?>").html(msg.replace(/\</g,"&lt;").replace(/\>/g,"&gt;").replace(/\n/g,"<br />"));
+		}else{
+			$("#dialog-err-ppl-msg<?php echo $this->dialogCount;?>").html("").append($(msg));
+		}
+		
+		$errDlg.dialog('open');
+	};
+	
+	var showAsk = function(msg) {
+        $("#dialog-ask-ppl-msg<?php echo $this->dialogCount;?>").html(msg);
+		$askDlg.dialog('open');
+	};
+
+
+	var onValidate<?php echo $this->dialogCount;?> = function() {
+		var valid = true;
+		var invalidMessages = [];
+   		var sub=$('#editperson<?php echo $this->dialogCount;?>')[0].getElementsByTagName("input");
+		var isRobot = <?php echo (($this->entry->accounttype==1)?'true':'false'); ?>;
+		//check for country
+		for (var i in sub) {
+			if (sub[i] !== undefined) {
+				if(sub[i].name == 'firstName'){
+					if($.trim(sub[i].value) == '' || sub[i].name.toLowerCase()==sub[i].value.toLowerCase()){
+						invalidMessages[invalidMessages.length] = "first name";
+						valid = false;
+					}
+				}else if(sub[i].name == 'lastName'){
+					if($.trim(sub[i].value) == '' || sub[i].name.toLowerCase()==sub[i].value.toLowerCase()){
+						invalidMessages[invalidMessages.length] = "last name";
+						valid = false;
+					}
+				} else if (sub[i].name == "countryID") {
+					if ( sub[i].value == '0' || $.trim(sub[i].value) == '' ) {
+						invalidMessages[invalidMessages.length] = "country";
+						valid = false;
+					}
+				}
+			}
+		}
+		if(valid == false){
+			var err = "<div ><div>Please fill the mandatory fields listed bellow:</div><ul>"
+			for(var i =0; i<invalidMessages.length; i+=1){
+				err += "<li>"+invalidMessages[i]+"</li>";
+			}
+			err += "</ul></div>";
+			showErr($(err));
+			return;
+		}
+		if(isRobot==false){
+			//check for at least one e-mail address
+			if ($("input[name^='contactType']").filter('[value=7]').length == 0) {
+				showErr("Please enter at least one valid e-mail address in the Contact Information section");
+				valid = false;
+			} else {
+				//check that e-mail addresses are valid
+				$("input[name^='contactType']").filter('[value=7]').each(function() {
+					var n = $(this).attr("name").substr(11);
+
+					re = new RegExp(/^[-!#$%&'*+/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z{|}~])*@[a-zA-Z0-9](-?[a-zA-Z0-9])*(\.[a-zA-Z](-?[a-zA-Z0-9])*)+$/);
+					if (! re.test($("input[name='contact"+n+"']").val())) {
+						showErr("e-mail address \n`"+$("input[name='contact"+n+"']").val()+"` \nis invalid");
+						valid = false;
+						return;
+					} else {
+						//check that valid e-mail addresses do not already exist
+						var mailexists = 0;
+						var mailname = '';
+						$.ajax({
+							url: '/people/emailexists?email='+encodeURIComponent($.trim($("input[name='contact"+n+"']").val())),
+							success: function(data,txtStatus) {
+								if (data != '') {
+									data = eval("("+data+")");
+									mailexists = data.id;
+									mailname = data.fullname;
+								}
+							},
+							async: false
+						});
+						if (mailexists !== 0) if (mailexists != '<?php echo $this->entry->id;?>') {
+							mailname = '<a style="color: #D96B00" href="/?p='+appdb.utils.base64.encode('/people/details?id='+mailexists)+'" target="_blank">'+mailname+'</a>';
+							showErr("e-mail address `"+$("input[name='contact"+n+"']").val()+"` is already in use by "+mailname);
+							valid = false;
+							return;
+						}
+					}
+				});
+			}
+		}
+        //check that the same name does not exist, if entry is created by someone else (e.g. a manager)
+        <?php if ( (!checkRegister($this)) && ($this->entry->id !== $this->session->userid)) { ?>
+        var nameexists = 0;
+        var fullname = '';
+        $.ajax({
+            url: '/people/nameexists?fname='+encodeURIComponent($.trim($("input[name='firstName']").val()))+'&'+'lname='+encodeURIComponent($.trim($("input[name='lastName']").val())),
+            success: function(data,txtStatus) {
+                if (data != '') {
+                    data = eval("("+data+")");
+                    nameexists = data.id;
+                    fullname = data.fullname;
+                }
+            },
+            async: false
+        });
+        if (nameexists !== 0) if (nameexists != '<?php echo $this->entry->id;?>') {
+            fullname = '<a style="color: #D96B00" href="/?p='+appdb.utils.base64.encode('/people/details?id='+nameexists)+'" target="_blank">'+fullname+'</a>';
+			if (askResult === 'no') {
+				showAsk("There already exists a person with a similar name: "+fullname+"<br/>Are you sure you want to create the record?");
+            	valid=false;
+			}
+        }
+		<?php } ?>
+		if (valid) $("#details").fadeOut();
+		return valid;
+	};
+	
+	var onUpdate<?php echo $this->dialogCount;?> = function(response) {
+		<?php if($this->entry->id=='') { ?>
+			appdb.views.Main.showPerson({id: ""});
+		<?php } else { ?>
+			appdb.views.Main.refresh();
+		<?php } ?>
+	};
+
+	var onError = function() {
+		alert('There was an error processing you request');
+	};
+		
+	var setRegion<?php echo $this->dialogCount;?> = function() {
+		var sub=$('#editperson<?php echo $this->dialogCount;?>')[0].getElementsByTagName("input");
+		for (i in sub) {
+			if (sub[i] !== undefined) {
+			if (sub[i].name == "countryID") {
+				var cid=sub[i].value;
+				<?php
+					echo "var crs = new Array();";
+					echo "var cfs = new Array();";
+                    echo "crs['0'] = 'N/A';";
+                    echo "cfs['0'] = 'null';";
+					for($i=0; $i<$this->countries->count(); $i++) {
+						echo "crs['".$this->countries->items[$i]->id."']='".$this->countries->items[$i]->region->name."';";
+						echo "cfs['".$this->countries->items[$i]->id."']='".trim(strtolower($this->countries->items[$i]->isoCode))."';";
+					}
+				?>
+				var region = crs[cid];
+				var flags;
+				if (cfs[cid] !== undefined) flags = cfs[cid].split("/");
+				for (i in flags) {
+					var flag = "/images/flags/"+flags[i]+".png";
+					$("#flag"+i+"_<?php echo $this->dialogCount;?>").attr("src",flag);
+				}
+				$("#region<?php echo $this->dialogCount;?>").text(region);
+				break;
+			}}
+		}		
+	};
+	 
+	var onEdit = function() {
+		$('editdiv'+dialogCount).addClass("editmode");
+		$( "#navdiv"+dialogCount).addClass("editmode");
+		$('#editdiv<?php echo $this->dialogCount;?>').hide();
+		if(dijit.byId("navdiv<?php echo $this->dialogCount;?>")){
+			$("#navdiv<?php echo $this->dialogCount;?>" ).tabs("remove",1);
+			$("#navdiv<?php echo $this->dialogCount;?>" ).tabs("remove",1);
+			if(dijit.byId("docdiv<?php echo $this->dialogCount;?>")){
+				dijit.byId("docdiv<?php echo $this->dialogCount;?>").destroyRecursive(false);
+			}
+			<?php if ( $this->session->userid == $this->entry->id ) { ?>
+			$("#navdiv<?php echo $this->dialogCount;?>").tabs("remove",1);
+			if(dijit.byId("privdiv<?php echo $this->dialogCount;?>")){
+				dijit.byId("privdiv<?php echo $this->dialogCount;?>").destroyRecursive(false);
+			}
+			//remove connected accounts tab
+			$("#navdiv<?php echo $this->dialogCount;?>").tabs("remove",1);
+			<?php } ?>
+			$("#navdiv<?php echo $this->dialogCount;?>" ).tabs("select", 0);
+		}
+		editForm('editperson<?php echo $this->dialogCount;?>'); 
+		$('#addcontactinfo<?php echo $this->dialogCount;?>').show(); 
+		$('#pplimg<?php echo $this->dialogCount;?>').parent().html($('#pplimg<?php echo $this->dialogCount;?>').parent().html()+'<div id=\'uploadimage<?php echo $this->dialogCount?>\'>Upload image...</div>');
+		$('#pplimg<?php echo $this->dialogCount;?>').attr('onmouseover','');
+		$('#pplimg<?php echo $this->dialogCount;?>').attr('onmouseout','');
+		$('.ngirow').hide();
+		prepareUploadPersonImage();
+		appdb.utils.DataWatcher.Registry.activate("person");
+		<?php if($this->entry->id == "") { ?>
+		appdb.pages.Person.initEditValidation();
+		<?php } ?>
+		appdb.pages.Person.initRelationEditor(true);
+		$(".person-group.groupcontainer > ul > li.contactinfo > a").trigger("click");
+	};
+
+    var toggleRememberMe = function() {
+        if ( $("input[name='rememberme']:last").attr("checked")) {
+            $.get('/users/rememberme');
+        } else {
+            $.get('/users/forgetme');
+        }
+	};
+
+	var toggleRememberNews = function() {
+        if ( $("input[name='remembernewsfeed']:last").attr("checked")) {
+            remembernewsfeed=true;
+        } else {
+            remembernewsfeed=false;
+        }
+	};
+
+	$("#addcontactinfo<?php echo $this->dialogCount;?>").hide();
+	var docgrid = false;
+		var closeDialog = function () {
+		if (dijit.byId("detailsdlg<?php echo $this->dialogCount;?>") !== undefined) dijit.byId("detailsdlg<?php echo $this->dialogCount;?>").onCancel();
+	};
+	var makePersonDocs = function () {
+		var doccount = <?php echo count($this->entry->publications); ?>
+		
+		if( doccount > 0 ){
+			$("#docdiv" + dialogCount).removeClass("isempty");
+		}else{
+			$("#docdiv" + dialogCount).addClass("isempty");
+		}
+		if ( docgrid == false ) {
+			docgrid = new dojox.grid.Grid({height:"100%",autoHeight:true},"docgrid<?php echo $this->dialogCount;?>");
+			var data = [
+			<?php
+			$i=0;
+			if ($this->entry->id != '') foreach ($this->entry->publications as $doc) {
+				$i++;
+				if ($doc->pageStart == "") {
+					$pageStart = $doc->pageEnd;
+					$pageEnd = "";
+				} else {
+					$pageStart = $doc->pageStart;
+					$pageEnd = $doc->pageEnd;
+				}
+				if ($pageStart == "0") $pageStart = "";
+				if ($pageEnd == "0") $pageEnd = "";
+				if ($pageStart == $pageEnd) $pageEnd = "";
+				$pages = $pageStart;
+				if ( $pageEnd != "" ) $pages.=" - $pageEnd";
+				if ($doc->url != "") {
+					$title = "<a href=\"".$doc->url."\" target=\"_blank\">".str_replace("'","\'",$doc->title)."</a>";
+				} else {
+					$title = $doc->title;
+				}
+				echo "[['".$title."'], '".$doc->docType->description."', '".$doc->conference."', '".$doc->volume."', '".$pages."', '".$doc->year."', '".$doc->publisher."', '".$doc->isbn."', ";
+				if ( ! is_null($doc->application) ) {
+					$contenttype = "software";
+					switch(trim($doc->application->metatype)){
+						case "1":
+							$contenttype = "vappliance";
+							break;
+						case "2":
+							$contenttype = "swappliance";
+							break;
+						case "0":
+						default:
+							break;
+					}
+					echo "['<a href=\"/store/".$contenttype."/".$doc->application->cname."\" onclick=\"appdb.views.Main.showApplication({id: ".$doc->application->id.", cname:\'".$doc->application->cname."\'}, {mainTitle: \'".$doc->application->name."\',content:\'".$contenttype."\'});\">".$doc->application->name."</a>']";
+				} else {
+					echo "[]";
+				}
+				echo ", '".$doc->proceedings."', '".$doc->journal."', [";
+				$j=0;
+				foreach ($doc->authors as $author) {
+					$j++;
+					echo "'";
+					if ($author->main) echo "<b>";
+					if (($author->authorId !== null) && ($author->author !== null)) echo "<a href=\"/store/person/".$author->author->cname."\" onclick=\"appdb.views.Main.showPerson({id: ".$author->authorId.", cname: \'".$author->author->cname."\'}, {mainTitle: \'".$author->fullName."\'});\">";
+					echo $author->fullName;
+					if (! ($author->authorId === null)) echo "</a>";
+					if ($author->main) echo "</b>";
+					echo "'";
+					if ($j < count($doc->authors)) echo ",\n";
+				}
+				echo "]]";
+				if ($i < count($this->entry->publications)) echo ",\n";
+			}
+			?>
+			];	
+			var model = new dojox.grid.data.Table(null, data);
+			var view = {
+				cells: [[
+					{name: 'Title', rowSpan: 1, width:'20%'},
+					{name: 'Type', rowSpan: 2, width:'5%'},
+					{name: 'Conference', width:'20%'},	
+					{name: 'Volume', width:'5%'},
+					{name: 'Pages', width:'5%'},
+					{name: 'Year', width:'2%' },
+					{name: 'Publisher', width:'10%'},
+					{name: 'ISBN', width:'10%'}                    
+				],[
+					{name: 'Software'},
+					{name: 'Proceedings'},
+					{name: 'Journal', colSpan:2},
+					{name: 'Authors', colSpan:3}
+				]]
+			};
+			var structure = [ view ];
+			docgrid.setModel(model);
+			docgrid.setStructure(structure);
+			
+			if ( detailsStyle == 1 ) {
+				dojo.parser.parse(dojo.byId("detailsdlgcontent<?php echo $this->dialogCount;?>"));
+			} else {
+				dojo.parser.parse($(".detailsdlgcontent")[0]);
+			}
+			docgrid.render();
+		};
+	};
+	var titlebar;
+	if ( detailsStyle == 1) titlebar = $("#detailsdlg"+dialogCount+":last div span"); else titlebar = $(".detailsdlg:last div span");
+	<?php if ($this->entry->id === null) { ?>
+	if ( titlebar !== undefined ) {
+		if ( titlebar.length > 0 ) {
+			titlebar[0].innerHTML = 'New Person Profile';
+		}
+	}
+    <?php } else { ?>
+	if ( titlebar !== undefined ) {
+		if ( titlebar.length > 0 ) {
+			titlebar[0].innerHTML = 'Person Details - <I><?php echo $this->entry->firstName." ".$this->entry->lastName; ?></I>';
+		}
+	}
+	<?php } ?>
+	var dlgHeight = Number(getComputedHeight("detailsdlgcontent<?php echo $this->dialogCount;?>"))-30;
+	$("#docdiv<?php echo $this->dialogCount;?>").css("height",dlgHeight+'px');
+	shortcut.add("esc", closeDialog);
+	
+	<?php if ($this->session->userid !== null) if ($this->entry->id != $this->session->userid) { ?>
+    var doSendUserMessage = function() {
+        if (validateMessage()) {
+            $.ajax({
+                url: "/people/leaveMessage", 
+                type: "POST",
+                data: ({
+                    receiverID: $(':input[name="receiverID"]:last').val(),
+                    msg: $(':input[name="msg"]:last').val()
+                }),
+				success: function(d){
+					console.log(d);
+					if(d == "ok"){
+						$('#msgdiv<?php echo $this->dialogCount;?> .sending img').attr("src","/images/yes.png");
+						setTimeout(function(){ $('#msgdiv<?php echo $this->dialogCount;?> .sending img').remove(); },1500);
+					}
+				}
+            });
+            cancelMessage();
+			var sp = $(document.createElement("span")).addClass("sending").append("<img src='/images/ajax-loader-trans-orange.gif' border='0' width='14' height='14' />");
+			$('#msgdiv<?php echo $this->dialogCount;?>').append(sp);
+        }
+    };
+
+	var sendUserMessage = function() {
+		$('#msgdiv<?php echo $this->dialogCount;?>').html('<table width="100%"><tr><td><input name="receiverID" type="text" value="<?php echo $this->entry->id; ?>" style="display: none"/><label>Message:</label></td></tr><tr><td><textarea name="msg" dojoType="dijit.form.Textarea" onkeypress="return imposeMaxLength(this, 15);"></textarea></td></tr><tr><td align="right" colspan="2"><button onclick="cancelMessage();" dojotype="dijit.form.Button">Cancel</button><span/><button dojotype="dijit.form.Button" onclick="doSendUserMessage();">Send</button></td></tr></table>');
+		dojo.parser.parse('msgdiv<?php echo $this->dialogCount;?>');
+	};
+	<?php } ?>
+	function cancelMessage() {
+		$('#msgdiv<?php echo $this->dialogCount;?>').html('<a href="#" onclick="sendUserMessage()" class="icontext"><img src="/images/feedback.png" alt=""/><span>Leave a message</span></a>');
+	};
+	
+	function validateMessage() {
+        if ( $(':input[name="msg"]:last').val() == "" ) return false; else return true;
+	};
+	
+	function validateImage() {
+		alert($("#imageform<?php echo $this->dialogCount;?>")[0]);
+		return false;
+	}
+	
+	function imageUploaded(responseText, statusText, xhr, $form) {
+		alert(responseText);
+	};
+
+    var prepareUploadPersonImage2 = function() {
+        $('#uploadimage<?php echo $this->dialogCount;?>').html('<iframe scrolling="no" style="width:110px; height:75px; border:none; overflow:hidden" frameborder="0" src="/people/uploadframe"></iframe>');
+    };
+	
+	var prepareUploadPersonImage = function() {
+		$('#uploadimage<?php echo $this->dialogCount;?>').html('<a href="#" onclick="prepareUploadPersonImage2();return false;">Change image</a>');
+	};
+
+	var permreqdlg;
+
+    var requestPermissions = function() {
+		permreqdlg = new dojox.Dialog({
+			title: "Request Permissions",
+			style: "width: 40%",
+			modal: true,
+			id: "permreqdlg"+dialogCount
+		});
+
+        dialogCount++;
+        permreqdlg.setHref('people/permreq');
+        permreqdlg.show();
+    };
+
+    var closePermReqDlg = function() {
+        permreqdlg.onCancel();
+    };
+
+    var positionTypeChanged = function() {
+        if ('<?php echo $this->entry->positionTypeID; ?>' != $("input[name^=positionTypeID]").val()) {
+            $("#roleVerifiedImg<?php echo $this->dialogCount;?>").attr('src','/images/close2.png');
+            $("#roleVerifiedImg<?php echo $this->dialogCount;?>").attr('title','Role will be activated upon verification');
+        } else {
+            $("#roleVerifiedImg<?php echo $this->dialogCount;?>").attr('src','/images/close.png');
+            $("#roleVerifiedImg<?php echo $this->dialogCount;?>").attr('title','Role verified');
+        };
+	};
+
+	var prepareUpload_old = function() {
+		var props = {
+			isDebug:false,
+			hoverClass:"uploadHover",
+			activeClass:"uploadPress",
+			disabledClass:"uploadDisabled",
+			uploadUrl: "people/uploadimage",
+			fileMask:[
+				["Jpeg File",   "*.jpg;*.jpeg"],
+				["GIF File",    "*.gif"],
+				["PNG File",    "*.png"],
+				["All Images",  "*.jpg;*.jpeg;*.gif;*.png"]
+			]
+		};
+		$('#uploadimage<?php echo $this->dialogCount;?>').addClass('btn').addClass('uploadBtn');
+		uploader = new dojox.form.FileUploader(dojo.mixin({
+			force: "html",
+			skipServerCheck: true,
+			showProgress: true,
+			selectMultipleFiles:false,
+			deferredUploading: 1,
+			uploadOnChange: false
+		},props), "uploadimage<?php echo $this->dialogCount;?>");
+		dojo.connect(uploader, "onProgress", function(dataArray){
+			dojo.forEach(dataArray, function(d){
+				$('#pplimg<?php echo $this->dialogCount;?>')[0].setAttribute('width','32px');
+				$('#pplimg<?php echo $this->dialogCount;?>')[0].setAttribute('height','32px');
+				$('#pplimg<?php echo $this->dialogCount;?>').attr('src','/images/ajax-loader-small.gif');
+			});
+		});
+		dojo.connect(uploader,"onChange",function(_a) {
+			console.log("DATA:",_a);
+			dojo.forEach(_a,function(d) {
+				console.log(d.name+" "+Math.ceil(d.size*0.001)+"kb \n");
+			});
+		});
+		dojo.connect(uploader, "onComplete", function(dataArray){
+			dojo.forEach(dataArray, function(d){
+				$('#pplimg<?php echo $this->dialogCount;?>')[0].setAttribute('width','110px');
+				$('#pplimg<?php echo $this->dialogCount;?>')[0].setAttribute('height','110px');
+				if ( d.additionalParams.filename !== undefined ) {
+					$('#pplimg<?php echo $this->dialogCount;?>').attr('src','/upload/pplimage/'+d.additionalParams.filename);
+					$(':input[name="newimage"]:last').val('/upload/pplimage/'+d.additionalParams.filename);
+				} else {
+					$('#pplimg<?php echo $this->dialogCount;?>').attr('src','');
+					alert('An error occurred while uploading the image');
+				};
+			});
+		});
+	};
+
+    var pubHelpDlg;
+    var showPubHelp = function() {
+        if (pubHelpDlg !== undefined ) dijit.popup.close(pubHelpDlg);
+        var content = '<div align="right" width="100%"><a href="#" onclick="dijit.popup.close(pubHelpDlg);"><img title="Close" border="0" src="/images/closeicon.png" width="12px"/></a></div>'+
+            '<div><p>This is a reverse-list of publications listed under the software this person is associated with.<br/>'+
+            'If you wish to edit publication data, you should do it from the appropriate software profile pages.</p></div>';
+        pubHelpDlg = new dijit.TooltipDialog({
+            title: 'Help',
+            content: content 
+        });
+		setTimeout(function(){
+			dijit.popup.open({
+				popup: pubHelpDlg,
+				parent: $("#doctab<?php echo $this->dialogCount;?> img")[0],
+				around: $("#doctab<?php echo $this->dialogCount;?> img")[0],
+				orient: {BL:'TL'}                    
+			});
+			$(pubHelpDlg.domNode).hide();
+			$(pubHelpDlg.domNode).fadeIn();
+		}, 500);
+	};
+
+	$(document).ready(function(){
+		appdb.config.permalink = '<?php echo 'http://'.$_SERVER["HTTP_HOST"].'?p='.base64_encode('/people/details?id='.$this->entry->id); ?>';
+		
+        if ( detailsStyle == 0 ) {
+            $("#relatedappsdiv<?php echo $this->dialogCount;?>").css("max-height","");
+        }
+        if ( ! detailsStyleAuto ) {
+            if (detailsStyle == 0) {
+                $("input[name='displaySettings']").filter("[value='0']:first").attr('checked','checked');
+            } else if (detailsStyle == 1) {
+                $("input[name='displaySettings']").filter("[value='1']:last").attr('checked','checked');
+            }
+        } else {
+            if (detailsStyle == 1) {
+                $("input[name='displaySettings']").filter('[value="-1"]:last').attr('checked','checked');
+            } else if (detailsStyle == 0) { 
+                $("input[name='displaySettings']").filter('[value="-1"]:first').attr('checked','checked');
+            }
+		}
+		try {
+	        if ( $.cookie("rememberme") == "1" ) $("input[name='rememberme']").attr("checked","checked");
+		} catch(e) {
+			$("input[name='rememberme']").attr("checked","");
+		}
+        if ( remembernewsfeed ) $("input[name='remembernewsfeed']").attr("checked","checked");
+		$(".prefsdiv").css('height',dlgHeight+'px');
+		makePersonDocs();
+		<?php if ($this->entry->id != "") { ?>
+		$("#toolbarContainer").empty();
+		<?php } ?>
+		if ( userID !== null ) { 
+			$(".pplviewtoolbar").appendTo($("#toolbarContainer")); 
+			$(".pplviewtoolbar").show(); 
+		} else $(".pplviewtoolbar").empty().remove();
+		
+		if (detailsStyle == 0 ) $(titlebar.parent()[0]).hide();
+		$("td#personregistration").text(appdb.utils.FormatISODate($("td#personregistration").text()));
+        
+        <?php if($this->session->userid !== null && $this->entry->id == $this->session->userid) {?>
+            appdb.components.Person.getPrimaryContact(function(v){
+                if(appdb.model.PrimaryContact.userPrimaryContact!=null){
+                    if($("#defaultnotificationholder").length>0){
+                        $(".defaultnotificationresult").empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >loading...</span>');
+                        appdb.components.Person.getDefaultNotification(getDefaultNotifcationHandler,"<?php /* FIXME: NIL thing*/ echo ($userIsNil)?"country:".$this->escape($this->entry->country->name)." id:SYSTTAG1":"~application.name:. id:SYSTAG1";?>");
+                    }
+                    if($("#rolenotificationholder").length>0){
+                        $(".rolenotificationresult").empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >loading...</span>');
+                        appdb.components.Person.getRoleNotification(getRoleNotificationHandler,{});
+                    }
+                    if($("#nodisseminationholder").length>0){
+                        $(".nodisseminationresult").empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >loading...</span>');
+						 appdb.components.Person.getNoDissemination(getNoDisseminationHandler,{});
+                    }
+                    if($("#ownednotificationholder").length>0){
+                     $(".ownednotificationresult").empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >loading...</span>');
+                     appdb.components.Person.getOwnedNotification(getOwnedNotificationHandler);
+                    }
+                    if($("#relatednotificationholder").length>0){
+                     $(".relatednotificationresult").empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >loading...</span>');
+                     appdb.components.Person.getRelatedNotification(getRelatedNotificationHandler,{});
+                    }
+                    if($("#inboxnotificationholder").length>0){
+                     $(".inboxnotificationresult").empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >loading...</span>');
+                     appdb.components.Person.getInboxNotification(getInboxNotificationHandler,{});
+                    }
+                } else {
+                    if($("#defaultnotificationholder").length>0){
+                        $("#defaultnotificationholder").hide();
+                    }
+                    if($("#rolenotificationholder").length>0){
+                        $("#rolenotificationholder").hide();
+                    }
+                    if($("#nodisseminationholder").length>0){
+                        $("#nodisseminationholder").hide();
+                    }
+                    if($("#ownednotificationholder").length>0){
+                     $("#ownednotificationholder").hide();
+                    }
+                    if($("#relatednotificationholder").length>0){
+                     $("#relatednotificationholder").hide();
+                    }
+                    if($("#inboxnotificationholder").length>0){
+                     $("#inboxnotificationholder").hide();
+                    }
+                }
+				if(CurrentAccessTokenHandler){
+					CurrentAccessTokenHandler.destroy();
+				}else{
+					var CurrentAccessTokenHandler = undefined;
+				}
+				setTimeout(function(){
+					CurrentAccessTokenHandler = new appdb.components.AccessTokenHandler({container: $("#accesstokenhandler")});
+					CurrentAccessTokenHandler.load();
+				},1);
+				if(CurrentAPIKeyHandler){
+					CurrentAPIKeyHandler.destroy();
+				}else{
+					var CurrentAPIKeyHandler = undefined;
+				}
+				setTimeout(function(){
+					CurrentAPIKeyHandler = new appdb.components.APIKeyHandler({container: $("#webapikeyhandler")});
+					CurrentAPIKeyHandler.load();
+				},1);
+            });
+			
+			
+        <?php  } ?>
+
+            $("#defaultnotification").unbind('click').click(function(){
+                var defflt = "<?php /* FIXME: NIL thing*/ echo ($userIsNil)?"country:".$this->escape($this->entry->country->name)." id:SYSTTAG1":"~application.name:. id:SYSTAG1";?>",
+                    chk = $(this).is(':checked'), deliv = dijit.byId('defaultdelivery<?php echo $this->dialogCount;?>').attr('value'),
+                    def = appdb.model.MailSubscription.defaultNotification, res = $(".defaultnotificationresult"),
+                    dename = "<?php /* FIXME: NIL thing*/ echo ($userIsNil)?$this->entry->country->name . "'s activities":"Software activities"; ?>";
+
+                if(chk){ //mail subscription exists
+                    $(res).empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >adding...</span>');
+                    appdb.components.Person.setDefaultNotification(true,{name:dename,subjecttype:"app",events:31,delivery:deliv,flt:defflt},function(){
+                        $(res).empty();
+                    })//new subscription
+                }else{
+                    $(res).empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >removing...</span>');
+                    appdb.components.Person.setDefaultNotification(false,{id:def.id,pwd:def.unsubscribe_pwd},function(err){
+                        $(res).empty();
+                    });//remove subscription
+                }
+                dijit.byId('defaultdelivery<?php echo $this->dialogCount;?>').attr('disabled',!$(this).is(':checked'));
+            });
+            dojo.connect(dijit.byId("defaultdelivery<?php echo $this->dialogCount;?>"),"onChange",function(){
+                var res = $(".defaultnotificationresult"), def = appdb.model.MailSubscription.defaultNotification,
+                    defflt = "<?php /* FIXME: NIL thing*/ echo ($userIsNil)?"country:".$this->escape($this->entry->country->name)." id:SYSTTAG1":"~application.name:. id:SYSTAG1";?>",
+                    deliv = dijit.byId('defaultdelivery<?php echo $this->dialogCount;?>').attr('value');
+
+                $(res).empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >setting...</span>');
+                appdb.components.Person.setDefaultNotification(undefined,{id:def.id,name:def.name,subjecttype:"app",events:def.events,delivery:deliv,flt:defflt},function(){
+                    $(res).empty();
+                });//update subscription
+            });
+            var getDefaultNotifcationHandler = function(v){
+                v = v || {};
+                $(".defaultnotificationresult").empty();
+                if(v.error){
+                    $("#defaultnotification").removeAttr("checked");
+                    dijit.byId("defaultdelivery<?php echo $this->dialogCount;?>").attr("disabled",false);
+                    $(".defaultnotificationresult").empty().append(v.error);
+                }else if(v.id){
+                    $("#defaultnotification").attr("checked","checked");
+                    appdb.model.MailSubscription.defaultNotification = v;
+                    dijit.byId("defaultdelivery<?php echo $this->dialogCount;?>").attr("disabled",false);
+                    dijit.byId("defaultdelivery<?php echo $this->dialogCount;?>").attr("value",v.delivery);
+                }else{
+                    $("#defaultnotification").removeAttr("checked");
+                    appdb.model.MailSubscription.defaultNotification = null;
+                    dijit.byId("defaultdelivery<?php echo $this->dialogCount;?>").attr("disabled",true);
+                }
+            };
+         
+			<?php 
+				// FIXME: Provide for NILs assigned to counties other than their own
+				if( $entryIsAdminOrManager || $entryIsNil ){ 
+			?>
+
+             $("#rolenotification").unbind('click').click(function(){
+                var defflt = "",
+                    chk = $(this).is(':checked'), deliv = 0,
+                    def = appdb.model.MailSubscription.roleNotification, res = $(".rolenotificationresult"),
+                    dename = "<?php /* FIXME: Provide for NILs assigned to counties other than their own*/ echo ($userIsNil?$this->entry->country->name . "'s Role verification mailing list":"Role verification mailing list"); ?>",
+                    deflt = "<?php if ($entryIsNil){
+                                echo "+=country.id:".$this->entry->country->id." -=role.id:7 -=role.id:5";
+                            } else if (userIsManager($this->entry->id)) {
+                                echo "-=role.id:5";
+                            } else  {
+                               echo ""; 
+                            }
+                            ?>";
+                   deflt = appdb.utils.base64.encode(deflt);
+                if(chk){ //mail subscription exists
+                    $(res).empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >adding...</span>');
+                    appdb.components.Person.setRoleNotification(true,{name:dename,flt:deflt},function(){
+                        $(res).empty();
+                    });//new subscription
+                }else{
+                    $(res).empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >removing...</span>');
+                    appdb.components.Person.setRoleNotification(false,{id:def.id,pwd:def.unsubscribe_pwd},function(err){
+                        $(res).empty();
+                    });//remove subscription
+                }
+            });
+            var getRoleNotificationHandler = function(v){
+                v = v || {};
+                $(".rolenotificationresult").empty();
+                if(v.error){
+                    $("#rolenotification").removeAttr("checked");
+                    $(".rolenotificationresult").empty().append(v.error);
+                }else if(v.id){
+                    $("#rolenotification").attr("checked","checked");
+                    appdb.model.MailSubscription.roleNotification = v;
+                }else{
+                    $("#rolenotification").removeAttr("checked");
+                    appdb.model.MailSubscription.roleNotification = null;
+                }
+            };
+         <?php } ?>
+
+            $("#nodissemination").unbind('click').click(function(){
+                var defflt = "",
+                    chk = $(this).is(':checked'),
+                    res = $(".nodisseminationresult");
+                if(chk){ // nodissemination is false
+                    $(res).empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >adding...</span>');
+                    appdb.components.Person.setNoDissemination(true,{},function(){
+                        $(res).empty();
+                    });
+                } else {
+                    $(res).empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >removing...</span>');
+                    appdb.components.Person.setNoDissemination(false,{},function(err){
+                        $(res).empty();
+                    });
+                }
+            });
+            var getNoDisseminationHandler = function(v){
+                v = v || {};
+                $(".nodisseminationresult").empty();
+                if(v.error){
+                    $("#nodissemination").removeAttr("checked");
+                    $(".nodisseminationresult").empty().append(v.error);
+                }else if(v.value && v.value == "true"){
+                    $("#nodissemination").removeAttr("checked");
+                    appdb.model.MailSubscription.noDissemination = null;
+                }else{
+                    $("#nodissemination").attr("checked","checked");
+                    appdb.model.MailSubscription.noDissemination = v;
+                }
+            };
+            $("#ownednotification").unbind('click').click(function(){
+                var chk = $(this).is(':checked'),
+                    res = $(".ownednotificationresult"),
+                    del = dijit.byId("owneddelivery<?php echo $this->dialogCount;?>").attr("value");
+                    $(res).empty();
+                if(chk){
+                    $(res).empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"/><span >adding...</span>');
+                    appdb.components.Person.setOwnedNotification(true,{delivery:del},function(v){$(res).empty();getOwnedNotificationHandler(v);});
+                } else {
+                    $(res).empty();
+                    appdb.components.Person.setOwnedNotification(false,{},getOwnedNotificationHandler);
+                }
+            });
+            dojo.connect(dijit.byId("owneddelivery<?php echo $this->dialogCount;?>"),"onChange",function(){
+                var res = $(".ownednotificationresult"),
+                    deliv = dijit.byId('owneddelivery<?php echo $this->dialogCount;?>').attr('value');
+                if(appdb.model.MailSubscription.ownedNotification && appdb.model.MailSubscription.ownedNotification.delivery != deliv){
+                 $(res).empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >setting...</span>');
+                 appdb.components.Person.setOwnedNotification(true,{delivery:deliv},function(v){
+                     $(res).empty();
+                 });//update subscription
+                }
+                
+            });
+            var getOwnedNotificationHandler = function(v){
+                v = v || {};
+                $(".ownednotificationresult").empty();
+                if(v.error){
+                    $("#ownednotification").removeAttr("checked");
+                    dijit.byId("owneddelivery<?php echo $this->dialogCount;?>").attr("disabled",false);
+                    $(".ownednotificationresult").empty().append(v.error);
+                }else if(v.id){
+                    $("#ownednotification").attr("checked","checked");
+                    appdb.model.MailSubscription.ownedNotification = v;
+                    dijit.byId("owneddelivery<?php echo $this->dialogCount;?>").attr("disabled",false);
+                    dijit.byId("owneddelivery<?php echo $this->dialogCount;?>").attr("value",v.delivery);
+                }else{
+                    $("#ownednotification").removeAttr("checked");
+                    appdb.model.MailSubscription.ownedNotification = null;
+                    dijit.byId("owneddelivery<?php echo $this->dialogCount;?>").attr("disabled",true);
+                }
+            };
+
+            $("#relatednotification").unbind('click').click(function(){
+                var chk = $(this).is(':checked'),
+                    res = $(".relatednotificationresult");
+                if(chk){ // relatednotification is false
+                    $(res).empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >adding...</span>');
+                    appdb.components.Person.setRelatedNotification(true,{},getRelatedNotificationHandler);
+                } else {
+                    $(res).empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >removing...</span>');
+                    appdb.components.Person.setRelatedNotification(false,{},getRelatedNotificationHandler);
+                }
+            });
+            dojo.connect(dijit.byId("relateddelivery<?php echo $this->dialogCount;?>"),"onChange",function(){
+			var res = $(".relatednotificationresult"),
+                    deliv = dijit.byId('relateddelivery<?php echo $this->dialogCount;?>').attr('value');
+                if(appdb.model.MailSubscription.relatedNotification && appdb.model.MailSubscription.relatedNotification.delivery != deliv){
+					$(res).empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >setting...</span>');
+					appdb.components.Person.setRelatedNotification(true,{delivery:deliv},function(v){
+						$(res).empty();
+					});//update subscription
+				}
+            });
+            var getRelatedNotificationHandler = function(v){
+                v = v || {};
+                $(".relatednotificationresult").empty();
+                if(v.error){
+                    $("#relatednotification").removeAttr("checked");
+                    dijit.byId("relateddelivery<?php echo $this->dialogCount;?>").attr("disabled",false);
+                    $(".relatednotificationresult").empty().append(v.error);
+                }else if(v.id){
+                    $("#relatednotification").attr("checked","checked");
+                    appdb.model.MailSubscription.relatedNotification = v;
+                    dijit.byId("relateddelivery<?php echo $this->dialogCount;?>").attr("disabled",false);
+                    dijit.byId("relateddelivery<?php echo $this->dialogCount;?>").attr("value",v.delivery);
+                }else{
+                    $("#relatednotification").removeAttr("checked");
+                    appdb.model.MailSubscription.relatedNotification = null;
+                    dijit.byId("relateddelivery<?php echo $this->dialogCount;?>").attr("disabled",true);
+                }
+            };
+            $("#inboxnotification").unbind('click').click(function(){
+                var defflt = "",
+                    chk = $(this).is(':checked'),
+                    res = $(".inboxnotificationresult");
+                if(chk){ // inboxnotification is false
+                    $(res).empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >adding...</span>');
+                    appdb.components.Person.setInboxNotification(true,{},getInboxNotificationHandler);
+                } else {
+                    $(res).empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >removing...</span>');
+                    appdb.components.Person.setInboxNotification(false,{},getInboxNotificationHandler);
+                }
+            });
+            var getInboxNotificationHandler = function(v){
+               v = v || {};
+                $(".inboxnotificationresult").empty();
+                if(v.error){
+                    $("#inboxnotification").removeAttr("checked");
+                    $(".inboxnotificationresult").empty().append(v.error);
+                }else if(v.id){
+					$("#inboxnotification").attr("checked","checked");
+                    appdb.model.MailSubscription.inboxNotification = v;
+                }else{
+                    $("#inboxnotification").removeAttr("checked");
+                    appdb.model.MailSubscription.inboxNotification = null;
+                }
+            };
+            $(function() {
+				$( "#navdiv<?php echo $this->dialogCount;?>" ).tabs();
+				<?php if($this->entry->accounttype==1){ ?>
+					$("#navdiv<?php echo $this->dialogCount;?>" ).tabs("remove",1);
+				<?php } ?>
+				$( "#navdiv<?php echo $this->dialogCount;?>" ).bind( "tabsselect", function(event, ui) {
+					if(ui.index==1){
+						$("docdiv"+dialogCount).show();
+						setTimeout(function(){
+							if(dijit.byId("docgrid<?php echo $this->dialogCount;?>")){
+								$(dijit.byId("docgrid<?php echo $this->dialogCount;?>").domNode).css({"height":"100%","width":"100%"});
+								dijit.byId("docgrid<?php echo $this->dialogCount;?>").resize();
+							}
+						},1);
+					}
+					setTimeout(function(){
+						if( ui.index > 0){
+							$("#navdiv<?php echo $this->dialogCount;?> .expandContainer").css("display", "none");
+						}else{
+							$("#navdiv<?php echo $this->dialogCount;?> .expandContainer").css("display", "inline-block");
+						}
+					},10);
+					if( window.persontabselect != ui.index){
+						window.persontabselect = ui.index;
+						appdb.pages.Person.updateSection(ui.index);
+						if($("#ppl_details").hasClass("editmode") === false ){
+							window.persontabselect = (window.persontabselect>1)?0:window.persontabselect;
+						}
+					}
+					window.persontabselect = ui.index;
+				});
+				<?php if( $this->selectedTab  ) { ?>
+					setTimeout(function(){
+						var selected = '<?php echo $this->selectedTab;?>';
+						if( selected == "replymessage"){
+							sendUserMessage();
+							$("#msgdiv"+dialogCount).animate({"background-color":"#fcfcd0"}, 2000).animate({"background-color":"white"},4000);
+						} else {
+							$("#navdiv<?php echo $this->dialogCount;?> > ul.ui-tabs-nav li a").each(function(index,elem){
+								var txt = $(elem).text();
+								txt = $.trim(txt).toLowerCase();
+								
+								if( txt == selected ){
+									$( "#navdiv<?php echo $this->dialogCount;?>" ).tabs("select", index);
+									return false;
+								}
+							});
+						}
+					},1);
+				<?php } ?>
+				$( ".detailsdlgcontent div:first" ).css("height","100%");
+				<?php if ( $this->session->userid == $this->entry->id ) { ?>
+					if(typeof window.userRequests !== "undefined"){
+						window.userRequests.destroy();
+						window.userRequests = null;
+					}
+					window.userRequests = new appdb.components.UserRequests({container: $( "#pendingdiv<?php echo $this->dialogCount;?>").find(".pendingrequests")[0]});
+					window.userRequests.load();
+				<?php } ?>
+			});
+    });
+	if( appdb.config.routing && appdb.config.routing.useCanonical === true){
+	  $("#relatedappsdiv<?php echo $this->dialogCount; ?> .itemcontainer > .item > a.itemlink").each(function(index,elem){
+		 var surl = appdb.utils.getItemCanonicalUrl("software",$(elem).data("cname"));
+		 if( surl[0] == "/" ) surl = surl.slice(1);
+		 $(elem).attr('href', appdb.config.endpoint.base + surl);
+	  });
+	}
+	if( $.trim(window.location.pathname.substr(1,5)).toLowerCase() !== "users" ){
+		appdb.views.AppsList.SetupRatings();
+		<?php if ($this->session->userid !== null ) if ( $canEditProfile || $userIsAdminOrManager ) { ?>
+		setTimeout(function(){
+				(new appdb.utils.ExpandButton({dom: $("#toolbarContainer"), display: "actions" }));
+			},10);
+		<?php } ?>
+		<?php 
+			$accessgroupslist = array();
+			foreach($this->entry->actorGroups as $g) {
+				$accessgroupslist[] = array("id"=> $g->group->id,"name"=>$g->group->name,"payload"=>$g->payload, "suid"=>$g->actorguid);
+			}
+			
+		?>
+		appdb.pages.Person.init({
+			id: '<?php echo ($this->entry->id); ?>',
+			firstName: '<?php echo $this->entry->firstName; ?>',
+			lastName: '<?php echo $this->entry->lastName; ?>',
+			cname: '<?php echo $this->entry->cname; ?>',
+			countryid: '<?php echo $this->entry->country->id; ?>',
+			countryname: '<?php echo $this->entry->country->name; ?>',
+			role: {
+				id: '<?php echo $this->entry->positionType->id;?>',
+				description: '<?php echo $this->entry->positionType->description; ?>',
+				validated: <?php echo ( ($this->roleverified)?'true':'false' );?>
+			},
+			grouppermissions: <?php echo json_encode( AccessGroups::getAccessGroupsPermissions($this->session->userid, $this->entry) ); ?>,
+			groups: <?php echo json_encode($accessgroupslist); ?>,
+			vomembership: <?php echo $this->entryVoMemberShip; ?>,
+			relations: '<?php echo base64_encode('<?xml version="1.0"?><entity:relations xmlns:regional="http://appdb.egi.eu/api/regional" xmlns:entity="http://appdb.egi.eu/api/1.0/entity" xmlns:organization="http://appdb.egi.eu/api/1.0/organization" xmlns:project="http://appdb.egi.eu/api/1.0/project" xmlns:person="http://appdb.egi.eu/api/1.0/person" xmlns:application="http://appdb.egi.eu/api/1.0/application" xmlns:site="http://appdb.egi.eu/api/1.0/site" xmlns:vo="http://appdb.egi.eu/api/1.0/vo">' . str_replace('\'', '&apos;',$this->entryRelationsXml) . '</entity:relations>'); ?>'
+		});
+	}
+	appdb.pages.Person.onPersonLoad();
+</script>
+ <?php } else {?>
+<div class="recordnotfound emptycontent">
+	<div class="content">
+		<img alt="" src="/images/error.png" />
+		<span>Record not found or removed.</span>
+	</div>
+</div>
+<?php } ?>

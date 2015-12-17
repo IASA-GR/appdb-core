@@ -1,0 +1,392 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><script type="text/javascript" src="/js/jquery.quicksearch.js" ></script>
+<script type="text/javascript" src="/js/jquery.tablesorter.js"></script>
+<?php 
+
+function isEmptyValue($value){
+	$v = null;
+	if( is_array($value) ){
+		if( count($value) === 0 ){
+			return true;
+		}else if( count($value) === 1){
+			$v = $value[0];
+		}else{
+			return false;
+		}
+	} else {
+		$v = $value;
+	}
+	return ( !$v || trim( str_replace("\n", "", $v) ) === "" );
+}
+function getHtmlValue($value, $context, $split = true){
+	if(isEmptyValue($value)){
+		return '<span class="emptyvalue">n/a</span>';
+	}
+	if( is_array($value) && $split === true ){
+		$escaped = array();
+		foreach($value as $val){
+			$escaped[] = $context->escape( str_replace("\n","<br/>",$val) );
+		}
+		return "<span>". implode('<span class="comboseperator">•</span>', $escaped) . "</span>";
+	}else{
+		return "<span>". $context->escape(str_replace("\n","<br/>",$value)) . "</span>";
+	}
+}
+function getHtmlDateValue($value, $context){
+	if(isEmptyValue($value) || trim($value) == "0000-00-00 00:00:00"){
+		return getHtmlValue("");
+	}
+	return getHtmlValue($value, $context); 
+}
+?>
+<?php if ($this->entry !== null) { ?>
+<div align="left" style="height:100%;padding:0px;">
+	<div id="navdiv<?php echo $this->dialogCount;?>" style="width:100%;height:auto;padding:0px;" class="entityvo<?php if( trim($this->entry->sourceid) !== '1' ){ echo ' nonegivo'; }?>" >
+	<ul>
+		<li><a href="#infodiv<?php echo $this->dialogCount;?>">Information</a></li>
+		<?php if( $this->canEdit === true ) { ?>
+		<li><a href="#imagelistdiv<?php echo $this->dialogCount;?>">Image List</a></li>
+		<?php } ?>
+		<div class='closedialog'><a href="#" title="click to close current page" onClick="appdb.views.Main.closeCurrentView();"><img src="/images/closeview.png" border="0" alt="close"></a></div>
+		<a class="reloadentity reloadvo icontext" href="#" onclick="appdb.pages.vo.reload();" title="Reload"><img alt="reload" border="0" src="/images/refresh.png"/><span>Reload</span></a>
+	</ul>
+	<div id="infodiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" title="Information" selected="true">
+		<?php if( trim($this->entry->sourceid) !== '1' ){?>
+			<div class="nonegi hint">
+				<span class="title">Non EGI: </span><span class="details">This VO may <b>not</b> be supported by the EGI Infrastructure.</span>
+			</div>
+		<?php } ?>
+		<table border="0" width="99%" style="border-bottom: 1px dashed #3a3a3a;">
+			<tr>
+				<td width="101px" style="vertical-align:top">
+					<div style="vertical-align:middle;">
+					<center>
+					<img id="voimg<?php echo $this->dialogCount;?>" border="0" src="/vo/getlogo?req=<?php echo rand();?>&name=<?php echo urlencode($this->entry->name); ?>&vid=<?php echo urlencode($this->entry->id); ?>&id=<?php echo urlencode($this->entry->discipline["domain"]); ?>" width='110px'>					
+					</center>
+					</div>
+				</td>
+				<td>
+					<table border="0" width="100%">
+						<tr>
+							<td style="width:450px;">
+								<table border="0" style="width:100%;margin-top:-15px;">
+									<tr >
+									<?php if ($this->entry->id != "") { ?>
+										<td colspan="2">
+											<div class="entityheader">
+												<span ><?php echo $this->entry->name; ?></span>
+												<div class="permalink"><a href="http://<?php echo $_SERVER["HTTP_HOST"];?>?p=<?php echo base64_encode('/vo/details?id='.$this->entry->id); ?>" target="_blank" class="vopermalink permalink">[permalink]</a></div>
+												<div class="entityid">(id:<span style="padding-right: 3px" ><?php echo $this->entry->Id; ?></span>)</div>
+											</div>
+										</td>
+									<?php } ?>
+									</tr>
+									<tr>
+									</tr>
+									<tr style="display: none;"><td style="width:100px;">Scientific Domain: </td><td><?php echo getHtmlValue($this->entry->discipline["domain"], $this); ?></td>
+									<tr class="disciplinesrow"><td style="width:100px;">Disciplines: </td><td class="disciplinesvalue"><span class="vodisciplines"></span></td>
+									</tr>
+									<tr><td>Scope: </td><td><span><?php echo getHtmlValue($this->entry->scope, $this); ?></span></td>
+									</tr>
+									<tr><td>Validated On: </td><td><?php echo getHtmlDateValue($this->entry->validationDate, $this);?></td>
+									<?php if (isset($this->entry->middlewares)) { ?>
+									<tr><td>Middlewares: </td><td style='white-space:pre-wrap;word-break:break-all;'><?php echo getHtmlValue($this->entry->middlewares, $this ); ?></td></tr>
+									<? } else { ?>
+									<tr><td>Middlewares: </td><td><span><span class="emptyvalue">n/a</span></span></td></tr>
+									<? } ?>
+									</tr>
+								</table>
+
+							</td>
+							<td style="min-width:400px; vertical-align:top; border-left: 1px dashed;" align="right" class="viewmode" >
+								<div class="vo-group small-group groupcontainer" style="margin-top: -8px;">
+									<ul>
+										<li class="resourcesinfo"><a href="#resourcesinfo" title="View Virtual Organization Resources">Virtual Organization Resources</a></li>
+										<li class="contactinfo current"><a href="#contactinfo" title="View Contact Information">Contact Information</a></li>
+									</ul>
+								   <div id="resourcesinfo">
+									  <div id="docdiv<?php echo $this->dialogCount;?>" title="Resources" ></div>
+								   </div>
+									<div id="contactinfo" class="current">
+										<?php if ( count($this->entry->contacts) > 0 ) {?>
+										<table border="0" width="99%" id="contactInfoTable<?php echo $this->dialogCount;?>">
+											<?php if ($this->entry->id != "") { if (is_array($this->entry->contacts)) { foreach ($this->entry->contacts as $contact) { ?> 
+											<tr>
+												<td align="right" style="text-align: right; width: 48%">
+													<span><?php 
+														$role = trim($contact->role);
+														$role = strtolower($role);
+														$role = preg_replace("/^vo\ /","VO ",$role);
+														echo $this->escape($role);
+													?></span>
+												</td>
+												<td style="width:2px;">:</td>
+												<td align="left">
+													<span class="vocontactvalue">
+													<?php if( is_null($contact->researcherid) === true ) { ?>
+													<span><?php echo trim($contact->name);?></span><a href="#" onclick="appdb.pages.vo.findPerson('<?php echo str_replace("'","\'",$contact->name);?>');" class="icontext searchvoperson" title="Search for user profile"><img src="/images/search.png" alt=""/></a></span>
+													<?php } else { $researcher = $contact->getResearcher(); ?>
+													<a href="/store/person/<?php echo $researcher->cname; ?>" onclick="appdb.views.Main.showPerson({id:<?php echo $researcher->id;?>, cname: '<?php echo $researcher->cname; ?>'},{mainTitle : '<?php echo $researcher->firstname . ' ' . $researcher->lastname; ?>',append:true});"><?php echo trim($contact->name); ?></a></span>
+													<?php } ?>
+												</td>
+											</tr>
+											<?php } } } ?>
+										</table>
+										<?php } else { ?>
+										<div style="display: block;" class="emptycontent">
+											<div class="content">	
+												<img src="/images/exclam16.png">
+												<span>No contact information found.</span>
+											</div>
+										</div>
+										<?php } ?>
+									</div>
+								</div>
+							</td>
+						</tr>
+					</table>
+
+			<table border="0" width="100%">
+				<tr>
+					<td><span style="padding-right: 10px;">Description:</span><?php echo ( isEmptyValue($this->entry->description) )?getHtmlValue($this->entry->description, $context):"";  ?></td>
+				</tr>
+				<tr>
+					<td width="100%">
+						<?php if( isEmptyValue($this->entry->description) === false ) { ?>
+						<div class="vodescription" style="width:100%;">
+							<div width="100%" style="text-align: justify">
+								<?php echo getHtmlValue($this->entry->description, $this); ?>
+							</div>
+							<a href="#" class="more" title="Click to view more">read more</a>
+						</div>
+						<?php } ?>
+					</td>
+				</tr>
+			</table>
+            <br/>
+			<div class="volinksdiv">
+<?php 
+	$s=''; 
+	if ($this->entry->homepageUrl != null && trim($this->entry->homepageUrl)!="")	$s.='<a href="'.$this->escape($this->entry->homepageUrl).'" target="_blank" >Homepage</a> | ';
+	if ($this->entry->enrollmentUrl != null && trim($this->escape($this->entry->enrollmentUrl))!="") $s.='<a href="'.$this->escape($this->entry->enrollmentUrl).'" target="_blank">Enrollment</a> | ';
+	if ($this->entry->aup != null && trim($this->entry->aup)!="") {
+		if (is_weburl($this->entry->aup)) {
+			$s.='<a href="'.$this->escape($this->entry->aup).'" target="_blank" title="Acceptable Usage Policy">Acceptable Usage Policy</a> | ';
+		}
+	} else if( isEmptyValue($this->entry->aup) === false ) { 
+		$s.='<div class="aupdiv" style="display: none">'.$this->escape($this->entry->aup).'</div><a title="Acceptable Usage Policy" href="#" onclick="alert($(\'.aupdiv:last\').text())">Acceptable Usage Policy</a> | ';
+	}
+	if ($this->entry->supportproc != "") { $s.='<a href="'.$this->escape($this->entry->supportproc).'" target="_blank">Support Procedure</a> | '; }
+	if( trim($this->entry->sourceid) == '1' ){
+		$s .= '<a href="https://operations-portal.egi.eu/vo/view/voname/'.$this->entry->name.'" target="_blank"><img src="/images/opport_favicon.ico" border="0" style="vertical-align: middle" alt="" width="16"/> EGI Operations Portal link</a> | ';
+	}else if(trim($this->entry->sourceid) == '2'){
+		$s .= '<a href="http://perun.cesnet.cz/" target="_blank"><img src="/images/perun_logo.png" border="0" style="vertical-align: middle" alt="" width="16"/> Perun portal link</a> | ';
+	}
+	if( $this->canEdit === true ) { 
+		$s .= '<a href="" target="_blank" class="vmcatcherlink canedit icontext"><img src="/images/cloudmp_128.png" border="0" alt="" /><span>VMCatcher Image List</span></a><a href="#" title="Edit VO image list" class="editvowideimagelist btn btn-primary btn-compact icontext"><span>edit</span></a> | ';
+	}else{
+		$s .= '<a href="" target="_blank" class="vmcatcherlink icontext"><img src="/images/cloudmp_128.png" border="0" alt="" /><span>VMCatcher Image List</span></a> | ';
+	}
+	echo substr($s,0,-2);
+?>
+</div><br/>
+
+				</td>
+			</tr>
+		</table>
+		<br/>
+		<?php if ($this->entry->id !=0 &&  count($this->relatedItems) > 0) { ?>
+		<div class="voapps" style="overflow:visible;">
+			<div class="filterdecorator voitems" data-pagelength="9">
+				<div class="header">
+					<div class="title">Related items:</div>
+					<ul class="filter" data-filter="applications">
+						<li class="all current" data-filterclass="itemcontainer"><a href="" title="View all related items"><span>All</span><span class="counter"></span></a></li>
+						<li class="seperator">|</span>
+						<li class="switems" data-filterclass="switem"><a href="" title="View related software"><span>Software</span><span class="counter"></span></a></li>
+						<li class="seperator">|</span>
+						<li class="vappitems" data-filterclass="vappitem"><a href="" title="View related virtual appliances"><span>Virtual Appliances</span><span class="counter"></span></a></li>
+						<?php if ( Supports::swappliance() ) { ?>
+						<li class="seperator">|</li>
+						<li class="filterselector swappitems" data-filterclass="swappitem"><a href="" title="View related software appliances"><span>Software Appliances</span><span class="counter"></span></a></li>
+						<?php } ?>
+						<li class="seperator">|</li>
+						<li class="filterselector sitesitems" data-filterclass="siteitem" data-sticky="true"><a href="" title="View related resource providers"><span>Resource Providers</span><span class="counter"></span></a></li>
+					</ul>
+				</div>
+			<ul class="itemgrid filteredlist" data-filter="applications" style="z-index:0">
+			<?php foreach ($this->relatedItems as $app) {
+				if( get_class($app) !== 'Default_Model_Site') {
+					$content = "software";
+					$cls = "switem";
+					$contentcaller = 'showApplication';
+					switch(trim($app->metatype)){
+						case "1":
+							$content = "vappliance";
+							$cls = "vappitem";
+							$contentcaller = 'showVirtualAppliance';
+							break;
+						case "2":
+							$content = "swappliance";
+							$cls = "swappitem";
+							$contentcaller = 'showSoftwareAppliance';
+							break;
+						case "0":
+						default:
+							break;
+					}
+					if( $content === "swappliance" && !Supports::swappliance() ){
+						continue;
+					}
+					$applogo = $app->logo;
+					if ( $applogo == '' ) { 
+						if( $content === 'swappliance'){
+							$applogo = '/images/swapp.png';
+						} else if ( $app->primaryCategory ) { 
+							$applogo = '/images/category' . $app->primaryCategory->id . '.png';
+						} else {
+							$applogo = '/images/category1.gif'; 
+						}
+					} else { 
+						$applogo = '/apps/getlogo?req='.$app->lastUpdated.'&id='.$app->id; 
+					}
+				} else {
+					$content = "sites";
+					$cls = "siteitem";
+					$applogo = '/images/site.png';
+				}
+				
+				if( get_class($app) === 'Default_Model_Site') { ?>
+				<li class="itemcontainer <?php echo $cls; ?>">
+					<div class="item">
+						<a title="<?php echo strtolower($app->name); ?>" data-cname="<?php echo strtolower($app->name); ?>" href="/store/site/<?php echo strtolower($app->name); ?>" onClick='appdb.views.Main.showSite({"name":"<?php echo  $app->name;?>"});' title='<?php echo $app->name; ?>' target="_blank" class="itemlink">
+							<img src="/images/site.png" class="itemimage" />
+							<span class="personflags">
+								<img width="16px" src="/images/flags/<?php echo strtolower($app->countrycode); ?>.png" border="0" alt="" title="<?php echo $app->countryname;?>">
+							</span>
+							<span class="itemname"><?php echo  $app->name;?></span>
+							<span class="itemsorttext"><?php echo  $app->officialname;?></span>
+							<span class="itemlongtext"><?php echo  $app->officialname;?></span>
+						</a>
+						<div class="itemurlcontainer">
+							<?php if ( trim($app->portalurl) !== "" ) { ?>
+							<span class="urlitem sitelinks">
+								<a href="<?php echo $app->portalurl;?>" title="Open in new window" target="_blank"><img src="/images/gocdb.png" alt=""><span>GOCDB Portal</span></a>
+							</span>
+							<?php } ?>
+							<?php if ( trim($app->portalurl) !== "" && trim($app->homeurl)!=="") { ?>
+							<span class="urlseperator">|</span>
+							<?php } ?>
+							<?php if ( trim($app->homeurl)!=="") { ?>
+							<span class="urlitem sitelinks">
+								<a href="<?php echo $app->homeurl; ?>" title="Open in new window" target="_blank"><span>home</span></a>
+							</span>
+							<?php } ?>
+						</div>
+					</div>
+				</li>
+				<?php } else { ?>
+				<li class='itemcontainer <?php echo $cls; ?>'><div class='item'><a href='#' data-cname="<?php echo $app->cname; ?>" title='<?php echo $app->name; ?>' onclick='appdb.views.Main.<?php echo $contentcaller; ?>({id: <?php echo $app->id;?>, cname: "<?php echo $app->cname; ?>"}, {mainTitle: "<?php echo str_replace("'","\\'",$app->name); ?>", content:"<?php echo $content; ?>"});' class='itemlink'><img border='0' src='<?php echo $applogo; ?>' width='100px' height='100px' class='itemimage'><span class='itemname'><?php echo $this->escape($app->Name); ?></span><span class='itemsorttext'><?php echo $this->escape(substr($app->description,0,80)); if (strlen($app->description)>80) echo "..."; ?></span>
+					<?php if($app->rating>0){ ?>
+						<div class='rating'/>
+						<div class='ratingcount'><?php echo $app->rating;?></div>
+						<div class='ratingvotes'><span class='votes'><?php echo $app->ratingCount; ?></span><span class='datatype'>vote<?php echo ( ($app->ratingCount>1)?"s":"" ); ?></span></div>
+					<?php }?>
+					<?php if($app->hitcount>0){ ?>
+						<div class='ratinginfo'>
+							<div class="field">
+								<span class="description">
+									<span class="hits"><?php echo $app->hitcount; ?></span>
+									<span class="datatype">visit<?php echo (($app->hitcount>1)?"s":""); ?></span>
+								</span>
+							</div>
+						</div>
+					<?php  } ?>
+					</a>
+					<div class='categoriescontainer'>
+						<a href="#" class="shortcut">member of<span class="urllistarrow">▼</span></a>
+						<ul class="categories">
+						<?php foreach($app->categories as $cat){ if( !isnull($cat->category->parentid)) { continue; } $catname = $cat->category->name; $catid = $cat->category->id; ?>
+							<li class="category<?php echo (($cat->isPrimary)?" primary":""); ?>">
+								<a <?php echo (($cat->isPrimary)?"class='primary'":""); ?> href="#" title="Click to view software in category <?php echo $catname; ?>" onClick="appdb.views.Main.showApplications({flt:'+=category.id:<?php echo $catid;?>'},{isBaseQuery:true,mainTitle:'<?php echo $catname;?>',filterDisplay:'Search in <?php echo $catname;?>...', content:'<?php echo $content; ?>'})">
+									<img src="/images/app.png" border="0" />
+									<span class="name"><?php echo $catname;?></span>
+								</a>
+							</li>
+						<?php }?>
+						</ul>
+					</div>
+				</div>
+			</li>
+			<?php } }?>
+			</ul>
+			<div class="filterpager">
+				<button class="action btn btn-light">
+					<span class="pagermessage">show more</span>
+				</button>
+			</div>
+			<div class="emptycontent" >
+				<div class="content">	
+					<img src="/images/exclam16.png">
+					<span>No related items found.</span>
+				</div>
+			</div>
+			</div>
+		</div>
+		<?php } else { ?>
+			<div class="emptycontent" style="display: block;">
+				<div class="content">	
+					<img src="/images/exclam16.png">
+					<span>No related items found.</span>
+				</div>
+			</div>
+	<?php }?>
+	</div> <!--pplInfo div closes -->
+	<?php if( $this->canEdit === true ) { ?>
+	<div id="imagelistdiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" title="Information" >
+		<div class="voimagelistmanager" >
+			<div class="voimagelistcontainer"></div>
+		</div>
+	</div>
+	<?php } ?>
+	</div> <!-- navdiv closes -->
+</div> <!--main div closes -->
+<script type="text/javascript">
+	appdb.pages.vo.init({
+		"id": '<?php echo $this->entry->id; ?>',
+		"name": '<?php echo str_replace("'","\\'",$this->entry->name); ?>',
+		"discipline": '<?php echo($this->escape($this->entry->discipline["domain"])); ?>',
+		"disciplines": <?php echo($this->entry->discipline["disciplines"]); ?>,
+		"dialogCount": (window.dialogCount || 0)
+	});
+</script>
+<?php } else {?>
+<div class="recordnotfound emptycontent">
+	<div class="content">
+		<img alt="" src="/images/error.png" />
+		<span>Record not found or removed.</span>
+	</div>
+</div>
+<div style="text-align: center">
+
+<div style="width: 60%; text-align: left; margin-left: auto; margin-right: auto">
+<p style="text-align: justify">
+If you have been led here from an external link (permalink), then this record has been most likely deleted. If on the other hand you have been led here from within the AppDB portal, then this could be due to a network problem while synchronizing data with the external VO sources, and should resolve itself shortly. If the probem persists, please <a href="http://helpdesk.egi.eu/" target="_blank">let us know</a>.
+</p>
+</div>
+<?php } ?>

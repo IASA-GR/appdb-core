@@ -1,0 +1,3 @@
+<?php
+class Repository_Model_DeletedMetaPoaReleaseFilter extends Repository_Model_DeletedMetaPoaReleaseFilterBase {
+}

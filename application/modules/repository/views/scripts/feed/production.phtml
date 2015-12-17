@@ -1,0 +1,32 @@
+<?php echo '<?xml version="1.0" encoding="utf-8"?>';?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<channel>
+	<title>Channel: EGI Community Repository - Production level Software Releases</title>
+	<description>This is the EGI Community Repository Releases  RSS channel.</description>
+<?php foreach($this->items as $item) { ?>
+<?php 
+$cname = getCanonicalName( strtolower(trim($item['swName'])) ); 
+$cname = ($cname)?$cname:$item['swName'];
+$title = $cname . "/" . $item["seriesName"] . " Release: " . $item["releaseName"];
+$hash = md5( 'commrepo:' . $title . "/" . $item["releaseId"] );
+?>
+<?php $proxypath = $this->proxypath; ?>
+	<item>
+		<title><?php echo $title;?></title>
+		<id><![CDATA[<?php echo $item["releaseId"]; ?>]]></id>
+		<mpid><![CDATA[<?php echo $hash; ?>]]></mpid>
+		<link>http://<?php echo $_SERVER["SERVER_NAME"];?>/store/software/<?php echo $cname;?>/releases/<?php echo $item["seriesName"];?>/<?php echo $item["releaseName"];?></link>
+		<distroIdentifier><![CDATA[<?php echo $cname . "/" . $item["seriesName"] . "/" . $item["releaseName"]; ?>]]></distroIdentifier>
+		<description><?php echo $item["releaseNotes"];?></description>
+		<updated><![CDATA[<?php echo $item["lastupdated"]; ?> EEST]]></updated>
+		<pubdate><![CDATA[<?php echo $item["lastreleasedate"]; ?> EEST]]></pubdate>
+		<software id="<?php echo $item["swId"];?>"><![CDATA[<?php echo $cname; ?>]]></software>
+		<series id="<?php echo $item["seriesId"];?>"><![CDATA[<?php echo $item["seriesName"]; ?>]]></series>
+		<release id="<?php echo $item["releaseId"];?>"><![CDATA[<?php echo $item["releaseName"]; ?>]]></release>
+		<swAPICallBack><![CDATA[http://<?php echo $proxypath; ?>/proxy.php?type=sw&id=<?php echo $item["swId"];?>]]></swAPICallBack>
+		<seriesAPICallBack><![CDATA[http://<?php echo $proxypath; ?>/proxy.php?type=series&id=<?php echo $item["seriesId"];?>]]></seriesAPICallBack>
+		<releaseAPICallBack><![CDATA[http://<?php echo $proxypath; ?>/proxy.php?type=release&id=<?php echo $item["releaseId"];?>]]></releaseAPICallBack>
+	</item>
+<?php } ?>
+</channel>
+</rss>

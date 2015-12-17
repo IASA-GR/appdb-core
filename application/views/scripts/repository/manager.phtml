@@ -1,0 +1,167 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php if( $this->id == 0 ) { return; }
+	$isLoggedin = ( $this->session->userid === null )?false:true;
+?>
+<div class="releasemanager <?php echo ( ($this->hasReleases==true)?'':'noreleases' ); ?>" data-id="<?php echo $this->id; ?>" >
+	<div class="empty<?php echo ( ( $this->hasReleases)?' hidden':''); ?>">
+		<div>
+			<div class="content"><img src="/images/exclam16.png" /><span>No releases found for this software item.</span></div>
+			<div class="actions <?php if( $isLoggedin == false) echo 'hidden'; ?>">
+				<div class="action newrelease base">
+					<a href="#" ><img src="/images/add.png" /><span>Create new</span></a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<?php if( $isLoggedin && $this->hasReleases) { ?>
+	<div class="toolbar">
+		<ul>
+			<li class="newrelease">
+				<a href="#" onclick="return false;"><img src="/images/add.png" /><span>Create new</span></a>
+			</li>
+		</ul>
+	</div>
+	<?php } ?>
+	<div class="header"></div>
+	<div class="contents">
+		<div class="releaselistcontainer" >
+			<div class="templates hidden">
+				<div class="base">
+					<a class="baserelease">
+						<div class="metadata">
+							<div class="id" data-path="id"></div>
+							<div class="repository" data-path="repositoryarea.name"></div>
+							<div class="displayVersion" data-path="displayversion"></div>
+						</div>
+					</a>
+				</div>
+				<div class="update">
+					<a class="updaterelease">
+						<div class="metadata">
+							<div class="id" data-path="id"></div>
+							<div class="displayVersion" data-path="displayversion"></div>
+						</div>
+					</a>
+				</div>
+				<div class="initial">
+					<a class="updaterelease initial">
+						<div class="metadata">
+							<div class="id" data-path=""></div>
+							<div class="displayVersion" ><span class="value" data-path="displayversion"></span><span class="base"> (base)</span></div>
+						</div>
+					</a>
+				</div>
+			</div>
+			<div class="releaselist<?php echo ( ( ! $this->hasReleases )?' hidden':''); ?>" data-view="appdb.repository.ui.views.ReleaseList">
+				<ul class="baselist" data-template-selector=".releaselistcontainer > .templates > .base">
+				<?php for($i=0; $i<count($this->releases); $i++) { 
+					$base = $this->releases[$i]["base"]; 
+					$updates = $this->releases[$i]["updates"]; ?>
+					<li >
+						<a class="baserelease">
+							<div class="metadata">
+								<div class="id"><?php echo $base["id"]; ?></div>
+								<div class="repository"><?php echo $base["repoAreaName"]; ?></div>
+								<div class="displayVersion"><?php echo $base["displayVersion"]; ?></div>
+							</div>
+						</a>
+						<?php if( $isLoggedin ) { ?>
+						<div class="actions" >
+							<div class="action newrelease update" data-parentid="<?php echo $base["id"]; ?>">
+								<a href="#" title="Create new update for this release"><img src="/images/add.png" /><span>new</span></a>
+							</div>
+						</div>
+						<?php } ?>
+						<ul class="updatelist" data-template=".releaselistcontainer > .templates > .update">
+						<?php for($j=0; $j<count($updates); $j+=1){ $update = $updates[$j]; ?>
+							<li>
+								<a class="updaterelease">
+									<div class="metadata">
+										<div class="id"><?php echo $update["id"]; ?></div>
+										<div class="displayVersion"><?php echo $update["displayVersion"]; ?></div>
+									</div>
+								</a>
+							</li>
+						<?php } ?>
+							<li data-template-selector=".releaselistcontainer > .templates > .base">
+								<a class="updaterelease initial">
+									<div class="metadata">
+										<div class="id"><?php echo $base["id"]; ?></div>
+										<div class="displayVersion"><?php echo $base["displayVersion"]; ?><span class="base"> (base)</span></div>
+									</div>
+								</a>
+							</li>
+						</ul>
+					</li>
+				<?php } ?>
+				</ul>
+			</div> 
+		</div>
+		<div class="releasedetails<?php echo ( ( $this->hasReleases )?'':' hidden'); ?>">
+			<div class="header">
+				<div class="navigation">
+					<ul>
+						<li>
+							<a href="">
+								<span>Documentation</span>
+							</a>
+						</li>
+						<li>
+							<a href="">
+								<span>Files</span>
+							</a>
+						</li>
+						<li>
+							<a href="">
+								<span>Repository / Download</span>
+							</a>
+						</li>
+						<li>
+							<a href="">
+								<span>Source</span>
+							</a>
+						</li>
+						<li>
+							<a href="">
+								<span>Contact</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="contents">
+				
+			</div>
+		</div>
+	</div>
+	<div class="templates hidden"> <!-- BEGIN Templates -->
+		<div class="releaseactions">
+			
+		</div>
+	</div><!-- END Templates -->
+</div>
+
+<script type="text/javascript">
+	setTimeout( function(){ 
+		(new appdb.repository.ui.ReleaseManager({
+			id: '<?php echo $this->id; ?>',
+			softwareData: appdb.pages.application.currentData()
+		}));
+	},1);
+	
+</script>

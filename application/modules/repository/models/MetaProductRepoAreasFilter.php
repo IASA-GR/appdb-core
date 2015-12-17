@@ -1,0 +1,3 @@
+<?php
+class Repository_Model_MetaProductRepoAreasFilter extends Repository_Model_MetaProductRepoAreasFilterBase {
+}

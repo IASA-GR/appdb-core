@@ -1,0 +1,586 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php 
+	$session = $this->session;
+?>
+<style>
+	#maincontent.newprofile .icontext{
+		height: auto;
+	}
+	#maincontent.newprofile > div.content > .header > p{
+		text-align: left;
+	}
+	#maincontent.newprofile > div.content > .description {
+		border-radius: 5px;
+		border: 1px solid #eaeaea;
+		background: #fafafa;
+		padding: 15px;
+		margin-bottom: 10px;
+		font-size: 14px;
+		line-height: 18px;
+	}
+	#maincontent.newprofile > div.content > .description > p {
+		font-size: 14px;
+		line-height: 18px;
+		margin: 5px 0px;
+	}
+	#maincontent.newprofile > div.content > .description > h1{
+		font-size: 20px;
+		font-family: arial;
+		font-weight: normal;
+		padding: 5px 0px;
+		margin: 0px;
+		display: block;
+		text-align: left;
+	}
+	#maincontent.newprofile > div.content > .description > h2{
+		font-size: 18px;
+		font-family: arial;
+		font-weight: normal;
+		padding: 5px 0px;
+		margin: 0px;
+		display: block;
+		text-align: left;
+	}
+	#maincontent.newprofile #profiles .loader{
+		display: none;
+	}
+	#maincontent.newprofile #profiles.loading .loader{
+		display: block;
+	}
+	#maincontent.newprofile #profiles.loading > .loading{
+		display: none;
+	}
+	
+	#maincontent.newprofile .feature{
+		margin: 10px 0px;
+		border: 1px solid transparent;
+		text-decoration:none;
+	}
+	#maincontent.newprofile .feature > .title{
+		max-height: 40px;
+		border: 1px solid #e0e0e0;
+		font-size: 18px;
+		color: #555;
+		min-height: 40px;
+		padding: 7px;
+		vertical-align: middle;
+		position: relative;
+		margin: -1px;
+		cursor: pointer;
+	}
+	#maincontent.newprofile .feature.small > .main,
+	#maincontent.newprofile .feature.small.selected > .main{
+		display: none;
+	}
+	#maincontent.newprofile .feature:hover,
+	#maincontent.newprofile .feature:hover > .title,
+	#maincontent.newprofile .feature.selected:hover > .main{
+		border: 1px solid #a0a0a0;
+	}
+	#maincontent.newprofile .feature:hover > .title,
+	#maincontent.newprofile .feature.selected > .title{
+		background: #ffffff; /* Old browsers */
+		/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+		background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjYxJSIgc3RvcC1jb2xvcj0iI2Y2ZjZmNiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNlZGVkZWQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+		background: -moz-linear-gradient(top,  #ffffff 0%, #f6f6f6 61%, #ededed 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(61%,#f6f6f6), color-stop(100%,#ededed)); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top,  #ffffff 0%,#f6f6f6 61%,#ededed 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top,  #ffffff 0%,#f6f6f6 61%,#ededed 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top,  #ffffff 0%,#f6f6f6 61%,#ededed 100%); /* IE10+ */
+		background: linear-gradient(to bottom,  #ffffff 0%,#f6f6f6 61%,#ededed 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ededed',GradientType=0 ); /* IE6-8 */
+	}
+	#maincontent.newprofile .feature > .title > img,
+	#maincontent.newprofile .feature > .title > .connecttype
+	{
+		width: 35px;
+		height: 35px;
+		border: none;
+		padding: 5px;
+		position: absolute;
+		top: 5px;
+		left: 0px;
+		bottom: 0px;
+	}
+	#maincontent.newprofile .feature > .title > span{
+		display: inline-block;
+		margin-left: 40px;
+		vertical-align: middle;
+	}
+	#maincontent.newprofile .feature > .title .details{
+		display: block;
+		font-size: 12px;
+		color: #777;
+	}
+	#maincontent.newprofile .feature > .main{
+		display: none;
+		padding: 0px;
+	}
+	#maincontent.newprofile .feature.selected > .main{
+		display: block;
+		padding: 10px;
+		border: 1px solid #e0e0e0;
+		margin: -1px;
+	}
+	#maincontent.newprofile #profiles > .feature.createnewprofile > .main > .contents {
+		margin: 15px 0px;
+	}
+	#maincontent.newprofile .feature.cancel .main .contents{
+		text-align: center;
+		padding: 20px;
+	}
+	#maincontent.newprofile .feature.cancel .main .contents .editbutton{
+		padding: 5px 10px;
+		font-size: 16px;
+	}
+	#maincontent.newprofile .feature.cancel .main .contents .editbutton img{
+		width: 17px;
+		height: 17px;
+	}
+	#maincontent.newprofile .topfeatures{
+		position: relative;
+		height: 80px;
+		max-height: 80px;
+		min-height: 80px;
+	}
+	#maincontent.newprofile .feature.small.cancel {
+		position: absolute;
+		right: 0px;
+	}
+	#maincontent.newprofile a.feature > .main {
+		display: none;
+	}
+	#maincontent.newprofile .feature.small {
+		min-width: 260px;
+		width: 300px;
+		display: inline-block;
+		position: relative;
+		height: 50px;
+		min-height: 50px;
+	}
+	#maincontent.newprofile .feature.small > .title{
+		height: 50px;
+		min-height: 50px;
+	}
+	#maincontent.newprofile .feature.small > .title > .details{
+		font-size: 11px;
+		line-height: 11px;
+	}
+	#maincontent.newprofile > .content{
+		display: none;
+	}
+	
+	#maincontent.newprofile.connectaccount > .content.connectaccount .primaryemail {
+		vertical-align: middle;
+		display: inline-block;
+		padding: 0px 5px;
+		overflow: hidden;
+		height: 12px;
+		text-align: left;
+	}
+	#maincontent.newprofile.connectaccount > .content.connectaccount .sendrequest .itemlist{
+		position: relative;
+		width: 800px;
+	}
+	#maincontent.newprofile.connectaccount > .content.connectaccount .sendrequest .itemlist ul{
+		padding: 0px;
+		list-style: none; 
+	}
+	#maincontent.newprofile.connectaccount > .content.connectaccount .sendrequest .itemlist > ul > li {
+		background-color: #E8DFDF;
+		-moz-border-radius: 7px;
+		-webkit-border-radius: 7px;
+		background-color: #F7F7F7;
+		border-radius: 7px;
+		border: #D9D6D6 1px solid;
+		margin: 4px;
+	}
+	#maincontent.newprofile.connectaccount > .content.connectaccount .sendrequest .itemlist > ul > li .contacts{
+		display: none;
+	}
+	#maincontent.newprofile.connectaccount > .content.connectaccount .sendrequest .itemlist > ul > li .itemimage{
+		width: 80px;
+		height: 80px;
+	}
+	#maincontent.newprofile.connectaccount > .content.connectaccount .sendrequest .sendconfirmationcode{
+		width: 250px;
+		border: 1px solid #F0F0F0;
+		font-size: 16px;
+		padding: 4px;
+		position: absolute;
+		bottom: 5px;
+		right: 3px;
+		border-right: none;
+		border-bottom: none;
+		background: #FFF;
+		border-radius: 5px 0px 5px 0px;
+		border-color: #D9D6D6;
+		background: #e8e8e8; /* Old browsers */
+		/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+		background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2U4ZThlOCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNjY2NjY2MiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+		background: -moz-linear-gradient(top,  #e8e8e8 0%, #cccccc 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e8e8e8), color-stop(100%,#cccccc)); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top,  #e8e8e8 0%,#cccccc 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top,  #e8e8e8 0%,#cccccc 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top,  #e8e8e8 0%,#cccccc 100%); /* IE10+ */
+		background: linear-gradient(to bottom,  #e8e8e8 0%,#cccccc 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e8e8e8', endColorstr='#cccccc',GradientType=0 ); /* IE6-8 */
+		cursor: pointer;
+	}
+	#maincontent.newprofile.connectaccount > .content.connectaccount .sendrequest .sendconfirmationcode:hover{
+		background: #cdeb8b; /* Old browsers */
+		/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+		background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2NkZWI4YiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNjZGViOGIiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+		background: -moz-linear-gradient(top,  #cdeb8b 0%, #cdeb8b 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#cdeb8b), color-stop(100%,#cdeb8b)); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top,  #cdeb8b 0%,#cdeb8b 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top,  #cdeb8b 0%,#cdeb8b 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top,  #cdeb8b 0%,#cdeb8b 100%); /* IE10+ */
+		background: linear-gradient(to bottom,  #cdeb8b 0%,#cdeb8b 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cdeb8b', endColorstr='#cdeb8b',GradientType=0 ); /* IE6-8 */
+	}
+	#maincontent.newprofile.connectaccount > .content.connectaccount .sendrequest .sendconfirmationcode > img{
+		float: left;
+		width: 35px;
+		height: 35px;
+	}
+	#maincontent.newprofile.connectaccount > .content.connectaccount .sendrequest .savingdisplay{
+		display: none;
+	}
+	#maincontent.newprofile.connectaccount > .content.connectaccount .sendrequest.saving .savingdisplay{
+		display: block;
+	}
+	#maincontent.newprofile.connectaccount > .content.connectaccount .sendrequest .savingdisplay,
+	#maincontent.newprofile.connectaccount > .content.connectaccount .sendrequest .savingdisplay .shader{
+		position: absolute;
+		top:0;
+		left:0;
+		right:0;
+		bottom:0;
+		text-align: center;
+	}
+	#maincontent.newprofile.connectaccount > .content.connectaccount .sendrequest .savingdisplay .shader{
+		background-color: #fff;
+		opacity: 0.5;
+		z-index: 8000;
+	}
+	#maincontent.newprofile.connectaccount > .content.connectaccount .sendrequest .savingdisplay .message{
+		padding: 10px;
+		z-index: 10000;
+		border: 1px solid #A0A0A0;
+		border-radius: 4px;
+		background-color: #F0F0F0;
+		text-align: center;
+		width: 140px;
+		height: auto;
+		position: absolute;
+		left: 40%;
+		top: 15%;
+	}
+	#maincontent.newprofile.connectaccount > .content.connectaccount .sendrequest .savingdisplay .message > img{
+		width: 16px;
+		height: 16px;
+		vertical-align: middle;
+	}
+	#maincontent.newprofile.connectaccount > .content.connectaccount .sendrequest .sendconfirmationcode > span{
+		display: block;
+	}
+	#maincontent.newprofile .feature.confirmation .main > .header {
+		padding: 2px;
+		padding-bottom: 15px;
+	}
+	#maincontent.newprofile .feature.confirmation .main > .contents{
+		margin: 15px auto;
+		width: 380px;
+		text-align: right;
+		font-size: 16px;
+	}
+	#maincontent.newprofile .feature.confirmation .main > .contents > div{
+		padding: 5px;
+	}
+	#maincontent.newprofile .feature.confirmation .main > .contents a.action{
+		padding: 5px 10px;
+	}
+	#maincontent.newprofile.registration > .content.registration,
+	#maincontent.newprofile.connectaccount > .content.connectaccount,
+	#maincontent.newprofile.connectresponse > .content.connectresponse{
+		display: block;
+	}
+	#maincontent.newprofile .featurelink{
+		font-size: 14px;
+		line-height: 14px;
+		cursor: pointer;
+		text-decoration: none;
+		outline: none;
+	}
+	#maincontent.newprofile .featurelink:hover{
+		
+	}
+	
+	body .notifydialog.cancelregistration {
+		
+	}
+	body .notifydialog.cancelregistration .header br{
+		line-height: 25px;
+	}
+	body .notifydialog.cancelregistration .contents{
+		padding: 10px;
+		padding-top: 30px;
+		text-align: center;
+	}
+	body .notifydialog.cancelregistration .contents .editbutton {
+		padding: 5px;
+		font-size: 15px;
+	}
+	
+</style>
+<script type="text/javascript">
+	var userName = <?php if ($this->session->userid === -1) echo '""'; else echo "'".$this->session->username."'"; ?>;
+	var userCName = <?php if ($this->session->userid === -1) echo '""'; else echo "'".  $this->session->usercname."'"; ?>;
+	var userFullname = <?php if ($this->session->userid === -1) echo '""'; else echo "'".$this->session->fullName."'"; ?>;
+	var userRole = <?php if ($this->session->userid === -1) echo '4'; else echo $this->session->userRole; ?>;
+	var userSamlSource = '<?php echo $session->authSource; ?>';
+	setTimeout(function(){
+		hideAjaxLoading();
+	},10);
+	
+</script>
+<div class="sitebanner">
+	<div class="topmenubar"></div>
+	<div class="main">
+		<div class="logo"><img src="/images/appdblogo.png" alt=""/><span>Applications <span>Database</span><br/><span class="subtext">Software solutions for research communities</span></span></div>
+		<ul class="contents">
+			<li class="software" ><span>Software<br/>Marketplace</span></li>
+			<li class="vappliance"><span>Cloud<br/>Marketplace</span></li>
+			<li class="researchers"><span>People</span></li>
+		</ul>
+		<?php if ( strtolower($_SERVER["SERVER_NAME"]) !== "appdb.egi.eu" ) { ?>
+		<div class="developmentinstance"><span>Development Instance</span><a href="http://appdb.egi.eu" title='Click here to go to production instance' >[go to production]</a></div>
+		<?php } ?>
+	</div>
+</div>
+<div id="maincontent" class="newprofile registration">
+	<div class="logo">
+		<div class="decorator bottomright">
+			<span>Software for research communities</span>
+		</div>
+		<div class="decorator topleft">
+			<a href="#" onclick="showHome();window.scroll(0,0);" title="go home"><img class="moto" src="/images/appdb_logo_moto.png" alt=""></a>
+		</div>
+		<img class="logo" src="/images/appdb-logo-new-small.png" usemap="#appdblogomap">
+	</div>
+	<div class="content registration">
+		<div class="header">
+			<h3>Welcome <?php echo $this->session->fullName; ?> !</h3>
+		</div>
+		<div class="description">
+			<p>This is the first time you visit the EGI Applications Database with this <b><span class="currentuseraccount"></span></b>.</p>
+			<ul style="display:block;padding: 5px;margin:3px;list-style: none;text-align: left">
+				<li>- If you already have a profile in our system, you might want to <a href="#" class="featurelink" onclick="appdb.pages.newaccount.showRegistrationFeature('connecttoprofile');return false;" title="" >connect</a> the current account with that profile. </li>
+				<li>- If you don't have any profile in our system, please <a href="#" class="featurelink" onclick="appdb.pages.newaccount.showRegistrationFeature('createnewprofile');return false;">create a new one</a>.</li>
+			</ul>
+			<p>If you don't wish any of the above click <a href='<?php echo $session->cancelUrl; ?>' title='Logout and return to the EGI Applications Database portal'>here</a> to sign out and return to the EGI Applications Database.</p>
+		</div>
+		<div id="profiles" class="loading">
+			<div class="topfeatures">
+				<div class="feature cancel small dialog" href="" >
+					<div class="title" onclick="">
+						<img src="/images/error.png" alt="" />
+						<span>Cancel registration</span>
+						<span class="details">Sign out and return to the EGI Applications Database home page</span>
+					</div>
+					<div class="main">
+						<div class="title">Cancel Registration process</div>
+						<div class="message">
+							<div class="header">By clicking the <b>"Sign Out"</b> button bellow, you will exit the registration process and return to the EGI Applications Database home page as an read only user.<br/> You can then, repeat the registration process.</div>
+							<div class="contents">
+								<a href="<?php echo $session->cancelUrl; ?>" class="editbutton icontext" title="Sign out">
+									<img src="/images/logout3.png" alt="" />
+									<span>Sign Out</span>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="loader">
+				<div class="message icontext"><img src="/images/ajax-loader-trans-orange.gif" alt=""/><span>Initializing Profile</span>
+					<a href="<?php echo $session->cancelUrl; ?>" title="Cancel profile initialization and return to appdb portal" style='position:relative;top:10px;left:80px;font-size:14px;'>Cancel</a>
+				</div>
+			</div>
+			<div class="feature createnewprofile loading">
+				<div class="title">
+					<img src="/images/person.png" alt="" />
+					<span>Create a new profile</span>
+					<span class="details">As a new user you must create a new profile before signing in to the EGI Appications Database.</span>
+				</div>
+				<div class="main">
+					<div class="header">Please fill the form bellow, with your information. When done click the "<b>Save</b>" button.<br/> If you don't wish to continue with the process click the "<b>Cancel</b>".</div>
+					<div class="contents newprofile"></div>
+					<div class="footer"></div>
+				</div>
+			</div>
+			<div class="feature connecttoprofile loading">
+				<div class="title">
+					<img src="/images/sendrequest.png" alt="" />
+					<span>Connect to an existing profile</span>
+					<span class="details">This feature enables you to search for a profile in our system and connect your <span class="currentuseraccount"></span> to it.</span>
+				</div>
+				<div class="main">
+					<div class="header">Below you can search for your profile and click "<b>Connect</b>" to associate with the selected profile.</div>
+					<div class="contents empty"></div>
+					<div class="footer"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="content connectaccount">
+		<div class="header">
+			<h3>Welcome <?php echo $this->session->fullName; ?> !</h3>
+		</div>
+		<div class="description">
+			<h1>Connect to an existing profile</h1>
+			<h2>Step: 1 / 2</h2>
+			You choose to connect with the profile <b><span class="profiletoconnect"></span></b> using your <span class="currentuseraccount"></span>.<br/> 
+			Before we proceed with the connection, we need first to verify that the profile you are requesting to be connected with, <b>is really yours</b>.<br/>
+			For that purpose, once you click on the button <b>"Send confirmation code"</b>, the system will send an email at <span class='primaryemail'></span> with a confirmation code and further steps.<br>
+		</div>
+		<div class="main">
+			<div class="topfeatures">
+				<a class="feature back small" onclick='appdb.pages.newaccount.showRegistration();'>
+					<div class="title">
+						<img src="/images/previousview.png" alt="" />
+						<span>Go back to registration</span>
+						<span class="details">Select this if you don't wish to send a connection request and return to the previous page.</span>
+					</div>
+				</a>
+				<div class="feature cancel small dialog">
+					<div class="title" onclick="">
+						<img src="/images/error.png" alt="" />
+						<span>Cancel registration</span>
+						<span class="details">Sign out and return to the EGI Applications Database home page</span>
+					</div>
+					<div class="main">
+						<div class="title">Cancel Registration process</div>
+						<div class="message">
+							<div class="header">By clicking the <b>"Sign Out"</b> button bellow, you will exit the registration process and return to the EGI Applications Database home page as an read only user.<br/> You can then, repeat the registration process.</div>
+							<div class="contents">
+								<a href="<?php echo $session->cancelUrl; ?>" class="editbutton icontext" title="Sign out">
+									<img src="/images/logout3.png" alt="" />
+									<span>Sign Out</span>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="feature sendrequest selected">
+				<div class="title">
+					<img src="/images/sendmessage.png" alt="" />
+					<span>Send connection request</span>
+					<span class="details">Send a connection request to the primary e-mail of the selected profile.</span>
+				</div>
+				<div class='main'>
+					<div class='header'></div>
+					<div class='itemlist'>
+						<ul class='profilelist peoplelist'>
+							<li class='itemcontainer profilecontainer'>
+							</li>
+							<div class='savingdisplay'>
+								<div class='shader'></div>
+								<div class='message'>
+									<img src='/images/ajax-loader-trans-orange.gif' alt=''/>
+									<span>...Sending request</span>
+								</div>
+							</div>
+						</ul>
+						<div title='Send confirmation request to profile primary email' class='sendconfirmationcode'>
+							<img src='/images/upload_active.png' alt=''/>
+							<span>Send confirmation code </span><span class='primaryemail'></span>
+						</div>
+					</div>
+				</div>
+			</div>
+			</div>
+	</div>
+	<div class="content connectresponse">
+		<div class="header">
+				<h3>Welcome <?php echo $this->session->fullName; ?> !</h3>
+				<div class="description"></div>
+			</div>
+		<div class="description">
+				<h1>Connect to an existing profile</h1>
+				<h2>Step: 2 / 2</h2>
+				You requested to connect with the profile of <b><span class="profiletoconnect"><?php echo $session->connecttoprofile; ?></span></b> using your<span class="currentuseraccount"><?php echo $session->authSource; ?></span>.<br />
+				A <b>confirmation code</b> has been sent to the primary e-mail of this profile which you need to enter in the field bellow and click <b>Confirm</b> in order to complete the connection process.<br><br>		
+				<b>NOTE</b>: The confirmation code expires 30 minutes after the request.
+				In this case, the process is canceled.
+			</div>
+		<div class="main">
+				<div class="topfeatures">
+					<div class="feature cancel small dialog">
+						<div class="title" onclick="">
+							<img src="/images/error.png" alt="" />
+							<span>Cancel registration</span>
+							<span class="details">Sign out and return to the EGI Applications Database home page</span>
+						</div>
+						<div class="main">
+							<div class="title">Cancel Registration process</div>
+							<div class="message">
+								<div class="header">By clicking the <b>"Sign Out"</b> button bellow, you will exit the registration process and return to the EGI Applications Database home page as an read only user.<br/> You can then, repeat the registration process.</div>
+								<div class="contents">
+									<a href="<?php echo $session->cancelUrl; ?>" class="editbutton icontext" title="Sign out">
+										<img src="/images/logout3.png" alt="" />
+										<span>Sign Out</span>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="feature confirmation selected">
+					<div class="title" onclick="">
+						<img src="/images/email.png" alt="" />
+						<span>Enter your confirmation code</span>
+						<span class="details">Provide the confirmation code sent to you via email</span>
+					</div>
+					<div class="main">
+						<div class="header"></div>
+						<div class="contents">
+							<div>
+								<span>Enter confirmation code: </span><span><input type="text" value="" id="confirmationcode" name="confirmationcode" /></span>
+							</div>
+							<div>
+								<a href="" title="Submit confirmation code" class="action icontext editbutton disabled submitconfirmationcode" >Confirm</a>
+							</div>
+						</div>
+						
+					</div>
+				</div>
+			</div>
+	</div>
+	<div style="padding: 10px 0px;"></div>
+</div>
+<script type="text/javascript">
+	appdb.pages.newaccount.init({
+		userAccount: "<?php echo $session->authSource; ?>",
+		userAccountName: "<?php echo $session->userFirstName . " " . $session->userLastName; ?>",
+		userAccountStatus: "<?php echo $session->accountStatus; ?>",
+		userProfileNameToConnect: "<?php echo $session->accountPendingProfileName; ?>"
+	});	
+</script>

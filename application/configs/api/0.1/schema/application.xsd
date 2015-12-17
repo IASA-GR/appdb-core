@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+     The work represented by this source file is partially or entirely funded 
+     by the EGI-InSPIRE project through the European Commission's 7th Framework 
+     Programme (contract # INFSO-RI-261323)
+
+     Copyright 2010 IASA and GRNET
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at [http://www.apache.org/licenses/LICENSE-2.0| Apache License 2.0]
+
+
+     Unless required by applicable law or agreed to in writing, software 
+     distributed under the License is distributed on an "AS IS" BASIS, 
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+     See the License for the specific language governing permissions and 
+     limitations under the License.
+-->
+     
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+    targetNamespace="http://appdb.egi.eu/api/1.0/application"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:application="http://appdb.egi.eu/api/1.0/application"
+    xmlns:person="http://appdb.egi.eu/api/1.0/person"
+    xmlns:publication="http://appdb.egi.eu/api/1.0/publication"
+    xmlns:vo="http://appdb.egi.eu/api/1.0/vo"
+    xmlns:regional="http://appdb.egi.eu/api/1.0/regional">
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/vo"
+        schemaLocation="vo.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/publication"
+        schemaLocation="publication.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/regional"
+        schemaLocation="regional.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/person"
+        schemaLocation="person.xsd"/>
+
+    <xs:complexType name="middlewareType" mixed="true">
+        <xs:attribute name="id" type="xs:integer" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="statusType" mixed="true">
+        <xs:attribute name="id" type="xs:integer" use="required" />
+    </xs:complexType>
+
+
+    <xs:complexType name="urlType" mixed="true">
+        <xs:attribute name="type" type="xs:string" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="subdisciplineType" mixed="true">
+        <xs:attribute name="id" type="xs:integer" use="required" />
+    </xs:complexType>
+    
+    <xs:complexType name="disciplineType" mixed="true">
+        <xs:attribute name="id" type="xs:integer" use="required" />
+    </xs:complexType>
+
+    <xs:element name="discipline" type="application:disciplineType" />
+    <xs:element name="subdiscipline" type="application:subdisciplineType" />
+    <xs:element name="middleware" type="application:middlewareType" />
+    <xs:element name="status" type="application:statusType" />
+    
+    <xs:complexType name="applicationType">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="description" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="abstract" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="addedOn" type="xs:dateTime" />
+            <xs:element name="owner" type="person:personType" minOccurs="0" />
+            <xs:element ref="application:discipline" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="application:status" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="application:subdiscipline" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="vo:vo" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element ref="regional:region" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element ref="regional:country" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="contact" type="person:personType" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="url" type="application:urlType" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element ref="publication:publication" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element ref="application:middleware" minOccurs="0" maxOccurs="1" />
+            <xs:element name="permalink" type="xs:string" minOccurs="0" maxOccurs="1" />
+            <xs:element name="logo" type="xs:string" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:integer" use="required" />
+        <xs:attribute name="tool" type="xs:boolean" use="optional" default="false" />
+    </xs:complexType>
+
+    <xs:element name="application" type="application:applicationType" />
+    <xs:group name="disciplines">
+        <xs:sequence>
+            <xs:element ref="application:discipline" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element ref="application:subdiscipline" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:group>
+</xs:schema>

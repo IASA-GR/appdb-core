@@ -1,0 +1,1008 @@
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelarating Systems and Applications
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+
+ul.menu{
+			display: block;
+			position:relative;
+			vertical-align: middle;
+			padding:0px;
+			margin:0px;
+			list-style: none;
+			text-align: left;
+			background: none;
+		}
+ul.menu li{
+	position:relative;
+	padding:0px;
+	margin:0px;
+	vertical-align: middle;
+	list-style: none;
+	width:auto;
+	/*overflow: hidden;*/
+}
+
+ul.menu > li, ul.menu li.active{
+	overflow: visible;
+}
+ul.menu li > a{
+	display: inline-block;
+	padding:0px;
+	margin:0px;
+	width:100%;
+	height:100%;
+	text-decoration: none;
+}
+ul.menu li > a + ul,
+ul.menu li.headless > ul{
+	display: none;
+}
+ul.menu.right {
+	text-align: right;
+}
+ul.menu > li.rightalign{
+	float: right;
+}
+
+ul.menu.horizontal, ul.menu ul.horizontal{	}
+ul.menu.horizontal > li, ul.menu ul.horizontal > li {
+	display: inline-block;
+}
+
+ul.menu.vertical, ul.menu ul.vertical{}
+ul.menu.vertical > li, ul.menu ul.vertical > li {
+	display: block;
+}
+
+ul.menu > li > a {}
+ul.menu > li > a + ul{}
+ul.menu > li > a + ul > li{}
+ul.menu > li > a + ul > li a{}
+ul.menu > li > a + ul > li a + ul{}
+ul.menu li.active{}
+ul.menu li.active > a{}
+ul.menu li.active > a + ul {
+	display: block;
+	top:auto;
+	left:0px;
+	right:auto;
+	white-space: nowrap;
+}
+ul.menu li.active > a + ul.horizontal {
+	display: inline-block;
+}
+li.active > a + ul{
+	position: absolute;
+	padding:0px;
+	margin:0px;
+	width:auto;
+	height:auto;
+	overflow: visible;
+	right:0px;
+	left:100%;
+}
+li.active > a + ul > li.active  a {}
+li.active > a + ul  li.active a + ul,  li.active > a + ul  li.active > a + ul li.active > a + ul {
+	top:0px;
+	left:100%;
+	right:auto;
+}
+li.active > a + ul  li.active.left > a + ul,  li.active > a + ul  li.active > a +ul li.active.left > a + ul{
+	top:0px;
+	left:auto;
+	right:100%;
+}
+ul.menu > li.active.rightalign.left {
+	text-align: right;
+}
+ul.menu > li.active.rightalign.left > a + ul{
+	left:auto;
+	right:auto;
+	text-align: right;
+}
+ul.menu > li.active > a + ul li.seperator{
+	display: block ;
+	padding:1px !important ;
+	margin:0px !important;
+	width:100% ;
+	background-color: black ;
+	height:1px !important;
+}
+ul.menu > li.active > a + ul.horizontal li.seperator{
+	display: inline-block;
+	width:1px !important;
+	height: 100% !important;
+}
+ul.menu > li.active > a + ul.horizontal li.active  a+ ul.horizontal{
+	top: 100%;
+	right:0px;
+	left:auto;
+}
+ul.menu > li.active > a+ul > li > a{
+	padding-right:3px;
+}
+ul.menu > li.active > ul.headless{
+	width:auto;
+	display: block;
+}
+ul.menu > li > ul.headless > li{
+	vertical-align: top;
+}
+ul.menu > li > ul.headless > li > ul{
+	padding: 0px;
+	margin: 0px;
+	vertical-align: top;
+}
+ul.menu > li > ul.headless > li > ul > li {
+	vertical-align: top;
+}
+
+ul.menu > li > ul.vertical.leftalign{
+	left: auto;
+	right: -5px;
+}
+/*****************************
+****    LINKEDIN THEME    ****
+*****************************/
+
+ul.linkedin.menu{
+			
+		}
+ul.linkedin.menu a:visited,ul.linkedin.menu a:hover,ul.linkedin.menu a:active,ul.linkedin.menu{
+	color: #069
+}
+ul.linkedin.menu > li > a:visited,ul.linkedin.menu > li > a:hover,ul.linkedin.menu > li > a:active{
+	color:white;
+}
+ul.linkedin.menu > li {			
+	line-height: 37px;
+	padding: 0;
+	list-style-type: none;
+	border: 0;
+	outline: 0;
+	background: none;
+	vertical-align: middle;
+}
+ul.linkedin.menu > li > a + ul > li{
+	background: white;
+}
+ul.linkedin.menu > li > a{
+	color: #71C5EF;
+	padding:0 10px;
+	text-align: center;
+}
+ul.linkedin.menu > li > a + ul > li a{
+	min-width: 50px;
+}
+ul.linkedin.menu > li > a:hover,ul.linkedin.menu > li.active >a{
+	background-color: black;
+}
+ul.linkedin.menu > li.active > a + ul, ul.linkedin.menu > li.active > a + ul > li a+ul{
+	background: white;
+	border: 10px solid #303030;
+	border: 10px solid rgba(0, 0, 0, 0.6);
+	z-index: 10005;
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding;
+	-o-background-clip: padding-box;
+	-ms-background-clip: padding-box;
+	-khtml-background-clip: padding-box;
+	background-clip: padding-box;
+	-moz-border-radius-bottomleft: 4px;
+	-webkit-border-bottom-left-radius: 4px;
+	-o-border-bottom-left-radius: 4px;
+	-ms-border-bottom-left-radius: 4px;
+	-khtml-border-bottom-left-radius: 4px;
+	border-bottom-left-radius: 4px;
+	-moz-border-radius-bottomright: 4px;
+	-webkit-border-bottom-right-radius: 4px;
+	-o-border-bottom-right-radius: 4px;
+	-ms-border-bottom-right-radius: 4px;
+	-khtml-border-bottom-right-radius: 4px;
+	border-bottom-right-radius: 4px;
+	-moz-box-shadow: 0 0 10px #303030;
+	-webkit-box-shadow: 0 0 10px #303030;
+	-o-box-shadow: 0 0 10px #303030;
+	box-shadow: 0 0 10px #303030;
+}
+
+ul.linkedin.menu > li.active > a + ul  li {
+	padding: 5px;
+}
+ul.linkedin.menu > li.active > a + ul  li a:hover{
+	background-color: #016799;
+	color: white;
+}
+
+ul.linkedin.menu > li.active > a + ul  li.active a + ul{
+	top:-10px;
+	margin-left:12px;
+}
+ul.linkedin.menu > li.active > a + ul  > li.active > a + ul{
+	top:-10px;
+}
+ul.linkedin.menu > li.active > a + ul  li.active.left a + ul{
+	margin-left:0px;
+	margin-right: 12px;
+	top:-10px;
+}
+ul.linkedin.menu > li.active > a + ul > li.seperator{
+	background-color: rgba(0, 0, 0, 0.6) ;
+	padding:0px !important;
+}
+ul.linkedin.menu > li.active > a + ul.horizontal li.active a + ul.horizontal{
+	margin-top:10px;
+	right: -5px;
+}
+ul.linkedin.menu li > a + ul li.container{
+	position: relative;
+}
+ul.linkedin.menu li > a + ul li.container> a:hover{
+	
+}
+
+/*****************************
+****      APPDB THEME     ****
+*****************************/
+
+ul.appdb.menu{
+}
+ul.appdb.menu > li > ul li > a, 
+ul.appdb.menu > li > ul li > a:visited,
+ul.appdb.menu > li > ul li > a:hover,
+ul.appdb.menu > li > ul li > a:active{
+	color: #069 ;
+}
+ul.appdb.menu, ul.appdb.menu > li > a:visited, ul.linkedin.menu > li > a:hover, ul.linkedin.menu > li > a:active{
+	color:white;
+}
+ul.appdb.menu > li {			
+	line-height: 30px;
+	padding:0 5px 0px 0px;
+	list-style-type: none;
+	border: 0;
+	outline: 0;
+	background: none;
+	vertical-align: middle;
+}
+ul.appdb.menu > li > a + ul > li{
+	background: white;
+}
+ul.appdb.menu > li > a{
+	color: white;
+	padding:0 5px;
+	text-align: center;
+}
+ul.appdb.menu > li > a + ul > li a{
+	min-width: 50px;
+}
+ul.appdb.menu > li > a:hover,ul.appdb.menu > li.active > a{
+	background-color: #808080;
+	color: white !important;
+	border-radius: 3px 3px 0px 0px;
+}
+ul.appdb.menu > li.active > a + ul, ul.appdb.menu > li.active > a + ul > li a + ul{
+	background: white;
+	border: 5px solid #909090;
+	border: 5px solid rgba(144, 144, 144, 0.6);
+	z-index: 10005;
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding;
+	-o-background-clip: padding-box;
+	-ms-background-clip: padding-box;
+	-khtml-background-clip: padding-box;
+	background-clip: padding-box;
+	-moz-border-radius-bottomleft: 4px;
+	-webkit-border-bottom-left-radius: 4px;
+	-o-border-bottom-left-radius: 4px;
+	-ms-border-bottom-left-radius: 4px;
+	-khtml-border-bottom-left-radius: 4px;
+	border-bottom-left-radius: 4px;
+	-moz-border-radius-bottomright: 4px;
+	-webkit-border-bottom-right-radius: 4px;
+	-o-border-bottom-right-radius: 4px;
+	-ms-border-bottom-right-radius: 4px;
+	-khtml-border-bottom-right-radius: 4px;
+	border-bottom-right-radius: 4px;
+	-moz-box-shadow: 0 0 10px #909090;
+	-webkit-box-shadow: 0 0 10px #909090;
+	-o-box-shadow: 0 0 10px #909090;
+	box-shadow: 0 0 10px #909090;
+}
+
+ul.appdb.menu > li.active > a + ul  li {
+	padding: 5px;
+}
+ul.appdb.menu > li.active > a + ul  li a:hover{
+	background-color: #909090;
+	color: white;
+}
+
+ul.appdb.menu > li.active > a + ul  li.active > a + ul{
+}
+ul.appdb.menu > li.active > a + ul > li.active > a + ul{
+}
+ul.appdb.menu > li.active > a + ul  li.active.left > a + ul{
+	margin-left:0px;
+	margin-right: 12px;
+	top:-10px;
+}
+ul.appdb.menu > li.active > a + ul > li.seperator{
+	background-color: rgba(0, 0, 0, 0.6) ;
+	padding:0px !important;
+}
+ul.appdb.menu > li.active > a + ul.horizontal li.active a + ul.horizontal{
+	margin-top:10px;
+	right: -5px;
+}
+ul.appdb.menu li > a + ul li.container{
+	position: relative;
+}
+ul.appdb.menu li > a + ul li.container > a:hover{
+	
+}
+ul.appdb.menu > li.active > a + ul > li.seperator{
+	background-color: rgba(0, 0, 0, 0.6) ;
+	padding:0px !important;
+}
+ul.appdb.menu > li.seperator.horizontal{
+	height: 17px;
+	width: 1px;
+	margin: 0px;
+	margin-left: 2px;
+	margin-right: 2px;
+	background-color: white;
+	vertical-align: middle;
+	padding: 0px;
+	top: 6px;
+}
+ul.appdb.menu > li > ul{
+	
+}
+ul.appdb.menu > li a > .arrow.down{
+	padding: 0px;
+	margin: 0px;
+	padding-left: 3px;
+	padding-bottom: 4px;
+	clear:both;
+}
+ul.appdb.menu > li a{
+	width:100%;
+}
+ul.appdb.menu > li a > .arrow.right{
+	display: inline-block;
+	position:absolute;
+	padding: 0px;
+	margin: 0px;
+	padding-left: 3px;
+	vertical-align: middle;
+	padding-bottom: 4px;
+	right:2px;
+}
+ul.appdb.menu > li a+ul {
+	min-width:130px;
+}
+
+ul.appdb.menu > li.active > a + ul.left{
+	right: -5px !important;
+	left: auto !important;
+}
+ul.appdb.menu > li.active > a + ul li > a > .icontext{
+	display: block;
+	vertical-align: middle;
+}
+ul.appdb.menu > li.active > a + ul li > a > .icontext > img{
+	width: 16px;
+	height:16px;
+	border:0;
+	padding:2px;
+	vertical-align: middle;
+}
+ul.appdb.menu > li.active > a + ul li > a > .icontext > span, ul.appdb.menu > li.active > a + ul li > a > .icontext > span{
+	display: inline-block;
+	vertical-align: middle;
+	padding: 2px;
+}
+
+/***********************
+**** Logistics theme ***
+***********************/
+ul.logistics.menu{
+	
+}
+ul.logistics.menu a span{
+	font-family: "Open Sans",Arial;
+	font-size: 11px;
+	/*line-height: 12px;*/
+}
+ul.logistics.menu > li > ul li > a, 
+ul.logistics.menu > li > ul li > a:visited,
+ul.logistics.menu > li > ul li > a:hover,
+ul.logistics.menu > li > ul li > a:active{
+	color: #069 ;
+}
+ul.logistics.menu, ul.logistics.menu > li > a:visited, ul.logistics.menu > li > a:hover, ul.logistics.menu > li > a:active{
+	/*color:white;*/
+}
+ul.logistics.menu > li {			
+	line-height: 20px;
+	padding:0 0px 0px 0px;
+	list-style-type: none;
+	border: 0;
+	outline: 0;
+	background: none;
+	vertical-align: middle;
+	margin: 0px 3px;
+}
+ul.logistics.menu > li > a + ul > li{
+	background: white;
+}
+ul.logistics.menu > li > a{
+	color: white;
+	padding:0 3px;
+	text-align: center;
+}
+ul.logistics.menu > li > a + ul > li a{
+	min-width: 50px;
+}
+ul.logistics.menu > li > a:hover,
+ul.logistics.menu > li.active > a{
+	background-color: #808080;
+	color: white !important;
+	border-radius: 3px 3px 0px 0px;
+}
+ul.logistics.menu > li.active > a + ul, 
+ul.logistics.menu > li.active > a + ul > li a + ul{
+	background: white;
+	margin-top: -2px;
+	border: 1px solid #909090;
+	border: 1px solid rgba(144, 144, 144, 0.6);
+	z-index: 905;
+}
+ul.logistics.menu > li.active > a + ul{
+	top: 20px;
+}
+ul.logistics.menu > li.active > a + ul  li {
+	padding: 2px;
+}
+ul.logistics.menu > li.active > a + ul  li a:hover{
+	background-color: #909090;
+	color: white;
+}
+ul.logistics.menu > li.active > a + ul  li.container a {
+	margin-right: 15px;
+}
+ul.logistics.menu > li.active > a + ul  li.active > a + ul{
+}
+ul.logistics.menu > li.active > a + ul > li.active > a + ul{
+}
+ul.logistics.menu > li.active > a + ul  li.active.left > a + ul{
+	margin-left:0px;
+	margin-right: 12px;
+	top:-10px;
+}
+ul.logistics.menu > li.active > a + ul > li.seperator{
+	background-color: rgba(0, 0, 0, 0.6) ;
+	padding:0px !important;
+}
+ul.logistics.menu > li.active > a + ul.horizontal li.active a + ul.horizontal{
+	margin-top:10px;
+	right: -5px;
+}
+ul.logistics.menu li > a + ul li.container{
+	position: relative;
+}
+ul.logistics.menu li > a + ul li.container > a:hover{
+	
+}
+ul.logistics.menu > li.active > a + ul > li.seperator{
+	background-color: rgba(0, 0, 0, 0.6) ;
+	padding:0px !important;
+}
+ul.logistics.menu > li.seperator.horizontal{
+	height: 17px;
+	width: 1px;
+	margin: 0px;
+	margin-left: 2px;
+	margin-right: 2px;
+	background-color: white;
+	vertical-align: middle;
+	padding: 0px;
+	top: 6px;
+}
+ul.logistics.menu > li > ul{
+	
+}
+ul.logistics.menu > li a > .arrow.down{
+	padding: 0px;
+	margin: 0px;
+	padding-left: 3px;
+	padding-bottom: 4px;
+	clear:both;
+}
+ul.logistics.menu > li a{
+	width:100%;
+	color: #555;
+	font-family: "Open Sans",Arial;
+}
+ul.logistics.menu > li a > .arrow.right{
+	display: inline-block;
+	position:absolute;
+	padding: 0px;
+	margin: 0px;
+	padding-left: 3px;
+	vertical-align: middle;
+	padding-bottom: 4px;
+	right:2px;
+	font-size: 8px;
+	padding-right: 2px;
+}
+ul.logistics.menu > li > a+ul {
+	min-width:145px;
+}
+
+ul.logistics.menu > li.active > a + ul.left{
+	right: -5px !important;
+	left: auto !important;
+}
+ul.logistics.menu > li.active > a + ul li > a > .icontext{
+	display: block;
+	vertical-align: middle;
+}
+ul.logistics.menu > li.active > a + ul li > a > .icontext > img{
+	width: 16px;
+	height:16px;
+	border:0;
+	padding:2px;
+	vertical-align: middle;
+}
+ul.logistics.menu > li.active > a + ul li > a > .icontext > span, 
+ul.logistics.menu > li.active > a + ul li > a > .icontext > span{
+	display: inline-block;
+	vertical-align: middle;
+	padding: 2px;
+}
+
+ul.logistics.menu li > a > .count {
+	display: inline-block;
+	min-width: 20px;
+	padding: 1px 3px;
+	margin: 0px 3px 0px -2px;
+	color: #555;
+	background-color: whiteSmoke;
+	border-radius: 0px 4px 4px 0px;
+	text-align: right;
+	vertical-align: top;
+}
+ul.logistics.menu ul > li > a > .name{
+	display: inline-block;
+	min-width: 20px;
+	max-width: 120px;
+	white-space: pre;
+	line-height: 12px;
+}
+ul.logistics.menu li > a:hover{
+	cursor: pointer;
+}
+ul.logistics.menu ul > li > a{
+	/*width: auto;
+	min-width: 200px;
+	max-width: 400px;*/
+}
+ul.logistics.menu ul > li > a > .name {
+	display: inline-block;
+	min-width: 30px;
+	max-width: 150px;
+	padding: 0;
+	white-space: pre-line;
+	width: auto;
+	width:-moz-max-content !important;
+	width:-ms-max-content !important;
+}
+ul.logistics.menu li.active > a + ul > li > a {
+	
+}
+.logistics.container.active >  ul.headless {
+	padding: 0;
+	margin:0;
+	width: auto;
+	width:-moz-max-content !important;
+	width:-ms-max-content !important;
+	width:intrinsic;
+}
+.dj_ie8 ul.logistics.menu ul > li > a > .name{
+	max-width: 110px;	
+}
+.dj_ie8 ul.logistics.menu ul > li > ul{
+	min-width: 115%;
+}
+/*.dj_ie8 .logistics.container.active >  ul.headless {
+	padding-right: 50px;
+}
+.dj_ie8 .phonebook > ul.headless{
+	padding-right: 0px;
+}
+.dj_ie8 .phonebook.container.active > ul.headless > li >a {
+	padding: 0px;
+}*/
+ul.logistics.menu ul{
+	width: auto;
+	width:intrinsic;
+	width:-moz-max-content !important;
+	width:-ms-max-content !important;
+	width:-webkit-max-content !important;
+	width:-o-max-content !important;
+}
+ul.logistics.menu ul > li > a.nocount{
+	color: #555;
+	cursor: default;
+}
+ul.logistics .horizontal.leftalign{
+	left: auto;
+	right: -6px;
+}
+ul.logistics .headless.horizontal.noalign ul{
+	padding: 0;
+	margin: 0;
+}
+ul.logistics .headless.horizontal.noalign li {
+	vertical-align: top;
+}
+ul.logistics .active > ul.headless.horizontal {
+	display: table-row;
+	border-collapse: collapse;
+	border-spacing: 0;
+	table-layout: fixed;
+	empty-cells: show;
+	width: auto;
+	margin: 0px;
+}
+ul.logistics .active > .headless.horizontal > li {
+	display: table-cell;
+	width: auto;
+	word-break: keep-all;
+	white-space: nowrap;
+	word-wrap: initial;
+	margin: 0px;
+	border-collapse: collapse;
+	border-spacing: 1px;
+	table-layout: fixed;
+	empty-cells: show;
+}
+ul.logistics .active > .headless.horizontal > li > ul {
+	display: block;
+	width: auto;
+	padding: 0px;
+	margin: 0px;
+}
+ul.logistics .active > .headless.horizontal > li > ul > li{
+	display: block;
+	width: auto;
+	margin: 0px;
+}
+ul.logistics .active > .headless.horizontal > li > ul > li > a {
+	display: inline-block;
+}
+.dj_ie8 .logistics.container.active >  ul.headless{
+	padding-right: 15px;
+}
+ul.logistics.menu > li.overflowed > ul.vertical.rightsided li ul.vertical,
+ul.logistics.menu > li.overflowed.rightsided > ul ul
+{
+	left: auto;
+	right: 100%;
+	width: auto;
+} 
+
+
+/*****************************
+****      METRO THEME     ****
+*****************************/
+
+ul.metro.menu{
+	height: 40px;
+	min-height: 25px;
+	max-height: 40px;
+	clear:both;
+}
+ul.metro.menu > li{
+	display: inline-block;
+}
+ul.metro.menu > li > ul li > a, 
+ul.metro.menu > li > ul li > a:visited,
+ul.metro.menu > li > ul li > a:hover,
+ul.metro.menu > li > ul li > a:active{
+	color: white ;
+}
+ul.metro.menu, ul.metro.menu > li > a:visited, ul.metro.menu > li > a:hover, ul.metro.menu > li > a:active{
+	color:white;
+}
+ul.metro.menu > li {			
+	line-height: 30px;
+	padding:0 5px 0px 0px;
+	list-style-type: none;
+	border: 0;
+	outline: 0;
+	background: none;
+	vertical-align: middle;
+}
+ul.metro.menu > li > a + ul > li{
+	background: white;
+}
+ul.metro.menu > li > a{
+	color: white;
+	padding:0 5px;
+	text-align: center;
+}
+ul.metro.menu > li > a + ul > li a{
+	min-width: 50px;
+}
+ul.metro.menu > li > a:hover,ul.metro.menu > li.active > a{
+	background-color: #000;
+	color: white !important;
+	border-radius: 3px 3px 0px 0px;
+	
+	display: block;
+	text-decoration: none;
+	font-family: 'Open Sans Light', Verdana, Arial, Helvetica, sans-serif;
+	font-weight: 300;
+	letter-spacing: 0.00em;
+	font-size: 2.5rem;
+	line-height: 2.5rem;
+	letter-spacing: 0.01em;
+
+	line-height: 2.2rem;
+	font-size: 2.2rem;
+}
+ul.metro.menu > li.active > a + ul, ul.metro.menu > li.active > a + ul > li a + ul{
+	border: 5px solid #909090;
+	border: 5px solid rgba(144, 144, 144, 0.6);
+	z-index: 10005;
+	background-color: #333;
+	border: 2px #333 solid;
+	color: white;
+}
+
+ul.metro.menu > li.active > a + ul  li > a {
+	padding: 5px 0px;
+	padding-left: 5px;
+	font-size: 12px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 300;
+}
+ul.metro.menu li > a.activelistitem,
+ul.metro.menu > li.active > a + ul  li > a.activelistitem{
+	font-weight: bold;
+}
+ul.metro.menu > li.active > a + ul  li {
+	padding: 0px;
+	padding-right: 5px;
+	z-index: 10005;
+	background-color: #333;
+	color: white;
+}
+ul.metro.menu > li.active > a + ul  li a:hover{
+	background-color: #909090;
+	color: white;
+	border: 0;
+	background-color: #201A1A;
+	color: white;
+}
+
+ul.metro.menu > li.active > a + ul  li.active > a + ul{
+}
+ul.metro.menu > li.active > a + ul > li.active > a + ul{
+}
+ul.metro.menu > li.active > a + ul  li.active.left > a + ul{
+	margin-left:0px;
+	margin-right: 12px;
+	top:-10px;
+}
+ul.metro.menu > li.active > a + ul > li.seperator{
+	background-color: rgba(0, 0, 0, 0.6) ;
+	padding:0px !important;
+}
+ul.metro.menu > li.active > a + ul.horizontal li.active a + ul.horizontal{
+	margin-top:10px;
+	right: -5px;
+}
+ul.metro.menu li > a + ul li.container{
+	position: relative;
+}
+ul.metro.menu li > a + ul li.container > a:hover{
+	
+}
+ul.metro.menu > li.active > a + ul > li.seperator{
+	background-color: rgba(0, 0, 0, 0.6) ;
+	padding:0px !important;
+}
+ul.metro.menu > li.seperator.horizontal{
+	height: 17px;
+	width: 1px;
+	margin: 0px;
+	margin-left: 2px;
+	margin-right: 2px;
+	background-color: white;
+	vertical-align: middle;
+	padding: 0px;
+	top: 6px;
+}
+ul.metro.menu > li ul{
+	box-shadow: 0 2px 6px #333;
+}
+ul.metro.menu > li > ul{
+	
+}
+ul.metro.menu > li a > .arrow.down{
+	padding: 0px;
+	margin: 0px;
+	padding-left: 3px;
+	padding-bottom: 4px;
+	clear:both;
+	color: transparent;
+}
+ul.metro.menu > li a{
+	width:100%;
+}
+ul.metro.menu li a > .arrow{ 
+	color: transparent;
+	font-family: Arial;
+	position: relative;
+}
+.dj_ie8 ul.metro.menu li a > .arrow{ 
+	color: white;
+}
+ul.metro.menu > li a > .arrow.right{
+	display: inline-block;
+	position:absolute;
+	padding: 0px;
+	margin: 0px;
+	padding-left: 3px;
+	vertical-align: middle;
+	padding-bottom: 4px;
+	right:2px;
+	font-family: Arial;
+	content: '\02C3';
+}
+ul.metro.menu > li > a > .arrow.down::before{ 
+	content: '';
+	display: inline-block;
+	position: absolute;
+	top: 2px;
+	right:2px;
+	width: 0px;
+	height: 0px;
+	border-style: solid;
+	border-width: 6px 3.5px 0 3.5px;
+	border-color: #333333 transparent transparent transparent;
+	line-height: 0px;
+	_border-color: #333333 #000000 #000000 #000000;
+	_filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');
+	z-index: 500;
+}
+ul.metro.menu > li > a > .arrow.down::after {
+	content: '';
+	display: inline-block;
+	position: absolute;
+	top: 5px;
+	right: 2px;
+	width: 0px;
+	height: 0px;
+	border-style: solid;
+	border-width: 6px 3.5px 0 3.5px;
+	border-color: #d0d0d0 transparent transparent transparent;
+	line-height: 0px;
+	_border-color: #d0d0d0 #000000 #000000 #000000;
+	_filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');
+	z-index: 250;
+}
+ul.metro.menu li > a > .arrow.right::before {
+	content: '';
+	display: inline-block;
+	position: absolute;
+	top: 12px;
+	right: 2px;
+	width: 0px;
+	height: 0px;
+	border-style: solid;
+	border-width: 3px 0 3px 7px;
+	border-color: transparent transparent transparent #333333;
+	line-height: 0px;
+	_border-color: #000000 #000000 #000000 #333333;
+	_filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');
+	z-index: 500;
+}
+ul.metro.menu li a > .arrow.right::after {
+	content: '';
+	display: inline-block;
+	position: absolute;
+	top: 12px;
+	right: 0px;
+	width: 0px;
+	height: 0px;
+	border-style: solid;
+	border-width: 3px 0 3px 7px;
+	border-color: transparent transparent transparent #d0d0d0;
+	line-height: 0px;
+	_border-color: #000000 #000000 #000000 #d0d0d0;
+	_filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');
+	z-index: 250;
+}
+ul.metro.menu  li:hover > a:hover > .arrow.right::before,
+ul.metro.menu  li.active > a > .arrow.right::before{
+	border-color: transparent transparent transparent #000000;
+	_border-color: #000000 #000000 #000000 #000000;
+}
+ul.metro.menu > li:hover > a:hover > .arrow.down::before,
+ul.metro.menu > li.active > a > .arrow.down::before{
+	border-color: #000000 transparent transparent transparent;
+	_border-color: #000000 #000000 #000000 #000000;
+}
+
+ul.metro.menu > li a+ul {
+	min-width:140px;
+}
+
+ul.metro.menu > li.active > a + ul.left{
+	right: -5px !important;
+	left: auto !important;
+}
+ul.metro.menu > li.active > a + ul li > a > .icontext{
+	display: block;
+	vertical-align: middle;
+}
+ul.metro.menu > li.active > a + ul li > a > .icontext > img{
+	width: 16px;
+	height:16px;
+	border:0;
+	padding:2px;
+	vertical-align: middle;
+}
+ul.metro.menu > li.active > a + ul li > a > .icontext > span, ul.metro.menu > li.active > a + ul li > a > .icontext > span{
+	display: inline-block;
+	vertical-align: middle;
+	padding: 2px;
+}
+ul.metro.menu li.active.container > a{
+	background-color: #000;
+	outline: none;
+}
+
+ul.metro.menu .loginselector a{
+	color: white;
+	min-height: 45px;
+}
+ul.metro.menu .loginselector .sourcetype.egi-sso-login {
+	border-color: #888;
+}
+ul.metro.menu .loginselector .sourcetype.egi-sso-login:hover {
+	background-color: #333;
+}
+ul.metro.menu .loginselector .sourcetype.egi-sso-login:hover > a{
+	background-color: #000;
+}
+ul.metro.menu .loginselector .sourcetype.egi-sso-login:hover .details{
+	color: white;
+}
+ul.metro.menu > li.rightalign{
+	min-height: 25px;
+	max-height: 40px;
+	max-width: 310px;
+	float: none;
+}
+ul.metro.menu > li.rightalign:first-child{
+	margin-right: 10px;
+}

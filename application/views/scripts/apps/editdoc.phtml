@@ -1,0 +1,346 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><script type="text/javascript" src="/js/jquery.outerhtml.js"></script>
+<script type="text/javascript">
+	var makeAuthors = function() {
+		var s='';
+		var ss;
+		var first=1;
+		atd=$(':input[name="authors"]:last').parent();
+		atd.find(':input').each(function(x) {
+			if ( ($(this).val() != '') && ($(this).hasClass('dijitInputInner')) ) {
+				ss=$(this).val();
+				ss=ss.replace(",","");
+                if (ss.indexOf('(ID: ') >=0 ) {
+                    var id=ss.substr(ss.indexOf('(ID: ')+5);
+                    id=id.substr(0,id.length-1);
+                    if ( id != '' ) {
+						var caller = "appdb.views.Main.showPerson({id: "+id+"},{ mainTitle: '"+ ss.substr(0,ss.indexOf('(ID:')-1).replace(/'/g,"\\'")+ "'});";
+						ss='<a data-authorid="'+id+'" data-authorMain="'+((first==1)?"true":"false")+'" href="#" onclick="'+caller+'">'+ss.substr(0,ss.indexOf('(ID: ')-1)+'</a>';
+                    };
+				} else {
+						ss='<span data-authorname="'+ss+'" data-authorMain="'+((first==1)?"true":"false")+'">'+ss+'</span>'
+				};
+				if ( first==1 ) ss='<b>'+ss+'</b>';
+				s=s+ss+', ';
+				first=0;
+			};
+		});
+		s=s.substr(0,s.length-2);
+		return s;
+	};
+	var makeRow = function() {
+		var s = makeAuthors();
+		var title = '<span data-docid="'+$(':input[name="id"]:last').val()+'">';
+		var url = $(':input[name="url"]:last').val();
+		if (url != '') {
+			title = title + '<a target="_blank" href="'+url+'">'+$(':input[name="title"]:last').val()+'</a></span>';
+		} else {
+			title = title + $(':input[name="title"]:last').val()+'</span>';
+		}
+		var row = [
+				[title],
+				['<span data-doctypeid="'+$(':input[name="type"]:last').val()+'">'+$(':input[name="type"]:last').prev().val()+'</span>'],
+				$(':input[name="conference"]:last').val(),
+				$(':input[name="volume"]:last').val(),
+				$(':input[name="pageStart"]:last').val()+' - '+$(':input[name="pageEnd"]:last').val(),
+				$(':input[name="year"]:last').val(),
+				$(':input[name="publisher"]:last').val(),
+				$(':input[name="isbn"]:last').val(),
+				$(':input[name="proceedings"]:last').val(),
+                $(':input[name="journal"]:last').val(),
+				[ s ]
+			];
+		docgrid.removeSelectedRows();
+		docgrid.addRow(row);
+		editDocDlg.onCancel();
+		return true;
+	};
+	
+	var addAuthor = function() {
+		if(validateAuthors()==false){ return false; }
+			var atd=$(':input[name="authors"]:last').parent();
+		var s=makeAuthors();
+		var a = s.replace(/, *{/g,"").split(',');
+		var h='<input style="display:none" type="text" name="authors"/>';
+		var hasAuthor = false;
+		for (var i in a) {
+			if (a[i] != "" ){
+				hasAuthor = true;
+			}
+		};
+		h=h+makeAuthCombo();
+		if(hasAuthor==false){
+			atd.empty().append(h);
+		}else{
+			atd.append(h);
+		}
+
+		dojo.parser.parse(atd[0]);
+		atd.find(".dijitComboBox").each(function() {
+			$(this).click(function() {
+				setFocusedItem($(this));
+			});
+			dojo.connect(dijit.byNode($(this)[0]), "onChange", function(){
+				if( $.trim(this.attr("value"))!=="" ) {
+					validateDocSave();
+				}
+			});
+		});
+		renderLists($(".app-docs:last"),remAuthor,function(e){ validateDocSave();return ($(e).find(".listremove").length===0?false:true)});
+		$(".editdoc .tip").show();
+	};
+	
+	var remAuthor = function() {
+		setFocusedItem(null);
+		validateDocSave();
+	};
+	
+	var setAuthor = function() {
+		focusedDijitItem.find(':input:last')[0].setAttribute('value',focusedDijitItem.find(':input:last').val());
+	};
+	var validateAuthors = function(ev){
+		var invalidElem = null;
+		$("#editDocDialog").find(".dijitComboBox.authorselect .dijitInputField :input").each(function(){
+        if( $.trim($(this).val()) == '' ) {
+			invalidElem = $(this).parent().parent();
+		}
+    });
+	if(invalidElem != null){
+		$(invalidElem).animate({"opacity":"0.5","background-color":"red"},500,function(){setTimeout(function(){$(invalidElem).animate({"opacity":"1","background-color":"white"},1000);},10);});
+		window.event.cancelBubble = true;
+		if(ev)ev.stopPropagation();
+		return false;
+	}
+	return true;
+  };
+  var cancelRow = function(ev){
+  	editDocDlg.onCancel();
+    return false;
+  };
+  var setFocusedItem = function(el){
+	  if(el){
+		focusedDijitItem = el;
+		dojo.connect($(el)[0],"onChange",function(){validateDocSave();});
+		$(".editdoc .tip").show();
+	  }else{
+		focusedDijitItem.remove();
+		if($(".editdoc .app-docs .app-doc").length == 0) {
+			$(".editdoc .tip").hide();	
+		}
+	  }
+	  
+  };
+</script>
+
+<div class="editdoc editmode">
+<table width="100%">
+<tr><td width="50"><span class="field-name">Title:<span style="vertical-align: top; color: red; display: inline-block; " class="mandatoryflag" title="Field is mandatory">*</span></span></td><td colspan="2"><input style="width:0" type="hidden" name="id"/><input style="left:0; width:100%" type="text" dojoType="dijit.form.ValidationTextBox" name="title" required="true" id="name"/></td></tr>
+<tr><td><span class="field-name">URL:</span></td><td colspan="2"><input style="width:100%" type="text" dojoType="dijit.form.TextBox" name="url"></select></td></tr>
+<tr><td><span class="field-name">Conference:</span></td><td colspan="2"><input style="width:100%" type="text" dojotype="dijit.form.TextBox" name="conference"/></td></tr>
+<tr><td><span class="field-name">Proceedings:</span></td><td colspan="2"><input style="width:100%" type="text" dojotype="dijit.form.TextBox" name="proceedings"/></td></tr>
+<tr><td><span class="field-name">Journal:</span></td><td colspan="2"><input style="width:100%" type="text" dojotype="dijit.form.TextBox" name="journal"/></td></tr>
+<tr><td><span class="field-name">Volume:</span></td><td><input style="width:88%" type="text" dojotype="dijit.form.TextBox" name="volume"/></td>
+ <td width="50%">
+  <table cellspacing="0" cellpadding="0" width="100%"><tr><td class="field-name inner"><span class="field-name inner">Pages:</span></td>
+  <td class="field-value inner"><div><span>From </span><input style="width:50px" type="text" dojotype="dijit.form.TextBox" name="pageStart"/> <span>To </span> <input style="width:50px" type="text" dojotype="dijit.form.TextBox" name="pageEnd"/></div>
+  </td></tr></table></td></tr>
+<tr><td><span class="field-name">Year:</span></td><td><input style="width:88%" type="text" dojotype="dijit.form.TextBox" name="year"/></td>
+<td width="50%">
+ <table width="100%" cellspacing="0" cellpadding="0"><tr><td class="field-name inner"><span class="field-name inner">Type:</span></td>
+   <td class="field-value inner"><select style="width:80%" dojoType="dijit.form.FilteringSelect" name="type">
+	<?php
+	for ($i=0; $i<$this->docTypes->count(); $i++) {
+		$docType = $this->docTypes->items[$i];
+		echo "<option value='".$docType->Id."'>".$docType->description."</option>";
+	}
+	?>
+	</select>
+</td>
+</tr></table></td></tr>
+<tr><td><span class="field-name">Publisher:</span></td><td><input style="width:88%" type="text" dojotype="dijit.form.TextBox" name="publisher"/></td>
+ <td width="50%">
+  <table cellspacing="0" cellpadding="0" width="100%"><tr>
+    <td class="field-name inner"><span class="field-name inner">ISBN:</span></td>
+    <td class="field-value inner"><input style="width:80%" type="text" dojotype="dijit.form.TextBox" name="isbn"/></td></tr></table></td></tr>
+<tr><td class="field-name" ><span class="field-name" style="width:100%">Authors:<span style="vertical-align: top; color: red; display: inline-block; " class="mandatoryflag" title="Field is mandatory">*</span>
+  <span class="listhandler adder" ><a href="#" onclick="return addAuthor();"><img alt="add" style="vertical-align:middle;" border="0" src="/images/plus.png"><span>Add</span></a></span></span></td>
+  <!--<span style="vertical-align:middle"><a href="#" onclick="return addAuthor();"><img border="0" src="images/plus.png"/></a><a style="display:none" href="#" onclick="remAuthor();" ><img border="0" src="images/minus.png"/></a></span></td>-->
+<td colspan="2" class="field-value inner"><span class="app-docs"><input style="display:none" type="text" name="authors"/></span></td></tr>
+</table>
+<div style="text-align: right">
+<div class="pubeditwarning" style="color: red; font-style:italic; font-size:90%; margin-left: 5px; margin-top: 6px; display:inline-block; width:auto; float: left">
+</div>
+<div style="display:inline-block; width:auto; text-align:right">
+	<span class="tip" style="display:none;"><img src="/images/exclam16.png" alt="" border="0"></img><span>In case you cannot find the author you are looking for in the list above, you can insert a new one just by typing the name.</span></span>
+	<button dojoType="dijit.form.Button" onmouseup="return validateAuthors();" onclick="return makeRow();" id="docSave">Save</button>
+	<button dojoType="dijit.form.Button" onmouseup="return cancelRow();" >Cancel</button>
+</div>
+</div>
+</div>
+<script type="text/javascript">
+	dojo.parser.parse($('div.editdoc:last')[0]);
+	
+	var makeAuthCombo = function(n, isInternal,par) {
+    var wasundef=false;
+    if ( n == undefined ) wasundef = true;
+		var s='<select '+((typeof n == 'undefined')?'displayedValue=""':'')+' onchange="setAuthor()" class="authorselect"  dojoType="dijit.form.ComboBox" autocomplete="true">';
+		var authors = [<?php $pc = $this->people->count();$pcc = $pc-1;
+		for ($i=0; $i<$pc; $i++) {
+			$person = $this->escape($this->people->items[$i]->firstName." ".$this->people->items[$i]->lastName);
+			$person=str_replace("'","\\'",$person);
+			echo '{value :"' . $this->people->items[$i]->Id . '" , name : "' . $person.' (ID: '.$this->people->items[$i]->Id . ')"}' . (($i==$pcc)?'':',');
+		}
+		?>];
+		authors.sort(function(a,b){
+			var na = a.name.toLowerCase(), nb = b.name.toLowerCase();
+				if ( na < nb ) return -1;
+				if ( na > nb ) return 1;
+				return 0;
+		});
+		for(var i=0; i<authors.length; i+=1){
+			s=s+'<option value="'+authors[i].value+'">'+authors[i].name+'</option>';
+		}
+		s=s+'</select>';
+		s ="<span class='app-doc' edit_type='combo' edit_group='true'>"+s+"</span>";
+		if(par){
+			s = $(s);
+			$(par).append(s);
+		}
+		var id;
+		if ( ! wasundef ) {
+			if (typeof n === "string") {
+				n='<item>'+n+'</item>';
+				if ($(n).find('a')[0] !== undefined) {
+					id = $(n).find('a')[0].getAttribute('onclick');
+					id = id.substr(id.indexOf('id:')+4);
+					id = id.replace(/}.+/,"");
+					s = $(s).find('option').each(function(index,elem) {
+						if ( id == $(elem).attr('value') ) { $(elem)[0].setAttribute('selected','selected');};
+					}).parent().outerHTML();
+				} else {
+					s=$(s).append('<option selected="selected" value="'+$(n).text()+'">'+$(n).text()+'</option>').outerHTML();
+				};
+			} else if (typeof n === "object") {
+				if (isInternal) {
+					s=$(s).find('option').each(function(index,elem) {
+						if ( n[0] == $(elem).attr('value') ) { $(elem)[0].setAttribute('selected','selected');}
+					}).parent().outerHTML();
+				} else {
+					s=$(s).find("select").append('<option selected="selected" value="'+n[0]+'">'+n[0]+'</option>').outerHTML();
+				}
+			}
+        } else {
+			
+		}
+		$(".editdoc .app-doc .dijitReset.dijitRight.dijitButtonNode.dijitArrowButton.dijitDownArrowButton.dijitArrowButtonContainer").live('click', function(){
+			setTimeout(function(){
+				$("div.dijitPopup.dijitComboBoxMenuPopup").css({"z-index": "999999999"});
+			},10);
+		});
+        return s;
+	};
+
+	var loadDocData = function(data) {
+		$(':input[name="id"]:last').val(data.id);
+		$(':input[name="title"]:last').val(data.title);	
+		$(':input[name="url"]:last').val(data.url);
+		$(':input[name="type"]:last').prev().val(data.type);
+		$(':input[name="type"]:last').val(data.typeID);
+		$(':input[name="conference"]:last').val(data.conference);
+		$(':input[name="volume"]:last').val(data.volume);
+		$(':input[name="pageStart"]:last').val(data.pageStart);
+		$(':input[name="pageEnd"]:last').val(data.pageEnd);
+		$(':input[name="year"]:last').val(data.year);
+		$(':input[name="publisher"]:last').val(data.publisher);
+		$(':input[name="isbn"]:last').val(data.isbn);
+		$(':input[name="proceedings"]:last').val(data.proceedings);
+		$(':input[name="journal"]:last').val(data.journal);
+		var atd=$(':input[name="authors"]:last').parent();
+		for (i=0;i<data.intAuthors.length;i++) {
+			makeAuthCombo(data.intAuthors[i], true,atd)
+		};
+		for (i=0;i<data.extAuthors.length;i++) {
+			makeAuthCombo(data.extAuthors[i], false,atd);
+		};
+	};
+	
+	var data = <?php echo $this->data;?>;
+	if ( data !== "" ) loadDocData(data);
+	var validateDocSave = function(){
+		var disabled = false;
+		if($.trim(dijit.byId("name").get("displayedValue")) === ''){
+			disabled = true;
+		}else {
+			disabled = true;
+			$(".editdoc.editmode .app-docs .app-doc").each(function(index,elem){
+				var djt = dijit.byNode($(elem).find("div:first")[0]);
+				if( djt.attr("displayedValue") !== ""){ 
+					disabled = false;
+					return false;
+				}
+			});
+		}
+		if ( isNaN($(":input[name='year']").val()) ) {
+			$(".pubeditwarning:last").text('Year should be a number');
+			disabled = true;
+		} else if ( isNaN($(":input[name='pageStart']").val()) ) {
+			$(".pubeditwarning:last").text('Start page should be a number');
+			disabled = true;
+		} else if ( isNaN($(":input[name='pageEnd']").val()) ) {
+			$(".pubeditwarning:last").text('End page should be a number');
+			disabled = true;
+		} 
+		if(disabled == true) {
+			var pu =  new dijit.TooltipDialog({ content : "<div><span class='tip'>Title field and at least one author are mandatory</span></div>" });
+			$("#docSave").unbind("mouseover").bind("mouseover",function(){
+				setTimeout((function(_this){
+					return function(){
+						dijit.popup.open({
+							parent : $(_this)[0],
+							popup: pu,
+							around : $(_this)[0],
+							orient: {'TL':'BL','TR':'BR'}
+						});
+						setTimeout(function(){dijit.popup.close(pu);},7000);
+					};
+				})(this),1);
+			}).unbind("mouseleave").bind("mouseleave",function(){
+				dijit.popup.close(pu);
+			});
+		} else {
+			$(".pubeditwarning:last").text('');
+			$("#docSave").unbind("mouseover");
+		}
+		dijit.byId("docSave").set("disabled",disabled);
+	};
+    $(document).ready(function() {
+   		var atd=$(':input[name="authors"]:last').parent();
+        dojo.parser.parse(atd[0]);
+        atd.find(".dijitComboBox").each(function(){
+			$(this).click(function() {
+                setFocusedItem($(this));
+            });
+        });
+        renderLists($(".app-docs:last"),remAuthor);
+        validateDocSave();
+        dojo.connect(dijit.byId("name"),"onKeyUp",function(v){
+         validateDocSave();
+        });
+		$(".editdoc.editmode").keyup(validateDocSave);
+    });
+</script>

@@ -1,0 +1,140 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php
+header("Pragma: no-cache");
+header("Expires: 0");
+header('Content-Description: File Transfer');
+header('Content-Disposition: attachment; filename='.basename($this->fname));
+header('Content-Type: '.$this->type);
+
+flush();
+if(ob_get_length()){
+    @ob_flush();
+    @flush();
+    @ob_end_flush();
+}
+ob_start();
+ob_flush();
+ob_clean();
+if($this->type === 'text/x-csv'){
+    echo "firstname,lastname,role,institution,country,region,registered,contacts,software,owner,permalink\n";
+    $pplar  = $this->people;
+    foreach($pplar as $ppl) {
+        echo  '"'.$ppl->firstName.'",';
+        echo  '"'.$ppl->lastName.'",';
+        echo  '"'.$ppl->positionType->description.'",';
+        echo  '"'.$ppl->institution.'",';
+        echo  '"'.$ppl->country->name.'",';
+        echo  '"'.$ppl->country->region->name.'",';
+        echo  '"'.$ppl->dateInclusion.'",';
+         if(count($ppl->contacts)){
+            $contacts = '';
+            foreach($ppl->contacts as $c){
+                //If sensitive is on, do not export e-mails.
+                if(($c->contactTypeID!==6) && $this->isSensitive){
+                    continue;
+                }
+                if($c->data!==""){
+					$contacts.=$c->contactType->description . ': ' . $c->data.',';
+                }
+            }
+            echo '"'.substr($contacts,0,-1).'",';
+        }else{
+            echo '"'.'",';
+        }
+
+        if(count($ppl->applications)){
+            $apps = '';
+            $owner = '';
+            foreach($ppl->applications as $a){
+                if((isnull($a->addedBy) === false) && ($a->addedBy === $ppl->id)){
+                   $owner.=$a->name.',';
+                }else{
+                    $apps.=$a->name.',';
+                }
+            }
+            echo (strlen($apps)>0)?'"'.substr($apps,0,-1).'",':'"",';
+            echo (strlen($owner)>0)?'"'.substr($owner,0,-1).'",':'"",';
+        }else{
+            echo '"",';
+            echo '"",';
+        }
+		echo '"' . ApplicationConfiguration::url("store/person/" . $ppl->cname) .'",';
+        echo "\n";
+        ob_end_flush();
+        ob_flush();
+        flush();
+        ob_start();
+        unset($pplar);
+    }
+}else{
+    echo '<?xml version="1.0" encoding="UTF-8"?>';
+    echo "<people>\n";
+    $pplar  = $this->people;
+    foreach ($pplar as $ppl) {
+        echo '<person>';
+        echo  '<firstname>'.recode_string("utf8..xml", $ppl->firstName).'</firstname>';
+        echo  '<lastname>'.recode_string("utf8..xml", $ppl->lastName).'</lastname>';
+        echo  '<role>'.recode_string("utf8..xml", $ppl->positionType->description).'</role>';
+        echo  '<institution>'.recode_string("utf8..xml", $ppl->institution).'</institution>';
+        echo  '<country>'.$ppl->country->name.'</country>';
+        echo  '<region>'.$ppl->country->region->name.'</region>';
+        echo  '<registered>'.$ppl->dateInclusion.'</registered>';
+        echo '<contacts>';
+        if(count($ppl->contacts)){
+            foreach($ppl->contacts as $c){
+                //If sensitive is on, do not export e-mails.
+                if(($c->contactTypeID!==6) && $this->isSensitive){
+                    continue;
+                }
+                if($c->data!==""){
+					echo '<contact type="'.$c->contactType->description.'">';
+					echo recode_string("utf8..xml", $c->data);
+					echo '</contact>';
+                }
+            }
+        }
+        echo '</contacts>';
+
+        echo '<applications>';
+        if(count($ppl->applications)){
+            foreach($ppl->applications as $a){
+                if((isnull($a->addedBy) === false) && ($a->addedBy === $ppl->id)){
+                    echo '<application owner="true">'.recode_string("utf8..xml", $a->name).'</application>';
+                }else{
+                    echo '<application>'.recode_string("utf8..xml", $a->name).'</application>';
+                }
+            }
+        }
+        echo "</applications>";
+
+        echo "<permalink>" . ApplicationConfiguration::url("store/person/" . $ppl->cname) . "</permalink>";
+        echo '</person>';
+        ob_end_flush();
+        ob_flush();
+        flush();
+        ob_start();
+        unset($pplar);
+    }
+    echo "</people>";
+}
+ob_end_flush();
+ob_flush();
+flush();
+ob_clean();
+ob_end_clean();
+?>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+     The work represented by this source file is partially or entirely funded 
+     by the EGI-InSPIRE project through the European Commission's 7th Framework 
+     Programme (contract # INFSO-RI-261323)
+
+     Copyright 2010 IASA and GRNET
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at [http://www.apache.org/licenses/LICENSE-2.0| Apache License 2.0]
+
+
+     Unless required by applicable law or agreed to in writing, software 
+     distributed under the License is distributed on an "AS IS" BASIS, 
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+     See the License for the specific language governing permissions and 
+     limitations under the License.
+-->
+     
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" 
+    targetNamespace="http://appdb.egi.eu/api/1.0/privilege"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:privilege="http://appdb.egi.eu/api/1.0/privilege">
+
+	<xs:complexType name="privTargetType" mixed="true">
+		<xs:attribute name="suid" type="xs:string" use="required" />
+        <xs:attribute name="type" type="xs:string" use="required" />
+        <xs:attribute name="name" type="xs:string" use="required" />
+        <xs:attribute name="id" type="xs:integer" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="privActorType" mixed="true">
+		<xs:sequence>
+			<xs:element name="action" type="privilege:privActionType" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="suid" type="xs:string" use="optional" />
+        <xs:attribute name="type" type="xs:string" use="optional" />
+        <xs:attribute name="name" type="xs:string" use="optional" />
+        <xs:attribute name="cname" type="xs:string" use="optional" />
+        <xs:attribute name="id" type="xs:integer" use="optional" />
+	</xs:complexType>
+
+	<xs:complexType name="privGroupType" mixed="true">
+		<xs:sequence>
+			<xs:element name="actor" type="privilege:privActorType" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+        <xs:attribute name="id" type="xs:integer" use="required" />
+        <xs:attribute name="suid" type="xs:string" use="required" />
+        <xs:attribute name="name" type="xs:string" use="optional" />
+        <xs:attribute name="payload" type="xs:string" use="optional" />
+	</xs:complexType>
+
+	<xs:complexType name="privActionType" mixed="true">
+		<xs:sequence>
+			<xs:element name="target" type="privilege:privTargetType" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+        <xs:attribute name="id" type="xs:integer" use="required" />
+        <xs:attribute name="description" type="xs:boolean" use="optional" />
+        <xs:attribute name="system" type="xs:boolean" use="optional" />
+        <xs:attribute name="canRevoke" type="xs:boolean" use="optional" />
+        <xs:attribute name="canGrant" type="xs:boolean" use="optional" />
+        <xs:attribute name="revoked" type="xs:boolean" use="optional" />
+	</xs:complexType>
+
+	<xs:complexType name="privilegesType" mixed="false">
+		<xs:sequence>
+            <xs:element name="action" type="privilege:privActionType" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+        <xs:attribute name="userid" type="xs:integer" />
+	</xs:complexType>
+
+	<xs:element name="action" type="privilege:privActionType"/>
+	<xs:element name="target" type="privilege:privTargetType" nillable="true"/>
+	<xs:element name="actor" type="privilege:privActorType"/>
+	<xs:element name="group" type="privilege:privGroupType"/>
+
+	<xs:group name="personprivs">
+		<xs:sequence>
+			<xs:element ref="privilege:action" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="privilege:group" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:group></xs:schema>

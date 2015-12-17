@@ -1,0 +1,230 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php 
+	$curaccount = $this->currentAccount;
+	$fullName = $this->fullName;
+	$source = $this->authSource;
+	$source = str_replace("-sp", "", $source);
+    $source = str_replace("ldap", "", $source);
+	$source = str_replace("-", " ", $source);
+	$returnurl = $this->returnUrl;
+	
+?>
+<html>
+	<head>
+		<link href="/js/dojox/grid/_grid/tundraGrid.css" media="screen" rel="stylesheet" type="text/css">
+		<link href="/css/main.css" media="screen" rel="stylesheet" type="text/css">
+		<link href="/css/view.css" media="screen" rel="stylesheet" type="text/css">
+		<style>
+			#maincontent.blockedaccount {
+
+			}
+			#maincontent.blockedaccount > .content{
+				position: relative;
+				margin: 10px auto;
+			}
+			#maincontent.blockedaccount > .content > .header{
+				font-size: 16px;
+				padding: 30px;
+				border: 1px solid #f0f0f0;
+				background: #fafafa;
+				margin: 30px 50px;
+				text-align: center;
+				border-radius: 4px;
+			}
+			#maincontent.blockedaccount > .content > .header > p{
+				font-size: 16px;
+				line-height: 25px;
+			}
+			#maincontent.blockedaccount > .content > .header b,
+			#maincontent.blockedaccount > .content > .header a{
+				color: #555;
+			}
+			#maincontent.blockedaccount > .content > .header a:hover{
+				color: #D96B00;
+			}
+			#maincontent.blockedaccount > .content .actions{
+				padding: 0px;
+				padding-top: 20px;
+				margin-bottom: -10px;
+			}
+			#maincontent.blockedaccount > .content .actions > .action{
+				padding: 15px;
+				margin: 5px;
+			}
+			#maincontent.blockedaccount > .content .actions > .action > img{
+				width: 20px;
+				height: 20px;
+				outline: none;
+				border: none;
+				padding-right: 5px;
+				vertical-align: middle;
+			}
+			#maincontent.blockedaccount > .content .actions > .action > span{
+				vertical-align: middle;
+				font-size: 16px;
+			}
+			.sitebanner {
+				height:135px;
+				padding: 0px;
+				margin: 0 auto;
+				margin-bottom: 40px;
+			}
+			.sitebanner > .topmenubar{
+				max-height: 40px;
+				height: 40px;
+				min-height: 40px;
+				background: none;
+				background-color: #333;
+				box-shadow: 0 2px 6px #333;
+				position: fixed;
+				width: 100%;
+				left: 0px;
+				right: 0px;
+				top: 0px;
+				z-index: 950;
+			}
+			.sitebanner > .main{
+				height: 110px;
+				max-width: 1024px;
+				margin: 0 auto;
+				position: relative;
+				top: 40px;
+			}
+			.sitebanner > .main > .logo{
+				width: auto;
+				top: 13px;
+				left: 4px;
+				position: absolute;
+				margin: 3px;
+			}
+			.sitebanner > .main > .logo > img{
+				width: 80px;
+				height: 80px;
+				vertical-align: middle;
+			}
+			.sitebanner > .main > .logo > span{
+				width: 400px;
+				height: 60px;
+				font-size: "Open Sans";
+				font-size: 24px;
+				color: #333;
+				display: inline-block;
+				position: relative;
+				vertical-align: middle;
+				padding: 5px;
+				top: 10px;
+			}
+			.sitebanner > .main > .logo > span > span{
+				letter-spacing: 4px;
+				color: #5C84FA;
+			}
+			.sitebanner > .main > .logo > span > .subtext{
+				font-size: 16px;
+				color: #0F4FF3;
+				letter-spacing: 0px;
+				vertical-align: top;
+			}
+			.sitebanner > .main > .contents {
+				position: absolute;
+				top: 0px;
+				right: 0px;
+				padding: 0px;
+				margin: 0px;
+				top: 0px;
+				list-style: none;
+				vertical-align: top;
+			}
+			.sitebanner > .main > .contents > li {
+				display: inline-block;
+				position: relative;
+				width: 150px;
+				height: 90px;
+				margin: 0px 5px;
+				text-align: center;
+				vertical-align: bottom;
+				border-radius: 0px 0px 3px 3px;
+			}
+			.sitebanner > .main > .contents > li.software{
+				background-color: #0E72A2;
+			}
+			.sitebanner > .main > .contents > li.vappliance{
+				background-color: #094461;
+			}
+			.sitebanner > .main > .contents > li.researchers{
+				background-color: #405C69;
+			}
+			.sitebanner > .main > .contents > li > span{
+				display: block;
+				width: 100%;
+				padding: 1px;
+				position: absolute;
+				left: 6px;
+				right: 6px;
+				bottom: 1px;
+				color: whiteSmoke;
+				display: inline-block;
+				margin: 0 auto;
+				text-align: left;
+				font-family: "Open Sans",Arial;
+				font-size: 18px;
+				white-space: pre-wrap;
+				vertical-align: bottom;
+			}
+		</style>
+	</head>
+	<body class="tundra display1024">
+		<div class="sitebanner">
+			<div class="topmenubar"></div>
+			<div class="main">
+				<div class="logo"><img src="/images/appdblogo.png" alt=""/><span>Applications <span>Database</span><br/><span class="subtext">Software solutions for research communities</span></span></div>
+				<ul class="contents">
+					<li class="software" ><span>Software<br/>Marketplace</span></li>
+					<li class="vappliance"><span>Cloud<br/>Marketplace</span></li>
+					<li class="researchers"><span>People</span></li>
+				</ul>
+				<?php if ( strtolower($_SERVER["SERVER_NAME"]) !== "appdb.egi.eu" ) { ?>
+				<div class="developmentinstance"><span>Development Instance</span><a href="http://appdb.egi.eu" title='Click here to go to production instance' >[go to production]</a></div>
+				<?php } ?>
+			</div>
+		</div>
+		<div id="maincontent" class="blockedaccount">
+			<div class="logo">
+				<div class="decorator bottomright">
+					<span>Software for research communities</span>
+				</div>
+				<div class="decorator topleft">
+					<a href="#" onclick="window.scroll(0,0);return false;" title="go home"><img class="moto" src="/images/appdb_logo_moto.png" alt=""></a>
+				</div>
+				<img class="logo" src="/images/appdb-logo-new-small.png" usemap="#appdblogomap">
+			</div>
+			<div class="content">
+				<h1>Hello <?php echo $fullName; ?></h1>
+				<div class="header">
+					<p>It seems that this <b><?php echo $source; ?></b> account is blocked by our system and you cannot use it to sign in the EGI Applications Database.
+						<br/>Click <b>Contact Us</b> to ask for details, or click on <b>Close</b> to return to the EGI Applications Database.</p>
+					<p>
+					<div class="actions">
+						<a class="icontext action feedback editbutton" href="http://<?php echo $_SERVER['HTTP_HOST']; ?>/pages/contact/feedback" title="Go to the EGI Applications Database Feedback form"><img src='/images/email.png' alt=''/><span>Contact Us</span></a>
+						<a class="icontext action close editbutton" href="<?php echo $returnurl; ?>" title="Return to the EGI Applications Database portal"><img src='/images/previousview.png' alt=''/><span>Close</span></a>
+					</div>
+					</p>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

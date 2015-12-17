@@ -1,0 +1,134 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php if( $this->error != "") { ?>
+	<div class="createrelease template error">
+		<span><?php echo $this->error; ?></span>
+	</div>
+<?php 
+	return;
+}?>
+<div class="createrelease template"><!-- BEGIN New release form -->
+	<?php if( $this->type == "update"){?>
+	<div class="page selectrelease"><!-- BEGIN Select Update -->
+		<div class="header">Select the major release for your update:</div>
+		<div class="content">
+			<select name="selectrelease" dojoType="dijit.form.Select">
+				<?php for($i=0; $i< count($this->majorList); $i++){ ?>
+				<option value="<?php echo $this->majorList[$i]["id"]; ?>" ><?php echo $this->majorList[$i]["displayVersion"]; ?></option>
+				<?php }?>
+			</select>
+		</div>
+		<div class="footer">
+			<div class="actions">
+				<button class="cancel" dojoType="dijit.form.Button">Cancel</button>
+				<button class="next" dojoType="dijit.form.Button" >Next</button>
+			</div>
+		</div>
+	</div><!-- END Select Update -->
+	<?php } ?>
+	<div class="page displayname <?php if( $this->type == "update"){?>hidden<?php }?>"><!-- BEGIN Select Major -->
+		<div class="header">Type the display name / version of your release:</div>
+		<div class="content">
+			<input type="text" maxlength="55" dojoType="dijit.form.TextBox" class="displayname" />
+			<div class="validation hidden">
+				<div class="checking">
+					<img src="/images/ajax-loader-small.gif" /><span>...validating</span>
+				</div>
+				<div class="unavailable hidden">
+					<img src="/images/cancelicon.png" />
+					<span class="error">There is already a release with this name</span>
+				</div>
+			</div>
+		</div>
+		<div class="footer">
+			<div class="actions">
+				<button class="cancel" dojoType="dijit.form.Button">Cancel</button>
+				<button class="previous" dojoType="dijit.form.Button">Previous</button>
+				<button class="next" dojoType="dijit.form.Button">Next</button>
+			</div>
+		</div>
+	</div><!-- END Select Major -->
+	
+	<div class="page selecttargets hidden"><!-- BEGIN Target selection -->
+		<div class="header"></div>
+		<div class="content">
+			<ul class="targetslist">
+				<li class="title">
+					<div class="target">
+						<div class="data">
+							<div class="osname">OS name</div>
+							<div class="flavor">Flavor</div>
+							<div class="archname">Architecture</div>
+							<div class="artifactType">type</div>
+						</div>
+						<div class="selection">select</div>
+					</div>
+				</li>
+				<?php for($i=0; $i<count($this->targets); $i++) { ?>
+				<li >
+					<div class="target">
+						<div class="data" data-id="<?php echo $this->targets[$i]["id"]; ?>">
+							<div class="osname"><?php echo $this->targets[$i]["osName"]; ?></div>
+							<div class="flavor"><?php echo $this->targets[$i]["osFlavor"]; ?></div>
+							<div class="archname"><?php echo $this->targets[$i]["archName"]; ?></div>
+							<div class="artifactType"><?php echo $this->targets[$i]["osArtifactType"]; ?></div>
+						</div>
+						<div class="selection">
+							<input type="checkbox" value="<?php echo $this->targets[$i]["id"]; ?>" />
+						</div>
+					</div>
+				</li>
+				<?php } ?>
+			</ul>
+		</div>
+		<div class="footer">
+			<div class="actions">
+				<button class="cancel" dojoType="dijit.form.Button">Cancel</button>
+				<button class="previous" dojoType="dijit.form.Button">Previous</button>
+				<button class="next" dojoType="dijit.form.Button">Next</button>
+			</div>
+		</div>
+	</div><!-- END Target selection -->
+	
+	<div class="page report hidden"><!-- BEGIN Report -->
+		<div class="header">You are about to create a new release. Please review the information you provided and click <i>submit</i> to proceed.</div>
+		<div class="content">
+			<div class="releasetype"></div>
+			<div class="software">
+				<div class="name">Software:</div>
+				<div class="value"></div>
+			</div>
+			<div class="displayname">
+				<div class="name">Display version:</div>
+				<div class="value"></div>
+			</div>
+		</div>
+		<div class="footer">
+			<div class="submitting hidden">
+				<img src="/images/ajax-loader-small.gif" /><span>...creating new release</span>
+			</div>
+			<div class="error hidden">
+				<img src="/images/cancelicon.png" /><span></span>
+			</div>
+			<div class="actions">
+				<button class="cancel" dojoType="dijit.form.Button">Cancel</button>
+				<button class="previous" dojoType="dijit.form.Button">Previous</button>
+				<button class="submit" dojoType="dijit.form.Button">Submit</button>
+			</div>
+		</div>
+	</div>
+</div><!-- END New release form --><!-- END Report -->

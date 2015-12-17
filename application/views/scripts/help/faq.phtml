@@ -1,0 +1,59 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php 
+$wiki = ApplicationConfiguration::app('wiki', ApplicationConfiguration::uiUrl());
+$haswiki = ($wiki==="")?false:true;
+$currentwiki = "/pages/about/faq"; 
+if( $haswiki ){
+	$currentwiki = $wiki . "main:faq";
+}
+?>
+<div class="aboutpage">
+<div class="aboutheader">
+	<span ><a href="<?php echo $currentwiki; ?>" data-href="/pages/about/faq" target="_blank">permalink</a></span>
+	<h1 >Frequently Asked Questions</h1>
+	<hr />
+</div>
+<?php if($haswiki === false ){ ?>
+<script type="text/javascript">function toggleFAQ(e) {	/*if ($("#"+$(e).attr("id")+"a").is(":visible")) $("#"+$(e).attr("id")+"a").fadeOut(); else $("#"+$(e).attr("id")+"a").fadeIn();*/}</script>
+<div class="faqcontact"><span>If this section does not cover your questions,please do not hesitate to <a href="/pages/contact/feedback" title="AppDB support" onclick="appdb.views.Main.showPage('feedback',{mainTitle:'Contact us',url:'/index/feedback'});window.scroll(0,0);return false;">contact us</a>.</span></div>
+<div class="wikitoc"></div>
+<ul class='faqlist' style="list-style-type: decimal" >
+<?php 
+foreach($this->entries as $faq) {
+	$d = new DateTime($faq->when);
+	$d = $d->format('d M Y, H:i');
+	echo '<li id="faq' . $faq->id . '" onclick="toggleFAQ(this);" class="faq headline' . (($faq->locked)?" locked":"") . '" data-ord="' . $faq->ord . '">' . $faq->question . '</li>' . "\n";
+	echo '<div id="faq' . $faq->id . 'a" class="faq' . ($faq->locked?" locked":"") . '" data-ord="' . $faq->ord . '">' . str_replace('”', '"', $faq->answer) . '<div class="faqmeta"><i>Last edited by <a href="/store/person/'.$faq->submitter->cname.'" onclick="appdb.views.Main.showPerson({id: ' . $faq->submitter->id . ', cname:\''.$faq->submitter->cname.'\'}, {mainTitle: \'' . $faq->submitter->name . '\'});">'. $faq->submitter->name .'</a> on<br/><span class="submitted">' . $d . '</span></i></div></div><br/>' . "\n";
+}?>
+</ul>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+	appdb.utils.Faq.setup();
+});
+</script>
+<?php } else { ?>
+<div class="contentmoved isempty">
+	<div class="emptycontent">
+		<div class='content'>
+			<img src="/images/exclam16.png">
+			<span>The FAQ section has permanently moved <a href='<?php echo $currentwiki;?>' target='_blank'>here</a>.</span>
+		</div>
+	</div>
+</div>
+<?php } ?>

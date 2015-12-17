@@ -1,0 +1,113 @@
+<?php if( $this->error != "") { ?>
+	<div class="createrelease template error">
+		<span><?php echo $this->error; ?></span>
+	</div>
+<?php 
+	return;
+}?>
+<div class="newrelease page">
+	<div class="header">Please select the type of release:</div>
+	<div class="content">
+			<div class="selection basetype">
+				<input type="radio" name="releasetypeselect" tabindex="0" value="base" align="left" id="basereleasetypeselect" />
+				<label for="releasetypeselect">Base / Major release</label>
+			</div>
+			<div class="selection updatetype">
+				<input type="radio" name="releasetypeselect" tabindex="0" value="base" align="left" id="updatereleasetypeselect" />
+				<label for="basereleaseoption">An update release</label>
+			</div>
+			<div class="base releasetype">
+				<div class="field repoarea">
+					<label for="basereleasetag">Set new series name-tag for this base release:</label>
+					<span class="repoareacontent">
+						<!--<span class="repoareaprefix" />-->
+						<span class="repoareatext">
+							<input id="repoarea" name="repoarea" type="text" maxlength="20" dojoType="dijit.form.ValidationTextBox" required="true"/>
+						</span>
+						<!--<span class="repoareasuffix">/&lt;OS&gt;/&lt;arch&gt;/</span>-->
+					</span>
+					<span class="help">
+						<img src="/images/question_mark.gif" alt=""/>
+						<span class="messagepopup hidden">
+							<p>A series is a collection of releases. It is comprised of <b>one</b> base / major release and <b>one or more</b> relative update releases.</p>
+							<p>The series name-tag should be descriptive of the releases which will be contained.</p>
+							<p>Examples:</p>
+							<ul class="exampleslist">
+								<li><span>1.x</span></li>
+								<li><span>2.x-alpha</span></li>
+								<li><span>3.x-beta</span></li>
+								<li><span>v.1x</span></li>
+							</ul>
+							<p>A series is identified by a unique name-tag under the specific software item.</p>
+						</span>
+					</span>
+					<div class="indication" >
+						<div class="checker hidden"><img src="/images/ajax-loader-small.gif" alt=""/><span >...validating</span></div>
+						<div class="validation hidden" ><img src="/images/cancelicon.png" alt=""/><span class="value"></span></div>
+					</div>
+				</div>
+				<div class="field displayversion">
+					<label for="basereleasetag">Set release version-tag:</label>
+					<input type="text" dojoType="dijit.form.ValidationTextBox" maxlength="20" name="basereleasetag" id="basereleasetag" required="true" />
+					<span class="help">
+						<img src="/images/question_mark.gif" alt=""/>
+						<span class="messagepopup hidden">
+							<p>Indicates the version of the newly created release.</p>
+							<p>Examples:</p>
+							<ul class="exampleslist">
+								<li><span>1.0.0</span></li>
+								<li><span>2.0.0</span></li>
+								<li><span>3.0</span></li>
+								<li><span>v.1.0</span></li>
+							</ul>
+						</span>
+					</span>
+					<div class="indication" >
+						<div class="checker hidden"><img src="/images/ajax-loader-small.gif" alt=""/><span >...validating</span></div>
+						<div class="validation hidden" ><img src="/images/cancelicon.png" alt=""/><span class="value"></span></div>
+					</div>
+				</div>
+			</div>
+			<div class="update releasetype">
+				<div class="field">
+					<label for="associatedrelease">Select series to associate the new update release: </label>
+					<select name="associatedrelease" id="associatedrelease" size="10" dojoType="dijit.form.Select" ><?php  for($i=0; $i < count($this->baselist); $i+=1){ $m=$this->baselist[$i]; ?><option value="<?php echo $m["id"]; ?>" <?php echo ( ($i==0)?'selected="selected"':'' ); ?>><?php echo $m["repoAreaName"] ; ?></option><?php } ?></select>
+					<span class="help">
+						<img src="/images/question_mark.gif" alt=""/>
+						<span class="messagepopup hidden">
+							<p>Sets the base / major release that the new update release will be reffered to.</p>
+						</span>
+					</span>
+				</div>
+				<div class="field updatedisplayversion">
+					<label for="updatereleasetag">Set update release tag:</label>
+					<input type="text" dojoType="dijit.form.ValidationTextBox" maxlength="20" name="updatereleasetag" id="updatereleasetag" required="required" />
+					<span class="help">
+						<img src="/images/question_mark.gif" alt=""/>
+						<span class="messagepopup hidden">
+							<p>Indicates the version of the newly created update release. It is recommended to follow the same version schema as its base / major release.</p>
+							<p>Examples:</p>
+							<ul class="exampleslist">
+								<li><span>1.0.1</span></li>
+								<li><span>2.1.2-1</span></li>
+								<li><span>3.4</span></li>
+								<li><span>v.1.1</span></li>
+							</ul>
+						</span>
+					</span>
+					<div class="indication" >
+						<div class="checker hidden"><img src="/images/ajax-loader-small.gif" alt=""/><span >...validating</span></div>
+						<div class="validation hidden" ><img src="/images/cancelicon.png" alt=""/><span class="value"></span></div>
+					</div>
+				</div>
+				<div class="indication hidden" ></div>
+			</div>
+		
+	</div>
+	<div class="footer">
+		<div class="actions">
+			<button class="cancel" dojoType="dijit.form.Button" >Cancel</button>
+			<button class="submit" dojoType="dijit.form.Button" disabled="disabled">Submit</button>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,1429 @@
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelarating Systems and Applications
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+.contentcontainer {
+	width: 100%;
+	height: 100%;
+	padding: 0px;
+	text-align: left;
+}
+.menucontents .menu.home .list .homenavlink.datasets {
+	background: #758B96;
+	color: whiteSmoke;
+	box-shadow: 2px 2px 2px #9FA9AD;
+	behavior: none;
+}
+#main span.dataset-version-row {
+	font-family: "Open Sans",Arial;
+	font-size: 16px;
+	line-height: 18px;
+	color: #555;
+	vertical-align: middle;
+}
+#main span.dataset-version-row > span {
+	vertical-align: middle;
+	padding: 5px 0px;
+	margin-right: 5px;
+}
+#main span.dataset-version-row .dataset-version {
+	font-size: 17px;
+	color:#111;
+}
+#main .dataset-disciplines-row .datasetdisciplines{
+	vertical-align: top;
+	display: inline-block;
+	margin-top: -2px;
+}
+#main .editmode .dataset-disciplines-row .datasetdisciplines{
+	padding-bottom: 10px;
+}
+#main .dataset-disciplines-row .datasetdisciplines .appdisciplinelist.treedatalist{
+	margin-top: -5px;
+}
+#main .dataset-description {
+	display: block;
+	font-family: "Open Sans",Arial;
+	font-size: 14px;
+	color: #555;
+	border-bottom: 1px dashed #E0E0E0;
+	padding-bottom: 20px;
+}
+
+#main .field-app-maindata {
+	margin: 10px 0px;
+	min-width: 851px;
+	max-width: 851px;
+	min-height: 50px;
+	display: block;
+	font-family: 'Open Sans', Arial;
+	font-size: 12px;
+	color: #222;
+}
+
+#main .dataset-metadata{
+	padding-top:10px;
+}
+ul.datasets.itemlist  > li.itemcontainer > div.item a.itemlink span.itemlongtext{
+	height: 56px;
+	line-height: 14px;
+}
+ul.datasets > li.itemcontainer > div.item a.itemlink span.itemlongname{
+	display: none;
+}
+ul.datasets.itemlist  > li.itemcontainer > div.item a.itemlink span.itemname{
+	display: none;
+}
+ul.datasets.itemlist  > li.itemcontainer > div.item a.itemlink span.itemlongname{
+	display: block;
+}
+ul.datasets.itemlist  > li.itemcontainer > div.item a.itemlink span.itemversion,
+ul.datasets.itemlist  > li.itemcontainer > div.item a.itemlink span.itemlocation{
+	color: #555;
+	font-weight: normal;
+	vertical-align: middle;
+	line-height: 16px;
+	padding: 5px 0px;
+	display: inline-block;
+}
+ul.datasets > li.itemcontainer > div.item a.itemlink span.itemversion,
+ul.datasets > li.itemcontainer > div.item a.itemlink span.itemlocation{
+	color: #777;
+}
+ul.datasets.itemgrid > li.itemcontainer > div.item a.itemlink span.itemversion .value,
+ul.datasets.itemgrid > li.itemcontainer > div.item a.itemlink span.itemlocation .value{
+	font-weight: bold;
+}
+ul.datasets.itemgrid > li.itemcontainer > div.item a.itemlink span.itemversion,
+ul.datasets.itemgrid > li.itemcontainer > div.item a.itemlink span.itemlocation{
+	margin-top: 3px;
+	display: inline-block;
+}
+ul.datasets.itemgrid > li.itemcontainer > div.item a.itemlink span.itemversion > .value,
+ul.datasets.itemgrid > li.itemcontainer > div.item a.itemlink span.itemlocation > .value{
+	margin: 0 5px;
+}
+ul.datasets.itemlist  > li.itemcontainer > div.item a.itemlink span.itemversion > .value,
+ul.datasets.itemlist  > li.itemcontainer > div.item a.itemlink span.itemlocation > .value{
+	color: black;
+	padding: 1px 3px;
+	text-align: center;
+	color: #777;
+	text-decoration: none;
+	line-height: 1.2em;
+	font-weight: bold;
+	border: 1px solid #e0e0e0;
+	background-color: #f0f0f0;
+	border-radius: 2px;
+	margin: 0 5px;
+	min-width: 20px;
+	display: inline-block;
+}
+ul.datasets > li.itemcontainer > div.item > .ancestry{
+	position: absolute;
+	padding: 3px 5px;
+	color: white;
+	font-size: 10px;
+	line-height: 12px;
+	border-radius: 2px;
+	z-index: 10;
+	cursor: default;	
+}
+ul.datasets > li.itemcontainer > div.item > .ancestry.derived{
+	background-color: #FFB556;
+}
+ul.datasets > li.itemcontainer > div.item > .ancestry.primary{
+	background-color: #428BCA;
+		/* IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+	/* IE 5-7 */
+	filter: alpha(opacity=70);
+	/* Netscape */
+	-moz-opacity: 0.7;
+	/* Safari 1.x */
+	-khtml-opacity: 0.7;
+	opacity: 0.7;
+}
+ul.datasets.itemlist > li.itemcontainer > div.item > .ancestry > span{
+	display: none;
+	position: relative;
+}
+ul.datasets.itemlist > li.itemcontainer > div.item > .ancestry{
+	top: 0px;
+	right: 0px;
+	border-radius: 0px 0px 0px 2px;
+}
+
+ul.datasets.itemgrid > li.itemcontainer > div.item > .ancestry{
+	bottom: 0px;
+	left: 0px;
+	border-radius: 0px 2px 0px 0px;
+}
+.viewmode .dataset-group.groupcontainer{
+	margin: 20px auto;
+}
+.viewmode .dataset-group.groupcontainer > div.tabcontent{
+	min-width: 800px;
+	min-height: 150px;
+}
+.entitydataset.editmode .dataset-info {
+	display: none;
+}
+.dataset-licenses .empty,
+.dataset-locations-list .empty {
+	display: none;
+}
+
+.dataset-licenses.empty .empty
+{
+	color: #888;
+	font-size: 14px;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 20px;
+	width: 150px;
+}
+.dataset-locations-list.empty .field-title{
+	padding-bottom: 0px;
+	margin-bottom: 0px;
+}
+.dataset-locations-list.empty .empty{
+	display: block;
+	color: #777;
+	background-color: #F0F0F0;
+	text-align: center;
+	line-height: 50px;
+	width: 99%;
+	border: 1px solid #D0D0D0;
+	border-top-color: #BBB;
+	border-radius: 0px 0px 4px 4px;
+	margin-top: -1px;
+}
+.dataset-locations-list button.addnew {
+	display: none;
+	margin: 5px;
+	line-height: 14px;
+	font-size: 12px;
+	box-shadow: -3px 0px 10px 0px #B0B0B0;
+}
+.version-container.canedit.editmode .dataset-locations-list button.addnew{
+	display: inline-block;
+}
+.entitydataset .showonedit{
+	display: none;
+}
+.entitydataset.editmode .showonedit{
+	display: inline-block;
+}
+#main .entitydataset.ui-tabs .ui-tabs-panel .datasetdisciplines a{
+	color: #222;
+}
+.entitydataset .mandatory-flag{
+	display: none;
+	vertical-align:top;
+	color:red;
+}
+.entitydataset.editmode .mandatory-flag{
+	display: inline-block;
+}
+.entitydataset #disciplineRow > td > * {
+	vertical-align: middle;
+	display: inline-block;
+}
+.entitydataset .fieldvalue .show-more{ 
+	position: absolute;
+	display: block;
+	bottom: 0px;
+	right: 0px;
+	background-color: white;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 16px;
+	font-size: 12px;
+	cursor: pointer;
+	color:#225896;
+}
+.entitydataset .fieldvalue .show-more .viewall .show-more{
+	bottom: -10px;
+}
+.entitydataset .fieldvalue .viewall{
+	max-height: 300px;
+}
+.entitydataset .fieldvalue .show-more,
+.entitydataset .fieldvalue .show-more:hover {
+	color: #0029A3;
+	text-decoration: underline;
+}
+.dataset-location-list {
+	display: block;
+	list-style: none;
+	padding: 10px;
+	margin: 0;
+	display: block;
+	max-height: 500px;
+	max-width: 785px;
+	overflow-y: auto;
+	list-style: none;
+	padding: 10px;
+	margin-bottom: 10px;
+	padding-bottom: 55px;
+}
+.dataset-location-list > li {
+	position: relative;
+	display: block;
+	padding: 0px;
+	margin: 5px 0;
+	border: 1px solid #e0e0e0;
+	border-radius: 2px;
+	box-shadow: 0px 0px 10px 3px #ECECEC;
+}
+.dataset-location-list > li:hover {
+	box-shadow: 1px 0px 8px 2px #C0C0C0;
+}
+.dataset-location-list > li.focused{
+	border-color: #aaaaaa;
+	box-shadow: 1px 0px 8px 2px #a0a0a0;
+}
+.dataset-location-list > li.focused > div,
+.dataset-location-list > li.editmode:hover > div{
+	background-color: #FDFDEC;
+}
+.dataset-location-list > li > div {
+	padding-bottom: 5px;
+}
+.dataset-locations-list.editmode .dataset-location-list > li  .fieldvalue.showonedit,
+.dataset-location-list > li  .fieldvalue {
+	display: block;
+	padding: 1px 5px;
+}
+.dataset-locations-list.editmode .dataset-location-list > li  .fieldvalue.showonedit{
+	padding-bottom: 10px;
+}
+.dataset-location-list > li .fieldvalue.showonedit{
+	display: none;
+}
+.dataset-location-list > li  .inline-contents > .fieldvalue {
+	display: inline-block;
+}
+.dataset-location-list > li  .fieldvalue.ds-location-uri-container{
+	border-bottom: 1px dashed #dadada;
+	margin-bottom: 10px;
+	padding: 0px;
+}
+.dataset-location-list > li  .editmode .fieldvalue.ds-location-uri-container{
+	display: inline-block;
+}
+.dataset-location-list > li  .fieldvalue.ds-location-uri-container > *{
+	padding: 5px;
+	vertical-align: top;
+	line-height: 14px;
+	max-height: 25px;
+	overflow: hidden;
+}
+.dataset-location-list > li  .fieldvalue.ds-location-uri-container > .field{
+	background-color: #f0f0f0;
+	padding-right: 8px;
+	border-right: 1px solid #dadada;
+}
+.dataset-location-list > li  .editmode .fieldvalue{
+	padding-bottom:10px;
+}
+.dataset-location-list > li  .editmode .fieldvalue.ds-location-uri-container > .field{
+	background-color: transparent;
+	padding-right: 8px;
+	border-right: 1px solid transparent;
+}
+.dataset-location-list > li  .editmode .fieldvalue.ds-location-uri-container > .value {
+	width: 550px;
+}
+#main .dataset-location-list > li  .fieldvalue.ds-location-uri-container > .value > a{
+	color: #225896;
+	display: inline-block;
+	max-width: 650px;
+	white-space: nowrap;
+	word-break: break-all;
+	
+}
+
+#main .dataset-location-list > li  .fieldvalue.ds-location-uri-container > .value > a:hover {
+	color: #0029A3;
+}
+.dataset-location-list > li  .fieldvalue{
+	margin-bottom: 5px;
+}
+.dataset-location-list > li  .fieldvalue > * {
+	display: inline-block;
+	line-height: 16px;
+	vertical-align: middle;
+	font-size: 12px;
+	font-family: "Open Sans",Arial;
+}
+.dataset-location-list > li  .fieldvalue > .field{
+	color: #555;
+	font-weight: bold;
+	margin-right: 3px;
+	min-width: 75px;
+	border-bottom: 1px dashed #e0e0e0;
+}
+.dataset-location-list > li .ds-location-uri-container.fieldvalue > .field{
+	min-width: 25px;
+}
+.editmode .dataset-location-list > li  .fieldvalue > .field{
+	border-bottom: 1px dashed transparent;
+}
+.dataset-location-list > li .fieldvalue.ds-location-ismaster-container {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	padding: 5px;
+}
+
+.dataset-location-list > li button.remove {
+	display: none;
+}
+.dataset-location-list > li .editmode > button.remove {
+	display: block;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	/* IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+	/* IE 5-7 */
+	filter: alpha(opacity=20);
+	/* Netscape */
+	-moz-opacity: 0.2;
+	/* Safari 1.x */
+	-khtml-opacity: 0.2;
+	opacity: 0.2;
+}
+.dataset-location-list > li:hover .editmode > button.remove {
+	/* IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+	/* IE 5-7 */
+	filter: alpha(opacity=100);
+	/* Netscape */
+	-moz-opacity: 1.0;
+	/* Safari 1.x */
+	-khtml-opacity: 1.0;
+	opacity: 1.0;
+}
+.dataset-location-list > li .fieldvalue.ds-location-ismaster-container > .field{
+	display: none;
+}
+.dataset-location-list > li .fieldvalue.ds-location-ismaster-container {
+	color: white;
+	background-color: #5CB85C;
+	border-color: #4CAE4C;
+}
+.entitycontent .dataset-location-list > li .replica .fieldvalue.ds-location-ismaster-container {
+	color: white;
+	background-color: #EEA236;
+	border-color: #EE8036;
+}
+.dataset-location-list > li .editmode .fieldvalue.ds-location-ismaster-container,
+.dataset-location-list > li .editmode.replica .fieldvalue.ds-location-ismaster-container{
+	position: relative;
+	display: inline-block;
+	padding: 0px;
+	width: 40px;
+	color: #222;
+	background-color: transparent;
+	border-color: transparent;
+	top: 3px;
+	vertical-align: top;
+}
+.entitycontent .dataset-location-list > li .fieldvalue.ds-location-addedby-container{
+	display: none;
+}
+.dataset-location-list > li .ds-location-exchangeformat-container.fieldvalue,
+.dataset-location-list > li .ds-location-connectiontype-container.fieldvalue{
+	display: inline-block;
+}
+.dataset-location-list > li .ds-location-exchangeformat-container.fieldvalue {
+	width: 68%;
+}
+.dataset-location-list > li .ds-location-connectiontype-container.fieldvalue{
+	width: 28%;
+}
+.dataset-location-list > li .editmode .ds-location-exchangeformat-container.fieldvalue .value{
+	/*width: 365px;*/
+}
+.dataset-location-list > li .editmode .ds-location-site-container.fieldvalue .value,
+.dataset-location-list > li .editmode .ds-location-site-container.fieldvalue .value > *{
+	width: 100%;
+	
+}
+.dataset-location-list > li .editmode .fieldvalue > .field{
+	vertical-align: top;
+}
+.dataset-location-list > li .editmode .fieldvalue.ds-location-notes-container > .field,
+.dataset-location-list > li .editmode .fieldvalue.ds-location-site-container > .field,
+.dataset-location-list > li .editmode .fieldvalue.ds-location-exchangeformat-container > .field{
+	width: 45px;
+}
+.dataset-location-list > li .ds-location-notes-container{
+	position: relative;
+}
+.dataset-location-list > li .ds-location-notes-container .field{
+	vertical-align: top;
+}
+.dataset-location-list > li .ds-location-notes-container .value {
+	position: relative;
+	max-width: 715px;
+	max-height: 16px;
+	overflow: hidden;
+	line-height: 16px;
+	word-break: break-all;
+	word-wrap: break-word;
+	white-space: pre-wrap;
+}
+.dataset-location-list > li .editmode .ds-location-notes-container .value{
+	width: 800px;
+	min-height: 50px;
+	padding-bottom: 10px;
+}
+.dataset-location-list > li .editmode .ds-location-notes-container .value .validationstatus{
+	bottom: -5px;
+}
+.dataset-location-list > li .editmode .ds-location-notes-container .value textarea{
+	min-height: 40px;
+}
+.dataset-location-list > li .ds-location-notes-container .value.viewall{
+	overflow: auto;
+	max-height: 300px;
+}
+.dataset-location-list > li  .ds-location-organization-container .value .flags,
+.dataset-location-list > li  .ds-location-site-container .value .flags,
+.appdb-ui .flags {
+	display: inline-block;
+}
+.dataset-location-list > li  .ds-location-organization-container .uieditorcontainer,
+.dataset-location-list > li  .ds-location-site-container .uieditorcontainer{
+	display: none;
+}
+.dataset-locations-list.editmode .dataset-location-list > li  .ds-organization-name .uieditorcontainer{
+	display: inline-block;
+}
+
+.dataset-location-list > li  .ds-location-organization-container .value .flags > img,
+.dataset-location-list > li  .ds-location-site-container .value .flags > img,
+.appdb-ui li .flags > img{
+	width: 16px;
+	border: none;
+	margin-right: 5px;
+}
+.dataset-location-list > li  .ds-location-site-container .value .ds-site-name {
+	width: 92%;
+}
+.dataset-location-list > li  .ds-location-organization-container .value .ds-organization-name .shortname,
+.dataset-location-list > li  .ds-location-site-container .value .ds-site-name .shortname{
+	font-weight: bold;
+	padding-right: 5px;
+}
+
+.dataset-location-list > li  .ds-location-organization-container .value .ds-organization-name a > span,
+.dataset-location-list > li  .ds-location-site-container .value .ds-site-name a > span{
+	color: #1A4270;
+}
+.dataset-location-list > li  .ds-location-organization-container .value .ds-organization-name a:hover > span,
+.dataset-location-list > li  .ds-location-site-container .value .ds-site-name a:hover > span{
+	color: #225896;
+}
+.dataset-location-list > li  .ds-location-organization-container .value .ds-organization-name a:hover ,
+.dataset-location-list > li  .ds-location-site-container .value .ds-site-name a:hover {
+	text-decoration: none;
+}
+.dataset-locations-list.editmode .dataset-location-list > li  .ds-location-organization-container .value .ds-location-organization-list{
+	width: 100%;
+}
+.dataset-locations-list.editmode .dataset-location-list > li  .ds-location-organization-container .value .autocompletelist{
+	width: 100%;
+}
+.dataset-locations-list.editmode .dataset-location-list > li  .ds-location-organization-container .value .autocompletelist > .menu.results ul.results{
+	max-height: 150px;
+}
+.dataset-locations-list.editmode .dataset-location-list > li  .ds-location-organization-container .value .autocompletelist > .menu{
+	border: 1px solid #B3B3B3;
+	border-top: none;
+}
+.dataset-locations-list.editmode .dataset-location-list > li  .ds-organization-name .uieditorcontainer > .filter{
+	border: 1px solid #B3B3B3;
+}
+.dataset-locations-list .fieldvalue > .value[data-empty] > .empty{
+	display: inline-block;
+}
+.dataset-location-item-template/*, 
+.dataset-licenses .customitemtemplate,
+.dataset-licenses .itemtemplate,
+.dataset-licenses .emptytemplate,
+.dataset-licenses .addertemplate,
+.dataset-licenses .customaddertemplate*/{
+	display: none;
+}
+
+body[data-content='dataset'] .navigation > .menucontents a.activelistitem{
+	font-weight: normal;
+}
+#main .entitydataset.canedit  > div.ui-tabs-panel{
+	padding-top: 20px;
+}
+.command-toolbar{
+	position: absolute;
+	right: 10px;
+	top: 50px;
+}
+.command-toolbar > a {
+	padding: 2px 5px;
+}
+.command-toolbar > a > *{
+	display: inline-block;
+	vertical-align: middle;
+	line-height: 14px;
+	padding: 0px 3px;
+}
+.command-toolbar > a img{
+	width: 14px;
+	height: 14px;
+	border: none;
+}
+.entitydataset.editmode .hideonedit,
+.entitydataset .command-toolbar .showonedit
+{
+	display: none;
+}
+.contentcontainer .command-toolbar a.command.disabled{
+	cursor: default;
+}
+.contentcontainer .command-toolbar a.command.disabled > * {
+	display: none;
+}
+.contentcontainer .command-toolbar a.command.disabled > * ,
+.contentcontainer .command-toolbar a.command > .invalid {
+	display: none;
+}
+.contentcontainer.invalid .command-toolbar a.command.disabled > .invalid {
+	display: inline-block;
+}
+.contentcontainer.invalid .command-toolbar a.command.disabled {
+	background-color: #FDFDEA;
+	padding: 5px;
+	margin-top: -5px;
+	border: 1px solid #E0E0CD;
+	border-radius: 2px;
+	color: #555;
+}
+.contentcontainer.invalid .command-toolbar a.command.disabled > span {
+	color: #555;
+}
+.entitydataset.viewmode .hideonedit,
+.entitydataset.editmode .showonedit
+{
+	display: inline-block;
+}
+
+.entitydataset .appdb-ui > .dijitValidationTextBox,
+.entitydataset .appdb-ui > .dijitTextBox,
+.entitydataset .appdb-ui > input{
+	height: 20px;
+	line-height: 16px;
+	vertical-align: middle;
+	width: 100%;
+}
+.appdb-ui{
+	position: relative;
+}
+.appdb-ui[data-editor] {
+	min-height: 15px;
+	display: block;
+}
+.field-app-maindata .appdb-ui[data-editor] {
+	min-height: 35px;
+}
+.appdb-ui.invalid > textarea,
+.appdb-ui.invalid > input,
+.appdb-ui.invalid > .dijit,
+.appdb-ui.invalid-status > textarea,
+.appdb-ui.invalid-status > input{
+	background-color: #F9F7BA;
+	background-image: none;
+}
+.appdb-ui.invalid-status > .validationstatus{
+	color: #910C0C;
+}
+
+.appdb-ui.invalid-message > .validationmessage{
+	display: block;
+}
+.appdb-ui > .validationstatus{
+	position: absolute;
+	right: 0px;
+	bottom: 0px;
+	width: auto;
+	font-size: 10px;
+	color: #555;
+	padding: 2px 0px;
+}
+.appdb-ui > .validationstatus.description {
+	
+}
+.appdb-ui > .validationstatus.description > .unit{
+	padding-left: 5px;
+}
+.appdb-ui > .validationmessage{
+	position: absolute;
+	display: none;
+	left: 0px;
+	word-break: break-all;
+	font-size: 10px;
+}
+.appdb-ui.invalid-message > .validationmessage{
+	display: block;
+}
+.appdb-ui > .validationmessage * {
+	display: inline-block;
+	vertical-align: middle;
+	line-height: 14px;
+	padding: 2px;
+}
+
+.appdb-ui > .validationmessage img	{
+	width: 14px;
+	height: 14px;
+	border: none;
+}
+.appdb-ui > textarea,
+.appdb-ui > input{
+	border: 1px solid #B3B3B3;
+}
+.appdb-ui > textarea {
+	display: block;
+	height: 100%;
+	min-height: 50px;
+	width: 99%;
+}
+
+.dataset-info {
+	display: block;
+	position: relative;
+	width: 100%;
+}
+.dataset-info > .list,
+.dataset-info > .main{
+	display: inline-block;
+	padding:0px;
+	margin: 0px;
+	vertical-align: top;
+	position: relative;
+}
+.dataset-info > .main{
+	box-shadow: 0px 0px 10px 2px #D0D0D0;
+	border-radius: 3px;
+	border: 1px solid transparent;
+	padding-left: 10px;
+	min-height: 400px;
+	height: auto;
+	max-height: 1000px;
+	min-width: 815px;
+	max-width: 815px;
+	width: 815px;
+	background: white;
+	z-index: 0;
+	overflow: hidden;
+}
+.dataset-info > .list{
+	border: 1px solid transparent;
+	min-width: 145px;
+	max-width: 145px;
+	width: 145px;
+	z-index:400;
+}
+.dataset-info.loading > .list,
+.dataset-info.loading > .main,
+.dataset-info.loading > .emptycontainer{
+	/*visibility: hidden;*/
+	/* IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
+	/* IE 5-7 */
+	filter: alpha(opacity=40);
+	/* Netscape */
+	-moz-opacity: 0.4;
+	/* Safari 1.x */
+	-khtml-opacity: 0.4;
+	opacity: 0.4;
+}
+.dataset-info.init.loading > .list,
+.dataset-info.init.loading > .main,
+.dataset-info.loading > .emptycontainer{
+	visibility: hidden;
+}
+.dataset-info > .loader{
+	position:absolute;
+	top: 0px;
+	left: -2px;
+	right: -2px;
+	bottom: 0px;
+	text-align: center;
+	vertical-align: middle;
+}
+.dataset-info.loading > .loader{
+	display: block;
+}
+.dataset-info > .loader .sheet{
+	position:absolute;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	padding: 5px;
+	background-color: #999;
+	/* IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+	/* IE 5-7 */
+	filter: alpha(opacity=20);
+	/* Netscape */
+	-moz-opacity: 0.2;
+	/* Safari 1.x */
+	-khtml-opacity: 0.2;
+	opacity: 0.2;
+	z-index: 330;
+	border-radius: 5px;
+	border: 2px solid #555;
+}
+.dataset-info > .loader .loadmessage{
+	position: relative;
+	text-align: center;
+	vertical-align: middle;
+	min-height: 20px;
+	max-height: 30px;
+	min-width:180px;
+	max-width: 200px;
+	width: auto;
+	height: auto;
+	z-index: 450;
+	padding: 5px;
+	background-color: whitesmoke;
+	border: 1px solid #444;
+	border-radius: 5px;
+	font-family: "Open Sans" !important;
+	font-size: 12px !important;
+	margin: 5px auto;
+	vertical-align: middle;
+	margin-top: 5%;
+}
+.dataset-info > .loader .loadmessage img{
+	width: 12px ;
+	height: 12px;
+	border: none;
+	padding-right: 5px;
+	vertical-align: middle;
+}
+.dataset-info > .loader .loadmessage span{
+	vertical-align: middle;
+}
+.dataset-info > .list > .group-version-list > .header {
+	font-size: 16px;
+	padding: 0PX 5PX;
+	line-height: 30PX;
+	vertical-align: middle;
+}
+.dataset-info > .list .group-version-list ul{
+	display: block;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	background-color: #F0F0F0;
+}
+.dataset-info > .list .group-version-list ul > li{
+	margin: 2px;
+	border: 1px solid transparent;
+	min-height: 25px;
+	vertical-align: middle;
+	line-height: 20px;
+	cursor: pointer;
+	color: #777;
+	margin-right: -4px;
+	border-right-color: transparent;
+}
+.dataset-info > .list .group-version-list ul > li:hover {
+	background-color: #f0f0f0;
+	color: #555;
+	border-right: 1px solid #E0E0E0;
+}
+.dataset-info > .list .group-version-list ul > li.selected{
+	border: 1px solid #D0D0D0;
+	background: white;
+	border-bottom-color: #D96B00;
+	border-right-color: transparent;
+	color: #111;
+	box-shadow: -3px 0px 10px 0px #B0B0B0;
+}
+.dataset-info > .list .group-version-list ul > li.selected .editvalue.fieldvalue,
+.dataset-info.version-editmode > .list .group-version-list ul > li.selected .version.fieldvalue{
+	display: none;
+}
+.dataset-info.version-editmode > .list .group-version-list ul > li.selected .editvalue.fieldvalue{
+	display: block;
+}
+.dataset-info.version-editmode > .list .group-version-list ul > li.selected .editvalue.fieldvalue > .empty {
+	color: #888;
+	text-align: center;
+	font-style: italic;
+}
+.dataset-info > .list .group-version-list ul > li > div {
+	padding: 5px 3px;
+	line-height: 25px;
+}
+.dataset-info > .list .group-version-list ul > li .id.fieldvalue{
+	display: none;
+}
+.dataset-info > .main .version-info .version-info-version.field-title {
+	color: #555;
+}
+.dataset-info > .main .version-info .version-info-version.field-title > span {
+	color: black;
+	padding-left: 5px;
+}
+.dataset-info > .main .version-info .fieldvalue > div {
+	display: inline-block;
+	min-width: 60px;
+	vertical-align: top;
+}
+.dataset-info > .main .version-info .fieldvalue > .field {
+	font-weight: bold;
+	color: #555;
+}
+.dataset-info > .list .group-version-list > .toolbar{
+	display: none;
+}
+.dataset-info > .list .group-version-list > .toolbar > button{
+	display: block;
+	width: 100%;
+	margin: 0px 2px;
+	padding: 8px;
+}
+	
+.dataset-info > .main .version-container > .toolbar{
+	display: none;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+}
+.dataset-info > .main .version-container.canedit.editmode{
+	padding-top: 10px;
+}
+.canedit .dataset-info > .list .group-version-list.canedit > .toolbar,
+.canedit .dataset-info > .main .version-container.canedit > .toolbar{
+	display: block;
+}
+.canedit .dataset-info > .main .version-container.canedit.editmode .toolbar > .edit,
+.canedit .dataset-info > .main .version-container .toolbar > .showonedit{
+	display: none;
+}
+
+.canedit .dataset-info > .main .version-container.canedit.editmode .toolbar > .showonedit{
+	display: inline-block;
+}
+.dataset-info .version-container.canedit.editmode .hideonedit{
+	display: none;
+}
+.dataset-info .version-container .version-info-version > .appdb-ui[data-editor],
+.dataset-info .version-container.canedit.editmode .version-info-version > .appdb-ui{
+	display: inline-block;
+	width: 700px;
+}
+.dataset-info .version-container.canedit.editmode .version-info-version .appdb-ui[data-editor]{
+	padding-bottom: 15px;
+}
+.dataset-info .version-container.canedit.editmode .version-info-version .appdb-ui[data-editor] > .validationstatus{
+	bottom: -3px;
+}
+.dataset-info .version-container.canedit.editmode .version-info-notes .field{
+	vertical-align: top;
+}
+.dataset-info .version-container.canedit.editmode .version-info-notes .value.appdb-ui[data-editor] {
+	width: 710px;
+	padding-bottom: 15px;
+}
+.dataset-info > .emptycontainer{
+	display: none;
+}
+.dataset-info.empty {
+	
+}
+.dataset-info.empty > .main,
+.dataset-info.empty > .list{
+	display: none;
+}
+.dataset-info.empty > .emptycontainer{
+	display: block;
+	width: 950px;
+	padding: 5px;
+	margin: 0 auto;
+}
+.dataset-info.empty > .emptycontainer > .emptymessage {
+	background-color: whitesmoke;
+	border: 1px solid #E0E0E0;
+	padding: 10px;
+	font-family: "Open Sans", Arial;
+	font-size: 12px;
+	text-align: center;
+	margin: 0 auto;
+	border-radius: 2px;
+	color: #555;
+}
+.dataset-info.empty > .emptycontainer > .emptymessage > *{
+	display: block;
+	text-align: center;
+	padding: 5px;
+	margin: 0 auto;
+	line-height: 16px;
+}
+.dataset-info.empty > .emptycontainer > .emptymessage > span{
+	color: #777;
+}
+.dataset-info.empty > .emptycontainer > .emptymessage > span.message{
+	font-size: 14px;
+	color: #555;
+}
+.dataset-info.empty > .emptycontainer > .emptymessage:hover > span.message{
+	color: #222;
+}
+.dataset-info.empty > .emptycontainer > .emptymessage > button{
+	margin: 5px auto;
+}
+.dataset-info.empty > .emptycontainer .emptymessage > .showoneditable,
+.dataset-info.empty > .emptycontainer .emptymessage > button{
+	display: none;
+}
+.dataset-info.empty.canedit > .emptycontainer .showoneditable,
+.dataset-info.empty.canedit > .emptycontainer button{
+	display: block;
+	/* IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=60)";
+	/* IE 5-7 */
+	filter: alpha(opacity=60);
+	/* Netscape */
+	-moz-opacity: 0.6;
+	/* Safari 1.x */
+	-khtml-opacity: 0.6;
+	opacity: 0.6;
+}
+.dataset-info.empty > .emptycontainer > .emptymessage:hover > .showoneditable,
+.dataset-info.empty > .emptycontainer > .emptymessage:hover > button{
+	/* IE 8 */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+	/* IE 5-7 */
+	filter: alpha(opacity=100);
+	/* Netscape */
+	-moz-opacity: 1.0;
+	/* Safari 1.x */
+	-khtml-opacity: 1.0;
+	opacity: 1.0;
+}
+.dataset-info.empty > .emptycontainer > .emptymessage:hover {
+	box-shadow: 3px 3px 6px 2px #EAEAEA;
+}
+.dataset-info > .main .notfound,
+.dataset-info.versionnotfound.empty > .main .notfound{
+	display: none;
+}
+.dataset-info.versionnotfound > .main .notfound {
+	display: block;
+	
+}
+.dataset-info.versionnotfound > .main .version-container{
+	display: none;
+}
+.dataset-info.versionnotfound > .main .notfound .message-container {
+	padding: 10px;
+	margin: 0 auto;
+	text-align: center;
+	margin-top: 10px;
+}
+.dataset-info.versionnotfound > .main .notfound .message-container .message {
+	padding: 10px;
+	margin: 0 auto;
+	border: 1px solid #E0E0E0;
+	width: 350px;
+	vertical-align: top;
+	background-color: whiteSmoke;
+	line-height: 17PX;
+	color: #555;
+	border-radius: 2px;
+}
+.dataset-info.versionnotfound > .main .notfound .message-container .message * {
+	vertical-align: top;
+}
+.dataset-info.versionnotfound > .main .notfound .message-container .message span {
+	display: inline-block;
+	width: 300px;
+	padding: 2PX;
+}
+.dataset-url-type.appdb-ui >a > * {
+	vertical-align: middle;
+	padding: 0px 3px;
+}
+.dataset-url-type.appdb-ui >a:hover ,
+.dataset-url-type.appdb-ui >a:hover > span {
+	text-decoration: none;
+}
+.dataset-url-type.appdb-ui >a > *{
+	color: #225896
+}
+.dataset-url-type.appdb-ui >a > img{
+	max-width: 16px;
+	max-height: 16px;
+	border: none;
+}
+.dataset-url-type.appdb-ui > a > span{
+	padding-right: 10px;
+}
+.datasetlisttypeselector{
+	text-align: right;
+	background: whiteSmoke;
+	padding: 5px;
+	display: inline-block;
+	position: absolute;
+	right: 8px;
+	top: 42px;
+	box-shadow: 1px 2px 3px -1px #CCC;
+	border: 1px solid #F0F0F0;
+	z-index: 0;
+	font-family: "Open Sans";
+	font-size: 12px;
+	font-weight: normal;
+	color: #333;
+	border-top: whiteSmoke;
+}
+.datasetlisttypeselector * {
+	vertical-align: middle;
+	line-height: 19px;
+	font-size: 13px;
+}
+.listcontainer.datasets .listmetadata {
+	padding-top: 0px;
+	margin-top: 30px;
+}
+
+.namestatus {
+	position: absolute;
+	right: 5px;
+	bottom:-3px;
+	text-align: right;
+	font-size: 10px;
+	padding: 0px;
+	vertical-align: middle;
+	line-height: 14px;
+}
+.namestatus > *{
+	vertical-align: middle;
+}
+.namestatus > img {
+	width: 14px;
+	height: 14px;
+	padding-right: 5px;
+}
+
+#appdb_components_Dataset .newapphintcontainer > .newapphint{
+	top: 47px;
+	left: 130px;
+	width: 395px;
+	color: #555;
+}
+#appdb_components_Dataset .entityheader{
+	width: 863px;
+	margin-bottom: 10px;
+}
+.dataset-parent.appdb-ui.richui > .fieldvalue{
+	position: absolute;
+	line-height: 20px;
+	padding: 0px 5px;
+	border: 1px solid #E7E2DE;
+	border-radius: 0px 0px 3px 3px;
+	border-top: none;
+	background-color: whiteSmoke;
+	color: #616060;
+	top: 5px;
+}
+.dataset-parent.appdb-ui .fieldvalue > * {
+	display: inline-block;
+	padding: 0px 5px 0px;
+}
+.dataset-parent.appdb-ui.richui > .fieldvalue > *{
+	display: inline-block;
+	line-height: 20px;
+	margin-right: 2px;
+	padding: 0px 0px;
+	vertical-align: middle;
+	font-size: 12px;
+}
+.dataset-parent.appdb-ui.smallui > .fieldvalue > .field,
+.dataset-parent.appdb-ui.smallui > .fieldvalue > .arrow{
+	display: none
+}
+.dataset-parent.appdb-ui > .fieldvalue > .field{
+	color: #555;
+}
+.dataset-parent.appdb-ui > .fieldvalue > .arrow.field{
+	color: #888;
+}
+.dataset-parent-property .hasparent,
+.dataset-parent-property .noparent{
+	
+}
+.contentcontainer .hasparent,
+.contentcontainer .setparent,
+.contentcontainer.isderived .noparent,
+.contentcontainer  .cannotparent,
+#main .contentcontainer.hassetparent .dataset-disciplines-row .datasetdisciplines{
+	display: none;
+}
+.contentcontainer.isderived  .hasparent,
+.contentcontainer  .noparent,
+.contentcontainer.hasderived  .cannotparent,
+.contentcontainer.hassetparent .setparent{ 
+	display: block;
+	position: relative;
+	width: 695px;
+	min-height: 30px;
+	margin-top: -10px;
+}
+.contentcontainer.isderived  .noparent{
+	display: none;
+}
+.contentcontainer.isderived.hasderived  .hasparent,
+.contentcontainer.hasderived .dataset-parent-property .noparent{
+	display: none;
+}
+
+.contentcontainer.hasderived .field-app-maindata .dataset-parent-property > .appdb-ui[data-editor] {
+	display: none;
+}
+.contentcontainer .editmode table.field-app-maindata > tbody > tr > td.propertyvalue.dataset-parent-property {
+	position: relative;
+}
+.contentcontainer .inlinemessage .message {
+	border: 1px solid #F5D8AE;
+	border-radius: 2px;
+	padding: 3px;
+	line-height: 14px;
+	width: 675px;
+	margin: 3px auto;
+	position: relative;
+	display: block;
+	background-color: #FCF8E3;
+	color: #222;
+}
+.contentcontainer .inlinemessage .message > * {
+	vertical-align: top;
+	display: inline-block;
+	font-size: 10px;
+}
+.contentcontainer .inlinemessage .message img{
+	width: 28px;
+	height: 28px;
+	border: none;
+	padding-right: 10px;
+}
+.contentcontainer .hasparent.inlinemessage .message img,
+.contentcontainer .cannotparent.inlinemessage .message img{
+	width: 18px;
+	height: 18px;
+}
+
+.contentcontainer.hasderived .cannotparent {
+	padding-top: 10px;
+}
+.contentcontainer .version-info-derived.fieldvalue{
+	display: none;
+}
+.contentcontainer.isderived .version-info-derived.fieldvalue{
+	display: block;
+	margin-top: -12px;
+	margin-bottom: 15px;
+}
+.contentcontainer.isderived .version-info-derived.fieldvalue > * {
+	vertical-align: top;
+}
+
+.contentcontainer.hasderived .version-info-derived.fieldvalue{
+	display: none;
+}
+.contentcontainer .dataset-info > .main .version-info .version-info-derived.fieldvalue > .field{
+	font-family: "Open Sans", Arial;
+	font-size: 12px;
+	font-weight: normal;
+	line-height: 12px;
+	color: #777;
+}
+.contentcontainer .dataset-info > .main .version-info .version-info-derived .fieldvalue  * {
+	line-height: 15px;
+	vertical-align: top;
+	padding: 0px 2px;
+}
+.contentcontainer .dataset-info > .main .version-info .version-info-derived .fieldvalue span{
+	color: #aaa;
+	font-size: 12px;
+}
+
+.contentcontainer.isderived .version-container.editmode .version-info-derived.fieldvalue{
+	margin-top : 0px;
+}
+.contentcontainer.isderived .version-container.editmode .version-info-derived.fieldvalue > .field {
+	width: 60px;
+	font-weight: bold;
+	color: #555;
+	font-size: 12px;
+	font-family: Arial;
+}
+.contentcontainer.isderived .version-container.editmode .version-info-derived.fieldvalue > .parentversions-container .value {
+	display: inline-block;
+	padding-right: 8px;
+	vertical-align: top;
+	line-height: 20px;
+}
+.contentcontainer .version-container .showonedit{
+	display: none;
+}
+.contentcontainer .version-container.editmode .showonedit{
+	display: inherit;
+}
+.contentcontainer.isderived .version-container.noderivedversion .version-info-derived {
+	display: none;
+}
+.contentcontainer.isderived .version-container.editmode.noderivedversion .version-info-derived {
+	display: block;
+}
+.contentcontainer.isderived .version-container .version-info-derived .noparentversions-container,
+.contentcontainer.isderived.noparentversions .version-container.editmode .version-info-derived .parentversions-container {
+	display: none;
+}
+.contentcontainer.isderived.noparentversions .version-container.editmode .version-info-derived .noparentversions-container{
+	display: inline-block;
+}
+.contentcontainer.isderived.noparentversions .version-container.editmode .version-info-derived .noparentversions-container .message{
+	background: #f0f0f0;
+	border: 1px solid #e0e0e0;
+	border-radius: 2px;
+	padding: 5px 10px;
+	vertical-align: top;
+}
+.contentcontainer.isderived.noparentversions .version-container.editmode .version-info-derived .noparentversions-container .message > *{
+	line-height: 12px;
+	font-size:11px;
+	vertical-align: middle;
+	color: #555;
+}
+.contentcontainer.isderived.noparentversions .version-container.editmode .version-info-derived .noparentversions-container .message  img{
+	width: 18px;
+	height: 18px;
+	border: 0px;
+	padding-right: 5px;
+}
+.contentcontainer .derived-datasets-list-container {
+	display: none;
+	margin-top: 50px;
+	width: 1000px;
+}
+.display1024 .contentcontainer .derived-datasets-list-container .itemgrid{
+	margin: 0 auto;
+	padding: 10px;
+	
+}
+.display1024 .contentcontainer .derived-datasets-list-container .itemgrid li.itemcontainer{
+	width: 300px;
+}
+.contentcontainer.hasderived .derived-datasets-list-container {
+	display: block;
+}
+
+.editmode .column.on-edit-inline {
+	display: inline-block;
+	vertical-align: top;
+	
+}
+
+.appdb-ui-collection {
+	
+}
+.appdb-ui-collection ul {
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+}
+.appdb-ui-collection.appdb-ui-collection-inline {
+	
+}
+.appdb-ui-collection.appdb-ui-collection-inline ul {
+	display: inline-block;
+}
+.appdb-ui-collection.appdb-ui-collection-item-inline ul li {
+	display: inline-block;
+}
+.appdb-ui-collection .collection-item-inline {
+	display: table;
+}
+.appdb-ui-collection .collection-item-inline > * {
+	display: table-cell;
+	margin: 0px;
+	padding: 0px;
+	vertical-align: top;
+	width: 95%;
+}
+.appdb-ui-collection .collection-item-inline > .addon{
+	line-height: 14px;
+	height: 20px;
+	padding: 1px 5px;
+	margin: 0px;
+}
+.contentcontainer .version-container.editmode .appdb-ui-collection .collection-item-inline > .addon.showonedit{
+	display: table-cell;
+}
+
+.appdb-ui-collection > .empty-collection-container
+{
+	display: none;
+}
+.appdb-ui-collection.empty > .empty-collection-container
+{
+	display: block;
+}
+.appdb-ui-collection > .empty-collection-container{
+	background-color: #EEE;
+	line-height: 20px;
+	height: 22px;
+	margin: 0px;
+	border: 1px solid #DDD;
+	color: #666;
+	padding: 0px 5px;
+	font-size: 12px;
+}
+.editmode .column.on-edit-inline .collection-item{
+	width: 100%;
+}
+.entitydataset .collection-item .appdb-ui > input,
+.entitydataset .collection-item .appdb-ui > .dijitTextBox{
+	margin: 0px;
+	padding: 0px;
+	height: 18px;
+}
+.entitydataset .collection-item .appdb-ui .autocompletelist > .filter{
+	height: 18px;
+	border: 1px solid #B4B4B4
+}
+.entitydataset .collection-item .appdb-ui .dijitComboBox, 
+.entitydataset .collection-item .appdb-ui .dijitArrowButton{
+	height: 18px !important;
+}

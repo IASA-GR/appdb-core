@@ -1,0 +1,212 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php $wiki = ApplicationConfiguration::app('wiki', ApplicationConfiguration::uiUrl()); ?>
+<div class="homepage custom">
+	<div class="supported">
+		<a href="/supported">Supported Browsers</a>
+	</div>
+	<div class="homeitem-container row welcome">
+		<div class="title">
+			<h3 ><span class="userfirstname" />, welcome to the <span style="color:#0068B3">EGI Applications Database</span></h3>
+		</div>
+		<div class="description">
+				Below you may find the list of registered items associated or owned by
+			you. For general assistance on how to use the AppDB service please click
+			<a class="wiki" href="<?php echo $wiki;?>" target="_blank">here</a>. Also, have a look at the quick guides on how to register a
+			<a class="wiki" href="<?php echo $wiki;?>main:faq:how_to_register_a_software" target="_blank">Software Item</a><?php if(Supports::swappliance() ) {?>
+			, <a class="wiki" href="<?php echo $wiki;?>main:faq:how_to_register_a_virtual_appliance" target="_blank">Virtual Appliance</a> or <a class="wiki" href="<?php echo $wiki;?>main:faq:how_to_register_a_software_appliance" target="_blank">Software Appliance</a>.
+			<?php } else { ?> or <a class="wiki" href="<?php echo $wiki;?>main:faq:how_to_register_a_virtual_appliance" target="_blank">Virtual Appliance</a>.
+			<?php }?> 
+		</div>
+	</div>
+	<div class="homeitem-container tabcontainer banner row medium hidden" style="top:-5px;">
+		<ul class="header">
+			<li class="requests current" data-tab="requests"><a class="icontext"><img src="/images/sendrequest.png" alt=""/><span>Pending requests</span></a></li>
+			<li class="messages" data-tab="messages"><a class="icontext"><img src="/images/sendmessage.png" alt=""/><span>User Messages</span></a></li>
+		</ul>
+		<div class="tabcontent requests tabcontainer row content current"><div class="pendingrequests panel"><div class="main"><ul class="list"></ul></div></div></div>
+		<div class="tabcontent messages tabcontainer row content ">Unread Messages</div>
+	</div>
+	<div class="homeitem-container tabcontainer banner row personal">
+		<ul class="header">
+			<li class="software current" data-tab="software"><a class="icontext"><img src="/images/category1.gif" alt=""/><span>My Software</span></a></li>
+			<li class="vappliance" data-tab="vappliance"><a class="icontext"><img src="/images/category34.png" alt=""/><span>My Virtual Appliances</span></a></li>
+			<?php if ( Supports::swappliance() ) { ?>
+			<li class="swappliance" data-tab="swappliance"><a class="icontext"><img src="/images/category34.png" alt=""/><span>My Software Appliances</span></a></li>
+			<?php } ?>
+			<li class="vos" data-tab="vos"><a class="icontext"><img src="/images/other.png" alt=""/><span>My Virtual Organizations</span></a></li>
+		</ul>
+		<div class="tabcontent software tabcontainer row content current">
+			<ul class="header">
+				<li class="owned current" data-tab="owned"><a class="icontext"><span>Owned</span><span class="count">-</span></a></li>
+				<li class="associated" data-tab="associated"><a class="icontext"><span>Associated</span><span class="count">-</span></a></li>
+				<li class="editable" data-tab="editable"><a class="icontext"><span>Editable</span><span class="count">-</span></a></li>
+				<li class="followed rightalign" data-tab="followed"><a class="icontext"><img src="/images/follow.png" alt=""/><span>Following</span><span class="count">-</span></a></li>
+				<li class="bookmarked rightalign" data-tab="bookmarked"><a class="icontext"><img src="/images/star2.png" alt=""/><span>Bookmarked</span><span class="count">-</span></a></li>
+			</ul>
+			<div  class="content tabcontent owned current" >
+				<div class="mediumitems listcontainer" data-orderby="name" data-orderbyop="ASC" data-rows ="1" data-cols="5" data-type="software" data-subtype="owned" data-filter="+*&application.metatype:0" data-autoload="true" data-async="false">
+					
+				</div>
+			</div>
+			<div class="content tabcontent associated" >
+				<div class="mediumitems listcontainer" data-orderby="name" data-orderbyop="ASC" data-rows ="1" data-cols="5" data-type="software" data-subtype="associated" data-filter="+*&application.metatype:0" data-autoload="true" >
+					
+				</div>
+			</div>
+			<div class="content tabcontent editable" >
+				<div  class="mediumitems listcontainer" data-orderby="name" data-orderbyop="ASC" data-rows ="1" data-cols="5" data-type="software" data-subtype="editable" data-filter="+*&application.metatype:0" data-autoload="true" >
+					
+				</div>
+			</div>
+			<div class="content tabcontent followed" >
+				<div  class="mediumitems listcontainer" data-orderby="name" data-orderbyop="ASC" data-rows ="1" data-cols="5" data-type="software" data-subtype="followed" data-filter="+*&application.metatype:0" data-autoload="true" >
+					
+				</div>
+			</div>
+			<div class="content tabcontent bookmarked" >
+				<div  class="mediumitems listcontainer" data-orderby="name" data-orderbyop="ASC" data-rows ="1" data-cols="5" data-type="software" data-subtype="bookmarked" data-filter="+*&application.metatype:0" data-autoload="true" >
+					
+				</div>
+			</div>
+		</div>
+		<div class="tabcontent vappliance tabcontainer row content">
+			<ul class="header">
+				<li class="owned current" data-tab="owned"><a class="icontext"><span>Owned</span><span class="count">-</span></a></li>
+				<li class="associated" data-tab="associated"><a class="icontext"><span>Associated</span><span class="count">-</span></a></li>
+				<li class="editable" data-tab="editable"><a class="icontext"><span>Editable</span><span class="count">-</span></a></li>
+				<li class="followed rightalign" data-tab="followed"><a class="icontext"><img src="/images/follow.png" alt=""/><span>Following</span><span class="count">-</span></a></li>
+				<li class="bookmarked rightalign" data-tab="bookmarked"><a class="icontext"><img src="/images/star2.png" alt=""/><span>Bookmarked</span><span class="count">-</span></a></li>
+			</ul>
+			<div  class="content tabcontent owned current" >
+				<div class="mediumitems listcontainer" data-orderby="name" data-orderbyop="ASC" data-rows ="3" data-cols="5" data-type="vappliance" data-subtype="owned" data-filter="+*&application.metatype:1" data-autoload="true" data-async="false">
+					
+				</div>
+			</div>
+			<div class="content tabcontent associated" >
+				<div class="mediumitems listcontainer" data-orderby="name" data-orderbyop="ASC" data-rows ="3" data-cols="5" data-type="vappliance" data-subtype="associated" data-filter="+*&application.metatype:1" data-autoload="true" >
+					
+				</div>
+			</div>
+			<div class="content tabcontent editable" >
+				<div  class="mediumitems listcontainer" data-orderby="name" data-orderbyop="ASC" data-rows ="3" data-cols="5" data-type="vappliance" data-subtype="editable" data-filter="+*&application.metatype:1" data-autoload="true" >
+					
+				</div>
+			</div>
+			<div class="content tabcontent followed" >
+				<div  class="mediumitems listcontainer" data-orderby="name" data-orderbyop="ASC" data-rows ="3" data-cols="5" data-type="vappliance" data-subtype="followed" data-filter="+*&application.metatype:1" data-autoload="true" >
+					
+				</div>
+			</div>
+			<div class="content tabcontent bookmarked" >
+				<div  class="mediumitems listcontainer" data-orderby="name" data-orderbyop="ASC" data-rows ="3" data-cols="5" data-type="vappliance" data-subtype="bookmarked" data-filter="+*&application.metatype:1" data-autoload="true" >
+					
+				</div>
+			</div>
+		</div>
+		<?php if ( Supports::swappliance() ) { ?>
+		<div class="tabcontent swappliance tabcontainer row content">
+			<ul class="header">
+				<li class="owned current" data-tab="owned"><a class="icontext"><span>Owned</span><span class="count">-</span></a></li>
+				<li class="associated" data-tab="associated"><a class="icontext"><span>Associated</span><span class="count">-</span></a></li>
+				<li class="editable" data-tab="editable"><a class="icontext"><span>Editable</span><span class="count">-</span></a></li>
+				<li class="followed rightalign" data-tab="followed"><a class="icontext"><img src="/images/follow.png" alt=""/><span>Following</span><span class="count">-</span></a></li>
+				<li class="bookmarked rightalign" data-tab="bookmarked"><a class="icontext"><img src="/images/star2.png" alt=""/><span>Bookmarked</span><span class="count">-</span></a></li>
+			</ul>
+			<div  class="content tabcontent owned current" >
+				<div class="mediumitems listcontainer" data-orderby="name" data-orderbyop="ASC" data-rows ="3" data-cols="5" data-type="swappliance" data-subtype="owned" data-filter="+*&application.metatype:2" data-autoload="true" data-async="false">
+					
+				</div>
+			</div>
+			<div class="content tabcontent associated" >
+				<div class="mediumitems listcontainer" data-orderby="name" data-orderbyop="ASC" data-rows ="3" data-cols="5" data-type="swappliance" data-subtype="associated" data-filter="+*&application.metatype:2" data-autoload="true" >
+					
+				</div>
+			</div>
+			<div class="content tabcontent editable" >
+				<div  class="mediumitems listcontainer" data-orderby="name" data-orderbyop="ASC" data-rows ="3" data-cols="5" data-type="swappliance" data-subtype="editable" data-filter="+*&application.metatype:2" data-autoload="true" >
+					
+				</div>
+			</div>
+			<div class="content tabcontent followed" >
+				<div  class="mediumitems listcontainer" data-orderby="name" data-orderbyop="ASC" data-rows ="3" data-cols="5" data-type="swappliance" data-subtype="followed" data-filter="+*&application.metatype:2" data-autoload="true" >
+					
+				</div>
+			</div>
+			<div class="content tabcontent bookmarked" >
+				<div  class="mediumitems listcontainer" data-orderby="name" data-orderbyop="ASC" data-rows ="3" data-cols="5" data-type="swappliance" data-subtype="bookmarked" data-filter="+*&application.metatype:2" data-autoload="true" >
+					
+				</div>
+			</div>
+		</div>
+		<?php } ?>
+		<div class="tabcontent vos tabcontainer row content">
+			<ul class="header">
+				<li class="member current" data-tab="member"><a class="icontext"><span>Member</span><span class="count">-</span></a></li>
+				<li class="manager" data-tab="manager"><a class="icontext"><span>Manager</span><span class="count">-</span></a></li>
+				<li class="deputy" data-tab="deputy"><a class="icontext"><span>Deputy</span><span class="count">-</span></a></li>
+				<li class="expert" data-tab="expert"><a class="icontext"><span>Expert</span><span class="count">-</span></a></li>
+				<li class="shifter" data-tab="shifter"><a class="icontext"><span>Shifter</span><span class="count">-</span></a></li>
+			</ul>
+			<div class="content tabcontent member current" >
+				<div  class="mediumitems listcontainer" data-orderby="none" data-orderbyop="ASC" data-rows ="1" data-cols="5" data-type="vos" data-subtype="member" data-filter="" data-autoload="true" data-async="false"></div>
+			</div>
+			<div  class="content tabcontent manager" >
+				<div class="mediumitems listcontainer" data-orderby="none" data-orderbyop="ASC" data-rows ="1" data-cols="5" data-type="vos" data-subtype="manager" data-filter="" data-autoload="true" ></div>
+			</div>
+			<div class="content tabcontent deputy" >
+				<div  class="mediumitems listcontainer" data-orderby="none" data-orderbyop="ASC" data-rows ="1" data-cols="5" data-type="vos" data-subtype="deputy" data-filter="" data-autoload="true" ></div>
+			</div>
+			<div class="content tabcontent expert" >
+				<div  class="mediumitems listcontainer" data-orderby="none" data-orderbyop="ASC" data-rows ="1" data-cols="5" data-type="vos" data-subtype="expert" data-filter="" data-autoload="true" ></div>
+			</div>
+			<div class="content tabcontent shifter" >
+				<div class="mediumitems listcontainer" data-orderby="none" data-orderbyop="ASC" data-rows ="1" data-cols="5" data-type="vos" data-subtype="shifter" data-filter="" data-autoload="true" ></div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="homeitem-container row">
+		<div class="homeitem banner row hidden">
+			<div class="title"><span>Newest / Recently updated Software</span></div>
+			<div  class="content" >
+				<div id="banner_recent" class="recent software mediumitems" data-orderby="lastupdated" data-orderbyop="DESC" data-rows ="1" data-cols="5" data-type="software" data-autoload="true" data-filter="+=application.metatype:0" >
+					<a href="#" class="more">...see more</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="homeitem-container row" >
+		<div class="homeitem banner twothirds hidden">
+			<div class="title"><span>Newest / Recently updated Appliances</span></div>
+			<div  class="content " >
+				<div id="banner_newest" class="newest software mediumitems" data-orderby="lastupdated" data-orderbyop="DESC" data-rows ="2" data-cols="3" data-type="software" data-autoload="true" data-filter="-=application.metatype:0" >
+					<a href="#" class="more">...see more</a>
+				</div>
+			</div>
+		</div>
+		<div class="homeitem banner row hidden" id="announcediv">
+			<div class="title"><span>Most visited</span></div>
+			<div  class="content" >
+				<div id="banner_toprated" class="toprated software mediumitems" data-orderby="hitcount" data-orderbyop="DESC" data-rows ="2" data-cols="2" data-type="software" data-autoload="true" >
+					<a href="#" class="more">...see more</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

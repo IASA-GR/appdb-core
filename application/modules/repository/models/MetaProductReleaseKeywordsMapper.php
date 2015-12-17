@@ -1,0 +1,5 @@
+<?php
+class Repository_Model_MetaProductReleaseKeywordsMapper extends Repository_Model_MetaProductReleaseKeywordsMapperBase
+{
+
+}

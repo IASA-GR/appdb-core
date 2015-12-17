@@ -1,0 +1,1475 @@
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelarating Systems and Applications
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+#cscript-uploader-container #pseudo_uploader {
+	display: inline-block;
+	position:relative;
+    overflow:hidden;
+	cursor:pointer;
+}
+#cscript-uploader-container #pseudo_uploader > input[type="file"] { 
+	display: block;
+    cursor:pointer;
+    position:absolute;
+    z-index: 999999;
+    opacity:0;
+	filter:alpha(opacity=0);
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	top: -1px;
+	left: -1px;
+	bottom: -1px;
+	right: -1px;
+	padding: 0px;
+	margin: 0px 2px 0px 1px;
+}
+
+.dj_ie8 #cscript-uploader-container #pseudo_uploader > input[type="file"]{
+	padding-bottom: 12px;
+}
+
+.plupload,
+.plupload > input[type=file] {
+	cursor: pointer;
+}
+.contextualizationcontainer.isloading .contextualization-container{
+	display: none;
+}
+.contextualization-container.isempty .contextualization{
+	display: none;
+}
+.contextualization * {
+	font-family: "Open Sans",Arial;
+	position: relative;
+	vertical-align: top;
+	line-height: 14px;
+	text-align: left;
+}
+.contextualization-container.isempty > .emptycontent,
+.contextualizationcontainer.isloading > .loader{
+	margin: 35px auto 0 auto;
+}
+.contextualization .vertical-align{
+	display: inline-block;
+}
+.contextualization .showonedit,
+.contextualization .editmode .showonview,
+.contextualization  btn.showonedit,
+.contextualization .editmode btn.showonview,
+.contextualization .editmode btn.hideonedit,
+.contextualization .editmode .hideonedit
+{
+	display: none;
+}
+
+.contextualization .editmode .showonedit{
+	display: inherit;
+}
+.contextualization .editmode .vertical-align.showonedit{
+	display: inline-block;
+}
+.contextualization .header {
+	font-size: 14px;
+	padding: 10px;
+	min-height: 20px;
+}
+
+.contextualization .fieldvalue {
+	display: block;
+	vertical-align: top;
+	padding: 5px;
+}
+.contextualization .fieldvalue > .field{
+	min-width: 70px;
+}
+
+.contextualization .fieldvalue > .field,
+.contextualization .fieldvalue > .value{
+	display: inline-block;
+	vertical-align: top;
+	line-height: 14px;
+}
+.contextualization > .header > .fieldvalue{
+	display: inline-block;
+	background: none repeat scroll 0 0 whiteSmoke;
+	border: 1px solid #DDD;
+	border-radius: 5px;
+	box-shadow: 5px 5px 5px #E0E0E0;
+	behavior: url('/css/PIE.htc');
+	min-width: 50px;
+	width: auto;
+	padding: 10px 5px;
+	margin: 10px;
+}
+.contextualization > .header {
+	display: table;
+	width: 100%;
+	padding: 20px 10px;
+}
+.contextualization > .header > div {
+	display: table-row;
+}
+.contextualization > .header > div > div {
+	display: table-cell;
+	position: relative;
+}
+.contextualization > .header > div > div  .fieldvalue{
+	display: inline-block;
+	position: relative;
+}
+.contextualization > .header > div > div  .fieldvalue,
+.contextualization > .header > div > div  .fieldvalue > *{
+	text-align: left;
+}
+.contextualization > .header > div > div  .fieldvalue > .field{
+	min-width: 120px;
+	max-width: 120px;
+}
+.contextualization > .header > div > div  .fieldvalue > .value{
+	min-width: 148px;
+	max-width: 155px;
+}
+.contextualization > .header > div > div.left{
+	max-width: 310px;
+	min-width: 310px;
+	width: 310px;
+	border-right: 1px dashed #CCC;
+}
+.contextualization > .header > div > div.right{
+	padding-left: 10px;
+}
+.contextualization > .header > div > div.left .fieldvalue{
+	margin: 3px 0px;	
+}
+.contextualization > .header > div > div  .fieldvalue.context-version-property{
+	min-height: 50px;
+}
+.contextualization > .header > div > div  .fieldvalue.context-description-property,
+.contextualization > .header > div > div  .fieldvalue.context-description-property > *{
+	width: 645px;
+	min-width: 645px;
+	max-width: 645px;
+}
+.contextualization > .header > div > div  .fieldvalue.context-version-property > * ,
+.contextualization > .header > div > div  .fieldvalue.context-description-property > .field{
+	font-size: 14px;
+	font-family: "Open Sans",Arial;
+	line-height: 16px;
+	vertical-align: middle;
+}
+.contextualization > .header > div > div  .fieldvalue.context-version-property > .field,
+.contextualization > .header > div > div  .fieldvalue.context-description-property > .field{
+	font-size: 14px;
+	font-family: "Open Sans";
+	line-height: 16px;
+	vertical-align: top;
+}
+.contextualization > .header > div > div  .fieldvalue.context-version-property > .value.hideonedit{
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	word-break: break-all;
+}
+	
+.contextualization > .header > div > div  .fieldvalue.context-version-property .action,
+.contextualization > .header > div > div  .fieldvalue.context-description-property .action{
+	line-height: 16px;
+	padding: 0px 4px;
+	cursor: pointer;
+	display: inline;
+}
+.contextualization > .header > div > div  .fieldvalue.context-version-property .field .action,
+.contextualization > .header > div > div  .fieldvalue.context-description-property .field .action{
+	display: inline-block;
+	color: white;
+	line-height: 14px;
+	padding: 0px 5px;
+	margin: 0px 3px;
+	font-size: 12px;
+	border-radius: 1px;
+}
+
+.contextualization > .header > div > div  .fieldvalue.context-version-property > .field{
+	min-width: 100px;
+	max-width: 100px;
+}
+.contextualization > .header > div > div  .fieldvalue.context-version-property > .value{
+	min-width: 190px;
+	max-width: 190px;
+}
+.contextualization-version.contextualization > .header > div > div  .fieldvalue.context-version-property .field.hideonedit{
+	min-width: 60px;
+	max-width: 60px;
+}
+.contextualization-version.canedit.contextualization > .header > div > div  .fieldvalue.context-version-property .field.hideonedit{
+	min-width: 100px;
+	max-width: 105px;
+}
+.contextualization-version.contextualization > .header > div > div  .fieldvalue.context-version-property{
+	min-width: 300px;
+	max-width: 300px;
+}
+.contextualization-version.contextualization > .header > div > div  .fieldvalue.context-version-property .value.hideonedit{
+	min-width: 225px;
+	max-width: 225px;
+}
+.contextualization-version.canedit.contextualization > .header > div > div  .fieldvalue.context-version-property .value.hideonedit{
+	min-width: 190px;
+	max-width: 190px;
+}
+.contextualization > .header > div > div  .fieldvalue.context-description-property > *{
+	padding: 2px 4px;
+}
+.contextualization > .header > div > div  .fieldvalue.context-description-property.editmode > .showonedit,
+.contextualization > .header > div > div  .fieldvalue.context-description-property.editmode > .showonedit > *{
+	display: block;
+}
+.contextualization > .header > div > div  .fieldvalue.context-description-property.editmode > .value.showonedit > *{
+	width: 650px;
+	min-width: 650px;
+	max-width: 650px;
+}
+.contextualization > .header > div > div  .fieldvalue.context-description-property.editmode > .value.showonedit > textarea{
+	min-height: 70px;
+	padding:0px;
+	margin: 0px;
+}
+.contextualization > .header > div > div  .fieldvalue.context-description-property > .value.hideonedit{ 
+	max-height: 190px;
+	overflow: hidden;
+	line-height: 16px;
+	word-break: break-all;
+	word-wrap: break-word;
+	white-space: pre-wrap;
+	font-size: 12px;
+}
+.contextualization > .header > div > div  .fieldvalue.context-description-property > .value.hideonedit.viewall{
+	max-height: none;
+	overflow: visible;
+}
+.contextualization > .header > div > div  .fieldvalue.context-description-property .show-more{ 
+	position: absolute;
+	display: block;
+	bottom: 0px;
+	right: 4px;
+	background-color: white;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 16px;
+	font-size: 12px;
+	cursor: pointer;
+	color:#225896;
+}
+.contextualization > .header > div > div  .fieldvalue.context-description-property .viewall .show-more{
+	bottom: -12px;
+}
+.contextualization > .header > div > div  .fieldvalue.context-description-property .show-more
+.contextualization > .header > div > div  .fieldvalue.context-description-property .show-more:hover{
+	color: #0029A3;
+	text-decoration: underline;
+}
+.contextualization > .header > div > div .showonedit,
+.contextualization > .header > div > div .editmode .hideonedit{
+	display: none;
+}
+.contextualization > .header  > div > div .editmode div.showonedit{
+	display: block;
+}
+.contextualization > .header  > div > div .editmode div.field.showonedit,
+.contextualization > .header  > div > div .editmode div.value.showonedit{
+	display: inline-block;
+}
+.contextualization > .header  > div > div .actions {
+	vertical-align: middle;
+	text-align: right;
+	margin-top: 2px;
+}
+.contextualization > .header  > div > div .actions > button.action.btn{
+	line-height: 10px;
+	padding: 2px 4px;
+	font-size: 12px;
+	vertical-align: middle;
+}
+.contextualization > .header > div > div  .fieldvalue.editmode > .field{
+	vertical-align: top;
+	min-width: 70px;
+	max-width: 70px;
+	width: 70px;
+}
+.contextualization > .header > div > div  .fieldvalue.editmode > .value,
+.contextualization > .header > div > div  .fieldvalue.editmode .value .dijitTextBox{
+	width: 200px;
+	max-width: 200px;
+	min-width: 200px;
+}
+.contextualization > .header > div > div  .fieldvalue.editmode .value .dijitTextBox{
+	margin: 0 -2px;
+	padding: 0px;
+}
+.contextualization > .header > div > div  .fieldvalue.context-version-property .editorstatus{ 
+	position: absolute;
+	bottom: 0px;
+	left: -73px;
+}
+.contextualization > .header > div > div .fieldvalue.context-description-property.editmode > .showonedit > .editorstatus{
+	position: absolute;
+	bottom: 5px;
+	left: 5px;
+	text-align: left;
+	display:inline-block;
+	width: auto;
+	min-width: 100px;
+}
+.contextualization > .header > div > div  .fieldvalue.context-version-property .emptydatamessage{
+	color: #B90000;
+}
+.contextscript-list-container > .toolbar{
+	text-align: right;
+}
+.contextualization > .header > div > div .fieldvalue.highlight{
+	background: none repeat scroll 0 0 #F5F5F5;
+	border: 1px solid #DDD;
+	border-radius: 5px;
+	box-shadow: 5px 5px 5px #E0E0E0;
+	margin-right: 15px;
+	/*behavior: url('/css/PIE.htc');*/
+}
+
+.contextscript-list-container{
+	margin: 0 auto;
+	background-color: whiteSmoke;
+	padding: 0px;
+	padding-bottom: 15px;
+	min-width: 965px;
+	width: 965px;
+	max-width: 965px;
+	box-shadow: 7px 8px 10px 0px #BBB;
+	border-radius: 4px 4px 0px 0px;
+	margin-top: 20px;
+}
+.contextscript-list-container > .header {
+	color: white;
+	margin: 0;
+	border: 1px solid #EAEAEA;
+	border-radius: 3px 3px 0px 0px;
+	background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJo…gaGVpZ2h0PSIxIiBmaWxsPSJ1cmwoI2dyYWQtdWNnZy1nZW5lcmF0ZWQpIiAvPgo8L3N2Zz4=');
+	background: -moz-linear-gradient(left, rgba(105, 140, 178, 1) 0%, rgba(105, 140, 178, 0.3) 79%, rgba(255, 255, 255, 0.11) 100%);
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(105, 140, 178, 1)), color-stop(79%,rgba(105, 140, 178, 0.3)), color-stop(100%,rgba(255, 255, 255, 0.11)));
+	background: -webkit-linear-gradient(left, rgba(105, 140, 178, 1) 0%,rgba(105, 140, 178, 0.3) 79%,rgba(255, 255, 255, 0.11) 100%);
+	background: -o-linear-gradient(left, rgba(105, 140, 178, 1) 0%,rgba(105, 140, 178, 0.3) 79%,rgba(255, 255, 255, 0.11) 100%);
+	background: -ms-linear-gradient(left, rgba(105, 140, 178, 1) 0%,rgba(105, 140, 178, 0.3) 79%,rgba(255, 255, 255, 0.11) 100%);
+	background: linear-gradient(to right, rgba(105, 140, 178, 1) 0%,rgba(105, 140, 178, 0.3) 79%,rgba(255, 255, 255, 0.11) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#698cb2', endColorstr='#1cffffff',GradientType=1 );
+	padding: 8px 0 3px 10px;
+	border-bottom: 2px solid #F9A134;
+	margin-bottom: 10px;
+	border-radius: 4px 4px 0px 0px;	
+}
+.contextscript-list-container > .toolbar{
+	padding: 5px 10px;
+}
+.contextscript-list-container .contextscript-list {
+	padding: 10px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item {
+	position: relative;
+	padding: 5px;
+	margin: 0 auto;
+	margin-top: 10px;
+	border: 1px solid #D0D0D0;
+	border-radius: 2px;
+	box-shadow: 1px 2px 6px 0px #CCC;
+	background-color: #FAFAFA;
+	min-height: 120px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .title{
+	min-height: 25px;
+	max-height: 25px;
+	height: 25px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item:hover{
+	background-color: white;
+	border: 1px solid #A0A0A0;
+	box-shadow: 7px 8px 10px 0px #BBB;
+	behavior: url('/css/PIE.htc');
+}
+.contextscript-list-container .contextscript-list .contextscript-item .horizontal-align.title{
+	margin-bottom: 10px;
+	border: 1px solid transparent;
+	border-bottom: 1px dashed #aaa;
+	vertical-align: middle;
+	line-height: 20px;
+	padding: 0px 5px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .horizontal-align > *{
+	padding: 0px;
+	margin-bottom: 10px;
+	display: inline-block;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.popup{
+	position: relative;
+	border-radius: 2px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.popup > *{
+	border: 1px solid transparent;
+	padding: 2px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.popup > .value{
+	display: none;
+	padding: 10px;
+	background: white;
+	position: absolute;
+	margin-top: -1px;
+	z-index: 500;
+	border-radius: 0px 0px 2px 2px;
+	min-width: 100px;
+	width: auto;
+	white-space: nowrap;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.popup > .value .fieldvalue {
+	padding: 3px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.popup > .value .fieldvalue > .field{
+	text-align: right;
+	font-weight: bold;
+	color: #555;
+	min-width: 10px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.popup > .field > .arrow{
+	display: inline-block;
+	border: none;
+	border-left: 1px solid #aaa;
+	color: #aaa;
+	vertical-align: top;
+	margin-left: 5px;
+	padding-left: 3px;
+		
+}
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.popup:hover > *,
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.popup.hovered > *,
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.popup.sticky > *{
+	border-color: #999;
+	display: block;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.popup:hover > .field,
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.popup.hovered > .field,
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.popup.sticky > .field{
+	border-bottom: 1px solid transparent;
+	border-radius: 2px 2px 0px 0px;
+	background-color: white;
+	z-index: 600;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.popup > .value .fieldvalue.subpanel {
+	padding: 0px 0px;
+	margin-top: 7px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.popup > .value .fieldvalue.subpanel > .field {
+	display: block;
+	text-align: left;
+	padding: 5px 0px;
+}
+.contextualization .fieldvalue > .field, .contextualization .fieldvalue.popup > .value .fieldvalue.subpanel > .value {
+	display: inline-block;
+	vertical-align: top;
+	line-height: 14px;
+	padding-left: 3px;
+}
+.contextualization .fieldvalue > .field, .contextualization .fieldvalue.popup > .value .fieldvalue.subpanel > .value > .toolbar{
+	text-align: right;
+}
+.contextualization .fieldvalue > .field.inliner,
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.popup > .value .fieldvalue.subpanel > .field.inliner
+{
+	display: inline-block;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .horizontal-align > .fieldvalue.popup{
+	margin-right: 10px;
+	padding: 1px 5px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item > .fieldvalue > .field{
+	min-width: 70px;
+	text-align: right;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.addedby{
+	display: inline-block;
+	padding: 2px 0px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.addedby > .value{ 
+	margin-right: 0;
+	padding: 4px;
+	vertical-align: middle;
+	line-height: 14px;
+	max-width: 300px;
+	white-space: pre-wrap;
+	position: relative;
+	overflow: visible;
+	max-height: 16px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.addedby > .value [data-path='addedon']{
+	display: inline-block;
+}
+.contextualization .emptydatamessage {
+	color: #888;
+	font-style: italic;
+}
+.contextualization .displayon_hidden {
+	display: none !important;
+}
+
+.contextscript-list-container .contextscript-list .contextscript-item .vertical-align.metadatacontainer {
+	width: 525px;
+	margin-right: 25px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .vertical-align.assocvappscontainer {
+	width: 375px;
+	min-height: 80px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .vertical-align.assocvappscontainer .assocvapps-list-container > .title{
+	border: 1px dashed transparent;
+	border-bottom: 1px dashed #AAA;
+	margin-bottom: 10px;
+	vertical-align: middle;
+	line-height: 20px;
+	padding: 0px 5px;
+}
+.vappliancelink {
+	display: inline-block;
+	position: relative;
+	padding: 0px 4px;
+	border: 1px solid transparent;
+	border-radius: 2px;
+	cursor: pointer;
+	width: 370px;
+	min-width: 370px;
+	max-width: 370px;
+}
+.vappliancelink * {
+	vertical-align: top;
+	line-height: 14px;
+	display: inline-block;
+}
+
+.vappliancelink:hover {
+	border: 1px solid #e0e0e0;
+	background: #f0f0f0;
+}
+.vappliancelink .arrow{
+	display: inline-block;
+	color: #555;
+	text-align: right;
+	min-width: 16px;
+	float: right;
+	visibility: hidden;
+}
+
+.vappliancelink:hover .arrow{
+	visibility: visible;
+}
+.vappliancelink a,
+.vappliancelink a *{
+	display: inline-block;
+	line-height: 14px;
+	font-size: 14px;
+}
+.vappliancelink a:hover span{
+	text-decoration: underline;
+}
+.vappliancelink a > span{
+	max-width: 265px;
+	min-width: 265px;
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+.vappliance-item.expired .vappliancelink a > span{
+	min-width: 215px;
+	max-width: 205px;
+}
+.vappliancelink img{
+	width: 16px;
+	height: 16px;
+	border: none;
+	margin-right: 6px;
+}
+.vappliancelink div[data-type] {
+	min-width: 370px;
+	max-width: 370px;
+	line-height: 22px;
+}
+.vappliancelink div[data-type] * {
+	vertical-align: middle;
+	line-height: 22px;
+}
+.vappliancelink div[data-type] > a{
+	display: inline-block;
+	min-width: 290px;
+	max-width: 290px;
+}
+.vappliancelink div[data-type] > a > span{
+	display: inline-block;
+	min-width: 265px;
+	max-width: 265px;
+}
+.vappliancelink div[data-type] > a > * {
+	vertical-align: middle;
+	line-height: 16px;
+}
+.vappliancelink div[data-type] > a > img{
+	vertical-align: middle;
+	line-height: 22px;
+}
+.contextscript-item .vappliancelink div[data-type] > a > span{
+	display: inline-block;
+	line-height: 22px;
+	max-height: 26px;
+	overflow: hidden;
+}
+.contextscript-item.canedit .outdated .vappliancelink div[data-type] > a,
+.editmode .vappliancelink div[data-type] > a{
+	max-width: 255px;
+	min-width: 255px;
+}
+.contextscript-item.canedit.editmode .outdated .vappliancelink div[data-type] > a{
+	max-width: 240px;
+	min-width: 240px;	
+}
+.editmode .vappliancelink div[data-type] {
+	min-width: 341px;
+	max-width: 341px;
+}
+.contextscript-item.canedit .outdated .vappliancelink div[data-type]{
+	min-width: 330px;
+	max-width: 330px;
+}
+.contextscript-item.editmode  .outdated .vappliancelink div[data-type],
+.contextscript-item.canedit.editmode  .outdated .vappliancelink div[data-type]{
+	min-width: 310px;
+	max-width: 310px;
+}
+.contextscript-item.canedit .outdated .vappliancelink div[data-type] > a > span,
+.contextscript-item.canedit.editmode .vappliancelink div[data-type] > a > span{
+	max-width: 220px;
+	min-width: 220px;
+}
+
+.contextscript-item.canedit.editmode .outdated .vappliancelink div[data-type] > a > span{
+	max-width: 213px;
+	min-width: 213px;
+}
+.expired .vappliancelink div[data-type]
+.vappliancelink .imagecount{
+	max-width: 60px;
+	min-width: 60px;
+	width: 60px;
+	text-align: right;
+	float: right;
+}
+.vappliancelink .imagecount,
+.vappliancelink .imagecount *{
+	font-size: 11px;
+	color: #777;
+}
+.vappliancelink .imagecount .plural{
+	display: none;
+}
+.vappliancelink .imagecount.plural .plural{
+	display: inline-block;
+}
+.vappliancelink .imagecount .count{
+	margin: 0 5px;
+}
+.editmode .vappliancelink a > span{
+	max-width: 238px;
+	min-width: 238px;
+}
+.vappliancelink button{
+	line-height: 22px;
+	font-size: 15px;
+	border-radius: 2px 0px 0px 2px;
+	padding: 0px 6px;
+	margin: 0px 0px 0px -4px;
+	line-height: 22px;
+	vertical-align: middle;
+}
+.vappliance-item.expired .vappliancelink .imagecount,
+.vappliance-item.deleted .vappliancelink .imagecount,
+.vappliance-item.moderated .vappliancelink .imagecount{
+	display: none;
+}
+.vappliancelink .update-icon {
+	color: white;
+	background-color: #5CB85C;
+	border-color: #4CAE4C;
+	padding: 4px;
+	margin: 0px 2px;
+}
+.vappliance-item .showonoutdated,
+.vappliance-item .showonexpired,
+.vappliance-item .showondeleted,
+.vappliance-item .showonmoderated
+{
+	display: none;
+}
+.vappliance-item.outdated .showonoutdated{
+	display: inline-block;
+}
+.vappliance-item .outdatedpanel.showonoutdated,
+.vappliance-item .expiredpanel.showonexpired,
+.vappliance-item .deletedpanel.showondeleted,
+.vappliance-item .moderatedpanel.showonmoderated{
+	display: none;
+	position: absolute;
+	padding: 5px;
+	z-index: 500;
+	border: 1px solid #A4C2B4;
+	background-color: white;
+	left: 0px;
+	color: black;
+	white-space: pre-wrap;
+	width: auto;
+	min-width: 300px;
+	vertical-align: top;
+	line-height: 0px;
+	bottom: 100%;
+	right: auto;
+	margin: -1px 0px;
+	border-radius: 2px;
+}
+.vappliance-item .deletedpanel.showondeleted,
+.vappliance-item .moderatedpanel.showonmoderated{
+	border: 1px solid #C60909;
+}
+.vappliance-item.expired .expiredpanel.showonexpired{
+	border-color: #EE8036;
+}
+.vappliance-item.deleted .expiredpanel.showondeleted,
+.vappliance-item.moderated .expiredpanel.showonmoderated{
+	border-color: #DF1512;
+}
+.vappliance-item .outdatedpanel.showonoutdated > span,
+.vappliance-item .expiredpanel.showonexpired > span,
+.vappliance-item .deletedpanel.showondeleted > span,
+.vappliance-item .moderatedpanel.showonmoderated > span{
+	position: relative;
+	line-height: 13px;
+	font-size: 12px;
+	display: inline-block;
+	vertical-align: top;
+	margin: 0px;
+	padding: 5px;
+}
+.contextscript-item.canedit .vappliance-item.expired .expiredpanel .hasupdates,
+.contextscript-item.canedit .vappliance-item.expired.outdated .expiredpanel .noupdate{
+	display: none;
+}
+.contextscript-item.canedit .vappliance-item.expired.outdated .expiredpanel .hasupdates{
+	display: inline-block;
+}
+.editmode .vappliance-item button {
+	position: relative;
+	max-height: 24px;
+}
+.vappliance-item button img{
+	vertical-align: middle;
+	display: inline;
+	margin: 0 auto;
+	padding: 0px;
+}
+.vappliance-item button.updatecurrentvappliance:hover + .outdatedpanel.showonoutdated,
+.vappliance-item .outdatedpanel.showonoutdated:hover,
+.vappliance-item .expiredvappliance:hover + .expiredpanel.showonexpired,
+.vappliance-item .expiredpanel.showonexpired:hover,
+.vappliance-item .deletedvappliance:hover + .deletedpanel.showondeleted,
+.vappliance-item .deletedpanel.showondeleted:hover,
+.vappliance-item .moderatedvappliance:hover + .moderatedpanel.showonmoderated,
+.vappliance-item .moderatedpanel.showonmoderated:hover{
+	display: block;
+}
+.vappliance-item .outdatedpanel.showonoutdated p,
+.vappliance-item .expiredpanel.showonexpired p,
+.vappliance-item .deletedpanel.showondeleted p,
+.vappliance-item .moderatedpanel.showonmoderated p{
+	margin: 5px 0px;
+}
+.vappliance-item .expiredpanel.showonexpired .btn.btn-compact,
+.vappliance-item .deletedpanel.showondeleted .btn.btn-compact,
+.vappliance-item .moderatedpanel.showonmoderated .btn.btn-compact{
+	line-height: 10px;
+	font-size: 10px;
+	margin: 0 3px;
+	padding: 3px;
+}
+
+.vappliance-item.expired .imagecount,.vappliance-item.expired .arrow{
+	display: none;
+}
+.vappliance-item.expired .expiredvappliance,
+.vappliance-item.deleted .deletedvappliance,
+.vappliance-item.moderated .moderatedvappliance
+{
+	padding: 0px 5px;
+	line-height: 22px;
+	opacity: 0.9;
+	position: absolute;
+	top: 0px;
+	bottom: 0px;
+	right: 0px;
+	z-index: 100;
+	color: white;
+	background-color: #EEA236;
+	border-color: #EE8036;
+	font-size: 12px;
+}
+.vappliance-item.deleted .deletedvappliance, .vappliance-item.moderated .moderatedvappliance {
+	background-color: #B90000;
+	border-color: #DF1512;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .postsavemessage.icontext {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	padding: 4px 6px;
+	background-color: #F5F691;
+	border: 1px solid transparent;
+	border-bottom: 1px solid #e0e0e0;
+	display: block;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .postsavemessage.icontext > a.closemessage {
+	padding: 4px 6px;
+	border: 1px solid #BBB;
+	line-height: 14px;
+	right: -1px;
+	position: absolute;
+	top: -2px;
+	bottom: -1px;
+	margin: 0px;
+	background: #F1EB5F;
+	color: #888;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .postsavemessage.icontext > a.closemessage:hover{
+	color: #333;
+	border: 1px solid #555;
+}
+.contextscript-list-container .contextscript-list .contextscript-item.hasmessage{
+	padding-top: 30px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item > .toolbar{
+	position: absolute;
+	right: -1px;
+	padding: 0px;
+	top: -1px;
+	border-radius: 0px 2px 0px 0px;
+	overflow: hidden;
+	border: 1px solid rgba(0, 0, 0, 0);
+	z-index: 200;
+	opacity: 0.6;
+	filter: alpha(opacity=60);
+}
+.contextscript-list-container .contextscript-list .contextscript-item.hasmessage > .toolbar{
+	top: 25px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item:hover > .toolbar,
+.contextscript-list-container .contextscript-list .editmode .toolbar{
+	opacity: 1;
+	filter: alpha(opacity=100);
+}
+.contextscript-list-container .contextscript-list .contextscript-item > .toolbar > .btn{
+	padding: 6px 20px;
+}
+.contextscript-list-container .editmode button.showonedit{
+	display: inline-block;
+	padding: 0px 5px;
+	font-size: 12px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .vappliance-item .images{
+	display: none;
+	padding: 5px;
+	border: 1px solid #E0E0E0;
+	border-radius: 0px 0px 2px 2px;
+	border-top: none;
+	width: 368px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .vappliance-item  .images .header{
+	padding: 0px;
+	min-height: 1px;
+	height: auto;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .vappliance-item  .images  .image-item{
+	padding: 2px 4px;
+	margin-left: 5px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .vappliance-item .images  .image-item .seperator{
+	padding: 0px 2px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .vappliance-item .images  .footer{
+	padding: 0px 5px;
+	text-align: right;
+	padding-top: 8px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .vappliance-item .images  .footer a{
+	color: #555;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .vappliance-item .images  .footer a:hover,
+.contextscript-list-container .contextscript-list .contextscript-item .vappliance-item .images  .footer a:hover > span{
+	color: #416FA4;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .vappliance-item.toggled .vappliancelink{
+	border: 1px solid #E0E0E0;
+	background: #F0F0F0;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .vappliance-item.toggled .images{
+	
+} 
+.contextscript-list-container .contextscript-list .contextscript-item input,
+.contextscript-list-container .contextscript-list .contextscript-item textarea,
+.contextscript-list-container .contextscript-list .contextscript-item .dijitValidationTextBox {
+	min-width: 405px;
+	max-width: 405px;
+	width: 405px;
+	padding: 2px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item  .dijitValidationIcon{
+	min-width: 18px;
+	max-width: 18px;
+	width: 18px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .dijitSelect .dijitArrowButton{
+	vertical-align: middle;
+}
+.contextscript-list-container .contextscript-list .contextscript-item textarea{
+	border: 1px solid #E0E0E0;
+	padding: 5px 2px;
+	border-radius: 2px;
+	margin: 0px;
+	padding-right: 20px;
+	margin-right: -20px;
+}
+.contextualization > .header .editorstatus,
+.contextscript-list-container .contextscript-list .contextscript-item .editorstatus{
+	display: block;
+	font-size: 10px;
+	text-align: right;
+	padding-top: 2px;
+	color: #666;
+}
+.contextualization .invalid > .editorstatus,
+.contextualization .invalid > .editorstatus span,
+.contextscript-list-container .contextscript-list .contextscript-item .invalid .editorstatus,
+.contextscript-list-container .contextscript-list .contextscript-item .invalid .editorstatus span{
+	color: #D9534F;
+}
+.contextualization .invalid > .dijit,
+.contextscript-list-container .contextscript-list .contextscript-item .invalid .dijit{
+	background-color: #F9F999;
+	background-image: none;
+}
+.contextualization .dijitPlaceHolder.dijitInputField{
+	position:absolute;
+	font-size: 12px;
+	line-height: 14px;
+}
+.contextscript-list-container .contextscript-list .contextscript-item.hasvappliances .addvappliance,
+.contextscript-list-container .contextscript-list .contextscript-item .action.removevappliance
+{
+	display: none;
+}
+.contextscript-list-container .contextscript-list .contextscript-item.hasvappliances .action.removevappliance{
+	display: inline-block;
+}
+.contextscript-list-container .contextscript-list .contextscript-item.state-toberemoved,
+.contextscript-list-container .contextscript-list .contextscript-item.state-tobeupdated
+{
+	border: 1px dashed #E53A3A;
+	background: #FFF5A5;
+}
+.contextscript-list-container .contextscript-list .contextscript-item.state-toberemoved .editoritem,
+.contextscript-list-container .contextscript-list .contextscript-item.state-tobeupdated .editoritem,
+.contextscript-list-container .contextscript-list .contextscript-item.state-removing .editoritem,
+.contextscript-list-container .contextscript-list .contextscript-item.state-saving .editoritem,
+.contextscript-list-container .contextscript-list .contextscript-item.state-updating .editoritem,
+.contextscript-list-container .contextscript-list .contextscript-item.state-updatingurl .editoritem,
+.contextualization-version.state-removing .editoritem,
+.contextualization-version.state-saving .editoritem,
+.contextualization-version.state-updating .editoritem
+{
+	visibility: hidden;
+}
+
+.contextualization .loader {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	text-align:center;
+	vertical-align: middle;
+	z-index: 99000;
+}
+.contextualization .loader .sheet {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	z-index: 100;
+	background: #F0F0F0;
+	opacity: 0.3;
+	filter: alpha(opacity=30);
+}
+.contextualization .loader .loadmessage {
+	opacity: 1;
+	margin: auto;
+	background: #FFF;
+	display: inline-block;
+	vertical-align: bottom;
+	border: 1px solid #999;
+	z-index: 200;
+	padding: 5px 15px;
+	margin-top: 4%;
+}
+.contextualization .loader .loadmessage img {
+	width: 18px;
+	height: 18px;
+	border: 0px;
+	margin-right: 5px;
+}
+.contextualization .loader .loadmessage > * {
+	vertical-align: middle;
+	position: relative;
+	display: inline-block;
+}
+.contextualization > .header > div > div .fieldvalue .loader {
+	text-align: center;
+}
+.contextualization > .header > div > div .fieldvalue .loader > .loadmessage{
+	margin-top: 5%;
+}
+.contextualization > .header > div > div .fieldvalue.context-version-property .loader > .loadmessage{
+	position: absolute;
+	bottom: 0px;
+	height: 21px;
+	width: 115px;
+	font-size: 10px;
+	display: inline-block;
+	text-align: right;
+	right: 5px;
+	border: none;
+	line-height: 10px;
+	padding: 0px;
+}
+.contextualization > .header > div > div .fieldvalue.context-version-property .loader > .loadmessage > img{
+	width: 16px;
+	height: 16px;
+}
+.addvappliance.description{
+	margin: 10px auto;
+	padding: 15px;
+	width: 250px;
+	border: 1px solid #E0E0E0;
+	vertical-align: middle;
+	line-height: 15px;
+	background-color: #F8F8F8;
+	font-family: "Open Sans";
+	font-size: 12px;
+}
+.addvappliance.description > * {
+	vertical-align: middle;
+	line-height: 18px;
+}
+
+.vappliance-item.loading {
+	text-align: center;
+	border: 1px solid #E0E0E0;
+	background-color: #F8F8F8;
+	padding: 10px 0px;
+}
+.vappliance-item.loading * {
+	vertical-align: middle;
+	line-height: 15px;
+	text-align: center;
+}
+.vappliance-item.loading img {
+	width: 15px;
+	height: 15px;
+	border: 0px;
+	padding: 0px 10px;
+}
+.btn[disabled]{
+	background: #f0f0f0;
+	color: #777;
+	border: 1px solid #aaa;
+}
+.contextscript-item.editmode .value.location .dijitTextBox,
+.contextscript-item.editmode .value.location .dijitValidationTextBox{
+	max-width: 375px;
+	min-width: 375px;
+	width: 375px;
+}
+.contextscript-item.canedit .urlvalidator {
+	display: inline-block;
+	position: relative;
+	vertical-align: middle;
+}
+.contextscript-item.canedit .urlvalidator > .result.hidden{
+	display: none;
+}
+.contextscript-item.canedit .urlvalidator > .result {
+	display: inline-block;
+}
+.contextscript-item.canedit .urlvalidator > .result .error{
+	color: #520000;
+}
+.contextscript-item.canedit .urlvalidator > .result .success{
+	color: #368700;
+}
+.contextscript-item.canedit .urlvalidator > .popupmessage,
+.contextscript-item.canedit .urlvalidator > .status{
+	position: relative;
+	vertical-align: middle;
+	display: inline;
+	padding: 0px;
+	outline: none;
+}
+.contextscript-item.canedit .urlvalidator > .popupmessage > span{
+	display: none;
+}
+.contextscript-item.canedit .urlvalidator > .popupmessage:hover > span{
+	display: block;
+	position: absolute;
+	border: 1px solid #999;
+	background-color: #fafafa;
+	text-align: center;
+	top: -25px;
+	width: auto;
+	padding: 5px 3px;
+	white-space: nowrap;
+	z-index: 5000;
+	border-radius: 3px 3px 3px 0px;
+}
+.contextscript-item.canedit .urlvalidator > .popupmessage > img{
+	border: 1px solid transparent;
+	padding: 3px;
+	margin: 0px;
+	vertical-align: middle;
+	border-radius: 0px 0px 3px 3px;
+	outline: none;
+}
+.contextscript-item.canedit .urlvalidator > .popupmessage:hover > img{
+	position: relative;
+	border-color: #999;
+	border-top-color: transparent;
+	background-color: #fafafa;
+	white-space: nowrap;
+	z-index: 5001;
+}
+
+.contextscript-item .value.scriptlocation {
+	padding: 5px 5px;
+	text-align: left;
+}
+.contextscript-item .value.scriptlocation > a{
+	white-space: pre-wrap;
+	word-break: break-all;
+	display: inline-block;
+	max-width:300px;
+}
+
+.editmode .entitysoftwareappliance .hideonswapplianceedit{
+	display: none;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.popup.downloadcontainer > .field {
+	padding: 3px;
+	background-color: #FFF;
+	border-radius: 2px;
+	color: #FFF;
+	background: #A4B357;
+	background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJo…iIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+');
+	background: -moz-linear-gradient(top, rgba(164, 179, 87, 1) 0%, rgba(117, 137, 12, 1) 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#A4B357), color-stop(100%,#75890C));
+	background: -webkit-linear-gradient(top, #A4B357 0%,#75890C 100%);
+	background: -o-linear-gradient(top, rgba(164, 179, 87, 1) 0%,rgba(117, 137, 12, 1) 100%);
+	background: -ms-linear-gradient(top, rgba(164, 179, 87, 1) 0%,rgba(117, 137, 12, 1) 100%);
+	background: linear-gradient(to bottom, #A4B357 0%,#75890C 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a4b357', endColorstr='#75890c',GradientType=0 );
+	height: auto;
+}
+.contextscript-list-container .contextscript-list .contextscript-item .fieldvalue.popup.downloadcontainer > .field > .arrow {
+	color: #FFF;
+}
+
+.downloadarea.contextualizationdownload > a.download{
+	width: 225px;
+	min-width: 225px;
+}
+.downloadarea.contextualizationdownload > a.download > .content > span{
+	font-size: 15px;
+	line-height: 15px;
+}
+.downloadarea.contextualizationdownload > a.download > .content > span.published{
+	font-size: 9px;
+}
+.editmode .downloadarea.contextualizationdownload.hideonedit {
+	display: none;
+}
+
+.scriptsizelimit {
+	font-size: 10px;
+	display: block;
+	min-width: 100px;
+	position: absolute;
+	left: 0px;
+	bottom: 1px;
+	color: #666;
+	font-family: "Open San",Arial;
+	line-height: 14px;
+}
+.scriptsizelimit > span{
+	padding-left: 1px;
+}
+.scriptsizelimit > span.sizelimit{
+	font-weight: bold;
+}
+
+.contextscript-editor-container {
+	width: 700px;
+	height: 300px;
+	display: table;
+}
+.contextscript-editor-container .content-error,
+.contextscript-editor-container .loader{
+	display: none;
+}
+.contextscript-editor-container.error .content-error{
+	display: block;
+	padding: 5px;
+	vertical-align: middle;
+	border: 1px solid #BB8282;
+	background-color: #F7EFEF;
+	color: #6B2B2B;
+	border-radius: 2px;
+	text-align: left;
+	margin-bottom: 5px;
+}
+.contextscript-editor-container.loading {
+	cursor: progress;
+}
+.contextscript-editor-container.loading .loader {
+	display: block;
+	padding: 0px;
+	position: absolute;
+	top: 0;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	text-align: center;
+	z-index: 99000;
+}
+.contextscript-editor-container.loading .loader .sheet{
+	display: block;
+	padding: 0px;
+	position: absolute;
+	top: 0;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	vertical-align: middle;
+	text-align: center;
+	background-color: #F0F0F0;
+	opacity: 0.4;
+	filter: alpha(opacity=40);
+	z-index: 1000;
+}
+.contextscript-editor-container.loading .loader .message{
+	position: relative;
+	z-index: 1200;
+	vertical-align: middle;
+	padding: 10px 20px;
+	border: 1px solid #818080;
+	background-color: white;
+	display: inline-block;
+	margin: 10% auto;
+	text-align: center;
+	width: auto;
+	border-radius: 2px;
+}
+.contextscript-editor-container.loading .loader .message > *,
+.contextscript-editor-container.error .content-error > *{
+	padding: 0px 5px;
+}
+.contextscript-editor-container .content.script .code.loader{
+	display: none;
+}
+.contextscript-editor-container .content.script.loading .code.loader{
+	display: inline-block;
+	float: right;
+	padding: 0px 5px;
+	width: auto;
+}
+.contextscript-editor-container .content.script.loading .code.loader button.btn-compact{
+	line-height: 12px;
+	font-size: 11px;
+	padding: 0px 3px;
+	margin-left: 5px;
+}
+.contextscript-editor-container.loading .footer button.apply {
+	
+}
+.contextscript-editor-container.loading .footer .commands {
+	display: inline-block;
+	width: auto;
+}
+.contextscript-editor-container > div {
+	display: table-row;
+}
+.contextscript-editor-container > .header{
+	height: 0px;
+}
+.contextscript-editor-container > .footer{
+	height: 30px;
+}
+.contextscript-editor-container .content {
+	display: none;
+}
+
+.contextscript-editor-container .content.active {
+	display: block;
+}
+
+.contextscript-editor-container .content .title {
+	padding: 10px;
+	margin: 10px auto;
+	text-align: center;
+	background-color: #eaeaea;
+	color: #666;
+	border: 1px solid #dadada;
+}
+
+.contextscript-editor-container .content.file .title .btn-small {
+	line-height: 12px;
+	padding: 0px 5px;
+	font-size: 12px;
+}
+
+.contextscript-editor-container .content .select-file { 
+	position: relative;
+	padding: 20px 10px;
+	margin: 0 auto;
+	text-align: center;
+}
+.contextscript-editor-container .content .select-file .pseudo-uploader { 
+	position: relative;
+	display: block;
+}
+.contextscript-editor-container .content .select-file.uploading >  .pseudo_uploader,
+#cscript-uploader-container.select-file.uploading > #pseudo_uploader,
+.contextscript-editor-container .content .select-file .progressbar{
+	display: none;
+}
+.contextscript-editor-container .content .select-file.uploading .progressbar{
+	display: block;
+	position: relative;
+	height: 15px;
+}
+.contextscript-editor-container .content .select-file.uploading .progressbar .bar{
+	display: block;
+	height: 100%;
+	width: 1px;
+	background-color: #416FA4;
+	z-index: 10;
+}
+.contextscript-editor-container .content .select-file.uploading .progressbar .percent{
+	display: block;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	text-align: center;
+	vertical-align: middle;
+	z-index: 55555;
+	line-height: 16px;
+}
+.contextscript-editor-container .content .select-file.completed .progressbar{
+	display: none;
+}
+.contextscript-editor-container .content .select-file .error-message {
+	display: none;
+	color: #C60909;
+	padding: 10px 5px;
+}
+.contextscript-editor-container .content .select-file.error .error-message{
+	display: block;
+}
+.contextscript-editor-container .content .select-file.error.uploading .error-message{
+	display: none;
+}
+.contextscript-editor-container .content .select-file .selected-file{
+	color: #555;
+	padding: 10px;
+}
+.contextscript-editor-container .content .select-file .selected-file.error{
+	
+}
+.contextscript-editor-container .content .content-error{
+	position: absolute;
+	padding: 10px;
+	margin-top: 20px;
+	color: #C60909;
+}
+.contextscript-editor-container .content .empty{
+	padding: 10px;
+	margin: 10px auto;
+	text-align: center;
+	background-color: #eaeaea;
+	color: #666;
+	border: 1px solid #dadada;
+}
+
+.contextscript-editor-container .footer{
+	width: 100%;
+	text-align: right;
+	padding: 5px;
+	border-top: 1px solid #ddd;
+}
+.contextscript-editor-container .value.appdb-ui.text .dijitTextBox{
+	width: 98%;
+	height: 20px;
+	line-height: 20px;
+	padding: 2px 5px;
+	margin: 5px auto;
+}
+.contextscript-editor-container .value.appdb-ui.textarea,
+.contextscript-editor-container .value.appdb-ui.textarea textarea{
+	width: 600px;
+	height: 280px;
+	max-height: 280px;
+	min-height: 180px;
+	min-width: 99%;
+	max-width: 99%;
+}
+.contextscript-editor-container .appdb-ui .validationstatus{
+	bottom: -20px;
+}
+.contextscript-editor-container .fieldvalue > .value{
+	margin: 5px; 
+}
+.contextscript-editor-container .contextscript-editor-selection-container td{
+	padding:0px 5px;
+}
+.contextscript-editor-container .formatlist-container{
+	display: none;
+} 
+
+.contextscript-editor-container.use-formats .formatlist-container{
+	display: table-cell;
+}

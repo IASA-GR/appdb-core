@@ -1,0 +1,36 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><table style="width:100%;table-layout:fixed;padding:0px;margin:0px;" cellpadding="0" cellspacing="0"><tr><td><h3 align="left" style="margin-left:6px;">Latest EGI News</h3></td><td style="vertical-align: bottom;"><a href="http://www.egi.eu/about/news/news.rss" target="_blank" style="float:right;padding-bottom:16px;" ><img class="rssimg" src="" alt="rss feed" title="Click to open EGI rss feed"  border="0" style="float:right;" /></a></td></tr></table>
+<div>
+	<table cellspacing="0" width="100%"><tr class="bar1" height="4px"><td></td></tr></table>
+</div>
+<ul style="margin-left:-10px">
+<?php
+	foreach ($this->news as $news) {
+		$news_date = strtotime($news["date"]);
+		$news_date = date("Y.m.d",$news_date);
+		echo "<li>".$news_date."<br/><span><a href='".$news["link"]."' target='_blank'>".$news["title"]."</a></span><br/><span>by <i>".$news["creator"]."</i></span></li><br/>";
+	};
+?>
+<br/>
+</ul>
+<script type="text/javascript">
+	$(document).ready(function(){
+		loadImage('rss.gif', 'img.rssimg');
+		$('.bar1').attr('style', "height: 4px; background: url('" + loadImage('bar1.png') + "') repeat;");
+	});
+</script>

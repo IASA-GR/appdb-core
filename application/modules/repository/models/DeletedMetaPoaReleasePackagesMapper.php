@@ -1,0 +1,5 @@
+<?php
+class Repository_Model_DeletedMetaPoaReleasePackagesMapper extends Repository_Model_DeletedMetaPoaReleasePackagesMapperBase
+{
+
+}

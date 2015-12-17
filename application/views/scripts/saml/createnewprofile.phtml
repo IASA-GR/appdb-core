@@ -1,0 +1,58 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php 
+	$errors = $this->error;
+	$session = $this->session;
+	$source = trim($session->authSource);
+	$source = str_replace("-sp", "", $source);
+	$source = str_replace("-", " ", $source);
+	$source = str_replace("ldap", "", $source);
+	if( count($errors) > 0 ){
+?>
+<div class='createnewprofile response error notifydialog display'>
+	<div class="shade"></div>
+	<div class="dialog">
+		<div class="title"><img src="/images/vappliance/redwarning.png" alt="" /><span>Failed to create new user profile</span></div>
+		<div class='message'>
+			<div>Could not create new user profile. Some errors occurred listed bellow: </div>
+			<ul>
+				<?php for( $i=0; $i<count($errors); $i+=1 ){ $err = $errors[$i]; ?>
+				<li><?php echo $err; ?></li>
+				<?php } ?>
+			</ul>
+		</div>
+		<div class="actions">
+			<a class="action close iconttext" title="" onclick="$(this).closest('.notifydialog').remove();" >Close</a>
+		</div>
+	</div>
+</div>
+<?php } else { ?>
+<div class='createnewprofile response success notifydialog display'>
+	<div class="shade"></div>
+	<div class="dialog">
+		<div class='title'><img src="/images/tick.png" alt=""><span>Your user profile was created successfully</span></div>
+		<div class='message'>
+			Now that your profile is created you can sign into the EGI Applications Database using your <?php echo $source; ?> account.<br/><br/>
+			You can visit your <a style="font-size:15px;" href="https://<?php echo $_SERVER['HTTP_HOST'];?>/store/person/<?php echo $session->usercname;?>" title="Your profile page"><span>profile</span></a> to add more information about yourself or even connect to other accounts. 
+		</div>
+		<div class="actions">
+			<a class="action close icontext" href="https://<?php echo $_SERVER['HTTP_HOST'];?>" title="Go to EGI Applications Database" >close</a>
+		</div>
+	</div>
+</div>
+<?php } ?>
+

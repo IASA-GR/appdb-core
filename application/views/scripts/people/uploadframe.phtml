@@ -1,0 +1,79 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><!-- <script type="text/javascript" src="/js/dojo/dojo.js"></script> -->
+<style type="text/css">
+div.fileinputs {
+    position: relative;
+}
+
+div.fakefile {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 1;
+}
+
+input.file {
+    position: relative;
+    text-align: right;
+    -moz-opacity:0 ;
+    filter:alpha(opacity: 0);
+    opacity: 0;
+    z-index: 2;
+}
+</style>
+<script type="text/javascript" src="/js/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="/js/jquery.form.js"></script>
+<form id="uploadform" action="/people/uploadimage" method="post" enctype="multipart/form-data">
+ <div class="fileinputs">
+  <input type="hidden" name="MAX_FILE_SIZE" value="204800" />
+  <input class="file" type="file" name="uploadedfile" maxlength="204800" size="1">
+  <div class="fakefile">
+   <button dojoType="dijit.form.Button">Browse</button>
+  </div>
+ </div><div style="font-size:0;height:6px;"></div>  
+ <button onclick="submitme" dojoType="dijit.form.Button" type="submit">Upload</button><img onclick="alert(this.getAttribute('title'));" title="200kb max size, 110x110 natural size" src="/images/question_mark.gif"/>
+</form>
+<script type="text/javascript">
+var oldpic;
+var submitme = function() {
+        $("#uploadform").submit();
+};
+var ok1 = function(responseText, statusText, xhr, $form) {
+	if ( $(responseText).text() != '') {
+		var fname=$(responseText).text();
+		$("body",top.document).find("img[id^=pplimg]")[0].setAttribute('height','110px');
+		$("body",top.document).find("img[id^=pplimg]")[0].setAttribute('width','110px');
+		$("body",top.document).find("img[id^=pplimg]").attr('src','/upload/pplimage/'+fname);
+		$("body",top.document).find(':input[name="newimage"]:last').val('/upload/pplimage/'+fname);
+	} else {
+		alert('Error while uploading image');
+		$("body",top.document).find("img[id^=pplimg]")[0].setAttribute('height','110px');
+		$("body",top.document).find("img[id^=pplimg]")[0].setAttribute('width','110px');
+		$("body",top.document).find("img[id^=pplimg]").attr('src',oldpic);
+	};
+};
+
+var pre1 = function() {
+	oldpic = $("body",top.document).find("img[id^=pplimg]").attr('src'); 
+	$("body",top.document).find("img[id^=pplimg]")[0].setAttribute('height','32px');
+	$("body",top.document).find("img[id^=pplimg]")[0].setAttribute('width','32px');
+	$("body",top.document).find("img[id^=pplimg]").attr('src','/images/ajax-loader-small.gif');
+};
+
+$("#uploadform").ajaxForm({beforeSubmit: pre1, success: ok1});
+</script>

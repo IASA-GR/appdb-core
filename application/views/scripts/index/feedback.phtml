@@ -1,0 +1,332 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><div class="feedbackform aboutpage" >
+	<div class="aboutheader">
+		<span ><a href="/pages/contact/feedback" target="_blank">permalink</a></span>
+		<h1>Contact us / Feedback</h1>
+		<hr>
+	</div>
+	<div class="description">
+		<span>Your feedback is valuable in the continuing development of the EGI  
+AppDB service, so please take note that we always welcome requests for 
+new features.</span>
+	</div>
+	<div class="fields">
+		<div class="field username">
+			<div class="fieldname"><span class="mandatoryflag" title="Field is mandatory">*</span>Your name:</div>
+			<div class="fieldinput name">
+				<?php if( trim($this->username) !== "" ) { ?>
+					<span class="username"><?php echo $this->username; ?></span>
+					<input type="text" name="name"  value="<?php echo $this->username; ?>" dojoType="dijit.form.TextBox" style="display: none;"/>
+				<?php } else { ?>
+					<input type="text" name="name"  value="<?php echo $this->username; ?>" dojoType="dijit.form.ValidationTextBox" required="true" maxLength="80"/>
+				<?php } ?>
+				
+			</div>
+		</div>
+		<div class="field email">
+			<div class="fieldname"><span class="mandatoryflag" title="Field is mandatory">*</span>Your e-mail address:</div>
+			<div class="fieldinput email">
+				<?php if( count( $this->contacts ) > 0 ) { ?>
+				<select  dojoType="dijit.form.ComboBox" required="true">
+					<?php foreach($this->contacts as $c) { ?>
+					<option value="<?php echo $c->id; ?>" <?php echo ($c->isPrimary == "true")?"selected='selected'":""; ?> maxLength="100" ><?php echo $c->data; ?></option>
+					<?php } ?>
+				</select>
+				<?php } else { ?>
+					<input type="text" name="email"  value="" dojoType="dijit.form.ValidationTextBox" required="true" maxLength="300" />
+				<?php } ?>
+			</div>
+			<?php if( trim($this->username) !== "") { ?>
+			<div class="fieldinput cc">
+				<input type="checkbox" id="sendtome" value="true" />
+				<span>Add me to the CC list</span>
+			</div>
+			<div class="fieldinput help">
+				<span>You can provide many email addresses separated with a semicolon (<span class="keyword">;</span>)</span>
+			</div>
+			<?php } ?>
+		</div>
+		<div class="field subject">
+			<div class="fieldname"><span class="mandatoryflag" title="Field is mandatory">*</span>Subject:</div>
+			<div class="fieldinput subject">
+				<input type="text" name="subject" value="" dojoType="dijit.form.ValidationTextBox" required="true" maxLength="300"/>
+			</div>
+		</div>
+		<div class="field feedbacktext">
+			<div class="fieldname"><span class="mandatoryflag" title="Field is mandatory">*</span>Your feedback:</div>
+			<div class="fieldinput text">
+				<textarea class="feedbacktext" dojoType="dijit.form.Textarea" style="height:100%;" required="true" ></textarea>
+				<div class="maxchars"></div>
+			</div>
+		</div>
+	</div>
+	<div class="footer" >
+		<div class="contents">
+			<div class="captcha"><?php echo $this->captcha;?><?php if( trim($this->username) == "" ) {?>
+				<div class="captchacontent">
+					<div class="description">
+						<span class="securityrefresh">Click image to <span style="color:#0029A3;">refresh</span> word</span>
+						<span>Please type in the security word</span>
+					</div>
+					<div class="fieldinput captchainput">
+						<input type="text" dojoType="dijit.form.TextBox" required="true" maxLength="5" />
+					</div>
+				</div>
+				<?php } ?>
+			</div>
+			<div class="actions">
+				<span class="results"></span>
+				<button class="action send" dojoType="dijit.form.Button">Send</button>
+			</div>
+		</div>
+	</div>
+	<div class="report" style="display: none">
+		<div class="description">
+			Thank you for your feedback. We will reply as soon as possible. Bellow you can view the details of your feedback:
+		</div>
+		<div class="reportdata">
+			<div class="address">
+				<div class="fieldname">We will reply to your feedback to this address(es):</div>
+				<div class="fielddata"></div>
+			</div>
+			<div class="subject">
+				<div class="fieldname">
+					The subject of the feed back is:
+				</div>
+				<div class="fielddata"></div>
+			</div>
+			<div class="body">
+				<div class="fieldname">
+					The body of the message is:
+				</div>
+				<div class="fielddata"></div>
+			</div>
+		</div>
+		<div class="newfeedback">
+			<a href="#">Send new feedback</a>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+var feedback = (function(){
+	return new function(){
+		var name, email, feedback,captcha,captchaid, subject;
+		var sendit;
+		var MAX_CHARS = 2000;
+		
+		this.init = (function(_this){
+			return function(){
+				$(".feedbackform textarea.feedbacktext:last").attr("maxLength",MAX_CHARS);
+
+				dojo.parser.parse($(".feedbackform")[0]);
+				name =  dijit.byNode($(".feedbackform .fieldinput.name:last .dijit:last")[0]);
+				email = dijit.byNode($(".feedbackform .fieldinput.email:last .dijit:last")[0]);
+				feedback = dijit.byNode($(".feedbackform textarea.feedbacktext:last")[0]);
+				subject = dijit.byNode($(".feedbackform .fieldinput.subject:last .dijit:last")[0]);
+				sendit = dijit.byNode($(".feedbackform .actions .action.send:last")[0]);
+				
+				_this.initCaptcha();
+				_this.initValidator();
+			};
+		})(this);
+
+		this.initValidator = function(){
+			dojo.connect(email, "onKeyUp", this.checkValid);
+			dojo.connect(email, "onMouseUp", this.checkValid);
+			dojo.connect(email, "onChange", this.checkValid);
+			dojo.connect(feedback, "onKeyUp", this.checkValid);
+			dojo.connect(feedback, "onMouseUp", this.checkValid);
+			dojo.connect(feedback, "onChange",this.checkValid);
+			dojo.connect(name, "onKeyUp", this.checkValid);
+			dojo.connect(name, "onMouseUp", this.checkValid);
+			dojo.connect(name, "onChange",this.checkValid);
+			dojo.connect(subject, "onKeyUp", this.checkValid);
+			dojo.connect(subject, "onMouseUp", this.checkValid);
+			dojo.connect(subject, "onChange",this.checkValid);
+			dojo.connect(sendit,"onClick", this.sendFeedback);
+			
+			this.checkValid();
+		};
+		this.initCaptcha = (function(_this){
+			return function(){
+				if( $.trim($(".feedbackform .footer .captcha").html()) !== "" ){
+					$(".feedbackform .footer .captcha img:last").click(function(){
+						_this.refreshCaptcha();
+					});
+					captcha = dijit.byNode($(".feedbackform .footer .contents .captcha .captchainput > .dijit")[0]);
+				} else {
+					$(".feedbackform .footer .captcha").remove();
+				}
+			};
+		})(this);
+		
+		this.checkValid = (function(_this){
+			return function(){
+				var allHaveValues = ($.trim(email.get('displayedValue')).length>0) 
+					&& ($.trim(feedback.get('displayedValue')).length > 0 )
+					&& ($.trim(subject.get('displayedValue')).length > 0 )
+					&& ($.trim(name.get('displayedValue')).length > 0 );
+				
+				sendit.set("disabled",!allHaveValues);
+				
+				var fval = feedback.get('displayedValue');
+				
+				if(fval.length > 0){
+					$(".feedbackform .maxchars").html("using " + fval.length + " of " + MAX_CHARS + " characters");
+				} else {
+					$(".feedbackform .maxchars").html("max " + MAX_CHARS + " characters");
+				}
+				
+				if(fval.length >= MAX_CHARS){
+					$(".feedbackform .maxchars").addClass("invalid");
+				} else {
+					$(".feedbackform .maxchars").removeClass("invalid");
+				}	
+			};
+		})(this);
+		this.setupReport = function(d){
+			$(".feedbackform > .description").css({"display":"none"});
+			$(".feedbackform > .fields").css({"display":"none"});
+			$(".feedbackform > .footer").css({"display":"none"});
+			$(".feedbackform .report").css({"display":"block"});
+			if ( d.to && d.to.indexOf(";") ) {
+				var to = d.to.split(";");
+				$(".feedbackform .report .reportdata .address .fielddata").empty()
+				for(var i=0; i<to.length; i+=1){
+					$(".feedbackform .report .reportdata .address .fielddata").append("<div>"+to[i]+"</div>");
+				}
+			} else {
+				$(".feedbackform .report .reportdata .address .fielddata").text(d.to);
+			}
+			$(".feedbackform .report .reportdata .subject .fielddata").text(d.subject);
+			$(".feedbackform .report .reportdata .body .fielddata").empty().append("<pre>"+d.val()+"</pre>");
+			$(".feedbackform .report .newfeedback > a").click((function(self){ 
+				return function(){
+					email.set("value","");
+					subject.set("value","");
+					feedback.set("value","");
+					if( captcha && captcha.set ) {
+						name.set("value","");
+						captcha.set("value","");
+					}
+					$(".feedbackform .footer .captcha img:last").click();
+					$(".feedbackform > .description").css({"display":"block"});
+					$(".feedbackform > .fields").css({"display":"block"});
+					$(".feedbackform > .footer").css({"display":"block"});
+					$(".feedbackform .report").css({"display":"none"});
+					
+					self.checkValid();
+				};
+				
+			})(this));
+		};
+		this.setResults = function(state,data){
+			var res = $(".feedbackform .results"), senddisabled = false;
+			switch(state){
+				case "sending":
+					senddisabled = true;
+					$(res).html("<span class='loading'><img src='/images/ajax-loader-small.gif' border='0'/><span>...sending</span></span>");
+					break;
+				case "error":
+					$(res).html("<span class='error'><img src='/images/reportabuse.png' border='0'/><span>" + data + "</span></span>");
+					break;
+				case "unknown":
+					$(res).html("<span class='error'><img src='/images/reportabuse.png' border='0'/><span>" + data + "</span></span>");
+					break;
+				case "success":
+					$(res).html("");
+					this.setupReport(data);
+					senddisabled = true;
+					break;
+			}
+			sendit.set("disabled",senddisabled);
+		};
+		this.animateGroup = function(g){
+			$(".field." + g).css({"background-color":"#FF0000","border-radius":"5px"}).animate({"background-color":"#FFFFFF"},"slow", function(){
+				$(".field." + g).attr("style","");
+			});
+		};
+		this.sendFeedback = (function(_this){
+			return function(){
+				var v = {};
+				v.name = name.get('value');
+				v.email = email.get('value');
+				v.feedback = appdb.utils.base64.encode(feedback.get('value'));
+				v.cc = $(".feedbackform input#sendtome").is(":checked");
+				v.subject = subject.get('value');
+				
+				if( captcha ){
+					v.captchaid = $(".feedbackform input#captcha-id").val();
+					v.captcha = captcha.get('displayedValue');
+				}
+				
+				
+				sendit.set("disabled",true);
+				_this.setResults("sending");
+				$.ajax({
+					url: appdb.config.endpoint.base +"index/feedback",
+					type: "POST",
+					data: v,
+					success : function(d){
+						var o = appdb.utils.convert.toObject(d);
+						if( o.error ){
+							_this.setResults("error", o.error);
+							if(o.group){
+								_this.animateGroup(o.group);
+							}
+							return false;
+						}
+						_this.setResults("success", o);
+						return true;
+					},
+					error: function(e){
+						_this.setResults("unknown",e);
+						return false;
+					}
+				});
+			};
+		})(this);
+		this.refreshCaptcha = (function(_this){
+			return function(){
+				$(".feedbackform .footer .captcha").append("<div class='loadglass' ></div>").append("<span class='loading'><img src='/images/ajax-loader-small.gif' border='0'/><span>...sending</span></span>")
+				sendit.set("disabled",true);
+				$.ajax({
+					url: appdb.config.endpoint.base +"index/getcaptcha",
+					type: "GET",
+					success: function(d){
+						$(".feedbackform .footer .captcha form:last").remove();
+						$(".feedbackform .footer .captcha").prepend($(d));
+						$(".feedbackform .footer .captcha .loadglass").remove();
+						$(".feedbackform .footer .captcha .loading").remove();
+						_this.initCaptcha();
+						_this.checkValid();
+					},
+					error: function(){
+						$(".feedbackform .footer .captcha .loadglass").remove();
+						$(".feedbackform .footer .captcha .loading").remove();
+						_this.checkValid();
+					}
+				});
+			};
+		})(this);
+		this.init(); 
+	};
+})();
+
+</script>

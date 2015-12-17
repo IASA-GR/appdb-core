@@ -1,0 +1,203 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><div id="ppl_details"  class="person" xmlns="http://www.w3.org/1999/xhtml" xmlns:t="http://appdb.egi.eu/0.1/Template" xmlns:p="http://appdb.egi.eu/0.1/Template/Properties" xmlns:e="http://appdb.egi.eu/0.1/Template/Events">
+    <div style="width:inherit;height:99%;" id="personTabContainer" >
+		<ul>
+			<li><a href="#personInformationTab">Information</a></li>
+			<li><a href="#ppl_details_pubs">Publications</a></li>
+			<a class="reloadentity reloadperson icontext" href="#" onclick="appdb.pages.Person.reload();" title="Reload"><img alt="reload" border="0" src="/images/refresh.png"/><span>Reload</span></a>
+		</ul>
+		<div dojoType="dijit.layout.ContentPane" id="personInformationTab" title="Information" selected="true" style="overflow:visible;">
+    <div id="ppl_details_info" style="width:100%;">
+        <table style="width:100%;">
+            <tbody>
+                <tr>
+                    <td style="vertical-align: top;width:101px" >
+					 <center class="canzoom">
+                        <t:image p:id="personImage" p:src="/people/getimage?id={id}" e:mouseover="showImage('{id}',this);" p:loader="/images/ajax-loader-small.gif" p:title="{firstname} {lastname}" alt="Person image" p:runat="client" width="120" class="personimage" ></t:image>
+					 </center>
+						<div class='registeredrow'><span>Since:</span><t:data p:datamember="registeredOn" p:runat="client" p:transform="appdb.utils.FormatISODate" class='personregistration'/>
+                    </td>
+                    <td style="width: 400px;">
+                    <table style="vertical-align: middle;width: 100%">
+                        <tbody>
+                            <tr >
+                                <td colspan="2">
+									<div class="entityheader header">
+									   <t:data p:id="firstname" p:datamember="firstname" p:runat="client" style="padding-right:5px;" />
+									   <t:data p:id="lastname" p:edit="true" p:datamember="lastname" p:runat="client" />
+									   <div class="permalink"><t:link p:href="{permalink}" p:target="_blank" p:runat="client" class="permalink">[permalink]<p:empty></p:empty></t:link></div>
+									   <div class="entityid personid">(id:<t:data p:datamember='id' style="padding-right: 3px" p:runat="client" ></t:data>)</div>
+									</div>
+                                </td>
+                                </tr>
+                                <tr>
+                                    <td style="vertical-align: middle;width: 120px;">Gender:</td>
+                                    <td>
+                                        <t:enum p:id="gender" p:datamember="gender" p:provider="appdb.model.Genders" p:runat="client" >
+                                            <p:editor a:type="enum" p:provider="appdb.model.Genders" />
+                                            <p:empty><i>n/a</i></p:empty>
+                                        </t:enum>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="vertical-align: middle;">Scientific Orientation:</td>
+                                    <td>
+                                        <t:data p:id="roleType" p:datamember="role.type" p:runat="client" p:empty="<i>no role given</i>" style="padding-right:4px;" ></t:data>
+                                    </td>
+                                </tr>
+                                <tr style="display: none;">
+                                    <td style="vertical-align: middle;">Institute:</td>
+                                    <td>
+                                        <t:data p:id="institute" p:datamember="institute" p:empty="<i>n/a</i>" p:runat="client" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="vertical-align: middle;">Country:</td>
+                                    <td >
+                                        <t:data p:id="personCountry" p:datamember="country.$" p:runat="client" style="padding-right:5px" />
+                                        <t:repeat id="repeater" p:list="country.isocode" p:splitter="/" p:tolower="true" p:runat="client" style="display:inline;">
+                                            <p:item style="display:inline;"><t:image p:src="/images/flags/{_}.png" p:runat="client" p:title="{country.$}" style="border:1px solid #BFBFBF;vertical-align: middle" width="18" ></t:image></p:item>
+                                            <p:seperator style="padding:2px"></p:seperator>
+                                        </t:repeat>
+										<span class="nils software"><a href='#' class='nilcountryitems' data-country-id='' data-country-name='' >View country's related items </a></span>
+                                    </td>
+                                </tr>
+								<tr class="accessgroupcontainer">
+									<td style="vertical-align: middle;">Access Groups:</td>
+									<td><span class="accessgroups"></div></td>
+								</tr>
+								<tr><td class='rowseperator' colspan='2'><div class='seperator'/></td></tr>
+								<tr>
+									<td style="vertical-align: top;">Organizations:</td>
+									<td>
+										<div class="relationlist person-organization viewer"></div>
+									</td>
+								</tr>
+								<tr>
+									<td style="vertical-align: top;">Projects:</td>
+									<td>
+										<div class="relationlist person-project viewer"></div>
+									</td>
+								</tr>
+<?php if ( APPLICATION_ENV == "DISABLED-production" ) { ?>
+								<tr>
+                                    <td>Resource Provider:</td>
+                                    <td>
+                                    <t:repeat id="repeater" p:id="resourceProvider"  p:list="provider" p:runat="client">
+                                        <p:item><t:link p:href="#" p:target="" e:click="appdb.views.Main.showNgi({id:'{_.id}'},{mainTitle: '{._name}'});return false;" p:runat="client" title="click to view information about {_.name}" ><t:data p:datamember="_.name" p:runat="client"></t:data></t:link></p:item>
+                                        <p:seperator style="padding-right:2px;padding-left:2px">|</p:seperator>
+                                        <p:empty><i>No provider found</i></p:empty>
+                                    </t:repeat>
+                                    </td>
+								</tr>
+<?php } ?>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td colspan="2" align="center" style="text-align:center;width:45%;border-left: #3a3a3a 1px dashed;" class="viewmode">
+						<div class="person-group small-group groupcontainer">
+							<ul>
+								<li class="vomembershiplist"><a href="#vomembershiplist" title="View Virtual Organization Membership">Virtual Organization Membership</a></li>
+								<li class="contactinfo current"><a href="#contactinfo" title="View Contact Information">Contact Information</a></li>
+							</ul>
+                           <div id="vomembershiplist">
+							   <div class="vomembership"></div>
+						   </div>
+						   <div id="contactinfo" class="">
+							   <br/>
+							   <t:repeat p:list="contact" p:empty="#ppl_contacts_empty" p:runat="client" p:container="<ul style='list-style:none;padding:0px;margin:0px;'></ul>" >
+									<p:item contentType="li" style="padding:0px;margin:0px;width:100%;">
+										<div>
+										<div style="vertical-align: middle;text-align:right;width:40%;display:inline-block;">
+											<t:image p:src="/images/contacts/{_.type}.png" p:alt="{_.type}" p:title="{_.type}" p:runat="client" width="15" height="15" style="vertical-align: middle;max-width:60px;" ></t:image>
+											<t:data p:datamember="_.type" p:runat="client"  style="vertical-align: middle;display:inline-block;"></t:data><span style="padding:5px;">:</span>
+										</div>
+										<t:data p:datamember="_.protected" p:runat="client" style="display:inline-block;text-align:left;vertical-align: middle;width:40%;">
+											<p:empty><t:data p:datamember="_.$" p:runat="client" style="display:inline-block;text-align:left;vertical-align: middle;"></t:data></p:empty>
+											<t:image p:src="{_.$}" p:renderon="{_.protected}" p:runat="client" style="display:inline-block;text-align:left;vertical-align: middle;"></t:image>
+										</t:data>
+										</div>
+									</p:item>
+							   </t:repeat>
+						   </div>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+                </table>
+		<div id="msgdiv1" class="leavemsg"><a href="#" onclick="leaveMessageUnsigned();" class="icontext"><img src="/images/feedback.png" alt=""/><span>Leave a message</span></a></div>
+        <div style="min-height: 300px; overflow: visible; min-width: 1000px;width: 1000px;margin: 0 auto;">
+		<div class="filterdecorator personitems" data-pagelength="9" >
+			<div class="header">
+				<div class="title">Related items:</div>
+				<ul class="filter">
+					<li class="all current" data-filterclass="itemcontainer"><a href="" title="View all related items"><span>All</span><span class="counter"></span></a></li>
+					<li class="seperator">|</span>
+					<li class="switems" data-filterclass="switem"><a href="" title="View related software"><span>Software</span><span class="counter"></span></a></li>
+					<li class="seperator">|</span>
+					<li class="vappitems" data-filterclass="vappitem"><a href="" title="View related virtual appliances"><span>Virtual Appliances</span><span class="counter"></span></a></li>
+					<?php if ( Supports::swappliance() ) { ?>
+					<li class="seperator">|</li>
+					<li class="filterselector swappitems" data-filterclass="swappitem"><a href="" title="View related software appliances"><span>Software Appliances</span><span class="counter"></span></a></li>
+					<?php } ?>
+				</ul>
+			</div>
+			<ul class="itemgrid filteredlist" classname="itemgrid" ></ul>
+			<div class="filterpager">
+				<button class="action btn btn-light" onclick="return false;">
+					<span class="pagermessage">show more</span>
+				</button>
+			</div>
+			<div class="emptycontent" >
+				<div class="content">	
+					<img src="/images/exclam16.png">
+					<span>No related items found.</span>
+				</div>
+			</div>
+        </div>
+		</div>
+    </div>
+            </div>
+        <div dojoType="dijit.layout.ContentPane" title="Publications" class="publicationcontainer" style="width:inherit;height:95%;padding:0px;" >
+            <div id="ppl_details_pubs" dojoType="dijit.layout.ContentPane">
+            </div>
+        </div>
+	</div>
+</div>
+<div style="display:none">
+    <span id="ppl_data_empty"><i style="color: #727070">No data</i></span>
+    <span id="ppl_contacts_empty">
+        <center>
+            <div style="text-align:center;width:70%;padding:50px;margin:5px;">
+                <img src="/images/cancelicon.png" alt="" width="10" height="10" />
+                <span>No contact info found</span>
+            </div>
+        </center>
+    </span>
+    <span id="ppl_details_no_apps">
+        <i style="color: #727070">{firstname} {lastname} is not associated with any software</i>
+    </span>
+    <span id="ppl_details_no_pubs" >
+		<div class="emptycontent" style="display: block;">
+			<div class="content">	
+				<img src="/images/exclam16.png">
+				<span>No associated publications found.</span>
+			</div>
+		</div>
+    </span>
+</div>

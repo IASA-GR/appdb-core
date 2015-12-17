@@ -1,0 +1,622 @@
+/* 
+    Document   : default
+    Created on : Feb 21, 2011, 6:37:27 PM
+    Author     : nakos
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+body {
+    margin: 0px;
+    overflow: hidden;
+    padding: 0px;
+    color: #454545;
+    padding: 0px 0;
+    font-size: 99%;
+    font-family: Arial,sans-serif;
+    background-color: transparent;
+}
+body  * {
+    font-size: 99%  ;
+    font-family: Arial,sans-serif;
+   
+}
+html {
+   padding: 0px;
+   margin:0px;
+}
+
+.docktop{
+    border-radius: 12px 12px 0px 0px;
+    -moz-border-radius: 12px 12px 0px 0px;
+    -webkit-border-top-right-radius: 12px;
+    -webkit-border-top-left-radius: 12px;
+    vertical-align: top;
+    background: url("images/pagerbck.png") repeat-x 50% 50%;
+    border-style:none;
+    white-space: nowrap;
+    display: block;
+    padding:0px;
+    margin:0px;
+    background-color: black;
+    line-height: 0px;
+    height: auto;
+}
+.dockbottom{
+}
+.view-container{
+    height:100%;
+    padding: 0px;
+    margin:0px;
+    
+}
+.view-container table{
+    padding-bottom: 0px;
+    margin-bottom:0px;
+    
+}
+.listContainer{
+    width: 100%;
+    overflow-y: scroll;
+    background-color: white;
+}
+.list{
+   padding:0px;
+   margin:0px;
+}
+ul.list{
+    display:block;
+    margin-left: 0px;
+    padding-left:0px;
+    width: 100%;
+    clear: both;
+    height:50%;
+
+}
+ul.list li table{
+    width:100%;
+}
+ul.list li{
+    list-style: none;
+    margin-right:0px;
+    overflow:hidden;
+}
+.signature {
+        border-radius: 0px 0px 12px 12px;
+        -moz-border-radius: 0px 0px 12px 12px;
+        -webkit-border-bottom-right-radius: 12px;
+        -webkit-border-bottom-left-radius: 12px;
+	display:block;
+	text-align:left;
+	clear:both;
+	padding:0px;
+        margin-bottom: 0px;
+        background: url("images/pagerbck.png") repeat-x 50% 50%;
+        height:100%;
+}
+.listpager{
+    width: 101%;
+    border-style:none;
+	display:block;
+	text-align:left;
+	clear:both;
+	padding:7px;
+        padding-bottom:0px;
+        margin-bottom: 0px;
+        vertical-align: middle;
+        background: url("images/pagerbck.png") repeat-x 50% 50%;
+}
+.listpager li{
+        padding:0px;
+        margin:0px;
+	margin-left:10px;
+	text-decoration:none;
+	background-color:#F5F5F5;
+	color:#0072bc;
+	width:22px;
+        background: url("images/pagerbck.png") repeat-x 50% 50%;
+
+}
+li.pagerLink a,li.pagerLink a:link, li.pagerLink a:visited{
+	margin-left:10px;
+	text-decoration:none;
+	background-color:#F5F5F5;
+	color:#0072bc;
+	width:22px;
+        background: url("images/pagerbck.png") repeat-x 50% 50%;
+        cursor:pointer;
+}
+li.pagerLink a:hover {
+        border-radius: 0px 0px 12px 12px;
+        -moz-border-radius: 00px 0px 12px 12px;
+        -webkit-border-bottom-right-radius: 12px;
+        -webkit-border-bottom-left-radius: 12px;
+        color:#D96B00;
+        text-decoration:none;
+}
+li.pagerDisabled {
+	border:0px solid #EBEBEB;
+	margin-left:10px;
+	text-decoration:none;
+	background-color:transparent;
+        color :#d7d6d6;
+	cursor:default;
+}
+ul.listpager {
+	margin: -3px;
+	padding: 5px;
+	list-style: none;
+	text-align: center;
+	white-space:nowrap;
+        
+}
+ul.listpager li {
+	margin: -3px;
+	padding: 5px;
+	list-style: none;
+	display: inline;
+}
+.listtable{
+    
+}
+.listrow{
+    background-color: whitesmoke;
+    padding:0px;
+    margin:0px;
+    
+}
+.listitemseperator{
+    border-color: #7d99ab;
+    border-style: ridge;
+    border-width: 1px;
+}
+.odd{
+    background-color: #e6e4e4;
+}
+
+.listtable .listleftcol{
+    width:60px;
+    vertical-align: top;
+    padding-right: 5px;
+}
+.listcolimg{
+    padding:5px;
+    margin:5px;
+    width:30px;
+    height:30px;
+}
+.listcolimg img{
+    width:50px;
+    height:50px;
+    text-decoration: none;
+    border-style: none;
+}
+.listcolimg img a:hover {
+    border-style: solid;
+    border-width: 3px;
+}
+.listtable .listrightcol{
+    padding-top:5px;
+    height:95px;
+    vertical-align: top;
+}
+
+.listtable .listrightcol ul li{
+    text-align: left;
+    vertical-align: top;
+}
+
+.fieldcell{
+    text-align: left;
+    vertical-align: top;
+    width:30px;
+}
+.fieldvalue{
+    font-size: 99%;
+    font-family: Arial,sans-serif;
+}
+#p_appdb_applications_header{
+    border-bottom: #7d99ab ridge 2px;
+}
+#p_appdb_applications_pager{
+    padding-right: -5px;
+    margin-right:0px;
+    border-top: #7d99ab ridge 5px;
+    width:100%;
+}
+.valuecell{
+    font-weight: normal;
+}
+.searchPanel{
+    display:none;
+    text-align: center;
+    background: url("images/pagerbck.png") repeat 50% 50%;
+}
+.searchPanel td{
+    padding-top:0px;
+}
+.inputrow{
+    height:5px;
+    padding:20px;
+    margin:20px;
+}
+.searchfieldcell{
+    padding:0px;
+    padding-right: 10px;
+    text-align: right;
+}
+.searchfieldcell span{
+    padding-right: 10px;
+}
+.searchvaluecell{
+    padding:0px;
+    margin:0px;
+    padding-right: 10px;
+    width:200px;
+}
+.searchvaluecell input{
+    height:20px;
+    padding:0px;
+    margin:0px;
+    width:100%;
+}
+.searchdroplist{
+    width:100%;
+    font-size:x-small;
+}
+/*a.button {
+    background: url("images/button_corner_right.gif") no-repeat scroll right top transparent;
+    color: #444444;
+    display: block;
+    float: left;
+    font: 12px arial,sans-serif;
+    height: 24px;
+    margin-right: 6px;
+    padding-right: 18px;
+    text-decoration: none;
+    cursor:pointer;
+}
+a.button:hover {
+    color:#D96B00;
+}
+a.button span {
+    background: url("images/button.gif") no-repeat scroll 0 0 transparent;
+    display: block;
+    line-height: 14px;
+    padding: 5px 0 5px 18px;
+}*/
+a:hover{
+    color:#D96B00;
+}
+a.button {
+   border-top: 1px solid #f0f0f0;
+   background-color: #c4c2c4;
+   
+   height:15px;
+   -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorstr='#f0f0f0', EndColorstr='#e3e0e3')"; /* IE8 */
+   filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorstr='#f0f0f0', EndColorstr='#e3e0e3'); /* for IE */
+   background: -webkit-gradient(linear, left top, left bottom, from(#f0f0f0), to(#e3e0e3));
+   background: -moz-linear-gradient(top, #f0f0f0, #e3e0e3);
+   padding: 2px 4px;
+   -webkit-border-radius: 6px;
+   -moz-border-radius: 6px;
+   border-radius: 6px;
+   -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   box-shadow: rgba(0,0,0,1) 0 1px 0;
+   color: #474747;
+   font-size: 12px;
+   font-family: arial,sans-serif;
+   text-decoration: none;
+   vertical-align: middle;
+   cursor:pointer;
+   }
+a.button:hover {
+    color:#D96B00;
+   border-top-color: #ffffff;
+   background: #ffffff;
+   
+   }
+a.button:active {
+   border-top-color: #dedbde;
+   background: #dedbde;
+   }
+.itemfooter{
+    padding-top:10px;
+    width:auto;
+    font-size: x-small;
+}
+.itemfooter td{
+    width:auto;
+    padding:0px;
+    margin:0px;
+    text-align: center;
+    vertical-align: middle;
+}
+.itemfooterlink{
+    background-color:#cdcdcd;
+    border: #a7a9ac solid 1px;
+}
+.itemfooterlink.itemselected{
+    background-color: #444444;
+    color:white;
+}
+.applicationUrlList{
+    list-style: none;
+}
+.applicationUrlList a{
+    text-decoration: none;
+    cursor:pointer;
+}
+.applicationUrlList a:hover{
+    text-decoration: none;
+    cursor:pointer;
+}
+.itemfooterlink a{
+    text-decoration: none;
+     cursor:pointer;
+}
+.itemfooterlink a:hover {
+    color:#D96B00;
+   
+}
+td.hiddentext {
+    display:block;
+    overflow:hidden;
+    height:30px;
+}
+div.moretext a{
+    padding-left: 10px;
+    background: url('images/down.png') no-repeat center;
+}
+#ajaxloader{
+    border-radius: 12px 12px 12px 12px;
+    -moz-border-radius: 12px 12px 12px 12px;
+    -webkit-border-top-right-radius: 12px;
+    -webkit-border-top-left-radius: 12px;
+}
+a.hidetext{
+    text-decoration: none;
+    color: #0072bc;
+    font-weight: bold;
+    padding-left:0px;
+    cursor: pointer;
+}
+a.hidetext:hover{
+    color:#D96B00;
+}
+.appContactsList{
+    height:110px;
+    overflow-x:hidden;
+    overflow-y:scroll;
+}
+.appContactsList tbody tr{
+    overflow:scroll;
+}
+.appContactsListrow{
+   display: block;    
+}
+.appContact{
+    border-radius: 12px 12px 12px 12px;
+    -moz-border-radius: 12px 12px 12px 12px;
+    -webkit-border-top-right-radius: 12px;
+    -webkit-border-top-left-radius: 12px;
+    height:60px;
+    display:inline;
+    width: 220px;
+    float:left;
+    border-style:solid;
+    border-color: darkgray;
+    border-width:1px;
+    margin-right:10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.appPublication{
+
+}
+.appPublication .odd{
+    background-color: #e6e4e4;
+}
+.publicationRow{
+    border-bottom-style:none;
+}
+.publistrightcol{
+    text-align: left;
+    vertical-align: top;
+}
+
+.detailsBack{
+    display:block;
+    position:relative;
+     background: url("images/horizontalbck.png") repeat-y 50% 50% ;
+    /*background-color: #999999;*/
+    font-size:x-large;
+    vertical-align: middle;
+    text-align: center;
+    width:20px;
+    height: 100%;
+    padding:0px;
+    margin:0px;
+    padding-bottom:0px;
+    margin-bottom: 0px;
+}
+.detailsBack a.linkButton:hover{
+    background-color: #a7a9ac;
+    background: url("images/horizontalbck.png") repeat-y;
+}
+.backHover{
+ background-color: #a7a9ac;
+ background: url("images/horizontalbck.png") repeat-y ;
+}
+.contactlistrightcol{
+    display:inline-table;
+    vertical-align: top;
+    width:150px;
+    padding:0px;
+    margin:0px;
+
+}
+.contactlistrightcol table tr{
+    display: inline-table;
+    width:150px;
+    padding:0px;
+    margin:0px;
+    line-height: 8px;
+}
+.applicationUrlList{
+    vertical-align: top;
+}
+.applicationCountries{
+    vertical-align: top;
+}
+.applicationVos{
+    vertical-align: top;
+}
+.scroll-pane
+{
+        width:100%;
+	height:100%;
+	overflow: auto;
+}
+.activesearch{
+    color:green;
+}
+a.linkButton {
+  text-decoration: none;
+    color: #0072bc;
+    font-weight: bold;
+    padding-left:0px;
+    cursor: pointer;
+}
+.applicationDetails{
+    background-color: #ffffff;
+    padding:0px;
+    margin:0px;
+}
+.applicationDetails > table{
+    background-color: #ffffff;
+    padding:0px;
+    margin:0px;
+}
+a.linkButton:hover {
+     color:#D96B00;
+}
+a.linkButton:visited{
+    color: #0072bc;
+}
+a.linkButton:active{
+    color: #0072bc;
+}
+a.linkButton:link{
+    color: #0072bc;
+}
+
+
+.toggleButton{
+    color:#D96B00;
+    text-decoration: none;
+    cursor: pointer;
+}
+a.toggleButton:hover{
+    font-weight: bold;
+}
+
+div.backButton{
+    border-style: none;
+    position:relative;
+    top:200px;
+    padding:0px;
+    margin:0px;
+}
+#helpContainer{
+    background-color:  whitesmoke;
+}
+.helpButton{
+    color:#D96B00;
+    text-decoration: none;
+    width:100%;
+    cursor: pointer;
+    margin:0px;
+    padding-left:10px;
+    padding-right: 10px;
+}
+a.helpButton:hover {
+    width:100%;
+    background-color: #D96B00;
+    color:white;
+}
+.helpButton.selectedButton{
+    background-color: #D96B00;
+    color:white;
+    border-style:none;
+}
+#helpDocs{
+    overflow:auto;
+}
+div.changelogItem{
+    
+}
+ul.changelogItem{
+    padding:0px;
+    margin:0px;
+    padding-left:10px;
+    padding-top:5px;
+    list-style: none;
+}
+
+ul.changelogItem ul{
+    padding:0px;
+    margin:0px;
+   list-style: square;
+   padding-left:20px;
+}
+
+
+.viewpart{
+	width:100%;
+	padding:0px;
+	margin:0px;
+	
+}
+.viewpart input{
+	width:80%;
+	font-size:12px;
+	margin:0px;
+	height:22px;
+}
+.viewpart input[disabled]{
+	color:#a7a9ac;
+}
+
+.viewpart button.ui-button-icon-only {
+	margin:0px;
+	padding:0px;
+    height: 22px;
+    vertical-align: bottom;
+    width: 1.4em;
+}
+.ui-menu-item{
+	font-size:12px;
+	line-height: 14px;	
+}
+
+.ui-autocomplete.ui-menu{
+	overflow:auto;
+	max-height: 250px;
+}
+.invalidInputData {
+	border-color : #D96B00;
+	border-width :2px;
+	background-color: #F9F7BA;
+	background-image: none;
+}
+
+.searchvaluecell{
+ text-align: left;
+}
+
+.treeitems span{
+	color: #005CE5;
+}

@@ -1,0 +1,32 @@
+<?php
+
+class NgiController extends Zend_Controller_Action
+{
+
+    public function init()
+    {
+        /* Initialize action controller here */
+    }
+
+    public function indexAction()
+    {
+        trackPage('/ngi');
+	    $this->_helper->layout->disableLayout();
+        $entries=array();
+        exec('/usr/bin/perl /var/www/html/appdb/cgi-bin/rocs.pl',$phpcode);
+        eval(implode(" ",$phpcode));
+        $this->view->entries=$entries;
+    }
+
+    public function detailsAction()
+    {
+        trackPage('/ngi');
+	    $this->_helper->layout->disableLayout();
+        $entries=array();
+        exec('/usr/bin/perl /var/www/html/appdb/cgi-bin/rocs.pl '.$_GET["id"],$phpcode);
+        eval(implode(" ",$phpcode));
+        $this->view->entries=$entries;
+    }
+
+}
+

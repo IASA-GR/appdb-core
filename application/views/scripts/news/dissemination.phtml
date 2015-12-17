@@ -1,0 +1,59 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><div id="disseminationdivcontainer"><span style="float: right; margin-right: 20px;padding-top: 15px;"><a href="http://<?php echo $_SERVER['APPLICATION_UI_HOSTNAME'];?>/pages/admin/dissemination" target="_blank">permalink</a></span><br/>
+	<div id="disseminationdiv">
+		<form id="disseminationform" name="dissemination">
+			<div class="tabs">
+				<ul style="border-top: 0px; border-left: 0px; border-right: 0px">
+					<li><a href="#dissemination_recipients">Recipients</a></li>
+					<li><a href="#dissemination_message">Message</a></li>
+					<li><a href="#dissemination_log">Log</a></li>
+				</ul>				
+				<div id="dissemination_recipients">
+					<div>
+						<span><h3>Select recipients</h3></span>
+					</div>
+					<div id="dissemination_filter_builder"></div>
+					<div style="margin-bottom: 10px">
+						<span><h3 style="margin-bottom: 0px">Recipient Matches</h3></span><ul style="margin-top:0; margin-bottom:0"><li><span style="font-size: 8pt"><i>Hint: Use the checkboxes to <span style="color:red">exclude</span> individuals from the recipient matches below</i></span></li><li><span style="font-size: 8pt"><i>Note that users who have opted out of receiving dissemination e-mails will <span style="color:red">not</span> be displayed</i></span></li></ul>
+					</div>
+					<div id="dissemination_result"></div>
+					<div style="text-align: right">
+						<button dojoType="dijit.form.Button" onclick="$('div.tabs:last').tabs('select',1)">Continue &gt;&gt;</button>
+					</div>
+				</div>
+				<div id="dissemination_message">
+					<b>Subject:</b> <input class="dissemination_subject" style="width:84%" dojoType="dijit.form.TextBox"/><br/><br/>
+					<textarea style="width:90%;height:300px" class="tinymce"></textarea>
+					</br>
+					<div class="buttons" style="width:90%; text-align:right">
+					</div>
+				</div>
+				<div id="dissemination_log">
+					
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">	
+	$(function() {
+		$("div.tabs:last").tabs();
+		$("div.tabs:last").bind("tabsselect", function(event, ui) {
+		});
+	});
+</script>

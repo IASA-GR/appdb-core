@@ -1,0 +1,3 @@
+<?php
+class Repository_Model_MetaPoaReleasePackagesFilter extends Repository_Model_MetaPoaReleasePackagesFilterBase {
+}

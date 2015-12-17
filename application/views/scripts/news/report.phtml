@@ -1,0 +1,281 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><script type="text/javascript">
+var getReporting = function(){
+	var d=$("#report").serialize();
+	$("#main").empty();
+	showAjaxLoading();
+	$.ajax({
+		url: '/news/report',
+		type: 'POST',
+		data: d,
+		success: function(data){
+			$("#main").html(data);
+			hideAjaxLoading();
+		}
+	});
+};
+var exportReportToCSV = function(){
+	var csv='"Date","Type","Event","Name",';
+	$("#reporttable").find("tr").each(function(){
+		var l='';
+		$(this).find("td").each(function(){
+			if ( jQuery.trim($(this).text()) != '' ) {
+				l=l+'"'+$(this).text()+'",';
+			}
+		});
+		csv=csv+l+"\n";
+	});
+	$(".reporttext:last").show();
+	var ta = new dijit.form.Textarea({
+		value: csv
+	}, $(".reporttext:last")[0]);
+	$(".exportreport").remove();
+};
+$(document).ready(function(){
+	dojo.parser.parse($("#reportdiv")[0]);
+});
+</script>
+<div class="aboutpage">
+<div class="aboutheader">
+	<span><a href="http://<?php echo $_SERVER['APPLICATION_UI_HOSTNAME'];?>/pages/admin/activityreport" target="_blank">permalink</a></span>
+	<h1>Activity report</h1>
+	<hr>
+</div>
+<div id="reportdiv">
+<form id="report" name="report" >
+<label for="from" title="YYYY-MM-DD">From: </label><input dojotype="dijit.form.DateTextBox" constraints="{datePattern:'yyyy-MM-dd'}" type="text" name="from" <?php if ($this->from != '') echo 'value="'.$this->from.'"';?>/>
+<label for="to" title="YYYY-MM-DD">To: </label><input dojotype="dijit.form.DateTextBox" constraints="{datePattern:'yyyy-MM-dd'}" type="text" name="to" <?php if ($this->to != '') echo 'value="'.$this->to.'"';?>/>
+Type: <select class="reportitemtype" dojotype="dijit.form.FilteringSelect" name="filter">
+<option value=" ">Everything</option>
+<option value="app" <?php if ($this->filter == 'app') echo 'selected="selected"';?>>Software</option>
+<option value="vapp" <?php if ($this->filter == 'vapp') echo 'selected="selected"';?>>Virtual Appliances</option>
+<option value="ppl" <?php if ($this->filter == 'ppl') echo 'selected="selected"';?>>People</option>
+<option value="doc" <?php if ($this->filter == 'doc') echo 'selected="selected"';?>>Publications</option>
+</select>
+Event: <select class="reporteventtype" dojotype="dijit.form.FilteringSelect" name="event">
+<option value=" ">Any</option>
+<option value="insert" <?php if ($this->event == 'insert') echo 'selected="selected"';?>>New</option>
+<option value="update" <?php if ($this->event == 'update') echo 'selected="selected"';?>>Update</option>
+</select>
+<!-- <input type="submit" value="Search"/> -->
+<button dojotype="dijit.form.Button" type="button" onclick="getReporting();">Generate</button>
+</form>
+<br/><br/>
+<?php
+function isVAppCategory($data){
+	if( !$data || isset($data->category) === false ) return;
+	$categories = $data->category;
+	if( is_array($categories) ){
+		foreach($categories as $category){
+			if( trim($category->id) === "34" ){
+				return true;
+			}
+		}
+	}
+	return false;
+}
+function elink($type, $id, $name, $cname='') {
+	$sname = str_replace("'","\\'",$name);
+	switch ($type) {
+	case "app":
+		return '<a href="/store/software/'.$cname.'" onclick="appdb.views.Main.showApplication({id: '.$id.', cname:\''.$cname.'\'}, {mainTitle: \''.$sname.'\', content:\'software\'});">'.$name.'</a>';
+	case "vapp":
+		return '<a href="/store/vappliance/'.$cname.'" onclick="appdb.views.Main.showVirtualAppliance({id: '.$id.', cname:\''.$cname.'\'}, {mainTitle: \''.$sname.'\', content:\'vappliance\'});">'.$name.'</a>';
+	case "ppl":
+		return '<a href="/store/person/'.$cname.'" onclick="appdb.views.Main.showPerson({id: '.$id.', cname: \''.$cname.'\'}, {mainTitle: \''.$sname.'\'});">'.$name.'</a>';
+	case "doc":
+		if ( $id != '' ) {
+			return '<a href="'.$id.'" target="_blank">'.$name.'</a>';
+		} else {
+			return $name;
+		}
+		break;
+	}
+}
+
+if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
+	$appcount=0;
+	$vappcount=0;
+	$appcount2=0;
+	$vappcount2=0;
+	$pplcount=0;
+	$pplcount2=0;
+	$doccount=0;
+	if ($this->entries->count() == 0) {
+		echo "No results";
+	} else {
+		echo '<table id="reporttable" width="100%" style="table-layout:fixed;">';
+		echo '<tr ><th  style="width:25px;"></th><th style="width:150px;">Date</th><th style="width: 130px;">Type</th><th style="width: 100px;">Event</th><th style="text-align: left" >Name</th></tr>';
+		for($i=0; $i < $this->entries->count(); $i++) {
+			$entry = $this->entries->items[$i];
+			$itemType = $entry->subjectType;
+			if( $entry->subjectType === "app" ){
+				$subjectdata = $entry->getSubjectData();
+				if( $subjectdata ){
+					$subjectdata = json_decode($subjectdata);
+					if( $subjectdata && isset($subjectdata->application) === true){
+						$subjectdata = $subjectdata->application;
+						if( isVAppCategory($subjectdata) === true ){
+							$itemType = "vapp";
+						}
+					}
+				}
+			}
+			$e = null;
+			$l='<tr>';
+        	if ( $entry->subjectType == "doc" ) $img='<img style="vertical-align:middle" src="/images/pub.png" width="16px"/> ';
+        	elseif ( $entry->subjectType == "ppl" ) $img='<img style="vertical-align:middle" src="/images/pplicon2_grey.png"/ width="16px"> ';
+        	elseif ( $entry->subjectType == "app" ) $img='<img style="vertical-align:middle" src="/images/gear.png" width="16px"/> ';
+			$l.='<td>'.$img."</td>";
+			$timestamp = date_format(date_create($entry->timestamp),"Y-m-d H:i:s");
+			$l.='<td>'.$timestamp."</td>";
+			switch( $entry->subjectType ) {
+			case "app":
+				if ( $this->apps->item($entry->subjectId) !== null ) {
+					$e = $this->apps->item($entry->subjectId);
+					if( $itemType === "vapp" ){
+						$appcontenttype = "Virtual Appliance";
+					}else{
+						$appcontenttype = "Software";
+					}
+					switch ($entry->action) {
+					case "insert":
+						if( $itemType === "vapp" ){
+							$vappcount++;
+						}else{
+							$appcount++;
+						}
+						$l.="<td >" . $appcontenttype . "</td><td >New</td><td>".elink($itemType,$e->id,$this->escape($e->name),$this->escape($e->cname))."</td>";
+						break;
+					case "update":
+						if( $itemType === "vapp" ){
+							$vappcount2++;
+						}else{
+							$appcount2++;
+						}
+						$l.="<td >" . $appcontenttype . "</td><td >Update</td><td>".elink($itemType,$e->id,$this->escape($e->name),$this->escape($e->cname))."</td>";
+						break;
+					default: $e=null; break;
+					}
+				}
+				break;
+			case "ppl":
+				if ( $this->ppl->item($entry->subjectId) !== null ) {
+					$e = $this->ppl->item($entry->subjectId);
+					switch ($entry->action) {
+					case "insert":
+						$pplcount++;
+						$l.="<td >Person</td><td >New</td><td>".elink("ppl",$e->id,$this->escape($e->firstname." ".$e->lastname),$this->escape($e->cname))."</td>";
+						break;
+					case "update":
+						$pplcount2++;
+						$l.="<td >Person</td><td >Update</td><td>".elink("ppl",$e->id,$this->escape($e->firstname." ".$e->lastname), $this->escape($e->cname))."</td>";
+						break; 
+					default: $e=null; break;
+					}
+				}
+				break;
+			case "doc":
+				if ( $this->docs->item($entry->subjectId) !== null ) {
+					$e = $this->docs->item($entry->subjectId);
+					switch ($entry->action) {
+					case "insert":
+						$doccount++;
+						$l.="<td >Publication</td><td>New</td><td>".elink("doc",$e->url,$this->escape($e->title))."</td>";
+						break;
+					default: $e=null; break;
+					}
+				}
+				break;
+			default: break;
+			}
+			if ( $e !== null ) {
+				$l.='</tr>';
+				echo $l;
+			}
+		}
+		echo '</table>';
+		echo '<div style="margin-left:10px">';
+		echo '<br/>';
+		echo '<b>';
+		
+		if(trim($this->filter) === "app" || trim($this->filter) === ""){
+			if( $appcount > 0 ){
+				echo "$appcount new software item" . (($appcount>1)?"s have":" has") . " been registered<br/>";
+			}else{
+				echo "No software has been registered<br/>";
+			}
+
+			if( $appcount2 > 0 ){
+				echo "$appcount2 updated software item" . (($appcount2>1)?"s":"") . "<br/>";
+			}else{
+				echo "No software has been updated<br/>";
+			}
+			echo "<br/>";
+		}
+		if(trim($this->filter) === "vapp" || trim($this->filter) === ""){
+			if( $vappcount > 0 ){
+				echo "$vappcount new virtual appliance" . (($vappcount>1)?"s have":" has") . " been registered<br/>";
+			}else{
+				echo "No virtual appliance has been registered<br/>";
+			}
+
+			if( $vappcount2 > 0 ){
+				echo "$vappcount2 updated virtual appliance" . (($vappcount2>1)?"s":"") . "<br/>";
+			}else{
+				echo "No virtual appliance has been updated<br/>";
+			}
+			echo "<br/>";
+		}
+		if(trim($this->filter) === "ppl" || trim($this->filter) === ""){
+			if( $pplcount > 0 ){
+				echo "$pplcount new people profile" . (($pplcount>1)?"s have":" has") . " been registered<br/>";
+			}else{
+				echo "No person profile has been registered<br/>";
+			}
+
+			if( $pplcount2 > 0 ){
+				echo "$pplcount2 updated person profile" . (($pplcount2>1)?"s":"") . "<br/>";
+			}else{
+				echo "No person profile has updated<br/>";
+			}
+			echo "<br/>";
+		}
+		if(trim($this->filter) === "doc" || trim($this->filter) === ""){
+			if( $doccount > 0 ){
+				echo "$doccount new publication" . (($doccount>1)?"s have":" has") . " been inserted<br/>";
+			}else{
+				echo "No publication have been inserted<br/>";
+			}
+			echo '</br>';
+		}
+		echo '<button class="exportreport" dojotype="dijit.form.Button" type="button" onclick="exportReportToCSV();">Export to CSV</button>';
+		echo '<div style="margin-left:10px">';
+		echo '<textarea style="display: none" class="reporttext"></textarea>';
+		echo '</div>';
+		echo '</div>';
+	}
+}
+?>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+	dojo.require("dijit.form.DateTextBox");
+});
+</script>
+</div>

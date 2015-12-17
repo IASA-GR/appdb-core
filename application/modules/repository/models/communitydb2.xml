@@ -1,0 +1,204 @@
+<model db='communitydb' host='appdb-dev' user='commdb_remote' dba='mysql'>
+	<table name='comm_repo_allowed_os_dmethod_combinations' oname='CommRepoAllowedOsDmethodCombinations' singular='CommRepoAllowedOsDmethodCombination' selected='1' prefix='Repository'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='osId' oname='osId' otype='integer' selected='1' fkoname='os' fkotype='CommRepoOs' />
+		<field name='dMethodId' oname='dMethodId' otype='integer' selected='1' fkoname='deployMethod' fkotype='CommRepoDmethod' />
+	</table>
+	<table name='comm_repo_allowed_platform_combinations' oname='CommRepoAllowedPlatformCombinations' singular='CommRepoAllowedPlatformCombination' selected='1' prefix='Repository'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='osId' oname='osId' otype='integer' selected='1' fkoname='os' fkotype='CommRepoOs' />
+		<field name='archId' oname='archId' otype='integer' selected='1' fkoname='arch' fkotype='CommRepoArch' />
+		<field name='canSupport' oname='canSupport' otype='string' selected='1' />
+		<field name='fsPatternPrim' oname='fsPatternPrim' otype='string' selected='1' />
+		<field name='fsPatternSec' oname='fsPatternSec' otype='string' selected='1' />
+	</table>
+	<table name='comm_repo_archs' oname='CommRepoArchs' singular='CommRepoArch' selected='1' prefix='Repository'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='name' oname='name' otype='tinytext' selected='1' />
+		<field name='label' oname='label' otype='string' selected='1' />
+	</table>
+	<table name='comm_repo_dmethods' oname='CommRepoDmethods' singular='CommRepoDmethod' selected='1' prefix='Repository'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='name' oname='name' otype='tinytext' selected='1' />
+		<field name='label' oname='label' otype='string' selected='1' />
+		<field name='urlPattern' oname='urlPattern' otype='string' selected='1' />
+	</table>
+	<table name='comm_repo_oss' oname='CommRepoOss' singular='CommRepoOs' selected='1' prefix='Repository'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='name' oname='name' otype='tinytext' selected='1' />
+		<field name='displayName' oname='displayName' otype='tinytext' selected='1' />
+		<field name='flavor' oname='flavor' otype='tinytext' selected='1' />
+		<field name='displayFlavor' oname='displayFlavor' otype='string' selected='1' />
+		<field name='artifactType' oname='artifactType' otype='string' selected='1' />
+		<field name='acronym' oname='acronym' otype='string' selected='1' />
+	</table>
+	<table name='comm_repo_repositories' oname='CommRepoRepositories' singular='CommRepoRepository' selected='1' prefix='Repository'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='name' oname='name' otype='varchar' selected='1' />
+		<field name='base_path' oname='basePath' otype='varchar' selected='1' />
+		<field name='base_url' oname='baseUrl' otype='varchar' selected='1' />
+	</table>
+	<table name='comm_repo_states' oname='CommRepoStates' singular='CommRepoState' selected='1' prefix='Repository'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='name' oname='name' otype='varchar' selected='1' />
+		<field name='repository_id' oname='repositoryId' otype='integer' selected='1' fkoname='commRepoRepository' fkotype='CommRepoRepository' />
+	</table>
+	<table name='config' oname='Config' singular='ConfigEntry' selected='1' prefix='Repository'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='name' oname='name' otype='varchar' selected='1' />
+		<field name='value' oname='value' otype='string' selected='1' />
+	</table>
+	<table name='meta_apt_repofiles' oname='MetaAptRepofiles' singular='MetaAptRepofile' selected='1' prefix='Default'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='template' oname='template' otype='longtext' selected='1' />
+	</table>
+	<table name='meta_contacts' oname='MetaContacts' singular='MetaContact' selected='1' prefix='Repository'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='assocId' oname='assocId' otype='integer' selected='1' />
+		<field name='assocEntity' oname='assocEntity' otype='string' selected='1' />
+		<field name='externalId' oname='externalId' otype='integer' selected='1' />
+		<field name='contactTypeId' oname='contactTypeId' otype='integer' selected='1' fkoname='contactType' fkotype='MetaContactType' />
+		<field name='firstname' oname='firstname' otype='string' selected='1' />
+		<field name='lastname' oname='lastname' otype='string' selected='1' />
+		<field name='email' oname='email' otype='varchar' selected='1' />
+	</table>
+	<table name='meta_contact_types' oname='MetaContactTypes' singular='MetaContactType' selected='1' prefix='Repository'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='name' oname='name' otype='varchar' selected='1' />
+	</table>
+	<table name='meta_poa_docLinks' oname='MetaPoaDocLinks' singular='MetaPoaDocLink' selected='1' prefix='Repository'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='poaId' oname='poaId' otype='integer' selected='1' fkoname='poaRelease' fkotype='MetaPoaRelease' />
+		<field name='documentationLink' oname='documentationLink' otype='string' selected='1' />
+		<field name='documentationLinkType' oname='documentationLinkType' otype='integer' selected='1' />
+	</table>
+	<table name='meta_poa_release' oname='MetaPoaReleases' singular='MetaPoaRelease' selected='1' prefix='Repository'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='productReleaseId' oname='productReleaseId' otype='integer' selected='1' fkoname='productRelease' fkotype='MetaProductRelease' />
+		<field name='displayVersion' oname='displayVersion' otype='string' selected='1' />
+		<field name='releaseNotes' oname='releaseNotes' otype='string' selected='1' />
+		<field name='changeLog' oname='changeLog' otype='string' selected='1' />
+		<field name='poaUrl' oname='poaUrl' otype='string' selected='1' />
+		<field name='poaCandidateUrl' oname='poaCandidateUrl' otype='string' selected='1' />
+		<field name='poaPath' oname='poaPath' otype='string' selected='1' />
+		<field name='targetPlatformCombId' oname='targetPlatformCombId' otype='integer' selected='1' fkoname='targetCombonation' fkotype='CommRepoAllowedPlatformCombination' />
+		<field name='dMethodCombId' oname='dMethodCombId' otype='integer' selected='1' fkoname='deployMethod' fkotype='CommRepoAllowedOsDmethodCombination' />
+		<field name='qualityCriteriaVerificationReport' oname='qualityCriteriaVerificationReport' otype='string' selected='1' />
+		<field name='stageRolloutReport' oname='stageRolloutReport' otype='string' selected='1' />
+		<field name='additionalDetails' oname='additionalDetails' otype='string' selected='1' />
+		<field name='deleted' oname='deleted' otype='enum' selected='1' />
+		<field name='extraFld1' oname='extraFld1' otype='string' selected='1' />
+		<field name='extraFld2' oname='extraFld2' otype='string' selected='1' />
+		<field name='extraFld3' oname='extraFld3' otype='string' selected='1' />
+		<field name='extraFld4' oname='extraFld4' otype='string' selected='1' />
+		<field name='extraFld5' oname='extraFld5' otype='string' selected='1' />
+		<field name='timestampInserted' oname='timestampInserted' otype='string' selected='1' />
+		<field name='timestampLastUpdated' oname='timestampLastUpdated' otype='string' selected='1' />
+		<field name='timestampLastStateChange' oname='timestampLastStateChange' otype='string' selected='1' />
+	</table>
+	<table name='meta_poa_release_packages' oname='MetaPoaReleasePackages' singular='MetaPoaReleasePackage' selected='1' prefix='Repository'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='poaId' oname='poaId' otype='integer' selected='1' fkoname='poaRelease' fkotype='MetaPoaRelease' />
+		<field name='pkgName' oname='pkgName' otype='string' selected='1' />
+		<field name='pkgVersion' oname='pkgVersion' otype='string' selected='1' />
+		<field name='pkgRelease' oname='pkgRelease' otype='string' selected='1' />
+		<field name='pkgArch' oname='pkgArch' otype='string' selected='1' />
+		<field name='pkgType' oname='pkgType' otype='string' selected='1' />
+		<field name='pkgFilename' oname='pkgFilename' otype='string' selected='1' />
+		<field name='pkgDescription' oname='pkgDescription' otype='string' selected='1' />
+		<field name='pkgGeneral' oname='pkgGeneral' otype='string' selected='1' />
+		<field name='pkgMisc' oname='pkgMisc' otype='string' selected='1' />
+		<field name='pkgLevel' oname='pkgLevel' otype='enum' selected='1' />
+		<field name='pkgMd5Sum' oname='pkgMd5Sum' otype='string' selected='1' />
+		<field name='pkgSha1Sum' oname='pkgSha1Sum' otype='string' selected='1' />
+		<field name='pkgSha256Sum' oname='pkgSha256Sum' otype='string' selected='1' />
+		<field name='timestampInserted' oname='timestampInserted' otype='string' selected='1' />
+	</table>
+	<table name='meta_product_capabilities' oname='MetaProductCapabilities' singular='MetaProductCapability' selected='1' prefix='Repository'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='releaseId' oname='releaseId' otype='integer' selected='1' fkoname='metaProductRelease' fkotype='MetaProductRelease' />
+		<field name='capability' oname='capability' otype='string' selected='1' />
+	</table>
+	<table name='meta_product_release' oname='MetaProductReleases' singular='MetaProductRelease' selected='1' prefix='Repository'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='currentStateId' oname='currentStateId' otype='integer' selected='1' fkoname='commRepoState' fkotype='CommRepoState' />
+		<field name='previousStateId' oname='previousStateId' otype='integer' selected='1' />
+		<field name='displayVersion' oname='displayVersion' otype='string' selected='1' />
+		<field name='parent_id' oname='parentId' otype='integer' selected='1' fkoname='parentRelease' fkotype='MetaProductRelease' />
+		<field name='displayIndex' oname='displayIndex' otype='integer' selected='1' />
+		<field name='repoAreaId' oname='repoAreaId' otype='integer' selected='1' fkoname='repoArea' fkotype='MetaProductRepoArea' />
+		<field name='priority' oname='priority' otype='enum' selected='1' />
+		<field name='description' oname='description' otype='longtext' selected='1' />
+		<field name='technologyProvider' oname='technologyProvider' otype='string' selected='1' />
+		<field name='technologyProviderShortName' oname='technologyProviderShortName' otype='string' selected='1' />
+		<field name='ISODate' oname='iSODate' otype='varchar' selected='1' />
+		<field name='incremental' oname='incremental' otype='boolean' selected='1' />
+		<field name='majorVersion' oname='majorVersion' otype='integer' selected='1' />
+		<field name='minorVersion' oname='minorVersion' otype='integer' selected='1' />
+		<field name='updateVersion' oname='updateVersion' otype='integer' selected='1' />
+		<field name='revisionVersion' oname='revisionVersion' otype='integer' selected='1' />
+		<field name='releaseNotes' oname='releaseNotes' otype='longtext' selected='1' />
+		<field name='changeLog' oname='changeLog' otype='longtext' selected='1' />
+		<field name='installationNotes' oname='installationNotes' otype='longtext' selected='1' />
+		<field name='knownIssues' oname='knownIssues' otype='string' selected='1' />
+		<field name='repositoryURL' oname='repositoryURL' otype='string' selected='1' />
+		<field name='releaseXML' oname='releaseXML' otype='longtext' selected='1' />
+		<field name='qualityCriteriaVerificationReport' oname='qualityCriteriaVerificationReport' otype='string' selected='1' />
+		<field name='stageRolloutReport' oname='stageRolloutReport' otype='string' selected='1' />
+		<field name='additionalDetails' oname='additionalDetails' otype='string' selected='1' />
+		<field name='deleted' oname='deleted' otype='enum' selected='1' />
+		<field name='extraFld1' oname='extraFld1' otype='string' selected='1' />
+		<field name='extraFld2' oname='extraFld2' otype='string' selected='1' />
+		<field name='extraFld3' oname='extraFld3' otype='string' selected='1' />
+		<field name='extraFld4' oname='extraFld4' otype='string' selected='1' />
+		<field name='extraFld5' oname='extraFld5' otype='string' selected='1' />
+		<field name='timestampInserted' oname='timestampInserted' otype='string' selected='1' />
+		<field name='timestampLastUpdated' oname='timestampLastUpdated' otype='string' selected='1' />
+		<field name='timestampLastStateChange' oname='timestampLastStateChange' otype='string' selected='1' />
+		<field name='timestampReleaseDate' oname='timestampReleaseDate' otype='string' selected='1' />
+	</table>
+	<table name='meta_product_release_keywords' oname='MetaProductReleaseKeywords' singular='MetaProductReleaseKeyword' selected='1' prefix='Repository'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='releaseId' oname='releaseId' otype='integer' selected='1' fkoname='metaProductRelease' fkotype='MetaProductRelease' />
+		<field name='keyword' oname='keyword' otype='string' selected='1' />
+	</table>
+	<table name='meta_product_repo_area' oname='MetaProductRepoAreas' singular='MetaProductRepoArea' selected='1' prefix='Repository'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='name' oname='name' otype='string' selected='1' />
+		<field name='swId' oname='swId' otype='integer' selected='1' />
+		<field name='swName' oname='swName' otype='string' selected='1' />
+		<field name='description' oname='description' otype='string' selected='1' />
+		<field name='installationNotes' oname='installationNotes' otype='string' selected='1' />
+		<field name='additionalDetails' oname='additionalDetails' otype='string' selected='1' />
+		<field name='yumId' oname='yumId' otype='integer' selected='1' />
+		<field name='aptId' oname='aptId' otype='integer' selected='1' />
+		<field name='knownIssues' oname='knownIssues' otype='string' selected='1' />
+		<field name='timestampInserted' oname='timestampInserted' otype='string' selected='1' />
+		<field name='timestampLastUpdated' oname='timestampLastUpdated' otype='string' selected='1' />
+	</table>
+	<table name='meta_yum_repofiles' oname='MetaYumRepofiles' singular='MetaYumRepofile' selected='1' prefix='Default'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='template' oname='template' otype='longtext' selected='1' />
+	</table>
+	<table name='v_meta_poa_release_packages' oname='VMetaPoaReleasePackages' singular='VMetaPoaReleasePackage' selected='1' prefix='Default'>
+		<field name='id' oname='id' otype='integer' selected='1' />
+		<field name='poaId' oname='poaId' otype='integer' selected='1' />
+		<field name='pkgName' oname='pkgName' otype='string' selected='1' />
+		<field name='pkgVersion' oname='pkgVersion' otype='string' selected='1' />
+		<field name='pkgRelease' oname='pkgRelease' otype='string' selected='1' />
+		<field name='pkgArch' oname='pkgArch' otype='string' selected='1' />
+		<field name='pkgType' oname='pkgType' otype='string' selected='1' />
+		<field name='pkgFilename' oname='pkgFilename' otype='string' selected='1' />
+		<field name='pkgDescription' oname='pkgDescription' otype='string' selected='1' />
+		<field name='pkgGeneral' oname='pkgGeneral' otype='string' selected='1' />
+		<field name='pkgMisc' oname='pkgMisc' otype='string' selected='1' />
+		<field name='pkgLevel' oname='pkgLevel' otype='enum' selected='1' />
+		<field name='pkgMd5Sum' oname='pkgMd5Sum' otype='string' selected='1' />
+		<field name='pkgSha1Sum' oname='pkgSha1Sum' otype='string' selected='1' />
+		<field name='pkgSha256Sum' oname='pkgSha256Sum' otype='string' selected='1' />
+		<field name='timestampInserted' oname='timestampInserted' otype='string' selected='1' />
+		<field name='pkgUrl' oname='pkgUrl' otype='string' selected='1' />
+		<field name='pkgCandidateUrl' oname='pkgCandidateUrl' otype='string' selected='1' />
+		<field name='pkgPath' oname='pkgPath' otype='string' selected='1' />
+	</table>
+</model>

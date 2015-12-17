@@ -1,0 +1,451 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/> 
+        <style type="text/css"><!--
+body {
+    font-family: Helvetica,Arial, sans-serif;
+    font-size: 14px;
+}
+.mailcontainer{
+    width:100%;
+    max-width : 1024px;
+	text-align: left;
+}
+.mailheader{
+    width:100%;
+    border-bottom: #999999 1px solid;
+    padding:0px;
+    margin :0px;
+    max-width : 1024px;
+}
+.mailbody{
+    
+    background-color: whitesmoke;
+    margin-top:2px;
+    margin-bottom : 2px;
+    max-width : 1024px;
+}
+.mailsub {
+    padding-bottom: 10px;
+	text-align: left;
+}
+.mailsubheader {
+    background-color: #dcdcdc;
+    border-bottom: #dcdcdc 1px solid;
+    color : #2A2A2A;
+    width:100%;
+    display : inline-block;
+}
+.mailsubheader .name {
+    display : inline;
+}
+.mailsubheader .name > h3{
+    padding :0px;
+    margin:0px;
+    padding-left: 5px;
+    display : inline-block;
+}
+
+.mailsubheader .toolkit{
+    display : inline-block;
+    float : right;
+    padding:2px;
+    padding-right: 5px;
+}
+.toolkit {
+    font-size: 12px;
+    width:200px;
+    text-align: right;
+}
+.toolkit div{
+    display : inline-block;
+}
+.toolkit .seperator{
+    list-style: circle;
+}
+.toolkit .unsubscribe a{
+    cursor : pointer;
+    color : #fe5e01;
+    text-decoration: none;
+}
+.toolkit .unsubscribe a:hover{
+    text-decoration: underline;
+    color : #D96B00;
+}
+.mailsubbody{
+     padding-left:10px;
+}
+.mailnews{
+    border-top: #dcdcdc 1px dashed;
+    padding-bottom : 5px;
+    padding-top : 2px;
+}
+.mailnews div{
+    vertical-align: middle;
+}
+.mailnewsheader{
+    display : inline-block;
+    width:100%;
+    height:30px;
+}
+.mailnewsimg{
+    display : inline-block;
+}
+.mailnewsimg img {
+    width:30px;
+}
+.mailnewstitle{
+    display : inline-block;
+    font-weight: bold;
+    vertical-align: middle;
+}
+.mailnewstitle a{
+    text-decoration: none;
+    color : #2A2A2A;
+}
+.mailnewstitle a:hover{
+    color : #D96B00;
+}
+.mailnewsdate{
+    display : inline-block;
+    font-size: 12px;
+    width:110px;
+    vertical-align: middle;
+    float : right;
+    margin:0px;
+    padding:0px;
+    margin-top:8px;
+}
+.mailnewssummary{
+    padding-left :35px;
+}
+.mailfooter{
+    display : block;
+    text-align: center;
+    background-color: whitesmoke;
+    padding:0px;
+	padding-top:3px;
+	padding-bottom:2px;
+	max-width: 1024px;
+}
+.mailfooter span{
+    font-size: 12px;
+    color:gray;
+}
+.mailfooter a{
+    text-decoration: none;
+    color : #D96B00;
+}
+.mailfooter a:hover{
+    text-decoration: underline;
+}
+.iasa{
+    display:inline-block;
+    text-decoration:none;
+    text-align: center;
+    color:gray;
+    font-size:12px;
+    padding:3px;
+	max-width:1024px;
+}
+.iasa:hover{
+    color : #fe5e01;
+}
+.iasa:visited{
+   color:gray;
+}
+div.digest{
+	display: inline-block;
+	position: absolute;
+	left: 0px;
+	bottom: 0px;
+	margin: 0px;
+	padding: 2px 20px;
+	color: #3A3A39;
+	font-size: 20px;
+	z-index: 5000;
+	background-color: #F8F8F8;
+	border: 1px solid #AAA;
+	border-width: 1px 1px 0px 0px;
+	border-radius: 0px 3px 0px 3px;
+}
+.sitebanner {
+	height:135px;
+	padding: 0px;
+	background-color: whiteSmoke;
+	border: 1px solid #CCC;
+	border-radius: 4px 4px 4px 4px;
+	box-shadow: 2px 3px 7px gray;
+	margin: 1px 5px 10px;
+	padding-bottom: 3px;
+	padding-top: 3px;
+	position: relative;
+	top: 7px;
+	max-width: 1024px;
+	width:1024px;
+	text-align: left;
+	margin-bottom: 15px;
+}
+.sitebanner > .topmenubar{
+	max-height: 40px;
+	height: 40px;
+	min-height: 40px;
+	background: none;
+	background-color: #333;
+	box-shadow: 0 2px 6px #333;
+	position: fixed;
+	width: 100%;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	z-index: 950;
+}
+.sitebanner > .main{
+	height: 110px;
+	max-width: 1024px;
+	margin: 0 auto;
+	position: relative;
+	top: 0px;
+	z-index: 2000;
+}
+.sitebanner > .main > .logo{
+	width: auto;
+	top: 13px;
+	left: 4px;
+	position: absolute;
+	margin: 3px;
+}
+.sitebanner > .main > .logo > img{
+	width: 80px;
+	height: 80px;
+	vertical-align: middle;
+}
+.sitebanner > .main > .logo > span{
+	width: 400px;
+	height: 60px;
+	font-family: "Open Sans", Arial;
+	font-size: 24px;
+	color: #333;
+	display: inline-block;
+	position: relative;
+	vertical-align: middle;
+	padding: 5px;
+	top: 10px;
+}
+.sitebanner > .main > .logo > span > span{
+	letter-spacing: 4px;
+	color: #5C84FA;
+}
+.sitebanner > .main > .logo > span > .subtext{
+	font-size: 16px;
+	color: #0F4FF3;
+	letter-spacing: 0px;
+	vertical-align: top;
+}
+.sitebanner > .main > .contents {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	padding: 0px;
+	margin: 0px;
+	top: 0px;
+	list-style: none;
+	vertical-align: top;
+}
+.sitebanner > .main > .contents > li {
+	display: inline-block;
+	position: relative;
+	width: 150px;
+	height: 90px;
+	margin: 5px;
+	text-align: center;
+	vertical-align: bottom;
+	border-radius: 3px;
+}
+.sitebanner > .main > .contents > li.software{
+	background-color: #0E72A2;
+}
+.sitebanner > .main > .contents > li.vappliance{
+	background-color: #094461;
+}
+.sitebanner > .main > .contents > li.researchers{
+	background-color: #405C69;
+}
+.sitebanner > .main > .contents > li > span{
+	display: block;
+	width: 100%;
+	padding: 1px;
+	position: absolute;
+	left: 6px;
+	right: 6px;
+	bottom: 1px;
+	color: whiteSmoke;
+	display: inline-block;
+	margin: 0 auto;
+	text-align: left;
+	font-family: "Open Sans",Arial;
+	font-size: 18px;
+	white-space: pre-wrap;
+	vertical-align: bottom;
+}
+-->
+        </style>
+    </head>
+    <body style="text-align:center">
+		<center>
+        <table class="mailcontainer" border="0" cellpadding="0" cellspacing="0">
+            <tbody><?php if( $this->isExternalRequest == false ) {?>
+				<tr style="max-width:1024px;" align="center" >
+					<td>
+						<span style="font-size:10px;"><i>If you are facing difficulties viewing this message in your e-mail client click <a href="<?php echo $this->externalurl; ?>" target="_blank" title="View this message in html format in your web browser.">here</a>.</i></span>
+					</td>
+				</tr>
+			<?php } ?>
+                <tr style="height:90px;max-width:1024px;" align="center">
+                    <td>
+						<div class="sitebanner">
+							<div class="main">
+								<div class="logo"><img src="<?php echo $this->server; ?>images/appdblogo.png" alt=""/><span>Applications <span>Database</span><br/><span class="subtext">Software solutions for research communities</span></span></div>
+								<ul class="contents">
+									<li class="software" ><span>Software<br/>Marketplace</span></li>
+									<li class="vappliance"><span>Cloud<br/>Marketplace</span></li>
+									<li class="researchers"><span>People</span></li>
+								</ul>
+							</div>
+							<div class="digest" ><?php echo ucwords($this->digest); ?> news digest</div>
+						</div>
+                    </td>
+                </tr>
+                <tr style="max-width:1024px;" align="center" >
+                    <td>
+                        <div class="mailbody"><?php
+                                $subnews = $this->news;
+                                foreach($subnews as $subnew){
+                                    $sub = $subnew["subscription"];
+                                    $news = $subnew["news"];
+                                    $newscount = count($news);
+                            ?>
+                            <div class="mailsub">
+								<table cellspacing="0" cellpadding="0" style="width:100%;">
+									<tbody>
+										<tr style="height:22px;">
+											<td>
+												 <div class="mailsubheader" style="height:22px;padding-top:3px;padding-left:2px;">
+													<table width="100%"><tr background="#dcdcdc">
+													<td>
+													<span class="name"><span style="font-size:16px"><b><?php echo $sub->name; ?></b></span></span>
+													</td>
+													<td align="right">
+													<span class="toolkit">
+														<span class="notifications" ><b><?php echo $newscount;?></b> notification<?php echo ($newscount===1)?'':'s'; ?></span>
+														<span class="seperator">-</span>
+														<span class="unsubscribe">
+															<a href="<?php echo $this->server ."news/unsubscribe?id=".$sub->id."&delivery=".$this->delivery."&pwd=".md5($sub->unsubscribePassword);?>" title="Click here to unsubscribe from '<?php echo  $sub->name; ?>'" target="_blank">unsubscribe</a>
+														</span>
+													</span>
+													</td>
+													</tr>
+													</table>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<td>
+											<div class="mailsubbody">
+												<?php foreach($news as $new){
+													$parsed = null;
+													$parseditems = $new["parsed"];
+													if( array_keys($parseditems) !== range(0, count($parseditems) - 1) ){
+														$parseditems = array($parseditems);
+													}
+													$item = $new["item"];
+													if($item->subjectData){
+														$data = json_decode($item->subjectData);
+													}
+													for($i=0; $i<count($parseditems); $i+=1){
+														$parsed = $parseditems[$i];
+												 ?>
+												<div class="mailnews">
+													<table cellspacing="0" cellpadding="0" style="width:100%">
+														<tbody>
+															<tr>
+																<td>
+																	<div class="mailnewsheader" style="vertical-align: top;">
+																		<span class="mailnewsimg"><img src="<?php echo $this->server . 'apps/getlogo?id=' . $item->subjectid;  ?>" alt="" border="0" style="width:30px;height:30px;" /></span>
+																		<span class="mailnewstitle" style="vertical-align:top;padding-top:4px;"><a href='<?php echo $parsed["link"];?>' title='Click to view the entry' target='_blank'><?php echo $parsed["title"]; ?></a></span>
+																		<span class="mailnewsdate">
+																			<?php 
+																			if( array_key_exists("timestamp",$parsed) === true){
+																				echo date('d-M-Y H:i',strtotime($parsed["timestamp"])); 
+																			}else{
+																				echo date("d-M-Y H:i",  strtotime($item->timestamp)); 
+																			}
+																			?>
+																		</span>
+																	</div>
+																</td>
+															</tr>
+															<tr>
+																<td>
+																	<div class="mailnewssummary"><?php echo $parsed["summary"]; ?></div>
+																</td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+												<?php } ?>
+												<?php } ?>
+											</div>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<div class="mailitemfooter"></div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+                            </div><?php } ?>
+                        </div>
+                    </td>
+                </tr>
+                <tr valign="bottom"  align="center" style="max-width:1024px;">
+                    <td>
+                        <div class="mailfooter">
+                            <?php if($this->unsubscribedigestall != null) { ?>
+                            <span><a href="<?php echo $this->unsubscribedigestall; ?>" target="_blank">Unsubscribe</a> from all <b><?php echo $this->digest; ?></b> email notifications.</span>
+                            <?php  } ?>
+                            <?php if($this->unsubscribeall != null) {?>
+                            <span><a href="<?php echo $this->unsubscribeall; ?>" target="_blank">Unsubscribe</a> from <b>all</b> email notifications</span>
+                            <?php } ?>
+							<span style="display:block;">Alternatively, you could login to the EGI Applications Database and manage your subscriptions from your profile preferences tab.</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr style="max-width:1024px;" align="center">
+                    <td align="center" style="color:gray;width:1024px;">
+                        <a class="iasa" href="http://www.iasa.gr/" target="_blank"><font>&copy; Institute of Accelerating Systems and Applications</font>, 2009-<?php echo date("Y");?>, Athens, Greece</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+		</center>
+    </body>
+</html>

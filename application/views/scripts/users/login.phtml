@@ -1,0 +1,428 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><style>
+	#maincontent{
+		margin-top:0px;
+	}
+	#maincontent > .logo{
+		text-align: center;
+	}
+</style>
+<?php $this->session = new Zend_Session_Namespace('default'); ?>
+<script type="text/javascript">
+function Left(str, n){
+	if (n <= 0)
+	    return "";
+	else if (n > String(str).length)
+	    return str;
+	else
+	    return String(str).substring(0,n);
+}
+
+function Right(str, n){
+    if (n <= 0)
+       return "";
+    else if (n > String(str).length)
+       return str;
+    else {
+       var iLen = String(str).length;
+       return String(str).substring(iLen, iLen - n);
+    }
+}
+</script>
+<?php if ( isset($this->accountDeleted) && $this->accountDeleted === true ) { ?>
+<div id="maincontent">
+	<div class="logo">
+		<div class="decorator bottomright">
+			<span>Software for research communities</span>
+		</div>
+		<div class="decorator topleft">
+			<a href="#" onclick="showHome();window.scroll(0,0);" title="go home"><img class="moto" src="/images/appdb_logo_moto.png" alt=""/></a>
+		</div>
+		<img class="logo" src="/images/appdb-logo-new-small.png" usemap="#appdblogomap" />
+	</div>
+<center>
+<h3>Profile locked</h3>
+We are sorry, but your AppDB profile has been locked by an administrator or a manager; authenticated access unavailable.
+<?php if ( ! is_null($this->accountDeleter) ) { ?>
+<p><b>Profile locked by <a href="http://<?php echo $_SERVER['HTTP_HOST']."/?p=".base64_encode("/people/details?id=".$this->accountDeleterID);?>"><?php echo $this->escape($this->accountDeleter);?></a> on <?php echo $this->escape(date("d F Y", strtotime($this->accountDeletedOn)));?></b></p>
+<?php } ?>
+<p>Redirecting you to the <a href="http://<?php echo $_SERVER['HTTP_HOST'];?>/">EGI Applications Database</a> home page <span id="countdown"></span></p>
+</center>
+</div>
+<script type="text/javascript">
+var countdown=60;
+document.getElementById('countdown').innerHTML = "in "+countdown+" seconds...";
+var doCountDown = function() {
+	if (countdown>1) {
+		countdown = countdown - 1;
+		if (countdown > 1) { document.getElementById('countdown').innerHTML = "in "+countdown+" seconds..."; } else document.getElementById('countdown').innerHTML = "in "+countdown+" second...";
+	} else document.getElementById('countdown').innerHTML = "now";
+};
+setTimeout('window.location="http://<?php echo $_SERVER['HTTP_HOST'];?>/";',countdown*1000);
+setInterval('doCountDown()',1000);
+</script>
+<?php } elseif ( ( $this->session->username !== null ) && ( $this->session->userid !== null ) ) {
+	if (!$this->handled) header('Location: https://'.$_SERVER['HTTP_HOST'].'/');
+} elseif ( ( $this->session->username !== null ) && ( $this->session->userid === null ) ) { ?>
+<script type="text/javascript">
+	var browser = "<?php echo browser();?>";
+</script>
+<script type="text/javascript" src="/js/ajaxLoading.js"></script>
+<div id="maincontent">
+	<div class="logo">
+		<div class="decorator bottomright">
+			<span>Software for research communities</span>
+		</div>
+		<div class="decorator topleft">
+			<a href="#" onclick="showHome();window.scroll(0,0);" title="go home"><img class="moto" src="/images/appdb_logo_moto.png" alt=""/></a>
+		</div>
+		<img class="logo" src="/images/appdb-logo-new-small.png" usemap="#appdblogomap" />
+	</div>
+<div id="metadata" style="display: none;">
+	<input type="text" id="viewtype" value="login"/>
+</div>
+<script type="text/javascript" src="/js/itemview.js"></script>
+<?php $this->dialogCount = 0;?>
+<center><h3>Welcome <?php echo $this->session->fullName;?>!</h3></center>
+<center>
+<?php if ( is_array($this->entries) ) { ?>
+<p style="text-align:justify; width:60%;">This seems to be the first time you visit the EGI Applications Database since the EGI SSO accounts integration. However, the system has detected that you might possibly have an existing profile. Please check the profiles listed below, and if one of those is your, <span id="claimit"><a href="#" onclick="claimAccount()">claim it</a></span>; otherwise, <span id="newprofspan"><a id ="newprof" href="#" onclick="$('#claimer').remove(); $('#claimit').html('claim it'); selectProfile(0); $('#newprofspan').append($('#newprof').html()); $('#newprof').remove();">create a new profile</a></span>.</p>
+<?php } else { ?>
+<p style="text-align:justify; width:60%;">This seems to be the first time you visit the EGI Applications Database since the EGI SSO accounts integration. If this is true, please fill in your profile information below, otherwise <a href="mailto:appdb-bug@hellasgrid.gr">contact us</a> about claiming an existing profile.
+<?php } ?>
+</center>
+<div style="margin-left:auto; margin-right:auto; width:80%" id="claimer">
+<?php if ( is_array($this->entries) ) { ?>
+	<table>
+	<tr>
+	<td>
+	<select id="accountCombo" dojoType="dijit.form.Select" onchange="selectProfile();"><?php for ($i=0; $i<count($this->entries); $i++) {
+				echo "<option value='".$this->entries[$i]->id."'>".$this->entries[$i]->firstName." ".$this->entries[$i]->lastName."</option>";
+			}
+	?></select>
+	</td>
+	<td><div dojoType="dijit.form.Button" onclick="claimAccount();">Claim Profile</div></td>
+	</tr>
+	</table>
+<?php } ?>
+<div id="toolbarContainer" style="margin-left:auto; margin-right:auto; width: 910px;">
+	<div style="float: right;">
+	</div>
+	<div>
+		<br/><br/>
+	</div>
+</div>
+</div>
+<div style="margin-left:auto; margin-right:auto; width:910px;" id="detailsdlgcontent0">
+</div>
+<div id="rolehelp" style="margin-left:auto; margin-right:auto; width:80%"></div>
+</div>
+<script type="text/javascript" src="/js/ajaxCall.js"></script>
+<script type="text/javascript" src="/js/editForm.js"></script>
+<script type="text/javascript">
+var focusedDijitItem;
+function getComputedHeight(theElt){
+        if(is_ie()){
+                tmphght = document.getElementById(theElt).offsetHeight;
+        }
+        else{
+                docObj = document.getElementById(theElt);
+                var tmphght1 = document.defaultView.getComputedStyle(docObj, "").getPropertyValue("height");
+                tmphght = tmphght1.split('px');
+                tmphght = tmphght[0];
+        }
+        return tmphght;
+};
+
+    var prepareUpload2 = function() {
+        $('#uploadimage<?php echo $this->dialogCount;?>').html('<iframe scrolling="no" style="width:110px; height:55px; border:none; overflow:hidden" src="/people/uploadframe"></iframe>');
+    };
+	
+	var prepareUpload = function() {
+		$('#uploadimage<?php echo $this->dialogCount;?>').html('<a href="#" onclick="prepareUpload2();">Change image</a>');
+	};
+
+
+var dialogCount=0;
+var prepareUpload_old = function() {
+		var props = {
+			isDebug:false,
+			hoverClass:"uploadHover",
+			activeClass:"uploadPress",
+			disabledClass:"uploadDisabled",
+			uploadUrl: "people/uploadimage",
+			fileMask:[
+				["Jpeg File",   "*.jpg;*.jpeg"],
+				["GIF File",    "*.gif"],
+				["PNG File",    "*.png"],
+				["All Images",  "*.jpg;*.jpeg;*.gif;*.png"]
+			]
+		};
+		$('#uploadimage<?php echo $this->dialogCount;?>').addClass('btn').addClass('uploadBtn');
+		var uploader = new dojox.form.FileUploader(dojo.mixin({
+			force: "flash",
+			skipServerCheck: true,
+			showProgress:false,
+			selectMultipleFiles:false,
+			deferredUploading: 1,
+			uploadOnChange:true
+		},props), "uploadimage<?php echo $this->dialogCount;?>");
+		dojo.connect(uploader, "onProgress", function(dataArray){
+			dojo.forEach(dataArray, function(d){
+				$('#pplimg<?php echo $this->dialogCount;?>')[0].setAttribute('width','32px');
+				$('#pplimg<?php echo $this->dialogCount;?>')[0].setAttribute('height','32px');
+				$('height: 451px;#pplimg<?php echo $this->dialogCount;?>').attr('src','/images/ajax-loader-small.gif');
+			});
+		});
+		dojo.connect(uploader, "onComplete", function(dataArray){
+			dojo.forEach(dataArray, function(d){
+				$('#pplimg<?php echo $this->dialogCount;?>')[0].setAttribute('width','110px');
+				$('#pplimg<?php echo $this->dialogCount;?>')[0].setAttribute('height','110px');
+				if ( d.additionalParams.filename !== undefined ) {
+					$('#pplimg<?php echo $this->dialogCount;?>').attr('src','upload/pplimage/'+d.additionalParams.filename);
+					$(':input[name="newimage"]:last').val('upload/pplimage/'+d.additionalParams.filename);
+				} else {
+					$('#pplimg<?php echo $this->dialogCount;?>').attr('src','');
+					alert('An error occurred while uploading the image');
+				};
+			});
+		});
+	};
+	var onCreateProfile=function() {
+		hideAjaxLoading();
+		$("#claimer").empty();
+		$("#detailsdlgcontent0").remove();
+		$("#rolehelp").remove();
+		var countdown = 10;
+		$("#claimer").append("<div class='claimaccountresult' ><span>Your profile creation was successful.</span><br/><span>Redirecting you to the <a href='http://<?php echo $_SERVER['HTTP_HOST'];?>/'>EGI Applications Database</a> home page in <span class='countdown'>"+countdown+"</span> seconds.</span>");
+		var inter = setInterval(function(){
+			countdown-=1;
+			if( countdown <=0 ){
+				clearInterval(inter);
+				window.location='https://<?php echo $_SERVER['HTTP_HOST'];?>/';
+			}else{
+				$("#claimer").find(".claimaccountresult .countdown").text(countdown);
+			}
+		},1000);
+	};
+
+<?php
+    function contactTypeData($view) {
+        $ids=array();
+        $vals=array();
+        for ($i=0; $i<$view->contactTypes->count(); $i++) {
+            $ids[]="'".$view->contactTypes->items[$i]->id."'";
+            $vals[]="'".$view->contactTypes->items[$i]->description."'";
+        }
+        $ids="[".implode(",",$ids)."]";
+        $vals="[".implode(",",$vals)."]";
+        $s="{ids: ".$ids.",vals: ".$vals."}";
+        return $s;
+    }
+?>
+
+var detailsStyleAuto=0;
+var detailsStyle=0;
+var remembernewsfeed=0;
+
+var selectProfile=function(id) {
+    showAjaxLoading();
+	$("#detailsdlgcontent0").load("/people/details?id="+id+"&dc="+dialogCount, function() {
+        hideAjaxLoading();
+        $('ul.mainlist').find('a').attr("onclick","");
+    	$('#doctab0').hide(); 
+		$('#privtab0').hide();
+        $(".prefsdiv").hide();
+        $("ul.tab li+li").remove();
+		if ( id == 0 ) { 
+			<?php if ( isset($this->gender) ) { 
+				$string = $this->gender;
+				$string = substr_replace($string, strtoupper(substr($string, 0, 1)), 0, 1); ?>
+				$('span[edit_name="gender"]').html('<?php echo $string;?>');
+			<?php } ?>
+			<?php if ( isset($this->country) ) { ?>
+            $('span[edit_name="countryID"]').html('<?php echo $this->country;?>');
+			<?php } ?>
+            <?php if ( isset($this->roleType) ) { ?>
+            $('span[edit_name="positionTypeID"]').html('<?php echo $this->roleType;?>');
+			<?php } ?>
+			<?php if ( isset($this->institute) ) { ?>
+            $('span[edit_name="institution"]').html('<?php echo $this->institute;?>');
+			<?php } ?>
+            <?php if ( isset($this->SSOmail) ) { ?>
+                var usermail = '<tr><td align="right">' +
+                '<span class="editable" edit_onchange="setContactType" edit_name="contactType" edit_type="combo" edit_style="{\'max-width\': \'150px\'}" edit_data="<?php echo preg_replace("/'/","\\'",contactTypeData($this)); ?>" edit_group="true">e-mail</span>' +
+                '</td>' +
+                '<td align="left">' +
+                '<span class="editable" edit_name="contact" edit_group="true"  edit_type="text"><?php echo $this->escape($this->SSOmail); ?></span>' +
+                '</td></tr>';
+            $('#contactInfoTable0 tr:last').after(usermail);
+            <?php } ?>
+            onEdit();
+			$("#cancelsavedetails").remove();
+			<?php
+			if ( isset($this->lastname) && ($this->lastname != '') ) {
+				$lastName = $this->lastname;
+				$firstName = $this->firstname;
+			} else {
+				if ( $this->session->fullName == "" ) {
+					$firstName =  '';
+					$lastName = '';
+				} else {
+					$name=explode(" ",$this->escape($this->session->fullName));
+					$firstName = array_shift($name);
+					$lastName = implode(" ",$name);
+				}
+			}
+            ?>
+            $(':input[name="lastName"]').val('<?php echo $this->escape($lastName);?>');
+            $(':input[name="firstName"]').val('<?php echo $this->escape($firstName);?>');
+	    	$('#savedetails').unbind('click');
+			$('#savedetails').click(function() {
+				if ( eval($("#editperson0").attr("onvalidate")) ) {
+					showAjaxLoading();
+					$.post("/people/update",$("#editperson0").serialize(), onCreateProfile);
+				}
+			});
+            $.get("/help/faq", {}, function(data, reqstatus) {
+                    $("#rolehelp").html('<p>'+$(data).find('#faq3a').html()+'</p>');
+                }, 'html'
+            );
+		};
+	});
+};
+
+var selectProfile2=function(id) {
+	$("#detailsdlgcontent0").load("/people/details?id="+id+"&dc="+dialogCount, function() {
+		var nop=0;
+		<?php if (!is_array($this->entries)) { ?>
+		$('#editdiv<?php echo $this->dialogCount;?>').hide(); 
+		editForm('editperson<?php echo $this->dialogCount;?>'); 
+		$('#addcontactinfo<?php echo $this->dialogCount;?>').show(); 
+		$('#pplimg<?php echo $this->dialogCount;?>').parent().html($('#pplimg<?php echo $this->dialogCount;?>').parent().html()+'<div id=\'uploadimage<?php echo $this->dialogCount?>\'>Upload image...</div>'); $('#pplimg<?php echo $this->dialogCount;?>').attr('onmouseover','');
+		$('#pplimg<?php echo $this->dialogCount;?>').attr('onmouseout','');
+		prepareUpload();
+		$('#savedetails').unbind('click');
+		$('#savedetails').click(function() {
+			showAjaxLoading();
+			$.post("/people/update",$("#editperson0").serialize(), onCreateProfile);
+		});
+		<?php } ?>
+		if ( id == 0 ) { onEdit(); $('#doctab0').hide(); $('#privtab0').hide();};
+	});
+};
+
+var onClaimError = function(XMLHttpRequest, textStatus, errorThrown) {
+	window.location.reload(true);
+};
+
+var onClaimed = function(data, textStatus, XMLHttpRequest) {
+	window.location.reload(true);
+};
+
+var claimAccount=function() {
+	var id = $("#accountCombo input").val();
+	$.ajax({
+		type: "POST",
+		url: "/users/claimaccount", 
+		data: "id="+id,
+		success: onClaimed,
+		error: onClaimError
+	});
+    $("#claimer").remove();
+};
+
+<?php if ( is_array($this->entries) ) { ?>
+selectProfile($("#accountCombo").val());
+<?php } else {?>
+selectProfile(0);
+<?php } ?>
+</script>
+<?php 
+$this->dojo()->enable()
+    ->setDjConfigOption('parseOnLoad', true)
+    ->setLocalPath('/js/dojo/dojo.js')
+    ->addLayer('/js/dojo/appdb.js')
+    ->requireModule("dojo.parser")
+    ->requireModule("dijit.form.Select")
+    ->requireModule("dijit.form.Button");
+?>
+<?php } else { ?>
+<div id="maincontent">
+	<div class="logo">
+		<div class="decorator bottomright">
+			<span>Software for research communities</span>
+		</div>
+		<div class="decorator topleft">
+			<a href="#" onclick="showHome();window.scroll(0,0);" title="go home"><img class="moto" src="/images/appdb_logo_moto.png" alt=""/></a>
+		</div>
+		<img class="logo" src="/images/appdb-logo-new-small.png" usemap="#appdblogomap" />
+	</div>
+<center>
+<?php if (isset($this->ldapError)) { ?>
+<h3>Authentication Error</h3>
+<b><?php echo $this->ldapError; ?></b><br/>
+Please try logging-in again in a few seconds. If the problem persists, please <a href="http://helpdesk.egi.eu/" target="_blank">let us know</a>.
+<p>Redirecting you to the <a href="http://<?php echo $_SERVER['HTTP_HOST'];?>/">EGI Applications Database</a> home page <span id="countdown"></span></p>
+<?php } else { ?>
+<h3>Invalid username / password combination</h3>
+If you do not have an EGI SSO account, or you have lost your password, please visit the <a href="https://www.egi.eu/sso/">EGI Single Sign On site</a>
+<p>Redirecting you to the <a href="http://<?php echo $_SERVER['HTTP_HOST'];?>/">EGI Applications Database</a> home page <span id="countdown"></span></p>
+<br/>
+<?php } ?>
+<form name="loginform" method="POST" action="http<?php if ( APPLICATION_ENV == "production" ) echo "s";?>://<?php echo $_SERVER['HTTP_HOST'];?>/users/login<?php if ( APPLICATION_ENV != 'production') echo 'dev2';?>" onsubmit="return validateLogin();">
+<div style="text-align: center; width:auto; margin-left: auto; margin-right: auto">
+<table style="display: inline-block"><tbody>
+<tr><td><label style="vertical-align: middle" for="username">Username: </label></td><td><input id="username" type="text" name="username" value="<?php echo $this->username; ?>" dojoType="dijit.form.TextBox" /></td></tr>
+<tr><td><label style="vertical-align: middle" for="password">Password: </label></td><td><input type="password" name="password" value="" dojoType="dijit.form.TextBox" /></td></tr>
+<tr><td colspan="2" style="text-align: right"><button type="submit" dojotype="dijit.form.Button">Retry</button></td></tr>
+</tbody></table>
+</div>
+</form>
+</center>
+</div>
+<script type="text/javascript">
+function validateLogin() {
+	if ( $('#username').val() == "" ) return false; else return true;
+}
+var countdown=60;
+document.getElementById('countdown').innerHTML = "in "+countdown+" seconds...";
+var doCountDown = function() {
+	if (countdown>1) {
+		countdown = countdown - 1;
+		if (countdown > 1) { document.getElementById('countdown').innerHTML = "in "+countdown+" seconds..."; } else document.getElementById('countdown').innerHTML = "in "+countdown+" second...";
+	} else document.getElementById('countdown').innerHTML = "now";
+};
+setTimeout('window.location="http://<?php echo $_SERVER['HTTP_HOST'];?>/";',countdown*1000);
+setInterval('doCountDown()',1000);
+
+window.onresize = function(event) {
+	var h=document.body.clientHeight;
+	$("#maincontent").css('height',(h-18)+'px');
+};
+
+window.onresize();
+
+</script>
+<?php } ?>
+<script type="text/javascript">
+//ie fix
+if( $.browser.msie ){
+	function showHome(){}
+}
+</script>

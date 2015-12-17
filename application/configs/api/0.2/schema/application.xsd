@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+     The work represented by this source file is partially or entirely funded 
+     by the EGI-InSPIRE project through the European Commission's 7th Framework 
+     Programme (contract # INFSO-RI-261323)
+
+     Copyright 2010 IASA and GRNET
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at [http://www.apache.org/licenses/LICENSE-2.0| Apache License 2.0]
+
+
+     Unless required by applicable law or agreed to in writing, software 
+     distributed under the License is distributed on an "AS IS" BASIS, 
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+     See the License for the specific language governing permissions and 
+     limitations under the License.
+-->
+     
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+    targetNamespace="http://appdb.egi.eu/api/0.2/application"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:application="http://appdb.egi.eu/api/0.2/application"
+    xmlns:person="http://appdb.egi.eu/api/0.2/person"
+    xmlns:user="http://appdb.egi.eu/api/0.2/user"
+    xmlns:publication="http://appdb.egi.eu/api/0.2/publication"
+    xmlns:vo="http://appdb.egi.eu/api/0.2/vo"
+    xmlns:dissemination="http://appdb.egi.eu/api/0.2/dissemination"
+    xmlns:rating="http://appdb.egi.eu/api/0.2/rating"
+    xmlns:regional="http://appdb.egi.eu/api/0.2/regional">
+
+    <xs:import namespace="http://appdb.egi.eu/api/0.2/dissemination"
+        schemaLocation="dissemination.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/0.2/rating"
+        schemaLocation="apprating.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/0.2/vo"
+        schemaLocation="vo.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/0.2/publication"
+        schemaLocation="publication.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/0.2/regional"
+        schemaLocation="regional.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/0.2/user"
+        schemaLocation="user.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/0.2/person"
+        schemaLocation="person.xsd"/>
+
+    <xs:complexType name="middlewareType" mixed="true">
+        <xs:attribute name="id" type="xs:integer" use="required" />
+        <xs:attribute name="comment" type="xs:string" use="optional" />
+    </xs:complexType>
+
+    <xs:complexType name="statusType" mixed="true">
+        <xs:attribute name="id" type="xs:integer" use="required" />
+    </xs:complexType>
+
+
+    <xs:complexType name="urlType" mixed="true">
+        <xs:attribute name="id" type="xs:integer" use="required" />
+        <xs:attribute name="type" type="xs:string" use="required" />
+        <xs:attribute name="title" type="xs:string" use="optional" />
+    </xs:complexType>
+
+    <xs:complexType name="subdisciplineType" mixed="true">
+        <xs:attribute name="id" type="xs:integer" use="required" />
+    </xs:complexType>
+    
+    <xs:complexType name="tagType" mixed="true">
+        <xs:attribute name="submitterID" type="xs:integer" use="optional" />
+    </xs:complexType>
+
+	<xs:complexType name="disciplineType" mixed="true">
+        <xs:attribute name="id" type="xs:integer" use="required" />
+    </xs:complexType>
+
+	<xs:complexType name="categoryType" mixed="true">
+        <xs:attribute name="id" type="xs:integer" use="required" />
+    </xs:complexType>
+
+    <xs:element name="category" type="application:categoryType" nillable="true"/>
+    <xs:element name="discipline" type="application:disciplineType" nillable="true"/>
+    <xs:element name="subdiscipline" type="application:subdisciplineType" nillable="true"/>
+    <xs:element name="middleware" type="application:middlewareType" />
+    <xs:element name="status" type="application:statusType" />
+
+	<xs:complexType name="contactItemType" mixed="true">
+        <xs:attribute name="id" type="xs:integer"/>
+        <xs:attribute name="type" type="xs:string"/>
+        <xs:attribute name="note" type="xs:string"/>
+	</xs:complexType>
+    
+    <xs:complexType name="applicationType">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="description" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="abstract" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="addedOn" type="xs:dateTime" />
+            <xs:element name="lastUpdated" type="xs:dateTime" />
+            <xs:element name="owner" type="person:personType" minOccurs="1" nillable="true"/>
+            <xs:element name="addedby" type="person:personType" minOccurs="1" nillable="true"/>
+            <xs:element ref="application:category" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element ref="application:discipline" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element ref="application:subdiscipline" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element ref="application:status" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="vo:vo" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element ref="regional:region" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element ref="regional:country" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="contact" type="person:personType" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="url" type="application:urlType" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element ref="publication:publication" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element ref="application:middleware" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="permalink" type="xs:string" minOccurs="0" maxOccurs="1" />
+            <xs:element name="logo" type="xs:string" minOccurs="0" maxOccurs="1" />
+            <xs:element name="moderatedOn" type="xs:dateTime" minOccurs="0" maxOccurs="1" />
+            <xs:element name="moderationReason" type="xs:string" minOccurs="0" maxOccurs="1" />
+            <xs:element name="moderator" type="person:personType" minOccurs="0" maxOccurs="1" />
+            <xs:element ref="user:permissions" minOccurs="0" maxOccurs="1" />
+            <xs:element name="tag" type="application:tagType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:integer" use="required" />
+        <xs:attribute name="tool" type="xs:boolean" use="optional" default="false" />
+        <xs:attribute name="rating" type="xs:float" use="optional" />
+        <xs:attribute name="ratingCount" type="xs:integer" use="optional" />
+        <xs:attribute name="popularity" type="xs:float" use="optional" />
+        <xs:attribute name="hitcount" type="xs:integer" use="optional" />
+        <xs:attribute name="tagPolicy" type="xs:integer" use="optional" />
+        <xs:attribute name="moderated" type="xs:boolean" use="optional" />
+        <xs:attribute name="bookmarked" type="xs:boolean" use="optional" default="false" />
+    </xs:complexType>
+
+    <xs:element name="application" type="application:applicationType" />
+    <xs:element name="contactItem" type="application:contactItemType" />
+
+	<xs:complexType name="ratingType">
+        <xs:sequence>
+            <xs:element ref="rating:rating" minOccurs="1" maxOccurs="1" />
+            <xs:element ref="rating:comment" minOccurs="0" maxOccurs="1" />
+			<xs:element ref="rating:submittedOn" minOccurs="1" maxOccurs="1" />
+			<xs:element ref="rating:submitter" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:integer" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="relatedApplicationType">
+        <xs:sequence>
+            <xs:element ref="application:application" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="rank" type="xs:integer" use="required" />
+        <xs:attribute name="parentID" type="xs:integer" use="required" />
+        <xs:attribute name="parentName" type="xs:string" use="required" />
+	</xs:complexType>
+
+    <xs:element name="rating" type="application:ratingType" />
+    <xs:element name="relatedapp" type="application:relatedApplicationType" />
+    
+    <!--	<xs:element name="filter" type="filter:filterType" /> -->
+
+    <xs:group name="disciplines">
+        <xs:sequence>
+            <xs:element ref="application:discipline" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element ref="application:subdiscipline" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:group>
+</xs:schema>

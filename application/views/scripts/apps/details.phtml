@@ -1,0 +1,1632 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php if ( $this->entryid == "0" ) $this->entryid = ''; ?>
+<?php $wiki = ApplicationConfiguration::app('wiki', ApplicationConfiguration::uiUrl()); ?>
+<?php if ( ( $this->entryid == '') && ($this->session->userid === null) ) { ?>
+<div style="text-align: center"><img alt="error" width="32px" src="/images/error.png" style="vertical-align: middle"/> <b>Permission denied</b></div>
+<?php } else { ?>
+<div class="appviewtoolbar" style="display:none;">
+	<a class="app-edit" href="#" onclick="$(this).hide(); onAppEdit(appdb.pages.application.currentId());"><img alt="edit" border="0" src="/images/editicon.png"/>Edit</a>
+	<a class="app-mod" href="#" style="display:inline-block;white-space: nowrap;"><img alt="moderate" border="0" src="/images/stop2.png"/><span style='margin:0px;padding:0px;'>Moderate</span></a>
+	<a class="app-del" href="#" onclick="deleteApplication(appdb.pages.application.currentId());"><img alt="delete" border="0" src="/images/cancelicon.png"/>Delete</a>
+	<a class="app-managereleases hidden hideonedit" href="#" onclick="appdb.pages.application.selectSection('releases',true);" title="Manage releases"><img alt="delete" border="0" src="/images/repository/managerepository.png"/>Manage releases</a>
+	<a class="app-vappliance hidden hideonedit" href="#" onclick="appdb.pages.application.selectSection('virtualappliance',true);" title='Manage Virtual Applicance'><img alt="delete" border="0" src="/images/repository/managerepository.png"/>Manage VA Images</a>
+	<a class="app-contextualization hidden hideonedit" href="#" onclick="appdb.pages.application.selectSection('versions',true);" title='Manage versions'><img alt="delete" border="0" src="/images/repository/managerepository.png"/>Manage versions</a>
+	<a class="app-bm" href="#" onclick="toggleBookmark(appdb.pages.application.currentId());"><img alt="bookmark" border="0" src="/images/star1.png"/>Bookmark</a>
+	<a class="app-history" href="#" onclick="appHistory(appdb.pages.application.currentId());"><img alt="history" border="0" src="/images/history.png"/>History</a>
+</div>
+<div align="left" style="height:100%;">
+
+<div id="navdiv<?php echo $this->dialogCount;?>" style="width:100%;height:100%;padding:0px;padding-right:0px;margin:0px;overflow: visible;" class="invisible<?php echo ' entity' . $this->entitytype; ?> viewmode" tabStrip="true" doLayout="false" itemscope itemtype="http://schema.org/SoftwareApplication">
+	<ul>
+		<li><a href="#infodiv<?php echo $this->dialogCount;?>">Information</a></li>
+		<li><a href="#docdiv<?php echo $this->dialogCount;?>">Publications<span class="publicationcounter tabcounter"></span></a></li>
+		<li data-forentity="software"><a href="#repositorydiv<?php echo $this->dialogCount;?>" <?php echo ( ( isset($_SERVER["Repository_Enabled"]) && $_SERVER["Repository_Enabled"] == "true")?"":" style='display:none;'"); ?>>Software Releases<span class="releasecounter tabcounter"></span></a></li>
+		<li data-forentity="vappliance"><a href="#vappliancediv<?php echo $this->dialogCount;?>">Virtual Appliance Versions<span class="privacycounter tabcounter hidden"></span></a></li>
+		<li data-forentity="swappliance"><a href="#contextualizationdiv<?php echo $this->dialogCount;?>">Software Appliance Version<span class="hidden"></span></a></li>
+		<li><a href="#ratingdiv<?php echo $this->dialogCount;?>">Comments & Ratings<span class="commentscounter tabcounter"></span></a></li>
+		<?php if( $this->session->userid ){ ?>
+		<li style="position:absolute;right:25px;top:1px;"><a href="#permissionsdiv<?php echo $this->dialogCount;?>" class="icontext"><img src="/images/logout.png" alt=""/><span>Permissions</span></a></li>
+		<?php } ?>
+		<div id='toolbarContainer'></div>
+		<div class='closedialog'><a href="#" title="click to close current page" onClick="appdb.views.Main.closeCurrentView();"><img src="/images/closeview.png" border="0" alt="close"></a></div>
+		<a class="reloadentity reloadapplication icontext" href="#" onclick="appdb.pages.Application.reload();" title="Reload"><img alt="reload" border="0" src="/images/refresh.png"/><span>Reload</span></a>
+	</ul>
+	<form id="bookmarkapp<?php echo $this->dialogCount;?>" name="bookmarkapp" callback="onToggleBookmark" method="post" action="apps/togglebookmark"><input name="id" style="display: none;" type="text" value="<?php echo $this->entryid;?>"/></form>
+	<form onvalidate="validateApp()" id="editapp<?php echo $this->dialogCount;?>" name="editapp<?php echo $this->dialogCount;?>" action="apps/update" method="post" callback="onAppUpdate" callback_data="{appID: '<?php echo $this->entryid;?>'}" errorcallback="onError" <?php if ( $this->entryid == "" ) { ?>cancelcallback="appdb.pages.application.cancelCallback();"<?php } else {?>cancelcallback="appdb.views.Main.refresh();"<?php } ?>>
+		<input type="hidden" name="metatype" id="metatype" value="<?php echo $this->entitytypeid; ?>" />
+		<div id="infodiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" title="" selected="true" class="information" >
+			<table width="100%" cellspacing="0">
+			<tr>
+			<td width="100%">
+			<table border="0" width="100%">				
+				<tr id="editRow<?php echo $this->dialogCount;?>"><td style="text-align: right;" colspan="2"></td></tr>
+				<tr>
+					<td width="100px">
+						<div style="vertical-align:middle;">
+							<center class="canzoom">
+							<img alt="app logo" class="app-logo" id="applogo<?php echo $this->dialogCount;?>" onmouseover="showLogo(<?php if (isnull($this->entryid)) echo "'0'"; else echo 'appdb.pages.application.currentId()'; ?>,this);" border="0" src="" width='100px' itemprop="image" />
+							</center>
+							<span class="editable" style="display:none" edit_type="hidden" edit_name="newimage"></span>
+						</div>
+						<span class="app-hitcount"></span>
+					</td>
+					<td>
+						<div class="app-title">
+							<span class="app-displayname" itemprop="name"></span>
+							<span class="rightalign">
+								<span class="app-id">(id:<?php echo $this->entryid; ?>)</span>
+								<span class="app-permalink"><a href="http://<?php echo $_SERVER["HTTP_HOST"].'?p='.base64_encode('/apps/details?id='.$this->entryid); ?>" class="permalink" target="_blank">[permalink]</a></span>
+							</span>
+						</div>
+						<div class="app-subtitle">
+							<?php if ( $this->entryid != ''  ) { ?>
+								<span class="app-rateit">Rate It:</span><span class="app-rating"></span>
+							<?php } ?>
+							<span class="followme dijitButtonNode"></span>
+						</div>
+						<div class="app-displaydescription" >
+							<span class="app-description" itemprop="description" ></span>
+						</div>
+						<div class="altRelatedApps" style="display: none; float: right;"><span style="display: none; padding-left: 5px; padding-right: 5px;" class="reportLinkSeparator">•</span><a href="#" onclick="$('div.relatedapps').parent().show(); $(this).parent().hide(); $('.reportLinkSeparator').hide();">Suggested items</a></div>
+
+						<table style="width: 95%" class="field-app-maindata">
+						<?php if ( $this->histid != '' ) { ?> 
+						<tr>
+							<td style="vertical-align: middle"><h4><span>Historical entry:</span></h4></td>
+							<td style="text-align: right"><h4><span class="app-hist-timestamp"></span> <span class="app-rollback"><button class="tundra" dojoType="dijit.form.Button" style="margin-left:15px" onclick="appHistoryRollback(appdb.pages.application.currentId(),appdb.pages.application.currentHistoryId(),appdb.pages.application.currentHistoryType());return false;">Rollback</button></span></h4></td>
+							<td><h4><span><button class="tundra" dojoType="dijit.form.Button" style="margin-left:15px" onclick="appdb.views.Main.showApplication({id: appdb.pages.application.currentId(), name: appdb.pages.application.currentName(), cname: appdb.pages.application.currentCName()}); return false;">Cancel</button></span></h4></td>
+						</tr>
+						<? } ?>
+						<?php if ( $this->entryid != ''  ) { ?>
+
+						<?php } ?>
+						<tr class="field-app-name appproperty">
+							<td class="fieldnamevalue">
+								<span  style="display:none" class="editable" edit_name="id" edit_type="hidden"><?php echo $this->entryid;?></span>
+							Name<span style="vertical-align:top;color:red;display:none;" class="mandatoryflag" title="Field is mandatory">*</span>:
+							</td>
+							<td class="propertyvalue">
+								<span class="app-name"></span><span id="appnamevalidator" style="display:none;"></span>
+							</td>
+						</tr>
+						<tr class="app-description-row appproperty">
+							<td style="white-space: nowrap;" class="fieldnamevalue">
+								<span class="field-label-description">Short description<span style="vertical-align:top;color:red;display:none;" class="mandatoryflag" title="Field is mandatory">*</span>:</span>
+							</td>
+							<td class="tipcontainer propertyvalue">
+								<span class="app-desc"></span>
+								<div class="maxlength-tip"><span>One line - <span class="usage">max 200 characters</span></span></div>
+							</td>
+						</tr>
+						<tr>
+							<td class="listhandlercontainer fieldnamevalue">Category<span style="vertical-align:top;color:red;display:none;" class="mandatoryflag" title="Field is mandatory">*</span>:</td>
+							<td class="propertyvalue"><span class="app-categories"></span></td>
+						</tr>
+						<?php if ( $this->entryid == '' ) { ?>
+							<input type="hidden" name="tool<?php echo $this->dialogCount; ?>" value="0" />
+						<?php } ?>
+						<tr>
+						</tr>
+						<tr id="disciplineRow<?php echo $this->dialogCount;?>">
+							<td class="listhandlercontainer fieldnamevalue"><span>Disciplines</span><span style="vertical-align:top;color:red;display:none;" class="mandatoryflag" title="Field is mandatory">*</span>:</td>
+							<td class="propertyvalue"><span class="app-domains"></span></td>
+						</tr>
+						<tr id="tagsRow<?php echo $this->dialogCount;?>" class="tagsrow">
+							<td class="fieldnamevalue">Tags:</td>
+							<td class="propertyvalue"><div class="app-tags"></div></td>
+						</tr>
+						<tr class="app-modrow" style="display:none"><td colspan="2"></td></tr>
+						<tr class="app-delrow" style="display:none"><td colspan="2"></td></tr>
+						<tr style="display:none"><td>Keywords: </td><td></td></tr>
+						</table>
+						<?php if ( $this->entryid != '' ) { ?>
+						<div class="downloadarea vmidownload hidden hideonedit" >
+							<div class="details">
+								<div class="fieldvalue version"><span class="field">Latest version:</span><span class="value"></span></div>
+								<div class="fieldvalue hypervisors"><span class="field">Supported Hypervisors:</span><span class="value"></span></div>
+								<div class="fieldvalue provider"><span class="field">VMCatcher:</span><span class="value"></span></div>
+							</div>
+							<a class="download" href="#" title="Download images" onclick="appdb.pages.Application.showLatestVAppliance();return false;">
+								<img class="hideonprivate" src="/images/download.png" alt="" />
+								<img class="showonprivate" src="/images/logout3.png" alt="" />
+								<div class="content">
+									<span class="hideonprivate">Browse & Download Images</span>
+									<span class="showonprivate">Private</span>
+									<span class="published">Published <span class="value">x days ago</span></span>
+								</div>
+							</a>
+						</div>
+						<div class="downloadarea swdownload hidden hideonedit" >
+							<div class="details">
+								<div class="fieldvalue latestreleases"><span class="field">Latest:</span><span class="value"></span></div>
+							</div>
+							<a class="download" href="#" title="Download releases" onclick="appdb.pages.application.showReleases();return false;">
+								<img src="/images/download.png" alt="" />
+								<div class="content">
+									<span>Download</span>
+									<span class="published">Published <span class="value">x days ago</span></span>
+								</div>
+							</a>
+						</div>
+						<div class="downloadarea contextualizationdownload hidden hideonedit" >
+							<div class="details">
+							</div>
+							<a class="download" href="#" title="Download contextualization scripts and/or virtual appliances" onclick="appdb.pages.Application.showContextualizationScripts();return false;">
+								<img src="/images/download.png" alt="" />
+								<div class="content">
+									<span>Download</span>
+									<span class="published">Updated <span class="value">x days ago</span></span>
+								</div>
+							</a>
+						</div>
+						<div id="addurldiv<?php echo $this->dialogCount;?>" style="display:none;vertical-align:middle;width:100%;">URLs: <span style="vertical-align:middle;"><a href="#" onclick="addURL();"><img alt="add" style="vertical-align:top;" border="0" src="/images/plus.png"/></a><a href="#" onclick="remURL();"><img alt="remove" style="vertical-align:top;" border="0" src="/images/minus.png"/></a></span></div>
+						<span class="appurltitle appurlscontaineritem">External Links: <span class="appurlemptymessage">No links available yet.</span></span>
+						<span class="app-urls appurlscontaineritem" id="urldiv<?php echo $this->dialogCount;?>" ></span>
+						<?php } ?>
+					</td>
+				</tr>
+			</table>
+			<table border="0" width="100%" cellpadding="0" cellspacing="0" style="padding:0px;margin:0px;padding-bottom:15px;padding-top:10px;">
+				<tr>
+					<td  class="fieldnamevalue abstract">
+						<?php if ( $this->entryid == '' ) { ?>
+							<span style='display:inline-block;'>Description / Abstract<span style='vertical-align:top;color:red;display:none;' class='mandatoryflag' title='Field is mandatory'>*</span>:</span>
+						<?php } else { ?>
+							<span style="display:inline-block;">Description / Abstract<span style="vertical-align:top;color:red;display:none;" class="mandatoryflag" title="Field is mandatory">*</span>:<span class="abstracthelp" style="display:none;font-size:10px;font-style:italic;color:gray;">  ...click to view more</span></span>
+						<?php } ?>
+					</td>
+				</tr>
+				<tr >
+					<td class="propertyvalue abstract">
+						<div id="abstractdiv<?php echo $this->dialogCount;?>" style="width:100%; min-height:50px;max-height:150px; overflow:auto" >
+							<div class="abstractprecontainer">
+								<pre align="justify" class="app-abstract" itemprop="about"></pre>
+							</div>
+						</div>
+					</td>
+					<td width="5%"></td>
+				</tr>
+			</table>
+			<?php if ( $this->entryid == '' ) { ?>
+			<div class="field-values misc app-status-container hideonvappliance hideonswappliance">
+				<span class="field">Status:</span><span class="value app-status"></span>
+			</div>
+			<?php } ?>
+			<div class="app-group">
+				<ul>
+					<li class="hidden"><a href="#vausage"><span>Availability & Usage</span></a></li>
+					<li class="hidden" style="display: none;"><a href="#valatest"><span>Latest Version</span></a></li>
+					<li class="current technnicaldetails"><a href="#technnicaldetails"><span>Technical Details</span></a></li>
+					<li><a href="#swlicenses"><span>License(s)</span></a></li>
+					<li><a href="#relationlists"><span>Projects & Organizations</span></a></li>
+					<li><a href="#additionalinformationtab"><span>Additional Info</span></a></li>
+				</ul>
+				<div id="vausage" class="hideonedit">
+					<div class="field-title">Usage</div>
+					<div class="resourceproviders">
+						<div class="header">
+							<div class="field-name"><div>Endorsed by VO: </div><div class="voselector" data-preselect="2391"></div><div class="vodetailslink hidden">(<a href="#" title="View VO details in new window" target="_blank">view VO details</a>)</div></div>
+						</div>
+						<div class='app-state-panels hidden'>
+							<div class='app-state-panel deleted'>
+								This virtual appliance is deleted from the system.
+							</div>
+							<div class='app-state-panel moderated'>
+								This virtual appliance is moderated.
+							</div>
+							<div class='app-state-panel expired'>
+								This virtual appliance image has expired.
+							</div>
+						</div>
+						<ul class="list"></ul>
+						<div class="empty emptycontent">
+							<div class="content">	
+								<img src="/images/exclam16.png">
+								<span>No usage information available yet.</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="technnicaldetails" class="technnicaldetails">
+					<div class="field-title">Technical Details</div>
+					
+					<span class="field-name proglangs">Programming Languages: </span>
+					<span class="field-description">Developed with the following programming language(s)</span>
+					<span class="field-values proglangs">
+						<span class="field-handlers" id="addproglangs<?php echo $this->dialogCount;?>" style="vertical-align:middle;"><a href="#" onclick="addProgLang();"class="listhandler adder editbutton" title="Associate a programming language"><span>Add</span></a></span>
+						<span class="app-proglangs field-lists" style="vertical-align: middle;" id="proglangdiv<?php echo $this->dialogCount;?>"></span><br/>
+					</span>
+					
+					<span class="field-name mws">Middleware: </span>
+					<span class="field-description">Compatible with the following middleware(s)</span>
+					<span class="field-values mws">
+						<span class="field-handlers" id="addmws<?php echo $this->dialogCount;?>" style="vertical-align:middle;"><a href="#" onclick="addMW();"class="listhandler adder editbutton" title="Associate a middleware"><span>Add</span></a><a href="#" onclick="remMW();" style="display:none"><img alt="remove" style="vertical-align:middle;" border="0" src="/images/minus.png"/></a></span>
+						<span class="app-mws field-lists" style="vertical-align: middle;" id="mwdiv<?php echo $this->dialogCount;?>"></span><br/>
+					</span>
+				</div>
+				<div id="swlicenses">
+					<div class="field-title">Software Licenses</div>
+					<span class="field-description showonedit"><span> Select licenses applied to this software item. </span><br/><br/> <span> It is recommended when selecting more than one license to describe in details the cases where each license is applied.</span> <br/><br/><span> If you cannot find the desired license you can always <a href="#" class="customlicenseadder" title="register new custom license" tabindex="-1">register a new one</a>.</span> </span>
+					<div class="app-licenses">
+						<span class="field-handlers customaddertemplate showonedit hidden" ><a href="#" class="listhandler customadder icontext" title="Register a new software license" ><img src="/images/add.png" border="0"><span>Register new</span></a></span>
+						<span class="field-handlers addertemplate showonedit" ><a href="#" class="listhandler adder editbutton" title="Add a software license"><span>Add</span></a></span>
+						<div class="itemtemplate hidden">
+							<div class="header">
+								<span class='field select showonedit'>Select License:</span>
+								<div class="value">
+									<span class="title"></span><span class="name" ></span>
+								</div>
+								<a class="licencelink hidden icontext" href="#" title="View license contents in new window" target="_blank"><img src="/images/search.png" alt=""/><span>View License</span></a>
+								<div class="actions showonedit">
+									<a href="#" title="remove license" class="remove action icontext" tabindex="-1">remove</a>
+								</div>
+							</div>
+							<div class="content">
+								<span class="field">Further details:</span>
+								<span class="comments"></span>
+							</div>
+						</div>
+						<div class="customitemtemplate hidden custom">
+							<div class="header">
+								<span class='field select showonedit'>License Name:</span>
+								<div class="value titlefield">
+									<span class="title"></span>
+									<div class="warning">
+										<div><img src="/images/vappliance/warning.png" alt=""/>The name you provided is already in the list of predefined licenses:</div>
+										<div class="predefinedlicense"><a href="#" title="View license in new window" target="_blank"></a></div>
+										<div>
+											It is recommended to use the predefined licenses instead of registering a new one,
+											and provide further information related to the selected licenses in the details section.
+										</div>
+									</div>
+								</div>
+								<div class="actions showonedit">
+									<a href="#" title="remove license" class="remove action icontext" tabindex="-1">remove</a>
+								</div>
+							</div>
+							<div class="linkcontainer header">
+								<span class='field select showonedit'>License Link:</span>
+								<span class="value linkfield showonedit"><span class="link"></span>
+									<div class="warning">
+										<div><img src="/images/vappliance/warning.png" alt=""/>The link you provided is associated with a predefined license:</div>
+										<div class="predefinedlicense"><a href="#" title="View license in new window" target="_blank"></a></div>
+										<div>
+											It is recommended to use the predefined licenses instead of registering a new one,
+											and provide further information related to the selected licenses in the details section.
+										</div>
+									</div>
+								</span>
+							</div>
+							<div class="content">
+								<span class="field">Further details:</span>
+								<span class="comments"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="relationlists" class="entityrelations">
+					<div class="field-title">Projects & Organizations</div>
+					
+					<span class="field-name app-project-relations">Related projects: </span>
+					<span class="field-description">User defined associations with projects:</span>
+					<span class="field-values project-relations">
+						<div class="app-project-relations field-lists relationlist" style="vertical-align: middle;" id="appprojectrelationsdiv<?php echo $this->dialogCount;?>"></div><br/>
+					</span>
+					
+					<span class="field-name app-organization-relations">Related organizations: </span>
+					<span class="field-description">User defined associations with organizations</span>
+					<span class="field-values app-organization-relations">
+						<div class="app-organization-relations field-lists relationlist" style="vertical-align: middle;" id="apporganizationrelationsdiv<?php echo $this->dialogCount;?>"></div><br/>
+					</span>
+				</div>
+				<div id="relationlists2" class="entityrelations showonedit">
+					<div class="field-title"><span>Connected Items</span><span class='description'><a href='<?php echo $wiki; ?>main:guides:general:connected_items_guide' target='_blank' title="Read more about editing connected items" ><img src="/images/question_mark.gif" alt=''/></a></span></div>
+					
+					<span class="field-name app-sw-relations">Software: </span>
+					<span class="field-description">User defined associations with software:</span>
+					<span class="field-values app-sw-relations">
+						<div class="app-sw-relations field-lists relationlist" style="vertical-align: middle;" id="appswrelationsdiv<?php echo $this->dialogCount;?>"></div><br/>
+					</span>
+					
+					<span class="field-name app-vappliance-relations">Virtual Appliance: </span>
+					<span class="field-description app-vappliance-relations">User defined associations with virtual appliances</span>
+					<span class="field-values app-vappliance-relations">
+						<div class="app-vappliance-relations field-lists relationlist" style="vertical-align: middle;" id="appvappliancerelationsdiv<?php echo $this->dialogCount;?>"></div><br/>
+					</span>
+					
+					<span class="field-name app-external-relations hideonview">External references: </span>
+					<span class="field-description hideonview app-external-relations">References from other items (software/vappliances) to the current one.<br/>You can edit their visibility in the list of connected items from here.</span>
+					<span class="field-values app-external-relations hideonview">
+						<div class="app-external-relations field-lists relationlist" style="vertical-align: middle;" id="appexternalrelationsdiv<?php echo $this->dialogCount;?>"></div><br/>
+					</span>
+				</div>
+				<div id="additionalinformationtab">
+					<div class="field-title">Additional Information</div>
+					<span class="field-name countries">Countries: </span>
+					<span class="field-description">Expertise and/or contact points exist(at least) in the following countries</span>
+					<span class="field-values countries">
+						<span class="field-handlers" id="addcountry<?php echo $this->dialogCount;?>"><a href="#" onclick="addCountry();" class="listhandler adder editbutton" title="Associate a country"><span>Add</span></a><a href="#" onclick="remCountry();" style="display:none;"><img border="0" src="/images/minus.png"/></a></span>
+						<span class="app-countries field-lists" id="countryDiv<?php echo $this->dialogCount;?>"></span>
+					</span>
+
+					<?php if ( $this->entryid != '' ) { ?>
+					<span class="field-name vos hideonvapplianceedit hideonswapplianceedit">Virtual Organizations: </span>
+					<span class="field-description hideonvapplianceedit hideonswapplianceedit">Support is offered by the following Virtual Organization(s)</span>
+					<span class="field-values vos hideonvapplianceedit hideonswapplianceedit">
+						<span class="field-handlers" id="addvos<?php echo $this->dialogCount;?>" style="vertical-align:middle;"><a href="#" onclick="addVO();" class="listhandler adder editbutton" title="Associate a virtual organization"><span>Add</span></a><a href="#" onclick="remVO();" style="display:none;"><img alt="remove" style="vertical-align:middle;" border="0" src="/images/minus.png"/></a></span>
+						<span class="app-vos field-lists" style="vertical-align: middle;" id="vodiv<?php echo $this->dialogCount;?>"></span>
+					</span>
+					
+					<span class="field-name misc ">Miscellaneous<span class="hideonview showonedit" style="padding-left:3px;">& Ownership</span></span>
+					<span class="field-values misc app-addedby-container hideonedit">
+						<span class="field">Added by:</span><span class="value app-addedby"></span><span class="textvalue">, on</span><span class="app-addedon textvalue" style="padding-left: 5px;"></span>
+					</span>
+					<span class="field-values misc app-owner-container hideonview">
+						<span class="field">Owned by:</span><span class="value app-owner"></span>
+					</span>
+					<span class="field-values misc app-status-container hideonvappliance hideonswappliance">
+						<span class="field">Status:</span><span class="value app-status"></span>
+					</span>
+					<?php } ?>
+				</div>
+			</div>
+			</td>
+			<td style=" height:100%">
+				<div class="swdownloadbutton releasedownloadbutton hidden downloadarea hidden">
+					<a class="download" href="#" title="Browse available releases" onclick="appdb.pages.application.showReleases();return false;">
+						<img src="/images/download.png" alt="">
+						<div class="content">
+							<span>Download</span>
+						</div>
+					</a>
+				</div>
+			<div id="appdetailssidebar" class="sidebar">
+				<div class="contentpanel" style="padding-left:5px;padding-bottom:5px;padding-top:5px;">
+					<div class="title">Communication</div>
+					<div class="content">
+						<span class="actionlist">
+							<div class="action requestjoin" style=""><a title="Send a request to join as a contact to the software team" href="#"><img src='/images/sendrequest.png' alt="" ></img><span>Join as a contact</span></a></div>
+							<div class="action sendmessage" style=""><a title="Send a message to the contacts of this software item" href="#"><img src="/images/sendmessage.png" alt=""></img><span>Send a message</span></a></div>
+							<div class="action reportAbuse" style=""><a title="Report abuse" href="#"><img src="/images/reportabuse.png" alt="" ></img><span>Report a problem</span></a></div>
+							<div class="action contactvos showonvappliance showonloggedin" style=""><a title="Contact Virtual Organizations" href="#"><img src="/images/other.png" alt="" ></img><span>Notify VOs</span></a><a class="helperlink wikilink" title="Learn more about VO notifications" target="_blank" href="<?php echo $wiki; ?>main:guides:notify_virtual_organization_representatives">?</a></div>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="relatedapps" style="float: right; height: 100%; max-width:240px; overflow: hidden;display:none;">
+				<div style="text-align: center; margin-top: 6px;">
+					<span ><b>Suggested items</b></span> <a class="relatedapps" onclick="$(this).parent().parent().parent().hide(); $('.altRelatedApps').show(); $('.reportLinkSeparator').show();" href="#">(hide)</a><br/><br/>
+				</div>
+				<div>
+					<ul class="mainlist_small">
+					</ul>
+				</div>
+			</div>
+			</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<div class="relationgridcontainer relationswvappcontainer hideonedit entityrelations contentcontainer">
+						<div class="title" title="Toggle Connected Items visibility" ><span onclick="toggleContent(this);" class='toggler'>Connected Items</span><span class="count"></span><span class='description'><a href='<?php echo $wiki; ?>main:faq:connected_items' target='_blank' title="Read more about connected items" ><img src="/images/question_mark.gif" alt=''/></a></span></div>
+						<div class="relations content"></div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<div class='suggesteditemscontainer relationgridcontainer hideonedit contentcontainer'>
+						<div class="title" title="Toggle Sugested Items visibility" ><span onclick="toggleContent(this);" class='toggler'>Suggested Items</span><span class="count"></span><span class='description'><a href='<?php echo $wiki; ?>main:faq:suggested_items' target='_blank' title="Read more about suggested items" ><img src="/images/question_mark.gif" alt=''/></a></span></div>
+						<div class='relations content'>
+							
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<?php if ( $this->entryid != '' ) { ?>
+					<div id="mainscicondiv<?php echo $this->dialogCount;?>" class="sciconcontainer">
+						<div class="mainscicontitle " >
+							<div class="hideonview">
+								<div class="hideonfullcontrol icontext">
+									<img src="/images/logout3.png" alt="" />
+									<span>You need full control permission in order to edit related contacts.</span>
+								</div>
+							</div>
+							<div class='title'><a href="#" title="Toggle Related Contacts visibility" class="scicontoggler" onclick="toggleSciCon();">Contacts</a></div>
+							<a href="#"  id="addSciConDiv<?php echo $this->dialogCount;?>" onclick="addSciCon();" title="Associate more persons" class='addnewcontacts btn btn-warning btn-compact' >
+								<span>Add new contact</span>
+							</a>
+						</div>
+						<div class="hideonview markremovepanel warning">
+							<div class="icontext">
+								<img src="/images/vappliance/warning.png" alt="">
+								<span class="message">Removing users from this list will also remove their privileges to this item.</span>
+							</div>
+						</div>
+						<ul id="managedSciConDiv" class="itemgrid">
+							<li class="app-extrainfo hideonedit itemcontainer stickyitem">
+								<div class="app-addedon-container">
+									<span class="textvalue">Since</span>
+									<span class="app-addedon" style="display:inline-block;min-width:55px;"></span>
+									<span class="textvalue">,</span>
+									<span class="app-owner-view"></span>
+								</div>
+
+								<div class="app-lastupdated-container">
+									<span class="textvalue">Last updated on</span>
+									<span class="app-lastupdated" style="display:inline-block;min-width:55px;"></span>
+								</div>
+							</li>
+						</ul>
+					</div>	
+					<?php } ?>
+				</td>
+			</tr>
+			</table>
+			<input type="hidden" name="documents" value=""/>
+		</div> <!--  appInfoTab closes -->
+
+		<?php if ( $this->entryid != "" ) { ?>
+		<div id="docdiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" title="Publications" selected="false" class="publicationcontainer" >
+			<div class="emptycontent">
+				<div class="content">	
+					<img src="/images/exclam16.png">
+					<span>No publications available for this item.</span>
+				</div>
+			</div>
+			<div id="editdoc<?php echo $this->dialogCount;?>" align="right" style="width:100%; vertical-align: middle; height: 20px">
+				<div class="publicationtoolbar">
+					<a title="add publication" href="#" onclick="addDoc();" title="Add a new publication entry"><img alt="add" border="0" src="/images/plus.png"/><span>Add New</span></a>
+					<a title="remove selected publication" href="#" onclick="remDoc();" title="Remove selected publication entry"><img alt="remove" border="0" src="/images/minus.png"/><span>Remove Selected</span></a>
+					<a title="edit selected publication" href="#" onclick="editDoc();" title="Edit selected publication entry"><img alt="edit" border="0" src="/images/editicon.png"/><span>Edit Selected</span></a>
+				</div>
+			</div>
+			<div id="docgrid<?php echo $this->dialogCount;?>" style="width:100%; height:99%;" >
+			</div>
+		</div> <!-- appDocTab closes -->
+		<?php }?>
+
+	</form>
+	<div id="ratingdiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" class="ratingcontainer">
+		<div class="emptycontent">
+			<div class="content">	
+				<img src="/images/exclam16.png">
+				<span>No comments for this item. Be the first to provide one. </span>
+			</div>
+		</div>
+	</div>
+	<div id="repositorydiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" data-forentity="software"></div>
+	<div id="vappliancediv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" class="vappliancecontainer" data-forentity="vappliance">
+		<div class="actions">
+			<div class="action contactvos showonvappliance showonloggedin" ><a title="Contact Virtual Organizations" href="#" class="icontext"><img src="/images/other.png" alt="" style="width:18px;height:18px;"></img><span>Notify VOs</span></a><a class="helperlink wikilink" title="Learn more about VO notifications" target="_blank" href="<?php echo $wiki; ?>main:guides:notify_virtual_organization_representatives">?</a></div>
+		</div>
+		<div class="loader emptycontent">
+			<div class="content">
+				<img src="/images/ajax-loader-trans-orange.gif" alt="" />
+				<span>Loading Virtual Appliance Versions...</span>
+			</div>
+		</div>
+		<div class="noappliance emptycontent">
+			<div class="content">
+				<img src="/images/exclam16.png" alt="" />
+				<span>No versions available yet.</span>
+				<div class="actions">
+					<div class="vapphelp"><a href="<?php echo $wiki; ?>main:guides:guide_for_managing_virtual_appliance_versions_using_the_portal#create_a_new_va_version" target="_blank">Need help ?</a></div>
+					<a href="#" class="action createupdate editbutton hidden">
+						<img src="/images/add.png" alt="" />
+						<span>Create New Version</span>
+						<span class="description">
+							<img src="/images/question_mark.gif" alt=""/>
+							<span>
+								By following this action, the system will prepare for you a clone of the latest published version (if exists).<br/>Therefore, you will be able to perform the following:
+								<ul>
+									<?php if( Supports::singleVMIPolicy() ) { ?>
+									<li><b>add</b> image</li>
+									<li><b>modify</b> the metadata of the existing one</li>
+									<li><b>reuse</b> images from previous versions, either <b>'as is'</b> or for <b>updating</b> them</li>
+									<li><b>modify version wide metadata</b> like version number, expiration date etc.</li>
+									<?php } else { ?>
+									<li><b>add/remove</b> images</li>
+									<li><b>modify</b> the metadata of the existed ones</li>
+									<li><b>reuse</b> images from previous versions, either <b>'as is'</b> or for <b>updating</b> them</li>
+									<li><b>modify version wide metadata</b> like version number, expiration date etc.</li>
+									<?php } ?>
+								</ul>
+								<br/><br/>
+								<b>Tips:</b>
+								<br/>
+								<ul>
+									<li>for organizing better your updates please remember to <b>increase at least the revision number</b>, i.e. if your latest version is tagged as 1.0.0 change it to 1.0.1.</li>
+								</ul>
+							</span>
+						</span>
+					</a>
+					<a href="#" class="action createnew editbutton">
+						<img src="/images/add.png" alt="" />
+						<span>Create New Version</span>
+						<span class="description">
+							<img src="/images/question_mark.gif" alt=""/>
+							<span>
+								By following this action, the system will prepare for you a clone of the latest published version (if exists).<br/>Therefore, you will be able to perform the following:
+								<ul>
+									<?php if( Supports::singleVMIPolicy() ) { ?>
+									<li><b>edit</b> image</li>
+									<li><b>modify</b> the metadata of the existing one</li>
+									<li><b>reuse</b> images from previous versions, either <b>'as is'</b> or for <b>updating</b> them</li>
+									<li><b>modify version wide metadata</b> like version number, expiration date etc.</li>
+									<?php } else { ?>
+									<li><b>add/remove</b> images</li>
+									<li><b>modify</b> the metadata of the existed ones</li>
+									<li><b>reuse</b> images from previous versions, either <b>'as is'</b> or for <b>updating</b> them</li>
+									<li><b>modify version wide metadata</b> like version number, expiration date etc.</li>
+									<?php } ?>
+								</ul>
+								<br/><br/>
+								<b>Tips:</b>
+								<br/>
+								<ul>
+									<li>for organizing better your updates please remember to <b>increase at least the revision number</b>, i.e. if your latest version is tagged as 1.0.0 change it to 1.0.1.</li>
+								</ul>
+							</span>
+						</span>
+					</a>
+				</div>
+			</div>
+		</div>
+		<div class="vappliance-templates hidden">
+			<div data-template="vappliance-vmiversion">
+				<div class="vaversion-vmiversion property<?php echo ( Supports::singleVMIPolicy()?' detailsview':'' )?>" data-list="true">
+					<?php if( Supports::singleVMIPolicy() === false ) { ?>
+					<div class="actions showonedit">
+						<a href="#" class="action remove"><img src="/images/vappliance/delete.png" alt=" "/><span></span></a>
+					</div>
+					<?php } ?>
+					<div class="integritycheck">
+						<div class="message">
+							<div class="success icontext">
+								<img src="/images/tick.png" alt=""/><span>This image was successfully verified by the integrity check.</span>
+							</div>
+							<div class="error icontext">
+								<img src="/images/vappliance/warning.png" alt=""/><span>This image failed to be verified.</span>
+								<a href="#" class="details" title="">
+									<span>details</span>
+									<div class="description">
+										<div class="errormessage"></div>
+									</div>
+								</a>
+								
+							</div>
+							<div class="unchecked icontext">
+								<span>This image is marked to be verified.</span>
+								<a href="#" class="details" title="">
+									<span>details</span>
+									<div class="description">
+										This image is marked to be checked for its integrity.
+									</div>
+								</a>
+							</div>
+							<div class="warning icontext">
+								<img src="/images/vappliance/warning.png" alt=""/><span>There seems to be a problem with the url of the image.</span>
+								<a href="#" class="details" title="">
+									<span>details</span>
+									<div class="description">
+										<div>Although, this won't affect the publishing of the image list, since it is not marked for integrity check, the url does not seem to be valid.</div>
+										<div class='errormessage'></div>
+									</div>
+								</a>
+							</div>
+						</div>
+						<div class="property vmiversion-integritystatus hidden" data-path="integritycheck.status" data-editable="false" data-type="text" data-name="integritystatus">
+							<div class="header">Integrity Status:</div>
+							<div class="value"></div>
+						</div>
+						<div class="property vmiversion-integritymessage hidden" data-path="integritycheck" data-type="text" data-editable="false" data-name="integritymessage">
+							<div class="header">Integrity Message:</div>
+							<div class="value"></div>
+						</div>
+					</div>
+					<div class="content">
+						<div class="verticalpanel info">
+							<div class="horizontalpanel">
+								<div class="property vmiversion-version fieldnamevalue xsmall compact mandatory" data-path="version" data-editable="true" data-type="<?php echo (Supports::singleVMIPolicy()?'vmiversion':'text')?>" data-validator="version" data-maxsize="20">
+									<div class="header">Version:</div>
+									<div class="value"></div>
+								</div>
+								<div class="property vaversion-identifier fieldnamevalue small compact popupvalue hideonedit" data-path="identifier" data-editable="false">
+									<div class="header">Identifier</div>
+									<div class="icontext descriptionmessage"><img src="/images/repository/warning.png" alt=""><span>This property is generated upon save</span></div>
+									<div class="value"></div>
+								</div>
+								<div class="property vmiversion-urlview fieldnamevalue small compact popupvalue hideonedit" data-path="url" data-name="location" data-editable="false" data-unique="true" >
+									<div class="header">Location:</div>
+									<div class="value"></div>
+								</div>
+								<div class="property vmiversion-checksum fieldnamevalue small compact popupvalue hideonedit" data-path="checksum" data-name="checksumview" data-editable="false" data-type="checksum">
+									<div class="header">Checksums & Size:</div>
+									<div class="value" ></div>
+								</div>
+							</div>
+							<div class="property vmiversion-url fieldnamevalue compact medium mandatory showonedit" data-path="url" data-type="url" data-editable="true" data-validator="uniqueurlhypervisor" data-revalidate="hypervisor" >
+								<div class="header">Location:</div>
+								<div class="value" style="width:81%"></div>
+								<?php if( Supports::singleVMIPolicy() ) { ?>
+								<div class="previouslocation hidden"><a href='#' title="Use latest version location">Use latest location</a></div>
+								<?php  } ?>
+							</div>
+							<div class="property vmiversion-integrity compact showonedit" data-path="integrity" data-default="true" data-editable="true" data-type="integritycheck">
+								<div class="header"></div>
+								<div class="value" title="Autocheck image file metadata integrity"></div>
+								<div class="helpmessage">
+									<div >If checked the system will calculate the sha512 checksum and size of image file after successful verification.</div>
+									<div style="padding-top: 5px;">Uncheck it in order to fill the checksum and file size manually.</div>
+									<div style="padding-top: 5px;">This feature is intended to be used for <b>http/https</b> protocols</div>
+								</div>
+								<div class="manualintegrity hidden">
+									<div class="property vmiversion-checksum512 compact mandatory " data-path="checksum" data-editable="true" data-type="checksum">
+										<div class="header">SHA512:</div>
+										<div class="value"></div>
+									</div>
+									<div class="property vmiversion-size compact mandatory" data-path="size" data-editable="true" data-datatype="number" data-type="filesize" data-maxsize="9223372036854775000">
+										<div class="header">File size:</div>
+										<div class="value"></div><span>bytes</span>
+									</div>
+								</div>
+							</div>
+							<?php if( Supports::singleVMIPolicy() === false ) { ?>
+							<div class="property vmiversion-addedby fieldnamevalue compact hideonedit" data-path="addedby" data-editable="false" data-type="person">
+								<div class="header">Added by:</div>
+								<div class="value"></div>
+							</div>
+							<div class="property vmiversion-addedon fieldnamevalue compact hideonedit" data-path="addedon" data-editable="false" data-type="datetime">
+								<div class="header">on</div>
+								<div class="value"></div>
+							</div>
+							<?php } ?>
+							<div class="property vmiversion-title fieldnamevalue compact mandatory hideonedit" data-name=viewtitle" data-path="title" data-type="text" data-editable="false" data-maxsize="150">
+								<div class="header">Title:</div>
+								<div class="value" ></div>
+							</div>
+							<div class="property vmiversion-description fieldnamevalue compact longtext autocollapse hideonedit" data-name="viewdescription" data-path="description" data-type="<?php echo (Supports::singleVMIPolicy()?'vmidescription':'longtext')?>" data-editable="false" data-maxsize="1000" data-minsize="0">
+								<div class="header">Description:</div>
+								<div class="value" ></div>
+							</div>
+							<div class="property vmiversion-cntxscripts fieldnamevalue compact">
+								<div class="header">Contextualization:</div>
+								<div class="value">
+									<div class="info-message hidden"><div class='info-contextualization-script'><p>There are cases where the current contextualization script of this image might change through time.</p><p>The current link will always provide the latest contextualization script for this image.</p></div></div>
+								</div>
+								<div class="appdb-ui vmi-contextscript-location hidden" data-bind="url" data-ui="contextscript" data-editor="contextscript" required="true" data-use>
+									<span class="empty-message"><span class='emptymessage icontext'><img src='/images/vappliance/warning.png' alt=''/>No script uploaded</span></span>
+									<button type="button" class="btn btn-primary btn-small btn-compact command upload" data-command="contextscript-edit" >upload</button>
+								</div>
+							</div>
+							<div class="property vmiversion-notes fieldnamevalue compact longtext viewondetails hideonedit" data-name="viewnotes" data-path="notes" data-type="longtext" data-editable="false" >
+								<div class="header">Comments:</div>
+								<div class="value" ></div>
+							</div>
+							<div class="property viewondetails hideonedit group cores">
+								<div class="header"><div class="title">Cores:</div></div>
+								<div class="value">
+									<div class="property fieldnamevalue compact viewondetails hideonedit" data-path="cores.minimum" data-name="viewcoresminimum" data-editable="false" >
+										<div class="header">Minimum:</div>
+										<div class="value" ></div>
+									</div>
+									<div class="property fieldnamevalue compact viewondetails hideonedit" data-path="cores.recommended" data-name="viewcoresrecommended" data-editable="false" >
+										<div class="header">Recommended:</div>
+										<div class="value" ></div>
+									</div>
+								</div>
+							</div>
+							<div class="property viewondetails hideonedit group ram">
+								<div class="header"><div class="title">Ram:</div></div>
+								<div class="value">
+									<div class="property fieldnamevalue compact viewondetails hideonedit" data-path="ram.minimum" data-name="viewramminimum" data-editable="false" >
+										<div class="header">Minimum (bytes):</div>
+										<div class="value" ></div>
+									</div>
+									<div class="property fieldnamevalue compact viewondetails hideonedit" data-path="ram.recommended" data-name="viewramrecommended" data-editable="false" >
+										<div class="header">Recommended (bytes):</div>
+										<div class="value" ></div>
+									</div>
+								</div>
+							</div>
+							<div class="property vmiversion-ovfurl fieldnamevalue compact viewondetails hidden" data-path="ovf.url" data-name='ovfurl' data-type="genericurl" data-editable="true" data-validator="url">
+								<div class="header">OVF File Url:</div>
+								<div class="value"></div>
+							</div>
+							<?php if( Supports::singleVMIPolicy() ) { ?>
+							<div class="property vmiversion-addedby fieldnamevalue compact hideonedit" data-path="addedby" data-editable="false" data-type="person">
+								<div class="header">Added by:</div>
+								<div class="value"></div>
+							</div>
+							<div class="property vmiversion-addedon fieldnamevalue compact hideonedit" data-path="addedon" data-editable="false" data-type="datetime">
+								<div class="header">on</div>
+								<div class="value"></div>
+							</div>
+							<?php } ?>
+						</div>
+						<div class="verticalpanel osinfo">
+							<div class="property vmiversion-os fieldnamevalue xsmall compact mandatory showonedit"  data-path="os" data-type="grouplist" data-source="appdb.model.StaticList.Oses" data-group-source="appdb.model.StaticList.OsFamilies" data-group-member="familyid" data-editable="true" data-displaymaxsize="15" data-selectid="242" >
+								<div class="header">OS:</div>
+								<div class="value"></div>
+							</div>
+							<div class="property vmiversion-osdisplay fieldnamevalue xsmall compact mandatory hideonedit"  data-path="os" data-name="osview" data-type="ostext"  data-editable="false" data-maxsize="60" data-displaymaxsize="25">
+								<div class="header">OS:</div>
+								<div class="value" ></div>
+							</div>
+							<div class="property vmiversion-osversion fieldnamevalue xsmall compact mandatory"  data-path="os.version" data-type="text"  data-editable="true" data-maxsize="60" data-displaymaxsize="15">
+								<div class="header">OS Version:</div>
+								<div class="value" ></div>
+							</div>
+							<div class="property vmiversion-arch fieldnamevalue xsmall compact mandatory" data-path="arch" data-source="appdb.model.StaticList.Archs" data-type="filterlist"  data-editable="true" data-displaymaxsize="15">
+								<div class="header">Architecture:</div>
+								<div class="value"  ></div>
+							</div>
+							<div class="property vmiversion-format fieldnamevalue compact showonedit mandatory" data-path="format" data-type="text" data-editable="true" data-maxsize="20">
+								<div class="header">Format:</div>
+								<div class="value" ></div>
+								<div class="emptyvalue"><span>none specified</span></div>
+							</div>
+							<div class="exports hideonedit" >
+								<a href="#" title="Export image data in xml format" class="xml icontext" target="_blank" >xml</a>
+								<span class="seperator">|</span>
+								<a href="#" title="Export image data in json format" class="json icontext" target="_blank" >json</a>
+							</div>		
+						</div>
+						<div class="verticalpanel hyperinfo">
+							<div class="property vmiversion-hypervisor fieldnamevalue compact mandatory" data-path="hypervisor" data-type="filterlist" data-source="appdb.model.StaticList.Hypervisors"  data-editable="true" data-validator="uniqueurlhypervisor" data-revalidate="url">
+								<div class="header">Hypervisor(s):</div>
+								<div class="value" ></div>
+							</div>
+							<div class="downloadpanel hideonedit">
+								<a class="downloadbutton" target="_blank" title="Download image file">
+									<div class="icontext"><img src="/images/download.png" alt="" /><span>Download</span><span class="format">(.<span class="value" />)</span></div>
+									<div class="property vmiversion-size fieldnamevalue compact hideonedit" data-path="size" data-name="filesize" data-type="binarysize" data-editable="false">
+										<div class="header">Size:</div>
+										<div class="value longtext" ></div>
+										<div style="display: none;">bytes</div>
+									</div>
+								</a>
+							</div>
+						</div>
+					</div>
+					<div class="showmore hideonedit <?php echo ( Supports::singleVMIPolicy()?' hidden':'' )?>">
+						<a href="#" class="icontext more" title="Show more details">
+							<span>&#x25BC; show more</span>
+						</a>
+						<a href="#" class="icontext less" title="Show less detaile">
+							<span>&#x25B2; show less</span>
+						</a>
+					</div>
+					<div class="horizontalpanel advancedpanel showonedit <?php echo ( Supports::singleVMIPolicy()?' expand':'' )?>">
+						<div class="advancedtoggler">
+							<div class="togglecontainer">
+								<div class="left" ><hr/></div>
+								<?php if( Supports::singleVMIPolicy() ) { ?>
+								<div class="toggler icontext">Optional</div>
+								<?php } else { ?>
+								<div class="toggler icontext">Advanced ▼</div>
+								<?php } ?>
+								<div class="right" ><hr /></div>
+							</div>
+						</div>
+						<div class="verticalpanel info">
+							<div class="property vmiversion-title fieldnamevalue compact mandatory" data-path="title" data-type="text" data-binder="defaultImageTitle" data-bind-properties="os,os.version,hypervisor" data-editable="true" data-maxsize="1000">
+								<div class="header">Title:</div>
+								<div class="value" ></div>
+							</div>
+							<?php if( Supports::singleVMIPolicy() === false ) { ?>
+							<div class="property vmiversion-description fieldnamevalue compact longtext " data-path="description" data-type="longtext" data-editable="true" data-maxsize="1000" data-minsize="0">
+								<div class="header">Description:</div>
+								<div class="value" ></div>
+							</div>
+							<?php } ?>
+							<div class="property vmiversion-notes fieldnamevalue compact longtext " data-path="notes" data-type="longtext" data-editable="true" >
+								<div class="header">Comments:</div>
+								<div class="value" ></div>
+							</div>
+						</div>
+						<div class="verticalpanel osinfo">
+							<div class="property vmiversion-mincores fieldnamevalue compact " data-path="cores.minimum" data-name="coresminimum" data-editable="true" data-type="number" data-datatype="number" data-minsize="0" data-maxsize="1000" data-default="0">
+								<div class="header">Minimum cores:</div>
+								<div class="value" ></div>
+							</div>
+							<div class="property vmiversion-recomcores fieldnamevalue compact " data-path="cores.recommended" data-name="coresrecommended" data-editable="true" data-type="number" data-datatype="number" data-minsize="0" data-maxsize="100000" data-default="0">
+								<div class="header">Recommended cores:</div>
+								<div class="value" ></div>
+							</div>
+							<div class="property vmiversion-minram fieldnamevalue compact " data-path="ram.minimum" data-name="ramminimum" data-editable="true" data-type="number" data-datatype="number" data-minsize="0" data-default="0" data-maxsize="9223372036854775000">
+								<div class="header">Minimum ram (bytes):</div>
+								<div class="value" ></div>
+							</div>
+							<div class="property vmiversion-recomram fieldnamevalue compact " data-path="ram.recommended" data-name="ramrecommended" data-editable="true" data-type="number" data-datatype="number" data-minsize="0" data-default="0" data-maxsize="9223372036854775000">
+								<div class="header">Recommended ram (bytes):</div>
+								<div class="value" ></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div data-template="vappliance-vmis">
+				<div class="vaversion-vmi property">
+					<div class="actions showonedit">
+						<a href="#" class="action remove"><img src="/images/vappliance/delete.png" alt=" "/><span></span></a>
+					</div>
+					<div class="content">
+						<div class="property vavmi-description fieldnamevalue compact mandatory" data-type="text" data-path="group" data-editable="true" data-maxsize="50" data-unique="true">
+							<div class="header">Group Title :</div>
+							<div class="value "></div>
+						</div>
+						<div class="property vavmi-notes fieldnamevalue compact longtext togglemore hidden" data-path="notes" data-editable="true" data-type="longtext">
+							<div class="header">Notes:</div>
+							<div class="value"></div>
+						</div>
+						<div class="property vavmi-versions" >
+							<div class="header">Virtual Machine Image<?php echo ( Supports::singleVMIPolicy()?'':'s' )?></div>
+							<div class="actions showonedit">
+								<a href="#" class="action new<?php echo ( Supports::singleVMIPolicy()?' hidden':'' )?>" title="Add new image for this group"><img src="/images/add.png" alt=" "/><span>New Image</span></a>
+								<a href="#" class="action import" title="Add/Update images used in the past"><img src="/images/vappliance/publish.png" alt=" " /><span>Reuse images</span></a>
+								<div class="helpmessage long">
+									<div style="width:570px;">
+										<div style='padding-bottom:3px;'>This feature enables you to import and reuse any image published in the past and,</div>
+										<div style='padding-left:10px;padding-bottom:2px;'>1. use it 'as is' in the new Virtual Appliance version (use-case: <b>republishing an image</b>)</div>
+										<div style='padding-left:10px;padding-bottom:2px;'>2. or, use it as a starting point/base for describing an image update (use-case: <b>image update</b>)</div>
+									</div>
+								</div>
+								<a href="#" class="action clearall disabled<?php echo ( Supports::singleVMIPolicy()?' hidden':'' )?>" title="Clear all images for this group of this virtual appliance version"><img src="/images/vappliance/delete.png" alt=" " /><span>Clear All</span></a>
+							</div>
+							<div class="vaversion-vmiversionlist property" data-usetemplate="vappliance-vmiversion" data-path="instance" data-editable="false" data-list="true"></div>
+						</div>
+					</div>
+					<div class="footer"></div>
+				</div>
+			</div>
+			<div data-template="vappliance-version">
+				<div class="vappliance-version">
+					<div class="header"></div>
+					<div class="content">
+						<div class="verticalpanel info">
+							<div class="property vaversion-version fieldnamevalue mandatory compact" data-path="version" data-editable="true" data-type="vaversion" data-validator="vaversion" data-maxsize="20">
+								<div class="header">Version:</div>
+								<div class="value"></div>
+							</div>
+							<div class="showonedit previousversionproperty version hidden" data-name="version">
+								<span class="title">latest version, number: </span><span class="value"/>
+							</div>
+							<div class="property vaversion-identifier fieldnamevalue small compact popupvalue hideonedit" data-path="identifier" data-editable="false">
+								<div class="header">vApp Identifier</div>
+								<div class="icontext descriptionmessage"><img src="/images/repository/warning.png" alt=""><span>This property is generated upon save</span></div>
+								<div class="value"></div>
+								<div class="versionstate" ><div class="latest" title="Published Version">P</div><div class="working" title="Unpublished Version">U</div><div class="previous" title="Archived Version">A</div></div>
+							</div>
+							<div class="property vaversion-createdon fieldnamevalue compact hideonedit" data-path="createdon" data-editable="false" data-type="datetime">
+								<div class="header"><span class="hideonpublished">Created on:</span><span class="showonpublished">Published on:</span></div>
+								<div class="value"></div>
+							</div>
+							<div class="property vaversion-expireson fieldnamevalue compact popup" data-path="expireson" data-editable="true" data-type="datetime" data-daterefersto="future">
+								<div class="header">Expires on:</div>
+								<div class="value"></div>
+							</div>
+							<div class="showonedit previousversionproperty hidden" data-name="expireson">
+								<span class="title">latest version, expiration date: </span><span class="value"/>
+							</div>
+							<div class="property vaversion-enabled fieldnamevalue compact hidden" data-path="enabled" data-editable="false" >
+								<div class="header">Enabled:</div>
+								<div class="value"></div>
+							</div>
+							<div class="property vaversion-archived fieldnamevalue compact hidden" data-path="archived" data-editable="false" >
+								<div class="header">Archived:</div>
+								<div class="value"></div>
+							</div>
+							<div class="property vaversion-status fieldnamevalue compact hidden" data-path="status" data-editable="false" >
+								<div class="header">Status:</div>
+								<div class="value"></div>
+							</div>
+							<div class="property vaversion-imagelist hideondisabled">
+								<a href="http://vmcaster.appdb-dev.marie.hellasgrid.gr" title="Click to open image list" class="icontext imagelistlink" target="_blank">
+									<img src="/images/export.png" alt=""/>
+									<span>Image List</span>
+									<span class="generatedby">compatible with</span>
+								</a>
+								<a href='http://github.com/hepix-virtualisation/vmcatcher' class="vmcatcherlink" title="Visit vmcatcher github repository" target="_blank">vmcatcher</a>
+							</div>
+						</div>
+						<div class="verticalpanel description">
+							<div class="property vaversion-title fieldnamevalue mandatory compact longtext togglemore" data-path="notes" data-editable="true" data-type="longtext" data-minlines="5">
+								<div class="header">Description:</div>
+								<div class="value"></div>
+							</div>
+						</div>
+						<div class="property vaversion-vmilist fieldnamevalue" data-editable="true" >
+							<div class="header">VMI Groups:</div>
+							<div class="actions showonedit">
+								<a href="#" class="action new" title="Create a new group of images for this virtual appliance version"><img src="/images/add.png" alt=" " /><span>New Group</span></a>
+								<a href="#" class="action clearall disabled" title="Clear all groups of this virtual appliance version"><img src="/images/vappliance/delete.png" alt=" " /><span>Clear All</span></a>
+							</div>
+							<div class="vaversion-vmis property" data-usetemplate="vappliance-vmis" data-path="image" data-list="true"></div>
+						</div>
+					</div>
+					<div class="footer"></div>
+				</div>
+			</div>
+		</div>
+		<div class="vappliance hidden <?php echo ( Supports::singleVMIPolicy()?' singlevmipolicy':'' )?>">
+			<ul>
+				<li class="latestversion current">
+					<a href="#latestvadiv<?php echo $this->dialogCount;?>" data-name="latestversion"><span>Latest version</span></a></li>
+				</li>
+				<li class="workingversion">
+					<a href="#workingvadiv<?php echo $this->dialogCount;?>" data-name="workingversion"><span>Working / New version</span></a></li>
+				</li>
+				<li class="previousversions">
+					<a href="#previousvadiv<?php echo $this->dialogCount;?>" data-name="previousversion"><span>Previous versions</span></a></li>
+				</li>
+			</ul>
+			<div id="latestvadiv<?php echo $this->dialogCount;?>" class="latestversion" data-usetemplate="vappliance-version">
+				<div class="toolbar">
+					<div class="actions">
+						<a href="#" class="action disable btn btn-compact btn-warning hideonview hideondisabled" title="">
+							<img src="/images/stop.png" alt=""/><span>hide/disable</span>
+							<span class="description">
+								<img src="/images/stop.png" alt="">
+								<span>This action will disable the published image list and hide the version from the end user.</span>
+							</span>
+						</a>
+						<a href="#" class="action enable btn btn-compact btn-warning hideonview hideonenabled" title="">
+							<img src="/images/stop2.png" alt=""/><span>visible/enable</span>
+							<span class="description">
+								<img src="/images/stop2.png" alt="">
+								<span>This action will re-enable the published image list and the version metadata to the end user.</span>
+							</span>
+						</a>
+						<a href="" onclick='return false;' class="action editlatest btn btn-compact btn-primary disabled hideon" title="">
+							<img src="/images/editicon.png" alt="" />
+							<span>Edit</span>
+							<span class="description">
+								<img src="/images/vappliance/warning.png" alt="" />
+								<span> Latest version is not editable. If your wish to make changes, go to the <span class='anchorspan' onclick='appdb.pages.application.selectVapplianceSection("workingversion");return false;' >Working/New version</span> section to create or edit an update version and then publish it.</span>
+							</span>
+						</a>
+					</div>
+				</div>
+			</div>
+			<div id="workingvadiv<?php echo $this->dialogCount;?>" class="workingversion" data-usetemplate="vappliance-version">
+				<div class="toolbar">
+					<div class="actions">
+						<a href="#" class="action delete btn btn-danger btn-compact hideonedit" title="">
+							<img src="/images/cancelicon.png" alt=""/><span>delete</span>
+							<span class="description">
+								<img src="/images/cancelicon.png" alt="">
+								<span>This action will delete this version from the system and allow you to create a new one.</span>
+							</span>
+						</a>
+						<a href="#" class="action preverify btn btn-warning btn-compact hideonedit notimplemented" title="">
+							<img src="/images/vappliance/publish.png" alt="" /><span>Verify</span>
+							<span class="description">
+								<img src="/images/vappliance/publish.png" alt="">
+								<span>This action will verify and calculate the checksums of the images marked for integrity check.</span>
+							</span>
+						</a>
+						<a href="#" class="action publish btn btn-success btn-compact hideonedit showonpublish" title="">
+							<img src="/images/vappliance/publish.png" alt=""/><span>publish</span>
+							<span class="description">
+								<img src="/images/vappliance/publish.png" alt="">
+								<span>Publish this version. The previously published version (if exists), it will automaticaly be moved to 'Previous versions' section.</span>
+							</span>
+						</a>
+						<a href="#" class="action verify btn btn-success btn-compact hideonedit" title="">
+							<img src="/images/vappliance/publish.png" alt=""/><span>verify & publish</span>
+							<span class="description">
+								<img src="/images/vappliance/publish.png" alt="">
+								<span>Verify the images marked for integrity check and publish the version on success. If a published version exists, it will automatically be moved to the 'Previous versions' section.</span>
+							</span>
+						</a>
+						<a href="#" class="action edit hideonedit btn btn-primary btn-compact" title="">
+							<img src="/images/editicon.png" alt="" /><span>edit</span>
+							<span class="description">
+								<img src="/images/editicon.png" alt="">
+								<span> Edit metadata and images of this version.</span>
+							</span>
+						</a>
+						<a href="#" class="action save showonedit btn btn-primary btn-compact" title="">
+							<img src="/images/diskette.gif" alt="" /><span>save</span>
+							<span class="description">
+								<img src="/images/vappliance/warning.png" alt="">
+								<span>You must fill all the required fields with valid information in the form bellow in order to be able to save data.</span>
+							</span>
+						</a>
+						<a href="#" class="action cancel showonedit btn btn-danger btn-compact" title=''>
+							<img src="/images/stop.png" alt="" /><span>cancel</span></a>
+					</div>
+				</div>
+				<div class="noworkingversion emptycontent">
+					<div class="content">
+						<img src="/images/exclam16.png" alt="" />
+						<span>No working version available.</span>
+						<div class="actions">
+							<div class="vapphelp"><a href="<?php echo $wiki; ?>main:guides:guide_for_managing_virtual_appliance_versions_using_the_portal#create_a_new_va_version" target="_blank">Need help ?</a></div>
+							<a href="#" class="action createupdate editbutton hidden">
+								<img src="/images/add.png" alt="" />
+								<span>Create New Version</span>
+								<span class="description">
+									<img src="/images/question_mark.gif" alt=""/>
+									<span>
+										By following this action, the system will prepare for you a clone of the latest published version (if exists).<br/>Therefore, you will be able to perform the following:
+										<ul>
+											<?php if( Supports::singleVMIPolicy() ) { ?>
+											<li><b>edit</b> image</li>
+											<li><b>modify</b> the metadata of the existing one</li>
+											<li><b>reuse</b> images from previous versions, either <b>'as is'</b> or for <b>updating</b> them</li>
+											<li><b>modify version wide metadata</b> like version number, expiration date etc.</li>
+											<?php } else { ?>
+											<li><b>add/remove</b> images</li>
+											<li><b>modify</b> the metadata of the existed ones</li>
+											<li><b>reuse</b> images from previous versions, either <b>'as is'</b> or for <b>updating</b> them</li>
+											<li><b>modify version wide metadata</b> like version number, expiration date etc.</li>
+											<?php } ?>
+										</ul>
+										<br/><br/>
+										<b>Tips:</b>
+										<br/>
+										<ul>
+											<li>for organizing better your updates please remember to <b>increase at least the revision number</b>, i.e. if your latest version is tagged as 1.0.0 change it to 1.0.1.</li>
+										</ul>
+									</span>
+								</span>
+							</a>
+							<a href="#" class="action createnew editbutton">
+								<img src="/images/add.png" alt="" />
+								<span>Create New Version</span>
+								<span class="description">
+									<img src="/images/question_mark.gif" alt=""/>
+									<span>
+										By following this action, the system will prepare for you a clone of the latest published version (if exists).<br/>Therefore, you will be able to perform the following:
+										<ul>
+											<?php if( Supports::singleVMIPolicy() ) { ?>
+											<li><b>edit</b> image</li>
+											<li><b>modify</b> the metadata of the existing one</li>
+											<li><b>reuse</b> images from previous versions, either <b>'as is'</b> or for <b>updating</b> them</li>
+											<li><b>modify version wide metadata</b> like version number, expiration date etc.</li>
+											<?php } else { ?>
+											<li><b>add/remove</b> images</li>
+											<li><b>modify</b> the metadata of the existed ones</li>
+											<li><b>reuse</b> images from previous versions, either <b>'as is'</b> or for <b>updating</b> them</li>
+											<li><b>modify version wide metadata</b> like version number, expiration date etc.</li>
+											<?php } ?>
+										</ul>
+										<br/><br/>
+										<b>Tips:</b>
+										<br/>
+										<ul>
+											<li>for organizing better your updates please remember to <b>increase at least the revision number</b>, i.e. if your latest version is tagged as 1.0.0 change it to 1.0.1.</li>
+										</ul>  
+									</span>
+								</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="previousvadiv<?php echo $this->dialogCount;?>" class="previousversions">
+				<div class="header">
+					<div class="versionselector">
+						<a class="previous paging" href="#" title="go to previous version">
+							<span class="arrow-left"></span>
+							<!--<span >&#x25C0;</span>-->
+						</a>
+						<ul class="versions"></ul>
+						<div class="item">
+							<div class="id fieldvalue" data-path="id"><div class="field">id:</div><div class="value"></div></div>
+							<div class="version fieldvalue" data-path="version"><div class="field">version:</div><div class="value"></div></div>
+							<div class="published fieldvalue"  data-path="createdon"><div class="field">published:</div><div class="value"></div></div>
+							<div class="archived fieldvalue"  data-path="archivedon"><div class="field">archived:</div><div class="value"></div></div>
+						</div>
+						<a class="next paging" href="#" title="go to next version">
+							<span class="arrow-right"></span>
+							<!--<span >&#x25B6;</span>-->
+						</a>
+						<div class="notfound icontext ">
+							<img src='/images/vappliance/warning.png' alt=''/><span>Select an existing archived version for this virtual appliance</span>
+						</div>
+					</div>
+				</div>
+				<div class="archivedversion" data-usetemplate="vappliance-version"></div>
+				<div class="emptycontent">
+					<div class="content">	
+						<img src="/images/exclam16.png">
+						<span>Requested archived version not found.</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="contextualizationdiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" class="contextualizationcontainer vappliancecontainer" data-forentity="swappliance">
+		<div class="loader emptycontent">
+			<div class="content">
+				<img src="/images/ajax-loader-trans-orange.gif" alt="" />
+				<span>Loading software appliance version...</span>
+			</div>
+		</div>
+		<div class="contextualization-container"> 
+			<div class="empty emptycontent">
+				<div class="content">	
+					<img src="/images/exclam16.png">
+					<span>No items available yet.</span>
+				</div>
+			</div>
+			<div class="contextualization-version contextualization workingversion viewmode" data-usetemplate="contextualization"></div>
+		</div>
+		<div class="contextualization-templates hidden">
+			<div data-template="contextscript-image-item"  class="image-item" >
+				<span data-path="os"></span><span class="seperator">/</span>
+				<span data-path="arch"></span><span class="seperator">/</span>
+				<span data-path="hypervisor"></span>
+			</div>
+			<div data-template="contextscipt-vappliance-list" class="vappliance-list" >
+				<div class="list"></div>
+				<div class="addvappliance description">
+					<span>There is no virtual appliance associated with this contextualization script.</span><div class="editoritem showonedit"><br/><span>You need to </span><button type="button" class="btn btn-primary btn-compact action addvappliance">add</button><span> one to perform save.</span></div>
+				</div>
+			</div>
+			<div data-template="contextscipt-vappliance-list-item" class="vappliance-item" >
+				<div class="vappliancelink">
+					<div class="expiredpanel showonexpired">
+						<span><p>The version of the current virtual appliance has expired.</p><p class="editoritem"><span class="noupdate">It is recommended to click <span class='btn btn-primary btn-compact'>update/edit</span> and remove <span class='btn btn-danger btn-compact'>x</span> this reference.</span><span class="hasupdates">It is recommended to update <img class='update-icon' src="/images/history_white.png" alt=""> this reference to the latest version.</span></p></span>
+					</div>
+					<div class="deletedpanel showondeleted">
+						<span><p>The current virtual appliance has been deleted.</p><p class="editoritem">It is recommended to click <span class='btn btn-primary btn-compact'>update/edit</span> and remove <span class='btn btn-danger btn-compact'>x</span> this reference.</p></span>
+					</div>
+					<div class="moderatedpanel showonmoderated">
+						<span><p>The current virtual appliance has moderated.</p><p class="editoritem"> It is recommended to click <span class='btn btn-primary btn-compact'>update/edit</span> and remove <span class='btn btn-danger btn-compact'>x</span> this reference.</p></span>
+					</div>
+					<button type="button" class="btn btn-success btn-compact action updatecurrentvappliance showonoutdated editoritem" title="Update virtual appliance"><img src="/images/history_white.png" alt=""/></button>
+					<div class="outdatedpanel showonoutdated editoritem">
+						<span><p>A newer version (<a href="#" target="_blank" alt="" title="View newer virtual appliance version" class="newversionlink"></a>) has been published.</p><p>This renders the currently referenced version as outdated. It is suggested to update it to the newer version by clicking this button</p></span>
+					</div>
+					<button type="button" class="btn btn-danger btn-compact action removecurrentvappliance showonedit" title="Diassociate virtual appliance">x</button>
+					<div data-path="_" data-type="vappliancelink"></div>
+				</div>
+				<div class="images">
+					<div class="header"></div>
+					<div class="content"></div>
+					<div class="footer">
+						<a href="#" title="view version details" class="icontext" target="_blank"><img src="/images/search.png" alt=""/><span>view details / download images</span></a>
+					</div>
+				</div>
+			</div>
+			<div data-template="contextscript-item" class="contextscript-item" data-view="ContextScriptItem">
+				<div class="toolbar editoritem">
+					<button class="btn btn-primary icontext hideonedit action edit" type="button">update/edit</button>
+					<button class="btn btn-danger icontext hideonedit action remove" type="button">remove</button>
+					<button class="btn btn-success icontext showonedit action save" type="button">save</button>
+					<button class="btn btn-danger icontext showonedit action cancel" type="button">cancel</button>
+				</div>
+				<div class="vertical-align metadatacontainer hideonedit">
+					<div class="horizontal-align title">Contextualization Script</div>
+					<div class="horizontal-align">
+						<div class="fieldvalue popup">
+							<div class="field">Identifier<span class="arrow">▼</span></div>
+							<div class="value" data-path="guid" data-editable="false" data-type="text"></div>
+						</div>
+						<div class="fieldvalue popup downloadcontainer">
+							<div class="field">Download<span class="arrow">▼</span></div>
+							<div class="value" >
+								<div class="fieldvalue subpanel">
+									<span class="field inliner" data-displayon="name">Script:</span>
+									<div class="value scriptlocation"><a data-path="url" data-editable="false" data-type="link" target="_blank"></a></div>
+								</div>
+								<div class="fieldvalue subpanel">
+									<div class="value alert alert-info hidden" data-displayon="relationid">Use <a href="#" target="_blank" class="pairurl">this link</a> to get the latest script for this pair <img src="/images/question_mark.gif" alt="" class="info" /><div class="info-message hidden"><div class='info-contextualization-script'><p>There are cases where the current contextualization script for this pair might change through time.</p><p>The current link will always provide the latest contextualization script for this pair.</p></div></div></div>
+								</div>
+								<div class="fieldvalue subpanel">
+									<div class="field">Checksum & Size</div>
+									<div class="value" style="width:100%;">
+										<div class="fieldvalue">
+											<div class="field"><span data-path="checksum.hashtype"></span>:</div>
+											<div class="value" data-path="checksum" data-editable="false" data-type="text"></div>
+										</div>
+										<div class="fieldvalue">
+											<div class="field">Size:</div>
+											<div class="value" data-path="size" data-editable="false" data-type="text"></div>
+											<div class="value">bytes</div>
+										</div>
+										<div class="editoritem toolbar">
+											<button class="btn btn-primary btn-compact action checkurl" type="button" title="Recalculate checksum and size">Update checksum</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="fieldvalue addedby">
+							<div class="value">Added by <span data-path="person" data-type="personlink"></span> on <span data-path="addedon" data-type="datetime"></span></div>
+						</div>
+					</div>
+					<div class="fieldvalue">
+						<div class="field">Format:</div>
+						<div class="value" data-path="format.name" data-type="text"></div>
+					</div>
+					
+					<div class="fieldvalue" >
+						<div class="field">Description:</div>
+						<div class="value" data-path="title" data-type="text" data-onempty="no description given yet"></div>
+					</div>
+					<div class="fieldvalue" data-displayon="description">
+						<div class="field">Notes:</div>
+						<div class="value" data-path="description" data-type="text" data-onempty="no description provided yet"></div>
+					</div>
+				</div>
+				<div class="vertical-align metadatacontainer showonedit">
+					<div class="horizontal-align title">Contextualization Script</div>
+					<div class="fieldvalue">
+						<div class="field">Script:</div>
+						<div class="value script">
+							<div class="appdb-ui script-location" data-bind="url" data-ui="contextscript" data-editor="contextscript" required="true" data-use>
+								<span class="empty-message"><span class='emptymessage icontext'><img src='/images/vappliance/warning.png' alt=''/>No script uploaded</span></span>
+								<button type="button" class="btn btn-primary btn-small btn-compact command upload" data-command="contextscript-edit" >upload</button>
+							</div>
+						</div>
+					</div>
+					<div class="fieldvalue">
+						<div class="field">Format:</div>
+						<div class="value format"><select data-path="format.id" data-source="appdb.model.StaticList.ContextFormats" data-editable="true" type="text"></select></div>
+					</div>
+					<div class="fieldvalue">
+						<div class="field">Description:</div>
+						<div class="value description"><input data-path="title" placeholder="please provide a description" data-editable="true" maxlength="150" /></div>
+					</div>
+					<div class="fieldvalue">
+						<div class="field">Notes:</div>
+						<div class="value notes"><textarea data-path="description" type="text" placeholder="please provide some notes" data-editable="true" maxlength="5000"></textarea></div>
+					</div>
+				</div>
+				<div class="vertical-align assocvappscontainer">
+					<div class="assocvapps-list-container">
+						<div class="title">Virtual Appliance</div>
+						<div class="content">
+							<div class="vappliances-list"></div>
+						</div>
+						<div class="toolbar showonedit" >
+						</div>
+					</div>
+				</div>
+			</div>
+			<div data-template="contextscript-script-editor">
+				<div class="contextscript-editor-container">
+					<div class="header">
+						
+					</div>
+					<div class="main">
+						<table class="contextscript-editor-selection-container">
+							<tbody>
+								<tr><td>
+									<div class="fieldvalue" >
+										<div class="field">Upload type:</div>
+										<div class="value">
+											<select class="contextscript-editor-type" name="contextscript-editor-type" dojo-type="dijit/form/Select" placeholder="Provide context script">
+												<option value="file">from file</option>
+												<option value="url">from url</option>
+												<option value="script">copy/paste script</option>
+											</select>
+										</div>
+									</div>
+								</td>
+								<td class="formatlist-container">
+									<div class="fieldvalue" >
+										<div class="field">Format:</div>
+										<div class="value">
+											<select class="contextscript-editor-formatlist" name="contextscript-editor-formatlist" ></select>
+										</div>
+									</div>
+								</td></tr>
+							</tbody>
+						</table>
+						<div class="content empty" data-select="none">
+							<div class="empty">
+								Please select a context script type from above
+							</div>
+						</div>
+						<div class="content file active" data-select="file">
+							<div class="title">
+								Please select a contextualization script file by clicking the button bellow and then click <i class="btn btn-primary btn-small btn-compact">apply</i>
+							</div>
+							<div id="cscript-uploader-container" class="select-file">
+								<div class="selected-file " data-empty="No file selected" data-ui="text" >No file selected</div>
+								<a id="pseudo_uploader" name="pseudo_uploader"  href="javascript:;" class="btn btn-success pseudo_uploader" >select a contextualization script file</a>
+								<div class="progressbar"><span class="bar"></span><span class="percent">0%</span></div>
+							</div>
+						</div>
+						<div class="content url" data-select="url">
+							<div class="title">Please provide a url location of the contextualization script. The script will be uploaded to appdb after saving this pair</div>
+							
+							<div class="fieldvalue">
+								<div class="field">Location:</div>
+								<div class="value appdb-ui text" data-name="url" data-bind="url" data-ui="url" data-editor="url" data-datatype="url" data-required="true"></div>
+							</div>
+						</div>
+						<div class="content script" data-select="script" >
+							<div class="title">
+								Please provide the script contents bellow. You can optionaly provide the name of the contextualization script.
+							</div>
+							<div class="fieldvalue">
+								<div class="field">Name:</div>
+								<div class="value appdb-ui text" data-name="name" data-bind="name"  data-ui="textbox" data-editor="textbox" data-datatype="text" required="false"></div>
+							</div>
+							<div class="fieldvalue" style="padding-bottom:25px;">
+								<div class="field">Content:<span class="code loader icontext"><img src="/images/ajax-loader-small.gif" alt=""/><span class="value">loading</span><button type="button" class='btn btn-danger btn-compact btn-small cancel-loader' title="Cancel content loading">cancel</button></span></div>
+								<div class="value appdb-ui textarea" data-name="content" data-bind="code" data-editor="textarea" data-editor-use="validation.status,validation.requiredmessage" data-required="true" data-max="150000" placeholder="Please provide contextualization script code here"></div>
+							</div>
+						</div>
+					</div>
+					<div class="loader">
+						<div class="sheet"></div>
+						<div class="message icontext">
+							<img src="/images/ajax-loader-small.gif" alt=""/><span class="value"></span>
+						</div>
+					</div>
+					<div class="footer">
+						<div class="content-error icontext"><img src="/images/vappliance/redwarning.png" alt=""/><span class="value"></span></div>
+						<div class="commands">							
+							<button type="button" class="btn btn-default btn-small command cancel" data-command="cancel">cancel</button>
+							<button type="button" class="btn btn-primary btn-small command apply" data-command="apply">apply</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div data-template="contextscript-list" data-view="ContextScriptList">
+					<div class="header">Contextualization Script / vAppliance Pairs</div>
+					<div class="nocontextualization emptycontent">
+						<div class="content">
+							<img src="/images/exclam16.png" alt="" />
+							<span>No pairs available yet.</span>
+						</div>
+					</div>
+					<div class="contextscript-list" data-usetemplate="contextscript-item" ></div>
+					<div class="toolbar editoritem">
+						<button class="btn btn-primary new action" type="button">
+							<img src="/images/add.png" alt=""/>
+							<span>Add new pair</span>
+						</button>
+					</div>
+			</div>
+			<div data-template="contextualization-version" data-view="ContextualizationVersion" >
+				<div class="field hideonedit">Version<button class="btn btn-primary btn-compact editoritem action edit" title="Edit version value">edit</button>:</div>
+				<div class="value hideonedit" data-path="version" data-editable="false" data-type="text" data-onempty="no version specified"></div>
+				<div class="field showonedit">Version:</div>
+				<div class="value showonedit">
+					<input data-path="version" placeholder="please provide a value" data-editable="true" maxlength="150" required="required"></input>
+					<div class="actions showonedit">
+						<button class="btn btn-primary btn-compact action save editoritem" type="button">save</button>
+						<button class="btn btn-danger btn-compact action cancel editoritem" type="button">cancel</button>
+					</div>
+				</div>
+			</div>
+			<div data-template="contextualization-description" data-view="ContextualizationDescription" >
+				<div class="field hideonedit">Description<button class="btn btn-primary btn-compact editoritem action edit" title="Edit description value">edit</button>:</div>
+				<div class="value hideonedit" data-path="description" data-editable="false" data-type="text" data-onempty="no description given"></div>
+				<div class="field showonedit">Description:</div>
+				<div class="value showonedit">
+					<textarea data-path="description" placeholder="please provide a value" data-editable="true" maxlength="5000" required="required"></textarea>
+					<div class="actions showonedit">
+						<button class="btn btn-primary btn-compact action save editoritem" type="button">save</button>
+						<button class="btn btn-danger btn-compact action cancel editoritem" type="button">cancel</button>
+					</div>
+				</div>
+			</div>
+			<div data-template="contextualization" class="contextualization">
+					<div class="toolbar hidden">
+						<div class="actions">
+							<a href="#" class="action edit hideonedit btn btn-primary btn-compact" title="">
+								<img src="/images/editicon.png" alt="" /><span>edit</span>
+								<span class="description">
+									<img src="/images/editicon.png" alt="">
+									<span>Edit metadata and images of this version.</span>
+								</span>
+							</a>
+							<a href="#" class="action save showonedit btn btn-primary btn-compact" title="">
+								<img src="/images/diskette.gif" alt="" /><span>save</span>
+								<span class="description">
+									<img src="/images/vappliance/warning.png" alt="">
+									<span>You must fill all the required fields with valid information in the form bellow in order to be able to save data.</span>
+								</span>
+							</a>
+							<a href="#" class="action cancel showonedit btn btn-danger btn-compact" title=''>
+								<img src="/images/stop.png" alt="" /><span>cancel</span>
+							</a>
+						</div>
+					</div>
+					<div class="header">
+						<div>
+							<div class="left">
+								<div class="fieldvalue context-version-property" data-usetemplate="contextualization-version"></div>
+								<div>
+									<div class="fieldvalue highlight" >
+										<div class="field">Created on:</div>
+										<div class="value" data-path="addedon" data-editable="false" data-type="datetime" data-onempty="not created yet"></div>
+									</div>
+								</div>
+								<div>
+									<div class="fieldvalue highlight" >
+										<div class="field">Last updated on:</div>
+										<div class="value"  data-path="lastupdatedon" data-editable="false" data-type="datetime" data-onempty="not updated yet"></div>
+									</div>
+								</div>
+							</div>
+							<div class="right">
+								<div class="fieldvalue context-description-property" data-usetemplate="contextualization-description"></div>
+							</div>
+						</div>
+					</div>
+					<div class="content contextscript-list-container" data-usetemplate="contextscript-list" ></div>
+					<div class="nocontextualization emptycontent">
+						<div class="content">
+							<img src="/images/exclam16.png" alt="" />
+							<span>No contextualization scripts available yet.</span>
+						</div>
+					</div>
+			</div>
+		</div>
+	</div>
+	<?php if( $this->session->userid ) { ?>
+	<div id="permissionsdiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane">
+		<div class="userpermissions">
+			<div class="section privacy">
+				<div class="header"><span class="title">Privacy</span><a href='/' title='Learn about privacy' class='icontext wiki-link' data-wiki-link='main:guides:general:privacy_guide' target='_blank'><span>...learn more</span></a></div>
+				<div class="main permissionscontainer">
+					<div class='boolbox'><input type="checkbox" value="true" id="isprivate"/><label for="isprivate"></label></div><span>Make it private</span>
+					<span class='privacynote'><span> (If checked, please use the permissions panel bellow and adjust who should have <b>access</b> to the <b>private data</b>)</span></span>
+					<span class="advicenote">
+						<div class="warning icontext">
+							<img src="/images/vappliance/warning.png" alt="" />
+							<span class="message">For vmcatcher subscription over a private image list, please make use of your <a class="profileaccess" href="/store/person/<?php echo $this->session->usercname;?>/preferences/accessmanagement" title="" target="_blank" onClick="appdb.views.Main.showPerson({id:<?php echo $this->session->userid;?>, cname:'<?php echo $this->session->usercname;?>',tab:'preferences/accessmanagement'},{mainTitle:'<?php echo $this->session->userFullname;?>'});">personal access token</a>. For more details click <a href='<?php echo $wiki;?>main:faq:how_can_i_create_a_personal_access_token' target='_blank' >here</a></span>
+						</div>
+					</span>
+					<div class="footer">
+						<div class="actions">
+							<button class="btn btn-danger action save showonchange" data-action="save">Save</button>
+							<button class="btn btn-primary action cancel showonchange" data-action="cancel">Cancel</button>
+						</div>
+					</div>
+					<div class="disablepanel">
+						<div class="sheet"></div>
+						<div class="warning">
+							<div class="icontext">
+								<img src="/images/vappliance/warning.png" alt="" />
+								<span class="message"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="section privileges">
+				<div class="header"><span class="title">Permissions</span><a href='/' title='Learn about permissions' class='icontext wiki-link' data-wiki-link='main:guides:general:permissions_guide' target="_blank"><span>...learn more</span></a></div>
+				<div class="main">
+					<div class="systemprivspolicy" ><b>By policy</b>, system users, have special permissions on your item.
+						<div class="dropdown-group menu" >
+							<button class="btn btn-light dropdown-toggle arrow-down" onclick="$(this).toggleClass('active');preventDefaultEvent(event);" >View system users</button>
+							<div class="dropdown-menu align-left" onclick="preventDefaultEvent();">
+								<div class="permissionscontainer systemcontainer">
+									<div class="systempermissions">
+										<ul class='permissiongrouplist'></ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="permissionscontainer contactcontainer">
+						<div class="contactpermissions content">
+							<ul class='permissiongrouplist'></ul>
+						</div>
+						<div class="footer">
+							<div class="actions">
+								<button class="btn btn-danger action save showonchange" data-action="save">Save</button>
+								<button class="btn btn-primary action cancel showonchange" data-action="cancel">Cancel</button>
+							</div>
+						</div>
+						<div class="disablepanel">
+							<div class="sheet"></div>
+							<div class="warning">
+								<div class="icontext">
+									<img src="/images/vappliance/warning.png" alt="" />
+									<span class="message"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="permissionscontainer explicitcontainer">
+						<div class="explicitpermissions content">
+							<ul class='permissiongrouplist' data-removable="true"></ul>
+						</div>
+						<div class="footer">
+							<div class="warning">
+								<div class="icontext">
+									<img src="/images/vappliance/warning.png" alt="" />
+									<span class="message"></span>
+								</div>
+							</div>
+							<div class="actions">
+								<button class="btn btn-success action addnew showoneditprivs" data-action="addnew">Add User</button>
+								<button class="btn btn-danger action save showonchange" data-action="save">Save</button>
+								<button class="btn btn-primary action cancel showonchange" data-action="cancel">Cancel</button>
+							</div>
+						</div>
+						<div class="disablepanel">
+							<div class="sheet"></div>
+							<div class="warning">
+								<div class="icontext">
+									<img src="/images/vappliance/warning.png" alt="" />
+									<span class="message"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>                                                                                                                                                                               
+	<?php } ?>
+</div> <!-- dojo tab div closes -->
+<ul class="socialtoolbar listtoolbox hidden">
+	<li class="description">
+		SHARE
+	</li>
+	<li>
+		<a class="social share facebook" title="share in facebook" data-name="facebook">
+			<img src="/images/social_facebook.png" alt=""/>
+		</a>
+	</li>
+	<li class="title">FACEBOOK</li>
+	<li>
+		<a class="social share twitter" title="share in twitter" data-name="twitter">
+			<img src="/images/social_twitter.png" alt=""/>
+		</a>
+	</li>
+	<li class="title">TWITTER</li>
+	<li>
+		<a class="social share linkedin" title="share in linkedin" data-name="linkedin">
+			<img src="/images/social_linkedin.png" alt=""/>
+		</a>
+	</li>
+	<li class="title">LINKEDIN</li>
+	<li>
+		<a class="social share googleplus" title="share in google+" data-name='googleplus'>
+			<img src="/images/social_googleplus.png" alt=""/>
+		</a>
+	</li>
+	<li class="title">GOOGLE+</li>
+</ul>
+<div class="software bottomtoolbar"></div>
+</div> <!-- main div closes -->
+
+<script type="text/javascript">
+	dialogCount = <?php echo $this->dialogCount; ?>;
+	if( window.autoinit !== false ){
+		window.autoinit = true;
+		appdb.pages.application.init({
+			id: '<?php if ($this->entryid === null) echo 'null'; elseif ($this->entryid !== '') echo $this->entryid; ?>',
+			dialogCount: '<?php echo $this->dialogCount;?>',
+			permalink: '<?php echo 'http://'.$_SERVER["HTTP_HOST"].'?p='.base64_encode('/apps/details?id='.$this->entryid); ?>',
+			historyId: '<?php echo $this->histid; ?>',
+			historyType: '<?php echo $this->histtype;?>',
+			entityType: '<?php echo $this->entitytype;?>'
+		});
+	}
+	window.autoinit = true;
+</script>
+<?php } ?>

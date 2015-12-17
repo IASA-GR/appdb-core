@@ -1,0 +1,220 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php
+$wiki = ApplicationConfiguration::app('wiki', ApplicationConfiguration::uiUrl());
+$haswiki = ($wiki==="")?false:true;
+$currentwiki = "/pages/about/announcements"; 
+if( $haswiki ){
+	$currentwiki = $wiki . "main:about:announcements";
+}
+?>
+<div class="aboutpage">
+<div class="aboutheader">
+	<span ><a href="<?php echo $currentwiki; ?>" data-href="/pages/about/announcements" target="_blank">permalink</a></span>
+	<h1 >Announcements</h1>
+	<hr />
+</div>
+<?php if($haswiki === true ){ ?>
+	<div class="contentmoved isempty">
+	<div class="emptycontent">
+		<div class='content'>
+			<img src="/images/exclam16.png">
+			<span>The Announcements section has permanently moved <a href='<?php echo $currentwiki;?>' target='_blank'>here</a>.</span>
+		</div>
+	</div>
+</div>
+<?php } else { ?>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$('.bar1').attr('style', "height: 4px; background: url('" + loadImage('bar1.png') + "') repeat;");
+		if($(".announcementscontainer").parent().parent().attr("id")=="main"){
+			$(".announcementscontainer a.oldannounce").click();
+		}
+	});
+</script>
+<div class="announcementscontainer">
+<ul class="announcelist">
+<li class="faq"><span class="header"><span class="date">2014-01-07</span>: New version <span class="version">4.6.0</span> released</span>
+	<div class="faqcontent"><span class="top">Release highlights:</span>
+		<ul>
+			<li>Support for Single Sign On accross services via the SAML standard</li>
+			<li>Support for login via x509 trusted certificates</li>
+		</ul>
+	</div>
+</li>
+<li class="faq"><span class="header"><span class="date">2013-12-02</span>: New version <span class="version">4.5.0</span> released</span>
+	<div class="faqcontent"><span class="top">Release highlights:</span>
+		<ul>
+			<li>Social sharing</li>
+			<li>Refactored homepage for logged-in users</li>
+			<li>Support for licensing information in s/w items</li>
+		</ul>
+	</div>
+</li>
+<li class="faq"><span class="header"><span class="date">2013-07-16</span>: New version <span class="version">4.4.0</span> released</span>
+	<div class="faqcontent"><span class="top">Release highlights:</span>
+		<ul>
+			<li>Faceted search: Refine your search results through property lists</li>
+			<li>Introduction of rich snippets for Google search results</li>
+			<li>New scientific discipline classification</li>
+			<li>Remodeled graphical browsing section</li>
+		</ul>
+	</div>
+</li>
+<li class="faq"><span class="header"><span class="date">2013-04-22</span>: New version <span class="version">4.2.0</span> released<!--, with support for the EGI Community Repository--></span>
+    <div class="faqcontent"><span class='top'>Release highlights:</span>
+    <ul>
+	 <li>offers the ability to manage and publish unlimited series of releases, 
+per registered software item</li>
+	 <li>follows a light-weight &amp; community driven, release management process</li>
+	 <li>populates all the required metadata needed by administrators as well 
+as typical developers</li>
+    </ul>
+    <span class="bottom">For more details, please check the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/changelog',mainTitle:'Changelog'})">changelog</a>, and make sure you read the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/faq',mainTitle:'Faq'})">FAQs</a> and <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/usage',mainTitle:'Usage'})">Usage guide</a>.</span>
+	</div>
+</li>
+<li class="faq"><span class="header"><span class="date">2013-02-04</span>: New version <span class="version">4.0.0</span> released</span>
+    <div class="faqcontent"><span class='top'>Release highlights:</span>
+    <ul>
+	 <li>New look &amp; feel</li>
+	 <li>Significant performance improvements</li>
+	 <li>Information restructuring</li>
+    </ul>
+    <span class="bottom">For more details, please check the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/changelog',mainTitle:'Changelog'})">changelog</a>, and make sure you read the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/faq',mainTitle:'Faq'})">FAQs</a> and <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/usage',mainTitle:'Usage'})">Usage guide</a>.</span>
+	</div>
+</li>
+<a class="oldannounce" onclick="$('div.oldannounce').show(); $(this).remove();" href="#">more...</a>
+<li class="faq"><span class="header"><span class="date">2012-06-28</span>: New version <span class="version">3.0.0</span> released</span>
+    <div class="faqcontent"><span class='top'>Release highlights:</span>
+    <ul>
+	 <li>REST API v1.0 with write support</li>
+	 <li>Application categories</li>
+	 <li>Application verification</li>
+    </ul>
+    <span class="bottom">For more details, please check the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/changelog',mainTitle:'Changelog'})">changelog</a>, and make sure you read the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/faq',mainTitle:'Faq'})">FAQs</a> and <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/usage',mainTitle:'Usage'})">Usage guide</a>.</span>
+	</div>
+</li><li class="faq"><span class="header"><span class="date">2012-03-23</span>: New version <span class="version">2.5.0</span> released</span>
+    <div class="faqcontent"><span class='top'>Release highlights:</span>
+    <ul>
+	 <li>Autocompletion and filter validation in search boxes</li>
+	 <li>Enhanced user interaction tools</li>
+	 <li>New dissemination tool for managers</li>
+    </ul>
+    <span class="bottom">For more details, please check the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/changelog',mainTitle:'Changelog'})">changelog</a>, and make sure you read the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/faq',mainTitle:'Faq'})">FAQs</a> and <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/usage',mainTitle:'Usage'})">Usage guide</a>.</span>
+	</div>
+</li>
+<li class="faq"><span class="header"><span class="date">2012-02-10</span>: New version <span class="version">2.4.0</span> released</span>
+    <div class="faqcontent"><span class='top'>Release highlights:</span>
+    <ul>
+	 <li>Enhanced site navigation through browser's history feature.</li>
+	 <li>Enhanced interactivity with clickable statistical charts.</li>
+    </ul>
+    <span class="bottom">For more details, please check the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/changelog',mainTitle:'Changelog'})">changelog</a>, and make sure you read the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/faq',mainTitle:'Faq'})">FAQs</a> and <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/usage',mainTitle:'Usage'})">Usage guide</a>.</span>
+	</div>
+</li>
+<li class="faq"><span class="header"><span class="date">2011-12-18</span>: New version <span class="version">2.3.0</span> released</span>
+    <div class="faqcontent"><span class='top'>Release highlights:</span>
+    <ul>
+		<li>Multiple (sub)disciplines in application entries</li>
+		<li>Per application contact expertise information</li>
+		<li>Addition of "&lt;", "&gt;" operators in syntactic search</li>
+		<li>Application editing improvements</li>
+		<li>Many GUI improvements</li>
+    </ul>
+    <span class="bottom">For more details, please check the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/changelog',mainTitle:'Changelog'})">changelog</a>, and make sure you read the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/faq',mainTitle:'Faq'})">FAQs</a> and <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/usage',mainTitle:'Usage'})">Usage guide</a>.</span>
+</div>
+</li>
+<div class="oldannounce" style="display:none">
+<li class="faq"><span class="header"><span class="date">2011-12-05</span>: New version <span class="version">2.2.2</span> released</span>
+    <div class="faqcontent"><span class='top'>Release highlights:</span>
+    <ul>
+        <li>Support for Internet Explorer v9.0</li>
+    </ul>
+    <span class="bottom">For more details, please check the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/changelog',mainTitle:'Changelog'})">changelog</a>, and make sure you read the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/faq',mainTitle:'Faq'})">FAQs</a> and <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/usage',mainTitle:'Usage'})">Usage guide</a>.</span>
+</div>
+</li>
+	<li class="faq"><span class="header"><span class="date">2011-11-25</span>: New version <span class="version">2.2.0</span> released</span>
+    <div class="faqcontent"><span class='top'>Release highlights:</span>
+    <ul>
+        <li>News feeds (RSS/Atom)</li>
+        <li>Mailing lists</li>
+        <li>Name uniqueness</li>
+    </ul>
+    <span class="bottom">For more details, please check the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/changelog',mainTitle:'Changelog'})">changelog</a>, and make sure you read the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/faq',mainTitle:'Faq'})">FAQs</a> and <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/usage',mainTitle:'Usage'})">Usage guide</a>.</span>
+</div>
+</li>
+<li class="faq"><span class="header"><span class="date">2011-10-27</span>: New version <span class="version">2.1.0</span> released</span>
+    <div class="faqcontent"><span class='top'>Release highlights:</span>
+    <ul>
+        <li>Application tagging mechanism</li>
+        <li>GUI improvements</li>
+        <li>Better HTTPS support</li>
+    </ul>
+    <span class="bottom">For more details, please check the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/changelog',mainTitle:'Changelog'})">changelog</a>, and make sure you read the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/faq',mainTitle:'Faq'})">FAQs</a> and <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/usage',mainTitle:'Usage'})">Usage guide</a>.</span>
+</div>
+</li>
+<li class="faq"><span class="header"><span class="date">2011-09-14</span>: New version <span class="version">2.0.0</span> released</span>
+    <div class="faqcontent"><span class='top'>Release highlights:</span>
+    <ul>
+        <li>Increased performance</li>
+        <li>Improved user interface</li>
+        <li>Syntactic searching</li>
+        <li>Ratings and comments for application entries, and much more</li>
+    </ul>
+    <span class="bottom">For more details, please check the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/changelog',mainTitle:'Changelog'})">changelog</a>, and make sure you read the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/faq',mainTitle:'Faq'})">FAQs</a> and <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/usage',mainTitle:'Usage'})">Usage guide</a>.</span>
+</div>
+</li>
+<li class="faq"><span class="header"><span class="date">2011-05-12</span>: New version <span class="version">1.4.0</span> released</span>
+    <div class="faqcontent"><span class='top'>Release highlights:</span>
+    <ul>
+        <li>Performance improvements regarding data entry</li>
+        <li>Better search support</li>
+    </ul>
+    <span class="bottom">For more details, please check the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/changelog',mainTitle:'Changelog'})">changelog</a>, and make sure you read the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/faq',mainTitle:'Faq'})">FAQs</a> and <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/usage',mainTitle:'Usage'})">Usage guide</a>.</span>
+    </div>
+</li>
+<li class="faq"><span class="header"><span class="date">2011-03-14</span>: New version <span class="version">1.3.0</span> released</span>
+    <div class="faqcontent"><span class='top'>Release highlights:</span>
+    <ul>
+        <li>Preferences tab in user profile, and embedded details view</li>
+        <li>Third-person profile management: Managers can add new user profiles on behalf of others</li>
+    </ul>
+    <span class="bottom">For more details, please check the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/changelog',mainTitle:'Changelog'})">changelog</a>, and make sure you read the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/faq',mainTitle:'Faq'})">FAQs</a> and <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/usage',mainTitle:'Usage'})">Usage guide</a>.</span>
+</div>
+</li>
+<li class="faq"><span class="header"><span class="date">2011-02-28</span>: New version <span class="version">1.2.0</span> released</span>
+<div class="faqcontent"><span class='top'>Release highlights:</span>
+    <ul>
+        <li>VO integration with data from the <a href="http://operations-portal.egi.eu" target="_blank">EGI Operations Portal</a>.</li>
+        <li>Third-person profile management: National representatives can edit profiles of people from the same country</li>
+    </ul>
+    <span class="bottom">For more details, please check the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/changelog',mainTitle:'Changelog'})">changelog</a>, and make sure you read the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/faq',mainTitle:'Faq'})">FAQs</a> and <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/usage',mainTitle:'Usage'})">Usage guide</a>.</span>
+</div>
+</li>
+<li class="faq"><span class="header"><span class="date">2011-02-04</span>: New version <span class="version">1.1.0</span> released</span>
+<div class="faqcontent"><span class='top'>After the successful testing of the new version of AppDB with several NGIs, AppDB v1.1.0 has been released, featuring amongst others:</span>
+    <ul>
+        <li>Improved and simplified write access: Every EGI SSO account holder can register applications and create developer profiles in the system.</li>
+        <li>API-based access: The system provides access for users of 3rd party software through a new, REST web-API. The API allows read-access for external sites and it is currently in beta mode. Write-mode API access is expected in May 2011.</li>
+    </ul>
+</div>
+</li>
+</div>
+</ul>
+</div>
+</div>
+<?php } ?>

@@ -1,0 +1,52 @@
+REQUIREMENTS
+
+- PHP v5.4.13 or higher
+	- PEAR modules
+		- Mail           v1.2.0
+		- Mail-Mime		 v1.8.2
+		- Net_SMTP       v1.4.3
+		- Auth_SASL      v1.0.4        
+
+	- PECL modules 
+		- proctitle
+		- apd
+
+	- other PHP modules 
+		- mbstring
+		- recode
+		- mcrypt
+		- gd
+		- process
+
+- Zend Framework v1.11.10 with DoJo
+	- apply zend patches
+	- copy Dialog.js into /opt/zend/externals/dojo/dojox/
+	- extract /opt/zend/externals/dojo/dojox/grid/compatGrid.tar.gz
+	- create a DoJo custom build by calling
+		./build.sh profile=appdb action=release cssOptimize=comments mini=true
+	  from /opt/zend/externals/dojo/util/buildscripts
+
+- Javascript Libraries (public/js)
+	- plupload (.swf and .xap files must be in public and public/js folders)
+	- tinymce
+	- shortcut.js
+	- dijit (../zend/externals/dojo/release/dojo/dijit/)
+	- dojo (../zend/externals/dojo/release/dojo/dojo/)
+	- dojox (../zend/externals/dojo/release/dojo/dijit/)
+	- ../compat -> js/dojox/grid
+	- ../cgi -> ../cgi-bin
+
+- System packages
+	- recode
+	- ImageMagick
+	- OpenLDAP
+	- Apache
+
+- Configuration
+	- add the PHP PEAR path to the "include_path" variable in php.ini
+	- make sure there is a working copy of php_browscap.ini on the system and add proper browscap entry in php.ini
+	- Apache configuration should include the following lines
+		AddEncoding x-gzip .jgz
+		AddType application/javascript .jgz
+		AddType text/css .cgz
+		AddType text/x-component .htc

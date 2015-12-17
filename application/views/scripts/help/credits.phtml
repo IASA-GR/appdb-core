@@ -1,0 +1,78 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php
+$wiki = ApplicationConfiguration::app('wiki', ApplicationConfiguration::uiUrl());
+$haswiki = ($wiki==="")?false:true;
+$currentwiki = "/pages/about/credits"; 
+if( $haswiki ){
+	$currentwiki = $wiki . "main:about:credits";
+}
+?>
+<div class="aboutpage">
+<div class="aboutheader">
+	<span ><a href="<?php echo $currentwiki;?>" target="_blank">permalink</a></span>
+	<h1 >Credits</h1>
+	<hr />
+</div>
+<?php if( $haswiki === true ){ ?>
+	<div class="contentmoved isempty">
+	<div class="emptycontent">
+		<div class='content'>
+			<img src="/images/exclam16.png">
+			<span>The Credits section has permanently moved <a href='<?php echo $currentwiki;?>' target='_blank'>here</a>.</span>
+		</div>
+	</div>
+</div>
+<?php } else { ?>
+<h3>Main developers</h3>
+<ul>
+    <li><a href="/store/person/marios.chatziangelou" onclick="appdb.views.Main.showPerson({id:41,cname:'marios.chatziangelou'}, {mainTitle: 'Marios Chatziangelou'});">Marios Chatziangelou</a></li>
+    <li><a href="/store/person/william.karageorgos" onclick="appdb.views.Main.showPerson({id:520,cname:'william.karageorgos'}, {mainTitle: 'William V. Karageorgos'});">William V. Karageorgos</a></li>
+    <li><a href="/store/person/alexander.nakos" onclick="appdb.views.Main.showPerson({id:551,cname:'alexander.nakos'}, {mainTitle: 'Alexander Nakos'});">Alexander Nakos</a></li>
+</ul>
+<h3>Partners</h3>
+<ul>
+    <li><a href="http://www.iasa.gr" target="_blank">IASA</a></li>
+    <li><a href="http://www.grnet.gr" target="_blank">GRNET</a></li>
+    <li><a href="http://www.hellasgrid.gr" target="_blank">Hellasgrid</a></li>
+    <li><a href="http://egi.eu" target="_blank">EGI</a></li>
+</ul>
+<div id="logosdiv" style="overflow:hidden;">
+    <table>
+	<tr><td><p/></td></tr>
+	<tr><td>
+	    <a target="_blank" href="http://www.hellasgrid.gr">
+		<img title="Hellas Grid Task Force" alt="Hellas Grid Task Force" border="0" width="130px" src="/images/hellasgrid.gif"/>
+	    </a>
+	</td><td>
+	    <a target="_blank" href="http://www.iasa.gr/">
+		<img title="Institute of Accelerating Systems and Applications" alt="Institute of Accelerating Systems and Applications" border="0" width="89px" src="/images/iasa.png"/>
+	    </a>
+	</td></tr>
+	<tr><td>
+	    <a target="_blank" href="http://www.grnet.gr">
+		<img title="Green Research & Technology Network" alt="Green Research & Technology Network" border="0" src="/images/hellas_grnet.gif"/>
+	    </a>
+	</td><td>
+	    <a target="_blank" href="http://egi.eu/">
+		<img title="European Grid Initiative" alt="European Grid Initiative" border="0" src="/images/EGI-logo_small2.png" />
+	    </a>
+	</td></tr>
+    </table>
+</div>    
+</div>
+<?php } ?>

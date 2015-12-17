@@ -1,0 +1,177 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><div class="contactvos-container mode-init">
+	<div class="contactvos-content composer">
+		<div class="header"></div>
+		<div class="main">
+			<div class="selectcontacttype-container dropdownoptions-container">
+				<div class="fieldvalue contact-type ">
+					<div class="field"><span>Notification type:</span></div>
+					<div class="value">
+						<div class="selectedcontacttype dropdownoptions-header dropdownoptions-handler">
+							<div class="contacttype empty"><span>Please select a type</span></div>
+						</div>
+						<ul class="dropdownoptions-menu">
+							<li data-value="-1" data-action="init" class="hidden"><div class="contacttype empty"><span>Please select a type</span></div></li>
+							<li data-value="0" data-action="suggest"><div class="contacttype suggest"><span>Request to be endorsed by VOs</span></div></li>
+							<li data-value="1" data-action="newversion"><div class="contacttype newversion"><span>Notify for new version</span></div></li>
+							<li data-value="2" data-action="exclude" class="hidden"><div class="contacttype exclude"><span>Request for exclusion from VO</span><span class="footnote">Only VOs which already endorsed this virtual appliance will be notified.</span></div></li>
+							<li data-value="3" data-action="generic"><div class="contacttype generic"><span>Generic notification</span></div></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="selectvos-container dropdownoptions-container">
+				<div class="selectedvocontacts-container ">
+					<div class="fieldvalue">
+						<div class="field"><span>Select VOs:</span></div>
+							<div class="value ">
+								<div class="nocontacttype">Please select a notification type in order to select VOs</div>
+								<div class="selectedvocontacts dropdownoptions-header dropdownoptions-handler"><ul></ul><span class="selectvo">Click to select VOs</span></div>
+								<div class="vocontactlist-container dropdownoptions-menu">
+									<div class="vocontact-filter">
+										<span>View:</span>
+										<ul class="actions">
+											<li class="selected"><button class="btn btn-content btn-compact action nofilter" title="View all available VOs" data-filter="false" data-allowactions="false">all<span class="count"></span></button></li>
+											<li><button class="btn btn-content btn-compact action endorsed" title="View VOs which already endorsed this virtual appliance" data-filter="endorsed" data-allowactions="true">endorsed<span class="count"></span></button></li>
+											<!--<li><button class="btn btn-content btn-compact action outdated" title="View selected VOs">endorsed out of date<span class="count"></span></button></li>-->
+											<li><button class="btn btn-content btn-compact action selected" title="View selected VOs" data-filter="selected" data-allowactions="true">selected<span class="count"></span></button></li>
+										</ul>
+										<div class="listactions">
+											<a href="#" title="Select all items of this list" class="action selectall hidden">select all</a>
+											<a href="#" title="Clear all items from this list" class="action clearall">clear all</a>
+										</div>
+									</div>
+									<div class="vocontactlist">
+										<ul>
+											<?php foreach($this->volist as $vo){ ?>
+											<li>
+												<div class="contactitem" data-id="<?php echo $vo["id"]; ?>" data-name="<?php echo $vo["name"]; ?>" data-discipline="<?php echo $vo["discipline"];?>" data-endorsed="<?php echo ($vo["endorsed"]=== true)?"true":"false";?>" data-updated="<?php echo ($vo["uptodate"] === true)?"true":"false";?>">
+													<span class="selection"></span>
+													<img src="/vo/getlogo?name=<?php echo urlencode($vo["name"]); ?>&id=<?php echo str_replace(" ", "+", trim($vo["discipline"]));?>" alt="" />
+													<span class="itemdata name"><?php echo $vo["name"];?></span>
+													<span class="itemdata discipline"><?php echo $vo["discipline"];?></span>
+													<?php if($vo["endorsed"] == true ) { ?>
+													<?php if($vo["uptodate"] == true ) { ?>
+													<span class="itemdata state">Endorsed</span>
+													<?php } else {?>
+													<span class="itemdata state">Endorsed with older version</span>
+													<?php } } ?>
+												</div>
+											</li>
+											<?php }?>
+										</ul>
+										<div class="empty-container">
+											<div class="emptymessage outdated">
+												<span>No VOs found with outdated endorsed images</span>
+											</div>
+											<div class="emptymessage endorsed">
+												<span>No images endorsed by any VO</span>
+											</div>
+											<div class="emptymessage selected">
+												<span>No VO selected</span>
+											</div>
+											<div class="emptymessage none">
+												<span>No available VOs found</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+					</div>
+				</div>
+			</div>
+			<div class="subject-container" data-maxcount="200">
+				<div class="fieldvalue">
+					<div class="field">Subject:</div>
+					<div class="value"><div></div></div>
+					<div class="validationmessage">
+						<span>One line - <span class="usage">using <span class="currentcount"></span> of <span class="maxcount"></span> characters</span></span>
+					</div>
+				</div>
+			</div>
+			<div class="message-container" data-maxcount="1000">
+				<div class="fieldvalue">
+					<div class="field"><span>Message:</span></div>
+					<div class="value"><div></div></div>
+					<div class="validationmessage">
+						<span class="usage">using <span class="currentcount"></span> of <span class="maxcount"></span> characters</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="footer">
+			<div class="warning">
+				<div class="message icontext nocontacttype">
+					<img src="/images/vappliance/warning.png" alt="" />
+					<span>You must select a notification type.</span>
+				</div>
+				<div class="message icontext nocontactvo">
+					<img src="/images/vappliance/warning.png" alt="" />
+					<span>You must select at least one VO.</span>
+				</div>
+				<div class="message icontext nosubject">
+					<img src="/images/vappliance/warning.png" alt="" />
+					<span>You must provide a valid subject.</span>
+				</div>
+				<div class="message icontext nomessage">
+					<img src="/images/vappliance/warning.png" alt="" />
+					<span>Please provide a valid message.</span>
+				</div>
+			</div>
+			<div class="actions">
+				<button class="btn btn-success btn-compact action preview hidden">Preview message</button>
+				<button class="btn btn-warning btn-compact action cancel">Cancel</button>
+				<button class="btn btn-disabled btn-compact action send" disabled="disabled">Send</button>
+			</div>
+		</div>
+	</div>
+	<div class="contactvos-content previewer hidden">
+		<div class="header">This is a preview of the message to be sent to the management teams of VO <span class="voselector"></span>:</div>
+		<div class="main">
+			<div class="sender fieldvalue"><span class="field">From:</span><span class="value"></span></div>
+			<div class="recipients fieldvalue hidden"><span class="field">To:</span><span class="value"></span></div>
+			<pre class="messagebody"></pre>
+		</div>
+		<div class="footer">
+			<div class="actions">
+				<button class="btn btn-success btn-compact action back">Close preview</button>
+			</div>
+		</div>
+	</div>
+	<div class="contactvos-content result hidden">
+		<div class="header"></div>
+		<div class="main">
+			<div class="state">
+				<div class="success hidden">
+					<img src="/images/yes.png" alt="" />
+					<span>Notification was sent successfully</span>
+				</div>
+				<div class="error hidden">
+					<img src="/images/vappliance/redwarning.png" alt=""/>
+					<span></span>
+				</div>
+			</div>
+		</div>
+		<div class="footer">
+			<div class="actions">
+				<button class="btn btn-success btn-compact action retry">Back to form</button>
+				<button class="btn btn-warning btn-compact action close">Close</button>
+			</div>
+		</div>
+	</div>
+</div>

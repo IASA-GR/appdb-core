@@ -1,0 +1,365 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php 
+	$session = $this->session;
+	$profileids = $this->profileids;
+	$hassuggested = ( ( count($profileids) > 0 )?true:false );
+?>
+<style>
+	.connectprofile {
+		padding-top: 10px;
+	}
+	.connectprofile > .header {
+		min-height: 30px;
+		max-height: 35px;
+		height: 33px;
+		padding: 3px;
+	}
+	.connectprofile > .header > .actions{
+		width: auto;
+	}
+	.connectprofile > .header > .actions .action {
+		display: inline-block;
+		vertical-align: middle;
+		padding: 10px;
+		border: 1px solid #f0f0f0;
+		border-radius: 3px;
+		margin: 0px 4px;
+		background: #ffffff; /* Old browsers */
+		/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+		background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNlNmVjZjIiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+');
+		background: -moz-linear-gradient(top,  #ffffff 0%, #e6ecf2 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#e6ecf2)); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top,  #ffffff 0%,#e6ecf2 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top,  #ffffff 0%,#e6ecf2 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top,  #ffffff 0%,#e6ecf2 100%); /* IE10+ */
+		background: linear-gradient(to bottom,  #ffffff 0%,#e6ecf2 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e6ecf2',GradientType=0 ); /* IE6-8 */
+		outline: none;
+	}
+	.connectprofile > .header > .actions .action.selected {
+		border-color: #f0f0f0;
+		background: #deefff; /* Old browsers */
+		/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+		background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2RlZWZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNhZmM4ZGQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+');
+		background: -moz-linear-gradient(top,  #deefff 0%, #afc8dd 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#deefff), color-stop(100%,#afc8dd)); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top,  #deefff 0%,#afc8dd 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top,  #deefff 0%,#afc8dd 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top,  #deefff 0%,#afc8dd 100%); /* IE10+ */
+		background: linear-gradient(to bottom,  #deefff 0%,#afc8dd 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#deefff', endColorstr='#afc8dd',GradientType=0 ); /* IE6-8 */
+	}
+	.connectprofile > .header > .actions .action > * {
+		vertical-align: middle;
+	}
+	.connectprofile > .header > .actions .action span{
+		color: #777;
+		font-size: 14px;
+	}
+	.connectprofile > .header > .actions .action.selected span{
+		color: #333;
+	}
+	.connectprofile > .profiles {
+		display: none;
+		min-height: 280px;
+		position: relative;
+		border-top: 2px solid #AFC8DD;
+	}
+	.connectprofile > .profiles.selected{
+		display: block;
+	}
+	.connectprofile > .profiles.selected.searched .filtercontainer{
+		position:absolute;
+		top: -30px;
+		left:70px;
+	}
+	.existingprofiles.connectprofile > .profiles.selected.searched .filtercontainer{
+		left: 190px;
+	}
+	.connectprofile > .profiles.selected.searched .filtercontainer > .filteraction{
+		border: 1px solid #A0A0A0;
+		margin: 0px;
+		padding: 2px 6px;
+		vertical-align: middle;
+		display: inline-block;
+		background-color: #DEEFFF;
+		border-radius: 0px 3px 3px 0px;
+		cursor: pointer;
+		min-height: 16px;
+		position: absolute;
+		left: 360px;
+		top: 0px;
+	}
+	.connectprofile > .profiles.selected.searched .filtercontainer > .filteraction .searchloader,
+	.connectprofile.loading > .profiles.selected.searched .filtercontainer > .filteraction .search,
+	.connectprofile > .profiles.selected.searched .loadinglist{
+		display: none;
+	}
+	.connectprofile.loading > .profiles.selected.searched .filtercontainer > .filteraction .searchloader,
+	.connectprofile > .profiles.selected.searched .filtercontainer > .filteraction .search{
+		display: inline-block;
+	}
+	.connectprofile.loading > .profiles.selected.searched .loadinglist{
+		display: block;
+		position: absolute;
+		top: 0;
+		left:0;
+		right:0;
+		bottom:0;
+		opacity: 0.5;
+		filter: alpha(opacity=50);
+		background: #fff;
+	}
+	.connectprofile > .profiles.selected.searched .filtercontainer > .filteraction:hover{
+		background: #ffd65e; /* Old browsers */
+		/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+		background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZDY1ZSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZWJmMDQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+');
+		background: -moz-linear-gradient(top,  #ffd65e 0%, #febf04 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffd65e), color-stop(100%,#febf04)); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top,  #ffd65e 0%,#febf04 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top,  #ffd65e 0%,#febf04 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top,  #ffd65e 0%,#febf04 100%); /* IE10+ */
+		background: linear-gradient(to bottom,  #ffd65e 0%,#febf04 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffd65e', endColorstr='#febf04',GradientType=0 ); /* IE6-8 */
+	}
+	.connectprofile > .profiles .emptymessage{
+		display: none;
+	}
+	.connectprofile > .profiles.empty .emptymessage{
+		display: block;
+		text-align: center;
+		padding: 20px
+	}
+	.connectprofile > .profiles.empty .emptymessage .icontext{
+		height: 20px;
+		border: 1px solid #F0F0F0;
+		width: 300px;
+		margin: 0 auto;
+		text-align: center;
+		font-size: 16px;
+		padding: 5px;
+		background: #FAFAFA;
+		border-radius: 3px;
+	}
+	.connectprofile > .profiles.empty .emptymessage .icontext img{
+		width: 16px;
+		height: 16px;
+	}
+	.connectprofile > .profiles.searched.empty .profilelist,
+	.connectprofile > .profiles.searched.empty .pager{
+		display: none;
+	}
+	.connectprofile > .profiles.selected.searched .filtercontainer > input{
+		border: 1px solid #A0A0A0;
+		padding: 2px 0px;
+		margin: 0px;
+		padding-bottom: 1px;
+		min-height: 17px;
+		width: 360px;
+		border-radius: 3px 0px 0px 3px;
+	}
+	
+	.connectprofile > .header > .actions .action.selected.search {
+		width: 450px;
+	}
+	
+	.connectprofile > .header > .actions .action.selected.search > img {
+		display: none;
+	}
+	.connectprofile .profilelist{
+		padding: 2px;
+	}
+	.connectprofile .profilelist li.itemcontainer{
+		width: 375px;
+		min-height: 100px;
+	}
+	.connectprofile .profilelist .itemcontainer div.item{
+		height: 100px;
+	}
+	.connectprofile .profilelist.itemlist li.itemcontainer div.item a.itemlink:hover > span.itemlongtext{
+		color: #333;
+	}
+	.connectprofile .profilelist .itemcontainer .item .itemimage{
+		width: 60px;
+		height: 60px;
+	}
+	.connectprofile .profilelist .itemcontainer .item .contacts {
+		list-style: none;
+		display: block;
+	}
+	.connectprofile .profilelist .itemcontainer .item .personflags{
+		position: absolute;
+		top: 50px;
+		left: 46px;
+		padding: 0px;
+		margin: 0px;
+	}
+	.connectprofile .profilelist .itemcontainer .item .personflags > img{
+		width: 20px;
+		border: 1px solid #F0F0F0;
+	}
+	.connectprofile .profilelist .itemcontainer .item .contacts{
+		display: none;
+	}
+	.connectprofile .profilelist .itemcontainer .item .contacts > li{
+		padding: 0px;
+		margin: 0px;
+	}
+	.connectprofile .profilelist .itemcontainer div.item a.itemlink span.itemlongtext{
+		height: auto;
+		max-height: 85px;
+	}
+	.connectprofile .profilelist .itemcontainer .item .contacts > li > .contact{
+		display: none;
+	}
+	.connectprofile .profilelist .itemcontainer .item .contacts > li > .contact.primary {
+		display: block;
+		vertical-align: middle;
+	}
+	.connectprofile .profilelist .itemcontainer .item .contacts > li > .contact.primary > span,
+	.connectprofile .profilelist .itemcontainer .item .contacts > li > .contact.primary > img {
+		color: #555;
+		vertical-align: middle;
+	}
+	.connectprofile .profilelist .itemcontainer .item .contacts > li > .contact.primary > img {
+		vertical-align: middle;
+		height: 14px;
+		padding-top: 4px;
+		margin: 0px 4px;
+	}
+	.connectprofile .profilelist .itemcontainer .item .connectaction{
+		display: none;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+	}
+	.connectprofile .profilelist .itemcontainer .item .connectaction,
+	.connectprofile .profilelist .itemcontainer .item .connectaction:hover{
+		text-decoration: none;
+	}
+	.connectprofile .profilelist .itemcontainer:hover .item .connectaction{
+		display: block;
+	}
+	.connectprofile .profilelist .itemcontainer .item .connectaction > .shade{
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: #FFF;
+		opacity: 0.5;
+		filter: alpha(opacity=50);
+		z-index: 800;
+	}
+	.connectprofile .profilelist .itemcontainer .item .connectaction > .text,
+	.connectprofile .profilelist .itemcontainer:hover .item .connectaction > .text{
+		margin: 0px auto;
+		display: block;
+		width: 150px;
+		text-align: center;
+		padding: 10px;
+		font-size: 16px;
+		color: #000;
+		background: #FFF;
+		opacity: 1;
+		filter: alpha(opacity=100);
+		z-index: 10000;
+		position: relative;
+		top: 30px;
+		border: 1px solid transparent;
+		border-radius: 5px;
+		background: #cdeb8b; /* Old browsers */
+		/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+		background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2NkZWI4YiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNjZGViOGIiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+		background: -moz-linear-gradient(top,  #cdeb8b 0%, #cdeb8b 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#cdeb8b), color-stop(100%,#cdeb8b)); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top,  #cdeb8b 0%,#cdeb8b 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top,  #cdeb8b 0%,#cdeb8b 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top,  #cdeb8b 0%,#cdeb8b 100%); /* IE10+ */
+		background: linear-gradient(to bottom,  #cdeb8b 0%,#cdeb8b 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cdeb8b', endColorstr='#cdeb8b',GradientType=0 ); /* IE6-8 */
+		text-decoration: none;
+		text-decoration-line: none;
+	}
+	.connectprofile .profiles.searched .searchhelp{
+		display: none;
+		width:200px;
+		height:200px;
+		overflow: hidden;
+		position:absolute;
+		top: 20px;
+		left:70px;
+	}
+	.connectprofile .profiles.searched.clear .searchhelp{
+		display: block;
+	}
+</style>
+<div class="connectprofile<?php echo (($hassuggested===true)?" existingprofiles":""); ?>">
+	<div class="header">
+		<div class="actions">
+			<?php if( $hassuggested === true ) { ?>
+			<a class="action suggested icontext" href="suggested" title="View suggested profiles to connect your account">
+				<img src="/images/browse_roles.png" alt="" />
+				<span>Suggested</span>
+			</a>
+			<?php } ?>
+			<a class="action search icontext" href="searched" title="search for profiles">
+				<img src="/images/search.png" alt="" />
+				<span>Search</span>
+			</a>
+		</div>
+	</div>
+	<?php if( $hassuggested === true ) { ?>
+	<div class="profiles suggested itemlist">
+		<ul class="profilelist"></ul>
+	</div>
+	<?php } ?>
+	<div class='profiles searched clear'>
+		<div class="header">
+			<span class="filtercontainer">
+				<input name="profilefilter" id="profilefilter" type="text" data-dojo-type="dijit/form/TextBox" data-dojo-props="trim:true" />
+				<a class="icontext filteraction" ><img src="/images/search.png" alt="" class="search" /><img src="/images/ajax-loader-trans-orange.gif" alt="" class="searchloader"/></a>
+			</span>
+		</div>
+		<div id="searchedpager" class="pager"></div>
+		<ul class="profilelist itemlist">
+		</ul>
+		<div class="searchhelp" >
+			<div class='message' style='color:#666;width:315px;height: 10px;margin:10px auto;position:relative;width:175px;'>
+				<div style='opacity:0.4;filter: alpha(opacity=40);position:absolute;left:15px;top: -75px;font-size:10em;font-family:arial;'>&#65085;</div>
+				<div style='padding-top:60px;'>Use the search field above to search for existing profiles in the system. <br/><br/>If you believe one of these refers to you click on it to connect you current account.</div>
+			</div>
+		</div>
+		<div class="loadinglist">
+			<div class="shade"/>
+		</div>
+		<div class="emptymessage">
+			<div class="icontext">
+				<img src="/images/vappliance/warning.png" alt="" />
+				<span>No profiles found with the given criteria</span>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	appdb.pages.connectprofile.init({
+		suggestedProfileIds: [<?php echo implode(",", $profileids); ?>]
+	});
+</script>

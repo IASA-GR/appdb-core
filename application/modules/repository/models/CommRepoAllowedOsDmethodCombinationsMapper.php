@@ -1,0 +1,5 @@
+<?php
+class Repository_Model_CommRepoAllowedOsDmethodCombinationsMapper extends Repository_Model_CommRepoAllowedOsDmethodCombinationsMapperBase
+{
+
+}

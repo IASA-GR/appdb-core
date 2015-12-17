@@ -1,0 +1,174 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><div class="announcementscontainer">
+<ul class="newsfeed" >
+<?php
+	$lasttime="";
+	if (is_object($this->entries)) { 
+		if ($this->entries->count() == 0) echo "Nothing has happened yet!";
+	} else echo "Nothing has happened yet!";
+
+    if (is_object($this->entries)) for($i=0; $i < $this->entries->count(); $i++) {
+        $line = "";
+        $entry = $this->entries->items[$i];
+		//Find category of application
+		if ( $entry->subjectType == "app" ) { 
+			$cat = "software";
+			if ($this->apps->item($entry->subjectID) !== null) {
+				$sd = ''.$entry->subjectData;
+				$sd = json_decode(str_replace("\xe2\x80\x9d",'"',$sd));
+				$sd = $sd->application;
+				if( (!isnull($sd)) && (!isnull($sd->category)) ) {
+					$primary = null;
+					foreach($sd->category as $cat){
+						if($cat->isPrimary == true){
+							$primary = $cat;
+							break;
+						}
+					}
+					if(isnull($primary) == false){
+						$cat = $primary->name;
+						$cat = substr($cat,0,strlen($cat)-1);
+					}
+				}
+			}
+		}
+        $line.='<li class="newsfeed"><table><tr><td>';
+        if ( $entry->subjectType == "doc" ) $line.='<div class="newsfeedimg"><img style="height:32px" src="/images/pub.png"/></div> ';
+        elseif ( $entry->subjectType == "ppl" ) $line.='<div class="newsfeedimg"><img style="height:32px" src="/people/getimage?id='.$entry->subjectID.'"></div> ';
+        elseif ( $entry->subjectType == "app" ) $line.='<div class="newsfeedimg"><img style="height:32px" src="/apps/getlogo?id='.$entry->subjectID.'"/></div> ';
+		$line.='</td><td width="100%"><div class="newsfeedtext" style="display: inline-block; padding-left: 5px; overflow: hidden; max-height:32px;">';
+		if (($entry->action == "role")||($entry->action == "roleverified")) {
+			$line='';
+		} elseif ( ($entry->action == "insertcmm") || ($entry->action == "insertcnt") ) {
+			if ($this->apps->item($entry->subjectID) !== null) {
+				$fieldstr = array();
+				$fields = explode(",", $entry->fields);
+				foreach($fields as $field) {
+					$fieldarray = explode(":", $field);
+					$fieldname = trim($fieldarray[1]);
+					$fieldid = $fieldarray[0];
+					$fieldstr[] = '<a href="#" onclick="appdb.views.Main.showPerson({id: '.$fieldid.'}, {mainTitle: \''.str_replace("'","\\'",$fieldname).'\'});">'.$fieldname.'</a>';
+				}				
+				if ( strpos($entry->fields,",") === false ) {
+					$verb = "has"; 
+				} else {
+					$verb = "have";
+				}
+				$fieldstr = implode(",", $fieldstr);
+				$fieldstr = str_replace(",", ", ", $fieldstr);
+				if ( $entry->action == "insertcmm" ) {
+					$line .= $fieldstr.' '.$verb.' commented on <a href="#" onclick="appdb.views.Main.showApplication({id: '.$entry->subjectID.'},{mainTitle: \''.str_replace("'","\\'",$this->apps->item($entry->subjectId)->name).'\'});">'.$this->apps->item($entry->subjectId)->name.'</a></li>';
+				} elseif ( $entry->action == "insertcnt" ) {
+					$line .= $fieldstr.' '.$verb.' been added to <a href="#" onclick="appdb.views.Main.showApplication({id: '.$entry->subjectID.'},{mainTitle: \''.str_replace("'","\\'",$this->apps->item($entry->subjectId)->name).'\'});">'.$this->apps->item($entry->subjectId)->name.'</a></li>';
+				}
+			}
+		} elseif ($entry->action == "insert") {
+			if ( $entry->subjectType == "doc" ) { 
+				if ($this->docs->item($entry->subjectID) !== null) { 
+					if ($this->docs->item($entry->subjectID)->url !== "http://") { 
+						$docurl='<a target="_blank" href="'.$this->docs->item($entry->subjectID)->url.'">'.$this->docs->item($entry->subjectID)->title.'</a>';
+					} else { 
+						$docurl=$this->docs->item($entry->subjectID)->title; 
+					}; 
+					$line.='A new publication entitled '.$docurl.' has been registered under the <a href="#" onclick="appdb.views.Main.showApplication({id: '.$this->docs->item($entry->subjectID)->appID.'}, {mainTitle: \''.str_replace("'","\\'",$this->apps->item($this->docs->item($entry->subjectID)->appID)->name).'\'});">'.$this->apps->item($this->docs->item($entry->subjectID)->appID)->name.'</a> software</li>'; 
+				} else $line = '';
+			} elseif ( $entry->subjectType == "ppl" ) { 
+				if ( $this->ppl->item($entry->subjectID) !== null ) {
+					$line.='<a href="#" onclick="appdb.views.Main.showPerson({id: '.$entry->subjectID.'}, {mainTitle: \''.str_replace("'","\\'",$this->ppl->item($entry->subjectID)->fullname).'\'});">'.$this->ppl->item($entry->subjectID)->fullname.'</a> has registered with the AppDB</li>'; 
+				} else {
+					$line=''; 
+				}
+			} elseif ( $entry->subjectType == "app" ) { 
+                if ($this->apps->item($entry->subjectID) !== null) {
+                    if (/*$this->apps->item($entry->subjectID)->tool*/$cat!=="application") {
+                        $line.='A new ' . $cat . ' by the name of <a href="#" onclick="appdb.views.Main.showApplication({id: '.$entry->subjectID.'},{mainTitle: \''.str_replace("'","\\'",$this->apps->item($entry->subjectId)->name).'\'});">'.$this->apps->item($entry->subjectId)->name.'</a> has been registered</li>';            
+                    } else {
+                        $line .= 'A new ' . $cat . ' by the name of <a href="#" onclick="appdb.views.Main.showApplication({id: '.$entry->subjectID.'},{mainTitle: \''.str_replace("'","\\'",$this->apps->item($entry->subjectId)->name).'\'});">'.$this->apps->item($entry->subjectId)->name.'</a> has been registered';
+						if ( count($this->apps->item($entry->subjectID)->domains) > 0 ) {
+							$line .= ' under the ';
+							$domArray = array();
+							for ($domCount=0; $domCount<count($this->apps->item($entry->subjectID)->domains); $domCount++) {
+								$domArray[] = '<a href="#" onclick="appQuickLink('.$this->apps->item($entry->subjectID)->domains[$domCount]->id.',4,{mainTitle: \''.$this->apps->item($entry->subjectID)->domains[$domCount]->name.'\'});">'.$this->apps->item($entry->subjectID)->domains[$domCount]->name.'</a>';
+							}
+							$line .= implode(", ",$domArray);
+							$line .= ' discipline'.(count($this->apps->item($entry->subjectID)->domains)>1?'s':'');
+						}
+						$line .= '</li>';
+                    }
+                } else {
+                    $line = '';                
+                }
+            }
+        } elseif ($entry->action == "update") {
+			if ( $entry->subjectType == "ppl" ) {
+				if ($this->ppl->item($entry->subjectID) != null) {
+					$ant = 'his/her';
+					if ( ! isnull($this->ppl->item($entry->subjectID)->gender) ) {
+						if ($this->ppl->item($entry->subjectID)->gender == 'male') $ant = 'his';
+						if ($this->ppl->item($entry->subjectID)->gender == 'female') $ant = 'her';
+					}
+					$line.='<a href="#" onclick="appdb.views.Main.showPerson({id: '.$entry->subjectID.'}, {mainTitle: \''.str_replace("'","\\'",$this->ppl->item($entry->subjectID)->fullname).'\'});">'.$this->ppl->item($entry->subjectID)->fullname.'</a> has updated '.$ant.' profile information <span class="newsfields">'.($entry->fields!=''?'('.$entry->fields.')':'').'</span></li>'; 
+				} else $line="";				
+            } elseif ( $entry->subjectType == "app" ) { 
+                if ($this->apps->item($entry->subjectId) !== null) {
+                    if (/*$this->apps->item($entry->subjectID)->tool*/$cat!=="application") {
+                        $line.= ucwords($cat) . ' <a href="#" onclick="appdb.views.Main.showApplication({id: '.$entry->subjectID.'},{mainTitle: \''.str_replace("'","\\'",$this->apps->item($entry->subjectId)->name).'\'});">'.$this->apps->item($entry->subjectId)->name.'</a> has been updated <span class="newsfields">'.($entry->fields!=''?'('.$entry->fields.')':'').'</span></li>';
+                    } else {
+                        $line.= ucwords($cat) . ' <a href="#" onclick="appdb.views.Main.showApplication({id: '.$entry->subjectID.'},{mainTitle: \''.str_replace("'","\\'",$this->apps->item($entry->subjectId)->name).'\'});">'.$this->apps->item($entry->subjectId)->name.'</a> has been updated <span class="newsfields">'.($entry->fields!=''?'('.$entry->fields.')':'').'</span></li>';
+                    }
+                } else {
+                    $line=''; 
+                }
+			}
+			if ( $entry->subjectType == "doc" ) {
+				if ($this->docs->item($entry->subjectID) !== null) { 
+					if ($this->docs->item($entry->subjectID)->url !== "http://") { 
+						$docurl='<a target="_blank" href="'.$this->docs->item($entry->subjectID)->url.'">'.$this->docs->item($entry->subjectID)->title.'</a>';
+					} else { 
+						$docurl=$this->docs->item($entry->subjectID)->title; 
+					}; 
+					$line.='A publication entitled '.$docurl.' has been updated under the <a href="#" onclick="appdb.views.Main.showApplication({id: '.$this->docs->item($entry->subjectID)->appID.'}, {mainTitle: \''.str_replace("'","\\'",$this->apps->item($this->docs->item($entry->subjectID)->appID)->name).'\'});">'.$this->apps->item($this->docs->item($entry->subjectID)->appID)->name.'</a> software</li>'; 
+				} else $line = '';
+			}
+        }  elseif ($entry->action == "delete") {
+                $line = '';
+        }
+		if ( $line !== '' ) {
+			$line.="<i class='newstimestamp'>".date('Y-m-d H:i',strtotime($entry->timestamp))."</i>";
+	        $line.='</div></td></tr></table>';
+	        echo $line;
+		}
+    }
+?>
+</ul>
+    </div>
+<script type="text/javascript">
+	function postprocessnewssfeed() {
+		$("li.newsfeed:odd").find("div.newsfeedtext").parent().css('background-color','#FFFFB8');
+		$("li.newsfeed").find("div.newsfeedtext").each(function(){
+			var h = $(this).text();
+			if (h.length > 120) {
+				$(this).css("font-size","80%");
+			}
+		});
+
+	}
+	$(document).ready(function(){
+		postprocessnewssfeed();
+	});
+</script>

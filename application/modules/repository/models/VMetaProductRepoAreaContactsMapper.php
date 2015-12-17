@@ -1,0 +1,5 @@
+<?php
+class Repository_Model_VMetaProductRepoAreaContactsMapper extends Repository_Model_VMetaProductRepoAreaContactsMapperBase
+{
+
+}

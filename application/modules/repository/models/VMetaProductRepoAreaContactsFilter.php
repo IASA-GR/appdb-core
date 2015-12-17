@@ -1,0 +1,3 @@
+<?php
+class Repository_Model_VMetaProductRepoAreaContactsFilter extends Repository_Model_VMetaProductRepoAreaContactsFilterBase {
+}

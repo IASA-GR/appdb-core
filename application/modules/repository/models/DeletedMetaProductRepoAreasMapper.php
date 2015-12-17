@@ -1,0 +1,5 @@
+<?php
+class Repository_Model_DeletedMetaProductRepoAreasMapper extends Repository_Model_DeletedMetaProductRepoAreasMapperBase
+{
+
+}

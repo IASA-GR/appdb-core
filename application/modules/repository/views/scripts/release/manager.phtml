@@ -1,0 +1,625 @@
+<?php if( $this->id == 0 ) { return; }
+	$isLoggedin = ( $this->session->userid === null )?false:true;
+	if( $isLoggedin == true ){
+		$isLoggedin = $this->canManageRelease;
+	}
+?>
+<div class="releasemanager <?php echo ( ($this->hasReleases==true)?'':'noreleases' ); ?>" data-id="<?php echo $this->id; ?>" >
+	<div class="error <?php echo ( ( trim($this->sqlerror)=='' )?' hidden':''); ?>">
+		<img src="/images/error.png" alt=""/>
+		<div class="description"><?php echo $this->sqlerror; ?><div>Please try again later.</div></div>
+		<div class="longdescription<?php echo ( (! userIsAdmin($this->session->userid))?' hidden':'' ); ?>"><span>Description:</span><pre><?php echo $this->sqlerrordescription; ?></pre></div>
+	</div>
+	<div class="empty<?php echo ( ( $this->hasReleases || trim($this->sqlerror)!='')?' hidden':''); ?>">
+		<div>
+			<div class="content"><img src="/images/exclam16.png" /><span>No releases found for this software item.</span></div>
+			<div class="actions <?php if( $isLoggedin == false) echo 'hidden'; ?>">
+				<div class="action newrelease base">
+					<a href="#" class="editbutton"><img src="/images/add.png" /><span>Create new</span></a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<?php if( $this->session->userid !== null && $this->canManageRelease == false) {?>
+		<?php if( $this->hasPendingRequest ){?>
+			<div class="request releasemanagement pending hidden">
+				<span class="icontext">
+					<img src="/images/logout3.png" alt="" />
+					<span>Your request for release management permission is pending...</span>
+				</span>
+			</div>
+		<?php } else { ?>
+			<div class="request releasemanagement hidden">
+				<a href="#" class="icontext btn-primary" title="Request permissions to the owner of this software item to manage its releases.">
+					<img src="/images/logout3.png" alt="" />
+					<span>Request release management permission</span>
+				</a>
+				<div class="content hidden">
+					<div class="verifyrequest">
+						<span>You are about to send a request for being granted as <b>software release manager</b> of the software </span>
+						<span class="softawarename"></span><span>.</span><br/>
+						<span>You will be notified via e-mail if the request will be accepted or rejected by the owner.</span>
+						<span class="tip">	Click <b>Send</b> to proceed or <b>Cancel</b> to close the dialog.</span>
+					</div>
+					<div class="nocontact hidden">
+						<span>In order to be able to manage software releases for this item, you should contact the owner of this item (<a href='' class='itemowner' ></a>) and request the appropriate permissions.</span>
+					</div>
+				</div>
+			</div>
+		<?php } ?>
+	<?php } ?>
+	<div class="header">
+	<?php if( $isLoggedin && $this->hasReleases && trim($this->sqlerror) == "") { ?>
+		<div class='createnewseries-container'>
+			<button class='btn action'><img src='/images/repository/managerepository.png' alt=''/><span>Create new series</span></button>
+		</div>
+		<div class="releaseoperations hidden" style="visibility: hidden;"></div>
+	<?php } ?>
+	</div>
+	<div class="contents<?php echo ( (trim($this->sqlerror) !== '')?" hidden":"");?>">
+		<div class="releaselistcontainer" >
+			<div class="releaselist hidden" data-view="appdb.repository.ui.views.ReleaseList">
+				<ul class="repoarealist baselist" >
+					<li class="template repositoryarealistitem">
+						<a class="repoarea">
+							<div class="metadata">
+								<div class="id"></div>
+								<div class="repository"></div>
+								<div class="displayVersion"></div>
+							</div>
+						</a>
+						<div class="actions" >
+							<div class="action newrelease update" >
+								<a href="#" title="Create new update for this release"><img src="/images/add.png" /><span>new</span></a>
+							</div>
+						</div>
+						<ul class="updatelist" >
+							<li class="template releaselistitem">
+								<a class="updaterelease">
+									<div class="releasestatevalue"></div>
+									<div class="metadata">
+										<div class="id"></div>
+										<div class="displayVersion"></div>
+									</div>
+								</a>
+							</li>
+							<li class="template basereleaselistitem">
+								<a class="updaterelease initial">
+									<div class="releasestatevalue"></div>
+									<div class="metadata">
+										<div class="id"></div>
+										<div class="displayVersion"></div><span class="base"> (base)</span>
+									</div>
+								</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div> 
+		</div>
+		<div class="releasenavigationbar hidden"></div>
+		<div class="repoareadetails maincontent hidden">
+			<div class="header">
+				<div class="navigation">
+					<ul>
+						<li class="popup">
+							<a href="" class="contact panel">
+								<img src="/images/browse_roles.png" alt="" />
+								<span>Contacts</span>
+							</a>
+							<div class="contact content">
+								<div class="header"></div>
+								<div class="toolbar"></div>
+								<div class="contents" >
+									<div class="contactscontainer" />
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="contents">
+				<div class="repoareacontainer sectioncontainer">
+					<div class="property overview selected">
+						<div class="header">
+							<div class="releaseactions toolbar">
+								<ul>
+									<li class="group-create-update command command-create-update"><button class="action create-update btn btn-warning btn-compact icontext" data-view="create.update" ><img src='/images/repository/managerepository.png' alt=''/><span>Create new update</span></button></li>
+									<li class="group-delete-series command command-delete-series"><button class="action delete-release btn btn-danger btn-compact icontext" data-view="remove.series" data-view-page="ConfirmData"><img src='/images/repository/undeploy.png' alt=''/><span>Delete series</span></button></li>
+									<li class="group-rename command command-rename-release"><button class="action rename-release btn btn-primary btn-compact icontext" data-view="rename.SeriesName" data-view-page="TextInput"><img src='/images/repository/repofileurl.png' alt=''/><span>Rename series</span></button></li>
+								</ul>
+							</div>
+							<div class="toccontainer" data-mincount="2"  ></div>
+						</div>
+						<div class="toolbar"></div>
+						<div class="contents">
+							<div class="property description hideempty" data-type="longtext" data-path="description" >
+								<div class="header">Overview</div>
+								<div class="value"></div>
+								<div class="actions"></div>
+							</div>
+							<div class="property releaselist noedit">
+								<div class="header">Available Releases</div>
+								<div class="reporeleaselist"></div>
+								<div class="actions"></div>
+							</div>
+							<div class="property repositories noedit noempty">
+								<div class="header">Repositories</div>
+								<div class="contents">
+									<div class="header"></div>
+									<div class="description">
+										<span>Below you may find the accumulative repositories containing all the <b>production-grade</b> releases for the series </span><span class="repoareaname"></span>. <span class="candidateexist hidden">If you would like to use <b>candidate</b> repositories instead, then please navigate to the individual canditate release using the navigation pane on your left.</span>
+									</div>
+									<div class="repositoriescontainer">
+										<div class="header"></div>
+										<div class="emptymessage hidden">No repositories available into production yet<div class="authorizedonly">At least one release must be published into production in order to generate repositories.</div></div>
+										<div class="contents">
+											<ul class="repositorylist">
+												<div class="template repositoryitem hidden">
+													<div class="target">
+														<img src="/images/repository/os_generic.png" alt=""/>
+														<div class="os">
+															<span class="title">Operating system:</span>
+															<span class="name"></span>
+															<span class="flavor"></span>
+														</div>
+														<div class="arch">
+															<span class="title">Architecture:</span>
+															<span>(</span><span class="name"></span><span>)</span>
+														</div>
+														<div class="artifacts">
+															<ul class="artifactlist">
+																<div class="template artifactitem ">
+																	<div class="icontext">
+																		<img src="/images/repository/artifact_generic.png" alt="" />
+																		<span class="name"></span>
+																	</div>
+																</div>
+															</ul>
+														</div>
+													</div>
+													<div class="repositorylinks">
+														<div class="repourl urlfield">
+															<a href="#" title="Click to go to repository url" class="icontext" target="_blank">
+																<img src="/images/repository/repourl.png" alt=""/>
+																<span class="urltitle">Download</span>
+															</a>
+														</div>
+														<div class="repofileurl urlfield">
+															<a href="#" title="Click to open repository file" class="icontext" target="_blank">
+																<img src="/images/repository/repofileurl.png" alt=""/>
+																<span class="urltitle">Repository File</span>
+															</a>
+														</div>
+													</div>
+													<div class="dropdownaction">
+														<a href="#" title="Click to toggle repository details">
+															<img src="/images/closeview.png" alt=""/>
+															<span>▼</span>
+														</a>
+													</div>
+													<div class="repositoryitemdetails" style="display: none;">
+														<div class="repofilecontents">
+															<div class="header">Repository file:</div>
+															<pre class="contents hidden"></pre>
+															<div class="emptymessage">No repository file contents found</div>
+														</div>
+														<div class="metapackagecontainer">
+															<div class="header">Metapackages:</div>
+															<div class="contents">
+																<div class="metapackagelist"></div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</ul>
+										</div>
+									</div>
+									<div class="candidatedescription hidden">
+									<div class="header"></div>
+									<div class="contents">
+										<img src="/images/repository/warning.png" alt=""/>
+										<span>There <span class="plurar">are</span><span class="singular">is</span> <span class="candidatecount"></span> candidate repositor<span class="plurar">ies</span><span class="singular">y</span> in this series. You can view <span class="plurar">them</span><span class="singular">it</span> under section '<i>Repositories / Download</i>' of individual release<span class="plurar">s</span> by selecting <span class="plurar">them</span><span class="singular">it</span> in the release navigation list on the left of the page.</span>
+									</div>
+								</div>
+								</div>
+								<div class="actions"></div>
+							</div>
+							<div class="property installationnotes hideempty" data-type="longtext" data-path="installationnotes" data-editable="true">
+									<div class="header">Installation Notes</div>
+									<div class="value"></div>
+									<div class="actions"></div>
+							</div>
+							<div class="property additionaldetails hideempty" data-type="longtext" data-path="additionaldetails">
+								<div class="header">Additional Information</div>
+								<div class="value"></div>
+								<div class="actions"></div>
+							</div>
+							<div class="property knownissues noedit" data-type="longtext" data-path="knownissues" data-editable="false">
+								<div class="header">Known Issues</div>
+								<div class="value"></div>
+								<div class="actions"></div>
+							</div>
+							<div class="property files noedit noempty uploadedfiles">
+								<div class="header">Files</div>
+								<div class="contents">
+									<div class="description">
+										<span>Below you may find the list of the <b>production-grade</b> files for the series </span><span class="repoareaname"></span>. <span class="candidateexist hidden">If you are looking for files that are associated with <b>candidate releases</b>, then please navigate to the individual candidate release using the navigation pane on your left.</span>
+									</div>
+									<div class="emptymessage">No files available into production yet.<span class="authorizedonly">This list contains only production-grade files. There should be at least one release published into production in order to generate a list of files.</span></div>
+									<div class="filesviewcontainer" ></div>
+								</div>
+								<div class="actions"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="releasedetails maincontent hidden">
+			<div class="header">
+				<div class="navigation">
+					<ul>
+						<li>
+							<a href="" class="documentation selected" data-section="details">
+								<span>Details</span>
+							</a>
+						</li>
+						<li>
+							<a href="" class="files" data-section="files">
+								<span>Files<span class="authorizedonly smalltip">Upload</span></span>
+							</a>
+						</li>
+						<li>
+							<a href="" class="download" data-section="repositories">
+								<span>Repositories / Download</span>
+							</a>
+						</li>
+						<li class="popup">
+							<a href="" class="contact panel">
+								<img src="/images/browse_roles.png" alt="" />
+								<span>Contacts</span>
+							</a>
+							<div class="contact content">
+								<div class="header"></div>
+								<div class="toolbar"></div>
+								<div class="contents" >
+									<div class="contactscontainer" />
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+				<div class="releaseactions toolbar hidden">
+					<ul>
+						<li class="group group-publish">
+							<a href='#' class='group-header icontext' tabindex="0"><img src='/images/repository/deploy.png' alt=''/><span>Publish</span></a>
+							<ul>
+								<li class="group-publish command command-publish-candidate" ><button class="action publish-candidate btn btn-warning btn-compact" data-view="publish.candidate" tabindex="1">as Candidate</button></li>
+								<li class="group-publish command command-publish-production" ><button class="action publish-production btn btn-success btn-compact" data-view="publish.production" tabindex="2">to Production</button></li>
+							</ul>
+						</li>
+						
+						<li class="group-unpublish command command-unpublish-candidate"><button class="action unpublish-candidate btn btn-warning btn-compact" data-view="unpublish.candidate" tabindex="4" title="Unpublish candidate."><img src='/images/repository/undeploy.png' alt=''/><span>Unpublish</span></button></li>
+						<li class="group-unpublish command command-unpublish-production"><button class="action publish-production btn btn-warning btn-compact" data-view="unpublish.production" tabindex="5" title="Unpublish from production"><img src='/images/repository/undeploy.png' alt=''/><span>Unpublish</span></button></li>
+						<li class="group group-rebuild seperator"></li>
+						<li class="group group-rebuild">
+							<a href='#' class='group-header icontext' tabindex="6"><img src='/images/repository/managerepository.png' alt=''/><span>Rebuild</span></a>
+							<ul>
+								<li class="group-rebuild command command-rebuild-repositories"><button class="action rebuild-repositories btn btn-primary btn-compact" data-view="rebuild.repositories" tabindex="7">Repositories</button></li>
+								<li class="group-rebuild command command-rebuild-files"><button class="action rebuild-repofiles btn btn-primary btn-compact" data-view="rebuild.repofiles" tabindex="8">Repo Files</button></li>
+							</ul>
+						</li>
+						
+						<li class="group group-delete-release"></li>
+						<li class="group-delete-release command command-delete-release"><button class="action delete-release btn btn-danger btn-compact icontext" data-view="remove.release" data-view-page="ConfirmData" tabindex="9"><img src='/images/repository/undeploy.png' alt=''/><span>Delete release</span></button></li>
+						
+						<li class="group group-rename seperator"></li>
+						<li class="group-rename command command-rename-release"><button class="action rename-release btn btn-primary btn-compact icontext" data-view="rename.ReleaseVersion" data-view-page="TextInput" tabindex="10"><img src='/images/repository/repofileurl.png' alt=''/><span>Rename Release</span></button></li>
+						
+					</ul>
+				</div>
+			</div>
+			<div class="miscproperties" >
+				<div class="releasestate fieldvalue">
+					<span class="field">State:</span><span class="value"></span>
+				</div>
+			</div>
+			<div class="contents">
+				<div class="releasecontainer sectioncontainer">
+					<div class="property documentation selected">
+						<div class="header">
+							<div class="toccontainer" data-mincount="2" ></div>
+							<div class="miscproperties" >
+								<div class="releasepriority fieldvalue">
+									<span class="field">Priority:</span><span class="value"></span>
+									<div class="editor authorizedonly">
+										<select>
+											<option value="low">low</option>
+											<option value="normal">normal</option>
+											<option value="high" selected="selected">high</option>
+										</select>
+										<div class="actions hidden">
+											<a href="#" class="icontext save">
+												<img src='/images/diskette.gif' alt=''/><span>save</span>
+											</a>
+											<a href="#" class="icontext cancel">
+												<img src='/images/cancelicon.png' alt=''/><span>cancel</span>
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="contents">
+							<div class="property description hideempty" data-type="longtext" data-path="description" >
+								<div class="header">Description</div>
+								<div class="value"></div>
+								<div class="actions"></div>
+							</div>
+							<div class="property releasenotes mandatory" data-type="longtext" data-path="releasenotes">
+								<div class="header">Release Notes</div>
+								<div class="value"></div>
+								<div class="actions"></div>
+							</div>
+							<div class="property changelog hideempty" data-type="longtext" data-path="changelog">
+								<div class="header">Changelog</div>
+								<div class="value"></div>
+								<div class="actions"></div>
+							</div>
+							<div class="property additionaldetails hideempty" data-type="longtext" data-path="additionaldetails">
+								<div class="header">Additional Information</div>
+								<div class="value"></div>
+								<div class="actions"></div>
+							</div>
+							<div class="property knownissues" data-type="longtext" data-path="knownissues">
+								<div class="header">Known issues</div>
+								<div class="value"></div>
+								<div class="actions"></div>
+							</div>
+						</div>
+					</div>
+					<div class="files">
+						<div class="header"></div>
+						<?php if( $isLoggedin ) { ?>
+						<div class="toolbar <?php ( ($isLoggedin == true)?'':'hidden'); ?>">
+							<div class="action uploadfile">
+								<a href="">
+									<img src="/images/upload_active.png" alt="" />
+									<span>Upload files</span>
+								</a>
+								<div class="contents">
+									<div class="header">
+										<span class="init">
+											<span>Select a platform to upload files to from the list below:</span></br>
+											<div class="targetselection">
+												<div class="selecttarget"></div>
+												<div class="template hidden">
+													<div class="target">
+															<a class="data">
+																<div class="id hidden"></div>
+																<img src="/images/repository/os_generic.png" alt="" />
+																<span><b>Platform: </b></span><div class="osname"></div>
+																<div class="archname hidden"></div>
+																<div class="deploymethod hidden"></div>
+																<div class="comments"></div>
+															</a>
+													</div>
+												</div>
+												<div class="selecttargetaction">
+													<a href="#" title="add target" class="icontext">
+														<img src="/images/add.png" alt=""/>
+														<span>add</span>
+													</a>
+												</div>
+											</div>
+											
+										</span>
+										<span class="uploading hidden icontext"><img src="/images/ajax-loader-small.gif" alt=""/><span>Uploading files. Please wait...</span></span>
+										<span class="complete hidden">The process of uploading is complete. Click '<i>Continue</i>' button to upload more files.</span>
+									</div>
+									<div class="targetselectorcontainer"></div>
+									<ul class="targets">
+										<li class="header"></li>
+										<li class="title hidden">
+											<div class="target">
+												<div class="data">
+													<div class="id hidden"></div>
+													<img src="/images/repository/os_generic.png" alt="" style="visibility: hidden"/>
+													<div class="osname">Operating System</div>
+													<div class="archname">Architecture</div>
+													<div class="deploymethod">Repository type</div>
+													<div class="comments">comments</div>
+												</div>
+												<div class="selection"></div>
+											</div>
+										</li>
+										<li class="targettemplate hidden">
+											<div class="target">
+												<a class="data">
+													<div class="id hidden"></div>
+													<img src="/images/repository/os_generic.png" alt="" />
+													<span><b>Platform: </b></span><div class="osname"></div>
+													<div class="archname hidden"></div>
+													<div class="deploymethod hidden"></div>
+													<div class="comments"></div>
+												</a>
+												<a class="action removetarget" title="Remove platform from list">
+													<img src="/images/cancelicon.png" alt="" />
+												</a>
+												<div class="action selection">
+													<a href="#" class="selectfiles icontext">
+														<img src="/images/upload_active.png" alt="" />
+														<span>select files</span>
+													</a>
+												</div>
+												<div class="action clearselectedfiles hidden">
+													<a href="#" class="icontext">
+														<img src="/images/cancelicon.png" alt=""/>
+														<span>clear all</span>
+													</a>
+												</div>
+											</div>
+											<div class="selectedfiles">
+												<div class="filecount icontext hidden">
+													<span class="count"></span><span> file<span class="plurar"></span> selected</span>
+												</div>
+												<ul class="hidden">
+													<li class="title">You selected the files below for uploading:</li>
+													<li class="template hidden">
+														<a class="name icontext">
+															<img src="/images/repository/artifact_generic.png" alt=""/>
+															<span></span>
+															<div class="fullname hidden"></div>
+														</a>
+														<a href="#" class="action remove icontext">
+															<img src="/images/cancelicon.png" alt=""/>
+														</a>
+														<span class="progress"></span>
+													</li>
+												</ul>
+											</div>
+										</li>
+									</ul>
+									<div class="actions">
+										<div class="warningmessage hidden">
+											<div class="contents">
+												<img src="/images/repository/warning.png" alt=""/>
+												<span>This release is currently published as a candidate. If you upload files the release will revert to unverified state and the current candidate repositories will be removed.</span>
+											</div>
+											
+										</div>
+										<div class="action cancel">
+											<button>
+												<img src="/images/cancelicon.png" alt=""/><span>cancel</span>
+											</button>
+										</div>
+										<div class="action upload">
+											<button class="inactive" disabled="disabled">
+												<img src="/images/upload_inactive.png" alt=""/><span>commit</span>
+											</button>
+										</div>
+										<div class="action close hidden">
+											<button class="icontext">
+												<img src="/images/cancelicon.png" alt=""/><span>close</span>
+											</button>
+										</div>
+										<div class="action continue hidden">
+											<button class="icontext">
+												<img src="/images/yes.png" alt=""/><span>continue</span>
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<?php } ?>
+						<div class="contents">
+							<div >
+								<hl></hl>
+							</div>
+							<div class="emptymessage">No files available yet.</div>
+							<div class="filescontainer">
+								<div class="ostabcontainer"></div>
+								<div class="filesviewcontainer"></div>
+							</div>
+						</div>
+					</div>
+					<div class="download">
+						<div class="header"></div>
+						<div class="toolbar"></div>
+						<div class="contents">
+							<div class="repositoriescontainer">
+								<div class="header">Repositories</div>
+								<div class="emptymessage hidden">No repositories available yet<div class="authorizedonly">The release must first be published into production or as a candidate in order to generate repositories.</div></div>
+								<div class="contents">
+									<ul class="repositorylist">
+										<div class="template repositoryitem hidden">
+											<div class="target">
+												<img src="/images/repository/os_generic.png" alt=""/>
+												<div class="os">
+													<span class="title">Operating system:</span>
+													<span class="name"></span>
+													<span class="flavor"></span>
+												</div>
+												<div class="arch">
+													<span class="title">Architecture:</span>
+													<span>(</span><span class="name"></span><span>)</span>
+												</div>
+												<div class="artifacts">
+													<ul class="artifactlist">
+														<div class="template artifactitem ">
+															<div class="icontext">
+																<img src="/images/repository/artifact_generic.png" alt="" />
+																<span class="name"></span>
+															</div>
+														</div>
+													</ul>
+												</div>
+											</div>
+											<div class="repositorylinks">
+												<div class="repourl urlfield">
+													<a href="#" title="Click to go to repository url" class="icontext" target="_blank">
+														<img src="/images/repository/repourl.png" alt=""/>
+														<span class="urltitle">Download</span>
+													</a>
+												</div>
+												<div class="repofileurl urlfield">
+													<a href="#" title="Click to open repository file" class="icontext" target="_blank">
+														<img src="/images/repository/repofileurl.png" alt=""/>
+														<span class="urltitle">Repository File</span>
+													</a>
+												</div>
+											</div>
+											<div class="dropdownaction">
+												<a href="#" title="Click to toggle repository details">
+													<img src="/images/closeview.png" alt=""/>
+													<span>▼</span>
+												</a>
+											</div>
+											<div class="repositoryitemdetails" style="display: none;">
+												<div class="repofilecontents">
+													<div class="header">Repository file:</div>
+													<pre class="contents hidden"></pre>
+													<div class="emptymessage">No repository file contents found</div>
+												</div>
+												<div class="metapackagecontainer">
+													<div class="header">Metapackages:</div>
+													<div class="contents">
+														<div class="metapackagelist"></div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</ul>
+								</div>
+							</div>
+							<div class="property installationnotes hideempty" data-type="longtext" data-path="installationnotes">
+								<div class="header">Installation Notes</div>
+								<div class="value"></div>
+								<div class="actions"></div>
+							</div>
+							<div class="property knownissues" data-type="longtext" data-path="knownissues">
+								<div class="header">Known issues</div>
+								<div class="value"></div>
+								<div class="actions"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+	<?php if(trim($this->sqlerror)==""){?>
+	setTimeout( function(){ 
+		(new appdb.repository.ui.ReleaseManager({
+			id: '<?php echo $this->id; ?>',
+			softwareData: appdb.pages.application.currentData()
+		}));
+	},1);
+	<?php } ?>
+</script>

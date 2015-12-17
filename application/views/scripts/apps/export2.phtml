@@ -1,0 +1,262 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php 
+header('Content-Description: File Transfer');
+header('Content-disposition: attachment; filename='.basename($this->fname));
+header('Content-type: '.$this->type);
+header("Pragma: no-cache");
+header("Expires: 0");
+flush();
+if(ob_get_length()){
+    @ob_flush();
+    @flush();
+    @ob_end_flush();
+}
+ob_start();
+ob_flush();
+ob_clean();
+if($this->type === "text/x-csv"){
+//EGI RT #1820: Remove RESPECT	
+     echo "Name, Description, Abstract, Status, Discipline, Subdiscipline, Middlewares, Date Added, Added By, Tool, Countries, Regions, VOs, Researchers, URLs\n";
+     foreach($this->applications as $appview){
+		$app = $appview;
+        echo '"'.$app->name.'",';
+        echo '"'.$app->description.'",';
+        $abstract = str_replace('"',"'",$app->abstract);
+        $abstract = str_replace(","," ",$abstract);
+        $abstract = str_replace("\r\n","",$abstract);
+        echo '"'.$abstract.'",';
+
+        echo '"'.$app->status->name.'",';
+        echo '"'.$app->domain->name.'",';
+        if(isnull($app->subdomain)){
+            echo '"'.'",';
+        }else{
+            echo '"'.$app->subdomain->name.'",';
+        }
+        if(count($app->middlewares)){
+            $mws='';
+            foreach ($app->middlewares as $mw) {
+                    $mws.=$mw->middleware->name.', ';
+            }
+            echo '"'.substr($mws,0,-2).'",';
+        }else{
+           echo '"'.'",';
+        }
+        echo '"'.$app->dateAdded.'",';
+        
+        $owneremail = null;
+        if(isnull($app->researcher)){
+            echo '"'.'",';
+        }else{
+			$addedby = $app->researcher;
+            if(!is_null($addedby)){
+                if(count($addedby->contacts)>0){
+                    foreach($addedby->contacts as $c){
+                         if(($c->contactTypeID==7) && !$this->isSensitive){
+                             $owneremail = $c->data;
+                             break;
+                         }
+                    }
+                }
+            }
+            if(is_null($owneremail)){
+                 echo '"'.$app->researcher->lastName.' '.$app->researcher->firstName.'",';
+            }else{
+                $owneremail = str_replace("'", "", $owneremail);
+                 echo '"'.$app->researcher->lastName.' '.$app->researcher->firstName.'['.$owneremail.']",';
+            }
+           
+        }
+        echo '"'.$app->tool.'",';
+
+        if(count($app->countries)){
+            $countries='';
+             foreach ($app->countries as $country) {
+                $countries.=$country->name.', ';
+            }
+            echo '"'.substr($countries,0,-2).'",';
+        }else{
+            echo '"'.'",';
+        }
+        if(count($app->regions)){
+            $regions='';
+            foreach ($app->regions as $region) {
+                    $regions.=$region->name.', ';
+            }
+            echo '"'.substr($regions,0,-2).'",';
+        }else{
+            echo '"'.'",';
+        }
+        if(count($app->vos)){
+            $vos='';
+            foreach ($app->vos as $vo) {
+                    $vos.=$vo->name.', ';
+            }
+            echo '"'.substr($vos,0,-2).'",';
+        }else{
+            echo '"'.'",';
+        }
+        
+        $email = null;
+        if(count($app->researchers)>0){
+            $rs='';
+            foreach ($app->researchers as $r) {
+                     if(count($r->contacts)>0 &&  !$this->isSensitive){
+                        foreach($r->contacts as $c){
+                                 $email = $c->data;
+                                 break;
+                        }
+                    }
+                    if(is_null($email)){
+                        $rs.=$r->lastName.' '.$r->firstName.', ';
+                    }else{
+                        $rs.=$r->lastName.' '.$r->firstName.'[email:'.$email.']'. ', ';
+                    }
+            }
+            echo '"'.substr($rs,0,-2).'",';
+        }else{
+            echo '"'.'",';
+        }
+
+        if(count($app->urls)){
+            $urls='';
+            foreach ($app->urls as $url) {
+                    $urls.=$url->description.": ".$url->url.', ';
+            }
+            echo '"'.substr($urls,0,-2).'",';
+        }else{
+            echo '"'.'",';
+        }
+        echo "\n";
+        ob_end_flush();
+        ob_flush();
+        flush();
+        ob_start();
+     }
+}else{
+    echo '<?xml version="1.0" encoding="UTF-8"?>';
+    echo "<applications>";
+    foreach($this->applications as $appview){
+		$app = $appview;
+        echo "<application>";
+        echo "<name>".recode_string("utf8..xml",$app->name)."</name>";
+        echo "<description>".recode_string("utf8..xml",$app->description)."</description>";
+        $abstract = str_replace('"',"'",$app->abstract);
+        $abstract = str_replace(","," ",$abstract);
+        $abstract = str_replace("\r\n","",$abstract);
+        echo "<abstract>". recode_string("utf8..xml",$abstract)."</abstract>";
+        echo "<status>".$app->status->name."</status>";
+        echo "<discipline>".$app->domain->name."</discipline>";
+        if(isnull($app->subdomain)){
+            echo "<subdiscipline />";
+        }else{
+            echo "<subdiscipline>".$app->subdomain->name."</subdiscipline>";
+        }
+        echo "<middlewares>";
+        if(count($app->middlewares)){
+            foreach ($app->middlewares as $mw) {
+                    echo "<middleware>".$mw->middleware->name."</middleware>";
+            }
+        }
+        echo "</middlewares>";
+        echo "<dateadded>".$app->dateAdded."</dateadded>";
+
+        $owneremail = null;
+        if(isnull($app->addedBy)){
+            echo "<addedby />";
+        }else{
+			$addedby = $app->researcher;
+            if(!is_null($addedby)){
+                if(count($addedby->contacts)>0){
+                    foreach($addedby->contacts as $c){
+                         if(!$this->isSensitive){
+                             $owneremail = $c->data;
+                             break;
+                         }
+                    }
+                }
+            }
+            if(is_null($owneremail)){
+                echo  "<addedby>".recode_string("utf8..xml",$app->researcher->lastName.' '.$app->researcher->firstName)."</addedby>";
+            }else{
+                $owneremail = str_replace("'", "", $owneremail);
+                echo  "<addedby email='".$owneremail."'>".recode_string("utf8..xml",$app->researcher->lastName.' '.$app->researcher->firstName)."</addedby>";
+            }
+        }
+        echo "<tool>".($app->tool>0?'true':'false')."</tool>";
+        
+        echo "<countries>";
+        if(count($app->countries)){
+             foreach ($app->countries as $country) {
+                echo "<country>".$country->name."</country>";
+            }
+        }
+        echo "</countries>";
+        echo "<regions>";
+        if(count($app->regions)){
+            foreach ($app->regions as $region) {
+                    echo "<region>".$region->name."</region>";
+            }
+        }
+        echo "</regions>";
+        echo "<vos>";
+        if(count($app->vos)){
+           foreach ($app->vos as $vo) {
+                    echo "<vo>".$vo->name."</vo>";
+            }
+        }
+        echo "</vos>";
+        echo "<researchers>";
+        $email = null;
+        if(count($app->researchers)){
+            foreach ($app->researchers as $r) {
+                if(count($r->contacts)>0 &&  !$this->isSensitive){
+                    foreach($r->contacts as $c){
+                             $email = $c->data;
+                             break;
+                    }
+                }
+                if(is_null($email)){
+                    echo "<researcher>".recode_string("utf8..xml",$r->lastName.' '.$r->firstName)."</researcher>";
+                }else{
+                    echo "<researcher email='".htmlspecialchars(recode_string("utf8..xml",$email))."'>".recode_string("utf8..xml",$r->lastName.' '.$r->firstName)."</researcher>";
+                }
+            }
+        }
+        echo "</researchers>";
+        echo "<urls>";
+        if(count($app->urls)){
+            foreach ($app->urls as $url) {
+                    echo "<url type='".$url->description."'>".recode_string("utf8..xml",$url->url)."</url>";
+            }
+        }
+        echo "</urls>";
+        echo "</application>";
+        ob_end_flush();
+        ob_flush();
+        flush();
+        ob_start();
+    }
+    echo "</applications>";
+}
+ob_end_flush();
+ob_flush();
+flush();
+ob_clean();
+ob_end_clean();
+?>

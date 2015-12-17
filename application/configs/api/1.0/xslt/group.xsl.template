@@ -1,0 +1,103 @@
+#!/bin/bash
+
+datatype="$1"; shift
+
+case $datatype in
+	"classification")
+		group_collections=$(
+			cat << EOF
+classification:version
+classification:discipline
+EOF
+)
+	;;
+	"application")
+
+		group_collections=$(
+			cat << EOF
+application:category|application:categories
+discipline:discipline
+application:tag
+regional:country|regional:countries
+publication:publication
+vo:vo
+application:url
+middleware:middleware
+EOF
+)
+	;;
+	*)
+		group_collections=""
+	;;
+esac
+
+cat << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Document   : app_for_export.xsl
+    Created on : August 05, 2011, 15:56
+    Author     : wvkarag
+-->
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+EOF
+
+for i in `echo -e "$group_collections" | awk '{print $1}' | sed -e 's/:.\+//g' | sort -u`;do 
+	cat << EOF
+xmlns:$i="http://appdb.egi.eu/api/1.0/$i"
+EOF
+done
+
+cat << EOF
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<xsl:output method="xml"/>
+EOF
+
+pp=""
+ss=""
+ss2=""
+for i in `echo -e "$group_collections"`;do
+	s=`echo -n "$i" | awk -F \| '{print $1}'`
+	p=`echo -n "$i" | awk -F \| '{print $2}'`
+	if [[ "$p" == "" ]]; then p="${s}s"; fi
+	if [[ "$pp" == "" ]]; then
+		pp="self::$p"
+	else
+		pp="${pp}|self::$p"
+	fi
+	if [[ "$ss" == "" ]]; then
+		ss="$s"
+	else
+		ss="${ss}|$s"
+	fi
+	if [[ "$ss2" == "" ]]; then
+		ss2="self::$s"
+	else
+		ss2="${ss2}|self::$s"
+	fi
+done
+cat << EOF
+	<xsl:template match="application:application[not($pp)][$ss]">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()[not($ss2)]"/>
+EOF
+for i in `echo -e "$group_collections"`;do
+	s=`echo -n "$i" | awk -F \| '{print $1}'`
+	p=`echo -n "$i" | awk -F \| '{print $2}'`
+	if [[ "$p" == "" ]]; then p="${s}s"; fi
+	cat << EOF
+				<$p>
+					<xsl:apply-templates select="$s"/>
+				</$p>
+EOF
+done
+cat << EOF
+		</xsl:copy>
+	</xsl:template>
+
+	<xsl:template match="@*|node()">
+		<xsl:copy>
+			<xsl:apply-templates select="@*|node()"/>
+		</xsl:copy>
+	</xsl:template>
+</xsl:stylesheet>
+EOF

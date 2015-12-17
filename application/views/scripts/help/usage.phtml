@@ -1,0 +1,127 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><?php
+$wiki = ApplicationConfiguration::app('wiki', ApplicationConfiguration::uiUrl());
+$haswiki = ($wiki==="")?false:true;
+$currentwiki = "/pages/about/faq"; 
+if( $haswiki ){
+	$currentwiki = $wiki . "main:faq";
+}
+?>
+<div class="aboutpage usage">
+<div class="aboutheader">
+	<span ><a href="/pages/about/usage" target="_blank">permalink</a></span>
+	<h1 >Usage</h1>
+	<hr />
+</div>
+<div class="content">
+<div><h3>Introduction</h3></div>
+<ul>
+<li>Please read the <a href="<?php echo $currentwiki; ?>" target="_blank" data-onclick="appdb.views.Main.showPage('about',{url:'/help/faq',mainTitle:'Faq'})">FAQs</a> before using the service for the first time.</li>
+<li>All users who hold an EGI SSO account may register a new software.</li>
+<li>Existing software entries are fully editable by owners; others may edit them based on privilege's dependent on their role, country, etc..</li>
+<li>All users will be prompted to create a profile upon logging in for the first time.</li>
+</ul>
+<div><h3>Software Entries</h3></div>
+<table>
+    <tr>
+        <th>Field</th>
+        <th>Explanation</th>
+    </tr>
+    <tr>
+        <td>ID</td><td>A number which uniquely identifies the entry</td>
+    </tr>
+    <tr>
+        <td>Category</td><td>"Application","Tool", etc</td>
+    </tr>
+    <tr>
+        <td>Name</td><td>The name of the software</td>
+    </tr>
+    <tr>
+        <td>Description</td><td>A short text describing the software</td>
+    </tr>
+    <tr>
+        <td>Discipline</td><td>The research field this software is related to</td>
+    </tr>
+	<tr>
+        <td>Subdiscipline</td><td>A second level research field that describes this software</td>
+    </tr>
+    <tr>
+        <td>URLs</td><td>A list of URLs which may provide documentation, support, download links, etc, about the software</td>
+    </tr>
+    <tr>
+        <td>Abstract</td><td>An extended text providing more detailed information about the software</td>
+    </tr>
+    <tr>
+        <td>Related Country</td><td>Countries the software is related to. Entries are inherited by the people that are referenced as contacts, or may be added explicitly</td>
+    </tr>
+    <tr>
+        <td>VOs</td><td>A list of VOs that support this software</td>
+    </tr>
+    <tr>
+        <td>Middleware</td><td>A list of middleware that this software works with</td>
+    </tr>
+    <tr>
+        <td>Status</td><td>The state of the software, concerning grid deployment</td>
+    </tr>
+    <tr>
+        <td>Related Contacts</td><td>A list of people who are responsible for the software, such as the developers who created it or who maintain it, etc.</td>
+    </tr>
+    <tr>
+        <td>Publications</td><td>A list of scientific papers related to the software</td>
+    </tr>
+</table>
+<div><h3>People Entries</h3></div>
+<table>
+    <tr>
+        <th>Field</th>
+        <th>Explanation</th>
+    </tr>
+    <tr>
+        <td>ID</td><td>A number which uniquely identifies the entry</td>
+    </tr>
+    <tr>
+        <td>Name</td><td>The person's full name</td>
+    </tr>
+    <tr>
+        <td>Role</td><td>The person's role. This will determine privileges and may require verification. Please refer to the <a href="#" onclick="appdb.views.Main.showPage('about',{url:'/help/faq',mainTitle:'Faq'})">FAQs</a> for more details.</td>
+    </tr>
+    <tr>
+        <td>Institute</td><td>A freeform text about the institutes the person is affiliated with</td>
+    </tr>
+    <tr>
+        <td>Country</td><td>The person's country of origin</td>
+    </tr>
+    <tr>
+        <td>Registered</td><td>Date of person's registration (profile creation)</td>
+    </tr>
+    <tr>
+        <td>Contact Information</td><td>A list of e-mail addresses, phone numbers etc. which can be used to contact the person</td>
+    </tr>
+    <tr>
+        <td>Related Software</td><td>A list of software under which this person is listed as a contact. This is a reverse list and thus read-only.</td>
+    </tr>
+    <tr>
+        <td>Publications</td><td>A list of publications and related software in which this person is listed as an author. This is a reverse list and thus read-only.</td>
+    </tr>
+</table>
+<div><h3>Bug reports and Requests</h3></div>
+<div class="faq">
+	For any matters pertaining to bugs, support and feature requests please use either the <a href="http://helpdesk.egi.eu/" target="_blank" >EGI Helpdesk</a> system in order to file a ticket, or directly contact us by using the <a href='/pages/contact/feedback' target="_parent" title='contact us'>feedback form</a>.
+</div>
+</div>
+</div>

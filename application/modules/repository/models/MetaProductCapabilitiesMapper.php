@@ -1,0 +1,5 @@
+<?php
+class Repository_Model_MetaProductCapabilitiesMapper extends Repository_Model_MetaProductCapabilitiesMapperBase
+{
+
+}

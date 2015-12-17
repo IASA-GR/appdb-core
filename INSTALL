@@ -1,0 +1,60 @@
+wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+wget http://yum.postgresql.org/9.2/redhat/rhel-6-x86_64/pgdg-centos92-9.2-6.noarch.rpm
+wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+
+yum localinstall epel-release-6-8.noarch.rpm pgdg-centos92-9.2-6.noarch.rpm remi-release-6.rpm
+yum install php php-recode php-mbstring php-mcrypt php-gd recode php-pear php-pear-Net-SMTP php-pear-Mail php-pear-Auth-SASL php-pear-Net-Socket postgresql92 postgresql92-server postgresql92-libs postgresql92-contrib php-pear-Mail-Mime curl libcurl php-common php-pgsql php-xml php-process php-cli php-devel php-imap mod_ssl rpm-build gcc gcc-c++ mysql mysql-server php-mysql python-devel php-ldap openssh-clients vim subversion make zip ImageMagick dpkg dpkg-devel openldap-clients perl-libwww-perl firefox
+
+# download and install JDK from Oracle
+
+# copy zend tarball from lovecraft.priv.iasa.gr:/opt and untar in /opt
+
+# set "include_path" to 
+# include_path = ".:/opt/zend/library:/usr/share/pear" 
+# in /etc/php.ini
+
+# copy /etc/php_browscap.ini from some othe machine
+# set "browscap" entry in /etc/php.ini
+# set "short_open_tag" to "On" in /etc/php.ini
+
+# set "error_reporting" in /etc/php.ini according to env (production / dev)
+cd /var/www/html
+svn co https://svn.iasa.gr/svn/appdb/... appdb-tag
+ln -s appdb-tag appdb
+mkdir appdb/cache
+chown apache. appdb-tag -R
+chmod a+rwx appdb/cache appdb/public/upload appdb/public/upload,{applogo,pplimage}
+
+# update appdb/application/configs/application.ini with proper params (from other machine)
+
+echo 'PGOPTS="-i"' >> /etc/sysconfig/pgsql/postgresql-9.2
+service postgresql-9.2 initdb
+# set-up pg_hba.conf and then
+service postgresql-9.2 restart
+chkconfig postgresql-9.2 on
+chkconfig httpd on
+
+su - postgres
+psql
+
+CREATE DATABASE appdb6;
+CREATE USER appdb WITH PASSWORD 'appdb';
+ALTER USER appdb SET bytea_output = 'escape';
+ALTER DATABASE appdb6 OWNER TO appdb;
+GRANT ALL ON DATABASE appdb6 TO appdb;
+\c appdb
+\i bakupfile
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO appdb;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA cache TO appdb;
+GRANT ALL PRIVILEGES ON SCHEMA public TO appdb;
+GRANT ALL PRIVILEGES ON SCHEMA cache TO appdb;
+
+# configure firewall and open http(s) ports
+system-config-firewall-tui
+# edit /etc/sysconfig/iptables to block ssh access from outside world
+
+# edit /etc/openldap/ldap.conf and add the line
+# TLS_REQCERT	never
+
+# compile and install linkchecker 7.2 from sources (needs python-devel)
+

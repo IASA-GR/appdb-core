@@ -1,0 +1,5 @@
+<li>Mozilla Firefox 3.0 or higher</li>
+<li>Google Chrome 6.0 or higher</li>
+<li>Apple Safari 5.0 or higher</li>
+<li>Mozilla SeaMonkey 2.0 or higher</li>
+<li>Internet Explorer 9.0 or higher</li>

@@ -1,0 +1,61 @@
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelarating Systems and Applications
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+ul.newsfeed {
+	margin-left: -40px;
+}
+
+li.newsfeed {
+	font-size:8pt;
+	height: 32px;
+	vertical-align: middle;
+	list-style-type: none;
+	padding-bottom: 3px;
+}
+
+li.newsfeed	i.newstimestamp {
+	font-size:6pt;
+	padding-left: 10px;
+	color: grey;
+}
+
+span.newsfields {
+	font-size:7pt;
+	padding-left: 10px;
+	color: grey;
+}
+
+li.newsfeed img {
+	vertical-align: middle;
+	height:32px;
+	max-width:32px;
+}
+
+li.newsfeed div.newsfeedimg {
+	vertical-align: middle;
+	text-align: center;
+	height: 32px;
+	width: 32px;
+	display: inline-block;
+}
+li.newsfeed table {
+	vertical-align: middle;
+}
+li.newsfeed tr {
+	vertical-align: middle;
+}
+li.newsfeed td {
+	vertical-align: middle;
+}

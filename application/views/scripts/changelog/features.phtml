@@ -1,0 +1,39 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+?><div class="aboutpage">
+<div class="aboutheader">
+	<span ><a href="/pages/about/features" target="_blank">permalink</a></span>
+	<h1 >Latest Features</h1>
+	<hr />
+</div>
+<ul style="padding-right:10px;">
+<li><h3>Increased performace through a new javascript client-side MVC architecture, which uses the REST API</h3></li>
+<div style="max-width:800px;text-align:justify">After introducing AppDB's REST web API, and producing a widget as a proof-of-concept for its potential usage, the next logical step was to put it in good use from within AppDB's GUI. Following the server-side MVC design pattern, we produced a second client-side MVC implementation in javascript, which fetches the data from the API. The result is much faster database searches, lower server load, and proof that the API can be used to create alternate web interfaces (e.g. VO or country specific) for the AppDB from scratch, without having server-side access.<br/>
+Overall, as far as search performance is concerned, we have seen that the increase ranges up to a maximum of 8x, with an effective average of around 4x, compared to the previous 1.x version.
+</div><br/>
+<br/><li><h3>Quicksearch bars in navigation pane</h3></li>
+<br/><img border="1" src="/images/features/f1.png"/><br/>
+<br/><br/><br/><br/><li><h3>Search, ordering, and timing information on index pages</h3></li>
+Keyword based syntactic search is available at the top-left corner of each index page.<br/>
+Index pages may be sorted according to various fields located at the top right.<br/>
+Query result count has been enriched with timing information.<br/>
+<br/><img border="1" style="width:700px" src="/images/features/f2.png"/><br/>
+<br/><br/><br/><br/><li><h3>Related software sidebar in software details view</h3></li>
+Entries that have similar names or shared developers are displayed in a sidebar at the right of the software details view<br/>
+<br/><img border="1" src="/images/features/f3.png"/><br/>
+</ul>
+</div>
