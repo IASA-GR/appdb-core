@@ -1,4 +1,255 @@
 <div class="aboutpage"><div class="aboutheader"><span ><a href="/pages/about/changelog" target="_blank">permalink</a></span><h1 >Changelog</h1><hr /></div><div class="faq">
+5.5.3 (2015-12-17)
+-Sort OS target list in sw repository file uploader
+
+5.5.2 (2015-12-16)
+-Maintenance release (bug fixes)
+
+5.5.1 (2015-12-14)
+- Maintenance release (bug fixes)
+
+5.5.0 (2015-11-24)
+- Simplify vAppliance management
+- Bug fixes
+
+5.4.23 (2015-11-03)
+- Maintenance release (bug fixes)
+
+5.4.22 (2015-10-09)
+- Added OCCI information in mpURIs response
+
+5.4.21 (2015-10-07)
+- Maintenance release (bug fixes)
+
+5.4.20 (2015-09-29)
+- Maintenance release (bug fixes)
+
+5.4.19 (2015-09-11)
+- Maintenance release (bug fixes)
+
+5.4.18 (2015-08-28)
+- Performance improvements
+
+5.4.17 (2015-07-31)
+- Contextualization scripts are now stored in EGI AppDB system.
+- Virtual organizations are now categorized by their disciplines instead of scientific domain
+- Virtual organizations views also display the associated resource providers (occi enabled sites)
+
+5.4.16 (2015-06-23)
+- Maintenance release (bug fixes)
+
+5.4.15 (2015-06-17)
+- Bug fixes regarding occi templates
+
+5.4.14 (2015-06-08)
+- Select multiple formats for contextualization scripts in vapplicance images
+
+5.4.13 (2015-05-05)
+- Include site information in vappliance image mpuris
+
+5.4.12 (2015-04-06)
+- Support both virtual appliance explicit contextualization scripts and software appliance contextualization scripts
+- Maintenance release (bug fixes)
+
+5.4.11 (2015-03-09)
+- Added community repository feed
+- Maintenance release (bug fixes)
+
+5.4.10 (2015-03-03)
+- Maintenance release (bug fixes)
+
+5.4.9 (2015-01-27)
+- Maintenance release (bug fixes)
+
+5.4.8 (2015-01-13)
+- Display grouped site templates
+- Maintenance release (bug fixes)
+
+5.4.7 (2014-12-23)
+- Introduced sofwtare appliances
+
+5.4.6 (2014-12-22)
+- Maintenance release (bug fixes)
+
+5.4.5 (2014-12-12)
+- Maintenance release (bug fixes)
+
+5.4.4 (2014-12-10)
+- Performance improvements
+- Maintenance release (bug fixes)
+
+5.4.3 (2014-10-22)
+- Maintenance release (bug fixes)
+
+5.4.2 (2014-10-13)
+- Maintenance release (bug fixes)
+
+5.4.1 (2014-10-10)
+- Added relations between software and vappliances
+- Added connected items list in software and vappliance detailed view
+- Display number of sites supporting images of a virtual appliance in the virtual appliance lists
+- Performance improvements
+
+5.4.0 (2014-09-10)
+- Search and import mechanisms for OpenAire harvested data
+- Added organizations and projects entitites
+- Added relations between people and organizations or projects
+- Added relations of software/vappliance entitites with other organization or project entities
+- People institutions are mapped to organization entities
+
+5.3.2 (2014-08-29)
+- Maintenance release (bug fixes)
+
+5.3.1 (2014-08-28)
+- Added sites content
+
+5.3.0 (2014-07-28)
+- Maintenance release (bug fixes)
+
+5.2.12 ( 2014-07-23)
+- Maintenance release (bug fixes)
+
+5.2.11 ( 2014-07-21)
+- Added contextualization script mechanism for vappliance images
+- Maintenance release (bug fixes)
+
+5.2.10 (2014-06-26)
+- Maintenance release (bug fixes)
+
+5.2.9 (2014-06-24)
+- Preselect 'Availability & Usage' in case related va providers exist for the current vappliance
+
+5.2.8 (2014-06-24)
+- Added experimental federated AAI 
+- Enhanced SW repository editing
+
+5.2.7 (2014-06-13)
+- Added VO contact form to virtual appliances for va managers
+- Display expired or deleted virtual appliances in VO wide image lists
+- Added email obsolete image status notifications for VO wide image lists 
+- Added email notifications to virtual appliance managers for expired or to be expired versions
+- Improved performance regarding VO wide image list related actions
+- UI bug fixes
+
+5.2.6 (2014-05-27)
+- Fixed firefox xml parsing issues 
+- Maintenance release (bug fixes)
+
+5.2.5 (2014-05-26)
+- Added cloud oriented middlewares
+- Maintenance release (bug fixes)
+
+5.2.4 (2014-05-22)
+- Maintenance release (bug fixes)
+
+5.2.3 (2014-05-21)
+- Maintenance release
+
+5.2.2 (2014-05-16)
+- Display cloud usage information in virtual appliance views
+
+5.2.1 (2014-05-13)
+- Maintenance release (bug fixes)
+
+5.2.0 (2014-05-09)
+- Introduced VO-wide image lists for Virtual Appliances
+
+5.1.1 (2014-05-02)
+- Maintenance release (bug fixes)
+
+5.1.0 (2014-04-15)
+- New, multi-content layout separated into three main areas: Software Marketplace, Cloud Marketplace, and People registry
+- Significant performance improvements
+- Documentation moved to dedicated wiki [https://wiki.appdb.egi.eu]
+- Various bug fixes
+
+5.0.5 (2014-03-27)
+- Maintenance releaase (bug fixes)
+
+5.0.4 (2014-03-21)
+- Added Virtual Organization related menus in logged-in view
+- Enhanced people, VO related item views
+- Bug fixes for dissemination tool
+
+5.0.3 (2014-03-17)
+- Maintenance release (bugfixes)
+
+5.0.2 (2014-03-14)
+- Added faceted search to people list
+
+5.0.1 (2014-03-14)
+- Maintenance release (bugfixes)
+
+5.0.1 (2014-03-14)
+- Maintenance release (bugfixes)
+
+5.0.0 (2014-03-13)
+- Added permission management tab under application details
+- Replaced user roles with access groups
+- Added scientific orientation field in people details
+- Added personal access tokens as an alternative authentication mechanism
+- Added privacy options for Virtual Appliances
+
+4.6.6 (2014-01-27)
+- Performance improvements 
+
+4.6.5 (2014-01-22)
+- Maintenance release (bugfixes)
+
+4.6.4 (2014-01-16)
+- Improved people / VO relations (contacts, members)
+- Introduction of EGI scientific classification API
+- Various bug fixes
+
+4.6.3 (2014-01-09) 
+- Maintenance release (bugfixes) 
+
+4.6.2 (2014-01-08) 
+- Maintenance release (bugfixes)
+
+4.6.1 (2014-01-07)
+- Added support for connecting multiple accounts per type 
+- Minor bug fixes 
+
+4.6.0 (2014-01-07)
+- Initial support for Single Sign On accross services via the SAML standard
+- Added support for login via x509 trusted certificates
+- Various bug fixes
+
+4.5.0 (2013-12-02)
+- Added license property for software items
+- Display logged user related items in home page
+- Minor bug fixes
+
+4.4.8 (2013-11-08)
+- Added freshness refined filter in software lists
+- Maintenance release (bugfixes)
+
+4.4.7 (2013-10-15)
+- Maintenance release (bugfixes)
+
+4.4.6 (2013-10-02)
+- Fixed refined filter display issues
+- Display user requests even if user is unverified
+- Fixed bugs concerning software and people image uploading
+
+4.4.5 (2013-09-27)
+- Enable social sharing count report mechanism
+- Minor bug fixes
+
+4.4.4 (2013-09-24)
+- Enable users to share software items with social media
+- Maintenance release (bugfixes)
+
+4.4.3 (2013-09-06)
+- Maintenance release (bugfixes)
+
+4.4.2 (2013-08-22)
+- Maintenance release (bugfixes)
+
+4.4.1 (2013-08-19)
+- Maintenance release (bugfixes)
+
 4.4.0 (2013-07-16)
 - Introduced faceted search functionality 
 - Added help links for some s/w categories
