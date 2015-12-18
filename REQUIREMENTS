@@ -28,7 +28,7 @@ REQUIREMENTS
 
 - Javascript Libraries (public/js)
 	- plupload (.swf and .xap files must be in public and public/js folders)
-	- tinymce
+	- tinymce folder (v.3.4.9)
 	- shortcut.js
 	- dijit (../zend/externals/dojo/release/dojo/dijit/)
 	- dojo (../zend/externals/dojo/release/dojo/dojo/)
