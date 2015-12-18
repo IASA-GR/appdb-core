@@ -27,7 +27,7 @@ REQUIREMENTS
 	  from /opt/zend/externals/dojo/util/buildscripts
 
 - Javascript Libraries (public/js)
-	- plupload (.swf and .xap files must be in public and public/js folders)
+	- plupload v.1.5.5 (.swf and .xap files must be in public and public/js folders)
 	- tinymce folder (v.3.4.9)
 	- shortcut.js
 	- dijit (../zend/externals/dojo/release/dojo/dijit/)
