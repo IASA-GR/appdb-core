@@ -30,7 +30,7 @@
         schemaLocation="application.xsd"/>
 
     <xs:import namespace="http://appdb.egi.eu/api/1.0/person"
-        schemaLocation="application.xsd"/>
+        schemaLocation="person.xsd"/>
 
     <xs:complexType name="logisticsType" mixed="false">
         <xs:attribute name="id" type="xs:integer" use="required" />

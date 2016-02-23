@@ -56,7 +56,7 @@ function getHtmlDateValue($value, $context){
 ?>
 <?php if ($this->entry !== null) { ?>
 <div align="left" style="height:100%;padding:0px;">
-	<div id="navdiv<?php echo $this->dialogCount;?>" style="width:100%;height:auto;padding:0px;" class="entityvo<?php if( trim($this->entry->sourceid) !== '1' ){ echo ' nonegivo'; }?>" >
+	<div id="navdiv<?php echo $this->dialogCount;?>" style="width:100%;height:auto;padding:0px;" class="entityvo<?php if( trim($this->entry->sourceid) !== '1' && trim($this->entry->name) !== 'vo.elixir-europe.org'){ echo ' nonegivo'; }?>" >
 	<ul>
 		<li><a href="#infodiv<?php echo $this->dialogCount;?>">Information</a></li>
 		<?php if( $this->canEdit === true ) { ?>
@@ -66,7 +66,7 @@ function getHtmlDateValue($value, $context){
 		<a class="reloadentity reloadvo icontext" href="#" onclick="appdb.pages.vo.reload();" title="Reload"><img alt="reload" border="0" src="/images/refresh.png"/><span>Reload</span></a>
 	</ul>
 	<div id="infodiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" title="Information" selected="true">
-		<?php if( trim($this->entry->sourceid) !== '1' ){?>
+		<?php if( trim($this->entry->sourceid) !== '1' && trim($this->entry->name) !== 'vo.elixir-europe.org' ){?>
 			<div class="nonegi hint">
 				<span class="title">Non EGI: </span><span class="details">This VO may <b>not</b> be supported by the EGI Infrastructure.</span>
 			</div>
