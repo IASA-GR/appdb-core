@@ -23991,3 +23991,7 @@ a.helperlink.wikilink:hover{
 .pseudo_uploader {
 	position: relative;
 }
+
+.latestversion .vaversion-vmiversion .property.vmiversion-version{
+	display: none;
+}
