@@ -3718,10 +3718,12 @@ appdb.views.VOsList = appdb.ExtendClass(appdb.View, "appdb.views.VOslist", funct
 			}
 		}
 		if( typeof d.sourceid !== "undefined" && $.trim(d.sourceid) !== "1" ){
-			var nonegi = $("<span class='nonegi' title=''></span>").text("non EGI");
-			$(nonegi).append("<span>This VO may <b>not</b> be supported by the EGI Infrastructure.</span>");
-			$(nonegi).attr("title",'');
-			$(a).append(nonegi);
+			if( d.name !== 'vo.elixir-europe.org' ) {
+				var nonegi = $("<span class='nonegi' title=''></span>").text("non EGI");
+				$(nonegi).append("<span>This VO may <b>not</b> be supported by the EGI Infrastructure.</span>");
+				$(nonegi).attr("title",'');
+				$(a).append(nonegi);
+			}
 		}
 		$(div).append($(a));
 		if (d.url) {

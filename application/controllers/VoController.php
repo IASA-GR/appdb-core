@@ -1164,7 +1164,14 @@ class VoController extends Zend_Controller_Action
 		$vaps->filter->in_production->equals(true);
 		$ret = array();
 		foreach ($vaps->items as $vap) {
-			$ret[] = array("id" => $vap->id, "name" => $vap->sitename, "url" => trim(substr($vap->url,0,(strpos($vap->url,"?") == true ? strpos($vap->url,"?") : strlen($vap->url))),'/'), "serviceid" => $vap->serviceid);
+			$url=trim(substr($vap->url,0,(strpos($vap->url,"?") == true ? strpos($vap->url,"?") : strlen($vap->url))),'/');
+			preg_match('/(?P<hostname>[a-zA-Z0-9.\-_]+):(?P<port>\d+)/', $url, $matches);
+			if($matches){
+				$pat=$matches['hostname'].":".$matches['port'];
+				$url = substr($url,0,(strpos($url,$pat) + strlen($pat)));
+			}
+			$ret[] = array("id" => $vap->id, "name" => $vap->sitename, "url" => $url, "serviceid" => $vap->serviceid);
+//          $ret[] = array("id" => $vap->id, "name" => $vap->sitename, "url" => trim(substr($vap->url,0,(strpos($vap->url,"?") == true ? strpos($vap->url,"?") : strlen($vap->url))),'/'), "serviceid" => $vap->serviceid);
 		}
 		return $ret;
 	}
