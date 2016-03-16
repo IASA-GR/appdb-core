@@ -7911,6 +7911,7 @@ class AccountConnect {
 		$paccounts->filter->chain($f2, "AND");
 		$paccounts->filter->chain($f3, "AND");
 		$paccounts->filter->chain($f4, "AND");
+		$paccounts->filter->orderBy("addedon DESC");
 		if( count($paccounts->items) === 0 ){
 			return null;
 		}
