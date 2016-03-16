@@ -24,7 +24,7 @@ class Default_Model_FilterItem {
 	protected $_expr;
 	protected $_tmpTable = null;
 	private $_dialect;
-	private $_escape_seq;
+	public $_escape_seq;
 	private $_ilike;
 	private $_rlike;
 	private $_charCast;
