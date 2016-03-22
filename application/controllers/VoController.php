@@ -789,8 +789,8 @@ class VoController extends Zend_Controller_Action
 	}
 
 	public function syncVOMembers() {
-		db()->query("INSERT INTO config (var, data) SELECT 'egi_vo_members_synced', NULL) WHERE NOT EXISTS (SELECT * FROM config WHERE var = 'egi_vo_members_synced')");
-		db()->query("INSERT INTO config (var, data) SELECT 'ebi_vo_members_synced', NULL) WHERE NOT EXISTS (SELECT * FROM config WHERE var = 'ebi_vo_members_synced')");
+		db()->query("INSERT INTO config (var, data) SELECT 'egi_vo_members_synced', NULL WHERE NOT EXISTS (SELECT * FROM config WHERE var = 'egi_vo_members_synced')");
+		db()->query("INSERT INTO config (var, data) SELECT 'ebi_vo_members_synced', NULL WHERE NOT EXISTS (SELECT * FROM config WHERE var = 'ebi_vo_members_synced')");
 		$this->syncEGIVOMembers();
 		$this->syncEBIVOMembers();
 	}
