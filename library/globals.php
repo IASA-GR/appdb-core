@@ -7756,7 +7756,33 @@ class SamlAuth{
 				break;
 		}
 	}
-	
+
+	//Extracts user entitlements from the saml login response if they exist.
+        //Returns an array with VO memberships and Site roles
+        private static function extractSamlEntitlements($attrs){
+          $res = array('vos' => array(), 'sites' => array());
+
+          if( !is_array($attrs) || !isset($attrs['idp:entitlement']) ){
+            return $res;
+          }
+
+          $entitlements = $attrs['idp:entitlement'];
+          foreach( $entitlements as $e ){
+            $vomatches = array();
+            preg_match("/^urn\:(mace\:)?(.*)\:vo\:(.*)\:role\:(.*)$/", $e, $vomatches);
+            if( count($vomatches) === 5 ) {
+              $source = $vomatches[2];
+              $voname = $vomatches[3];
+              $role = $vomatches[4];
+
+              if ($role === 'user') $role = 'member';
+              $res['vos'][] = array( 'source' => $source, 'vo' => $voname, 'role' => $role );
+            }
+          }
+
+          return $res;
+	}
+
 	//Performs actions after successful SAML Authedication
 	//Decides if the authedicated user is a new or an old
 	//user and fills the session accordingly.
@@ -7805,7 +7831,9 @@ class SamlAuth{
 			self::setupSamlNewUserSession($session, $accounttype);
 		}
 		
-		
+		//Store user entitlements
+		$session->entitlements = self::extractSamlEntitlements($attrs);
+
 		//Check if user account is blocked and updates session
 		self::setupUserAccountStatus($session, $useraccount);
 		
