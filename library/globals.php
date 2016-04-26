@@ -7782,7 +7782,7 @@ class SamlAuth{
 
 	//Update the VO contacts for the given EGI AAI persistend uid.
 	private static function updateAccountVOContacts($accountdata, $roles) {
-		$puid = $accountdata['uid'];
+		$puid = $accountdata['puid'];
 		$name = $accountdata['name'];
 		$email = $accountdata['email'];
 
@@ -7795,7 +7795,7 @@ class SamlAuth{
 
 	//Update the VO memberships for the given EGI AAI persistend uid.
 	private static function updateAccountVOMemberships($accountdata, $roles) {
-		$puid = $accountdata['uid'];
+		$puid = $accountdata['puid'];
 		$name = $accountdata['name'];
 
 		self::clearEGIAAIUserInfo($puid );
