@@ -7756,31 +7756,81 @@ class SamlAuth{
 				break;
 		}
 	}
+	//Helper function to return vo role mapping from EGI AAI entitlements
+	//If no EGI AAI vo role is given it return all of the role mappings
+	//If the given role is not found it returns null.
+	private static function getEGIAAIVORoleMapping($role = null) {
+		$roles = array(
+			"admin" => "VO MANAGER",
+			"user" => "member"
+		);
+		
+		if ($role === null) {
+			return $roles;
+		}
+		
+		if (isset($roles[$role])) {
+			return $roles[$role];
+		}
+		
+		return null;
+	}
+	
+	private static function clearEGIAAIUserInfo($accountid) {
+		db()->query("SELECT clear_egiaai_user_info(?)", array($accountid))->fetchAll();
+	}
+
+	//Update the VO contacts for the given EGI AAI persistend uid.
+	private static function updateAccountVOContacts($accountdata, $roles) {
+		$puid = $accountdata['uid'];
+		$name = $accountdata['name'];
+		$email = $accountdata['email'];
+
+		self::clearEGIAAIUserInfo($puid );
+
+		foreach($roles as $role) {
+		  db()->query("SELECT add_egiaai_user_vocontact_info(?, ?, ?, ?, ?)", array($puid, $name, $role['vo'], $role['role'], $email))->fetchAll();
+		}
+	}
+
+	//Update the VO memberships for the given EGI AAI persistend uid.
+	private static function updateAccountVOMemberships($accountdata, $roles) {
+		$puid = $accountdata['uid'];
+		$name = $accountdata['name'];
+
+		self::clearEGIAAIUserInfo($puid );
+
+		foreach($roles as $role) {
+		  db()->query("SELECT add_egiaai_user_vomember_info(?, ?, ?)", array($puid, $name, $role['vo']))->fetchAll();
+		}
+	}
 
 	//Extracts user entitlements from the saml login response if they exist.
-        //Returns an array with VO memberships and Site roles
-        private static function extractSamlEntitlements($attrs){
-          $res = array('vos' => array(), 'sites' => array());
+	//Returns an array with VO memberships and Site roles
+	private static function extractSamlEntitlements($attrs) {
+	  $res = array('vos' => array("members" => array(), "contacts" => array()), 'sites' => array());
 
-          if( !is_array($attrs) || !isset($attrs['idp:entitlement']) ){
-            return $res;
-          }
+	  if( !is_array($attrs) || !isset($attrs['idp:entitlement']) ){
+		return $res;
+	  }
 
-          $entitlements = $attrs['idp:entitlement'];
-          foreach( $entitlements as $e ){
-            $vomatches = array();
-            preg_match("/^urn\:(mace\:)?(.*)\:vo\:(.*)\:role\:(.*)$/", $e, $vomatches);
-            if( count($vomatches) === 5 ) {
-              $source = $vomatches[2];
-              $voname = $vomatches[3];
-              $role = $vomatches[4];
-
-              if ($role === 'user') $role = 'member';
-              $res['vos'][] = array( 'source' => $source, 'vo' => $voname, 'role' => $role );
-            }
-          }
-
-          return $res;
+	  $entitlements = $attrs['idp:entitlement'];
+	  foreach( $entitlements as $e ){
+		$vomatches = array();
+		preg_match("/^urn\:(mace\:)?(.*)\:vo\:(.*)\:role\:(.*)$/", $e, $vomatches);
+		if( count($vomatches) === 5 ) {
+		  $source = $vomatches[2];
+		  $voname = $vomatches[3];
+		  $role = self::getEGIAAIVORoleMapping($vomatches[4]);
+		  
+		  if($role === 'member') {
+			$res['vos']['members'][] = array( 'source' => $source, 'vo' => $voname );
+		  } else if($role !== null) {
+			$res['vos']['contacts'][] = array( 'source' => $source, 'vo' => $voname, 'role' => $role );
+		  }
+		}
+	  }
+	  return $res;
 	}
 
 	//Performs actions after successful SAML Authedication
@@ -7791,6 +7841,9 @@ class SamlAuth{
 		$attrs = $session->samlattrs;
 		$source = strtolower(trim($session->samlauthsource));
 		$uid = ( isset($attrs["idp:uid"])?$attrs["idp:uid"][0]:"");
+		$account_email = ( ( isset($attrs["idp:mail"]) === true && count($attrs["idp:mail"]) > 0 )?$attrs["idp:mail"][0]:"" );
+		$account_givenname = ( ( isset($attrs["idp:givenName"]) === true && count($attrs["idp:givenName"]) > 0 )?$attrs["idp:givenName"][0]:"" );
+		
 		if( trim($uid) == "" ) return false;
 		$accounttype = str_replace("-sp","",$source);
 		
@@ -7832,8 +7885,24 @@ class SamlAuth{
 		}
 		
 		//Store user entitlements
-		$session->entitlements = self::extractSamlEntitlements($attrs);
+		$entitlements = self::extractSamlEntitlements($attrs);
+		$session->entitlements = $entitlements;
+		if($entitlements && isset($entitlements['vos'])) {
+			$voentitlements = $entitlements['vos'];
+			$vocontacts = array();
+			$vomembers = array();
+			if(isset($voentitlements['contacts'])) {
+				$vocontacts = $voentitlements['contacts'];
+			}
+			if(isset($voentitlements['members'])) {
+				$vomembers = $voentitlements['members'];
+			}
 
+			$accountdata = array("puid" =>  $uid, "email" => $account_email, "name" => $account_givenname);
+
+			self::updateAccountVOContacts($accountdata, $vocontacts);
+			self::updateAccountVOMemberships($accountdata, $vomembers);
+		}
 		//Check if user account is blocked and updates session
 		self::setupUserAccountStatus($session, $useraccount);
 		
