@@ -365,11 +365,33 @@ FROM applications WHERE guid = '" . $target ."';
 	}
 
 	public function canViewVOWideImageList($target){
-		return $this->queryPriv(36, $target);
+		//return $this->queryPriv(36, $target);
+		if ( ($this->_actor === null) || ($this->_actor->id === null) ) return false;
+		// admin access
+		if ( ($this->_actor !== null) && userIsAdminOrManager($this->_actor->id) ) return true;
+		$db->setFetchMode(Zend_Db::FETCH_NUM);
+		$res = db()->query("query_vowide_img_list_view_perm(?, ?)", array($this->_actor->id, $target))->fetchAll();
+		if (count($res) == 0) {
+			return false;
+		} else {
+			$res = $res[0];
+			return filter_var($res[0], FILTER_VALIDATE_BOOLEAN);
+		}
 	}
 
 	public function canManageVOWideImageList($target){
-		return $this->queryPriv(37, $target);
+		//return $this->queryPriv(37, $target);
+		if ( ($this->_actor === null) || ($this->_actor->id === null) ) return false;
+		// admin access
+		if ( ($this->_actor !== null) && userIsAdminOrManager($this->_actor->id) ) return true;
+		$db->setFetchMode(Zend_Db::FETCH_NUM);
+		$res = db()->query("query_vowide_img_list_manage_perm(?, ?)", array($this->_actor->id, $target))->fetchAll();
+		if (count($res) == 0) {
+			return false;
+		} else {
+			$res = $res[0];
+			return filter_var($res[0], FILTER_VALIDATE_BOOLEAN);
+		}
 	}
 	
 	public function canEditRelatedProjects($target){
