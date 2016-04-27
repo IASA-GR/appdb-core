@@ -118,7 +118,7 @@ CREATE OR REPLACE VIEW vo_members AS
     researchers.id AS researcherid,
     NULL::timestamp AS member_since
    FROM egiaai.vo_members
-     JOIN vos ON lower(vos.name) = lower(vo_members.vo) AND NOT vos.deleted AND vos.sourceid = 2
+     JOIN vos ON lower(vos.name) = lower(vo_members.vo) AND NOT vos.deleted
      JOIN user_accounts ON (user_accounts.accountid = vo_members.puid) AND user_accounts.account_type = 'egi-aai'::e_account_type
      JOIN researchers ON researchers.id = user_accounts.researcherid
 UNION ALL
