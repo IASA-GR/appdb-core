@@ -7776,35 +7776,6 @@ class SamlAuth{
 		return null;
 	}
 	
-	private static function clearEGIAAIUserInfo($accountid) {
-		db()->query("SELECT clear_egiaai_user_info(?)", array($accountid))->fetchAll();
-	}
-
-	//Update the VO contacts for the given EGI AAI persistend uid.
-	private static function updateAccountVOContacts($accountdata, $roles) {
-		$puid = $accountdata['puid'];
-		$name = $accountdata['name'];
-		$email = $accountdata['email'];
-
-		self::clearEGIAAIUserInfo($puid );
-
-		foreach($roles as $role) {
-		  db()->query("SELECT add_egiaai_user_vocontact_info(?, ?, ?, ?, ?)", array($puid, $name, $role['vo'], $role['role'], $email))->fetchAll();
-		}
-	}
-
-	//Update the VO memberships for the given EGI AAI persistend uid.
-	private static function updateAccountVOMemberships($accountdata, $roles) {
-		$puid = $accountdata['puid'];
-		$name = $accountdata['name'];
-
-		self::clearEGIAAIUserInfo($puid );
-
-		foreach($roles as $role) {
-		  db()->query("SELECT add_egiaai_user_vomember_info(?, ?, ?)", array($puid, $name, $role['vo']))->fetchAll();
-		}
-	}
-
 	//Extracts user entitlements from the saml login response if they exist.
 	//Returns an array with VO memberships and Site roles
 	private static function extractSamlEntitlements($attrs) {
@@ -7832,7 +7803,46 @@ class SamlAuth{
 	  }
 	  return $res;
 	}
+	
+	//Persist any VO related information from EGI AAI entitlements given for a specific uid in SAML returned attributes
+	private static function updateEGIAAIEntitlements($attrs, $entitlements = array()) {
+		$vocontacts = array();
+		$vomembers = array();
+		$puid = ( isset($attrs["idp:uid"])?$attrs["idp:uid"][0]:"");
+		$email = ( ( isset($attrs["idp:mail"]) === true && count($attrs["idp:mail"]) > 0 )?$attrs["idp:mail"][0]:"" );
+		$firstname = ( ( isset($attrs["idp:givenName"]) === true && count($attrs["idp:givenName"]) > 0 )?$attrs["idp:givenName"][0]:"" );
+		$lastname = ( ( isset($attrs["idp:sn"]) === true && count($attrs["idp:givenName"]) > 0 )?$attrs["idp:sn"][0]:"" );
+		$name = trim($firstname . ' ' . $lastname);
 
+		//Clear any vo contact and membership information regarding given persisted uid
+		db()->query("SELECT clear_egiaai_user_info(?)", array($puid))->fetchAll();
+		
+		//Check if entitlements have VO specific information
+		if($entitlements && isset($entitlements['vos'])) {
+			$voentitlements = $entitlements['vos'];
+
+			//Get extracted vo contatcs from vo entitlements
+			if(isset($voentitlements['contacts'])) {
+				$vocontacts = $voentitlements['contacts'];
+			}
+
+			//Get extracted vo memberships from vo entitlements
+			if(isset($voentitlements['members'])) {
+				$vomembers = $voentitlements['members'];
+			}
+
+			//Update the VO memberships for the given EGI AAI persistend uid.
+			foreach($vomembers as $vomember) {
+				db()->query("SELECT add_egiaai_user_vomember_info(?, ?, ?)", array($puid, $name, $vomember['vo']))->fetchAll();
+			}
+
+			//Update the VO contacts for the given EGI AAI persistend uid.
+			foreach($vocontacts as $vocontact) {
+				db()->query("SELECT add_egiaai_user_vocontact_info(?, ?, ?, ?, ?)", array($puid, $name, $vocontact['vo'], $vocontact['role'], $email))->fetchAll();
+			}
+		}
+	}
+	
 	//Performs actions after successful SAML Authedication
 	//Decides if the authedicated user is a new or an old
 	//user and fills the session accordingly.
@@ -7841,9 +7851,7 @@ class SamlAuth{
 		$attrs = $session->samlattrs;
 		$source = strtolower(trim($session->samlauthsource));
 		$uid = ( isset($attrs["idp:uid"])?$attrs["idp:uid"][0]:"");
-		$account_email = ( ( isset($attrs["idp:mail"]) === true && count($attrs["idp:mail"]) > 0 )?$attrs["idp:mail"][0]:"" );
-		$account_givenname = ( ( isset($attrs["idp:givenName"]) === true && count($attrs["idp:givenName"]) > 0 )?$attrs["idp:givenName"][0]:"" );
-		
+
 		if( trim($uid) == "" ) return false;
 		$accounttype = str_replace("-sp","",$source);
 		
@@ -7885,24 +7893,11 @@ class SamlAuth{
 		}
 		
 		//Store user entitlements
-		$entitlements = self::extractSamlEntitlements($attrs);
-		$session->entitlements = $entitlements;
-		if($entitlements && isset($entitlements['vos'])) {
-			$voentitlements = $entitlements['vos'];
-			$vocontacts = array();
-			$vomembers = array();
-			if(isset($voentitlements['contacts'])) {
-				$vocontacts = $voentitlements['contacts'];
-			}
-			if(isset($voentitlements['members'])) {
-				$vomembers = $voentitlements['members'];
-			}
-
-			$accountdata = array("puid" =>  $uid, "email" => $account_email, "name" => $account_givenname);
-
-			self::updateAccountVOContacts($accountdata, $vocontacts);
-			self::updateAccountVOMemberships($accountdata, $vomembers);
+		$session->entitlements = self::extractSamlEntitlements($attrs);
+		if($accounttype === 'egi-aai') {
+			self::updateEGIAAIEntitlements($attrs, $session->entitlements);
 		}
+
 		//Check if user account is blocked and updates session
 		self::setupUserAccountStatus($session, $useraccount);
 		
