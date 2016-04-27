@@ -369,8 +369,12 @@ FROM applications WHERE guid = '" . $target ."';
 		if ( ($this->_actor === null) || ($this->_actor->id === null) ) return false;
 		// admin access
 		if ( ($this->_actor !== null) && userIsAdminOrManager($this->_actor->id) ) return true;
+
+		global $application;
+		$db = $application->getBootstrap()->getResource('db');
 		$db->setFetchMode(Zend_Db::FETCH_NUM);
-		$res = db()->query("query_vowide_img_list_view_perm(?, ?)", array($this->_actor->id, $target))->fetchAll();
+
+		$res = db()->query("SELECT query_vowide_img_list_view_perm(?, ?)", array($this->_actor->id, $target))->fetchAll();
 		if (count($res) == 0) {
 			return false;
 		} else {
@@ -384,8 +388,12 @@ FROM applications WHERE guid = '" . $target ."';
 		if ( ($this->_actor === null) || ($this->_actor->id === null) ) return false;
 		// admin access
 		if ( ($this->_actor !== null) && userIsAdminOrManager($this->_actor->id) ) return true;
+
+		global $application;
+		$db = $application->getBootstrap()->getResource('db');
 		$db->setFetchMode(Zend_Db::FETCH_NUM);
-		$res = db()->query("query_vowide_img_list_manage_perm(?, ?)", array($this->_actor->id, $target))->fetchAll();
+
+		$res = db()->query("SELECT query_vowide_img_list_manage_perm(?, ?)", array($this->_actor->id, $target))->fetchAll();
 		if (count($res) == 0) {
 			return false;
 		} else {
