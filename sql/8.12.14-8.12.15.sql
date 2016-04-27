@@ -57,7 +57,7 @@ CREATE OR REPLACE FUNCTION query_vowide_img_list_view_perm(
 	m_researcherid int,
 	m_voguid uuid
 ) RETURNS BOOLEAN AS 
-$$SELECT query_vowide_img_list_perm($1, $2, 36)$$ LANGUAGE sql STABLE STRICT;
+$$SELECT query_vowide_img_list_perm($1, $2, 36) OR query_vowide_img_list_perm($1, $2, 37)$$ LANGUAGE sql STABLE STRICT;
 ALTER FUNCTION query_vowide_img_list_view_perm(int, uuid) OWNER TO appdb;
 
 CREATE OR REPLACE FUNCTION query_vowide_img_list_manage_perm(
