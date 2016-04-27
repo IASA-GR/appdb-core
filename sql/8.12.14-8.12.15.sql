@@ -34,8 +34,9 @@ BEGIN
 IF EXISTS (
 SELECT * 
 FROM egiaai.vo_contacts 
-WHERE role IN ('VO MANAGER', 'VO DEPUTY', 'VO EXPERT', 'VO SHIFTER') AND
-puid IN (
+WHERE egiaai.vo_contacts.role IN ('VO MANAGER', 'VO DEPUTY', 'VO EXPERT', 'VO SHIFTER') AND
+egiaai.vo_contacts.vo IN (SELECT vos.name FROM vos WHERE vos.guid = $2) AND
+egiaai.vo_contacts.puid IN (
 	SELECT accountid 
 	FROM user_accounts
 	WHERE user_accounts.researcherid = $1 AND user_accounts.account_type = 'egi-aai'::e_account_type AND stateid = 1
