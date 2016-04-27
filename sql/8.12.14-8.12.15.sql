@@ -46,25 +46,25 @@ ELSE
 	RETURN EXISTS (
 		SELECT * 
 		FROM permissions 
-		WHERE actor = (SELECT guid FROM researchers WHERE id = $1) AND object = $2 AND actionid = $3
+		WHERE actor = (SELECT guid FROM researchers WHERE id = $1) AND ((object = $2) OR (object IS NULL)) AND actionid = $3
 	);
 END IF;
 END;
-$$ LANGUAGE plpgsql STABLE;
+$$ LANGUAGE plpgsql STABLE STRICT;
 ALTER FUNCTION query_vowide_img_list_perm(int, uuid, int) OWNER TO appdb;
 
 CREATE OR REPLACE FUNCTION query_vowide_img_list_view_perm(
 	m_researcherid int,
 	m_voguid uuid
 ) RETURNS BOOLEAN AS 
-$$SELECT query_vowide_img_list_perm($1, $2, 36)$$ LANGUAGE sql;
+$$SELECT query_vowide_img_list_perm($1, $2, 36)$$ LANGUAGE sql STABLE STRICT;
 ALTER FUNCTION query_vowide_img_list_view_perm(int, uuid) OWNER TO appdb;
 
 CREATE OR REPLACE FUNCTION query_vowide_img_list_manage_perm(
 	m_researcherid int,
 	m_voguid uuid
 ) RETURNS BOOLEAN AS 
-$$SELECT query_vowide_img_list_perm($1, $2, 37)$$ LANGUAGE sql;
+$$SELECT query_vowide_img_list_perm($1, $2, 37)$$ LANGUAGE sql STABLE STRICT;
 ALTER FUNCTION query_vowide_img_list_view_perm(int, uuid) OWNER TO appdb;
 
 INSERT INTO version (major,minor,revision,notes) 
