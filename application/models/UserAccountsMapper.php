@@ -18,5 +18,15 @@
 <?php
 class Default_Model_UserAccountsMapper extends Default_Model_UserAccountsMapperBase
 {
+	public function populate(&$entry, $row) {
+		parent::populate($entry,$row);
+		$entry->setIDPTrace(pg_to_php_array($row->idptrace));
+	}
 
+	public function save(Default_Model_UserAccount $value) {
+		$rec = $value->IDPTrace;
+		$value->IDPTrace = php_to_pg_array($value->IDPTrace, true);
+		parent::save($value);
+		$value->IDPTrace = $rec;
+    }
 }
