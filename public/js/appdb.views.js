@@ -13953,15 +13953,20 @@ appdb.views.ConnectedAccountsItem = appdb.ExtendClass(appdb.View, "appdb.views.C
 		var d = this.options.data;
 		var name = $("<span class='name'></span>");
 		var uid = $("<span class='uid'></span>");
+		var idps = (d.idptrace || '').split('\n');
+		if(idps.length > 0) {
+			idps = '(' + idps[0] + ')';
+		} else {
+			idps = '';
+		}
 
-
-		$(uid).text($.trim(d.uid));
+		$(uid).text($.trim(d.uid) + ' ' + idps);
 		$(name).text($.trim(d.name));
 		if ($.trim(d.name) !== "" && this.options.meta.displayName === true) {
 			if ($.trim(d.source).toLowerCase() === "edugain") {
 				$(uid).text(" (" + $(uid).text() + ")");
 			} else {
-				$(uid).text("");
+				$(uid).text(idps);
 			}
 		} else {
 			$(name).text("");
