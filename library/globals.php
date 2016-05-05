@@ -7765,17 +7765,36 @@ class SamlAuth{
 			"user" => "member"
 		);
 		
-		if ($role === null) {
+		if( $role === null ) {
 			return $roles;
 		}
 		
-		if (isset($roles[$role])) {
+		if( isset($roles[$role]) ) {
 			return $roles[$role];
 		}
 		
 		return null;
 	}
-	
+	//Helper function to return site role mapping from EGI AAI entitlements
+	//If no EGI AAI site role is given it return all of the role mappings
+	//If the given role is not found it returns null.
+	private static function getEGIAAISiteRoleMapping($role = null) {
+		$roles = array(
+			"Site+Administrator" => "administrator",
+			"Site+Security+Officer" => "",
+			"Site+Operations+Manager" => ""
+		);
+		
+		if( $role === null ) {
+			return $roles;
+		}
+		
+		if( isset($roles[$role]) && trim($roles[$role]) !== "" ) {
+			return $roles[$role];
+		}
+		
+		return null;
+	}
 	//Extracts user entitlements from the saml login response if they exist.
 	//Returns an array with VO memberships and Site roles
 	private static function extractSamlEntitlements($attrs) {
@@ -7787,18 +7806,39 @@ class SamlAuth{
 
 	  $entitlements = $attrs['idp:entitlement'];
 	  foreach( $entitlements as $e ){
-		$vomatches = array();
-		preg_match("/^urn\:(mace\:)?(.*)\:vo\:(.*)\:role\:(.*)$/", $e, $vomatches);
-		if( count($vomatches) === 5 ) {
-		  $source = $vomatches[2];
-		  $voname = $vomatches[3];
-		  $role = self::getEGIAAIVORoleMapping($vomatches[4]);
-		  
-		  if($role === 'member') {
+		$matches = array();
+
+		//Check if entitlement specifies a vo role
+		preg_match("/^urn\:(mace\:)?(.*)\:vo\:(.*)\:role\:(.*)$/", $e, $matches);
+		if( count($matches) === 5 ) {
+		  $source = $matches[2];
+		  $voname = $matches[3];
+		  $role = self::getEGIAAIVORoleMapping($matches[4]);
+
+		  if( $role === 'member' ) {
 			$res['vos']['members'][] = array( 'source' => $source, 'vo' => $voname );
 		  } else if($role !== null) {
 			$res['vos']['contacts'][] = array( 'source' => $source, 'vo' => $voname, 'role' => $role );
 		  }
+		  continue;
+		}
+
+		//Check if entitlement specifies a site role
+		preg_match("/^urn\:(mace\:)?(.*)\:user\-role\:(.*)\:on-entity\:(.*)\:primary\-key:(.*):in\-project:(.*):(.*)$/", $e, $matches);
+		if( count($matches) === 8) {
+			$role = self::getEGIAAISiteRoleMapping($matches[3]);
+			if( $role === null ) {
+				continue;
+			}
+
+			$res['sites'][] = array(
+				'source' => $matches[2],
+				'site_name' => $matches[4],
+				'site_key' => $matches[5],
+				'role' => $role,
+				'project_id' => $matches[6],
+				'project_name' => $matches[7]
+			);
 		}
 	  }
 	  return $res;
