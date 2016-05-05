@@ -7781,8 +7781,9 @@ class SamlAuth{
 	private static function getEGIAAISiteRoleMapping($role = null) {
 		$roles = array(
 			"Site+Administrator" => "administrator",
-			"Site+Security+Officer" => "",
-			"Site+Operations+Manager" => ""
+			"Site+Security+Officer" => "administrator",
+			"Site+Operations+Manager" => "administrator",
+			"Site+Operations+Deputy+Manager" => "administrator"
 		);
 		
 		if( $role === null ) {
