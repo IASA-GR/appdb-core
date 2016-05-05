@@ -7414,7 +7414,8 @@ class SamlAuth{
 						"uid" => trim($ua->accountid),
 						"source" => trim($ua->accounttypeid),
 						"name" => trim($ua->accountname),
-						"state" => trim($ua->getState()->name)
+						"state" => trim($ua->getState()->name),
+						"idptrace" => implode("\n", $ua->getIDPTrace())
 					));
 				}
 			}else{
@@ -7584,7 +7585,8 @@ class SamlAuth{
 				"id" => $account->id,
 				"source" => $account->accounttypeid,
 				"uid" => $account->accountid,
-				"name" => $account->accountname
+				"name" => $account->accountname,
+				"idptrace" => implode("\n", $account->getIDPTrace())
 			);
 			//load available user accounts
 			$session->currentUserAccounts = self::getUserAccountsByUser($user->id, true);
@@ -7927,6 +7929,19 @@ class SamlAuth{
 				$user = self::connectX509ToEgi($session);
 			}
 		}
+
+		if(isset($attrs['idp:traceidp'])) {
+			$session->idptrace = $attrs['idp:traceidp'];
+		} else {
+			$session->idptrace = array();
+		}
+		
+		if(isset($attrs['idp:loa'])) {
+			$session->loa = $attrs['idp:loa'];
+			if(is_array($session->loa) && count($session->loa) > 0) { 
+				$session->loa = $session->loa[0];
+			}
+		}
 		
 		//Create a new dunmmy user account model
 		if( $useraccount === null ){
@@ -7934,6 +7949,7 @@ class SamlAuth{
 			$useraccount->accountid = $uid;
 			$useraccount->accounttypeid = $accounttype;
 			$useraccount->stateid = 1;
+			$useraccount->IDPTrace = $session->idptrace;
 			if( $user !== null ){
 				$useraccount->researcherid = $user->id;
 			}
@@ -8208,7 +8224,7 @@ class AccountConnect {
 	}
 	
 	//Connect the given profile id to the user account information given
-	public static function connectAccountToProfile($profileid, $id, $type, $name = null){
+	public static function connectAccountToProfile($profileid, $id, $type, $name = null, $idptrace = array()){
 		//Check if this user account is already connected to a profile
 		$user = SamlAuth::getUserByAccountValues($id, $type);
 		if( $user !== null ){
@@ -8220,6 +8236,7 @@ class AccountConnect {
 		$uaccount->accountID = $id;
 		$uaccount->accountTypeID = $type;
 		$uaccount->accountName = $name;
+		$uaccount->IDPTrace = $idptrace;
 		$uaccount->save();
 		
 		$try_count = 0;
@@ -8253,7 +8270,7 @@ class AccountConnect {
 		$paccount->resolvedOn = 'NOW()';
 		$paccount->save();
 		
-		self::connectAccountToProfile( $paccount->researcherid, $paccount->accountID, $paccount->accountType, $paccount->accountName );
+		self::connectAccountToProfile( $paccount->researcherid, $paccount->accountID, $paccount->accountType, $paccount->accountName, $session->idptrace );
 		
 		unset($session->isNewUser);
 		unset($session->accountStatus);

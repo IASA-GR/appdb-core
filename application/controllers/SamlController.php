@@ -282,12 +282,13 @@ class SamlController extends Zend_Controller_Action
 		$userFirstName = ( ( isset($attributes["idp:givenName"]) === true && count($attributes["idp:givenName"]) > 0 )?$attributes["idp:givenName"][0]:"" );
 		$userLastName = ( ( isset($attributes["idp:sn"]) === true && count($attributes["idp:givenName"]) > 0 )?$attributes["idp:sn"][0]:"" );
 		$userFullName = trim($userFirstName . " " . $userLastName);
+		$idptrace = ( ( isset($attributes["idp:idptrace"]) === true && count($attributes["idp:idptrace"]) > 0 )?$attributes["idp:givenName"]:array() );
 		if( $userFullName === "" ){
 			$userFullName = null;
 		}
 
 		//Do the account connection
-		AccountConnect::connectAccountToProfile($this->session->userid, $uid, $authsource, $userFullName);
+		AccountConnect::connectAccountToProfile($this->session->userid, $uid, $authsource, $userFullName, $idptrace);
 
 		//Update connected user accounts
 		$this->session->currentUserAccounts = SamlAuth::getUserAccountsByUser($this->session->userid, true);
