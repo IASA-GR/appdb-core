@@ -583,12 +583,19 @@ class SamlController extends Zend_Controller_Action
 			$cont->save();
 		}
 		
+		//extract IDP Trace in case it is returned from SAML
+		$attrs = $this->session->samlattrs;
+		$idptrace = array();
+		if(isset($attrs['idp:traceidp']) && is_array($attrs['idp:traceidp'])) {
+			$idptrace = $attrs['idp:traceidp'];
+		}
+		
 		//Save user account
 		$useraccount = new Default_Model_UserAccount();
 		$useraccount->researcherid = $entry->id;
 		$useraccount->accountid = $this->session->authUid;
 		$useraccount->accounttypeid = str_replace("-sp","",$this->session->authSource);
-		$useraccount->IDPTrace = ((is_array($this->session->idptrace)) ? $this->sesssion->idptrace : array());
+		$useraccount->IDPTrace = $idptrace;
 		$useraccount->save();
 		
 		//Save user relations (organization)
