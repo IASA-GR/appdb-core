@@ -7956,7 +7956,9 @@ class SamlAuth{
 		}
 		
 		if( $user!==null && $user->id ){
-			self::harvestSamlData($session, $user);
+			if($accounttype !== 'egi-aai') {
+				self::harvestSamlData($session, $user);
+			}
 			self::setupSamlSession($session, $useraccount, $user);
 			if( $_COOKIE["SimpleSAMLAuthToken"] ){
 				self::setupSamlUserCredentials($user, $session);
