@@ -7756,20 +7756,41 @@ class SamlAuth{
 				break;
 		}
 	}
+	//Helper function to create entitlement role mappings
+	//based on appdb ini configuration file
+	public static function getEGIAAIRoleMappings($key) {
+		$res = array();
+		$roles =  explode('\n', ApplicationConfiguration::saml('egiaai.entitlements.' . $key, ''));
+		
+		foreach($roles as $role) {
+			$role = explode('=', $role);
+			if( count($role) <= 1) {
+				continue;
+			}
+			
+			$local = $role[0];
+			$remote = explode(';', $role[1]);
+			
+			if( count($remote) === 0) {
+				continue;
+			}
+		
+			$res = array_merge($res, array_fill_keys($remote, $local));
+		}
+		
+		return $res;
+	}
 	//Helper function to return vo role mapping from EGI AAI entitlements
 	//If no EGI AAI vo role is given it return all of the role mappings
 	//If the given role is not found it returns null.
 	private static function getEGIAAIVORoleMapping($role = null) {
-		$roles = array(
-			"admin" => "VO MANAGER",
-			"user" => "member"
-		);
+		$roles = self::getEGIAAIRoleMappings('vo');
 		
 		if( $role === null ) {
 			return $roles;
 		}
 		
-		if( isset($roles[$role]) ) {
+		if( isset($roles[$role]) && trim($roles[$role]) !== "" ) {
 			return $roles[$role];
 		}
 		
@@ -7779,12 +7800,7 @@ class SamlAuth{
 	//If no EGI AAI site role is given it return all of the role mappings
 	//If the given role is not found it returns null.
 	private static function getEGIAAISiteRoleMapping($role = null) {
-		$roles = array(
-			"Site+Administrator" => "administrator",
-			"Site+Security+Officer" => "administrator",
-			"Site+Operations+Manager" => "administrator",
-			"Site+Operations+Deputy+Manager" => "administrator"
-		);
+		$roles = self::getEGIAAIRoleMappings('site');
 		
 		if( $role === null ) {
 			return $roles;
