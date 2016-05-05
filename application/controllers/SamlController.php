@@ -588,6 +588,7 @@ class SamlController extends Zend_Controller_Action
 		$useraccount->researcherid = $entry->id;
 		$useraccount->accountid = $this->session->authUid;
 		$useraccount->accounttypeid = str_replace("-sp","",$this->session->authSource);
+		$useraccount->IDPTrace = ((is_array($this->session->idptrace)) ? $this->sesssion->idptrace : array());
 		$useraccount->save();
 		
 		//Save user relations (organization)
