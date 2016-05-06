@@ -119,7 +119,20 @@ appdb.config.accounts = {
 		{ id: "egi-sso-ldap-sp", source: "egi-sso-ldap", name: "EGI SSO", image: "/images/egilogo.png", canAdd: true, canRemove: true, connectMessage: "" },
 		{ id: "x509-sp", source: "x509", name:"X509 Digital Certificate", image: "/images/certificate.png", canAdd: true, canRemove: true, connectMessage: "" },
 		{ id: "edugain-sp", source: "edugain", name:"Federation (eduGAIN)", image: "/images/edugain_logo.png", canAdd: true, canRemove: true, displayName: true, connectMessage: "If you are already signed with the federation (eduGAIN) , the system will try to connect to the signed in federation account. Otherwise, please consider to be signed out from the federated acount." }
-	]
+	],
+	egiaai: {
+		idp: 'https://aai.egi.eu/proxy/metadata',
+		idptraces: {
+			'https://aai.egi.eu/proxy/metadata': 'egi-aai',
+			'https://aai.egi.eu/google/saml2/idp/metadata.php': 'google',
+			'https://aai.egi.eu/linkedin/saml2/idp/metadata.php': 'linkedin',
+			'https://aai.egi.eu/facebook/saml2/idp/metadata': 'facebook',
+			'https://extidp.cesnet.cz/idp/shibboleth': 'elixir',
+			'https://engine.elixir-czech.org/authentication/idp/metadata': 'elixir',
+			'https://www.egi.eu/idp/shibboleth': 'egi sso',
+			'https://vho.grnet.gr/idp/shibboleth': 'vho'
+		}
+	}
 };
 <?php if ( ApplicationConfiguration::isProductionInstance() === false ) { ?>
 appdb.config.accounts.available.push({ id: "elixir-sp", source: "elixir", name:"Elixir", image: "/images/elixir.png", canAdd: true, canRemove: true, displayName: true, connectMessage: "If you are already signed in Elixir the system will try to connect to the signed in account of Elixir. Otherwise, please consider to be signed out from Elixir." });

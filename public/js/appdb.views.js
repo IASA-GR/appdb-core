@@ -13949,24 +13949,43 @@ appdb.views.ConnectedAccountsItem = appdb.ExtendClass(appdb.View, "appdb.views.C
 		}
 		$(this.options.dom.actions).append(a);
 	};
+	this.getIdpTrace = function(traces) {
+		traces = ((typeof traces === 'string') ? traces.split('\n') : traces);
+		traces = ($.isArray(traces) ? traces : [traces]);
+		traces = $.grep(traces, function(t) { return $.trim(t) !== ''; });
+		var trace = '';
+		var spmap = appdb.config.accounts.egiaai.idptraces || {};
+
+		if (traces.length > 1 && spmap[traces[0]] === 'egi-aai') {
+			trace = $.trim(traces[traces.length -1]);
+		} else if (traces.length > 0) {
+			trace = $.trim(traces[0]);
+		}
+		
+		if (trace !== '' && $.trim(spmap[trace]) !== '') {
+			trace = $.trim(spmap[trace]);
+		}
+		
+		return trace;
+	};
 	this.renderContent = function() {
 		var d = this.options.data;
 		var name = $("<span class='name'></span>");
 		var uid = $("<span class='uid'></span>");
-		var idps = (d.idptrace || '').split('\n');
-		if(idps.length > 0) {
-			idps = '(' + idps[0] + ')';
+		var trace = this.getIdpTrace(d.idptrace || '');
+		if(trace !== '' && $.trim(d.source).toLowerCase() === "egi-aai") {
+			trace = '(' + trace + ')';
 		} else {
-			idps = '';
+			trace = '';
 		}
 
-		$(uid).text($.trim(d.uid) + ' ' + idps);
+		$(uid).text($.trim(d.uid) + ' ' + trace);
 		$(name).text($.trim(d.name));
 		if ($.trim(d.name) !== "" && this.options.meta.displayName === true) {
 			if ($.trim(d.source).toLowerCase() === "edugain") {
 				$(uid).text(" (" + $(uid).text() + ")");
 			} else {
-				$(uid).text(idps);
+				$(uid).text('');
 			}
 		} else {
 			$(name).text("");
