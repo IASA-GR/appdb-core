@@ -13974,18 +13974,18 @@ appdb.views.ConnectedAccountsItem = appdb.ExtendClass(appdb.View, "appdb.views.C
 		var uid = $("<span class='uid'></span>");
 		var trace = this.getIdpTrace(d.idptrace || '');
 		if(trace !== '' && $.trim(d.source).toLowerCase() === "egi-aai") {
-			trace = '(' + trace + ')';
+			trace = ' (' + trace + ')';
 		} else {
 			trace = '';
 		}
 
-		$(uid).text($.trim(d.uid) + ' ' + trace);
+		$(uid).text($.trim(d.uid) + trace);
 		$(name).text($.trim(d.name));
 		if ($.trim(d.name) !== "" && this.options.meta.displayName === true) {
 			if ($.trim(d.source).toLowerCase() === "edugain") {
 				$(uid).text(" (" + $(uid).text() + ")");
 			} else {
-				$(uid).text('');
+				$(uid).text(trace);
 			}
 		} else {
 			$(name).text("");
