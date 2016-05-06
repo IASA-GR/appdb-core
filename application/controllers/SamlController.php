@@ -282,7 +282,7 @@ class SamlController extends Zend_Controller_Action
 		$userFirstName = ( ( isset($attributes["idp:givenName"]) === true && count($attributes["idp:givenName"]) > 0 )?$attributes["idp:givenName"][0]:"" );
 		$userLastName = ( ( isset($attributes["idp:sn"]) === true && count($attributes["idp:givenName"]) > 0 )?$attributes["idp:sn"][0]:"" );
 		$userFullName = trim($userFirstName . " " . $userLastName);
-		$idptrace = ( ( isset($attributes["idp:idptrace"]) === true && count($attributes["idp:idptrace"]) > 0 )?$attributes["idp:givenName"]:array() );
+		$idptrace = ( ( isset($attributes["idp:traceidp"]) === true && count($attributes["idp:traceidp"]) > 0 )?$attributes["idp:traceidp"]:array() );
 		if( $userFullName === "" ){
 			$userFullName = null;
 		}
