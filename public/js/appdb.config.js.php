@@ -15,6 +15,9 @@ header('Content-type: text/javascript');
 
 var appdb = {};
 appdb.config = {
+	deploy: {
+		instance: '<?php echo ((ApplicationConfiguration::isProductionInstance()===true)?"production":"development"); ?>'
+	},
     appValidationPeriod: '<?php echo $appconf->invalid; ?>',
     apiversion: '<?php echo $apiconf->latestVersion; ?>',
 	version: '<?php echo ApplicationConfiguration::version(); ?>',

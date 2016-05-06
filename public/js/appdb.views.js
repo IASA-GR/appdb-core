@@ -14091,7 +14091,19 @@ appdb.views.ConnectedAccountTypeListItem = appdb.ExtendClass(appdb.View, "appdb.
 			$(this.dom).append("<div class='empty'><div class='message'>No connected " + this.options.meta.name + " accounts found.</div></div>");
 		}
 	};
+	this.canRenderActions = function() {
+		return !(
+			this.options.meta &&
+			this.options.meta.source === 'egi-aai' &&
+			appdb.config.deploy.instance === 'production' &&
+			window.userCurrentAccount &&
+			window.userCurrentAccount.source === 'egi-aai'
+		);
+	};
 	this.renderActions = function() {
+		if (this.canRenderActions() === false) {
+			return;
+		}
 		$(this.options.dom.actions).empty();
 		if (this.isEmpty() === false && ($.trim(samlLoginSourceType).toLowerCase() === "x509" || this.options.meta.id === "x509-sp"))
 			return;
