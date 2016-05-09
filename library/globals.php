@@ -7863,7 +7863,7 @@ class SamlAuth{
 		
 		//Check if entitlement specifies groups
 		preg_match("/^urn\:(mace\:)?(.*)\:group:(.*)$/", $e, $matches);
-		if( count($matches) === 3) {
+		if( count($matches) === 4) {
 			$res['groups'][] = array(
 				'source' => $matches[2],
 				'group' => $matches[3]
