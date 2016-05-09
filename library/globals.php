@@ -7817,7 +7817,7 @@ class SamlAuth{
 	//Extracts user entitlements from the saml login response if they exist.
 	//Returns an array with VO memberships and Site roles
 	private static function extractSamlEntitlements($attrs) {
-	  $res = array('vos' => array("members" => array(), "contacts" => array()), 'sites' => array());
+	  $res = array('vos' => array("members" => array(), "contacts" => array()), 'sites' => array(), 'groups' => array());
 
 	  if( !is_array($attrs) || !isset($attrs['idp:entitlement']) ){
 		return $res;
@@ -7857,6 +7857,16 @@ class SamlAuth{
 				'role' => $role,
 				'project_id' => $matches[6],
 				'project_name' => $matches[7]
+			);
+			continue;
+		}
+		
+		//Check if entitlement specifies groups
+		preg_match("/^urn\:(mace\:)?(.*)\:group:(.*)$/", $e, $matches);
+		if( count($matches) === 3) {
+			$res['groups'][] = array(
+				'source' => $matches[2],
+				'group' => $matches[3]
 			);
 		}
 	  }
