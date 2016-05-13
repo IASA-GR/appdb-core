@@ -843,7 +843,34 @@ class SamlController extends Zend_Controller_Action
 			$res = "1";
 			if( isset($_GET['profile']) && $_GET['profile'] === 'attributes' && $this->isAllowedProfileDataDomain()) {
 				header('Content-type: application/json');
-				echo json_encode($source->getAttributes());
+				$attrs = $source->getAttributes();
+				if ($attrs && count($attrs) > 0) {
+					$sourceIdentifier = false;
+					$uid = false;
+					$userAccount = false;
+					try {
+						if (isset($attrs['idp:sourceIdentifier']) && count($attrs['idp:sourceIdentifier']) === 1) {
+							$sourceIdentifier = $attrs['idp:sourceIdentifier'][0];
+							$sourceIdentifier = str_replace('-sp', '', $sourceIdentifier);
+						}
+
+						if (isset($attrs['idp:uid']) && count($attrs['idp:uid']) === 1) {
+							$uid = $attrs['idp:uid'][0];
+						}
+
+						if ($sourceIdentifier && $uid) {
+							$userAccount = SamlAuth::getUserAccount($uid, $sourceIdentifier);
+						}
+
+						if ($userAccount) {
+							$attrs['entitlements'] = array('vo' => array('memberships' => VoAdmin::getUserMembership($userAccount->researcherid)));
+						}
+					}catch(Exception $ex) {
+						
+					}
+				}
+
+				echo json_encode($attrs);
 				return;
 			}
 		}
