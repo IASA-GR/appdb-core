@@ -1454,7 +1454,7 @@ class FilterParser {
 						$end = '>'.FilterParser::fieldsToXML($fltstr, $base, $n+1).'</filter:field>';
                         break;
 					case("application"):
-						$fltstr = "id:numeric name:string description:string abstract:string registeredon:datetime lastupdated:datetime tool:boolean rating:numeric tag:string validated:boolean owner:numeric addedby:numeric deleted:boolean releasecount:numeric arch:string os:string language:string status:string phonebook:string license:complex published:boolean hypervisor:string osfamily:string imageformat:string metatype:integer";
+						$fltstr = "id:numeric name:string description:string abstract:string registeredon:datetime lastupdated:datetime tool:boolean rating:numeric tag:string validated:boolean owner:numeric addedby:numeric deleted:boolean releasecount:numeric arch:string os:string language:string status:string phonebook:string license:complex published:boolean hypervisor:string osfamily:string imageformat:string metatype:integer sitecount:integer year:integer month:integer day:integer";
 						if ( $base === $i ) {
 							$fltstr = $fltstr." person:complex country:complex middleware:complex vo:complex discipline:complex category:complex";
 						}
@@ -2219,6 +2219,9 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 						break;
 					case "application":
 						switch($fld) {
+						case "sitecount":
+							$fld = "(SELECT vappliance_site_count(###THETABLE###.id))";
+							break;
 						case "published":
 							$val = str_replace("%", "", $val);
 							if (filter_var($val, FILTER_VALIDATE_BOOLEAN)) {
