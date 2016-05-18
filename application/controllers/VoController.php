@@ -127,7 +127,51 @@ class VoController extends Zend_Controller_Action
         }
     }
 
-    private function populateVO(&$voentry)
+
+	private function parseDisc($discs, $lvl = 1, $pid = "") {
+		$vos = array();
+		$discs = $discs->xpath("./level" . $lvl);
+		foreach($discs as $disc) {
+			$att = $disc->attributes();
+			$vo = array();
+			$vo["name"] = strval($att["key"]);
+			db()->setFetchMode(Zend_Db::FETCH_BOTH); 
+			if (($lvl > 1) && ($pid != "")) {
+				$res = db()->query("SELECT * FROM htree('disciplines', '', 0, '') AS h WHERE h.name = ? AND parentid = ? AND h.lvl = ?", array(strval($att["key"]), $pid, $lvl))->fetchAll();
+			} else {
+				$res = db()->query("SELECT * FROM htree('disciplines', '', 0, '') AS h WHERE h.name = ? AND h.lvl = ?", array(strval($att["key"]), $lvl))->fetchAll();
+			}
+			if (count($res) > 0) {
+				$res = $res[0];
+			} else {
+				$res = null;
+			}
+			if ($res != null) {
+				$vo["id"] = $res["id"];
+				$vo["parentid"] = $res["parentid"];
+			} else {
+				$vo["id"] = 0;
+				$vo["parentid"] = 0;
+			}
+			$vo["order"] = 0;
+			if ($vo["name"] != "") {
+				$vos[] = $vo;
+			}
+			if ($lvl < 10) {
+				$_pid = $vo["parentid"];
+				if ($_pid == 0) {
+					$_pid = "";
+				}
+				$_vos = $this->parseDisc($disc, $lvl + 1, $_pid);
+				if (count($_vos) > 0) {
+					$vos = array_merge($vos, $_vos);
+				}
+			}
+		}
+		return $vos;
+	}
+
+	private function populateVO(&$voentry)
 	{
 		$vo = new Default_Model_VO2();
 		$att = $voentry->attributes();
@@ -139,20 +183,14 @@ class VoController extends Zend_Controller_Action
 		$discnames = array();
 		$minid = -1;
 		$minname = "Other";
-		$xdiscs = $voentry->xpath("./Disciplines/Discipline");
-		foreach ($xdiscs as $disc) {
-			$dattr = $disc->attributes();
-			$d = array();
-			$d["id"] = strval($dattr["id"]);
-			$d["parentid"] = strval($dattr["parentid"]);
-			$d["order"] = strval($dattr["order"]);
-			$d["name"] = strval($disc);
+		$xdiscs = $voentry->xpath("./Disciplines");
+		$discs = $this->parseDisc($xdiscs[0]);
+		foreach ($discs as $d) {
 			if ($minid == -1 || $minid > $d["id"]) {
 				$minid = $d["id"];
 				$minname = $d["name"];
 			}
 			$discnames[] = $d["name"];
-			$discs[] = $d;
 		}
 		$vo->disciplines = $discs;
 		$vo->discipline = $minname;
