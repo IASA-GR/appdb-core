@@ -129,12 +129,12 @@ class VoController extends Zend_Controller_Action
 
 
 	private function parseDisc($discs, $lvl = 1, $pid = "") {
-		$vos = array();
+		$ds = array();
 		$discs = $discs->xpath("./level" . $lvl);
 		foreach($discs as $disc) {
 			$att = $disc->attributes();
-			$vo = array();
-			$vo["name"] = strval($att["key"]);
+			$d = array();
+			$d["name"] = strval($att["key"]);
 			db()->setFetchMode(Zend_Db::FETCH_BOTH); 
 			if (($lvl > 1) && ($pid != "")) {
 				$res = db()->query("SELECT * FROM htree('disciplines', '', 0, '') AS h WHERE h.name = ? AND parentid = ? AND h.lvl = ?", array(strval($att["key"]), $pid, $lvl))->fetchAll();
@@ -147,28 +147,34 @@ class VoController extends Zend_Controller_Action
 				$res = null;
 			}
 			if ($res != null) {
-				$vo["id"] = $res["id"];
-				$vo["parentid"] = $res["parentid"];
+				$d["id"] = $res["id"];
+				$d["parentid"] = $res["parentid"];
 			} else {
-				$vo["id"] = 0;
-				$vo["parentid"] = 0;
+				$d["id"] = 0;
+				$d["parentid"] = 0;
 			}
-			$vo["order"] = 0;
-			if ($vo["name"] != "") {
-				$vos[] = $vo;
+			$res = db()->query("SELECT ord FROM disciplines WHERE id = ?", array($d["id"]))->fetchAll();
+			if (count($res) > 0) {
+				$res = $res[0];
+				$d["order"] = $res["ord"];
+			} else {
+				$d["order"] = 1;
+			}
+			if ($d["name"] != "") {
+				$ds[] = $d;
 			}
 			if ($lvl < 10) {
-				$_pid = $vo["parentid"];
+				$_pid = $d["parentid"];
 				if ($_pid == 0) {
 					$_pid = "";
 				}
 				$_vos = $this->parseDisc($disc, $lvl + 1, $_pid);
 				if (count($_vos) > 0) {
-					$vos = array_merge($vos, $_vos);
+					$ds = array_merge($ds, $_vos);
 				}
 			}
 		}
-		return $vos;
+		return $ds;
 	}
 
 	private function populateVO(&$voentry)
@@ -511,7 +517,7 @@ class VoController extends Zend_Controller_Action
 			$xsltable3 = $xsltable3[0];
 			$xsltable3 = $xsltable3[0];
 			$xsldata = 
-'<?xml version="1.0" encoding="UTF-8"?' . '>
+'<' . '?xml version="1.0" encoding="UTF-8"?' . '>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 	<xsl:output method="xml"/>
 	<xsl:strip-space elements="*" />
@@ -585,11 +591,11 @@ class VoController extends Zend_Controller_Action
 					if (substr($vd, 0, 4) === "0000") {
 						$vd = null;
 					}
-					$xdiscs = $xvo->xpath("./Disciplines/Discipline");
+					$xdiscs = $xvo->xpath("./Disciplines");
+					$xdiscs = $this->parseDisc($xdiscs[0]);
 					$discs = array();
 					foreach ($xdiscs as $xdisc) {
-						$datt = $xdisc->attributes();
-						$discs[] = trim(strval($datt["id"]));
+						$discs[] = $xdisc["id"];
 					}
 					db()->query("INSERT INTO egiops.vos (name, scope, validated, description, homepage, enrollment, aup, domainname, disciplineid, alias, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, (?)::int[], ?, ?)", array(strtolower(trim($att["Name"])), trim($xvo->Scope), $vd, trim($xvo->Description), trim($xvo->HomepageUrl), trim($xvo->EnrollmentUrl), trim($xvo->AUP), trim($xvo->Discipline), php_to_pg_array($discs, false) ,trim($att["Alias"]), trim($att["Status"])));
 				}
