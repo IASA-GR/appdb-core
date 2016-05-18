@@ -371,7 +371,8 @@ class Default_Model_FilterItem {
 				}
 			} else {
 				if ($sanitize) {
-					$s = "'".$val."'";
+					$s = explode(",", $val);
+					$s = "'".implode($s,"', '")."'";
 				} else {
 					$s = $val;
 				}
