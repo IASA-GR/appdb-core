@@ -505,6 +505,8 @@ class VoController extends Zend_Controller_Action
 			$xml2->loadXML($xml, LIBXML_NSCLEAN | LIBXML_COMPACT);
 			$xml = $proc->transformToXml( $xml2 );
 
+/* NOT needed since the EGI OPS VO dump XML schema change
+*
 			// convert sciclass IDs to discipline IDs
 			$xsl = new DOMDocument();
 			db()->setFetchMode(Zend_Db::FETCH_BOTH);
@@ -565,7 +567,7 @@ class VoController extends Zend_Controller_Action
 			$xml2 = new DOMDocument();
 			$xml2->loadXML($xml, LIBXML_NSCLEAN | LIBXML_COMPACT);
 			$xml = $proc->transformToXml($xml2);
-
+ */
 			// cache entries
 			@exec("rm ". $this->vofile . ".old");
 			@exec("cp " . $this->vofile . " " . $this->vofile . ".old");
