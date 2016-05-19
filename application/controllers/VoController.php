@@ -147,25 +147,25 @@ class VoController extends Zend_Controller_Action
 				$res = null;
 			}
 			if ($res != null) {
-				$d["id"] = $res["id"];
-				$d["parentid"] = $res["parentid"];
+				$d["id"] = "".$res["id"];
+				$d["parentid"] = "".$res["parentid"];
 			} else {
-				$d["id"] = 0;
-				$d["parentid"] = 0;
+				$d["id"] = "0";
+				$d["parentid"] = "0";
 			}
 			$res = db()->query("SELECT ord FROM disciplines WHERE id = ?", array($d["id"]))->fetchAll();
 			if (count($res) > 0) {
 				$res = $res[0];
-				$d["order"] = $res["ord"];
+				$d["order"] = "".$res["ord"];
 			} else {
-				$d["order"] = 1;
+				$d["order"] = "1";
 			}
 			if ($d["name"] != "") {
 				$ds[] = $d;
 			}
 			if ($lvl < 10) {
 				$_pid = $d["parentid"];
-				if ($_pid == 0) {
+				if ($_pid == "0") {
 					$_pid = "";
 				}
 				$_vos = $this->parseDisc($disc, $lvl + 1, $_pid);
@@ -199,6 +199,7 @@ class VoController extends Zend_Controller_Action
 			$discnames[] = $d["name"];
 		}
 		$vo->disciplines = $discs;
+		error_log(var_export($discs, true));
 		$vo->discipline = $minname;
 		$vo->discipline = array("domain" => $voentry->Discipline, "disciplines" => json_encode($discs));
 		if ($vo->discipline == '') $vo->discipline = "Other";
