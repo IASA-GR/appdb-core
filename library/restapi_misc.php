@@ -968,6 +968,15 @@ class RestVMIFmtList extends RestROResourceList {
 }
 
 class RestVAProvidersList extends RestROResourceList {
+	/**
+     * @overrides init() from RestResource
+     */
+	protected function init() {
+		parent::init();
+		$this->_cacheLife = 600; // ten minutes
+		$this->_cacheable = true;
+	}
+
 	public function getDataType() {
 		return "virtualization";
 	}
