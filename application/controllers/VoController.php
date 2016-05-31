@@ -20,6 +20,32 @@ class VoController extends Zend_Controller_Action
     protected $vofile;
     protected $xml;
 
+	private function makeVAprovidersCache() {
+		$uri = 'https://' . $_SERVER['APPLICATION_API_HOSTNAME'] . '/rest/latest/va_providers?listmode=details';
+		$ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $uri);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		if ( defined('CURLOPT_PROTOCOLS') ) curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);        
+		$headers = apache_request_headers();
+		$h = array();
+		$h["Expect"] = '';
+		if ( isset($headers['Accept-Encoding']) ) $h['Accept-Encoding'] = $headers['Accept-Encoding'];
+		foreach($h as $k => $v) {
+			$h[] = "$k: $v";
+		}
+		$h['Connection']='Keep-Alive';
+		$h['Keep-Alive']='300';
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $h);
+		error_log('VA providers RESTful API XML cache STARTED');
+        $result = curl_exec($ch);
+		curl_close($ch);
+		error_log('VA providers RESTful API XML cache DONE');
+	}
+
     public function init()
     {
         /* Initialize action controller here */
@@ -278,7 +304,7 @@ class VoController extends Zend_Controller_Action
 				if ( trim($data2) != "" ) {
 					$xp = $xml2->xpath("//IDCard");
 					foreach ($xp as $x) {
-						fwrite($f, str_replace('<?xml version="1.0"?'.'>', "", $x->asXML()));
+						fwrite($f, str_replace('<' . '?xml version="1.0"?'.'>', "", $x->asXML()));
 					}
 				}
 				$xp = $xml1->xpath("//IDCard");
@@ -286,7 +312,7 @@ class VoController extends Zend_Controller_Action
 					$xattr = $x->attributes();
 					$xp2 = $xml2->xpath("//IDCard[@Name='" . $xattr["Name"] . "']");
 					if (count($xp2) == 0) {
-						fwrite($f, str_replace('<?xml version="1.0"?'.'>', "", $x->asXML()));
+						fwrite($f, str_replace('<' . '?xml version="1.0"?'.'>', "", $x->asXML()));
 					}
 				}
 				fwrite($f, "\n</VoDump>");
@@ -1241,7 +1267,8 @@ class VoController extends Zend_Controller_Action
 			$this->_helper->layout->disableLayout();
 			$this->_helper->viewRenderer->setNoRender();
 			error_log("Sync VA Provider Images START");
-			$filter = '(&(GLUE2ApplicationEnvironmentRepository=*/appdb.egi.eu/*))';
+			//$filter = '(&(GLUE2ApplicationEnvironmentRepository=*/appdb.egi.eu/*))';
+			/*
 			$attrs = array(
 				'dn',
 				'GLUE2ApplicationEnvironmentID',
@@ -1301,8 +1328,11 @@ class VoController extends Zend_Controller_Action
 					}
 				}
 			}
-			db()->query("REFRESH MATERIALIZED VIEW site_services_xml;");
-			error_log("Sync VA Provider Images DONE");
+			 */
+//			db()->query("REFRESH MATERIALIZED VIEW site_services_xml;");
+//			error_log("Sync VA Provider Images DONE");
+			$this->makeVAprovidersCache();
+
 		} else {
 			$this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 403 Forbidden");
