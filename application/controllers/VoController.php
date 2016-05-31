@@ -1267,8 +1267,7 @@ class VoController extends Zend_Controller_Action
 			$this->_helper->layout->disableLayout();
 			$this->_helper->viewRenderer->setNoRender();
 			error_log("Sync VA Provider Images START");
-			//$filter = '(&(GLUE2ApplicationEnvironmentRepository=*/appdb.egi.eu/*))';
-			/*
+			$filter = '(&(GLUE2ApplicationEnvironmentRepository=*/appdb.egi.eu/*))';
 			$attrs = array(
 				'dn',
 				'GLUE2ApplicationEnvironmentID',
@@ -1328,9 +1327,8 @@ class VoController extends Zend_Controller_Action
 					}
 				}
 			}
-			 */
-//			db()->query("REFRESH MATERIALIZED VIEW site_services_xml;");
-//			error_log("Sync VA Provider Images DONE");
+			db()->query("REFRESH MATERIALIZED VIEW site_services_xml;");
+			error_log("Sync VA Provider Images DONE");
 			$this->makeVAprovidersCache();
 
 		} else {
