@@ -7876,6 +7876,7 @@ class SamlAuth{
 			$res['vos']['members'][] = array('scope' => $scope, 'source' => $source, 'vo' => $voname, 'group' => $group );
 		  } else if($role !== null) {
 			$res['vos']['contacts'][] = array('scope' => $scope, 'source' => $source, 'vo' => $voname, 'role' => $role, 'group' => $group );
+			$res['vos']['members'][] = array('scope' => $scope, 'source' => $source, 'vo' => $voname, 'group' => $group );
 		  }
 		  continue;
 		}
