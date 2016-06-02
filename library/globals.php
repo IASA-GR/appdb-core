@@ -7830,47 +7830,54 @@ class SamlAuth{
 	  foreach( $entitlements as $e ){
 		$matches = array();
 
-		//Check if entitlement specifies a vo role
-		preg_match("/^urn\:(mace\:)?(.*)\:vo\:(.*)\:role\:(.*)$/", $e, $matches);
-		if( count($matches) === 5 ) {
-		  $source = $matches[2];
-		  $voname = $matches[3];
-		  $role = self::getEGIAAIVORoleMapping($matches[4]);
-
-		  if( $role === 'member' ) {
-			$res['vos']['members'][] = array( 'source' => $source, 'vo' => $voname );
-		  } else if($role !== null) {
-			$res['vos']['contacts'][] = array( 'source' => $source, 'vo' => $voname, 'role' => $role );
-		  }
-		  continue;
-		}
-
 		//Check if entitlement specifies a site role
-		preg_match("/^urn\:(mace\:)?(.*)\:user\-role\:(.*)\:on-entity\:(.*)\:primary\-key:(.*):in\-project:(.*):(.*)$/", $e, $matches);
+		//preg_match("/^urn\:(mace\:)?(.*)\:user\-role\:(.*)\:on-entity\:(.*)\:primary\-key:(.*):in\-project:(.*):(.*)$/", $e, $matches);
+		preg_match("/^urn\:(mace\:)?(egi\.eu)\:(goc\.egi\.eu)\:([^\:]*)\:([^\:]*)\:([^\:]*)\@(egi\.eu)$/", $e, $matches);
 		if( count($matches) === 8) {
-			$role = self::getEGIAAISiteRoleMapping($matches[3]);
+			$role = self::getEGIAAISiteRoleMapping($matches[6]);
 			if( $role === null ) {
 				continue;
 			}
 
 			$res['sites'][] = array(
-				'source' => $matches[2],
-				'site_name' => $matches[4],
-				'site_key' => $matches[5],
-				'role' => $role,
-				'project_id' => $matches[6],
-				'project_name' => $matches[7]
+				'scope' => $matches[2],
+				'source' => $matches[3],
+				'site_key' => $matches[4],
+				'site_name' => $matches[5],
+				'role' => $role
 			);
 			continue;
 		}
 		
 		//Check if entitlement specifies groups
-		preg_match("/^urn\:(mace\:)?(.*)\:group:(.*)$/", $e, $matches);
-		if( count($matches) === 4) {
+		//preg_match("/^urn\:(mace\:)?(.*)\:group:(.*)$/", $e, $matches);
+		preg_match("/^urn\:(mace\:)?(egi\.eu)\:(www\.egi\.eu)\:([^\:]*)\:([^\:]*)\@egi\.eu$/", $e, $matches);
+		if( count($matches) === 6) {
 			$res['groups'][] = array(
-				'source' => $matches[2],
-				'group' => $matches[3]
+				'scope' => $matches[2],
+				'source' => $matches[3],
+				'group' => $matches[4],
+				'role' => $matches[5]
 			);
+			continue;
+		}
+		
+		//Check if entitlement specifies a vo role
+		//preg_match("/^urn\:(mace\:)?(.*)\:vo\:(.*)\:role\:(.*)$/", $e, $matches); 
+		preg_match("/^urn\:(mace\:)?(egi\.eu)\:([^\:]*)\:(.*\:)*([^\:]*)\@(.*)$/", $e, $matches);
+		if( count($matches) === 7 && $matches[6] !== 'egi.eu') {
+		  $scope = $matches[2];
+		  $source = $matches[3];
+		  $group = $matches[4];
+		  $role = self::getEGIAAIVORoleMapping($matches[5]);
+		  $voname = $matches[6];
+		  
+		  if( $role === 'member' ) {
+			$res['vos']['members'][] = array('scope' => $scope, 'source' => $source, 'vo' => $voname, 'group' => $group );
+		  } else if($role !== null) {
+			$res['vos']['contacts'][] = array('scope' => $scope, 'source' => $source, 'vo' => $voname, 'role' => $role, 'group' => $group );
+		  }
+		  continue;
 		}
 	  }
 	  return $res;
