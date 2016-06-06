@@ -15,6 +15,9 @@ header('Content-type: text/javascript');
 
 var appdb = {};
 appdb.config = {
+	deploy: {
+		instance: '<?php echo ((ApplicationConfiguration::isProductionInstance()===true)?"production":"development"); ?>'
+	},
     appValidationPeriod: '<?php echo $appconf->invalid; ?>',
     apiversion: '<?php echo $apiconf->latestVersion; ?>',
 	version: '<?php echo ApplicationConfiguration::version(); ?>',
@@ -118,12 +121,28 @@ appdb.config.accounts = {
 	available: [
 		{ id: "egi-sso-ldap-sp", source: "egi-sso-ldap", name: "EGI SSO", image: "/images/egilogo.png", canAdd: true, canRemove: true, connectMessage: "" },
 		{ id: "x509-sp", source: "x509", name:"X509 Digital Certificate", image: "/images/certificate.png", canAdd: true, canRemove: true, connectMessage: "" },
-		{ id: "edugain-sp", source: "edugain", name:"Federation (eduGAIN)", image: "/images/edugain_logo.png", canAdd: true, canRemove: true, displayName: true, connectMessage: "If you are already signed with the federation (eduGAIN) , the system will try to connect to the signed in federation account. Otherwise, please consider to be signed out from the federated acount." }
-	]
+		{ id: "edugain-sp", source: "edugain", name:"Federation (eduGAIN)", image: "/images/edugain_logo.png", canAdd: true, canRemove: true, displayName: true, connectMessage: "If you are already signed with the federation (eduGAIN) , the system will try to connect to the signed in federation account. Otherwise, please consider to be signed out from the federated acount." },
+		{ id: "egi-aai-sp", source: "egi-aai", name:"Egi AAI", image: "/images/egilogo.png", canAdd: true, canRemove: true, displayName: true, connectMessage: "If you are already signed in EGI AAI the system will try to connect to the signed in account of EGI AAI. Otherwise, please consider to be signed out from EGI AAI." }
+	],
+	egiaai: {
+		idp: 'https://aai.egi.eu/proxy/metadata.php',
+		idptraces: {
+			'https://aai.egi.eu/proxy/metadata': 'egi-aai',
+			'https://aai.egi.eu/proxy/metadata.php': 'egi-aai',
+			'https://aai.egi.eu/google/saml2/idp/metadata.php': 'google',
+			'https://aai.egi.eu/linkedin/saml2/idp/metadata.php': 'linkedin',
+			'https://aai.egi.eu/facebook/saml2/idp/metadata': 'facebook',
+			'https://aai.egi.eu/facebook/saml2/idp/metadata.php': 'facebook',
+			'https://extidp.cesnet.cz/idp/shibboleth': 'elixir',
+			'https://engine.elixir-czech.org/authentication/idp/metadata': 'elixir',
+			'https://engine.elixir-czech.org/authentication/idp/metadata.php': 'elixir',
+			'https://www.egi.eu/idp/shibboleth': 'egi sso',
+			'https://vho.grnet.gr/idp/shibboleth': 'vho'
+		}
+	}
 };
 <?php if ( ApplicationConfiguration::isProductionInstance() === false ) { ?>
 appdb.config.accounts.available.push({ id: "elixir-sp", source: "elixir", name:"Elixir", image: "/images/elixir.png", canAdd: true, canRemove: true, displayName: true, connectMessage: "If you are already signed in Elixir the system will try to connect to the signed in account of Elixir. Otherwise, please consider to be signed out from Elixir." });
-appdb.config.accounts.available.push({ id: "egi-aai-sp", source: "egi-aai", name:"Egi AAI", image: "/images/egilogo.png", canAdd: true, canRemove: true, displayName: true, connectMessage: "If you are already signed in EGI AAI the system will try to connect to the signed in account of EGI AAI. Otherwise, please consider to be signed out from EGI AAI." });
 appdb.config.accounts.available.push({ id: "facebook-sp", source: "facebook", name:"Facebook", image: "/images/social_facebook.png", canAdd: true, canRemove: true, displayName: true, connectMessage: "If you are already signed in Facebook the system will try to connect to the signed in account of Facebook. Otherwise, please consider to be signed out from Facebook." });
 appdb.config.accounts.available.push({ id: "linkedin-sp", source: "linkedin", name:"LinkedIn", image: "/images/social_linkedin.png", canAdd: true, canRemove: true, displayName: true, connectMessage: "If you are already signed in LinkedIn the system will try to connect to the signed in account of LinkedIn. Otherwise, please consider to be signed out from LinkedIn." });
 <?php } ?>

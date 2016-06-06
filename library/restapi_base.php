@@ -1174,7 +1174,19 @@ interface iRestResource {
 	 * @return bool
 	 */
 	public function isCacheable();
-    /**
+  	/**
+	 * function to indicate resource's caching validity time (in seconds) 
+	 *
+	 * @return int 
+	 */
+	public function getCacheLife();
+//  	/**
+//	 * function to set resource's caching validity time (in seconds) 
+//	 *
+//	 * @return int 
+//	 */
+//	public function setCacheLife();
+	/**
      * getter function for internal array of named parameters, set at 
      * construction time
      *
@@ -1266,6 +1278,10 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
 	 * UNIX epoch whence the request was initiated
 	 */
 	protected $_requestTime;
+	/**
+	 * cache validity time, in seconds
+	 */
+	protected $_cacheLife;
 	/**
 	 * UNIX epoch whence the GET/PUT/POST method was called
 	 */
@@ -1570,6 +1586,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
         }
         $this->_error = RestErrorEnum::RE_OK;
 		$this->_extError = null;
+		$this->_cacheLife = 60; // default to 60 seconds
 		$this->_cacheable = false;
 // NOTE: uncomment to re-enable cache
 //		$this->_cacheable = true;
@@ -1598,6 +1615,14 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
 	public function isCacheable() {
 		return $this->_cacheable;
 	}
+
+	public function getCacheLife() {
+		return $this->_cacheLife;
+	}
+
+//	public function setCacheLife($val) {
+//		$this->_cacheLife = val;
+//	}
 
     /**
      * PHP magic property getter function
@@ -1707,32 +1732,50 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
 			$cachefile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '/query_' . get_class($this) . '_' . md5(var_export($this->_pars,true)) . '.xml';
 			//debug_log("checking API cache file '" . $cachefile . "'");
 			if ( file_exists( $cachefile ) && $this->isCacheable() ) {
-				debug_log("serving cached data");
 				$cache = file_get_contents($cachefile);
-				// TODO: remove this code block, and add cache hooks to the RestResource interface which will properly implement
-				// needed actions in subclasses
-				if ((get_class($this) == "RestAppItem") || (get_class($this) == "RestPplItem") || (get_class($this) == "RestBroker")) {
-					$xml = new SimpleXMLElement($cache);
-					foreach ($xml->xpath('//appdb:appdb') as $x) {
-						$cachetime = strval($x->attributes()->cached);
-						if (is_numeric($cachetime)) {
-							if (time() - $cachetime > 60) { // TODO: read min cache time from config (do not hardcode to 1min)
-								$x->attributes()->cached = time();
-								foreach ($x->xpath('//application:application|person:person') as $y) {
-									$hitCount = strval($y->attributes()->hitcount);
-									if (is_numeric($hitCount)) {
-										$y->attributes()->hitcount = $hitCount + 1;
+				// invalidate cache if its life span has been exeeced
+				$xml = new SimpleXMLElement($cache);
+				$maxcachelife = 0;
+				foreach ($xml->xpath('//appdb:appdb') as $x) {
+					$cachetime = strval($x->attributes()->cached);
+					if (is_numeric($cachetime)) {
+						$cachelife = time() - $cachetime;
+						if ($cachelife > $maxcachelife) {
+							$maxcachelife = $cachelife;
+						}
+					}
+				}
+				if ($maxcachelife > $this->getCacheLife()) { // unlink cache file and perform proper query
+					@unlink($cachefile);
+		            $this->_model = $this->getModel();
+			        return new XMLFragmentRestResponse("", $this);
+				} else { // serve existing cache
+					//debug_log("serving cached data");
+					// TODO: remove this code block, and add cache hooks to the RestResource interface which will properly implement
+					// needed actions in subclasses
+					if ((get_class($this) == "RestAppItem") || (get_class($this) == "RestPplItem") || (get_class($this) == "RestBroker")) {
+						$xml = new SimpleXMLElement($cache);
+						foreach ($xml->xpath('//appdb:appdb') as $x) {
+							$cachetime = strval($x->attributes()->cached);
+							if (is_numeric($cachetime)) {
+								if (time() - $cachetime > $this->getCacheLife()) { // TODO: read min cache time from config (do not hardcode to 1min)
+									$x->attributes()->cached = time();
+									foreach ($x->xpath('//application:application|person:person') as $y) {
+										$hitCount = strval($y->attributes()->hitcount);
+										if (is_numeric($hitCount)) {
+											$y->attributes()->hitcount = $hitCount + 1;
+										}
 									}
 								}
 							}
 						}
+						$cache = $xml->asXML();
+						$f = fopen($cachefile, "w");
+						fwrite($f, $cache);
+						fclose($f);
 					}
-					$cache = $xml->asXML();
-					$f = fopen($cachefile, "w");
-					fwrite($f, $cache);
-					fclose($f);
+					return new XMLRestResponse($cache, $this);
 				}
-				return new XMLRestResponse($cache, $this);
 			} else {
 	            $this->_model = $this->getModel();
 		        return new XMLFragmentRestResponse("", $this);

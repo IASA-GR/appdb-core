@@ -272,10 +272,10 @@ if( $browserSupported == false ){
 							<div class="sourcetype edugain-login">
 								<a href="https://<?php echo  $_SERVER['HTTP_HOST']; ?>/saml/saml?source=edugain-sp" class="icontext"><img src="/images/edugain_logo.png" alt=""/><span >Federation (eduGAIN)</span></a>
 							</div>
-							<?php if (ApplicationConfiguration::isProductionInstance() === false ) { ?>
 							<div class="sourcetype egi-aai-login">
 								<a href="https://<?php echo  $_SERVER['HTTP_HOST']; ?>/saml/saml?source=egi-aai-sp" class="icontext"><img src="/images/egilogo.png" alt=""/><span >EGI AAI</span></a>
 							</div>
+							<?php if (ApplicationConfiguration::isProductionInstance() === false ) { ?>
 							<div class="sourcetype elixir-login">
 								<a href="https://<?php echo  $_SERVER['HTTP_HOST']; ?>/saml/saml?source=elixir-sp" class="icontext"><img src="/images/elixir.png" alt=""/><span >Elixir</span></a>
 							</div>

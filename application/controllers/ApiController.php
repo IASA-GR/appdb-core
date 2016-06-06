@@ -153,17 +153,25 @@ class ApiController extends Zend_Controller_Action
     }
 
 	public function latestAction() {
-		$proxy = new AppDBRESTProxy($this->latest);
-		$data = array();
-		$act = $this->getRequest()->getMethod();
-		if ($act === "POST") $data['data'] = $_POST['data'];
-		$uri = preg_replace('/.*\/rest\/*(latest){0,1}\/*/', '', $_SERVER['REQUEST_URI']);
-		//if ($uri === "") $uri .= 'schema';
+		$uri = preg_replace('/\/rest\/*(latest){0,1}\//', '/rest/' . $this->latest . '/', $_SERVER['REQUEST_URI']);
 		if ($uri === "") {
 			header('Location: https://' . $_SERVER['APPLICATION_API_HOSTNAME'] . '/rest/latest/resources');
 		} else {
-			$proxy->request($uri, $act, $data);
+			header('Location: ' . $uri);
 		}
+//		OLD CODE: use proxy instead of re-writting header -- this did not honor cached XML responses via wget for some reason
+//		NOTE: new code might break clients that do not honor redirections
+//		$proxy = new AppDBRESTProxy($this->latest);
+//		$data = array();
+//		$act = $this->getRequest()->getMethod();
+//		if ($act === "POST") $data['data'] = $_POST['data'];
+//		$uri = preg_replace('/.*\/rest\/*(latest){0,1}\/*/', '', $_SERVER['REQUEST_URI']);
+//		//if ($uri === "") $uri .= 'schema';
+//		if ($uri === "") {
+//			header('Location: https://' . $_SERVER['APPLICATION_API_HOSTNAME'] . '/rest/latest/resources');
+//		} else {
+//			$proxy->request($uri, $act, $data);
+//		}
 	}
 
     public function schemaAction() {

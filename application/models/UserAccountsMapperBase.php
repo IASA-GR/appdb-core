@@ -55,6 +55,7 @@ class Default_Model_UserAccountsMapperBase
 		if ( ! isnull($value->getAccountTypeID()) ) $data['account_type'] = $value->getAccountTypeID();
 		if ( ! isnull($value->getAccountname()) ) $data['accountname'] = $value->getAccountname();
 		if ( ! isnull($value->getStateID()) ) $data['stateid'] = $value->getStateID();
+		if ( ! isnull($value->getIDPTrace()) ) $data['idptrace'] = $value->getIDPTrace();
 
 
 		$q1 = 'id = ?';
@@ -84,6 +85,7 @@ class Default_Model_UserAccountsMapperBase
 		$entry->setAccountTypeID($row->account_type);
 		$entry->setAccountname($row->accountname);
 		$entry->setStateID($row->stateid);
+		$entry->setIDPTrace($row->idptrace);
 	}
 
 	public function find($id, Default_Model_UserAccounts &$value)

@@ -1454,7 +1454,7 @@ class FilterParser {
 						$end = '>'.FilterParser::fieldsToXML($fltstr, $base, $n+1).'</filter:field>';
                         break;
 					case("application"):
-						$fltstr = "id:numeric name:string description:string abstract:string registeredon:datetime lastupdated:datetime tool:boolean rating:numeric tag:string validated:boolean owner:numeric addedby:numeric deleted:boolean releasecount:numeric arch:string os:string language:string status:string phonebook:string license:complex published:boolean hypervisor:string osfamily:string imageformat:string metatype:integer";
+						$fltstr = "id:numeric name:string description:string abstract:string registeredon:datetime lastupdated:datetime tool:boolean rating:numeric tag:string validated:boolean owner:numeric addedby:numeric deleted:boolean releasecount:numeric arch:string os:string language:string status:string phonebook:string license:complex published:boolean hypervisor:string osfamily:string imageformat:string metatype:integer sitecount:integer year:integer month:integer day:integer";
 						if ( $base === $i ) {
 							$fltstr = $fltstr." person:complex country:complex middleware:complex vo:complex discipline:complex category:complex";
 						}
@@ -2219,6 +2219,9 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 						break;
 					case "application":
 						switch($fld) {
+						case "sitecount":
+							$fld = "(SELECT vappliance_site_count(###THETABLE###.id))";
+							break;
 						case "published":
 							$val = str_replace("%", "", $val);
 							if (filter_var($val, FILTER_VALIDATE_BOOLEAN)) {
@@ -7414,7 +7417,8 @@ class SamlAuth{
 						"uid" => trim($ua->accountid),
 						"source" => trim($ua->accounttypeid),
 						"name" => trim($ua->accountname),
-						"state" => trim($ua->getState()->name)
+						"state" => trim($ua->getState()->name),
+						"idptrace" => implode("\n", $ua->getIDPTrace())
 					));
 				}
 			}else{
@@ -7584,7 +7588,8 @@ class SamlAuth{
 				"id" => $account->id,
 				"source" => $account->accounttypeid,
 				"uid" => $account->accountid,
-				"name" => $account->accountname
+				"name" => $account->accountname,
+				"idptrace" => implode("\n", $account->getIDPTrace())
 			);
 			//load available user accounts
 			$session->currentUserAccounts = self::getUserAccountsByUser($user->id, true);
@@ -7756,6 +7761,167 @@ class SamlAuth{
 				break;
 		}
 	}
+	//Helper function to create entitlement role mappings
+	//based on appdb ini configuration file
+	public static function getEGIAAIRoleMappings($key) {
+		$res = array();
+		$roles =  explode('\n', ApplicationConfiguration::saml('egiaai.entitlements.' . $key, ''));
+		
+		foreach($roles as $role) {
+			$role = explode('=', $role);
+			if( count($role) <= 1) {
+				continue;
+			}
+			
+			$local = $role[0];
+			$remote = explode(';', $role[1]);
+			
+			if( count($remote) === 0) {
+				continue;
+			}
+		
+			$res = array_merge($res, array_fill_keys($remote, $local));
+		}
+		
+		return $res;
+	}
+	//Helper function to return vo role mapping from EGI AAI entitlements
+	//If no EGI AAI vo role is given it return all of the role mappings
+	//If the given role is not found it returns null.
+	private static function getEGIAAIVORoleMapping($role = null) {
+		$roles = self::getEGIAAIRoleMappings('vo');
+		
+		if( $role === null ) {
+			return $roles;
+		}
+		
+		if( isset($roles[$role]) && trim($roles[$role]) !== "" ) {
+			return $roles[$role];
+		}
+		
+		return null;
+	}
+	//Helper function to return site role mapping from EGI AAI entitlements
+	//If no EGI AAI site role is given it return all of the role mappings
+	//If the given role is not found it returns null.
+	private static function getEGIAAISiteRoleMapping($role = null) {
+		$roles = self::getEGIAAIRoleMappings('site');
+		
+		if( $role === null ) {
+			return $roles;
+		}
+		
+		if( isset($roles[$role]) && trim($roles[$role]) !== "" ) {
+			return $roles[$role];
+		}
+		
+		return null;
+	}
+	//Extracts user entitlements from the saml login response if they exist.
+	//Returns an array with VO memberships and Site roles
+	private static function extractSamlEntitlements($attrs) {
+	  $res = array('vos' => array("members" => array(), "contacts" => array()), 'sites' => array(), 'groups' => array());
+
+	  if( !is_array($attrs) || !isset($attrs['idp:entitlement']) ){
+		return $res;
+	  }
+
+	  $entitlements = $attrs['idp:entitlement'];
+	  foreach( $entitlements as $e ){
+		$matches = array();
+
+		//Check if entitlement specifies a site role
+		//preg_match("/^urn\:(mace\:)?(.*)\:user\-role\:(.*)\:on-entity\:(.*)\:primary\-key:(.*):in\-project:(.*):(.*)$/", $e, $matches);
+		preg_match("/^urn\:(mace\:)?(egi\.eu)\:(goc\.egi\.eu)\:([^\:]*)\:([^\:]*)\:([^\:]*)\@(egi\.eu)$/", $e, $matches);
+		if( count($matches) === 8) {
+			$role = self::getEGIAAISiteRoleMapping($matches[6]);
+			if( $role === null ) {
+				continue;
+			}
+
+			$res['sites'][] = array(
+				'scope' => $matches[2],
+				'source' => $matches[3],
+				'site_key' => $matches[4],
+				'site_name' => $matches[5],
+				'role' => $role
+			);
+			continue;
+		}
+		
+		//Check if entitlement specifies groups
+		//preg_match("/^urn\:(mace\:)?(.*)\:group:(.*)$/", $e, $matches);
+		preg_match("/^urn\:(mace\:)?(egi\.eu)\:(www\.egi\.eu)\:([^\:]*)\:([^\:]*)\@egi\.eu$/", $e, $matches);
+		if( count($matches) === 6) {
+			$res['groups'][] = array(
+				'scope' => $matches[2],
+				'source' => $matches[3],
+				'group' => $matches[4],
+				'role' => $matches[5]
+			);
+			continue;
+		}
+		
+		//Check if entitlement specifies a vo role
+		//preg_match("/^urn\:(mace\:)?(.*)\:vo\:(.*)\:role\:(.*)$/", $e, $matches); 
+		preg_match("/^urn\:(mace\:)?(egi\.eu)\:([^\:]*)\:(.*\:)*([^\:]*)\@(.*)$/", $e, $matches);
+		if( count($matches) === 7 && $matches[6] !== 'egi.eu') {
+		  $scope = $matches[2];
+		  $source = $matches[3];
+		  $group = $matches[4];
+		  $role = self::getEGIAAIVORoleMapping($matches[5]);
+		  $voname = $matches[6];
+		  
+		  if( $role === 'member' ) {
+			$res['vos']['members'][] = array('scope' => $scope, 'source' => $source, 'vo' => $voname, 'group' => $group );
+		  } else if($role !== null) {
+			$res['vos']['contacts'][] = array('scope' => $scope, 'source' => $source, 'vo' => $voname, 'role' => $role, 'group' => $group );
+			$res['vos']['members'][] = array('scope' => $scope, 'source' => $source, 'vo' => $voname, 'group' => $group );
+		  }
+		  continue;
+		}
+	  }
+	  return $res;
+	}
+	
+	//Persist any VO related information from EGI AAI entitlements given for a specific uid in SAML returned attributes
+	private static function updateEGIAAIEntitlements($attrs, $entitlements = array()) {
+		$vocontacts = array();
+		$vomembers = array();
+		$puid = ( isset($attrs["idp:uid"])?$attrs["idp:uid"][0]:"");
+		$email = ( ( isset($attrs["idp:mail"]) === true && count($attrs["idp:mail"]) > 0 )?$attrs["idp:mail"][0]:"" );
+		$firstname = ( ( isset($attrs["idp:givenName"]) === true && count($attrs["idp:givenName"]) > 0 )?$attrs["idp:givenName"][0]:"" );
+		$lastname = ( ( isset($attrs["idp:sn"]) === true && count($attrs["idp:givenName"]) > 0 )?$attrs["idp:sn"][0]:"" );
+		$name = trim($firstname . ' ' . $lastname);
+
+		//Clear any vo contact and membership information regarding given persisted uid
+		db()->query("SELECT clear_egiaai_user_info(?)", array($puid))->fetchAll();
+		
+		//Check if entitlements have VO specific information
+		if($entitlements && isset($entitlements['vos'])) {
+			$voentitlements = $entitlements['vos'];
+
+			//Get extracted vo contatcs from vo entitlements
+			if(isset($voentitlements['contacts'])) {
+				$vocontacts = $voentitlements['contacts'];
+			}
+
+			//Get extracted vo memberships from vo entitlements
+			if(isset($voentitlements['members'])) {
+				$vomembers = $voentitlements['members'];
+			}
+
+			//Update the VO memberships for the given EGI AAI persistend uid.
+			foreach($vomembers as $vomember) {
+				db()->query("SELECT add_egiaai_user_vomember_info(?, ?, ?)", array($puid, $name, $vomember['vo']))->fetchAll();
+			}
+
+			//Update the VO contacts for the given EGI AAI persistend uid.
+			foreach($vocontacts as $vocontact) {
+				db()->query("SELECT add_egiaai_user_vocontact_info(?, ?, ?, ?, ?)", array($puid, $name, $vocontact['vo'], $vocontact['role'], $email))->fetchAll();
+			}
+		}
+	}
 	
 	//Performs actions after successful SAML Authedication
 	//Decides if the authedicated user is a new or an old
@@ -7765,6 +7931,7 @@ class SamlAuth{
 		$attrs = $session->samlattrs;
 		$source = strtolower(trim($session->samlauthsource));
 		$uid = ( isset($attrs["idp:uid"])?$attrs["idp:uid"][0]:"");
+
 		if( trim($uid) == "" ) return false;
 		$accounttype = str_replace("-sp","",$source);
 		
@@ -7783,6 +7950,19 @@ class SamlAuth{
 				$user = self::connectX509ToEgi($session);
 			}
 		}
+
+		if(isset($attrs['idp:traceidp'])) {
+			$session->idptrace = $attrs['idp:traceidp'];
+		} else {
+			$session->idptrace = array();
+		}
+		
+		if(isset($attrs['idp:loa'])) {
+			$session->loa = $attrs['idp:loa'];
+			if(is_array($session->loa) && count($session->loa) > 0) { 
+				$session->loa = $session->loa[0];
+			}
+		}
 		
 		//Create a new dunmmy user account model
 		if( $useraccount === null ){
@@ -7790,13 +7970,16 @@ class SamlAuth{
 			$useraccount->accountid = $uid;
 			$useraccount->accounttypeid = $accounttype;
 			$useraccount->stateid = 1;
+			$useraccount->IDPTrace = $session->idptrace;
 			if( $user !== null ){
 				$useraccount->researcherid = $user->id;
 			}
 		}
 		
 		if( $user!==null && $user->id ){
-			self::harvestSamlData($session, $user);
+			if($accounttype !== 'egi-aai') {
+				self::harvestSamlData($session, $user);
+			}
 			self::setupSamlSession($session, $useraccount, $user);
 			if( $_COOKIE["SimpleSAMLAuthToken"] ){
 				self::setupSamlUserCredentials($user, $session);
@@ -7805,7 +7988,12 @@ class SamlAuth{
 			self::setupSamlNewUserSession($session, $accounttype);
 		}
 		
-		
+		//Store user entitlements
+		$session->entitlements = self::extractSamlEntitlements($attrs);
+		if($accounttype === 'egi-aai') {
+			self::updateEGIAAIEntitlements($attrs, $session->entitlements);
+		}
+
 		//Check if user account is blocked and updates session
 		self::setupUserAccountStatus($session, $useraccount);
 		
@@ -8059,7 +8247,7 @@ class AccountConnect {
 	}
 	
 	//Connect the given profile id to the user account information given
-	public static function connectAccountToProfile($profileid, $id, $type, $name = null){
+	public static function connectAccountToProfile($profileid, $id, $type, $name = null, $idptrace = array()){
 		//Check if this user account is already connected to a profile
 		$user = SamlAuth::getUserByAccountValues($id, $type);
 		if( $user !== null ){
@@ -8071,6 +8259,7 @@ class AccountConnect {
 		$uaccount->accountID = $id;
 		$uaccount->accountTypeID = $type;
 		$uaccount->accountName = $name;
+		$uaccount->IDPTrace = $idptrace;
 		$uaccount->save();
 		
 		$try_count = 0;
@@ -8104,7 +8293,7 @@ class AccountConnect {
 		$paccount->resolvedOn = 'NOW()';
 		$paccount->save();
 		
-		self::connectAccountToProfile( $paccount->researcherid, $paccount->accountID, $paccount->accountType, $paccount->accountName );
+		self::connectAccountToProfile( $paccount->researcherid, $paccount->accountID, $paccount->accountType, $paccount->accountName, $session->idptrace );
 		
 		unset($session->isNewUser);
 		unset($session->accountStatus);

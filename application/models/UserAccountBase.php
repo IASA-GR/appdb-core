@@ -27,6 +27,7 @@ class Default_Model_UserAccountBase
 	protected $_accountType;
 	protected $_accountname;
 	protected $_stateID;
+	protected $_idptrace;
 
 	public function __set($name,$value)
 	{
@@ -165,6 +166,20 @@ class Default_Model_UserAccountBase
 		return $this->_stateID;
 	}
 
+	public function setIDPTrace($value)
+	{
+		/* if ( $value === null ) {
+			$this->_idptrace = 'NULL';
+		} else */ $this->_idptrace = $value;
+		return $this;
+	}
+
+	public function getIDPTrace()
+	{
+		return $this->_idptrace;
+	}
+
+
 	public function setMapper($mapper)
 	{
 		$this->_mapper = $mapper;
@@ -208,6 +223,7 @@ class Default_Model_UserAccountBase
 		if ( ! ($this->_accountType === null) ) $XML .= $this->_accountType->toXML();
 		if ($this->_accountname !== null) $XML .= "<accountname>".recode_string("utf8..xml",$this->_accountname)."</accountname>\n";
 		if ($this->_stateID !== null) $XML .= "<stateID>".$this->_stateID."</stateID>\n";
+		if ($this->_idptrace !== null) $XML .= "<IDPTrace>".$this->_idptrace."</IDPTrace>\n";
 		$XML .= "</UserAccount>\n";
 		return $XML;
 	}

@@ -20,6 +20,32 @@ class VoController extends Zend_Controller_Action
     protected $vofile;
     protected $xml;
 
+	private function makeVAprovidersCache() {
+		$uri = 'https://' . $_SERVER['APPLICATION_API_HOSTNAME'] . '/rest/latest/va_providers?listmode=details';
+		$ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $uri);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		if ( defined('CURLOPT_PROTOCOLS') ) curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);        
+		$headers = apache_request_headers();
+		$h = array();
+		$h["Expect"] = '';
+		if ( isset($headers['Accept-Encoding']) ) $h['Accept-Encoding'] = $headers['Accept-Encoding'];
+		foreach($h as $k => $v) {
+			$h[] = "$k: $v";
+		}
+		$h['Connection']='Keep-Alive';
+		$h['Keep-Alive']='300';
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $h);
+		error_log('VA providers RESTful API XML cache STARTED');
+        $result = curl_exec($ch);
+		curl_close($ch);
+		error_log('VA providers RESTful API XML cache DONE');
+	}
+
     public function init()
     {
         /* Initialize action controller here */
@@ -127,7 +153,57 @@ class VoController extends Zend_Controller_Action
         }
     }
 
-    private function populateVO(&$voentry)
+
+	private function parseDisc($discs, $lvl = 1, $pid = "") {
+		$ds = array();
+		$discs = $discs->xpath("./level" . $lvl);
+		foreach($discs as $disc) {
+			$att = $disc->attributes();
+			$d = array();
+			$d["name"] = strval($att["key"]);
+			db()->setFetchMode(Zend_Db::FETCH_BOTH); 
+			if (($lvl > 1) && ($pid != "")) {
+				$res = db()->query("SELECT * FROM htree('disciplines', '', 0, '') AS h WHERE h.name = ? AND parentid = ? AND h.lvl = ?", array(strval($att["key"]), $pid, $lvl))->fetchAll();
+			} else {
+				$res = db()->query("SELECT * FROM htree('disciplines', '', 0, '') AS h WHERE h.name = ? AND h.lvl = ?", array(strval($att["key"]), $lvl))->fetchAll();
+			}
+			if (count($res) > 0) {
+				$res = $res[0];
+			} else {
+				$res = null;
+			}
+			if ($res != null) {
+				$d["id"] = "".$res["id"];
+				$d["parentid"] = "".$res["parentid"];
+			} else {
+				$d["id"] = "0";
+				$d["parentid"] = "0";
+			}
+			$res = db()->query("SELECT ord FROM disciplines WHERE id = ?", array($d["id"]))->fetchAll();
+			if (count($res) > 0) {
+				$res = $res[0];
+				$d["order"] = "".$res["ord"];
+			} else {
+				$d["order"] = "1";
+			}
+			if ($d["name"] != "") {
+				$ds[] = $d;
+			}
+			if ($lvl < 10) {
+				$_pid = $d["parentid"];
+				if ($_pid == "0") {
+					$_pid = "";
+				}
+				$_vos = $this->parseDisc($disc, $lvl + 1, $_pid);
+				if (count($_vos) > 0) {
+					$ds = array_merge($ds, $_vos);
+				}
+			}
+		}
+		return $ds;
+	}
+
+	private function populateVO(&$voentry)
 	{
 		$vo = new Default_Model_VO2();
 		$att = $voentry->attributes();
@@ -139,22 +215,17 @@ class VoController extends Zend_Controller_Action
 		$discnames = array();
 		$minid = -1;
 		$minname = "Other";
-		$xdiscs = $voentry->xpath("./Disciplines/Discipline");
-		foreach ($xdiscs as $disc) {
-			$dattr = $disc->attributes();
-			$d = array();
-			$d["id"] = strval($dattr["id"]);
-			$d["parentid"] = strval($dattr["parentid"]);
-			$d["order"] = strval($dattr["order"]);
-			$d["name"] = strval($disc);
+		$xdiscs = $voentry->xpath("./Disciplines");
+		$discs = $this->parseDisc($xdiscs[0]);
+		foreach ($discs as $d) {
 			if ($minid == -1 || $minid > $d["id"]) {
 				$minid = $d["id"];
 				$minname = $d["name"];
 			}
 			$discnames[] = $d["name"];
-			$discs[] = $d;
 		}
 		$vo->disciplines = $discs;
+		error_log(var_export($discs, true));
 		$vo->discipline = $minname;
 		$vo->discipline = array("domain" => $voentry->Discipline, "disciplines" => json_encode($discs));
 		if ($vo->discipline == '') $vo->discipline = "Other";
@@ -233,7 +304,7 @@ class VoController extends Zend_Controller_Action
 				if ( trim($data2) != "" ) {
 					$xp = $xml2->xpath("//IDCard");
 					foreach ($xp as $x) {
-						fwrite($f, str_replace('<?xml version="1.0"?'.'>', "", $x->asXML()));
+						fwrite($f, str_replace('<' . '?xml version="1.0"?'.'>', "", $x->asXML()));
 					}
 				}
 				$xp = $xml1->xpath("//IDCard");
@@ -241,7 +312,7 @@ class VoController extends Zend_Controller_Action
 					$xattr = $x->attributes();
 					$xp2 = $xml2->xpath("//IDCard[@Name='" . $xattr["Name"] . "']");
 					if (count($xp2) == 0) {
-						fwrite($f, str_replace('<?xml version="1.0"?'.'>', "", $x->asXML()));
+						fwrite($f, str_replace('<' . '?xml version="1.0"?'.'>', "", $x->asXML()));
 					}
 				}
 				fwrite($f, "\n</VoDump>");
@@ -460,6 +531,8 @@ class VoController extends Zend_Controller_Action
 			$xml2->loadXML($xml, LIBXML_NSCLEAN | LIBXML_COMPACT);
 			$xml = $proc->transformToXml( $xml2 );
 
+/* NOT needed since the EGI OPS VO dump XML schema change
+*
 			// convert sciclass IDs to discipline IDs
 			$xsl = new DOMDocument();
 			db()->setFetchMode(Zend_Db::FETCH_BOTH);
@@ -473,7 +546,7 @@ class VoController extends Zend_Controller_Action
 			$xsltable3 = $xsltable3[0];
 			$xsltable3 = $xsltable3[0];
 			$xsldata = 
-'<?xml version="1.0" encoding="UTF-8"?' . '>
+'<' . '?xml version="1.0" encoding="UTF-8"?' . '>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 	<xsl:output method="xml"/>
 	<xsl:strip-space elements="*" />
@@ -520,7 +593,7 @@ class VoController extends Zend_Controller_Action
 			$xml2 = new DOMDocument();
 			$xml2->loadXML($xml, LIBXML_NSCLEAN | LIBXML_COMPACT);
 			$xml = $proc->transformToXml($xml2);
-
+ */
 			// cache entries
 			@exec("rm ". $this->vofile . ".old");
 			@exec("cp " . $this->vofile . " " . $this->vofile . ".old");
@@ -547,11 +620,11 @@ class VoController extends Zend_Controller_Action
 					if (substr($vd, 0, 4) === "0000") {
 						$vd = null;
 					}
-					$xdiscs = $xvo->xpath("./Disciplines/Discipline");
+					$xdiscs = $xvo->xpath("./Disciplines");
+					$xdiscs = $this->parseDisc($xdiscs[0]);
 					$discs = array();
 					foreach ($xdiscs as $xdisc) {
-						$datt = $xdisc->attributes();
-						$discs[] = trim(strval($datt["id"]));
+						$discs[] = $xdisc["id"];
 					}
 					db()->query("INSERT INTO egiops.vos (name, scope, validated, description, homepage, enrollment, aup, domainname, disciplineid, alias, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, (?)::int[], ?, ?)", array(strtolower(trim($att["Name"])), trim($xvo->Scope), $vd, trim($xvo->Description), trim($xvo->HomepageUrl), trim($xvo->EnrollmentUrl), trim($xvo->AUP), trim($xvo->Discipline), php_to_pg_array($discs, false) ,trim($att["Alias"]), trim($att["Status"])));
 				}
@@ -789,8 +862,8 @@ class VoController extends Zend_Controller_Action
 	}
 
 	public function syncVOMembers() {
-		db()->query("INSERT INTO config (var, data) SELECT 'egi_vo_members_synced', NULL) WHERE NOT EXISTS (SELECT * FROM config WHERE var = 'egi_vo_members_synced')");
-		db()->query("INSERT INTO config (var, data) SELECT 'ebi_vo_members_synced', NULL) WHERE NOT EXISTS (SELECT * FROM config WHERE var = 'ebi_vo_members_synced')");
+		db()->query("INSERT INTO config (var, data) SELECT 'egi_vo_members_synced', NULL WHERE NOT EXISTS (SELECT * FROM config WHERE var = 'egi_vo_members_synced')");
+		db()->query("INSERT INTO config (var, data) SELECT 'ebi_vo_members_synced', NULL WHERE NOT EXISTS (SELECT * FROM config WHERE var = 'ebi_vo_members_synced')");
 		$this->syncEGIVOMembers();
 		$this->syncEBIVOMembers();
 	}
@@ -1256,6 +1329,8 @@ class VoController extends Zend_Controller_Action
 			}
 			db()->query("REFRESH MATERIALIZED VIEW site_services_xml;");
 			error_log("Sync VA Provider Images DONE");
+			$this->makeVAprovidersCache();
+
 		} else {
 			$this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 403 Forbidden");

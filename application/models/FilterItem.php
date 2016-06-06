@@ -371,7 +371,8 @@ class Default_Model_FilterItem {
 				}
 			} else {
 				if ($sanitize) {
-					$s = "'".$val."'";
+					$s = explode(",", $val);
+					$s = "'".implode($s,"', '")."'";
 				} else {
 					$s = $val;
 				}
@@ -423,6 +424,9 @@ class Default_Model_FilterItem {
 	public function expr() {
 		$s = $this->_expr;
 		$s = str_replace($this->_ancestor->_table.".EXTRACT","EXTRACT",$s);
+		$s = str_replace($this->_ancestor->_table.".(SELECT","(SELECT",$s);
+		$s = str_replace("###THETABLE###", $this->_ancestor->_table, $s);
+		debug_log($s);
 		return $s;
 	}
 

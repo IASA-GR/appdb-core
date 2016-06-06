@@ -28,7 +28,8 @@ class Default_Model_ApplicationsFilter extends Default_Model_ApplicationsFilterB
         $this->_fields[] = "lastupdated BETWEEN NOW\(\) - INTERVAL '[0-9]+ (year|month)s{0,1}' AND NOW\(\)";
         $this->_fields[] = "lastupdated BETWEEN NOW() - INTERVAL '".$interval."' AND NOW()";
         $this->_fields[] = "SUBSTRING(applications.name, 1, 1)";
-        $this->_fields[] = "relatedto";
+		$this->_fields[] = "relatedto";
+		$this->_fields[] = "(SELECT vappliance_site_count(###THETABLE###.id))";
         $this->_fields[] = "any.any";
 		$this->_fieldTypes['rank'] = 'integer';
 		$this->_fieldTypes['EXTRACT(YEAR FROM dateadded)'] = 'integer';
@@ -36,7 +37,8 @@ class Default_Model_ApplicationsFilter extends Default_Model_ApplicationsFilterB
 		$this->_fieldTypes['EXTRACT(DAY FROM dateadded)'] = 'integer';
         $this->_fieldTypes['keywords'] = 'string[]';
         $this->_fieldTypes["lastupdated BETWEEN NOW() - INTERVAL '".$interval."' AND NOW()"] = 'boolean';
-        $this->_fieldTypes["SUBSTRING(applications.name, 1, 1)"] = 'string';
+		$this->_fieldTypes["SUBSTRING(applications.name, 1, 1)"] = 'string';
+		$this->_fieldTypes["(SELECT vappliance_site_count(###THETABLE###.id))"] = 'integer';
         $this->_fieldTypes["any.any"] = 'string';
         $this->_fieldTypes["relatedto"] = 'string';
         $this->_fieldTypes["lastupdated BETWEEN NOW\(\) - INTERVAL '[0-9]+ (year|month)s{0,1}' AND NOW\(\)"] = 'string';

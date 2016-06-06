@@ -13949,19 +13949,43 @@ appdb.views.ConnectedAccountsItem = appdb.ExtendClass(appdb.View, "appdb.views.C
 		}
 		$(this.options.dom.actions).append(a);
 	};
+	this.getIdpTrace = function(traces) {
+		traces = ((typeof traces === 'string') ? traces.split('\n') : traces);
+		traces = ($.isArray(traces) ? traces : [traces]);
+		traces = $.grep(traces, function(t) { return $.trim(t) !== ''; });
+		var trace = '';
+		var spmap = appdb.config.accounts.egiaai.idptraces || {};
+
+		if (traces.length > 1 && spmap[traces[0]] === 'egi-aai') {
+			trace = $.trim(traces[traces.length -1]);
+		} else if (traces.length > 0) {
+			trace = $.trim(traces[0]);
+		}
+		
+		if (trace !== '' && $.trim(spmap[trace]) !== '') {
+			trace = $.trim(spmap[trace]);
+		}
+		
+		return trace;
+	};
 	this.renderContent = function() {
 		var d = this.options.data;
 		var name = $("<span class='name'></span>");
 		var uid = $("<span class='uid'></span>");
+		var trace = this.getIdpTrace(d.idptrace || '');
+		if(trace !== '' && $.trim(d.source).toLowerCase() === "egi-aai") {
+			trace = ' (' + trace + ')';
+		} else {
+			trace = '';
+		}
 
-
-		$(uid).text($.trim(d.uid));
+		$(uid).text($.trim(d.uid) + trace);
 		$(name).text($.trim(d.name));
 		if ($.trim(d.name) !== "" && this.options.meta.displayName === true) {
 			if ($.trim(d.source).toLowerCase() === "edugain") {
 				$(uid).text(" (" + $(uid).text() + ")");
 			} else {
-				$(uid).text("");
+				$(uid).text(trace);
 			}
 		} else {
 			$(name).text("");
@@ -14067,7 +14091,19 @@ appdb.views.ConnectedAccountTypeListItem = appdb.ExtendClass(appdb.View, "appdb.
 			$(this.dom).append("<div class='empty'><div class='message'>No connected " + this.options.meta.name + " accounts found.</div></div>");
 		}
 	};
+	this.canRenderActions = function() {
+		return !(
+			this.options.meta &&
+			this.options.meta.source === 'egi-aai' &&
+			appdb.config.deploy.instance === 'production' &&
+			window.userCurrentAccount &&
+			window.userCurrentAccount.source === 'egi-aai'
+		);
+	};
 	this.renderActions = function() {
+		if (this.canRenderActions() === false) {
+			return;
+		}
 		$(this.options.dom.actions).empty();
 		if (this.isEmpty() === false && ($.trim(samlLoginSourceType).toLowerCase() === "x509" || this.options.meta.id === "x509-sp"))
 			return;

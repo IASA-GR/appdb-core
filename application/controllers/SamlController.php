@@ -282,12 +282,13 @@ class SamlController extends Zend_Controller_Action
 		$userFirstName = ( ( isset($attributes["idp:givenName"]) === true && count($attributes["idp:givenName"]) > 0 )?$attributes["idp:givenName"][0]:"" );
 		$userLastName = ( ( isset($attributes["idp:sn"]) === true && count($attributes["idp:givenName"]) > 0 )?$attributes["idp:sn"][0]:"" );
 		$userFullName = trim($userFirstName . " " . $userLastName);
+		$idptrace = ( ( isset($attributes["idp:traceidp"]) === true && count($attributes["idp:traceidp"]) > 0 )?$attributes["idp:traceidp"]:array() );
 		if( $userFullName === "" ){
 			$userFullName = null;
 		}
 
 		//Do the account connection
-		AccountConnect::connectAccountToProfile($this->session->userid, $uid, $authsource, $userFullName);
+		AccountConnect::connectAccountToProfile($this->session->userid, $uid, $authsource, $userFullName, $idptrace);
 
 		//Update connected user accounts
 		$this->session->currentUserAccounts = SamlAuth::getUserAccountsByUser($this->session->userid, true);
@@ -582,11 +583,19 @@ class SamlController extends Zend_Controller_Action
 			$cont->save();
 		}
 		
+		//extract IDP Trace in case it is returned from SAML
+		$attrs = $this->session->samlattrs;
+		$idptrace = array();
+		if(isset($attrs['idp:traceidp']) && is_array($attrs['idp:traceidp'])) {
+			$idptrace = $attrs['idp:traceidp'];
+		}
+		
 		//Save user account
 		$useraccount = new Default_Model_UserAccount();
 		$useraccount->researcherid = $entry->id;
 		$useraccount->accountid = $this->session->authUid;
 		$useraccount->accounttypeid = str_replace("-sp","",$this->session->authSource);
+		$useraccount->IDPTrace = $idptrace;
 		$useraccount->save();
 		
 		//Save user relations (organization)
@@ -834,7 +843,34 @@ class SamlController extends Zend_Controller_Action
 			$res = "1";
 			if( isset($_GET['profile']) && $_GET['profile'] === 'attributes' && $this->isAllowedProfileDataDomain()) {
 				header('Content-type: application/json');
-				echo json_encode($source->getAttributes());
+				$attrs = $source->getAttributes();
+				if ($attrs && count($attrs) > 0) {
+					$sourceIdentifier = false;
+					$uid = false;
+					$userAccount = false;
+					try {
+						if (isset($attrs['idp:sourceIdentifier']) && count($attrs['idp:sourceIdentifier']) === 1) {
+							$sourceIdentifier = $attrs['idp:sourceIdentifier'][0];
+							$sourceIdentifier = str_replace('-sp', '', $sourceIdentifier);
+						}
+
+						if (isset($attrs['idp:uid']) && count($attrs['idp:uid']) === 1) {
+							$uid = $attrs['idp:uid'][0];
+						}
+
+						if ($sourceIdentifier && $uid) {
+							$userAccount = SamlAuth::getUserAccount($uid, $sourceIdentifier);
+						}
+
+						if ($userAccount) {
+							$attrs['entitlements'] = array('vo' => array('memberships' => VoAdmin::getUserMembership($userAccount->researcherid)));
+						}
+					}catch(Exception $ex) {
+						
+					}
+				}
+
+				echo json_encode($attrs);
 				return;
 			}
 		}
