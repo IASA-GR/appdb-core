@@ -27,6 +27,10 @@ Author: wvkarag@lovecraft.priv.iasa.gr
 
 START TRANSACTION;
 
+-- Function: va_provider_to_xml_ext(text)
+
+-- DROP FUNCTION va_provider_to_xml_ext(text);
+
 CREATE OR REPLACE FUNCTION va_provider_to_xml_ext(mid text)
   RETURNS SETOF xml AS
 $BODY$
@@ -136,13 +140,12 @@ SELECT
 			INNER JOIN vmiflavours ON vmiflavours.id = vmiinstances.vmiflavourid
 			INNER JOIN vmis ON vmis.id = vmiflavours.vmiid
 			INNER JOIN vapplications ON vapplications.id = vmis.vappid
-			INNER JOIN vapp_versions ON vapp_versions.vappid = vapplications.id AND vapp_versions.published
+			INNER JOIN vapplists ON vapplists.vmiinstanceid = va_provider_images.vmiinstanceid
+			INNER JOIN vapp_versions ON vapp_versions.id = vapplists.vappversionid
 			INNER JOIN applications ON applications.id = vapplications.appid
-
 			LEFT OUTER JOIN vowide_image_list_images ON vowide_image_list_images.id = va_provider_images.vowide_vmiinstanceid
 			LEFT OUTER JOIN vowide_image_lists ON vowide_image_lists.id = vowide_image_list_images.vowide_image_list_id
-			LEFT OUTER JOIN vos ON vos.id = vowide_image_lists.void
-			
+			LEFT OUTER JOIN vos ON vos.id = vowide_image_lists.void			
 			WHERE va_provider_id = va_providers.id AND ((
 				vowide_image_lists.state IN ('published'::e_vowide_image_state, 'obsolete'::e_vowide_image_state)
 			) OR (
