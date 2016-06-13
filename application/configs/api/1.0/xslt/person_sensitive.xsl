@@ -42,7 +42,7 @@ xmlns:application="http://appdb.egi.eu/api/1.0/application">
 				<xsl:attribute name="protected">
 					<xsl:value-of select="'true'"/>
 				</xsl:attribute>
-                <xsl:value-of select="concat('http://',//appdb:appdb/@host,'/texttoimage/personcontact?id=',@id)"/>
+                <xsl:value-of select="concat('https://',//appdb:appdb/@host,'/texttoimage/personcontact?id=',@id)"/>
 			</xsl:copy>
 		</xsl:when>
 		<xsl:otherwise>
