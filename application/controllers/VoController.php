@@ -1332,6 +1332,7 @@ class VoController extends Zend_Controller_Action
 				}
 			}
 			db()->query("REFRESH MATERIALIZED VIEW site_services_xml;");
+			db()->query("REFRESH MATERIALIZED VIEW site_service_images_xml;");
 			error_log("Sync VA Provider Images DONE");
 			$this->makeVAprovidersCache();
 
