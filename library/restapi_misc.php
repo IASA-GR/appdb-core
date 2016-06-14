@@ -973,7 +973,7 @@ class RestVAProvidersList extends RestROResourceList {
      */
 	protected function init() {
 		parent::init();
-		$this->_cacheLife = 600; // ten minutes
+		$this->_cacheLife = 900; // 15 minutes
 		$this->_cacheable = true;
 	}
 

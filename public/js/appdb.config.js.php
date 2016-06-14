@@ -122,7 +122,7 @@ appdb.config.accounts = {
 		{ id: "egi-sso-ldap-sp", source: "egi-sso-ldap", name: "EGI SSO", image: "/images/egilogo.png", canAdd: true, canRemove: true, connectMessage: "" },
 		{ id: "x509-sp", source: "x509", name:"X509 Digital Certificate", image: "/images/certificate.png", canAdd: true, canRemove: true, connectMessage: "" },
 		{ id: "edugain-sp", source: "edugain", name:"Federation (eduGAIN)", image: "/images/edugain_logo.png", canAdd: true, canRemove: true, displayName: true, connectMessage: "If you are already signed with the federation (eduGAIN) , the system will try to connect to the signed in federation account. Otherwise, please consider to be signed out from the federated acount." },
-		{ id: "egi-aai-sp", source: "egi-aai", name:"Egi AAI", image: "/images/egilogo.png", canAdd: true, canRemove: true, displayName: true, connectMessage: "If you are already signed in EGI AAI the system will try to connect to the signed in account of EGI AAI. Otherwise, please consider to be signed out from EGI AAI." }
+		{ id: "egi-aai-sp", source: "egi-aai", name:"EGI AAI", image: "/images/egilogo.png", canAdd: true, canRemove: true, displayName: true, connectMessage: "If you are already signed in EGI AAI the system will try to connect to the signed in account of EGI AAI. Otherwise, please consider to be signed out from EGI AAI." }
 	],
 	egiaai: {
 		idp: 'https://aai.egi.eu/proxy/metadata.php',

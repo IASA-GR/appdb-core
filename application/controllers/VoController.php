@@ -160,6 +160,9 @@ class VoController extends Zend_Controller_Action
 
 	private function parseDisc($discs, $lvl = 1, $pid = "") {
 		$ds = array();
+		if (!$discs) {
+			return $ds;
+		}
 		$discs = $discs->xpath("./level" . $lvl);
 		foreach($discs as $disc) {
 			$att = $disc->attributes();
