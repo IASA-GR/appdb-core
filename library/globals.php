@@ -1653,10 +1653,14 @@ class FilterParser {
 			}
 			$hackFlagAny = false;
 			if ($obj == '') {
-				if ( $prop == '' ) {
+				//if ( $prop == '' ) {
+				// DISABLE "any.any" as default context; instead, use "SEARCH_TAGET.any"
+				if ( false ) {
 					$hackFlagAny = true;
-					$obj = $prop = "any";
+					$obj = "any";
+					$prop = "any";
 				} else {
+					$prop = "any";
 					switch ($mode) {
 						case (FilterParser::NORM_APP):
                             switch ($prop) {
