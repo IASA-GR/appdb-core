@@ -1653,10 +1653,16 @@ class FilterParser {
 			}
 			$hackFlagAny = false;
 			if ($obj == '') {
-				if ( $prop == '' ) {
+				//if ( $prop == '' ) {
+				// DISABLE "any.any" as default context; instead, use "SEARCH_TAGET.any"
+				if ( false ) {
 					$hackFlagAny = true;
-					$obj = $prop = "any";
+					$obj = "any";
+					$prop = "any";
 				} else {
+					if (trim($prop) == "") {
+						$prop = "any";
+					};
 					switch ($mode) {
 						case (FilterParser::NORM_APP):
                             switch ($prop) {
@@ -1740,6 +1746,9 @@ class FilterParser {
                             break;
 					}
 				}
+			}
+			if ($prop == $obj) {
+				$prop = "any";
 			}
 			if ( ($obj == "any") && ( $prop != "any" ) ) {
 				$error = 'Grammar error. Invalid property ` '.$prop.' \' for specifier ` any \' at keyword '.($argi+1).".";

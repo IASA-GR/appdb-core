@@ -29,7 +29,7 @@ CREATE OR REPLACE FUNCTION clear_egiaai_user_info(
 $$
 BEGIN
 	DELETE FROM egiaai.vo_members WHERE egiaai.vo_members.puid = $1;
-	DELETE FROM egiaai.vo_contact WHERE egiaai.vo_members.puid = $1;
+	DELETE FROM egiaai.vo_contacts WHERE egiaai.vo_contacts.puid = $1;
 END
 $$ LANGUAGE plpgsql VOLATILE;
 ALTER FUNCTION clear_egiaai_user_info(text) OWNER TO appdb;
