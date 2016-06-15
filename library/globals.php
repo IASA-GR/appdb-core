@@ -5551,6 +5551,7 @@ class VMCaster{
 		}
 	}
 	public static function getSitesByVMI($guid,$id){
+		db()->setFetchMode(Zend_Db::FETCH_BOTH);
 		$sql = "SELECT distinct sites.id AS site_id, 
 				sites.name AS site_name, 
 				sites.officialname AS site_officialname, 
