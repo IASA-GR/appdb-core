@@ -9583,8 +9583,15 @@ appdb.components.VapplianceResourceProviders = appdb.ExtendClass(appdb.Component
 		if( app.vo ){
 			app.vo = app.vo || [];
 			app.vo = $.isArray(app.vo)?app.vo:[app.vo];
+			var foundVOs = {};
 			$.each(app.vo, function(i,e){
+				foundVOs[e.id] = true;
 				vos.push($.extend(true,{},e));
+			});
+			$.each(this.options.vos, function(i,e){
+				if(typeof foundVOs[e.id] === 'undefined') {
+					vos.push({id: e.id, name: e.name});
+				}
 			});
 		}
 		vos.sort(function(a,b){
@@ -9732,7 +9739,8 @@ appdb.components.VapplianceResourceProviders = appdb.ExtendClass(appdb.Component
 				$.each(e.provider, function(ii, ee){
 					if( ee.in_production === "false" ) return;
 					var pvoid = (typeof ee["void"] ==="undefined")?"-":$.trim(ee["void"]);
-					vos[pvoid] = vos[pvoid] || {id:pvoid, providers:{}};
+					var pvoname = (typeof ee["voname"] === "undefined")?"-":$.trim(ee["voname"]);
+					vos[pvoid] = vos[pvoid] || {id:pvoid, name: pvoname, providers:{}};
 					var pdata = self.getProvider(ee.provider_id);
 					var imgs = (pdata && vos[pvoid].providers[pdata.id] && vos[pvoid].providers[pdata.id].images )?vos[pvoid].providers[pdata.id].images:{};
 					if( pdata !== null ){
