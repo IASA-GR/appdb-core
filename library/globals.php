@@ -1661,6 +1661,7 @@ class FilterParser {
 					$prop = "any";
 				} else {
 					if (trim($prop) == "") {
+						$hackFlagAny = true;
 						$prop = "any";
 					};
 					switch ($mode) {
