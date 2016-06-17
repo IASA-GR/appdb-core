@@ -94,6 +94,7 @@ appdb.config = {
 		"swappliance.permissions.fullcontrol": "main:guides:general:permissions_guide#full_control",
 	},
 	features:{
+	"logistics": true,
 	"groupvaprovidertemplates": true,
 	"swappliance": <?php echo ( ( Supports::swappliance() )?"true":"false"); ?>,
 	"singleVMIPolicy": <?php echo ( ( Supports::singleVMIPolicy() )?"true":"false"); ?>,

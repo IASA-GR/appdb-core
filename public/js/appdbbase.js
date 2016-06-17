@@ -300,6 +300,9 @@ appdb.components.LogisticsSelector = appdb.ExtendClass(appdb.Component, "appdb.c
 		d = d || {};
 		$(this.dom).empty();
 		$(this.options.dom.list).empty();
+		if ( appdb.config.features.logistics === false ) {
+			return;
+		}
 		$(this.dom).append(this.options.dom.list);
 		var maxDisplayItems = this.getMaxDisplayedItems();
 		var moreItems = [];
@@ -350,6 +353,9 @@ appdb.components.LogisticsSelector = appdb.ExtendClass(appdb.Component, "appdb.c
 	this.load = function(flt,exclude){
 		exclude = exclude || [];
 		exclude = $.isArray(exclude)?exclude:[exclude];
+		if ( appdb.config.features.logistics === false ) {
+			return;
+		}
 		if( this._model === null ){
 			this.publish({event: "load", value: {} });
 			return;
