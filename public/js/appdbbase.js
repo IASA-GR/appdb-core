@@ -360,10 +360,20 @@ appdb.components.LogisticsSelector = appdb.ExtendClass(appdb.Component, "appdb.c
 			this.publish({event: "load", value: {} });
 			return;
 		}
+		if (typeof this.options.currentFlt !== 'undefined' && this.options.currentFlt == $.trim(flt)) {
+			if (this.options.isLoading === false) {
+				this.publish({event: "load", value: this.options.currentLogs || {}});
+			} else {
+				this.publish({event: 'beforeload', value: this.options.currentLogs});
+			}
+			return;
+		}
+		this.options.currentFlt = $.trim(flt);
 		this.abort();
 		this._model.Obs.clearAll();
 		this._model.subscribe({event: "beforeselect", callback: function(v){
 				this.renderLoading(true);
+				this.options.isLoading = true;
 				this.publish({event: "beforeload", value:true});
 		}, caller: this});
 		this._model.subscribe({event: "select", callback: function(v){
@@ -411,7 +421,9 @@ appdb.components.LogisticsSelector = appdb.ExtendClass(appdb.Component, "appdb.c
 					if( this.getMetaData(i,"display") ){
 						logs[i] = v.logistics[i];
 					}
-				}				
+				}			
+				this.options.isLoading=false;
+				this.options.currentLogs = logs;
 				this.publish({event: "load", value: logs});
 		},caller: this});
 		if( $.trim(flt) === "" ){
@@ -1516,7 +1528,7 @@ appdb.components.Applications = appdb.ExtendClass(appdb.Component,"appdb.compone
 		appdb.debug("[DEBUG] Applications Fetch: " + query.flt);
         this._model.subscribe({event:"beforeselect",callback:function(){
                 this.views.loading.show();
-				this.views.logistics.abort();
+				//this.views.logistics.abort();
 				this.views.managedFilter.setLoading(true);
 				appdb.pages.application.reset(true);
             },caller:this});
