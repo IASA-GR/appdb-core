@@ -1167,6 +1167,8 @@ appdb.utils.Pager = function(opts){
         _mediator.publish({event : 'error' , value : d});
     };
     var _gotoPage = function(n){
+        appdb.pages.index.requests.cancel("paging");
+        appdb.pages.index.requests.register(o.model, "paging");
         _calcPageOffset(n);
         o.model.get(_buildPageQuery(o.length,o.offset));
     };
