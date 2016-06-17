@@ -431,6 +431,8 @@ appdb.components.LogisticsSelector = appdb.ExtendClass(appdb.Component, "appdb.c
 			}
 			
 		}
+		appdb.pages.index.requests.cancel("logistics");
+		appdb.pages.index.requests.register(this._model, "logistics");
 		this._model.get(modelopts);
 	};
 	this.getDefaultMetaData = function(prop){
@@ -12315,6 +12317,7 @@ appdb.views.Main = (function(){
 					appdb.views.Main.isTerminalItem(false);
 				}
 			}
+			appdb.pages.index.requests.cancel('logistics');
 			f.apply(null,argv);
 			window.scroll(0,0);
 			var evtype = (ev && ev.type)?ev.type:"";
