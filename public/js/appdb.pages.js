@@ -270,9 +270,11 @@ appdb.pages.reset = function(){
 			}
 		}
 	}
+	appdb.pages.index.requests.reset();
 };
 appdb.pages.index = (function(){
 	var page = {};
+	page.requests = new appdb.utils.RequestPool("index");
 	page.initCodeInbox = function(){
 		if(!userID) return;
 		window.getUnreadMsgCount = function(){
