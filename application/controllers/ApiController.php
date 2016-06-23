@@ -189,6 +189,140 @@ class ApiController extends Zend_Controller_Action
     }
 
 	public function proxyAction() {
+		$apiroutes = new SimpleXMLElement(APPLICATION_PATH . "/apiroutes.xml", 0, true);
+		$pars = array();
+		$postdata = null;
+		$method = strtolower($this->getRequest()->getMethod());
+		$error = null;
+		$extError = null;
+		if ($method === "post") {
+			$postdata = $_POST['data'];
+			if( isset($_POST['resource']) && trim($_POST['resource']) === "broker"){
+				if ($this->session->isLocked()) {
+					$this->session->unLock();
+				}
+				session_write_close();
+			}
+			$res = $_POST['resource'];
+		} else {
+			$res = $this->_getParam("resource");
+		}
+		debug_log("RES = " . var_export($res, true));
+		$url = preg_replace('/\?.*/', '', $res);
+		$qs = explode("&", preg_replace('/.*\?/', '', $res));
+		$rx = RestBroker::matchResource($url, $apiroutes, $pars);
+		debug_log("RX = " . var_export($rx, true));
+		foreach ($qs as $q) {
+			$i = explode("=", $q);
+			if (count($i) > 1) {
+				$pars[$i[0]] = urldecode($i[1]);
+			}
+		}
+		if (! is_null($postdata)) {
+			$pars['data'] = $postdata;
+		}
+		$routeXslt = null;
+		switch(strtolower($method)) {
+			case "get":
+				$method = RestMethodEnum::RM_GET;
+				break;
+			case "put":
+				$method = RestMethodEnum::RM_PUT;
+				break;
+			case "post":
+				$method = RestMethodEnum::RM_POST;
+				break;
+			case "delete":
+				$method = RestMethodEnum::RM_DELETE;
+				break;
+			case "options":
+				$method = RestMethodEnum::RM_OPTIONS;
+				break;
+			default:
+				$method = RestMethodEnum::RM_GET;
+				break;
+		}
+
+		$ret = "";
+		if ( ! is_null($rx) ) {
+			try {
+				$resclass = strval($rx->resource);
+				$this->session = new Zend_Session_Namespace('default');
+				if ( isset($_SERVER['REMOTE_ADDR']) && ($_SERVER['REMOTE_ADDR'] != '') ) {
+					$src = base64_encode($_SERVER['REMOTE_ADDR']);
+				} else {
+					$src = '';
+				}
+				$pars['src'] = $src;
+				$apikey = $userid = $passwd = '';
+				if ( $this->session->userid !== null ) {
+					$userid = $this->session->userid;
+					if (isset($_COOKIE['SimpleSAMLAuthToken'])) {
+						$passwd = $_COOKIE['SimpleSAMLAuthToken'];
+					} else {
+						error_log("Warning: auth token cookie ('SimpleSAMLAuthToken') is undefined!");
+					}
+					$apiconf = Zend_Registry::get("api");
+					$apikey = $apiconf["key"];
+				}
+				$pars['userid'] = $userid;
+				$pars['passwd'] = $passwd;
+				$pars['apikey'] = $apikey;
+				$pars['sessionid'] = session_id();
+				$pars['cid'] = 0;
+				debug_log("PARS = " . var_export($pars, true));
+				$res = new $resclass($pars);
+				$fmt = $rx->xpath("format");
+				if ( count($fmt) > 0 ) {
+					foreach ( $fmt as $f ) {
+						if ( strval($f) === "xml" ) {
+							if ( strval($f->attributes()->xslt) != '' ) $routeXslt = strval($f->attributes()->xslt);
+							break;
+						}
+					}
+				}
+			} catch (Exception $e) {
+				$error = RestErrorEnum::RE_INVALID_REPRESENTATION;
+				$extError = "Could not instantiate REST resource for request `" . $res . "'";
+				$this->getResponse()->clearAllHeaders();
+				$this->getResponse()->setRawHeader("HTTP/1.0 400 Bad Request");
+				$this->getResponse()->setHeader("Status","400 Bad Request");
+				error_log($error . '\n' . $extError);
+				echo $error . '\n' . $extError;
+				return;
+			}
+		} else {
+			$error = RestErrorEnum::RE_INVALID_REPRESENTATION;
+			$extError = "Could not resolve REST resource for request `" . $res . "'";
+			$this->getResponse()->clearAllHeaders();
+			$this->getResponse()->setRawHeader("HTTP/1.0 400 Bad Request");
+			$this->getResponse()->setHeader("Status","400 Bad Request");			
+			error_log($error . '\n' . $extError);
+			echo $error . '\n' . $extError;
+			return;
+		}	
+		$s_method = strtolower(RestMethodEnum::toString($method));
+		$_res = $res->$s_method();
+		if ( $_res !== false ) {
+			if ( $_res->isFragment() ) {
+				$res = $_res->finalize();
+			} else {
+				$res = $_res;
+			}
+			if ( ! is_null($routeXslt) ) $res = $res->transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).$routeXslt);
+			echo $res;
+		} else {
+			$error = $res->getError();
+			$extError = $res->getExtError();
+			$this->getResponse()->clearAllHeaders();
+			$this->getResponse()->setRawHeader("HTTP/1.0 400 Bad Request");
+			$this->getResponse()->setHeader("Status","400 Bad Request");
+			error_log($error . '\n' . $extError);
+			echo $error . '\n' . $extError;		
+		}
+	}
+
+	public function oldproxyAction() {
 		$ver = $this->_getParam("version");
 		if ((!isset($ver)) || (trim($ver) == "")) $ver = 'latest';
 		$proxy = new AppDBRESTProxy($ver);

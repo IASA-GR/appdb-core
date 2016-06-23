@@ -616,7 +616,7 @@ class RestBroker extends RestResourceList {
         return $options;
 	}
 
-	private function matchResource($res, $apiroutes, &$pars) {
+	public static function matchResource($res, $apiroutes, &$pars) {
 		$ret = null;
 		$routes = $apiroutes->xpath("route");
 		if ( count($routes) > 0 ) {
@@ -727,7 +727,7 @@ class RestBroker extends RestResourceList {
 				if ( $res != '' ) {
 					if ( substr($res, 0, 1) == "/" ) $res = substr($res, 1);
 					$pars = array();
-					$rx = $this->matchResource($res, $apiroutes, $pars);
+					$rx = RestBroker::matchResource($res, $apiroutes, $pars);
 					if ( ! is_null($rx) ) {
 						try {
 							$resclass = strval($rx->resource);
