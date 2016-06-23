@@ -28,31 +28,6 @@ DROP MATERIALIZED VIEW site_service_images_xml;
 DROP VIEW va_provider_images;
 ALTER TABLE __va_provider_images RENAME TO va_provider_images;
 
-CREATE OR REPLACE FUNCTION good_vmiinstanceid(va_provider_images)
-  RETURNS integer AS
-$BODY$
-	SELECT get_good_vmiinstanceid($1.vmiinstanceid)
-$BODY$
-LANGUAGE sql VOLATILE
-  COST 100;
-
-/*CREATE OR REPLACE FUNCTION good_vmiinstanceid(va_provider_images)
-  RETURNS integer AS
-$BODY$
-SELECT CASE WHEN goodid IS NULL THEN $1.vmiinstanceid ELSE goodid END FROM (
-        SELECT max(t1.id) as goodid FROM vmiinstances AS t1
-        INNER JOIN vmiinstances AS t2 ON t1.checksum = t2.checksum AND t1.guid = t2.guid AND t2.id = $1.vmiinstanceid
-        INNER JOIN vapplists ON t1.id = vapplists.vmiinstanceid
-        INNER JOIN vapp_versions ON vapplists.vappversionid = vapp_versions.id 
-        WHERE vapp_versions.published
-) AS t
-$BODY$
-  LANGUAGE sql VOLATILE
-  COST 100;
-ALTER FUNCTION good_vmiinstanceid(va_provider_images)
-  OWNER TO appdb;
-*/
-
 CREATE MATERIALIZED VIEW site_services_xml
 AS 
  SELECT va_providers.sitename,
@@ -384,6 +359,229 @@ SELECT COUNT(p.sitename)::INTEGER FROM (
         GROUP BY vp.sitename
 ) AS p
 $_$;
+
+-- Function: count_site_matches(text, text, boolean)
+
+-- DROP FUNCTION count_site_matches(text, text, boolean);
+
+CREATE OR REPLACE FUNCTION count_site_matches(
+    itemname text,
+    cachetable text,
+    private boolean DEFAULT false)
+  RETURNS SETOF record AS
+$BODY$
+DECLARE q TEXT;
+DECLARE allitems INT;
+BEGIN
+	IF itemname = 'country' THEN
+		q := 'SELECT countries.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, countries.id AS count_id FROM ' || cachetable || ' AS sites LEFT JOIN countries ON countries.id = sites.countryid';
+	ELSIF itemname = 'discipline' THEN
+		q := 'SELECT disciplines.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, disciplines.id AS count_id FROM ' || cachetable || ' AS sites LEFT JOIN va_providers ON va_providers.sitename = sites.name
+		LEFT JOIN va_provider_images AS va_provider_images ON va_provider_images.va_provider_id = va_providers.id
+		LEFT JOIN vaviews ON vaviews.vmiinstanceid = va_provider_images.vmiinstanceid
+		LEFT JOIN applications ON applications.id = vaviews.appid
+		LEFT JOIN appdisciplines ON appdisciplines.appid = applications.id
+		LEFT JOIN disciplines ON disciplines.id = appdisciplines.disciplineid';
+		-- q := 'SELECT disciplines.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, disciplines.id AS count_id FROM ' || cachetable || ' AS sites' || CASE WHEN NOT private THEN ' LEFT JOIN app_vos ON app_vos.appid = applications.id LEFT JOIN vos ON vos.id = app_vos.void AND vos.deleted IS FALSE' ELSE '' END || ' LEFT JOIN appdisciplines ON appdisciplines.appid = applications.id LEFT JOIN disciplines ON disciplines.id = appdisciplines.disciplineid' || CASE WHEN NOT private THEN ' OR disciplines.id = vos.domainid' ELSE '' END;
+	ELSIF itemname = 'category' THEN
+		q := 'SELECT categories.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, categories.id AS count_id
+		FROM ' || cachetable || ' AS sites LEFT JOIN va_providers ON va_providers.sitename = sites.name LEFT JOIN va_provider_images AS va_provider_images ON va_provider_images.va_provider_id = va_providers.id
+		LEFT JOIN vaviews ON vaviews.vmiinstanceid = va_provider_images.vmiinstanceid LEFT JOIN applications ON applications.id = vaviews.appid LEFT JOIN categories ON categories.id = ANY(applications.categoryid)';
+		--q := 'SELECT categories.name::TEXT AS count_text, COUNT(DISTINCT applications.id) AS count, categories.id AS count_id FROM ' || cachetable || ' AS applications LEFT JOIN categories ON categories.id = ANY(applications.categoryid)';
+	ELSIF itemname = 'arch' THEN
+		q := 'SELECT archs.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, archs.id AS count_id FROM ' || cachetable || ' AS sites LEFT JOIN va_providers ON va_providers.sitename = sites.name
+		LEFT JOIN va_provider_images AS va_provider_images ON va_provider_images.va_provider_id = va_providers.id
+		LEFT JOIN vaviews ON vaviews.vmiinstanceid = va_provider_images.vmiinstanceid
+		LEFT JOIN applications ON applications.id = vaviews.appid
+		LEFT JOIN vapplications ON vapplications.appid = applications.id
+		LEFT JOIN vapp_versions ON vapp_versions.vappid = vapplications.id AND published AND enabled AND NOT archived AND status = ''verified''
+		LEFT JOIN vmis ON vmis.vappid = vapplications.id
+		LEFT JOIN vmiflavours ON vmiflavours.vmiid = vmis.id
+		LEFT JOIN archs ON archs.id = vmiflavours.archid';
+	ELSIF itemname = 'os' THEN
+		q := 'SELECT oses.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, oses.id AS count_id FROM  ' || cachetable || ' AS sites
+		LEFT JOIN va_providers ON va_providers.sitename = sites.name
+		LEFT JOIN va_provider_images AS va_provider_images ON va_provider_images.va_provider_id = va_providers.id
+		LEFT JOIN vaviews ON vaviews.vmiinstanceid = va_provider_images.vmiinstanceid
+		LEFT JOIN applications ON applications.id = vaviews.appid
+		LEFT JOIN vapplications ON vapplications.appid = applications.id
+		LEFT JOIN vapp_versions ON vapp_versions.vappid = vapplications.id AND published AND enabled AND NOT archived AND status = ''verified''
+		LEFT JOIN vmis ON vmis.vappid = vapplications.id
+		LEFT JOIN vmiflavours ON vmiflavours.vmiid = vmis.id
+		LEFT JOIN oses ON oses.id = vmiflavours.osid';
+	ELSIF itemname = 'osfamily' THEN
+		q := 'SELECT os_families.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, os_families.id AS count_id FROM ' || cachetable || ' AS sites
+		LEFT JOIN va_providers ON va_providers.sitename = sites.name
+		LEFT JOIN va_provider_images AS va_provider_images ON va_provider_images.va_provider_id = va_providers.id
+		LEFT JOIN vaviews ON vaviews.vmiinstanceid = va_provider_images.vmiinstanceid
+		LEFT JOIN applications ON applications.id = vaviews.appid
+		LEFT JOIN vapplications ON vapplications.appid = applications.id
+		LEFT JOIN vapp_versions ON vapp_versions.vappid = vapplications.id AND published AND enabled AND NOT archived AND status = ''verified''
+		LEFT JOIN vmis ON vmis.vappid = vapplications.id
+		LEFT JOIN vmiflavours ON vmiflavours.vmiid = vmis.id
+		LEFT JOIN oses ON oses.id = vmiflavours.osid
+		LEFT JOIN os_families ON os_families.id = oses.os_family_id';
+	ELSIF itemname = 'hypervisor' THEN
+		q :='SELECT hypervisors.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, hypervisors.id::int AS count_id FROM ' || cachetable || ' AS sites
+		LEFT JOIN va_providers ON va_providers.sitename = sites.name
+		LEFT JOIN va_provider_images AS va_provider_images ON va_provider_images.va_provider_id = va_providers.id
+		LEFT JOIN vaviews ON vaviews.vmiinstanceid = va_provider_images.vmiinstanceid
+		LEFT JOIN applications ON applications.id = vaviews.appid
+		LEFT JOIN vapplications ON vapplications.appid = applications.id
+		LEFT JOIN vapp_versions ON vapp_versions.vappid = vapplications.id AND published AND enabled AND NOT archived AND status = ''verified''
+		LEFT JOIN vmis ON vmis.vappid = vapplications.id
+		LEFT JOIN vmiflavours ON vmiflavours.vmiid = vmis.id
+		LEFT JOIN hypervisors ON hypervisors.name::text = ANY(vmiflavours.hypervisors::TEXT[])';
+	ELSIF itemname = 'vo' THEN
+		q := 'SELECT vos.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, vos.id AS count_id FROM ' || cachetable || ' AS sites
+		LEFT JOIN va_providers ON va_providers.sitename = sites.name
+		LEFT JOIN va_provider_images AS va_provider_images ON va_provider_images.va_provider_id = va_providers.id AND va_provider_images.vowide_vmiinstanceid IS NOT NULL
+		LEFT JOIN vowide_image_list_images ON vowide_image_list_images.ID = va_provider_images.vowide_vmiinstanceid and vowide_image_list_images.state = ''up-to-date''::e_vowide_image_state
+		LEFT JOIN vowide_image_lists ON vowide_image_lists.id = vowide_image_list_images.vowide_image_list_id AND vowide_image_list_images.state <> ''draft''::e_vowide_image_state
+		LEFT JOIN vos ON vos.id = vowide_image_lists.void AND vos.deleted IS FALSE';
+	ELSIF itemname = 'middleware' THEN
+		q := 'SELECT middlewares.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, middlewares.id AS count_id FROM ' || cachetable || ' AS sites
+		LEFT JOIN va_providers ON va_providers.sitename = sites.name
+		LEFT JOIN va_provider_images AS va_provider_images ON va_provider_images.va_provider_id = va_providers.id
+		LEFT JOIN vaviews ON vaviews.vmiinstanceid = va_provider_images.vmiinstanceid
+		LEFT JOIN applications ON applications.id = vaviews.appid
+		LEFT JOIN app_middlewares ON app_middlewares.appid = applications.id
+		LEFT JOIN middlewares ON middlewares.id = app_middlewares.middlewareid';
+	ELSIF itemname = 'supports' THEN
+		q := 'SELECT CASE WHEN va_providers.sitename IS NULL THEN ''none''
+		ELSE ''occi'' END AS count_text, COUNT(DISTINCT sites.id) AS count,
+		CASE WHEN va_providers.sitename IS NULL THEN 0 ELSE 1 END AS count_id
+		FROM ' || cachetable || ' AS sites
+		LEFT JOIN va_providers ON va_providers.sitename = sites.name and va_providers.in_production = true';
+	ELSIF itemname = 'hasinstances' THEN
+		q := 'SELECT CASE WHEN va_provider_images.vmiinstanceid IS NULL THEN ''none''
+		ELSE ''virtual images'' END AS count_text, COUNT(DISTINCT sites.id) AS count,
+		CASE WHEN va_provider_images.vmiinstanceid IS NULL THEN 0 ELSE 1 END AS count_id
+		FROM ' || cachetable || ' AS sites
+		LEFT JOIN va_providers ON va_providers.sitename = sites.name and va_providers.in_production = true
+		LEFT JOIN va_provider_images AS va_provider_images ON va_provider_images.va_provider_id = va_providers.id
+		LEFT JOIN vaviews ON vaviews.vmiinstanceid = va_provider_images.vmiinstanceid';
+	ELSE
+		RAISE NOTICE 'Unknown site property requested for logistics counting: %', itemname;
+		RETURN;
+	END IF;
+	RETURN QUERY EXECUTE 'SELECT count_text, count, count_id::text FROM (' || q || ' GROUP BY count_text, count_id) AS t WHERE NOT count_text IS NULL';
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION count_site_matches(text, text, boolean)
+  OWNER TO appdb;
+COMMENT ON FUNCTION count_site_matches(text, text, boolean) IS 'not to be called directly; used by site_logistics function';
+
+CREATE OR REPLACE FUNCTION good_vmiinstanceid(va_provider_images)
+  RETURNS integer AS
+$BODY$
+	SELECT CASE WHEN goodid IS NULL THEN $1.vmiinstanceid ELSE goodid END FROM (
+			SELECT max(t1.id) as goodid FROM vmiinstances AS t1
+			INNER JOIN vmiinstances AS t2 ON t1.checksum = t2.checksum AND t1.guid = t2.guid AND t2.id = $1.vmiinstanceid
+			INNER JOIN vapplists ON t1.id = vapplists.vmiinstanceid
+			INNER JOIN vapp_versions ON vapplists.vappversionid = vapp_versions.id 
+			WHERE vapp_versions.published
+	) AS t
+$BODY$
+  LANGUAGE sql STABLE
+  COST 100;
+ALTER FUNCTION good_vmiinstanceid(va_provider_images)
+  OWNER TO appdb;
+
+ALTER TABLE app_order_hack ADD CONSTRAINT pk_app_order_hack PRIMARY KEY (appid);
+ALTER TABLE va_provider_images ADD CONSTRAINT fk_va_provider_images_vmiinstances_1 FOREIGN KEY (vmiinstanceid) REFERENCES vmiinstances(id);
+CREATE INDEX idx_va_provider_images_vmiinstanceid ON va_provider_images(vmiinstanceid);
+CREATE INDEX idx_va_provider_images_vowide_vmiinstanceid ON va_provider_images(vowide_vmiinstanceid);
+CREATE INDEX idx_vapplications_appid ON vapplications(appid);
+CREATE INDEX idx_vapplists_vappversionid ON vapplists(vappversionid);
+CREATE INDEX idx_vapplists_vmiinstanceid ON vapplists(vmiinstanceid);
+CREATE INDEX idx_context_script_assocs_contextid ON context_script_assocs(contextid);
+CREATE INDEX idx_context_script_assocs_scriptid ON context_script_assocs(scriptid);
+CREATE INDEX idx_vowide_image_list_images_listid ON vowide_image_list_images(vowide_image_list_id);
+CREATE INDEX idx_vowide_image_list_images_vapplistid ON vowide_image_list_images(vapplistid);
+CREATE INDEX idx_vowide_image_lists_void ON vowide_image_lists(void);
+CREATE INDEX idx_vowide_image_lists_state ON vowide_image_lists(state);
+CREATE INDEX idx_vowide_image_lists_state_pub_or_obs ON vowide_image_lists(state) WHERE state = 'published' OR state = 'obsolete';
+CREATE INDEX idx_vmiinstance_contextscripts_vmiinstanceid ON vmiinstance_contextscripts(vmiinstanceid);
+CREATE INDEX idx_vmiinstance_contextscripts_contextscriptid ON vmiinstance_contextscripts(contextscriptid);
+CREATE INDEX idx_vmiinstances_checksum ON vmiinstances(checksum);
+CREATE INDEX idx_vmiinstances_guid ON vmiinstances(guid);
+CREATE INDEX idx_applications_metatype ON applications(metatype);
+
+CREATE OR REPLACE FUNCTION swapp_image_providers_to_xml(_appid integer)
+  RETURNS SETOF xml AS
+$BODY$
+SELECT
+	xmlelement(
+		name "virtualization:image",
+		xmlattributes(
+			vaviews.vmiinstanceid,
+			vaviews.vmiinstance_guid AS identifier,
+			vaviews.vmiinstance_version,
+			vaviews.va_version_archived AS archived,
+			vaviews.va_version_enabled AS enabled,
+			CASE WHEN vaviews.va_version_expireson >= NOW() THEN FALSE ELSE TRUE END AS isexpired
+		),
+		XMLELEMENT(NAME "application:application",
+			XMLATTRIBUTES(applications.id AS id, applications.cname AS cname, applications.guid AS guid, applications.deleted, applications.moderated),
+			XMLELEMENT(NAME "application:name", applications.name)
+		),
+		hypervisors.hypervisor::text::xml,
+		XMLELEMENT(NAME "virtualization:os", XMLATTRIBUTES(oses.id AS id, vaviews.osversion AS version, oses.os_family_id as family_id), oses.name), 
+		XMLELEMENT(NAME "virtualization:arch", XMLATTRIBUTES(archs.id AS id), archs.name),
+		vmiinst_cntxscripts_to_xml(vaviews.vmiinstanceid),
+		array_to_string(array_agg(DISTINCT 
+			xmlelement(name "virtualization:provider",
+				xmlattributes(
+					va_provider_images.va_provider_id as provider_id,
+					va_provider_images.va_provider_image_id as occi_id,
+					vowide_image_lists.void,
+					va_provider_images.vmiinstanceid as vmiinstanceid
+				)
+			)::text
+		),'')::xml
+)
+FROM contexts
+	INNER JOIN context_script_assocs ON context_script_assocs.contextid = contexts.id
+	INNER JOIN contextscripts AS cs ON cs.id = context_script_assocs.scriptid
+	INNER JOIN vmiinstance_contextscripts AS vcs ON vcs.contextscriptid = cs.id
+	INNER JOIN va_provider_images ON va_provider_images.good_vmiinstanceid = vcs.vmiinstanceid
+	INNER JOIN vaviews ON vaviews.vmiinstanceid = vcs.vmiinstanceid
+	INNER JOIN applications ON applications.id = vaviews.appid
+	LEFT OUTER JOIN vmiflavor_hypervisor_xml AS hypervisors ON hypervisors.vmiflavourid = vaviews.vmiflavourid
+	LEFT OUTER JOIN archs ON archs.id = vaviews.archid
+	LEFT OUTER JOIN oses ON oses.id = vaviews.osid
+	-- LEFT OUTER JOIN vmiformats ON vmiformats.name = vaviews.format
+	LEFT OUTER JOIN app_vos ON app_vos.appid = applications.id
+	LEFT OUTER JOIN vowide_image_list_images ON vowide_image_list_images.id = va_provider_images.vowide_vmiinstanceid
+	LEFT OUTER JOIN vowide_image_lists ON vowide_image_lists.id = vowide_image_list_images.vowide_image_list_id AND (vowide_image_lists.state = 'published' OR vowide_image_lists.state = 'obsolete')
+WHERE  
+	vaviews.va_version_published 
+	-- AND contexts.appid = $1
+GROUP BY 
+	applications.id,
+	vaviews.osversion,
+	hypervisors.hypervisor::text,
+	vaviews.vmiinstanceid, 
+	vaviews.vmiflavourid, 
+	vaviews.vmiinstance_guid,
+	vaviews.vmiinstance_version,
+	vaviews.va_version_archived,
+	vaviews.va_version_enabled,
+	vaviews.va_version_expireson,
+	archs.id, 
+	oses.id,
+	-- vmiformats.id,
+	app_vos.appid
+$BODY$
+  LANGUAGE sql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION swapp_image_providers_to_xml(integer)
+  OWNER TO appdb;
 
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 12, 26, E'Performance improvements'
