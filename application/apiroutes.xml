@@ -417,16 +417,16 @@
 	<resource>RestSiteList</resource>
 	<comment>A list of sites</comment>
 </route>
+<route type="rest" name="sitelogistics" url="/:version/sites/logistics">
+	<format>xml</format>
+	<resource>RestSiteLogistics</resource>
+	<comment>A list of Site logistics per various properties</comment>
+</route>
 <route type="rest" name="site" url="/:version/sites/:id">
 	<format xslt="site">xml</format>
     <param name="id" fmt=".+"/>
 	<resource>RestSiteItem</resource>
 	<comment>The site entry specified by the parameter :id</comment>
-</route>
-<route type="rest" name="sitelogistics" url="/:version/sites/logistics">
-	<format>xml</format>
-	<resource>RestSiteLogistics</resource>
-	<comment>A list of Site logistics per various properties</comment>
 </route>
 <route type="rest" hidden="true" name="sitefiltercheck" url="/:version/sites/filter/normalize">
 	<format>xml</format>
