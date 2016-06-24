@@ -282,23 +282,33 @@ class ApiController extends Zend_Controller_Action
 					}
 				}
 			} catch (Exception $e) {
-				$error = RestErrorEnum::RE_INVALID_REPRESENTATION;
+				$error = RestErrorEnum::toString(RestErrorEnum::RE_INVALID_REPRESENTATION);
 				$extError = "Could not instantiate REST resource for request `" . $res . "'";
 				$this->getResponse()->clearAllHeaders();
 				$this->getResponse()->setRawHeader("HTTP/1.0 400 Bad Request");
 				$this->getResponse()->setHeader("Status","400 Bad Request");
-				error_log($error . '\n' . $extError);
-				echo $error . '\n' . $extError;
+				if ($extError != "") {
+					error_log($error . '\n' . $extError);
+					echo $error . '\n' . $extError;
+				} else {
+					error_log($error);
+					echo $error;
+				}
 				return;
 			}
 		} else {
-			$error = RestErrorEnum::RE_INVALID_REPRESENTATION;
+			$error = RestErrorEnum::toString(RestErrorEnum::RE_INVALID_REPRESENTATION);
 			$extError = "Could not resolve REST resource for request `" . $res . "'";
 			$this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 400 Bad Request");
 			$this->getResponse()->setHeader("Status","400 Bad Request");			
-			error_log($error . '\n' . $extError);
-			echo $error . '\n' . $extError;
+			if ($extError != "") {
+				error_log($error . '\n' . $extError);
+				echo $error . '\n' . $extError;
+			} else {
+				error_log($error);
+				echo $error;
+			}
 			return;
 		}	
 		$s_method = strtolower(RestMethodEnum::toString($method));
@@ -312,13 +322,18 @@ class ApiController extends Zend_Controller_Action
 			if ( ! is_null($routeXslt) ) $res = $res->transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).$routeXslt);
 			echo $res;
 		} else {
-			$error = $res->getError();
+			$error = RestErrorEnum::toString($res->getError());
 			$extError = $res->getExtError();
 			$this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 400 Bad Request");
 			$this->getResponse()->setHeader("Status","400 Bad Request");
-			error_log($error . '\n' . $extError);
-			echo $error . '\n' . $extError;		
+			if ($extError != "") {
+				error_log($error . '\n' . $extError);
+				echo $error . '\n' . $extError;
+			} else {
+				error_log($error);
+				echo $error;
+			}
 		}
 	}
 

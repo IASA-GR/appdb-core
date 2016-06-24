@@ -10,6 +10,7 @@
 </route>
 <route type="rest" name="schemaEntry" url="/:version/schema/:xsdname">
 	<format>xml</format>
+	<param name="xsdname" fmt=".+"/>
 	<resource>RestSchemaItem</resource>
 	<comment>Request a schema definition for the resource specified by parameter :xsdname</comment>
 </route>
@@ -35,7 +36,7 @@
 <route type="rest" hidden="true" name="modappsItem" url="/:version/applications/moderated/:id">
 	<format xslt="applications">xml</format>
 	<resource>RestModAppItem</resource>
-	<param name="id" fmt="\d+"/>
+	<param name="id" fmt="(\d+|s:.+)"/>
 </route>
 <route type="rest" hidden="true" name="modappsList" url="/:version/applications/moderated">
 	<format xslt="applications">xml</format>
@@ -67,7 +68,7 @@
 </route>
 <route type="rest" name="apppubs" url="/:version/applications/:id/publications">
 	<format xslt="applications">xml</format>
-    <param name="id" fmt="(\d+|s:\w+)"/>
+	<param name="id" fmt="(\d+|s:.+)"/>
 	<resource>RestAppPubList</resource>
 	<comment>A list of scientific publications that the software entry specified by the parameter :id has led to</comment>
 </route>
@@ -113,6 +114,7 @@
 <route type="rest" name="rateReport2" url="/:version/applications/:id/ratingsreport/:type">
 	<format>xml</format>
     <param name="id" fmt="(\d+|s:.+)"/>
+	<param name="type" fmt=".+"/>
 	<resource>RestAppRatingReport</resource>
 	<comment>A report about ratings the software entry specified by the parameter :id has received by registered (:type="internal") or anonymous (:type="external") users</comment>
 </route>
@@ -164,7 +166,6 @@
 </route>
 <route type="rest" name="appvaitemimages" url="/:version/applications/:id/virtualization/productionimages">
     <param name="id" fmt="(\d+|s:.+)"/>
-    <param name="vappid" fmt="\d+"/>
 	<resource>RestVAImageList</resource>
 	<comment></comment>
 </route>
@@ -214,109 +215,117 @@
 </route>
 <route type="rest" name="personprivs" url="/:version/people/:id/privileges">
 	<format xslt="applications">xml</format>
-	<resource>RestPplPrivList</resource>
 	<param name="id" fmt="\d+"/>
+	<resource>RestPplPrivList</resource>
 	<comment>A list of the person's privileges on other targets</comment>
 </route>
 <route type="rest" name="pplvolist" url="/:version/people/:id/vos">
 	<format xslt="vos">xml</format>
-	<resource>RestPplVOList</resource>
 	<param name="id" fmt="\d+"/>
+	<resource>RestPplVOList</resource>
 	<comment>A list of VOs the user specified by parameter :id is related to</comment>
 </route>
 <route type="rest" name="vomemberlist" url="/:version/people/:id/vos/member">
 	<format xslt="vos">xml</format>
-	<resource>RestVOMemberList</resource>
 	<param name="id" fmt="\d+"/>
+	<resource>RestVOMemberList</resource>
 	<comment>A list of VOs the user specified by parameter :id is a member of</comment>
 </route>
 <route type="rest" name="vomanagerlist" url="/:version/people/:id/vos/manager">
 	<format xslt="vos">xml</format>
-	<resource>RestVOManagerList</resource>
 	<param name="id" fmt="\d+"/>
+	<resource>RestVOManagerList</resource>
 	<comment>A list of VOs the user specified by parameter :id is a manager of</comment>
 </route>
 <route type="rest" name="vodeputylist" url="/:version/people/:id/vos/deputy">
 	<format xslt="vos">xml</format>
-	<resource>RestVODeputyList</resource>
 	<param name="id" fmt="\d+"/>
+	<resource>RestVODeputyList</resource>
 	<comment>A list of VOs the user specified by parameter :id is a deputy of</comment>
 </route>
 <route type="rest" name="voexpertlist" url="/:version/people/:id/vos/expert">
 	<format xslt="vos">xml</format>
-	<resource>RestVOExpertList</resource>
 	<param name="id" fmt="\d+"/>
+	<resource>RestVOExpertList</resource>
 	<comment>A list of VOs the user specified by parameter :id is an expert of</comment>
 </route>
 <route type="rest" name="voshifterlist" url="/:version/people/:id/vos/shifter">
 	<format xslt="vos">xml</format>
-	<resource>RestVOShifterList</resource>
 	<param name="id" fmt="\d+"/>
+	<resource>RestVOShifterList</resource>
 	<comment>A list of VOs the user specified by parameter :id is a shifter of</comment>
 </route>
 <route type="rest" name="appfollowlist" url="/:version/people/:id/applications/followed">
 	<format xslt="applications">xml</format>
-	<resource>RestAppFollowedList</resource>
 	<param name="id" fmt="\d+"/>
+	<resource>RestAppFollowedList</resource>
 	<comment>A list of applications the user specified by parameter :id follows</comment>
 </route>
 <route type="rest" name="appfollowitem" url="/:version/people/:id/applications/followed/:appid">
 	<format xslt="applications">xml</format>
-	<resource>RestAppFollowedItem</resource>
     <param name="id" fmt="\d+"/>
 	<param name="appid" fmt="\d+"/>
+	<resource>RestAppFollowedItem</resource>
 	<comment>The software entry that the user follows, specified by the parameter :appid</comment>
 </route>
 <route type="rest" name="appfollowLogistics" url="/:version/people/:id/applications/followed/logistics">
 	<format>xml</format>
+    <param name="id" fmt="\d+"/>
 	<resource>RestAppFollowedLogistics</resource>
 	<comment>A list of software logistics per various properties</comment>
 </route>
 <route type="rest" name="bookmarks" url="/:version/people/:id/applications/bookmarked">
 	<format xslt="applications">xml</format>
-	<resource>RestAppBookmarkList</resource>
 	<param name="id" fmt="\d+"/>
+	<resource>RestAppBookmarkList</resource>
 	<comment>A list of all software entries that the user specified by parameter :id has bookmarked</comment>
 </route>
 <route type="rest" name="bookmarks2" url="/:version/people/:id/applications/bookmarked/:bmid">
 	<format xslt="applications">xml</format>
-	<resource>RestAppBookmarkItem</resource>
     <param name="id" fmt="\d+"/>
     <param name="bmid" fmt="\d+"/>
+	<resource>RestAppBookmarkItem</resource>
 	<comment>The software entry that the user has bookmarked, as specified by parameter :bmid</comment>
 </route>
 <route type="rest" name="bookmarkLogistics" url="/:version/people/:id/applications/bookmarked/logistics">
 	<format>xml</format>
+	<param name="id" fmt="\d+"/>
 	<resource>RestAppBookmarkLogistics</resource>
 	<comment>A list of software logistics per various properties</comment>
 </route>
 <route type="rest" name="editableApps" url="/:version/people/:id/applications/editable">
 	<format xslt="applications">xml</format>
+	<param name="id" fmt="\d+"/>
 	<resource>RestEdtAppList</resource>
 	<comment>A list of all software entries that the user can edit</comment>
 </route>
 <route type="rest" name="editableAppLogistics" url="/:version/people/:id/applications/editable/logistics">
 	<format>xml</format>
+	<param name="id" fmt="\d+"/>
 	<resource>RestEdtAppLogistics</resource>
 	<comment>A list of software logistics per various properties</comment>
 </route>
 <route type="rest" name="ownedApps" url="/:version/people/:id/applications/owned">
 	<format xslt="applications">xml</format>
+	<param name="id" fmt="\d+"/>
 	<resource>RestOwnAppList</resource>
 	<comment>A list of all the software entries that the user "owns"</comment>
 </route>
 <route type="rest" name="ownedAppLogistics" url="/:version/people/:id/applications/owned/logistics">
 	<format>xml</format>
+	<param name="id" fmt="\d+"/>
 	<resource>RestOwnAppLogistics</resource>
 	<comment>A list of software logistics per various properties</comment>
 </route>
 <route type="rest" name="associatedApps" url="/:version/people/:id/applications/associated">
 	<format xslt="applications">xml</format>
+	<param name="id" fmt="\d+"/>
 	<resource>RestAscAppList</resource>
 	<comment>A list of all the software entries in whose contact list the user is in</comment>
 </route>
 <route type="rest" name="associatedAppLogistics" url="/:version/people/:id/applications/associated/logistics">
 	<format>xml</format>
+	<param name="id" fmt="\d+"/>
 	<resource>RestAscAppLogistics</resource>
 	<comment>A list of software logistics per various properties</comment>
 </route>
@@ -331,14 +340,14 @@
 </route>
 <route type="rest" name="peopleDetails" url="/:version/people/:id">
 	<format xslt="persons">xml</format>
-	<resource>RestPplItem</resource>
 	<param name="id" fmt="\d+"/>
+	<resource>RestPplItem</resource>
 	<comment>The profile entry of the user specified by the parameter :id</comment>
 </route>
 <route type="rest" hidden="true" name="namedPeopleDetails" url="/:version/people/:name">
 	<format xslt="persons">xml</format>
-	<resource>RestPplItem</resource>
     <param name="name" fmt="s:.+"/>
+	<resource>RestPplItem</resource>
 </route>
 <route type="rest" name="countries" url="/:version/regional">
 	<format xslt="regional">xml</format>
@@ -410,6 +419,7 @@
 </route>
 <route type="rest" name="site" url="/:version/sites/:id">
 	<format xslt="site">xml</format>
+    <param name="id" fmt=".+"/>
 	<resource>RestSiteItem</resource>
 	<comment>The site entry specified by the parameter :id</comment>
 </route>
@@ -460,6 +470,7 @@
 </route>
 <route type="rest" name="vo" url="/:version/vos/:id">
 	<format xslt="vos">xml</format>
+    <param name="id" fmt="\d+"/>
 	<resource>RestVOItem</resource>
 	<comment>The grid Virtual Organization entry specified by parameter :id</comment>
 </route>
@@ -514,6 +525,7 @@
 </route>
 <route type="rest" hidden="true" name="disseminationentry" url="/:version/dissemination/:id">
 	<format xslt="dissemination">xml</format>
+    <param name="id" fmt="\d+"/>
 	<resource>RestDisseminationItem</resource>
 </route>
 <route type="rest" hidden="true" name="disseminationfiltercheck" url="/:version/dissemination/filter/normalize">
@@ -550,18 +562,18 @@
 	<format>json</format>
 </route>
 <route type="rest" name="sciclassitem" url="/:version/classification/version/:id">
+	<format>xml</format>
+	<format>json</format>
+    <param name="id" fmt="(\d+|s:.+)"/>
 	<resource>RestSciClassItem</resource>
 	<comment>EGI Scientific Discipline Classification API</comment>
-	<format>xml</format>
-	<format>json</format>
-    <param name="id" fmt="(\d+|s:.+)"/>
 </route>
 <route type="rest" name="sciclassitemalias1" url="/:version/classification/versions/:id">
-	<resource>RestSciClassItem</resource>
-	<comment>Alias for EGI Scientific Discipline Classification API</comment>
 	<format>xml</format>
 	<format>json</format>
     <param name="id" fmt="(\d+|s:.+)"/>
+	<resource>RestSciClassItem</resource>
+	<comment>Alias for EGI Scientific Discipline Classification API</comment>
 </route>
 <route type="rest" name="vologistics" url="/:version/vos/logistics">
 	<format>xml</format>
@@ -583,39 +595,6 @@
 	<resource>RestDatasetList</resource>
 	<comment>A list of available datasets</comment>
 </route>
-<route type="rest" name="datasetitem" url="/:version/datasets/:id">
-	<format xslt='ds_datasets'>xml</format>
-	<resource>RestDatasetItem</resource>
-	<param name="id" fmt="(\d+|.+)"/>
-	<comment>The dataset entry specified by the parameter :id</comment>
-</route>
-<route type="rest" name="datasetverlist" url="/:version/datasets/:id/versions">
-	<format xslt='ds_datasets'>xml</format>
-	<resource>RestDatasetVersionList</resource>
-	<param name="id" fmt="(\d+|.+)"/>
-	<comment>The dataset version list</comment>
-</route>
-<route type="rest" name="datasetveritem" url="/:version/datasets/:id/versions/:vid">
-	<format xslt='ds_datasets'>xml</format>
-	<resource>RestDatasetVersionItem</resource>
-	<param name="id" fmt="(\d+|.+)"/>
-	<param name="vid" fmt="(\d+|.+)"/>
-	<comment>The dataset version entry specified by the parameter :vid</comment>
-</route>
-<route type="rest" name="datasetloclist" url="/:version/datasets/:id/versions/:vid/locations">
-	<format xslt='ds_datasets'>xml</format>
-	<resource>RestDatasetLocationList</resource>
-	<param name="id" fmt="(\d+|.+)"/>
-	<param name="vid" fmt="(\d+|.+)"/>
-	<comment>The dataset location list for the dataset version specified by the parameter :vid</comment>
-</route>
-<route type="rest" name="datasetlocitem" url="/:version/datasets/:id/versions/:vid/locations/:lid">
-	<format xslt='ds_datasets'>xml</format>
-	<resource>RestDatasetLocationItem</resource>
-	<param name="id" fmt="(\d+|.+)"/>
-	<param name="vid" fmt="(\d+|.+)"/>
-	<comment>The dataset location entry specified by the parameter :lid</comment>
-</route>
 <route type="rest" name="dsexchangeformats" url="/:version/datasets/exchangeformats">
 	<format xslt='ds_exchange_fmt'>xml</format>
 	<resource>RestDSExchangeFormatList</resource>
@@ -625,5 +604,39 @@
 	<format xslt='ds_connection_types'>xml</format>
 	<resource>RestDSConnectionTypeList</resource>
 	<comment>A list of available connection types for datasets</comment>
+</route>
+<route type="rest" name="datasetitem" url="/:version/datasets/:id">
+	<format xslt='ds_datasets'>xml</format>
+	<param name="id" fmt="(\d+|.+)"/>
+	<resource>RestDatasetItem</resource>
+	<comment>The dataset entry specified by the parameter :id</comment>
+</route>
+<route type="rest" name="datasetverlist" url="/:version/datasets/:id/versions">
+	<format xslt='ds_datasets'>xml</format>
+	<param name="id" fmt="(\d+|.+)"/>
+	<resource>RestDatasetVersionList</resource>
+	<comment>The dataset version list</comment>
+</route>
+<route type="rest" name="datasetveritem" url="/:version/datasets/:id/versions/:vid">
+	<format xslt='ds_datasets'>xml</format>
+	<param name="id" fmt="(\d+|.+)"/>
+	<param name="vid" fmt="(\d+|.+)"/>
+	<resource>RestDatasetVersionItem</resource>
+	<comment>The dataset version entry specified by the parameter :vid</comment>
+</route>
+<route type="rest" name="datasetloclist" url="/:version/datasets/:id/versions/:vid/locations">
+	<format xslt='ds_datasets'>xml</format>
+	<param name="id" fmt="(\d+|.+)"/>
+	<param name="vid" fmt="(\d+|.+)"/>
+	<resource>RestDatasetLocationList</resource>
+	<comment>The dataset location list for the dataset version specified by the parameter :vid</comment>
+</route>
+<route type="rest" name="datasetlocitem" url="/:version/datasets/:id/versions/:vid/locations/:lid">
+	<format xslt='ds_datasets'>xml</format>
+	<param name="id" fmt="(\d+|.+)"/>
+	<param name="vid" fmt="(\d+|.+)"/>
+	<param name="lid" fmt="(\d+|.+)"/>
+	<resource>RestDatasetLocationItem</resource>
+	<comment>The dataset location entry specified by the parameter :lid</comment>
 </route>
 </routes>

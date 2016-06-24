@@ -616,6 +616,20 @@ class RestBroker extends RestResourceList {
         return $options;
 	}
 
+	public static function resourceParamMatches($xparams, $res) {
+		$matches = false;
+		foreach ($xparams as $xparam) {
+			$param = strval($xparam);
+			$name = strval($xparam->attributes()->name);
+			$fmt = strval($xparam->attributes()->fmt);
+			if (preg_match("/^" . $fmt . "$/", $res)) {
+				$matches = true;
+				break;
+			}
+		}
+		return $matches;
+	}
+
 	public static function matchResource($res, $apiroutes, &$pars) {
 		$ret = null;
 		$routes = $apiroutes->xpath("route");
@@ -625,6 +639,7 @@ class RestBroker extends RestResourceList {
 			$res = preg_replace("#/+#", "/" , $res);
 			$res = explode("/", $res);
 			foreach ( $routes as $xroute ) {
+				$xparams = $xroute->xpath("param");
 				$match = false;
 				$route = strval($xroute->attributes()->url);
 				if ( $route != '' ) {
@@ -637,7 +652,7 @@ class RestBroker extends RestResourceList {
 					if ( (count($route) > 0) && (count($res) == count($route)) ) {
 						$match = true;
 						for ($i=0; $i<count($res); $i++) {
-							$match = $match && ( ($route[$i] == $res[$i]) || ((substr($route[$i], 0, 1) == ":") && (is_numeric($res[$i]))) );
+							$match = $match && ( ($route[$i] == $res[$i]) || ((substr($route[$i], 0, 1) == ":") && RestBroker::resourceParamMatches($xparams, $res[$i])));
 							if ( ! $match ) break;
 							if ( substr($route[$i], 0, 1) == ":" ) {
 								$pars[substr($route[$i], 1)] = $res[$i];
