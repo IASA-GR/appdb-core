@@ -207,11 +207,9 @@ class ApiController extends Zend_Controller_Action
 		} else {
 			$res = $this->_getParam("resource");
 		}
-		debug_log("RES = " . var_export($res, true));
 		$url = preg_replace('/\?.*/', '', $res);
 		$qs = explode("&", preg_replace('/.*\?/', '', $res));
 		$rx = RestBroker::matchResource($url, $apiroutes, $pars);
-		debug_log("RX = " . var_export($rx, true));
 		foreach ($qs as $q) {
 			$i = explode("=", $q);
 			if (count($i) > 1) {
@@ -270,7 +268,9 @@ class ApiController extends Zend_Controller_Action
 				$pars['apikey'] = $apikey;
 				$pars['sessionid'] = session_id();
 				$pars['cid'] = 0;
-				debug_log("PARS = " . var_export($pars, true));
+				if ($userid != '') {
+					$_GET['userid'] = $userid;
+				}
 				$res = new $resclass($pars);
 				$fmt = $rx->xpath("format");
 				if ( count($fmt) > 0 ) {
