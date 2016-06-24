@@ -102,7 +102,7 @@ class Default_Model_AggregateNewsMapper extends Default_Model_AggregateNewsMappe
 				$select->where($filter->expr());
 				$select->limit($filter->limit, $filter->offset);
 				$select->order($filter->orderBy);
-				error_log("".$select);
+				//error_log("".$select);
 				$resultSet = $this->getDbTable()->fetchAll($select);
 				$entries = array();
 				foreach ($resultSet as $row) {

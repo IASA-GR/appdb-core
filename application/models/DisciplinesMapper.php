@@ -40,7 +40,7 @@ class Default_Model_DisciplinesMapper extends Default_Model_DisciplinesMapperBas
 					$func = "discipline_to_xml";
 				}
 				$query = "SELECT $func(id) as discipline FROM (".$select." $order) AS T;";
-				debug_log($query);
+				//debug_log($query);
 				$resultSet = $this->getDbTable()->getAdapter()->query($query)->fetchAll();
 				$entries = array();
 				foreach ($resultSet as $row) {

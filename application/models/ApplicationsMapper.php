@@ -292,7 +292,7 @@ class Default_Model_ApplicationsMapper extends Default_Model_ApplicationsMapperB
 //				debug_log(var_export($filter->fltstr,true));
 //				debug_log(var_export($from, true));
 //				debug_log(var_export($where,true));
-				debug_log($orderby);
+//				debug_log($orderby);
 				$frmt = "";
 				if( $func === "export_app" ){
 					$frmt = str_replace('export', '', $format);
@@ -325,7 +325,7 @@ class Default_Model_ApplicationsMapper extends Default_Model_ApplicationsMapperB
 			if ((strpos(str_replace('"', '', $orderby) ,"applications.name") !== false) && (! is_array($orderby))) {
 				$query = str_replace("DISTINCT \"applications", "DISTINCT ON (applications.name) \"applications", $query);
 			}
-			debug_log("########" . "".$query. "#########");
+//			debug_log("########" . "".$query. "#########");
 			noDBSeqScan($executor);
 			$resultSet = $executor->fetchAll($query);
         }

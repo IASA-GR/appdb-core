@@ -90,7 +90,7 @@ class Default_Model_DatasetsMapper extends Default_Model_DatasetsMapperBase
 					$func = "dataset_to_xml";
 				}
 				$query = "SELECT $func(array_agg(id), " . ($xmlflat ? "TRUE" : "FALSE") . ") as dataset FROM (".$select." $order) AS T;";
-				debug_log($query);
+				//debug_log($query);
 				$resultSet = $this->getDbTable()->getAdapter()->query($query)->fetchAll();
 				$entries = array();
 				foreach ($resultSet as $row) {

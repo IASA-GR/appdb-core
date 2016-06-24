@@ -52,9 +52,9 @@ class Default_Model_DatasetLocationsMapper extends Default_Model_DatasetLocation
 				} else {
 					$func = "dataset_location_to_xml";
 				}
-				error_log("".$select);
+				//error_log("".$select);
 				$query = "SELECT $func(id) as dataset FROM (".$select." $order) AS T;";
-				debug_log($query);
+				//debug_log($query);
 				$resultSet = $this->getDbTable()->getAdapter()->query($query)->fetchAll();
 				$entries = array();
 				foreach ($resultSet as $row) {

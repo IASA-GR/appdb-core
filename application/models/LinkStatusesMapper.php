@@ -39,7 +39,7 @@ class Default_Model_LinkStatusesMapper extends Default_Model_LinkStatusesMapperB
 			$executor = $this->getDbTable()->getAdapter();
 			$executor->setFetchMode(Zend_Db::FETCH_OBJ);
         }
-        debug_log("".$select);
+        //debug_log("".$select);
 		$res = $executor->fetchAll($select);
 		return $res[0]->count;
 	}

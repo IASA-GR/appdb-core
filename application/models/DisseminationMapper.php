@@ -89,7 +89,7 @@ class Default_Model_DisseminationMapper extends Default_Model_DisseminationMappe
 			$executor = $this->getDbTable()->getAdapter();
 			$executor->setFetchMode(Zend_Db::FETCH_OBJ);
         }
-        debug_log("".$select);
+        //debug_log("".$select);
 		$res = $executor->fetchAll($select);
 		return $res[0]->count;
 	}
@@ -114,7 +114,7 @@ class Default_Model_DisseminationMapper extends Default_Model_DisseminationMappe
 			$orderby = $filter->orderBy;
 			$select->order($orderby);
 		}
-		debug_log("".$select);
+		//debug_log("".$select);
 		if ($format === 'xml') {
 			$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
 			if ( ($this->count($filter) == 1) ) {

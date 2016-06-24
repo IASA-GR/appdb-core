@@ -87,7 +87,7 @@ class Default_Model_Filter {
 		} else {
 			$found = false;
 			foreach ($this->_fields as $ii) {
-				debug_log('/^' . $ii . '$/');
+				//debug_log('/^' . $ii . '$/');
 				if (preg_match('/^' . $ii . '$/', $i)) {
 					$found = true;
 					$f = new Default_Model_FilterItem($i, $this);
