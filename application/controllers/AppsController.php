@@ -222,7 +222,8 @@ class AppsController extends Zend_Controller_Action
     
 	private function cachelogos($items) {
 		foreach ($items as $item) {
-			$f = fopen(APPLICATION_PATH . "/../cache/app-logo-".$item->id.".png","w");
+			$fname = APPLICATION_PATH . "/../cache/app-logo-".$item->id.".png";
+			$f = fopen($fname, "w");
 			if (!isnull($item->logo)) {
 				$logo = base64_decode(pg_unescape_bytea($item->logo));
 				fwrite($f, $logo);
@@ -230,20 +231,47 @@ class AppsController extends Zend_Controller_Action
 				fwrite($f, 'NULL');
 			}
 			fclose($f);
+			$fname2 = str_replace("/app-logo", "/55x55/app-logo", $fname);
+			$fname3 = str_replace("/app-logo", "/100x100/app-logo", $fname);
+			$fname2 = str_replace(".png", ".jpg", $fname2);
+			$fname3 = str_replace(".png", ".jpg", $fname3);
+			`convert -background white -flatten -strip -interlace Plane -quality 80 -scale 55x55 $fname $fname2`;
+			`convert -background white -flatten -strip -interlace Plane -quality 80 -scale 100x100 $fname $fname3`;
 		}
 	}
 
     public function getlogoAction()
-    {
+	{
+		$size = $this->_getParam("size");
+		if ($size == "") $size = 0;
+		switch($size) {
+			case 0:
+				$size = "55x55/";
+				$type = "jpg";
+				break;
+			case 1:
+				$size = "100x100/";
+				$type = "jpg";
+				break;
+			case 2:
+				$size = "";
+				$type = "png";
+				break;
+			default:
+				$size = "55x55/";
+				$type = "jpg";
+		}
+		$type = "jpeg";
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
 		$logo = 'NULL';
 		$tool = false;
 		if ( !( ($this->_getParam("id") == "0") || ($this->_getParam("id") == '') ) && is_numeric($this->_getParam("id")) == true )	{
-			if ( file_exists(APPLICATION_PATH . "/../cache/app-logo-".$this->_getParam("id").".png") ) {
-				$logo = file_get_contents(APPLICATION_PATH . "/../cache/app-logo-".$this->_getParam("id").".png");
+			if ( file_exists(APPLICATION_PATH . "/../cache/app-logo-".$this->_getParam("id") . "." . $type) ) {
+				$logo = file_get_contents(APPLICATION_PATH . "/../cache/" . $size . "app-logo-".$this->_getParam("id") . "." . $type);
 			} 
 			if ( $logo == 'NULL' || $logo == false || isnull($logo) ) {
+				$type = "png";
 				$apps = new Default_Model_Applications();
 				$apps->filter->id->equals($this->_getParam("id"));
 				if (count($apps->items) > 0) {
@@ -264,13 +292,14 @@ class AppsController extends Zend_Controller_Action
 			}
 		}
 		if ( empty($logo) || ($logo == 'NULL') ) {
+			$type = "png";
 			if ($tool) {
 				$logo = file_get_contents("images/tool.png");
 			} else {
 				$logo = file_get_contents("images/app.png");
 			}
 		} 
-		header('Content-type: image/png');
+		header('Content-type: image/' . $type);
 		echo $logo;
     }
 
@@ -375,7 +404,7 @@ class AppsController extends Zend_Controller_Action
 				else
 					$this->view->logo = "/images/app.png";
 			} else {
-				$this->view->logo = "/apps/getlogo?id=".$app->id."&req=".urlencode($app->lastUpdated);
+				$this->view->logo = "/apps/getlogo?size=2&id=".$app->id."&req=".urlencode($app->lastUpdated);
 			}
 		} else $this->view->logo = '';
 	}
@@ -647,6 +676,8 @@ class AppsController extends Zend_Controller_Action
 					if ( $user->privs->canModifyApplicationLogo($app) ) {
 						$imgfile = APPLICATION_PATH."/../public/".$_POST['newimage'];
 						if ( file_exists(APPLICATION_PATH . "/../cache/app-logo-".$data["id"].".png") ) unlink(APPLICATION_PATH . "/../cache/app-logo-".$data["id"].".png");
+						if ( file_exists(APPLICATION_PATH . "/../cache/55x55/app-logo-".$data["id"].".png") ) unlink(APPLICATION_PATH . "/../cache/55x55/app-logo-".$data["id"].".png");
+						if ( file_exists(APPLICATION_PATH . "/../cache/100x100/app-logo-".$data["id"].".png") ) unlink(APPLICATION_PATH . "/../cache/55x55/app-logo-".$data["id"].".png");
 						$app->logo = pg_escape_bytea(base64_encode(file_get_contents($imgfile)));
 					};
 				};
