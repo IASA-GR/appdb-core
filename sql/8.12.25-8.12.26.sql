@@ -28,6 +28,22 @@ DROP MATERIALIZED VIEW site_service_images_xml;
 DROP VIEW va_provider_images;
 ALTER TABLE __va_provider_images RENAME TO va_provider_images;
 
+CREATE OR REPLACE FUNCTION good_vmiinstanceid(va_provider_images)
+  RETURNS integer AS
+$BODY$
+	SELECT CASE WHEN goodid IS NULL THEN $1.vmiinstanceid ELSE goodid END FROM (
+			SELECT max(t1.id) as goodid FROM vmiinstances AS t1
+			INNER JOIN vmiinstances AS t2 ON t1.checksum = t2.checksum AND t1.guid = t2.guid AND t2.id = $1.vmiinstanceid
+			INNER JOIN vapplists ON t1.id = vapplists.vmiinstanceid
+			INNER JOIN vapp_versions ON vapplists.vappversionid = vapp_versions.id 
+			WHERE vapp_versions.published
+	) AS t
+$BODY$
+  LANGUAGE sql STABLE
+  COST 100;
+ALTER FUNCTION good_vmiinstanceid(va_provider_images)
+  OWNER TO appdb;
+
 CREATE MATERIALIZED VIEW site_services_xml
 AS 
  SELECT va_providers.sitename,
