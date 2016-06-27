@@ -197,13 +197,15 @@ class ApiController extends Zend_Controller_Action
 		$extError = null;
 		if ($method === "post") {
 			$postdata = $_POST['data'];
-			if( isset($_POST['resource']) && trim($_POST['resource']) === "broker"){
+			if( isset($_POST['resource']) && trim($_POST['resource']) === "broker") {
 				if ($this->session->isLocked()) {
 					$this->session->unLock();
 				}
 				session_write_close();
+				$res = $_POST['resource'];
+			} else {
+				$res = $this->_getParam("resource");
 			}
-			$res = $_POST['resource'];
 		} else {
 			$res = $this->_getParam("resource");
 		}
