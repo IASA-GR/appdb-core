@@ -80,6 +80,7 @@ class GocdbController extends Zend_Controller_Action
 				@$db->rollBack();
 			}
 			db()->query("ALTER TABLE gocdb.va_providers ENABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;");
+			db()->query("REFRESH MATERIALIZED VIEW CONCURRENTLY va_providers;");
 			db()->query("SELECT request_permissions_refresh();");
 			debug_log("error in syncVAProviders: $e");
 		}

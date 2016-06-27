@@ -60,6 +60,8 @@ class SitesController extends Zend_Controller_Action{
 		header('Content-type: text/xml');
 		echo '<' . '?xml version="1.0" encoding="UTF-8"?'.'>'."\n";
 		$result = Gocdb::syncSites( $update, $force );
+		db()->query("REFRESH MATERIALIZED VIEW CONCURRENTLY sites;");
+		db()->query("SELECT request_permissions_refresh();");
 		db()->query("REFRESH MATERIALIZED VIEW site_services_xml;");
 		db()->query("REFRESH MATERIALIZED VIEW site_service_images_xml;");
 		if( is_array($result) ){

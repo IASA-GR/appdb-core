@@ -1447,6 +1447,8 @@ class VoController extends Zend_Controller_Action
 					}
 				}
 			}
+			db()->query("REFRESH MATERIALIZED VIEW CONCURRENTLY va_providers;");
+			db()->query("SELECT request_permissions_refresh();");
 			error_log("Sync VA Provider Endpoints DONE");
 		} else {
 			$this->getResponse()->clearAllHeaders();
