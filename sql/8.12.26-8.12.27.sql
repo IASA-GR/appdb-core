@@ -138,8 +138,8 @@ CREATE INDEX egiaai_vo_contacts_role_vo_puid ON egiaai.vo_contacts(role,vo,puid)
 CREATE INDEX egiaai_vo_contacts_role ON egiaai.vo_contacts(role);
 CREATE INDEX egiaai_vo_contacts_vo ON egiaai.vo_contacts(vo);
 CREATE INDEX egiaai_vo_contacts_puid ON egiaai.vo_contacts(puid);
-CREATE UNIQUE INDEX idx_permissions_actor_actionid_objnull ON permissions(actor,actionid) WHERE object IS NULL;
-CREATE UNIQUE INDEX idx_permissions_actor_actionid_objnotnull ON permissions(actor,actionid) WHERE NOT object IS NULL;
+CREATE INDEX idx_permissions_actor_actionid_objnull ON permissions(actor,actionid) WHERE object IS NULL;
+CREATE INDEX idx_permissions_actor_actionid_objnotnull ON permissions(actor,actionid) WHERE NOT object IS NULL;
 
 CREATE INDEX idx_relations_reltypeid ON relations(reltypeid);
 CREATE INDEX idx_relations_parentid ON relations(parentid);
