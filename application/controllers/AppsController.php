@@ -261,13 +261,12 @@ class AppsController extends Zend_Controller_Action
 				$size = "55x55/";
 				$type = "jpg";
 		}
-		$type = "jpeg";
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
 		$logo = 'NULL';
 		$tool = false;
 		if ( !( ($this->_getParam("id") == "0") || ($this->_getParam("id") == '') ) && is_numeric($this->_getParam("id")) == true )	{
-			if ( file_exists(APPLICATION_PATH . "/../cache/app-logo-".$this->_getParam("id") . "." . $type) ) {
+			if ( file_exists(APPLICATION_PATH . "/../cache/app-logo-".$this->_getParam("id") . "." . "png") ) {
 				$logo = file_get_contents(APPLICATION_PATH . "/../cache/" . $size . "app-logo-".$this->_getParam("id") . "." . $type);
 			} 
 			if ( $logo == 'NULL' || $logo == false || isnull($logo) ) {
@@ -299,6 +298,7 @@ class AppsController extends Zend_Controller_Action
 				$logo = file_get_contents("images/app.png");
 			}
 		} 
+		if ($type = "jpg") $type = "jpeg";
 		header('Content-type: image/' . $type);
 		echo $logo;
     }
