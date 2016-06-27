@@ -3434,7 +3434,8 @@ appdb.views.AppsList = appdb.ExtendClass(appdb.View, "appdb.views.AppsList", fun
 		}
 		img = $(doc.createElement("img")).addClass("itemimage");
 		if( logo ){
-			img.attr("src","/apps/getlogo?req=" + encodeURI(d.lastUpdated) + "&id=" + d.id);
+			//img.attr("src","/apps/getlogo?req=" + encodeURI(d.lastUpdated) + "&id=" + d.id);
+			img.attr("src","/images/applogo/55x55/app-logo-" + d.id + ".jpg?req=" + encodeURI(d.lastUpdated));
 		}else if( d.contentType === 'softwareappliance'){
 			img.attr("src", loadImage(appdb.config.images["software appliances"]));
 		}else if( d.primaryCategory ){

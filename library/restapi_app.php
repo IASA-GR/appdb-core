@@ -689,7 +689,24 @@ class RestAppXMLParser extends RestXMLParser {
 						}
 					}
 				}
-				if ( $removeLogoCache === true ) if ( $app->id != '' && file_exists(APPLICATION_PATH . "/../cache/app-logo-".$app->id.".png") ) unlink(APPLICATION_PATH . "/../cache/app-logo-".$app->id.".png");
+				if ( $removeLogoCache === true ) {
+					$logocachename = APPLICATION_PATH . "/../cache/app-logo-".$app->id.".png";
+					if ( $app->id != '' && file_exists($logocachename) ) {
+						// invalidate logo cache
+						unlink($logocachename);
+						// re-build logo cache
+						$flogo = fopen($logocachename, "w");
+						fwrite($flogo, base64_decode(pg_unescape_bytea($app->logo)));
+						fclose($flogo);
+						$logocachename2 = str_replace("/app-logo", "/55x55/app-logo",   $logocachename);
+						$logocachename3 = str_replace("/app-logo", "/100x100/app-logo", $logocachename);
+						$logocachename2 = str_replace(".png", ".jpg", $logocachename2);
+						$logocachename3 = str_replace(".png", ".jpg", $logocachename3);
+						`convert -background white -flatten -strip -interlace Plane -quality 80 -scale 55x55   $logocachename $logocachename2`;
+						`convert -background white -flatten -strip -interlace Plane -quality 80 -scale 100x100 $logocachename $logocachename3`;
+					}
+
+				}
 			}                    
 			
 			//Set metatype of application (0: software 1: vappliance 2:swappliance )
