@@ -168,7 +168,7 @@
             } else if(p.logo.substr(4,1)==="s") {
                 p.logo = "http:" + p.logo.substr(4,p.logo.length);
             }
-			return p.logo+"&req="+encodeURIComponent(p.lastUpdated);
+			return p.logo+"&size=1&req="+encodeURIComponent(p.lastUpdated);
 		}else {
 			if( $.trim(p.metatype) === "2"){
 				return appdb.config.images["software appliances"];
