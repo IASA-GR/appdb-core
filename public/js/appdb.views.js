@@ -765,7 +765,7 @@ appdb.views.Filter = appdb.ExtendClass(appdb.View, "appdb.views.Filter", functio
 				this.txtbox.attr("value", this._watermark);
 				this.txtbox.attr("style", {"color": appdb.views.Filter.watermarkColor});
 			} else {
-				this.txtbox.attr("value", this._currentValue);
+				this.txtbox.attr("value", this.clearNormalization(this._currentValue));
 			}
 		}
 		this._onValueChange(this._currentValue);
@@ -815,35 +815,55 @@ appdb.views.Filter = appdb.ExtendClass(appdb.View, "appdb.views.Filter", functio
 		q.pageoffset = 0;
 		return q;
 	};
-	this.normalizeFilter = function(v, target) {
-		var _this = this, type = "", ret = {};
-		if (target === undefined)
-			target = null;
-		if (_this.parent) {
-			if (_this.parent.views) {
-				if (_this.parent.views._export) {
-					type = (_this.parent.views._export) ? _this.parent.views._export.target : "";
-				} else if (_this.parent.views.peopleList) {
+	this.getTargetType = function(target) {
+		target = target || this._selectedTarget || undefined;
+		var type = "";
+		if (this.parent) {
+			if (this.parent.views) {
+				if (this.parent.views._export) {
+					type = (this.parent.views._export) ? this.parent.views._export.target : "";
+				} else if (this.parent.views.peopleList) {
 					type = "people";
-				} else if (_this.parent.views.vosList) {
+				} else if (this.parent.views.vosList) {
 					type = "vos";
-				} else if (_this.parent.views.sitesList) {
+				} else if (this.parent.views.sitesList) {
 					type = "sites";
 				}
 			}
 		}
+
 		if (type === "") {
-			if (target !== null)
+			if (!!target)
 				type = target.value;
 			else
 				type = "apps";
 		}
-		if (type === "apps")
+		
+		if (["apps", "applications", "vapps", "vappliances", "vappliance"].indexOf(type) > -1) {
 			type = "applications";
-		if (type === "sites")
-			type = "sites";
-		if (type === "vapps")
-			type = "applications";
+		}
+
+		return type;
+	};
+	
+	this.getFilterTargetName = function() {
+		var name = this.getTargetType();
+		switch(name) {
+			case "applications":
+				return "application";
+			case "people":
+				return "person";
+			case "vos":
+				return "vo";
+			case "sites":
+				return "site";
+			default:
+				return "";
+		}
+	};
+	this.normalizeFilter = function(v, target) {
+		var _this = this, type = _this.getTargetType(target), ret = {};
+
 		if (v != "" && type != "") {
 			var d = new appdb.utils.rest({
 				endpoint: appdb.config.endpoint.proxyapi + "?version=" + appdb.config.apiversion + "&resource=" + type + "/filter/normalize%3Fflt=" + encodeURIComponent(encodeURIComponent(v)), //appdb.config.endpoint.baseapi+type+'/filter/normalize?flt='+encodeURIComponent(v),
@@ -880,6 +900,24 @@ appdb.views.Filter = appdb.ExtendClass(appdb.View, "appdb.views.Filter", functio
 			message: err + errHelp
 		});
 	};
+	this.clearNormalization = function(value) {
+		var target = this.getFilterTargetName();
+		
+		if(!target) {
+			return value;
+		}
+		
+		var rx = new RegExp(target + '\.any\:','i');
+		value = $.trim(value.replace(rx, ' '));
+		var matches = value.match(/(\w+\.any\:)/ig);
+		if (matches) {
+			$.each(matches, function(i, m) {
+				value = $.trim(value.replace(m, (m.split('.any:').shift() + ':')));
+			});
+		}
+		
+		return value;
+	};
 	this.render = function() {
 		var layout = null, btsearch = null, bthelp = null, fuzzy = null, _this = this;
 		this.reset();
@@ -891,7 +929,7 @@ appdb.views.Filter = appdb.ExtendClass(appdb.View, "appdb.views.Filter", functio
 		});
 		this.txtbox = new dijit.form.TextBox({
 			id: this.id + this.idPostfix + "simpleFilter",
-			value: this._currentValue || "",
+			value: this.clearNormalization(this._currentValue || ""),
 			title: "Keywords search, googlesque syntax applies",
 			style: ((this._width !== null) ? "width:" + this._width + ";" : "")
 		});
@@ -918,10 +956,10 @@ appdb.views.Filter = appdb.ExtendClass(appdb.View, "appdb.views.Filter", functio
 			if (k == dojo.keys.ENTER) {
 				ret = _this.normalizeFilter(v, _this._selectedTarget);
 				v = ret.normalForm;
-				_this.txtbox.attr("value", v);
+				_this.txtbox.attr("value", this.clearNormalization(v));
 				if (ret.error)
 					this.showFilterError(ret.error);
-				this.doQuery(v, _this._selectedTarget);
+				this.doQuery(ret.normalForm, _this._selectedTarget);
 			}
 		}, true));
 		this._domEvents.push(dojo.connect(this.txtbox, "onMouseDown", this, function(k) {
@@ -941,7 +979,7 @@ appdb.views.Filter = appdb.ExtendClass(appdb.View, "appdb.views.Filter", functio
 			}
 			var ret = this.normalizeFilter(v);
 			v = ret.normalForm;
-			_this.txtbox.attr("value", v);
+			_this.txtbox.attr("value", _this.clearNormalization(v));
 			if (ret.error)
 				this.showFilterError(ret.error);
 			this.doQuery(v);
@@ -1031,7 +1069,7 @@ appdb.views.ExtendedFilter = appdb.ExtendClass(appdb.views.Filter, "appdb.views.
 
 		this.txtbox = new dijit.form.TextBox({
 			id: this.id + this.idPostfix + "simpleFilter",
-			value: this._currentValue || "",
+			value: this.clearNormalization(this._currentValue || ""),
 			title: "Keywords search, googlesque syntax applies",
 			style: w + h + "border:none;padding-left:3px;"
 		});
