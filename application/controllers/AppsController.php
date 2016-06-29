@@ -17,6 +17,24 @@
  
 class AppsController extends Zend_Controller_Action
 {
+	public function buildlogocacheAction() {
+		$this->_helper->layout->disableLayout();
+		$this->_helper->viewRenderer->setNoRender();
+		$islocal = localRequest();
+		if (! $islocal) {
+			header('HTTP/1.0 404 Not Found');
+			header("Status: 404 Not Found");
+			return;
+		} else {
+			db()->setFetchMode(Zend_Db::FETCH_NUM);
+			$res = db()->query("SELECT id FROM applications ORDER BY id")->fetchAll();
+			foreach($res as $r) {
+				$id = $r[0];
+				$this->getlogo($id, 0);
+			}
+		}
+	}
+
 	private function syncAppContactItems($appid, $data) {
 		$collection = new Default_Model_AppContactItems();
 		$collection->filter->appid->equals($appid);
@@ -240,9 +258,8 @@ class AppsController extends Zend_Controller_Action
 		}
 	}
 
-    public function getlogoAction()
+    private function getlogo($id, $size)
 	{
-		$size = $this->_getParam("size");
 		if ($size == "") $size = 0;
 		switch($size) {
 			case 0:
@@ -261,18 +278,16 @@ class AppsController extends Zend_Controller_Action
 				$size = "55x55/";
 				$type = "jpg";
 		}
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
 		$logo = 'NULL';
 		$tool = false;
-		if ( !( ($this->_getParam("id") == "0") || ($this->_getParam("id") == '') ) && is_numeric($this->_getParam("id")) == true )	{
-			if ( file_exists(APPLICATION_PATH . "/../cache/app-logo-".$this->_getParam("id") . "." . "png") ) {
-				$logo = file_get_contents(APPLICATION_PATH . "/../cache/" . $size . "app-logo-".$this->_getParam("id") . "." . $type);
+		if ( !( ($id == "0") || ($id == '') ) && is_numeric($id) == true )	{
+			if ( file_exists(APPLICATION_PATH . "/../cache/app-logo-" . $id . "." . "png") ) {
+				$logo = file_get_contents(APPLICATION_PATH . "/../cache/" . $size . "app-logo-". $id . "." . $type);
 			} 
 			if ( $logo == 'NULL' || $logo == false || isnull($logo) ) {
 				$type = "png";
 				$apps = new Default_Model_Applications();
-				$apps->filter->id->equals($this->_getParam("id"));
+				$apps->filter->id->equals($id);
 				if (count($apps->items) > 0) {
 					if ( (! isnull($apps->items[0]->logo) ) && $apps->items[0]->logo !== '' )
 						$logo=base64_decode($apps->items[0]->logo);
@@ -300,8 +315,16 @@ class AppsController extends Zend_Controller_Action
 		} 
 		if ($type = "jpg") $type = "jpeg";
 		header('Content-type: image/' . $type);
-		echo $logo;
+		return $logo;
     }
+
+	public function getlogoAction() {
+		$this->_helper->layout->disableLayout();
+		$this->_helper->viewRenderer->setNoRender();
+		if ( !( ($this->_getParam("id") == "0") || ($this->_getParam("id") == '') ) && is_numeric($this->_getParam("id")) == true )	{
+			echo $this->getlogo($this->_getParam("id"), $this->_getParam("size"));
+		}
+	}
 
 	public function getfblogoAction()
     {
