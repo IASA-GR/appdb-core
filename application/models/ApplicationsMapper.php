@@ -69,7 +69,7 @@ class Default_Model_ApplicationsMapper extends Default_Model_ApplicationsMapperB
 				$select->joinLeft('proglangs.any', 'proglangs.any.id = proglangs.id', array());
 			}
 			if ( in_array("hypervisors", $filter->joins) ) {
-				$select->joinLeft('hypervisors', 'hypervisors.name::TEXT = ANY(vmiflavours.hypervisors::TEXT[])', array());
+				$select->joinLeft('hypervisors', 'hypervisors.value = ANY(vmiflavours.hypervisors)', array());
 			}
 			if ( in_array("archs", $filter->joins) ) {
 				$select->joinLeft('archs', 'vmiflavours.archid = archs.id', array());
