@@ -189,6 +189,10 @@ class ApiController extends Zend_Controller_Action
     }
 
 	public function proxyAction() {
+		$this->newproxy();
+	}
+
+	public function newproxy() {
 		$apiroutes = new SimpleXMLElement(APPLICATION_PATH . "/apiroutes.xml", 0, true);
 		$pars = array();
 		$postdata = null;
@@ -254,6 +258,12 @@ class ApiController extends Zend_Controller_Action
 					$src = '';
 				}
 				$pars['src'] = $src;
+				if ( isset($_SERVER['SERVER_ADDR']) && ($_SERVER['SERVER_ADDR'] != '') ) {
+					$srv = base64_encode($_SERVER['SERVER_ADDR']);
+				} else {
+					$srv = '';
+				}
+				$pars['remoteaddr'] = $srv;
 				$apikey = $userid = $passwd = '';
 				if ( $this->session->userid !== null ) {
 					$userid = $this->session->userid;
@@ -339,7 +349,7 @@ class ApiController extends Zend_Controller_Action
 		}
 	}
 
-	public function oldproxyAction() {
+	public function oldproxy() {
 		$ver = $this->_getParam("version");
 		if ((!isset($ver)) || (trim($ver) == "")) $ver = 'latest';
 		$proxy = new AppDBRESTProxy($ver);

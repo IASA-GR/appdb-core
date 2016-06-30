@@ -1420,7 +1420,11 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
      */
     private function _validateAPIKey($key) {
         $valid = false;
-        $ip = $_SERVER['REMOTE_ADDR'];
+	if ( $this->getParam("remoteaddr") != "" ) {
+		$ip = base64_decode($this->getParam("remoteaddr"));
+	} else {
+	        $ip = $_SERVER['REMOTE_ADDR'];
+	}
         if ( count($key->netfilters) == 0 ) $valid = true;
         foreach($key->netfilters as $netfilter) {
             if ( $netfilter == '' ) {
@@ -1455,7 +1459,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
                 }
             }
         }
-        if ( ! $valid ) debug_log('Invalid API key ' . $key->key);
+        if ( ! $valid ) error_log('Invalid API key ' . $key->key . "(ip = $ip)");
         return $valid;
     }
 

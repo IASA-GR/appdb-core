@@ -696,6 +696,9 @@ class RestBroker extends RestResourceList {
 				$passwd = null;
 				$apikey = null;
 				$sessionid = null;
+				$src = null;
+				$srv = null;
+				$cid = null;
 				if (trim($apikey) == '') { $apikey = $this->getParam("apikey"); }
 				$method = strval($x->attributes()->method);
 				switch(strtolower($method)) {
@@ -738,6 +741,9 @@ class RestBroker extends RestResourceList {
 				$apikey = strval($x->attributes()->apikey);
 				if (trim($apikey) == '') { $apikey = $this->getParam("apikey"); }
 				$sessionid = $this->getParam("sessionid");
+				$src = $this->getParam("src");
+				$cid = $this->getParam("cid");
+				$srv = $this->getParam("remoteaddr");
 				$res = strval($x->attributes()->resource);
 				if ( $res != '' ) {
 					if ( substr($res, 0, 1) == "/" ) $res = substr($res, 1);
@@ -751,6 +757,9 @@ class RestBroker extends RestResourceList {
 							if ( $passwd != '' ) $pars["passwd"] = $passwd;
 							if ( $apikey != '' ) $pars["apikey"] = $apikey;
 							if ( $sessionid != '' ) $pars["sessionid"] = $sessionid;
+							if ( $src != '' ) $pars["src"] = $src;
+							if ( $cid != '' ) $pars["cid"] = $cid;
+							if ( $srv != '' ) $pars["remoteaddr"] = $srv;
 							$xparams = $x->xpath("appdb:param");
 							foreach ( $xparams as $xparam ) {
 								$pname = strval($xparam->attributes()->name);
