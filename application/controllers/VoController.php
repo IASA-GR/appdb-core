@@ -1287,7 +1287,7 @@ class VoController extends Zend_Controller_Action
 			);
 
 			$prod_sites = $this->getVAProvidersArray();
-			db()->query("TRUNCATE TABLE __va_provider_images");
+			db()->query("TRUNCATE TABLE va_provider_images");
 			foreach ($prod_sites as $site) {
 				$basedn = 'GLUE2GroupID=cloud,GLUE2DomainID=' . $site["name"] . ',GLUE2GroupID=grid,o=glue';
 				if(trim($site["serviceid"]) != "") {
