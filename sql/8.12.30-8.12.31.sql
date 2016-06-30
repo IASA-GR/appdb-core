@@ -507,7 +507,7 @@ AS $function$
       RAISE NOTICE 'Do not forget to clean up the cache';
       RETURN TRUE;
   END;                                                                                                      
-  $function$
+  $function$;
 
 -- Function: count_app_matches(text, text, boolean)
 
