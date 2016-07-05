@@ -1,4 +1,44 @@
 <?php
+class RestAppReport extends RestROAuthResourceList {
+    /**
+     * realization of getDataType from iRestResource
+     */
+	public function getDataType() {
+        return "list";
+    }
+
+    protected function _list() {
+        return $this->get();
+    }
+
+    /**
+     * @overrides get from RestResource
+     */
+	public function get() {
+		if (parent::get() !== false) {
+			$limit = $this->_pageLength;
+			$offset = $this->_pageOffset;
+			db()->setFetchMode(Zend_Db::FETCH_NUM);
+			$res = db()->query("SELECT * FROM app_xml_report(?, ?, ?)", array($this->getParam("id"), $this->_pageLength, $this->_pageOffset))->fetchAll();
+			$ret = array();
+			foreach ($res as $r) {
+				$ret[] = $r[0];
+			}
+			return new XMLFragmentRestResponse($ret, $this);
+		} else {
+			return false;
+		}
+	}
+
+	public function authorize($method) {
+		return true;
+        $res = parent::authorize($method);
+        $res = $res && (( $this->getParam("id") == $this->_userid ) || $this->userIsAdmin());
+        if ( ! $res && $this->getError() == RestErrorEnum::RE_OK ) $this->setError(RestErrorEnum::ACCESS_DENIED);
+        return $res;
+    }
+}
+
 /**
  * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
  * 
@@ -1281,6 +1321,13 @@ class RestAppFollowedList extends RestResourceList {
      * @overrides getModel from RestResource
      */
 	protected function getModel() {
+		$res = new Default_Model_Applications();
+		$res->filter = FilterParser::getApplications($this->getParam("flt"));
+		$f = new Default_Model_ApplicationsFilter();
+		$f->id->in("SELECT * FROM followed_app_ids(" . $this->getParam("id") . ") AS appid", false, false);
+		$res->filter->chain($f, "AND");
+		return $res;
+/*
 		$ids = array();
 		$f = new Default_Model_MailSubscriptions();
 		$f->filter->flt->like('%id:SYSTAG_FOLLOW')->and($f->filter->researcherid->equals($this->getParam("id")));
@@ -1298,6 +1345,7 @@ class RestAppFollowedList extends RestResourceList {
 			}
 		} else $res = null;
 		return $res;
+ */
 	}
 
     /**
@@ -1598,7 +1646,7 @@ class RestEdtAppList extends RestROAuthResourceList {
 		$res = new Default_Model_Applications();
 		$res->filter = FilterParser::getApplications($this->getParam("flt"));
 		$f = new Default_Model_ApplicationsFilter();
-		$f->id->in("SELECT appid FROM editable_apps WHERE actor = (SELECT guid FROM researchers WHERE id = " . $this->getParam("id") . ")", false, false);
+		$f->id->in("SELECT * FROM editable_app_ids(" . $this->getParam("id") . ") AS appid", false, false);
 		$res->filter->chain($f, "AND");
 		return $res;
 	}

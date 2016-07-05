@@ -255,6 +255,12 @@
 	<resource>RestVOShifterList</resource>
 	<comment>A list of VOs the user specified by parameter :id is a shifter of</comment>
 </route>
+<route type="rest" name="appreport" url="/:version/people/:id/applications/report">
+	<format xslt="applications">xml</format>
+	<param name="id" fmt="\d+"/>
+	<resource>RestAppReport</resource>
+	<comment>A list of applications the user specified by parameter :id follows</comment>
+</route>
 <route type="rest" name="appfollowlist" url="/:version/people/:id/applications/followed">
 	<format xslt="applications">xml</format>
 	<param name="id" fmt="\d+"/>
