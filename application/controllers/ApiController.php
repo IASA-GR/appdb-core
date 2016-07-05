@@ -53,11 +53,11 @@ class ApiController extends Zend_Controller_Action
         header('Access-Control-Request-Method: GET POST PUT DELETE OPTIONS');
         $this->handle = true;
         switch ($this->apiver) {
-        case "0.2":
-            $this->handle = false;
-            require_once(APPLICATION_PATH . '/controllers/Api02Controller.php');
-            $c = new Api02Controller($this->getRequest(), $this->getResponse(), $this->getInvokeArgs(), $this->pars);
-            break;
+//        case "0.2":
+//            $this->handle = false;
+//            require_once(APPLICATION_PATH . '/controllers/Api02Controller.php');
+//            $c = new Api02Controller($this->getRequest(), $this->getResponse(), $this->getInvokeArgs(), $this->pars);
+//            break;
         case "1.0":
             break;
         default:

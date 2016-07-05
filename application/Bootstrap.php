@@ -37,8 +37,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     {
 		$this->bootstrap('Request');
 		$this->LoadRouters();
-		include('APIBootstrap02.php');
-		LoadRouters02($this);
+		//include('APIBootstrap02.php');
+		//LoadRouters02($this);
 		$front = $this->getResource('FrontController');
 		$front->getRouter()->addRoute("hashnavigation", new Zend_Controller_Router_Route(':head/*',array(
             "controller" => "index",
@@ -199,7 +199,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		parent::run();
 	}
 
-    private function LoadRouters() {
+	private function LoadRouters() {
         $front = $this->getResource('FrontController');
         $apiRoutes = array();
 
