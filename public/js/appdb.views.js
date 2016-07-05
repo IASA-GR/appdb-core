@@ -907,7 +907,7 @@ appdb.views.Filter = appdb.ExtendClass(appdb.View, "appdb.views.Filter", functio
 			return value;
 		}
 		
-		var rx = new RegExp(target + '\.any\:','i');
+		var rx = new RegExp(target + '\.any\:','ig');
 		value = $.trim(value.replace(rx, ' '));
 		var matches = value.match(/(\w+\.any\:)/ig);
 		if (matches) {
