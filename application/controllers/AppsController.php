@@ -282,7 +282,7 @@ class AppsController extends Zend_Controller_Action
 		$tool = false;
 		if ( !( ($id == "0") || ($id == '') ) && is_numeric($id) == true )	{
 			if ( file_exists(APPLICATION_PATH . "/../cache/app-logo-" . $id . "." . "png") ) {
-				$logo = file_get_contents(APPLICATION_PATH . "/../cache/" . $size . "app-logo-". $id . "." . $type);
+				$logo = @file_get_contents(APPLICATION_PATH . "/../cache/" . $size . "app-logo-". $id . "." . $type);
 			} 
 			if ( $logo == 'NULL' || $logo == false || isnull($logo) ) {
 				$type = "png";
@@ -299,7 +299,7 @@ class AppsController extends Zend_Controller_Action
 						if(substr($logo,0,1) == "/"){
 							$logo = substr($logo,1);
 						}
-						$logo = file_get_contents($logo);
+						$logo = @file_get_contents($logo);
 					}
 					$this->cachelogos($apps->items);
 				}
@@ -339,7 +339,7 @@ class AppsController extends Zend_Controller_Action
 		}
 		if ( !( ($id == "0") || ($id == '') ) && is_numeric($id) == true )	{
 			if ( file_exists(APPLICATION_PATH . "/../cache/app-logo-".$id.".png") ) {
-				$logo = file_get_contents(APPLICATION_PATH . "/../cache/app-logo-".$id.".png");
+				$logo = @file_get_contents(APPLICATION_PATH . "/../cache/app-logo-".$id.".png");
 			} 
 			if ( $logo == 'NULL' || $logo == false || isnull($logo) ) {
 				$apps = new Default_Model_Applications();
@@ -355,7 +355,7 @@ class AppsController extends Zend_Controller_Action
 						if(substr($logo,0,1) == "/"){
 							$logo = substr($logo,1);
 						}
-						$logo = file_get_contents($logo);
+						$logo = @file_get_contents($logo);
 					}
 					$this->cachelogos($apps->items);
 				}
@@ -701,7 +701,7 @@ class AppsController extends Zend_Controller_Action
 						if ( file_exists(APPLICATION_PATH . "/../cache/app-logo-".$data["id"].".png") ) unlink(APPLICATION_PATH . "/../cache/app-logo-".$data["id"].".png");
 						if ( file_exists(APPLICATION_PATH . "/../cache/55x55/app-logo-".$data["id"].".png") ) unlink(APPLICATION_PATH . "/../cache/55x55/app-logo-".$data["id"].".png");
 						if ( file_exists(APPLICATION_PATH . "/../cache/100x100/app-logo-".$data["id"].".png") ) unlink(APPLICATION_PATH . "/../cache/55x55/app-logo-".$data["id"].".png");
-						$app->logo = pg_escape_bytea(base64_encode(file_get_contents($imgfile)));
+						$app->logo = pg_escape_bytea(base64_encode(@file_get_contents($imgfile)));
 					};
 				};
 				if ( isset($_POST['addedBy']) ) {
@@ -827,7 +827,7 @@ class AppsController extends Zend_Controller_Action
                     }
 					if ($_POST['newimage'] !== "") {
 						$imgfile = APPLICATION_PATH."/../public/".$_POST['newimage'];
-						$app->logo = pg_escape_bytea(base64_encode(file_get_contents($imgfile)));
+						$app->logo = pg_escape_bytea(base64_encode(@file_get_contents($imgfile)));
 					}
 					$app->keywords = null;
 					$apps->add($app);
