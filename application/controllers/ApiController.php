@@ -216,6 +216,25 @@ class ApiController extends Zend_Controller_Action
 		$url = preg_replace('/\?.*/', '', $res);
 		$qs = explode("&", preg_replace('/.*\?/', '', $res));
 		$rx = RestBroker::matchResource($url, $apiroutes, $pars);
+		if (is_null($rx)) {
+			// FIXME: workaround for erroneous proxy resource notation (double URL-encoded)
+			// FIXME: should be fixed at the source
+			$res = urldecode($res);
+			$url = preg_replace('/\?.*/', '', $res);
+			$qs = explode("&", preg_replace('/.*\?/', '', $res));
+			$rx = RestBroker::matchResource($url, $apiroutes, $pars);
+			if (! is_null($rx)) {
+				// FIXME: workaround for erroneous people canonical URLs with query strings
+				if (($rx->resource == "RestPplItem") && ($method = "get")) {
+					$qs = null;
+				}
+			}
+		} else {
+			// FIXME: workaround for erroneous people canonical URLs with query strings
+			if (($rx->resource == "RestPplItem") && ($method = "get")) {
+				$qs = null;
+			}
+		}
 		foreach ($qs as $q) {
 			$i = explode("=", $q);
 			if (count($i) > 1) {
