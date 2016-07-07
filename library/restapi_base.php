@@ -471,10 +471,14 @@ class XMLRestResponse extends XMLRestResponseBase {
 					$cachefile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '/query_' . get_class($this->_parent) . '_' . md5(var_export($this->_parent->getParams(), true)) . '.xml';
 					if ( ! file_exists($cachefile) ) {
 						debug_log("caching API response in '$cachefile'");
-						$f = fopen($cachefile, "w");
-						$ss = str_replace('<appdb:appdb ', '<appdb:appdb cached="' . time() . '" ', $s);
-						fwrite($f, $ss);
-						fclose($f);
+						$f = @fopen($cachefile, "w");
+						if (! is_null($f)) {
+							$ss = str_replace('<appdb:appdb ', '<appdb:appdb cached="' . time() . '" ', $s);
+							fwrite($f, $ss);
+							fclose($f);
+						} else {
+							error_log("Could not open file to cache API response (Permission denied?)");
+						}
 					}
 				} catch (Exception $e) {
 					error_log($e);

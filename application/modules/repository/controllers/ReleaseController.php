@@ -31,7 +31,11 @@ class Repository_ReleaseController extends Zend_Controller_Action {
 			}
 			session_write_close();
 		}
-		header('Access-Control-Allow-Origin: *');
+		@trigger_error(""); //clear any existing error
+		@header('Access-Control-Allow-Origin: *');
+		if (! is_null(error_get_last())) {
+			error_log("Cannot set headers in Repository_ReleaseController::init(); headers already set");
+		}
     }
 	
 	public function itemAction(){

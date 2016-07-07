@@ -35,8 +35,13 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
     protected function _initRestRoute()
     {
+
 		$this->bootstrap('Request');
-		$this->LoadRouters();
+		if ( strpos($_SERVER['REQUEST_URI'],'/rest/') !== false) { 
+			// only load REST API routes when really needed
+			$this->LoadRouters();
+		}
+		// don't load obsolete v0.2 REST API routes
 		//include('APIBootstrap02.php');
 		//LoadRouters02($this);
 		$front = $this->getResource('FrontController');
