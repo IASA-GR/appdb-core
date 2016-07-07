@@ -109,11 +109,11 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		}
 //		DO NOT RELOCATE FROM API/REST CALLS, LEST THE SESSION BE CLEARED.
 		if($_SERVER['HTTP_HOST']=='appdb-pi.egi.eu' && $_SERVER['REQUEST_URI']== '/'){
-			header('Location: http://appdb.egi.eu');
+			header('Location: https://appdb.egi.eu');
 			exit();
 		}
         if($this->isBot()===false && (strpos($_SERVER['REQUEST_URI'],'/news/atom') !== false || strpos($_SERVER['REQUEST_URI'],'/news/rss') !== false || strpos($_SERVER['REQUEST_URI'],'/news/mail') !== false )){
-            if(!$https){
+			if(!$https){
                 header('Location: https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
                 exit();
             }
@@ -280,7 +280,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			$proto = (($https==true)?"https://":"http://");
 			if( $ruri!=="" && in_array(substr($ruri,1, 5), array("store","brows","pages", "mp"))){
 				header('Location: ' . $proto . $_SERVER['HTTP_HOST'] . "/#" . $ruri);
-				return true;
+				exit();
+				//return true;
 			}
 		}
 		return false;
@@ -342,6 +343,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		  
 	  }
 	  header('Location: ' . $prot . $_SERVER['HTTP_HOST'] . "/" . $q);
+	  exit();
 	  return true;
 	 }
 	 return false;
