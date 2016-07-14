@@ -121,12 +121,16 @@ class VoController extends Zend_Controller_Action
 		$img = "images/vo_eubrazilcc_eu.png";
 	} else {
 		db()->setFetchMode(Zend_Db::FETCH_NUM);
-		$img = db()->query("SELECT vos.logoid FROM vos WHERE id = $vid")->fetchAll();
-		if (count($img) > 0) {
-			$img = $img[0][0];
+		if ($vid != '') {
+			$img = db()->query("SELECT vos.logoid FROM vos WHERE id = $vid")->fetchAll();
+			if (count($img) > 0) {
+				$img = $img[0][0];
+			} else {
+				$img = "0";
+			}
 		} else {
 			$img = "0";
-		}
+		}		
 		$img = "images/disciplines/$img.png";
 	}
 	header('PRAGMA: NO-CACHE');
