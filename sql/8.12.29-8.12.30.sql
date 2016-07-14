@@ -69,11 +69,11 @@ $$
 LANGUAGE plpgsql VOLATILE;
 ALTER FUNCTION trfn_refresh_vaviews() OWNER TO appdb;
 
-DROP TRIGGER IF EXISTS tr_vapplists_99_refresh_vaviews ON applications;
+DROP TRIGGER IF EXISTS tr_vapplists_99_refresh_vaviews ON vapplists;
 
 CREATE TRIGGER tr_vapplists_99_refresh_vaviews
   AFTER INSERT OR UPDATE OR DELETE
-  ON applications
+  ON vapplists
   FOR EACH STATEMENT
   EXECUTE PROCEDURE trfn_refresh_permissions();
 
@@ -81,7 +81,7 @@ DROP TRIGGER IF EXISTS tr_vmiinstances_99_refresh_vaviews ON vmiinstances;
 
 CREATE TRIGGER tr_vmiinstances_99_refresh_vaviews
   AFTER INSERT OR UPDATE OR DELETE
-  ON applications
+  ON vmiinstances
   FOR EACH STATEMENT
   EXECUTE PROCEDURE trfn_refresh_permissions();
 
@@ -89,7 +89,7 @@ DROP TRIGGER IF EXISTS tr_vmiflavours_99_refresh_vaviews ON vmiflavours;
 
 CREATE TRIGGER tr_vmiflavours_99_refresh_vaviews
   AFTER INSERT OR UPDATE OR DELETE
-  ON applications
+  ON vmiflavours
   FOR EACH STATEMENT
   EXECUTE PROCEDURE trfn_refresh_permissions();
 
@@ -97,7 +97,7 @@ DROP TRIGGER IF EXISTS tr_vmis_99_refresh_vaviews ON vmis;
 
 CREATE TRIGGER tr_vmis_99_refresh_vaviews
   AFTER INSERT OR UPDATE OR DELETE
-  ON applications
+  ON vmis
   FOR EACH STATEMENT
   EXECUTE PROCEDURE trfn_refresh_permissions();
 
@@ -105,7 +105,7 @@ DROP TRIGGER IF EXISTS tr_vapplications_99_refresh_vaviews ON vapplications;
 
 CREATE TRIGGER tr_vapplications_99_refresh_vaviews
   AFTER INSERT OR UPDATE OR DELETE
-  ON applications
+  ON vapplications
   FOR EACH STATEMENT
   EXECUTE PROCEDURE trfn_refresh_permissions();
 
@@ -113,7 +113,7 @@ DROP TRIGGER IF EXISTS tr_vapp_versions_99_refresh_vaviews ON vapp_versions;
 
 CREATE TRIGGER tr_vapp_versions_99_refresh_vaviews
   AFTER INSERT OR UPDATE OR DELETE
-  ON applications
+  ON vapp_versions
   FOR EACH STATEMENT
   EXECUTE PROCEDURE trfn_refresh_permissions();
 
@@ -129,7 +129,7 @@ DROP TRIGGER IF EXISTS tr_app_order_hack_99_refresh_vaviews ON app_order_hack;
 
 CREATE TRIGGER tr_app_order_hack_99_refresh_vaviews
   AFTER INSERT OR UPDATE OR DELETE
-  ON applications
+  ON app_order_hack
   FOR EACH STATEMENT
   EXECUTE PROCEDURE trfn_refresh_permissions();
 
