@@ -1591,7 +1591,11 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
         }
         if ( array_key_exists('passwd', $this->_pars) ) {
             $this->_pars['passwd'] = trim($this->_pars['passwd']);
-        }
+		}
+		// hard-codedly disable global private chained filter in flt, now that default scope is the search target and not the whole dependence graph
+		if (array_key_exists('flt', $this->_pars)) {
+			$this->_pars['flt'] = preg_replace("/ *\| *& *$/", "", $this->_pars['flt']);
+		}
         $this->_error = RestErrorEnum::RE_OK;
 		$this->_extError = null;
 		$this->_cacheLife = 60; // default to 60 seconds
