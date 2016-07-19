@@ -235,10 +235,12 @@ class ApiController extends Zend_Controller_Action
 				$qs = null;
 			}
 		}
-		foreach ($qs as $q) {
-			$i = explode("=", $q);
-			if (count($i) > 1) {
-				$pars[$i[0]] = urldecode($i[1]);
+		if (is_array($qs)) {
+			foreach ($qs as $q) {
+				$i = explode("=", $q);
+				if (count($i) > 1) {
+					$pars[$i[0]] = urldecode($i[1]);
+				}
 			}
 		}
 		if (! is_null($postdata)) {
