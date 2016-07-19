@@ -49,7 +49,7 @@ BEGIN
                 RETURN NULL;
         END IF;
 END;
-$function$
+$function$;
 
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 12, 34, E'Regression bug fix related to updating an image in a vo-wide image list'
