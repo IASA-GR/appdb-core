@@ -412,6 +412,10 @@ class IndexController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender();
 		if( localRequest() === true ){
 			opcache_reset();
+			// also erase DB metadata cache
+			foreach (glob(APPLICATION_PATH . "/../cache/dbmeta/*") as $dbcache) {
+				unlink($dbcache);
+			}
 		} else {
 			$this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 403 Forbidden");
