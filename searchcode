@@ -14,5 +14,5 @@ if [[ "$1" == "" ]]; then
 	echo "  -f"
 	echo "	print only matching filenames, instead of matching lines"
 else
-	find \( -name \*.php -o -name \*.phtml -o -name \*.js \) -exec grep --color=always -H $i "$1" '{}' \;|eval $f|less -r
+	find \( -name \*.php -o -name \*.phtml -o -name \*.js \) -exec egrep --color=always -H $i "$1" '{}' \;|eval $f|less -r
 fi
