@@ -1342,7 +1342,10 @@ class VoController extends Zend_Controller_Action
 			db()->query("REFRESH MATERIALIZED VIEW site_service_images_xml;");
 			error_log("Sync VA Provider Images DONE");
 			$this->makeVAprovidersCache();
-
+			if ( strtolower($_SERVER["SERVER_NAME"]) == "appdb.egi.eu" ) {
+				$proxy = new RESTProxy("https://dashboard.appdb.egi.eu/");
+				$proxy->request("services/appdb/sync/cloud", "GET", array(), false, null);
+			}
 		} else {
 			$this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 403 Forbidden");

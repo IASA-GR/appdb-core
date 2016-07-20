@@ -138,9 +138,13 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		}
 
 		// use cache for DB table metadata
-		$frontendOptions = array('automatic_serialization' => true);
+		$frontendOptions = array(
+			'automatic_serialization' => true, 
+			'lifetime' => null
+		);
 		$backendOptions  = array('cache_dir' => APPLICATION_PATH . "/../cache/dbmeta");
 		$cache = Zend_Cache::factory('Core', 'File', $frontendOptions, $backendOptions);
+
 		Zend_Db_Table_Abstract::setDefaultMetadataCache($cache);
 
 		header('Access-Control-Allow-Origin: *');
