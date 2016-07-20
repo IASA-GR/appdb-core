@@ -21,7 +21,7 @@ class Default_Model_VMIinstance extends Default_Model_VMIinstanceBase
 {
 	public function delete(){
 		$valists = new Default_Model_VALists();
-		$valists->filter->vmiinstanceid->equals($this->id);
+		$valists->filter->vmiinstanceid->numequals($this->id);
 		if( count($valists->items) > 0 ){
 			for($i=0; $i<count($valists->items); $i+=1){
 				$item = $valists->items[0];
@@ -48,7 +48,7 @@ class Default_Model_VMIinstance extends Default_Model_VMIinstanceBase
 	public function getVAVersion(){
 		$version = null;
 		$vlists = new Default_Model_VALists();
-		$vlists->filter->vmiinstanceid->equals($this->id);
+		$vlists->filter->vmiinstanceid->numequals($this->id);
 		if( count($vlists->items) > 0 ){
 			$item = $vlists->items[0];
 			$version = $item->getVAversion();
