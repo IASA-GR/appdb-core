@@ -5623,9 +5623,11 @@ class VMCaster{
 			$voindex = -1;
 			for($i=0; $i< count($vos); $i+=1){
 				$s = $vos[$i];
-				if( $s['id'] === $item['service_id'] ){
-					$voindex = $i;
-					break;
+				if (array_key_exists("id", $s)) {
+					if( $s['id'] === $item['service_id'] ){
+						$voindex = $i;
+						break;
+					}
 				}
 			}
 			
