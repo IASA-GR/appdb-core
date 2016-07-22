@@ -1280,7 +1280,7 @@ class VoController extends Zend_Controller_Action
 		if ( localRequest() ) {
 			$this->_helper->layout->disableLayout();
 			$this->_helper->viewRenderer->setNoRender();
-			error_log("Sync VA Provider Images START");
+			error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images START");
 			$filter = '(&(GLUE2ApplicationEnvironmentRepository=*/appdb.egi.eu/*))';
 			$attrs = array(
 				'dn',
@@ -1341,13 +1341,15 @@ class VoController extends Zend_Controller_Action
 					}
 				}
 			}
+			error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images DONE [1/2]. Will refresh related materialized views");
+			error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images: Refreshing site_services_xml...");
 			db()->query("REFRESH MATERIALIZED VIEW site_services_xml;");
+			error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images: Refreshing site_service_images_xml...");
 			db()->query("REFRESH MATERIALIZED VIEW site_service_images_xml;");
-			error_log("Sync VA Provider Images DONE");
+			error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images DONE [2/2]");
 			$this->makeVAprovidersCache();
 			if ( strtolower($_SERVER["SERVER_NAME"]) == "appdb.egi.eu" ) {
-				$proxy = new RESTProxy("https://dashboard.appdb.egi.eu/");
-				$proxy->request("services/appdb/sync/cloud", "GET", array(), false, null);
+                              file_get_contents("https://dashboard.appdb.egi.eu/services/appdb/sync/cloud");
 			}
 		} else {
 			$this->getResponse()->clearAllHeaders();
@@ -1355,6 +1357,7 @@ class VoController extends Zend_Controller_Action
 			$this->getResponse()->setHeader("Status","403 Forbidden");
 		}
 	}
+
 
 	public function syncvaprovidertemplatesAction() {
 		if ( localRequest() ) {
