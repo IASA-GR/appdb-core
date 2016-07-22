@@ -332,6 +332,9 @@ class VoController extends Zend_Controller_Action
 		} catch (Exception $e) {
 			error_log("Error while post-processing VO sync operation: $e");
 		}
+		error_log("Normalizing VOs [START]");
+		db()->query("REFRESH MATERIALIZED VIEW normalized_vos;");
+		error_log("Normalizing VOs [DONE]");
 	}
 
 	private function gridops_is_down() {
