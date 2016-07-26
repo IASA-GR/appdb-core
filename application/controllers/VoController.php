@@ -1058,7 +1058,7 @@ class VoController extends Zend_Controller_Action
 			if ( $xml === false ) {
 				$err = var_export(curl_error($ch), true);
 				error_log("error in syncEGIVOMembers: " . $err);
-				ExternalDataNotification::sendNotification('VO::syncEBIVOMembers', "Could not sync VO members from EGI operations portal. Error was:\n\n" . $err); 
+				ExternalDataNotification::sendNotification('VO::syncEGIVOMembers', "Could not sync VO members from EGI operations portal. Error was:\n\n" . $err); 
 				return;
 			}
 			@curl_close($ch);
@@ -1107,7 +1107,7 @@ class VoController extends Zend_Controller_Action
 					db()->query("UPDATE config SET data = NOW()::text WHERE var = 'egi_vo_members_synced'");
 					error_log("VO members sync'ed");
 				} else {
-					ExternalDataNotification::sendNotification('VO::syncEBIVOMembers', 'Could not sync VO members from EGI operations portal. Probably got currupt or empty data');
+					ExternalDataNotification::sendNotification('VO::syncEGIVOMembers', 'Could not sync VO members from EGI operations portal. Probably got currupt or empty data');
 				}
 			} else {
 				error_log("Sync EGI VO members: nothing to do (MD5 unchanged)");
