@@ -13,7 +13,7 @@ class AppDBrestAPIHelper {
 		"9" => array(1082,1083,1084,1109,1002,1007,1032,1091,1092,1378,1185), //Multidisciplinary
 		"10"=> array(1378) //Infrastructure
 	);
-    function  __construct($version="0.2") {
+    function  __construct($version="1.0") {
         $this->base = "http://".$_SERVER['APPLICATION_API_HOSTNAME']."/rest/".$version."/";
     }
     private function getData($url){
@@ -133,10 +133,10 @@ class AppDBrestAPIHelper {
         return $this->getData("vos/");
     }
 	public function Tags(){
-		return $this->getData("tags/");
+		return $this->getData("applications/tags/");
 	}
 	public function Categories(){
-		return $this->getData("categories/");
+		return $this->getData("applications/categories/");
 	}
 }
 ?>
