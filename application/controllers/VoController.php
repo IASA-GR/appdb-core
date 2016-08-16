@@ -1332,11 +1332,30 @@ class VoController extends Zend_Controller_Action
 							if ($type == "vo") {
 								$vowide_instanceID = $instanceID;
 								db()->setFetchMode(Zend_Db::FETCH_BOTH);							
-								$instanceID = db()->query("SELECT vapplists.vmiinstanceid FROM vowide_image_list_images INNER JOIN vapplists ON vapplists.id = vowide_image_list_images.vapplistid WHERE vowide_image_list_images.id = ?", array($instanceID))->fetchAll();
-								$instanceID = $instanceID[0][0];
+								$instanceID = db()->query("SELECT vapplists.vmiinstanceid FROM vowide_image_list_images INNER JOIN vapplists ON vapplists.id = vowide_image_list_images.vapplistid WHERE vowide_image_list_images.id = ?", array($instanceID))->fetchAll();								
+								if (count($instanceID) > 0) {
+									if (count($instanceID[0]) > 0) {
+										$instanceID = $instanceID[0][0];
+									} else {
+										$instanceID = null;
+									}
+								} else {
+									$instanceID = null;
+								}
 							}
-
-							db()->query("INSERT INTO va_provider_images (va_provider_id, vmiinstanceid, content_type, va_provider_image_id, mp_uri, vowide_vmiinstanceid) VALUES (?, ?, ?, ?, ?, ?)", array($site["id"], $instanceID, $type, $imageID, $mpURI, $vowide_instanceID));
+							try {
+								db()->query("INSERT INTO va_provider_images (va_provider_id, vmiinstanceid, content_type, va_provider_image_id, mp_uri, vowide_vmiinstanceid) VALUES (?, ?, ?, ?, ?, ?)", array($site["id"], $instanceID, $type, $imageID, $mpURI, $vowide_instanceID));
+							} catch (Exception $e) {
+								error_log("ERROR in 'INSERT INTO va_provider_images (va_provider_id, vmiinstanceid, content_type, va_provider_image_id, mp_uri, vowide_vmiinstanceid)'");
+								error_log("VALUES: " . 
+									"'" . var_export($site["id"], true) . "', " .  
+									"'" . var_export($instanceID, true) . "', " .
+									"'" . var_export($type, true) . "', " .
+									"'" . var_export($imageID, true) . "', " .
+									"'" . var_export($mpURI, true) . "', " .
+									"'" . var_export($vowide_instanceID, true) . "', "
+								);
+							}
 						}
 					}
 				}
