@@ -165,9 +165,8 @@
 	<comment></comment>
 </route>
 <route type="rest" name="appvaitemimages" url="/:version/applications/:id/virtualization/productionimages">
-    <param name="id" fmt="(\d+|s:.+)"/>
 	<resource>RestVAImageList</resource>
-	<comment></comment>
+	<comment></comment> 
 </route>
 <route type="rest" name="appvaitemversion" url="/:version/applications/:id/virtualization/:vappid/:versionid">
 	<format xslt="virtualization">xml</format>

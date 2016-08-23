@@ -5258,7 +5258,7 @@ class RestAppVAItem extends RestResourceItem {
 	
 			return $reply;
 */
-			return $reply = new XMLRestResponse($x, $this);
+			return $reply = new XMLFragmentRestResponse($x, $this);
 		} else {
 			return false;
 		}
