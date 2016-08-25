@@ -70,11 +70,11 @@ class AppDBrestAPIHelper {
 			$domain = $this->domainsmap[$v];
 			$res = array();
 			for($i = 0; $i < count($domain); $i++){
-				$res[] = "%3Ddiscipline.id:".$this->ValueToID("discipline", $domain[$i]);
+				$res[] = "%2B%3Ddiscipline.id:".$this->ValueToID("discipline", $domain[$i]);
 			}
 			return implode("%20",$res);
 		}else{
-			return "%3Ddiscipline.id:".$this->ValueToID("discipline", $v);
+			return "%2B%3Ddiscipline.id:".$this->ValueToID("discipline", $v);
 		}
 	}
     private function builQuery($q){
@@ -82,17 +82,34 @@ class AppDBrestAPIHelper {
 		$flt = "flt=";
         foreach($q as $k=>$v){
 			if($k=='tag'){
-				$flt .= "%3Dtag:".$this->ValueToID($k, $v);
+				$flt .= ((trim($flt)!=='')?"%20":"");
+				$flt .= "%2B%3Dtag:".$this->ValueToID($k, $v);
 			}else if($k == 'category' ){
 				$flt .= ((trim($flt)!=='')?"%20":"");
 				$flt .= "%2B%3D%26category.id:".$this->ValueToID($k, $v);
+			}else if($k == 'vo' ){
+				$flt .= ((trim($flt)!=='')?"%20":"");
+				$flt .= "%2B%3D%26vo.id:".$this->ValueToID($k, $v);
+			}else if($k == 'country' ){
+				$flt .= ((trim($flt)!=='')?"%20":"");
+				$flt .= "%2B%3D%26country.id:".$this->ValueToID($k, $v);
 			} else if($k == 'discipline' ){
 				$flt .= ((trim($flt)!=='')?"%20":"");
 				$flt .= $this->MapDomainValue($v); 
+			} else if($k == 'name' ){
+				$flt .= ((trim($flt)!=='')?"%20":"");
+				$flt .= "%2Bname:".$v;
+			} else if($k == 'description' ){
+				$flt .= ((trim($flt)!=='')?"%20":"");
+				$flt .= "%2Bdescription:".$v;
+			} else if($k == 'abstract' ){
+				$flt .= ((trim($flt)!=='')?"%20":"");
+				$flt .= "%2Babstract:".$v;
 			}else{
 				$res .= $k."=".$this->ValueToID($k, $v)."&";
 			}
-        }
+		}
+		error_log(var_export($flt, true));
 		if( $flt !== "flt="){
 			$res = $flt . "&" . $res;
 		}
@@ -126,8 +143,8 @@ class AppDBrestAPIHelper {
         return $this->getData("regional/");
     }
     public function  Desciplines() {
-		return file_get_contents("http://".$_SERVER['APPLICATION_API_HOSTNAME']."/rest/1.0/disciplines/"); //override. Does not return disciplines in version 0.2
-        //return $this->getData("disciplines/");
+		//return file_get_contents("http://".$_SERVER['APPLICATION_API_HOSTNAME']."/rest/1.0/disciplines/"); //override. Does not return disciplines in version 0.2
+        return $this->getData("disciplines/");
     }
     public function VOs(){
         return $this->getData("vos/");

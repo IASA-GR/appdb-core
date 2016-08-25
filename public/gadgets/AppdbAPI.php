@@ -61,7 +61,7 @@ class ObjectXml {
 }
 class AppDBrestAPIHelper {
     private $base;
-    function  __construct($version="0.2") {
+    function  __construct($version="1.0") {
 		$this->base = "http://".$_SERVER['APPLICATION_API_HOSTNAME']."/rest/".$version."/";
     }
     private function getData($url){
@@ -118,13 +118,13 @@ class AppDBrestAPIHelper {
         return new ObjectXml($x->documentElement);
     }
 	public function Tags(){
-        $tags =  $this->getData("tags/");
+        $tags =  $this->getData("applications/tags/");
         $x = new DOMDocument();
         @$x->loadXML($tags);
         return new ObjectXml($x->documentElement);
     }
 	public function Categories(){
-		$desc = $this->getData("categories/");
+		$desc = $this->getData("applications/categories/");
         $x = new DOMDocument();
         @$x->loadXML($desc);
         return new ObjectXml($x->documentElement);
