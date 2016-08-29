@@ -29,6 +29,7 @@ CREATE TABLE gocdb.site_contacts (
 	dn TEXT,
 	role TEXT
 );
+ALTER TABLE gocdb.site_contacts OWNER TO appdb;
 
 CREATE INDEX idx_site_contacts_site_pkey ON gocdb.site_contacts(site_pkey);
 CREATE INDEX idx_site_contacts_dn ON gocdb.site_contacts(dn);
@@ -47,6 +48,7 @@ SELECT sites.id AS siteid,
      INNER JOIN sites ON sites.id = gocdb.site_contacts.site_pkey
      LEFT JOIN user_accounts ON user_accounts.accountid = gocdb.site_contacts.dn AND user_accounts.account_type = 'x509'::e_account_type
      LEFT JOIN researchers ON researchers.id = user_accounts.researcherid;
+ALTER VIEW site_contacts OWNER TO appdb;
 
 DROP VIEW vldap_group_members;
 DROP VIEW editable_apps;
@@ -143,6 +145,7 @@ UNION
      INNER JOIN va_providers ON va_providers.sitename = sites.name
      JOIN researchers ON researchers.id = site_contacts.researcherid
   WHERE site_contacts.role = 'Site Operations Manager'::text;
+ALTER MATERIALIZED VIEW _actor_group_members OWNER TO appdb;
 
 DELETE FROM __actor_group_members AS agm WHERE groupid IN (-10, -14) AND EXISTS (
 	SELECT * FROM _actor_group_members 
