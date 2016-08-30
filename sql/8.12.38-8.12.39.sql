@@ -23,7 +23,7 @@ Author: wvkarag@lovecraft.priv.iasa.gr
 
 START TRANSACTION;
 
-CREATE TABLE gocdb.site_contacts (
+CREATE TABLE IF NOT EXISTS gocdb.site_contacts (
 	site_pkey TEXT NOT NULL REFERENCES gocdb.sites(pkey),
 	name TEXT,
 	dn TEXT,
@@ -31,11 +31,11 @@ CREATE TABLE gocdb.site_contacts (
 );
 ALTER TABLE gocdb.site_contacts OWNER TO appdb;
 
-CREATE INDEX idx_site_contacts_site_pkey ON gocdb.site_contacts(site_pkey);
-CREATE INDEX idx_site_contacts_dn ON gocdb.site_contacts(dn);
-CREATE INDEX idx_site_contacts_role ON gocdb.site_contacts(role);
+CREATE INDEX IF NOT EXISTS idx_site_contacts_site_pkey ON gocdb.site_contacts(site_pkey);
+CREATE INDEX IF NOT EXISTS idx_site_contacts_dn ON gocdb.site_contacts(dn);
+CREATE INDEX IF NOT EXISTS idx_site_contacts_role ON gocdb.site_contacts(role);
 
-CREATE VIEW site_contacts AS
+CREATE OR REPLACE VIEW site_contacts AS
 SELECT sites.id AS siteid,
     user_accounts.researcherid,
     gocdb.site_contacts.role,
@@ -158,6 +158,7 @@ DELETE FROM __actor_group_members AS agm WHERE groupid IN (-10, -14) AND EXISTS 
 );
 
 REFRESH MATERIALIZED VIEW _actor_group_members;
+REFRESH MATERIALIZED VIEW _actor_group_members2;
 
 CREATE UNIQUE INDEX idx__actor_group_members_unique ON _actor_group_members(groupid, actorid, payload);
 CREATE INDEX idx__actor_group_members_actorid ON _actor_group_members(actorid);
@@ -607,10 +608,12 @@ CREATE OR REPLACE RULE r_update_actor_group_members AS
     __actor_group_members.actorid,
     __actor_group_members.payload;
 
-INSERT INTO config (var, data) VALUES ('managed_site_admins', '1');
-
-COMMIT;
+INSERT INTO config (var, data) 
+	SELECT 'managed_site_admins', '1'
+	WHERE NOT EXISTS (SELECT * FROM config WHERE var = 'managed_site_admins');
 
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 12, 39, E'Added support for DN managed site admins and managers'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=12 AND revision=39);
+
+COMMIT;
