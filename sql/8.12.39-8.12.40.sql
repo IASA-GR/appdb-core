@@ -150,6 +150,7 @@ CREATE INDEX vos_name_idx1_textops ON vos USING btree (name text_pattern_ops);
 CREATE INDEX vos_name_idx_textops ON vos USING btree (name text_pattern_ops);
 CREATE INDEX vos_name_low_idx_textops ON vos USING btree (lower(name) text_pattern_ops);
 -- TRGM (for extending pattern matching beyong left-anchored only
+CREATE EXTENSION btree_gin;
 CREATE INDEX egiaai_vo_contacts_puid_trgmops ON egiaai.vo_contacts USING gin (puid gin_trgm_ops);
 CREATE INDEX egiaai_vo_contacts_role_trgmops ON egiaai.vo_contacts USING gin (role gin_trgm_ops);
 CREATE INDEX egiaai_vo_contacts_role_vo_puid_trgmops ON egiaai.vo_contacts USING gin (role, vo, puid gin_trgm_ops);
