@@ -110,7 +110,8 @@ UNION
      INNER JOIN sites ON sites.id = site_contacts.siteid
      INNER JOIN va_providers ON va_providers.sitename = sites.name
      JOIN researchers ON researchers.id = site_contacts.researcherid
-  WHERE site_contacts.role = 'Site Administrator'::text  
+  WHERE site_contacts.role = 'Site Administrator'::text 
+  AND EXISTS (SELECT * FROM config WHERE var = 'managed_site_admins' AND data = '1')
  UNION
   SELECT NULL::integer AS id,
     '-11'::integer AS groupid,
@@ -144,7 +145,8 @@ UNION
      INNER JOIN sites ON sites.id = site_contacts.siteid
      INNER JOIN va_providers ON va_providers.sitename = sites.name
      JOIN researchers ON researchers.id = site_contacts.researcherid
-  WHERE site_contacts.role = 'Site Operations Manager'::text;
+  WHERE site_contacts.role = 'Site Operations Manager'::text
+  AND EXISTS (SELECT * FROM config WHERE var = 'managed_site_admins' AND data = '1');
 ALTER MATERIALIZED VIEW _actor_group_members OWNER TO appdb;
 
 DELETE FROM __actor_group_members AS agm WHERE groupid IN (-10, -14) AND EXISTS (
@@ -604,6 +606,8 @@ CREATE OR REPLACE RULE r_update_actor_group_members AS
     __actor_group_members.groupid,
     __actor_group_members.actorid,
     __actor_group_members.payload;
+
+INSERT INTO config (var, data) VALUES ('managed_site_admins', '1');
 
 COMMIT;
 
