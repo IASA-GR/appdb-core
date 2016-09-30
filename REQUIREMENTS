@@ -50,3 +50,4 @@ REQUIREMENTS
 		AddType application/javascript .jgz
 		AddType text/css .cgz
 		AddType text/x-component .htc
+	- Issue ALTER USER appdb SET bytea_output = 'escape' in order for PNGs stored in database to work
