@@ -380,7 +380,7 @@
 	
 ?>
 <div class='profileitem'>
-<div id="detailsdlgcontent<?php echo $i; ?>"  data-id="<?php echo $profile->id; ?>" data-name="<?php echo $profile->firstname . " " . $profile->lastname; ?>" data-canedit="<? echo ($editable)?'true':'false'; ?>" >
+<div id="detailsdlgcontent<?php echo $i; ?>"  data-id="<?php echo $profile->id; ?>" data-name="<?php echo $profile->firstname . " " . $profile->lastname; ?>" data-canedit="<?php echo ($editable)?'true':'false'; ?>" >
 	<div id="infodiv<?php echo $i; ?>" dojoType="dijit.layout.ContentPane" title="" class="information person">
 		<form id="editperson<?php echo $i; ?>" name="editperson<?php echo $i;?>" action="/people/update" method="post" onvalidate="appdb.pages.newprofile.onValidate(<?php echo $i; ?>);" callback="appdb.pages.newprofile.onUpdate" errorcallback="appdb.pages.newprofile.onError" cancelcallback="appdb.views.Main.refresh();">
 			<div class="logocontainer">
@@ -405,7 +405,7 @@
 				<div class="fieldvalue role">
 					<div class="field">Role:</div>
 					<div class="value">
-						<span <? if($editable) { echo 'edit_style="{\'max-width\': \'160px\'}" class="editable" edit_watermark="Select role" edit_type="combo"' /* edit_onchange="appdb.pages.newprofile.positionTypeChanged"*/ . ' edit_name="positionTypeID" edit_data=\''.$positionTypes.'\' edit_style="{\'width\':\'200px\'}"'; } ?>><?php if ($profile->id != '-1') echo($this->escape($profile->positionType->description)); else echo 'Other';?></span>
+						<span <?php if($editable) { echo 'edit_style="{\'max-width\': \'160px\'}" class="editable" edit_watermark="Select role" edit_type="combo"' /* edit_onchange="appdb.pages.newprofile.positionTypeChanged"*/ . ' edit_name="positionTypeID" edit_data=\''.$positionTypes.'\' edit_style="{\'width\':\'200px\'}"'; } ?>><?php if ($profile->id != '-1') echo($this->escape($profile->positionType->description)); else echo 'Other';?></span>
 					</div>
 				</div>
 				<div class="fieldvalue country">

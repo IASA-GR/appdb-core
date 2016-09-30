@@ -287,7 +287,7 @@ class IndexController extends Zend_Controller_Action
 			$captcha = ( ( isset($_POST["captcha"]) && trim($_POST["captcha"]) !== "" )?$_POST["captcha"]:"" );
 			
 			header("Content-type: text/xml; charset=utf-8"); 
-			echo '<?xml version="1.0"?>';
+			echo '<' . '?xml version="1.0"?' . '>';
 			if( $feedback == "" ) {
 				echo "<response error='no feedback given' group='feedback'></response>";
 				return;
@@ -317,7 +317,7 @@ class IndexController extends Zend_Controller_Action
 			
 			//Validate email format
 			for( $i=0; $i < count($email); $i+=1 ) {
-				if(! eregi('^([0-9a-z]+[-._+&])*[0-9a-z]+@([-0-9a-z]+[.])+[a-z]{2,6}$',$email[$i]) ){
+				if(! preg_match('/^([0-9a-z]+[-._+&])*[0-9a-z]+@([-0-9a-z]+[.])+[a-z]{2,6}$/i', $email[$i])) {
 					echo "<response error='Email " . $email[$i] . " is invalid' group='email'></response>";
 					return;
 				}
@@ -330,7 +330,7 @@ class IndexController extends Zend_Controller_Action
 				echo "<response error='no feedback given' group='feedback'></response>";
 				return;
 			}
-			if( eregi("(\r|\n)(to:|from:|cc:|bcc:)",$body) ) {
+			if( preg_match("/(\r|\n)(to:|from:|cc:|bcc:)/i", $body) ) {
 				echo "<response error='Message body contains invalid headers' group='feedback'></response>";
 				return;
 			}

@@ -79,7 +79,7 @@ class VoController extends Zend_Controller_Action
         $entries=array();
         $data=do_post_request("http://operations-portal.egi.eu/vo/vOlist", "");
         $f=fopen("/var/www/html/appdb/public/upload/vos.html","w");
-        $data = ereg_replace('<script.*</script>', '', $data);
+        $data = preg_replace('#<script.*</script>#', '', $data);
         fwrite($f,$data);
         fclose($f);
     }

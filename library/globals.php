@@ -43,10 +43,26 @@ $_SERVER['APILatestVersion'] = $api["latestVersion"];
 $_SERVER['Repository_Enabled'] = ( ( isset($app["enableRepository"]) && $app["enableRepository"] == 'true' )?"true":"false");
 $_SERVER['Repository_Api'] = ( ( isset($app["repositoryApi"]) )?$app["repositoryApi"]:"" );
 
-if (function_exists('override_function')) {
-	override_function('mysql_real_escape_string' ,'$s,$r = null', 'if (is_null($r)) { $r = Zend_Registry::get("repository")->getConnection(); } $s = preg_replace("/^\'/", "", preg_replace("/\'$/", "", $r->quote($s))); return $s;');
+list($php_major, $php_minor, $php_bug) = explode(".", phpversion(), 3);
+
+if ($php_major <= 5) {
+	if (function_exists('override_function')) {
+		override_function('mysql_real_escape_string' ,'$s,$r = null', 'if (is_null($r)) { $r = Zend_Registry::get("repository")->getConnection(); } $s = preg_replace("/^\'/", "", preg_replace("/\'$/", "", $r->quote($s))); return $s;');
+	} else {
+		error_log("Warning: function 'override_function' does not exist. Has the 'php-pecl-apd' package been properly installed?");
+	}
 } else {
-	error_log("Warning: function 'override_function' does not exist. Has the 'php-pecl-apd' package been properly installed?");
+	if (function_exists('mysql_real_escape_string')) {
+		error_log("Warning: ext/mysql has been officially removed in PHP 7.0; please remove obsolete extension");
+	} else {
+		function mysql_real_escape_string($s, $r = null) {
+			if (is_null($r)) {
+				$r = Zend_Registry::get("repository")->getConnection(); 
+			} 
+			$s = preg_replace("/^\'/", "", preg_replace("/\'$/", "", $r->quote($s)));
+			 return $s;
+		}
+	}
 }
 
 function userIsAdmin($id) {
@@ -748,11 +764,11 @@ function is_url2($url){
     if ( !( $parts = @parse_url( $url ) ) ) return false;
     else {
         if ( $parts['scheme'] != "http" && $parts['scheme'] != "https" && $parts['scheme'] != "ftp" && $parts['scheme'] != "gopher" ) return false;
-        else if ( !eregi( "^[0-9a-z]([-.]?[0-9a-z])*.[a-z]{2,4}$", $parts['host'], $regs ) ) return false;
-        else if ( !eregi( "^([0-9a-z-]|[_])*$", $parts['user'], $regs ) ) return false;
-        else if ( !eregi( "^([0-9a-z-]|[_])*$", $parts['pass'], $regs ) ) return false;
-        else if ( !eregi( "^[0-9a-z/_.@~-]*$", $parts['path'], $regs ) ) return false;
-        else if ( !eregi( "^[0-9a-z?&=#,]*$", $parts['query'], $regs ) ) return false;
+        else if ( ! preg_match( "/^[0-9a-z]([-.]?[0-9a-z])*.[a-z]{2,4}$/i", $parts['host'], $regs ) ) return false;
+        else if ( ! preg_match( "/^([0-9a-z-]|[_])*$/i", $parts['user'], $regs ) ) return false;
+        else if ( ! preg_match( "/^([0-9a-z-]|[_])*$/i", $parts['pass'], $regs ) ) return false;
+        else if ( ! preg_match( "/^[0-9a-z/_.@~-]*$/i", $parts['path'], $regs ) ) return false;
+        else if ( ! preg_match( "/^[0-9a-z?&=#,]*$/i", $parts['query'], $regs ) ) return false;
     }
     return true;
 }
@@ -10643,13 +10659,13 @@ class VoContact{
 		}
 		
 		if( trim($subject) !== "" ){
-			if( eregi("(\r|\n)*(to:|from:|cc:|bcc:)",$subject) ) {
+			if( preg_match("/(\r|\n)*(to:|from:|cc:|bcc:)/i",$subject) ) {
 				return "The subject contains invalid headers";
 			}
 		}
 		
 		if( trim($message) !== "" ){
-			if( eregi("(\r|\n)(to:|from:|cc:|bcc:)",$message) ) {
+			if( preg_match("/(\r|\n)(to:|from:|cc:|bcc:)/i",$message) ) {
 				return "The message contains invalid headers";
 			}
 		}

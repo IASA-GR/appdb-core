@@ -26,7 +26,7 @@ var filterNGIs = function() {
 	showAjaxLoading();
 	$("#main").hide();
 	var filter = $(":input[name='ngifilter']:last").val();
-    <? if ( $this->european != null ) echo 'var european = "&eu='.urlencode($this->european).'";'; else echo 'var european="";'; ?>
+    <?php if ( $this->european != null ) echo 'var european = "&eu='.urlencode($this->european).'";'; else echo 'var european="";'; ?>
 	$.get('/ngi/index?filter='+encodeURIComponent(filter)+european, {}, function(data,txtstatus){
 		$("#main").html(data);
 		hideAjaxLoading();

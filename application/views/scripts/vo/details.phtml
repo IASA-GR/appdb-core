@@ -106,9 +106,9 @@ function getHtmlDateValue($value, $context){
 									<tr><td>Validated On: </td><td><?php echo getHtmlDateValue($this->entry->validationDate, $this);?></td>
 									<?php if (isset($this->entry->middlewares)) { ?>
 									<tr><td>Middlewares: </td><td style='white-space:pre-wrap;word-break:break-all;'><?php echo getHtmlValue($this->entry->middlewares, $this ); ?></td></tr>
-									<? } else { ?>
+									<?php } else { ?>
 									<tr><td>Middlewares: </td><td><span><span class="emptyvalue">n/a</span></span></td></tr>
-									<? } ?>
+									<?php } ?>
 									</tr>
 								</table>
 
