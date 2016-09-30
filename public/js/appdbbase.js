@@ -12029,6 +12029,8 @@ appdb.views.Main = (function(){
 				break;
 			case "appstats/pervo":
 				e.href = '/pages/statistics/software/vo';
+			case "appstats/pertime":
+				e.href = '/pages/statistics/software/time';
 				break;
 			case "/index/feedback":
 				e.href = '/pages/contact/feedback';
