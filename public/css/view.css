@@ -6347,9 +6347,9 @@ tr.mainNavigation{
  width:95%;
 	padding:2px 0px 10px 2px;
 	margin: 0px 0 5px 2px;
-	background: -moz-linear-gradient(center top , whitesmoke 0%, #254B65 700%) repeat-x;
 	background: -webkit-gradient(linear, 0% 0%, 0% 700%, color-stop(0%,whitesmoke ), color-stop(100%, #254B65)) repeat-x;
 	background: -o-linear-gradient(center top,whitesmoke 0%,#254B65 700%) repeat-x;
+	background: -moz-linear-gradient(center top , whitesmoke 0%, #254B65 700%) repeat-x;
 	background: linear-gradient(center top, whitesmoke 0%,#254B65 700%) repeat-x;
 	border-radius: 0px 0px 3px 3px;
 	box-shadow: 0px 0px 0px #eee;
