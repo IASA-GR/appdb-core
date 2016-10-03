@@ -236,7 +236,7 @@ class VoController extends Zend_Controller_Action
 			$discnames[] = $d["name"];
 		}
 		$vo->disciplines = $discs;
-		error_log(var_export($discs, true));
+		//error_log(var_export($discs, true));
 		$vo->discipline = $minname;
 		$vo->discipline = array("domain" => $voentry->Discipline, "disciplines" => json_encode($discs));
 		if ($vo->discipline == '') $vo->discipline = "Other";
