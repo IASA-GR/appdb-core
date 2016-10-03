@@ -677,7 +677,7 @@ function browser($agent=null) {
    $pattern = '#(' . join('|', $known) . ')[/ ]+([0-9]+(?:\.[0-9]+)?)#';
    
  // Find all phrases (or return empty array if none found)
- if (!preg_match_all($pattern, $agent, $matches)) return array();
+ if (!preg_match_all($pattern, $agent, $matches)) return '';
 
  // Since some UAs have more than one phrase (e.g Firefox has a Gecko phrase,
  // Opera 7,8 have a MSIE phrase), use the last one found (the right-most one
@@ -698,6 +698,7 @@ function isMSIE9(){
 	 if (strpos($_SERVER['HTTP_USER_AGENT'],"MSIE 9") || strpos($_SERVER['HTTP_USER_AGENT'],"MSIE 10")) return true; else return false;
 }
 function getMSIEVersion(){
+	if( !isset($_SERVER['HTTP_USER_AGENT']) ) return -1;
 	if( isMSIE8() ) return 8;
 	if( isMSIE9() ) return 9;
 	if( isMSIE10() ) return 10;
