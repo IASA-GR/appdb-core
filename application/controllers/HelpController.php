@@ -248,7 +248,7 @@ class HelpController extends Zend_Controller_Action
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
 		
-		$id = $this->_getParam('id');
+		/*$id = $this->_getParam('id');
 		$txt = $this->_getParam('answer');
 		$question = null;
 		
@@ -310,11 +310,11 @@ class HelpController extends Zend_Controller_Action
 				header("HTTP/1.0 404 Not Found");
 				echo 'Requested FAQ item not found';
 			}
-		} else {
+		} else {*/
 			$this->getResponse()->clearAllHeaders();
 			header("HTTP/1.0 403 Forbidden");
 			echo 'Access Denied';
-		}
+		//}
 	}
 
 	public function cachebuildcountAction() {

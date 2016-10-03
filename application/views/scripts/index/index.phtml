@@ -25,7 +25,7 @@ $isAdmin = false;
 if ( ($this->user || $this->session->userid !== null) && ($this->user!==null && $this->user->privs!==null) ) {
 	$this->user->privs->refresh();
 	$canInsertApplication = $this->user->privs->canInsertApplication();
-	$canEditFAQs = $this->user->privs->canEditFAQs();
+	//$canEditFAQs = $this->user->privs->canEditFAQs();
 	$isAdminOrManager = userIsAdminOrManager($this->user->id);
 	// FIXME: provide for NILs assigned to countries other than their own
 	$isNIL = userIsNIL($this->user->id, $this->user->countryid);
