@@ -280,8 +280,7 @@ function check_for_appdbcached() {
 	if ( $appdbcached == "" ) {
 		error_log('AppDB cache daemon not running. Starting it now');
 		$apppath = str_replace("\n", "", APPLICATION_PATH);
-		$appenv = str_replace("\n", "", $_SERVER['APPLICATION_ENV']);
-		exec("bash -c 'cd $apppath/../bin && ./appdbcached $apppath/configs/application.ini $appenv >/dev/null 2>&1 &' >/dev/null 2>&1 &");
+		exec("bash -c 'cd $apppath/../bin; . deploy.ini; export PGPASSWORD DBNAME DBUSER DBPORT DBHOST; ./appdbcached >/dev/null 2>&1 &' >/dev/null 2>&1 &");
 	}
 }
 
