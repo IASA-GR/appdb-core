@@ -390,7 +390,10 @@ function ipCIDRCheck ($IP, $CIDR) {
 // converts inet_pton output to string with bits
 function inet_to_bits($inet) 
 {
-   $unpacked = unpack('A16', $inet);
+// pack and unpack behavior was changed in PHP 5.5
+// this call should be OK w/o changes, though
+// http://php.net/manual/en/migration55.incompatible.php
+   $unpacked = unpack('A16', $inet); // working with PHP 5.4
    $unpacked = str_split($unpacked[1]);
    $binaryip = '';
    foreach ($unpacked as $char) {
@@ -605,6 +608,9 @@ function appdbVerInfo() {
 	return $v;
 }
 
+// NOTE: In PHP 5.6 mcryopt_* behavior has changed:
+// will no longer accept keys or IVs with incorrect sizes, and block cipher modes that require IVs will now fail if an IV isn't provided
+// make sure these functions still work
 function encrypt($str, $key)
 {
     $block = mcrypt_get_block_size('des', 'ecb');
