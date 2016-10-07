@@ -72,18 +72,6 @@ class VoController extends Zend_Controller_Action
 		}
 	}
 
-    public function index2Action()
-    {
-        trackPage('/vo');
-	    $this->_helper->layout->disableLayout();
-        $entries=array();
-        $data=do_post_request("http://operations-portal.egi.eu/vo/vOlist", "");
-        $f=fopen("/var/www/html/appdb/public/upload/vos.html","w");
-        $data = preg_replace('#<script.*</script>#', '', $data);
-        fwrite($f,$data);
-        fclose($f);
-    }
-
     private function printError() 
     {
 		$this->_helper->layout->disableLayout();
