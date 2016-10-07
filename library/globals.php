@@ -1545,21 +1545,22 @@ class FilterParser {
 		}
 		switch ($mode) {
 			case (FilterParser::NORM_APP):
-				$reflection_str = do_get_request("http://".$_SERVER["APPLICATION_API_HOSTNAME"]."/rest/$ver/applications/filter/reflect", null);
+				$normalizer = new RestAppFilterReflection();
 				break;
 			case (FilterParser::NORM_PPL):
-				$reflection_str = do_get_request("http://".$_SERVER["APPLICATION_API_HOSTNAME"]."/rest/$ver/people/filter/reflect", null);
+				$normalizer = new RestPplFilterReflection();
 				break;
 			case (FilterParser::NORM_VOS):
-				$reflection_str = do_get_request("http://".$_SERVER["APPLICATION_API_HOSTNAME"]."/rest/$ver/vos/filter/reflect", null);
+				$normalizer = new RestVOFilterReflection();
 				break;
 			case (FilterParser::NORM_DISSEMINATION):
-				$reflection_str = do_get_request("http://".$_SERVER["APPLICATION_API_HOSTNAME"]."/rest/$ver/dissemination/filter/reflect", null);
+				$normalizer = new RestDisseminationFilterReflection();
 				break;
 			case (FilterParser::NORM_SITE):
-				$reflection_str = do_get_request("http://".$_SERVER["APPLICATION_API_HOSTNAME"]."/rest/$ver/sites/filter/reflect", null);
+				$normalizer = new RestSiteFilterReflection();
 				break;
 		}
+		$reflection_str = strval($normalizer->get()->finalize());
 		$reflection = new DOMDocument();
 		$reflection->loadXML($reflection_str, LIBXML_NSCLEAN | LIBXML_COMPACT);
 		$help = '';
