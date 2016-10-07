@@ -676,8 +676,11 @@ function browser($agent=null) {
  // Clean up agent and build regex that matches phrases for known browsers
  // (e.g. "Firefox/2.0" or "MSIE 6.0" (This only matches the major and minor
  // version numbers.  E.g. "2.0.0.6" is parsed as simply "2.0"
- if ( array_key_exists('HTTP_USER_AGENT', $_SERVER) ) $agent = strtolower($agent ? $agent : $_SERVER['HTTP_USER_AGENT']); else $agent='';
- $agent = strtolower($agent ? $agent : $_SERVER['HTTP_USER_AGENT']);
+ if ( array_key_exists('HTTP_USER_AGENT', $_SERVER) ) {
+	$agent = strtolower($agent ? $agent : $_SERVER['HTTP_USER_AGENT']);
+ } else {
+	$agent='';
+ }
 // named matches only work with PCRE >= 7.0
    $pattern = '#(' . join('|', $known) . ')[/ ]+([0-9]+(?:\.[0-9]+)?)#';
    
@@ -8028,7 +8031,7 @@ class SamlAuth{
 		self::clearUserCredentails($session);
 		Zend_Session::destroy(true);
 		clearAuthCookies();
-		session_regenerate_id(FALSE);
+		@session_regenerate_id(FALSE);
 		session_unset();
 	}
 }
