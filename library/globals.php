@@ -755,8 +755,9 @@ function trackPage($url,$format = null) {
 function cloneXMLNode($node,$doc){
     $nd=$doc->createElement($node->nodeName);
            
-    foreach($node->attributes as $value)
-        $nd->setAttribute($value->nodeName,$value->value);
+    foreach($node->attributes as $value) {
+		$nd->setAttribute($value->nodeName,$value->value);
+	}
            
     if(!$node->childNodes)
         return $nd;
@@ -956,8 +957,12 @@ function explodeFltStr(&$fltstr) {
 	$f = preg_replace("/\s+/", " ", $f);
 	$r = array_merge($r, explode(" ", $f));
 	$a = array();
-	foreach ($r as $i) if (!((substr($i,0,1) == '-') || (substr($i,0,1) == '+'))) $a[] = $i;
-	foreach($r as $i) if ((substr($i,0,1) == '-') || (substr($i,0,1) == '+')) $a[] = $i;
+	foreach ($r as $i) {
+		if (!((substr($i,0,1) == '-') || (substr($i,0,1) == '+'))) $a[] = $i;
+	}
+	foreach($r as $i) {
+		if ((substr($i,0,1) == '-') || (substr($i,0,1) == '+')) $a[] = $i;
+	}
 	$fltstr=trim(implode(" ",$a));
 	for($i=0; $i<count($a); $i++) $a[$i] = preg_replace('/"/','',$a[$i]);
 	$b = array();
@@ -6300,8 +6305,7 @@ class VApplianceVersionState {
 		
 		if( count($versions) > 0  )
 		{
-			foreach($versions as $version)
-			{
+			foreach($versions as $version) {
 				$res[] = $version['va_version'];
 			}
 		}
@@ -6956,8 +6960,7 @@ class SocialReport{
 		$ns = $xml->getNamespaces(true);
 		$child = $xml->children($ns['application']);
 		$idx=0;
-		foreach ($child as $app)
-		{
+		foreach ($child as $app) {
 			if($app->attributes()->deleted == 'false'){
 				$apps[$idx]['id']=(int)$app->attributes()->id;
 				$apps[$idx]['url']=$config['appdb']['host'].$config['appdb']['sw_rel_url'].$app->attributes()->cname;
