@@ -52,10 +52,10 @@ ALTER VIEW site_contacts OWNER TO appdb;
 
 DROP VIEW vldap_group_members;
 DROP VIEW editable_apps;
-DROP VIEW editable_apps2;
+DROP VIEW IF EXISTS editable_apps2;
 DROP FUNCTION delete_agm(int);
 DROP VIEW actor_group_members;
-DROP MATERIALIZED VIEW _actor_group_members2;
+DROP MATERIALIZED VIEW IF EXISTS _actor_group_members2;
 DROP VIEW __permissions;
 DROP MATERIALIZED VIEW permissions;
 DROP MATERIALIZED VIEW _actor_group_members;
@@ -158,7 +158,6 @@ DELETE FROM __actor_group_members AS agm WHERE groupid IN (-10, -14) AND EXISTS 
 );
 
 REFRESH MATERIALIZED VIEW _actor_group_members;
-REFRESH MATERIALIZED VIEW _actor_group_members2;
 
 CREATE UNIQUE INDEX idx__actor_group_members_unique ON _actor_group_members(groupid, actorid, payload);
 CREATE INDEX idx__actor_group_members_actorid ON _actor_group_members(actorid);
@@ -443,6 +442,8 @@ UNION
   GROUP BY privileges.actor, privileges.object
  HAVING array_agg(privileges.actionid) @> app_fc_actions()
 WITH DATA;
+
+REFRESH MATERIALIZED VIEW _actor_group_members2;
 
 ALTER TABLE public._actor_group_members2
   OWNER TO appdb;

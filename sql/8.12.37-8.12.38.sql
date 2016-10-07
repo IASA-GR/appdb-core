@@ -83,7 +83,7 @@ BEGIN
 		END IF;
 	END;
 END;
-$function$
+$function$;
 
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 12, 38, E'Use live instead of materialized version of vaviews when updating vowide image lists'
