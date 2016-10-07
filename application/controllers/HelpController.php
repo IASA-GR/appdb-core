@@ -343,7 +343,7 @@ class HelpController extends Zend_Controller_Action
 			header("HTTP/1.0 404 Not Found");
 			return;
 		}
-		$data = @file_get_contents("https://wiki.appdb.egi.eu/". $page . "?do=export_xhtmlbody");
+		$data = @web_get_contents("https://wiki.appdb.egi.eu/". $page . "?do=export_xhtmlbody");
 		if( $data === false ){
 			header("HTTP/1.0 404 Not Found");
 			return;

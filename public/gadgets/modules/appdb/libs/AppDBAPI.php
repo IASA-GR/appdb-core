@@ -5,7 +5,7 @@ class AppDBrestAPI {
         $this->base = "http://appdb-pi.egi.eu/rest/".$version."/";
     }
     private function getData($url){
-        return file_get_contents($url);
+        return web_get_contents($url);
     }
     private function builQuery($q){
         $res="";

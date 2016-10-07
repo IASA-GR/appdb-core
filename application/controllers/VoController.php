@@ -1356,7 +1356,7 @@ class VoController extends Zend_Controller_Action
 			error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images DONE [2/2]");
 			$this->makeVAprovidersCache();
 			if ( strtolower($_SERVER["SERVER_NAME"]) == "appdb.egi.eu" ) {
-                              file_get_contents("https://dashboard.appdb.egi.eu/services/appdb/sync/cloud");
+                              web_get_contents("https://dashboard.appdb.egi.eu/services/appdb/sync/cloud");
 			}
 		} else {
 			$this->getResponse()->clearAllHeaders();

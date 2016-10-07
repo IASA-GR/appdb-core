@@ -31,8 +31,8 @@ class Repository_Model_MetaPoaRelease extends Repository_Model_MetaPoaReleaseBas
 	public function getRepositoryUrls(){
 		if( $this->_repositoryurls === null ){
 			$app = Zend_Registry::get("app");
-			//$this->_repositoryurls = file_get_contents("http://commrepo/repofiles/getrepositorydata/" . $this->id);
-			$this->_repositoryurls = file_get_contents($app["commrepoUrl"] . "repofiles/getrepositorydata/" . $this->id);
+			//$this->_repositoryurls = web_get_contents("http://commrepo/repofiles/getrepositorydata/" . $this->id);
+			$this->_repositoryurls = web_get_contents($app["commrepoUrl"] . "repofiles/getrepositorydata/" . $this->id);
 		}
 		return $this->_repositoryurls;
 	}

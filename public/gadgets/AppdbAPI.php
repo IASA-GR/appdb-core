@@ -65,7 +65,7 @@ class AppDBrestAPIHelper {
 		$this->base = "http://".$_SERVER['APPLICATION_API_HOSTNAME']."/rest/".$version."/";
     }
     private function getData($url){
-        return file_get_contents($this->base.$url);
+        return web_get_contents($this->base.$url);
     }
     private function builQuery($q){
         $res="";

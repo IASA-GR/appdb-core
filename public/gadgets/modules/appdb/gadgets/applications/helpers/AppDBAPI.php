@@ -17,7 +17,7 @@ class AppDBrestAPIHelper {
         $this->base = "http://".$_SERVER['APPLICATION_API_HOSTNAME']."/rest/".$version."/";
     }
     private function getData($url){
-        return file_get_contents($this->base.$url);
+        return web_get_contents($this->base.$url);
     }
     private function getVOIDFromValue($value){
         $vo = $this->VOs();
@@ -143,7 +143,7 @@ class AppDBrestAPIHelper {
         return $this->getData("regional/");
     }
     public function  Desciplines() {
-		//return file_get_contents("http://".$_SERVER['APPLICATION_API_HOSTNAME']."/rest/1.0/disciplines/"); //override. Does not return disciplines in version 0.2
+	//return web_get_contents("http://".$_SERVER['APPLICATION_API_HOSTNAME']."/rest/1.0/disciplines/"); //override. Does not return disciplines in version 0.2
         return $this->getData("disciplines/");
     }
     public function VOs(){

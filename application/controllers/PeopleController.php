@@ -1101,7 +1101,7 @@ class PeopleController extends Zend_Controller_Action
         $this->_helper->viewRenderer->setNoRender();
 		$uid = $this->session->userid;
 		header("Content-Type:text/xml");
-		echo "<?xml version='1.0'?>";
+		echo "<" . "?xml version='1.0'?" . ">";
 		//Check if user is logged in
 		if($_SERVER['HTTPS'] != "on"){
 			header("HTTP/1.0 403 Forbidden");
@@ -1170,7 +1170,7 @@ class PeopleController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender();
 		$uid = $this->session->userid;
 		header("Content-Type:text/xml");
-		echo "<?xml version='1.0'?>";
+		echo "<" . "?xml version='1.0'?" . ">";
 		//Check if user is logged in
 		if($_SERVER['HTTPS'] != "on"){
 			header("HTTP/1.0 403 Forbidden");

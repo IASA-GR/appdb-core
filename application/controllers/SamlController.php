@@ -886,7 +886,7 @@ class SamlController extends Zend_Controller_Action
 		header("Content-type: application/samlmetadata+xml");
 		header("Content-Disposition: attachment; filename=" . $source );
 		
-		echo file_get_contents("https://" . $_SERVER['HTTP_HOST'] . "/auth/module.php/saml/sp/metadata.php/" . $source);
+		echo web_get_contents("https://" . $_SERVER['HTTP_HOST'] . "/auth/module.php/saml/sp/metadata.php/" . $source);
 	}
 	
 	/**

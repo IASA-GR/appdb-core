@@ -19,7 +19,7 @@ if((array_key_exists("image", $_GET)) && ($_GET["image"]==="email")){
     header('PRAGMA: NO-CACHE');
     header('CACHE-CONTROL: NO-CACHE');
     header('Content-type: image/png');
-    echo file_get_contents('http://appdb.egi.eu/texttoimage/?msg=appdb-support@hellasgrid.gr');
+    echo web_get_contents('http://appdb.egi.eu/texttoimage/?msg=appdb-support@hellasgrid.gr');
 } else {
     include "AppdbAPI.php";
 $api = new AppDBrestAPIHelper();

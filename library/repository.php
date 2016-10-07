@@ -1840,7 +1840,7 @@ class RepositoryBackend{
 		
 		//YUM build repositories
 		$url = self::getBackendUrl() . "yum/action/create/release/" . $releaseid;
-		$responsetext = file_get_contents($url);
+		$responsetext = web_get_contents($url);
 		if( !$responsetext ){
 			$release->currentStateId = $prevstateid;
 			$release->save();
@@ -1857,7 +1857,7 @@ class RepositoryBackend{
 		
 		//APT build repositories
 		$url = self::getBackendUrl() . "apt/action/create/release/" . $releaseid;
-		$responsetext = file_get_contents($url);
+		$responsetext = web_get_contents($url);
 		if( !$responsetext ){
 			$release->currentStateId = $prevstateid;
 			$release->save();
@@ -1919,7 +1919,7 @@ class RepositoryBackend{
 		
 		//YUM/APT build repofiles
 		$url = self::getBackendUrl() . "repofiles/action/regenerate/" . $releaseid;
-		$responsetext = file_get_contents($url);
+		$responsetext = web_get_contents($url);
 		if( !$responsetext ){
 			$release->currentStateId = $prevstateid;
 			$release->save();
@@ -1955,7 +1955,7 @@ class RepositoryBackend{
 		}
 		
 		$url = self::getBackendUrl() . "release/action/publish/" . $releaseid . "/" . $typename;
-		$responsetext = file_get_contents($url);
+		$responsetext = web_get_contents($url);
 		if( !$responsetext ){
 			return self::createErrorResponse("Could not connect to community repository backend.", $output, $params);
 		}
@@ -2038,7 +2038,7 @@ class RepositoryBackend{
 		}
 		
 		$url = self::getBackendUrl() . "release/action/unpublish/" . $releaseid . "/" . $typename;
-		$responsetext = file_get_contents($url);
+		$responsetext = web_get_contents($url);
 		if( !$responsetext ){
 			return self::createErrorResponse("Could not connect to community repository backend.", $output , $params);
 		}
@@ -2118,7 +2118,7 @@ class RepositoryBackend{
 		$params["from"] = $from;
 		
 		$url = self::getBackendUrl() . "release/action/rename/" . $id . "/displayversion/" . $from . "/" . $to;		
-                $responsetext = file_get_contents($url);
+                $responsetext = web_get_contents($url);
 		if( !$responsetext ){
 			return self::createErrorResponse("Could not connect to community repository backend.", $output , $params);
 		}
@@ -2173,7 +2173,7 @@ class RepositoryBackend{
 		$params["from"] = $from;
 		
 		$url = self::getBackendUrl() . "release/action/rename/" . $id . "/seriesname/" . $from . "/" . $to;
-		$responsetext = file_get_contents($url);
+		$responsetext = web_get_contents($url);
 		if( !$responsetext ){
 			return self::createErrorResponse("Could not connect to community repository backend.", $output , $params);
 		}
@@ -2208,7 +2208,7 @@ class RepositoryBackend{
 			}
 		}
 		$url = self::getBackendUrl() . "release/action/remove/" . $id . "/release";
-		$responsetext = file_get_contents($url);
+		$responsetext = web_get_contents($url);
 		if( !$responsetext ){
 			return self::createErrorResponse("Could not connect to community repository backend.", $output , $params);
 		}
@@ -2244,7 +2244,7 @@ class RepositoryBackend{
 		}
 		
 		$url = self::getBackendUrl() . "release/action/remove/" . $id . "/series";
-		$responsetext = file_get_contents($url);
+		$responsetext = web_get_contents($url);
 		if( !$responsetext ){
 			return self::createErrorResponse("Could not connect to community repository backend.", $output , $params);
 		}
@@ -2284,7 +2284,7 @@ class RepositoryBackend{
 		$ptype = strtolower(trim($pck->pkgType));
 		if( $ptype == "rpm" ||  $ptype == "deb") {
 			$url = self::getBackendUrl() . "package/action/calcversionindex/" . $pck->id;
-			$response = file_get_contents($url);
+			$response = web_get_contents($url);
 			if( !$response ){
 				return false;
 			}
