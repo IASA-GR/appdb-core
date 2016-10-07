@@ -65,6 +65,16 @@ if ($php_major <= 5) {
 	}
 }
 
+function web_get_contents($url) {
+	$arrContextOptions=array(
+		"ssl"=>array(
+			"verify_peer"=>false,
+			"verify_peer_name"=>false,
+		),
+	);   
+	return file_get_contents($url, false, stream_context_create($arrContextOptions));
+}
+
 function userIsAdmin($id) {
 	if (is_null($id)) return false;
 	$admins = new Default_Model_Researchers();
@@ -4796,7 +4806,7 @@ class SEO{
 		if( !$fp ){
 			return;
 		}
-		$xml = '<?xml version="1.0" encoding="UTF-8"?>';
+		$xml = '<' . '?xml version="1.0" encoding="UTF-8"?' . '>';
 		$xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 		fwrite($fp, $xml);
 		fwrite($fp, "<sitemap>");
@@ -4822,7 +4832,7 @@ class SEO{
 		if( !$fp ){
 			return;
 		}
-		$xml = '<?xml version="1.0" encoding="UTF-8"?>';
+		$xml = '<' . '?xml version="1.0" encoding="UTF-8"?' . '>';
 		$xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 		$xml .= self::getStaticSiteMapEntries($options);
 		fwrite($fp, $xml);
@@ -4872,7 +4882,7 @@ class VMCaster{
 		
 		if( $vmcxml !== null && trim($vmcxml) !== "" && !is_numeric($vmcxml) ) {
 			if( strpos($vmcxml, "<?xml") !== 0 ) {
-				$vmcxml = '<?xml version="1.0" encoding="utf-8"?>' . $vmcxml;
+				$vmcxml = '<' . '?xml version="1.0" encoding="utf-8"?' . '>' . $vmcxml;
 			}
 			
 			try {
@@ -4907,7 +4917,7 @@ class VMCaster{
 	public static function createImageList($vaversionid, $target="published"){
 		//Call vmcaster service to produce image list
 		$url = VMCaster::getVMCasterUrl() . "/" . "vmlistcontroller/create/" . $vaversionid . "/".$target;
-		$result = file_get_contents($url);
+		$result = web_get_contents($url);
 		if( $result === false ){
 			error_log("[VAPP:VMCaster:createImageList]:Could not retrieve response data from " . $url);
 			return "Could not retrieve response data from " . $url;
@@ -5067,7 +5077,7 @@ class VMCaster{
 		$url = VMCaster::getVMCasterUrl() . "/integrity/checkimagelist/".$vaversionid."/xml";
 		
 		try{
-			$xml = file_get_contents($url);
+			$xml = web_get_contents($url);
 			if( trim($xml) === "" ){
 				throw new Exception('Could not connect to integrity check service. Please, try again later.');
 			}
@@ -5132,7 +5142,7 @@ class VMCaster{
 		VMCaster::clearIntegrityCheck($vaversionid);
 		
 		$url = VMCaster::getVMCasterUrl() . "/integrity/cancelimageList/".$vaversionid."/xml";
-		$xml = file_get_contents($url);
+		$xml = web_get_contents($url);		
 		if( trim($xml) === "" ) return false;
 		$result = VMCaster::parseIntegrityCheckResponse($xml);
 		return $result;
@@ -5141,7 +5151,7 @@ class VMCaster{
 	public static function statusIntegrityCheck($vaversionid){
 		$url = VMCaster::getVMCasterUrl() . "/integrity/statusimageList/".$vaversionid."/xml";
 		try{
-			$xml = file_get_contents($url);
+			$xml = web_get_contents($url);		
 			if( trim($xml) === "" ){
 				throw new Exception('Could not connect with integrity check service. Please, try again later.');
 			}
@@ -9994,7 +10004,7 @@ class VoAdmin{
 	private static function publishToVMCaster($researcher, $vo, $voimagelist){
 		$url = VMCaster::getVMCasterUrl();
 		$url .= "/vmlistcontroller/create/" . $voimagelist->id . "/published/vos";
-		$result = file_get_contents($url);
+		$result = web_get_contents($url);		
 		if( $result === false ){
 			error_log("[VOAdmin:publishToVMCaster]:Could not retrieve response data from " . $url);
 			return false;
