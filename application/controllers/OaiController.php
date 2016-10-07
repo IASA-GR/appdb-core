@@ -79,13 +79,16 @@ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
 					$itemid = $items[1];
 					switch($resource) {
 						case "applications":
+							$res = new RestAppItem(array("id" => $itemid));
+							break;
 						case "people":
+							$res = new RestPplItem(array("id" => $itemid));
 							break;
 						default:
 							return $this->buildResponse($this->getError("badArgument","Requested invalid resource"), "GetRecord", $prefix);
 					}
 					debug_log("[OaiController::getRecord]: Getting " . "http://".$_SERVER["APPLICATION_API_HOSTNAME"]."/rest/latest/$item");
-					$res = do_get_request("http://".$_SERVER["APPLICATION_API_HOSTNAME"]."/rest/latest/$item", null);
+					$res = strval($res->get());
 					$res = $this->buildResponse($res, "GetRecord", $prefix);
 					$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER)."oai-applications.xsl";
 					$xsl = new DOMDocument();
