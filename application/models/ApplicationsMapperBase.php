@@ -106,7 +106,7 @@ class Default_Model_ApplicationsMapperBase
 		$entry->setRespect($row->respect);
 		$entry->setTool($row->tool);
 		$entry->setGuid($row->guid);
-		$entry->setKeywords($row->keywords);
+//		$entry->setKeywords($row->keywords);
 		$entry->setLastUpdated($row->lastupdated);
 		$entry->setRating($row->rating);
 		$entry->setRatingCount($row->ratingcount);
