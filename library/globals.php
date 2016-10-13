@@ -149,7 +149,7 @@ function initLDAP($secure = true, $rdn = null, $pwd = null, $ldapError = null) {
 	if ($secure) {
 		$ldapCount = 0;
 		while($ldapCount < 10) { // try, try, try again
-			if ($ldapCount > 0) {
+			if ($ldapCount >= 0) {
 				error_log('Trying to set-up TLS ldap connection: attempt #' . $ldapCount);
 			}
 			$ds = _initLDAP(true, $rdn, $pwd, $ldapError);

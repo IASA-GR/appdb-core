@@ -1480,7 +1480,12 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
         return $valid;
     }
 
-    /**
+
+	public static function ldapErrorFunc($ds, $err) {
+		error_log($err);
+	}
+
+	/**
      * realization of authenticate() from iRestAuthModule
      */ 
 	public function authenticate() {
@@ -1526,7 +1531,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
 						if ( $username !== null ) { 
                             $username = "uid=".$username.",ou=people,dc=egi,dc=eu";
                             $password = $this->getParam('passwd');
-							$ds = initLDAP(true, $username, $password);
+							$ds = initLDAP(true, $username, $password, 'RestResource::ldapErrorFunc');
 							if (is_resource($ds)) { //login info was valid
 	                            ldap_close($ds);
             //                  error_log('API call authenticated');
@@ -1547,6 +1552,8 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
 						$_GET['userid'] = $actor->id;
 						return true;
 					}
+				} else {
+					error_log("API call authentication failed: cannot map access token to actor (invalid token?)");
 				}
 			}
 			$this->_userid = 0;
