@@ -253,6 +253,17 @@ class GocdbController extends Zend_Controller_Action
 		}
 	}
 
+	public function syncoccidowntimeinfoAction() {
+		if ( localRequest() ) {
+			$this->syncOcciDowntimeInfo();
+		} else {
+			$this->getResponse()->clearAllHeaders();
+			$this->getResponse()->setRawHeader("HTTP/1.0 403 Forbidden");
+			$this->getResponse()->setHeader("Status","403 Forbidden");
+		}
+	}
+
+
 	public function syncsitecontactsAction() {
 		if ( localRequest() ) {
 			$this->syncSiteContacts();
