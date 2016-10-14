@@ -100,6 +100,89 @@ class GocdbController extends Zend_Controller_Action
 		}
 	}
 
+
+	private function syncOcciDowntimeInfo() {
+		error_log("Syncing OCCI downtimes");
+		try {
+			db()->beginTransaction();
+		} catch (Exception $e) {
+			error_log("[syncOcciDowntimeInfo] Cannot initiate transaction. Aborting...");
+		}
+		try {
+			db()->query("ALTER TABLE gocdb.va_providers DISABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;");
+			db()->query("UPDATE gocdb.va_providers SET occi_downtime = 0::bit(2);");
+			$ch = curl_init();
+			$uri = "https://goc.egi.eu/gocdbpi/public/?method=get_downtime_nested_services&ongoing_only=yes";
+			curl_setopt($ch, CURLOPT_URL, $uri);
+			curl_setopt($ch, CURLOPT_HEADER, false);
+			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+			curl_setopt($ch, 181, 1 | 2);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);        
+			curl_setopt($ch, CURLOPT_SSLCERT, APPLICATION_PATH . '/../bin/sec/usercert.pem');
+			curl_setopt($ch, CURLOPT_SSLKEY, APPLICATION_PATH . '/../bin/sec/userkey.pem');
+			$headers = apache_request_headers();
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			$xml = curl_exec($ch);
+			
+			if ( $xml === false ) {
+				error_log("error in syncOcciDowntimeInfo: " . var_export(curl_error($ch), true));
+				$db = db();
+				@$db->rollBack();
+				return;
+			}
+			@curl_close($ch);
+			$xml = new SimpleXMLElement($xml);
+			$xps = $xml->xpath("//SERVICE_TYPE[text()='eu.egi.cloud.vm-management.occi']/../PRIMARY_KEY");
+			foreach ($xps as $xp) {
+				error_log("Currently down: " . strval($xp));
+				$pkey = strval($xp);
+				db()->query("UPDATE gocdb.va_providers SET occi_downtime = occi_downtime | 2::bit(2) WHERE pkey = '$pkey';");
+			}
+
+			$wstart = date('Y-m-d');
+			$wend = date('Y-m-d');
+			$ch = curl_init();
+			$uri = "https://goc.egi.eu/gocdbpi/public/?method=get_downtime_nested_services&windowstart=$wstart&windowend=$wend";
+			curl_setopt($ch, CURLOPT_URL, $uri);
+			curl_setopt($ch, CURLOPT_HEADER, false);
+			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+			curl_setopt($ch, 181, 1 | 2);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);        
+			curl_setopt($ch, CURLOPT_SSLCERT, APPLICATION_PATH . '/../bin/sec/usercert.pem');
+			curl_setopt($ch, CURLOPT_SSLKEY, APPLICATION_PATH . '/../bin/sec/userkey.pem');
+			$headers = apache_request_headers();
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			$xml = curl_exec($ch);
+			
+			if ( $xml === false ) {
+				error_log("error in syncOcciDowntimeInfo: " . var_export(curl_error($ch), true));
+				$db = db();
+				@$db->rollBack();
+				return;
+			}
+			@curl_close($ch);
+			$xml = new SimpleXMLElement($xml);
+			$xps = $xml->xpath("//SERVICE_TYPE[text()='eu.egi.cloud.vm-management.occi']/../PRIMARY_KEY");
+			foreach ($xps as $xp) {
+				error_log("Down sometime today: " . strval($xp));
+				$pkey = strval($xp);
+				db()->query("UPDATE gocdb.va_providers SET occi_downtime = occi_downtime | 1::bit(2) WHERE pkey = '$pkey';");
+			}
+			db()->commit();
+			db()->query("ALTER TABLE gocdb.va_providers ENABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;");
+			db()->query("REFRESH MATERIALIZED VIEW va_providers;");
+		} catch (Exception $e) {
+			error_log("[syncOcciDowntimeInfo] error $e");
+			$db = db();
+			@$db->rollBack();
+			return;
+		}
+	}
+
 	private function syncVAProviders() {
 		$inTransaction = false;
 		try {
@@ -117,7 +200,6 @@ class GocdbController extends Zend_Controller_Action
 			$headers = apache_request_headers();
 			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 			$xml = curl_exec($ch);
-			
 			if ( $xml === false ) {
 				error_log("error in syncVAProviders: " . var_export(curl_error($ch), true));
 				return;
@@ -147,10 +229,12 @@ class GocdbController extends Zend_Controller_Action
 					error_log("VA providers sync'ed");
 				}
 			} 
+			$this->syncOcciDowntimeInfo();
 		} catch (Exception $e) {
 			if ($inTransaction) {
 				$db = db();
 				@$db->rollBack();
+				error_log("Rollback. Cause: $e");
 			}
 			db()->query("ALTER TABLE gocdb.va_providers ENABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;");
 			db()->query("REFRESH MATERIALIZED VIEW CONCURRENTLY va_providers;");
