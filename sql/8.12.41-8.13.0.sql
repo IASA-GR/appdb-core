@@ -23,7 +23,7 @@ Author: wvkarag@lovecraft.priv.iasa.gr
 
 START TRANSACTION;
 
--- ALTER TABLE gocdb.va_providers ADD COLUMN occi_downtime BIT(2) NOT NULL DEFAULT '00'::BIT(2);
+ALTER TABLE gocdb.va_providers ADD COLUMN occi_downtime BIT(2) NOT NULL DEFAULT '00'::BIT(2);
 CREATE OR REPLACE VIEW public.__va_providers AS 
  SELECT va_providers.pkey AS id,
     va_providers.sitename,
