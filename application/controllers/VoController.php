@@ -519,6 +519,7 @@ class VoController extends Zend_Controller_Action
 			if ( $xml === false ) {
 				error_log("error in syncEGIVOs: " . var_export(curl_error($ch), true));
 				ExternalDataNotification::sendNotification('VO::syncEGIVOs', var_export(curl_error($ch), true), ExternalDataNotification::MESSAGE_TYPE_ERROR);
+				return false;
 			}
 			@curl_close($ch);
 
