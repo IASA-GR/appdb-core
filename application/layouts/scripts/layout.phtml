@@ -57,7 +57,10 @@ if ( ( APPLICATION_ENV == "api") ) {
     header('HTTP/1.0 404 Not Found');
     exit();
 }
-$br = get_browser(null,true);
+$br = @get_browser(null,true);
+if (! isset($br["browser"])) {
+	$bg["browser"] = "";
+}
 $isIE10 = (strtolower(trim($br["browser"])) === "ie" && isset($br["majorver"]) && trim($br["majorver"])==="10")?true:false;
 $isGtIE10 = (getMSIEVersion()>10)?true:false;
 $isIE9 = (strtolower(trim($br["browser"])) === "ie" && isset($br["majorver"]) && trim($br["majorver"])==="9")?true:false; 
@@ -74,7 +77,7 @@ echo $this->doctype(); fl();?>
 	<?php } ?>
 	<?php echo SEO::getHeaderTags(); ?>
 	<link rel="help" href="<?php echo ApplicationConfiguration::url('/pages/about/faq');?>" >
-	<script type="text/javascript"><?php if( $br["browser"]=='IE' ){ ?>
+	<script type="text/javascript"><?php if( strtolower(trim($br["browser"])) === "ie" ){ ?>
 		var emulateIE8=true;
 	<?php } else { ?>
 		var emulateIE8=false;
