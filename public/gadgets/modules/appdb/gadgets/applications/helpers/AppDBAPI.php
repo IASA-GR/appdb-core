@@ -1,4 +1,14 @@
 <?php
+function web_get_contents($url) {
+	$arrContextOptions=array(
+		"ssl"=>array(
+			"verify_peer"=>false,
+			"verify_peer_name"=>false,
+		),
+	);   
+	return file_get_contents($url, false, stream_context_create($arrContextOptions));
+}
+
 class AppDBrestAPIHelper {
     private $base;
 	private $domainsmap = array(
