@@ -179,19 +179,32 @@
 						<xsl:element name="virtualization:addedon"><xsl:value-of select="virtualization:addedon" /></xsl:element>
 						<xsl:element name="virtualization:addedby">
 							<xsl:choose>
-								<xsl:when test="person:person">
-									<xsl:attribute name="id"><xsl:value-of select="person:person/@id" /></xsl:attribute>
-									<xsl:attribute name="cname"><xsl:value-of select="person:person/@cname" /></xsl:attribute>
-									<xsl:element name="person:firstname"><xsl:value-of select="person:person/person:firstname" /></xsl:element>
-									<xsl:element name="person:lastname"><xsl:value-of select="person:person/person:lastname" /></xsl:element>
-									<xsl:element name="person:gender"><xsl:value-of select="person:person/person:gender" /></xsl:element>
-									<xsl:element name="person:institute"><xsl:value-of select="person:person/person:institute" /></xsl:element>
+								<xsl:when test="person:addedby">
+									<xsl:attribute name="id"><xsl:value-of select="person:addedby/@id" /></xsl:attribute>
+									<xsl:attribute name="cname"><xsl:value-of select="person:addedby/@cname" /></xsl:attribute>
+									<xsl:element name="person:firstname"><xsl:value-of select="person:addedby/person:firstname" /></xsl:element>
+									<xsl:element name="person:lastname"><xsl:value-of select="person:addedby/person:lastname" /></xsl:element>
+									<xsl:element name="person:institute"><xsl:value-of select="person:addedby/person:institute" /></xsl:element>
 									<xsl:element name="person:role">
-										<xsl:attribute name="id"><xsl:value-of select="person:person/person:role/@id" /></xsl:attribute>
-										<xsl:attribute name="type"><xsl:value-of select="person:person/person:role/@type" /></xsl:attribute>
+										<xsl:attribute name="id"><xsl:value-of select="person:addedby/person:role/@id" /></xsl:attribute>
+										<xsl:attribute name="type"><xsl:value-of select="person:addedby/person:role/@type" /></xsl:attribute>
 									</xsl:element>
-									<xsl:element name="person:permalink"><xsl:value-of select="person:person/person:permalink" /></xsl:element>
-									<xsl:element name="person:image"><xsl:value-of select="person:person/person:image" /></xsl:element>
+								</xsl:when>
+							</xsl:choose>
+						</xsl:element>
+						<xsl:element name="virtualization:lastupdatedon"><xsl:value-of select="virtualization:lastupdatedon" /></xsl:element>
+						<xsl:element name="virtualization:lastupdatedby">
+							<xsl:choose>
+								<xsl:when test="person:lastupdatedby">
+									<xsl:attribute name="id"><xsl:value-of select="person:lastupdatedby/@id" /></xsl:attribute>
+									<xsl:attribute name="cname"><xsl:value-of select="person:lastupdatedby/@cname" /></xsl:attribute>
+									<xsl:element name="person:firstname"><xsl:value-of select="person:lastupdatedby/person:firstname" /></xsl:element>
+									<xsl:element name="person:lastname"><xsl:value-of select="person:lastupdatedby/person:lastname" /></xsl:element>
+									<xsl:element name="person:institute"><xsl:value-of select="person:lastupdatedby/person:institute" /></xsl:element>
+									<xsl:element name="person:role">
+										<xsl:attribute name="id"><xsl:value-of select="person:lastupdatedby/person:role/@id" /></xsl:attribute>
+										<xsl:attribute name="type"><xsl:value-of select="person:lastupdatedby/person:role/@type" /></xsl:attribute>
+									</xsl:element>
 								</xsl:when>
 							</xsl:choose>
 						</xsl:element>
