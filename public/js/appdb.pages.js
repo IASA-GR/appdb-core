@@ -1412,23 +1412,29 @@ appdb.pages.home = (function(){
 		var fetchbroker = function(async, callback){
 			async = (typeof async === "boolean")?async:true;
 			var homebroker = new appdb.utils.broker(async);
-			$.each(clist, function(i,e){
-				if( e.async === async ){
-					homebroker.request(e.request);
-				}
-			});
+			homebroker.request({"id": "apps", "method": "GET", "resource": "people/" + userID + "/applications/report", "param": getParams($.extend(clist[0].view.getDataQuery(), {"listmode": "listing"}))});
+			homebroker.request({"id": "vos", "method": "GET", "resource": "people/" + userID + "/vos"});
 			homebroker.fetch(function(e){
 				e.reply = e.reply || [];
 				e.reply = $.isArray(e.reply)?e.reply:[e.reply];
-				for (var k=0; k<e.reply.length; k+=1) {
-					var item = $.grep(clist, (function(r){
-						return function(i){
-							return (i.id === r.id);
-						};
-					})(e.reply[k]));
-					if( item.length === 0 ) return;
-					item[0].view.load(void 0,e.reply[k].appdb);
-				}
+				$.each(clist, function(i, ee) {
+					if (ee.id.startsWith("vos")) {
+						ee.view.load(void 0, e.reply[1].appdb);
+					} else {
+						ex = null;
+						e.reply[0].appdb.list = $.isArray(e.reply[0].appdb.list) ? e.reply[0].appdb.list : [e.reply[0].appdb.list];
+						$.each(e.reply[0].appdb.list, function(i, er) {
+							if (er.key == ee.id) {							
+								ex = er;
+								//return;
+							}
+						});
+						if (ex === null) {
+							ex = {"count": "0", "application": []};
+						}
+						ee.view.load(void 0, ex);
+					}
+				});
 				if( async === true ){
 					if( typeof callback === "function" ){
 						setTimeout(function(){ callback(); }, 1);

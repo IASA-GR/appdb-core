@@ -8,8 +8,20 @@ class RestAppReport extends RestROAuthResourceList {
     }
 
     protected function _list() {
-        return $this->get();
-    }
+		if (parent::_list() !== false) {
+			$limit = $this->_pageLength;
+			$offset = $this->_pageOffset;
+			db()->setFetchMode(Zend_Db::FETCH_NUM);
+			$res = db()->query("SELECT * FROM app_xml_report(?, ?, ?, 'listing')", array($this->getParam("id"), $this->_pageLength, $this->_pageOffset))->fetchAll();
+			$ret = array();
+			foreach ($res as $r) {
+				$ret[] = $r[0];
+			}
+			return new XMLFragmentRestResponse($ret, $this);
+		} else {
+			return false;
+		}
+ }
 
     /**
      * @overrides get from RestResource
@@ -19,7 +31,7 @@ class RestAppReport extends RestROAuthResourceList {
 			$limit = $this->_pageLength;
 			$offset = $this->_pageOffset;
 			db()->setFetchMode(Zend_Db::FETCH_NUM);
-			$res = db()->query("SELECT * FROM app_xml_report(?, ?, ?)", array($this->getParam("id"), $this->_pageLength, $this->_pageOffset))->fetchAll();
+			$res = db()->query("SELECT * FROM app_xml_report(?, ?, ?, ?)", array($this->getParam("id"), $this->_pageLength, $this->_pageOffset, $this->_listMode))->fetchAll();
 			$ret = array();
 			foreach ($res as $r) {
 				$ret[] = $r[0];
