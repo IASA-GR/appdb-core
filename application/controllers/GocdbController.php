@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+require_once(APPLICATION_PATH . "/../library/argo.php");
+
 class GocdbController extends Zend_Controller_Action
 {
 
@@ -230,6 +232,7 @@ class GocdbController extends Zend_Controller_Action
 				}
 			} 
 			$this->syncOcciDowntimeInfo();
+			$this->syncArgoOcciStatus();
 		} catch (Exception $e) {
 			if ($inTransaction) {
 				$db = db();
@@ -256,6 +259,21 @@ class GocdbController extends Zend_Controller_Action
 	public function syncoccidowntimeinfoAction() {
 		if ( localRequest() ) {
 			$this->syncOcciDowntimeInfo();
+		} else {
+			$this->getResponse()->clearAllHeaders();
+			$this->getResponse()->setRawHeader("HTTP/1.0 403 Forbidden");
+			$this->getResponse()->setHeader("Status","403 Forbidden");
+		}
+	}
+	
+	public function syncArgoOcciStatus() {
+		$argo = new ArgoOCCI();
+		$argo->syncStatus();
+	}
+
+	public function syncargooccistatusAction() {
+		if ( localRequest() ) {
+			$this->syncArgoOcciStatus();
 		} else {
 			$this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 403 Forbidden");
