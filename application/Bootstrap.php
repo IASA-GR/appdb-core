@@ -100,7 +100,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             $front->setRequest($request);
 		}
 		
-		date_default_timezone_set('Europe/Athens');
 		$https = false;
 		if (array_key_exists('HTTPS',$_SERVER)) {
 			if ($_SERVER['HTTPS'] != '') {

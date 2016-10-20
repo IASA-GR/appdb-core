@@ -64,8 +64,7 @@ class Default_Model_MyNews {
 	}
 	$where .= " AND action <> 'delete') AND ( CASE WHEN action = 'update' THEN subjecttype<>'doc' ELSE true END)";
 	if ( ( $this->from != '') || ( $this->to != '' ) ) {
-	   date_default_timezone_set('Europe/Athens');
-		if ( $this->from != '' ) $from = "'".date("Y-m-d H:i:s", strtotime($this->from))."'"; else $from = '0';
+	   if ( $this->from != '' ) $from = "'".date("Y-m-d H:i:s", strtotime($this->from))."'"; else $from = '0';
 	   if ( $this->to != '' ) $to = "'".date("Y-m-d H:i:s", strtotime($this->to))."'"; else $to = 'EXTRACT(EPOCH FROM NOW())';
 	   $where.=" AND (timestamp BETWEEN $from AND $to)";
 	}
