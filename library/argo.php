@@ -67,7 +67,7 @@ class ArgoOCCI extends Argo {
 				$wto = gmdate("Y-m-d\TH:i:s\Z");
 				$ch = curl_init();
 				$uri = "https://web-api-devel.argo.grnet.gr/api/v2/status/" . $this->_reportType . "/SITES/$sitename/services/" . $this->_serviceType . "/endpoints/${endpoint}?start_time=$wfrom&end_time=$wto";
-				error_log("Syncing OCCI ARGO status for site $sitename");
+				debug_log("Syncing OCCI ARGO status for site $sitename");
 				curl_setopt($ch, CURLOPT_URL, $uri);
 				curl_setopt($ch, CURLOPT_HEADER, false);
 				curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
