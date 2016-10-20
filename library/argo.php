@@ -42,9 +42,9 @@ class ArgoOCCI extends Argo {
 		db()->query("ALTER TABLE gocdb.va_providers DISABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;");
 		db()->setFetchMode(Zend_Db::FETCH_NUM);
 		if (isset($site)) {
-			$vas = db()->query("SELECT pkey, sitename, hostname, argo_status, argo_status_date FROM gocdb.va_providers WHERE sitename = ? ORDER BY sitename, hostname", array($site))->fetchAll();
+			$vas = db()->query("SELECT pkey, sitename, hostname, service_status, service_status_date FROM gocdb.va_providers WHERE sitename = ? ORDER BY sitename, hostname", array($site))->fetchAll();
 		} else {
-			$vas = db()->query("SELECT pkey, sitename, hostname, argo_status, argo_status_date FROM gocdb.va_providers ORDER BY sitename, hostname")->fetchAll();
+			$vas = db()->query("SELECT pkey, sitename, hostname, service_status, service_status_date FROM gocdb.va_providers ORDER BY sitename, hostname")->fetchAll();
 		}
 		if (is_array($vas) && count($vas) > 0) {
 			foreach($vas as $va) {
@@ -113,7 +113,7 @@ class ArgoOCCI extends Argo {
 					}
 					if ($V != "") {
 						try {
-							db()->query("UPDATE gocdb.va_providers SET argo_status = ?, argo_status_date = ? WHERE pkey = ?", array($V, date("Y-m-d H:i:s",$T), $id))->fetchAll();
+							db()->query("UPDATE gocdb.va_providers SET service_status = ?, service_status_date = ? WHERE pkey = ?", array($V, date("Y-m-d H:i:s",$T), $id))->fetchAll();
 						} catch (Exception $e) {
 							error_log("error updating OCCI ARGO status in DB for site $sitename and endpoint $endpoint: $e");
 						}
