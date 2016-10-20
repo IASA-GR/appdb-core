@@ -122,6 +122,7 @@ class ArgoOCCI extends Argo {
 			}
 		}
 		db()->query("ALTER TABLE gocdb.va_providers ENABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;");
+		db()->query("REFRESH MATERIALIZED VIEW CONCURRENTLY va_providers;");
 		db()->commit();
 		error_log("OCCI ARGO status sync ended");
 	}
