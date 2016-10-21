@@ -1,3 +1,88 @@
+CREATE OR REPLACE FUNCTION public.ppl_vo_xml_report(
+    mid integer,
+    lim bigint DEFAULT 9223372036854775807::bigint,
+    ofs bigint DEFAULT 0::bigint,
+    listmode integer DEFAULT 0
+)
+  RETURNS SETOF xml AS
+$BODY$
+SELECT
+	XMLELEMENT(
+		name "appdb:list",
+		XMLATTRIBUTES(
+			ccc.cnt AS "count",
+			'vo' AS datatype,
+			$1 AS userid,
+			-- t.relation,
+			'vos_' || t.relation AS key
+		),
+		CASE $4 WHEN 1 THEN
+			REPLACE(array_to_string(array_agg((SELECT * FROM vo_to_xml(ARRAY[void])) ORDER BY name), ''), '<vo:vo ', '<vo:vo relation="' || t.relation || '" ')::xml
+		WHEN 2 THEN
+			REPLACE(array_to_string(array_agg((SELECT * FROM vo_to_xml_ext(void)) ORDER BY name), ''), '<vo:vo ', '<vo:vo relation="' || t.relation || '" ')::xml
+		ELSE
+			REPLACE(array_to_string(array_agg(vo_to_xml(void) ORDER BY name), ''), '<vo:vo ', '<vo:vo relation="' || t.relation || '" ')::xml
+		END
+	)
+FROM (
+SELECT * FROM (
+SELECT void, vos.name, 'member'::text AS relation, member_since
+FROM vo_members 
+INNER JOIN vos ON vos.id = vo_members.void
+WHERE researcherid = $1
+LIMIT $2 OFFSET $3
+) AS tt0
+UNION ALL
+SELECT * FROM (
+SELECT void, vos.name, LOWER(REPLACE(role::text,'VO ', '')) AS relation, NULL::timestamp AS member_since
+FROM vo_contacts
+INNER JOIN vos ON vos.id = vo_contacts.void
+WHERE researcherid = $1
+LIMIT $2 OFFSET $3
+) AS tt1
+) AS t
+INNER JOIN ppl_vo_xml_report_counts($1) AS ccc ON ccc.relation = t.relation
+GROUP BY t.relation, ccc.cnt
+ORDER BY t.relation
+$BODY$
+  LANGUAGE sql STABLE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.ppl_vo_xml_report(int, bigint, bigint, int)
+  OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION public.ppl_vo_xml_report_counts(
+    mid integer
+)
+RETURNS TABLE(cnt bigint, relation text) AS 
+$BODY$
+SELECT 
+COUNT(*) AS cnt,
+relation
+FROM (
+SELECT * FROM (
+SELECT void, vos.name, 'member'::text AS relation, member_since
+FROM vo_members 
+INNER JOIN vos ON vos.id = vo_members.void
+WHERE researcherid = $1
+) AS tt0
+UNION ALL
+SELECT * FROM (
+SELECT void, vos.name, LOWER(REPLACE(role::text,'VO ', '')) AS relation, NULL::timestamp AS member_since
+FROM vo_contacts
+INNER JOIN vos ON vos.id = vo_contacts.void
+WHERE researcherid = $1
+) AS tt1
+) AS t
+GROUP BY relation 
+ORDER BY relation;
+$BODY$
+  LANGUAGE sql STABLE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.app_xml_report_counts(integer)
+  OWNER TO appdb;
+
 DROP FUNCTION IF EXISTS app_xml_report(integer, integer, integer, integer);
 DROP FUNCTION IF EXISTS app_xml_report(integer, integer, integer);
 
