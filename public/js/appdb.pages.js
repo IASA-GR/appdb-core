@@ -1412,7 +1412,7 @@ appdb.pages.home = (function(){
 		var fetchbroker = function(async, callback){
 			async = (typeof async === "boolean")?async:true;
 			var homebroker = new appdb.utils.broker(async);
-			homebroker.request({"id": "apps", "method": "GET", "resource": "people/" + userID + "/applications/report", "param": getParams($.extend(clist[0].view.getDataQuery(), {"listmode": "listing"}))});
+			homebroker.request({"id": "apps", "method": "GET", "resource": "people/" + userID + "/applications/report", "param": [{"name": "pagelength", "val": 15}, {"name": "pageoffset", "val": 0}, {"name": "listmode", "val": "listing"}]});
 			homebroker.request({"id": "vos", "method": "GET", "resource": "people/" + userID + "/vos"});
 			homebroker.fetch(function(e){
 				e.reply = e.reply || [];

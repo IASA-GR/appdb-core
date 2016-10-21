@@ -1,10 +1,11 @@
-SELECT * FROM app_xml_report(520,NULL,NULL,1);
+DROP FUNCTION IF EXISTS app_xml_report(integer, integer, integer, integer);
+DROP FUNCTION IF EXISTS app_xml_report(integer, integer, integer);
 
-CREATE OR REPLACE FUNCTION public.app_xml_report(
+CREATE OR REPLACE FUNCTION app_xml_report(
     mid integer,
-    lim integer DEFAULT NULL::integer,
-    ofs integer DEFAULT NULL::integer,
-    listmode int DEFAULT 0)
+    lim bigint DEFAULT 9223372036854775807::bigint,
+    ofs bigint DEFAULT 0::bigint,
+    listmode integer DEFAULT 0)
   RETURNS SETOF xml AS
 $BODY$
 SELECT 
@@ -23,58 +24,64 @@ SELECT
 			END || '_' || t.association AS "key"
 		),
 		CASE $4 WHEN 1 THEN
-			array_to_string(array_agg((SELECT * FROM app_to_xml_list(ARRAY[appid]))), '')::xml
+			array_to_string(array_agg((SELECT * FROM app_to_xml_list(ARRAY[appid])) ORDER BY name), '')::xml
 		WHEN 2 THEN
-			array_to_string(array_agg((SELECT * FROM app_to_xml_ext(appid))), '')::xml
+			array_to_string(array_agg((SELECT * FROM app_to_xml_ext(appid)) ORDER BY name), '')::xml
 		ELSE
-			array_to_string(array_agg(app_to_xml(appid)), '')::xml
+			array_to_string(array_agg(app_to_xml(appid) ORDER BY name), '')::xml
 		END
 	)
 FROM (
 SELECT * FROM (
 SELECT * FROM (
-SELECT applications.id AS appid, applications.metatype AS metatype, 'editable'::text AS association
+SELECT 
+ROW_NUMBER() OVER (PARTITION BY applications.metatype ORDER BY applications.name) AS r,
+applications.name, applications.id AS appid, applications.metatype AS metatype, 'editable'::text AS association
 FROM applications 
 INNER JOIN editable_app_ids($1) AS e ON e.e = applications.id
 WHERE NOT applications.deleted AND NOT applications.moderated
-ORDER BY applications.name ASC
+ORDER BY applications.metatype, applications.name ASC
 ) AS tt0
-LIMIT $2 OFFSET $3
+WHERE r <= COALESCE($2, 9223372036854775807) AND r > COALESCE($3, 0)
 ) AS t0
 UNION ALL
 SELECT * FROM (
 SELECT * FROM (
-SELECT applications.id, applications.metatype, 'followed'::text
+SELECT 
+ROW_NUMBER() OVER (PARTITION BY applications.metatype ORDER BY applications.name) AS r,
+applications.name, applications.id, applications.metatype, 'followed'::text
 FROM applications 
 INNER JOIN followed_app_ids($1) AS f ON f.f = applications.id
 WHERE NOT applications.deleted AND NOT applications.moderated
 ORDER BY applications.name ASC
 ) AS tt1
-LIMIT $2 OFFSET $3
+WHERE r <= COALESCE($2, 9223372036854775807) AND r > COALESCE($3, 0)
 ) AS t1
 UNION ALL
 SELECT * FROM (
 SELECT * FROM (
-SELECT appbookmarks.appid, applications.metatype, 'bookmarked'::text
+SELECT ROW_NUMBER() OVER (PARTITION BY applications.metatype ORDER BY applications.name) AS r,
+applications.name, appbookmarks.appid, applications.metatype, 'bookmarked'::text
 FROM appbookmarks
 INNER JOIN applications ON applications.id = appbookmarks.appid
 WHERE researcherid = $1
 AND NOT applications.deleted AND NOT applications.moderated
 ORDER BY applications.name ASC
 ) AS tt2
-LIMIT $2 OFFSET $3
+WHERE r <= COALESCE($2, 9223372036854775807) AND r > COALESCE($3, 0)
 ) AS t2
 UNION ALL
 SELECT * FROM (
 SELECT * FROM (
-SELECT appid, applications.metatype, 'associated'::text
+SELECT ROW_NUMBER() OVER (PARTITION BY applications.metatype ORDER BY applications.name) AS r,
+applications.name, appid, applications.metatype, 'associated'::text
 FROM researchers_apps
 INNER JOIN applications ON applications.id = researchers_apps.appid
 WHERE researcherid = $1
 AND NOT applications.deleted AND NOT applications.moderated
 ORDER BY applications.name ASC
 ) AS tt3
-LIMIT $2 OFFSET $3
+WHERE r <= COALESCE($2, 9223372036854775807) AND r > COALESCE($3, 0)
 ) AS t3
 ) AS t
 INNER JOIN app_xml_report_counts($1) AS ccc ON ccc.metatype = t.metatype AND ccc.association = t.association
@@ -84,12 +91,8 @@ $BODY$
   LANGUAGE sql STABLE
   COST 100
   ROWS 1000;
-ALTER FUNCTION public.app_xml_report(integer, integer, integer, integer)
+ALTER FUNCTION public.app_xml_report(integer, bigint, bigint, integer)
   OWNER TO appdb;
-
--- Function: public.app_to_xml_list(integer[])
-
--- DROP FUNCTION public.app_to_xml_list(integer[]);
 
 CREATE OR REPLACE FUNCTION public.app_to_xml_list(ids integer[])
   RETURNS SETOF xml AS
@@ -107,7 +110,8 @@ applications.deleted,
 applications.guid
 ), 
 XMLELEMENT(name "application:name", applications.name),
-XMLELEMENT(name "application:category", XMLATTRIBUTES(c.id, TRUE AS primary), c.name)
+XMLELEMENT(name "application:category", XMLATTRIBUTES(c.id, TRUE AS primary), c.name),
+XMLELEMENT(name "application:logo", 'https://' || (SELECT data FROM config WHERE var = 'ui-host') || '/apps/getlogo?id=' || applications.id::text)
 )
 FROM applications 
 INNER JOIN LATERAL (SELECT id, name FROM categories WHERE id = ANY(applications.categoryid)
@@ -120,36 +124,6 @@ $BODY$
   ROWS 1000;
 ALTER FUNCTION public.app_to_xml_list(integer[])
   OWNER TO appdb;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 CREATE OR REPLACE FUNCTION public.app_xml_report_counts(
     mid integer
@@ -202,5 +176,3 @@ $BODY$
   ROWS 1000;
 ALTER FUNCTION public.app_xml_report_counts(integer)
   OWNER TO appdb;
-
-SELECT * FROM app_xml_report_counts(520)
