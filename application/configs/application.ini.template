@@ -54,6 +54,7 @@ deploy.instance='<production|development: Current deploy is in production or dev
 app.pngfont='wine-tahoma'
 app.timezone='UTC';
 app.argo_api_key='';
+app.argo_api_endpoint='';
 
 [staging : production]
 

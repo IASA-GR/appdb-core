@@ -18,14 +18,42 @@
 abstract class Argo {
 	protected $_serviceType;
 	protected $_reportType;
-	protected $_apikey;
+	private $_apikey;
+	private $_apiURI;
+	private $_ch;
 
 	public function __construct($serviceType = "eu.egi.cloud.vm-management.occi", $reportType = "Critical") {
 		$app = Zend_Registry::get('app');
+		$this->_apiURI = $app["argo_api_endpoint"];
 		$this->_apikey = $app["argo_api_key"];
 		$this->_timezone = $app["timezone"];
 		$this->_reportType = $reportType;
 		$this->_serviceType = $serviceType;
+		$this->_ch = curl_init();
+		curl_setopt($this->_ch, CURLOPT_HEADER, false);
+		curl_setopt($this->_ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($this->_ch, 181, 1 | 2);
+		curl_setopt($this->_ch, CURLOPT_SSL_VERIFYHOST, false);
+		curl_setopt($this->_ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($this->_ch, CURLOPT_RETURNTRANSFER, true);        
+		curl_setopt($this->_ch, CURLOPT_SSLCERT, APPLICATION_PATH . '/../bin/sec/usercert.pem');
+		curl_setopt($this->_ch, CURLOPT_SSLKEY, APPLICATION_PATH . '/../bin/sec/userkey.pem');
+		curl_setopt($this->_ch, CURLOPT_HTTPHEADER, array(
+			"Accept: application/xml",
+			"x-api-key: " . $this->_apikey
+		));
+	}
+
+	public function __destruct() {
+		@curl_close($this->_ch);
+	}
+
+	protected function _callAPI($resource) {		
+		$uri = $this->_apiURI . $resource;
+		curl_setopt($this->_ch, CURLOPT_URL, $uri);
+//		debug_log("Making ARGO API call to $uri");
+		$xml = curl_exec($this->_ch);
+		return $xml;
 	}
 
 	abstract public function syncStatus($site = null);
@@ -65,24 +93,7 @@ class ArgoOCCI extends Argo {
 					date_default_timezone_set($this->_timezone);
 				}	
 				$wto = gmdate("Y-m-d\TH:i:s\Z");
-				$ch = curl_init();
-				$uri = "https://web-api-devel.argo.grnet.gr/api/v2/status/" . $this->_reportType . "/SITES/$sitename/services/" . $this->_serviceType . "/endpoints/${endpoint}?start_time=$wfrom&end_time=$wto";
-				debug_log("Syncing OCCI ARGO status for site $sitename");
-				curl_setopt($ch, CURLOPT_URL, $uri);
-				curl_setopt($ch, CURLOPT_HEADER, false);
-				curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-				curl_setopt($ch, 181, 1 | 2);
-				curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);        
-				curl_setopt($ch, CURLOPT_SSLCERT, APPLICATION_PATH . '/../bin/sec/usercert.pem');
-				curl_setopt($ch, CURLOPT_SSLKEY, APPLICATION_PATH . '/../bin/sec/userkey.pem');
-				curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-					"Accept: application/xml",
-					"x-api-key: " . $this->_apikey
-				));
-				$xml = curl_exec($ch);
-
+				$xml = $this->_callAPI("/status/" . $this->_reportType . "/SITES/$sitename/services/" . $this->_serviceType . "/endpoints/${endpoint}?start_time=$wfrom&end_time=$wto");
 				if ( $xml === false ) {
 					error_log("connection error in Argo::syncStatus for site $sitename and endpoint $endpoint: " . var_export(curl_error($ch), true));
 					db()->query("ALTER TABLE gocdb.va_providers ENABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;");
@@ -90,7 +101,7 @@ class ArgoOCCI extends Argo {
 					db()->rollBack();
 					return;
 				}
-				@curl_close($ch);
+
 				try {
 					$xml = new SimpleXMLElement($xml);
 				} catch (Exception $e) {
@@ -113,6 +124,7 @@ class ArgoOCCI extends Argo {
 					}
 					if ($V != "") {
 						try {
+							debug_log("SITE: $sitename ENDPOINT_ID: $id STATE: $V TIMESTAMP: $T");
 							db()->query("UPDATE gocdb.va_providers SET service_status = ?, service_status_date = ? WHERE pkey = ?", array($V, date("Y-m-d H:i:s",$T), $id))->fetchAll();
 						} catch (Exception $e) {
 							error_log("error updating OCCI ARGO status in DB for site $sitename and endpoint $endpoint: $e");
