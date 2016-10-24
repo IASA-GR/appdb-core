@@ -259,7 +259,13 @@
 	<format xslt="applications">xml</format>
 	<param name="id" fmt="\d+"/>
 	<resource>RestAppReport</resource>
-	<comment>A list of applications the user specified by parameter :id follows</comment>
+	<comment>A list of applications the user specified by parameter :id is related to</comment>
+</route>
+<route type="rest" name="voreport" url="/:version/people/:id/vos/report">
+	<format xslt="applications">xml</format>
+	<param name="id" fmt="\d+"/>
+	<resource>RestVOReport</resource>
+	<comment>A list of VOs the user by parameter :id is a member of contact of</comment>
 </route>
 <route type="rest" name="appfollowlist" url="/:version/people/:id/applications/followed">
 	<format xslt="applications">xml</format>

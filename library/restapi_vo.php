@@ -15,6 +15,58 @@
  * limitations under the License.
  */
 
+class RestVoReport extends RestROAuthResourceList {
+    /**
+     * realization of getDataType from iRestResource
+     */
+	public function getDataType() {
+        return "list";
+    }
+
+    protected function _list() {
+		if (parent::_list() !== false) {
+			$limit = $this->_pageLength;
+			$offset = $this->_pageOffset;
+			db()->setFetchMode(Zend_Db::FETCH_NUM);
+			$res = db()->query("SELECT * FROM ppl_vo_xml_report(?, ?, ?, 'listing')", array($this->getParam("id"), $this->_pageLength, $this->_pageOffset))->fetchAll();
+			$ret = array();
+			foreach ($res as $r) {
+				$ret[] = $r[0];
+			}
+			return new XMLFragmentRestResponse($ret, $this);
+		} else {
+			return false;
+		}
+ }
+
+    /**
+     * @overrides get from RestResource
+     */
+	public function get() {
+		if (parent::get() !== false) {
+			$limit = $this->_pageLength;
+			$offset = $this->_pageOffset;
+			db()->setFetchMode(Zend_Db::FETCH_NUM);
+			$res = db()->query("SELECT * FROM ppl_vo_xml_report(?, ?, ?, ?)", array($this->getParam("id"), $this->_pageLength, $this->_pageOffset, $this->_listMode))->fetchAll();
+			$ret = array();
+			foreach ($res as $r) {
+				$ret[] = $r[0];
+			}
+			return new XMLFragmentRestResponse($ret, $this);
+		} else {
+			return false;
+		}
+	}
+
+	public function authorize($method) {
+		return true;
+        $res = parent::authorize($method);
+        $res = $res && (( $this->getParam("id") == $this->_userid ) || $this->userIsAdmin());
+        if ( ! $res && $this->getError() == RestErrorEnum::RE_OK ) $this->setError(RestErrorEnum::ACCESS_DENIED);
+        return $res;
+	}
+}
+
 /**
  * class RestVOList
  * derived class for lists of VOs
