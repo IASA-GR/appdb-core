@@ -16,8 +16,8 @@
 
 /* 
 EGI AppDB incremental SQL script
-Previous version: 8.13.1
-New version: 8.13.2
+Previous version: 8.13.3
+New version: 8.13.4
 Author: wvkarag@lovecraft.priv.iasa.gr
 */
 
@@ -121,7 +121,7 @@ CREATE OR REPLACE VIEW public.vapp_to_xml AS
   ORDER BY vapp_versions.published, vapp_versions.archived, vapp_versions.archivedon DESC;
 
 INSERT INTO version (major,minor,revision,notes) 
-	SELECT 8, 13, 2, E'Fix vapp_to_xml bug related to addedby/lastupdatedby'
-	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=13 AND revision=1);
+	SELECT 8, 13, 4, E'Fix vapp_to_xml bug related to addedby/lastupdatedby'
+	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=13 AND revision=4);
 
 COMMIT;
