@@ -3473,6 +3473,7 @@ appdb.views.AppsList = appdb.ExtendClass(appdb.View, "appdb.views.AppsList", fun
 		}
 		img = $(doc.createElement("img")).addClass("itemimage");
 		if( logo ){
+			// DNE: USE FAST PROGRESSIVE JPEGs INSTEAD OF SLOW PHP CALL
 			//img.attr("src","/apps/getlogo?req=" + encodeURI(d.lastUpdated) + "&id=" + d.id);
 			img.attr("src","/images/applogo/55x55/app-logo-" + d.id + ".jpg?req=" + encodeURI(d.lastUpdated));
 		}else if( d.contentType === 'softwareappliance'){
