@@ -1412,23 +1412,30 @@ appdb.pages.home = (function(){
 		var fetchbroker = function(async, callback){
 			async = (typeof async === "boolean")?async:true;
 			var homebroker = new appdb.utils.broker(async);
-			$.each(clist, function(i,e){
-				if( e.async === async ){
-					homebroker.request(e.request);
-				}
-			});
+			homebroker.request({"id": "apps", "method": "GET", "resource": "people/" + userID + "/applications/report", "param": [{"name": "pagelength", "val": 15}, {"name": "pageoffset", "val": 0}, {"name": "listmode", "val": "listing"}]});
+			homebroker.request({"id": "vos", "method": "GET", "resource": "people/" + userID + "/vos/report", "param": [{"name": "pagelength", "val": 15}, {"name": "pageoffset", "val": 0}, {"name": "listmode", "val": "listing"}]});
 			homebroker.fetch(function(e){
 				e.reply = e.reply || [];
 				e.reply = $.isArray(e.reply)?e.reply:[e.reply];
-				for (var k=0; k<e.reply.length; k+=1) {
-					var item = $.grep(clist, (function(r){
-						return function(i){
-							return (i.id === r.id);
-						};
-					})(e.reply[k]));
-					if( item.length === 0 ) return;
-					item[0].view.load(void 0,e.reply[k].appdb);
-				}
+				$.each(clist, function(i, ee) {
+					if (ee.id.startsWith("vos")) {
+						replyIDX = 1;
+					} else {
+						replyIDX = 0;
+					};
+					ex = null;
+					e.reply[replyIDX].appdb.list = $.isArray(e.reply[replyIDX].appdb.list) ? e.reply[replyIDX].appdb.list : [e.reply[replyIDX].appdb.list];
+					$.each(e.reply[replyIDX].appdb.list, function(i, er) {
+						if (er.key == ee.id) {							
+							ex = er;
+							//return;
+						}
+					});
+					if (ex === null) {
+						ex = {"count": "0", "vo": []};
+					}
+					ee.view.load(void 0, ex);
+				});
 				if( async === true ){
 					if( typeof callback === "function" ){
 						setTimeout(function(){ callback(); }, 1);
@@ -1448,10 +1455,7 @@ appdb.pages.home = (function(){
 			},1500);
 		});
 		//Sync load broker request maked with async=false
-		fetchbroker(false, function(){
-			//Async load rest of items
-			fetchbroker(true);
-		});
+		fetchbroker(false);
 	};
 	page.initCustomTabs = function(){
 		$(".homepage.custom .tabcontainer > ul.header > li").unbind("click").bind("click", function(ev){

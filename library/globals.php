@@ -35,6 +35,12 @@ Zend_Registry::set('api',$api);
 $app = $this->getOption("app");
 Zend_Registry::set('app',$app);
 
+if (isset($app["timezone"])) {
+	date_default_timezone_set($app["timezone"]);
+} else {
+	date_default_timezone_set('UTC');
+}
+
 $vouser_sync = $this->getOption("vouser_sync");
 Zend_Registry::set('vouser_sync',$vouser_sync);
 
@@ -1200,10 +1206,8 @@ function JSONPermalink($v){
 }
 
 function sendMail($subject, $to, $body = '', $username, $password) { 
-
 		if ( ApplicationConfiguration::isProductionInstance() === FALSE ) return;
 
-		date_default_timezone_set('Europe/Athens');
 		$headers = array();
         $headers['From']    = $username; 
         $headers['Subject'] = $subject;
@@ -1246,12 +1250,9 @@ function sendMail($subject, $to, $body = '', $username, $password) {
 }
 
 function sendMultipartMail($subject, $to, $txtbody='', $htmlbody='', $username, $password, $replyto = false, $attachment = null, $cc=false, $ext = null) {
-
 		error_log("[sendMultipartMail] Subject: $subject, To: " . var_export($to, true) . "CC: " . var_export($cc, true));
 		if ( ApplicationConfiguration::isProductionInstance() === FALSE ) return;
 
-		date_default_timezone_set('Europe/Athens');
-		
 		$message = new Mail_mime();
 		$message->setTXTBody($txtbody);
         $message->setHTMLBody($htmlbody);

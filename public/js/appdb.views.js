@@ -3372,6 +3372,7 @@ appdb.views.AppsList = appdb.ExtendClass(appdb.View, "appdb.views.AppsList", fun
 		var doc = document, a, img, span, span1, span2, span3, span4, more, div, div1, i, u = [], res = $(doc.createElement("li")), logo, ishttps = Boolean(appdb.config.https) && true, prot,
 				moderated = false, deleted = false, validated = false, title = '', rating = null, ratingcount = null, categories = null, c, descr;
 		title = d.name;
+		d.description = d.description || "";
 		descr = d.description;
 		if ($.trim(descr) === "" || $.trim(descr).toLowerCase() === $.trim(d.name).toLowerCase()) {
 			if ($.trim(d["abstract"]) !== "") {
@@ -3472,6 +3473,7 @@ appdb.views.AppsList = appdb.ExtendClass(appdb.View, "appdb.views.AppsList", fun
 		}
 		img = $(doc.createElement("img")).addClass("itemimage");
 		if( logo ){
+			// DNE: USE FAST PROGRESSIVE JPEGs INSTEAD OF SLOW PHP CALL
 			//img.attr("src","/apps/getlogo?req=" + encodeURI(d.lastUpdated) + "&id=" + d.id);
 			img.attr("src","/images/applogo/55x55/app-logo-" + d.id + ".jpg?req=" + encodeURI(d.lastUpdated));
 		}else if( d.contentType === 'softwareappliance'){
@@ -3482,6 +3484,7 @@ appdb.views.AppsList = appdb.ExtendClass(appdb.View, "appdb.views.AppsList", fun
 			img.attr("src", loadImage(appdb.config.images.applications) );
 		}
 		$(a).append(img);
+		d["abstract"] = d["abstract"] || "";
 		span = $(doc.createElement("span")).append(d.name.substring(0, 45).replace(/\</g, "&lt;").replace(/\>/g, "&gt;") + (d.name.length > 45 ? '...' : '')).addClass("itemname");
 		span1 = $(doc.createElement("span")).append(unescape(descr.substring(0, 80)).replace(/\<\/*\w+ *(\w+(=['"][a-zA-Z0-9:;\-_#! \.]*["']){0,}){0,}\/{0,}\>/g, "").replace(/\</g, "&lt;").replace(/\>/g, "&gt;") + ((descr.length > 80) ? '...' : '')).addClass("itemsorttext");
 		span2 = $(doc.createElement("span")).append("<span class='description'>" + unescape(d.description).replace(/\<\/*\w+ *(\w+(=['"][a-zA-Z0-9:;\-_#! \.]*["']){0,}){0,}\/{0,}\>/g, "").replace(/\</g, "&lt;").replace(/\>/g, "&gt;") + "</span>").append(doc.createElement("p")).append(d["abstract"].replace(/\<\/*\w+ *(\w+(=['"][a-zA-Z0-9:;\-_#! \.]*["']){0,}){0,}\/{0,}\>/g, "").replace(/\</g, "&lt;").replace(/\>/g, "&gt;")).addClass("itemlongtext");

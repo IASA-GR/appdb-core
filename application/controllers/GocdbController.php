@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+require_once(APPLICATION_PATH . "/../library/argo.php");
+
 class GocdbController extends Zend_Controller_Action
 {
 
@@ -110,7 +112,7 @@ class GocdbController extends Zend_Controller_Action
 		}
 		try {
 			db()->query("ALTER TABLE gocdb.va_providers DISABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;");
-			db()->query("UPDATE gocdb.va_providers SET occi_downtime = 0::bit(2);");
+			db()->query("UPDATE gocdb.va_providers SET service_downtime = 0::bit(2);");
 			$ch = curl_init();
 			$uri = "https://goc.egi.eu/gocdbpi/public/?method=get_downtime_nested_services&ongoing_only=yes";
 			curl_setopt($ch, CURLOPT_URL, $uri);
@@ -138,7 +140,7 @@ class GocdbController extends Zend_Controller_Action
 			foreach ($xps as $xp) {
 				error_log("Currently down: " . strval($xp));
 				$pkey = strval($xp);
-				db()->query("UPDATE gocdb.va_providers SET occi_downtime = occi_downtime | 2::bit(2) WHERE pkey = '$pkey';");
+				db()->query("UPDATE gocdb.va_providers SET service_downtime = service_downtime | 2::bit(2) WHERE pkey = '$pkey';");
 			}
 
 			$wstart = date('Y-m-d');
@@ -170,7 +172,7 @@ class GocdbController extends Zend_Controller_Action
 			foreach ($xps as $xp) {
 				error_log("Down sometime today: " . strval($xp));
 				$pkey = strval($xp);
-				db()->query("UPDATE gocdb.va_providers SET occi_downtime = occi_downtime | 1::bit(2) WHERE pkey = '$pkey';");
+				db()->query("UPDATE gocdb.va_providers SET service_downtime = service_downtime | 1::bit(2) WHERE pkey = '$pkey';");
 			}
 			db()->commit();
 			db()->query("ALTER TABLE gocdb.va_providers ENABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;");
@@ -230,6 +232,7 @@ class GocdbController extends Zend_Controller_Action
 				}
 			} 
 			$this->syncOcciDowntimeInfo();
+			$this->syncArgoOcciStatus();
 		} catch (Exception $e) {
 			if ($inTransaction) {
 				$db = db();
@@ -256,6 +259,21 @@ class GocdbController extends Zend_Controller_Action
 	public function syncoccidowntimeinfoAction() {
 		if ( localRequest() ) {
 			$this->syncOcciDowntimeInfo();
+		} else {
+			$this->getResponse()->clearAllHeaders();
+			$this->getResponse()->setRawHeader("HTTP/1.0 403 Forbidden");
+			$this->getResponse()->setHeader("Status","403 Forbidden");
+		}
+	}
+	
+	public function syncArgoOcciStatus() {
+		$argo = new ArgoOCCI();
+		$argo->syncStatus();
+	}
+
+	public function syncargooccistatusAction() {
+		if ( localRequest() ) {
+			$this->syncArgoOcciStatus();
 		} else {
 			$this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 403 Forbidden");
