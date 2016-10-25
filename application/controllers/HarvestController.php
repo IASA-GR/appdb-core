@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+require_once('harvest.php');
+
 class HarvestController  extends Zend_Controller_Action
 {
 

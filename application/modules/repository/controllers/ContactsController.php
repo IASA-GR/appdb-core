@@ -18,6 +18,8 @@
 if ( $_SERVER["Repository_Enabled"] === 'true') {
 	require_once('repository.php');
 }
+require_once('textPNG.php');
+
 class Repository_ContactsController extends Zend_Controller_Action {
 	
 	public function init(){

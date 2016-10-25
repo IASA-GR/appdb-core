@@ -14,6 +14,13 @@
  * See the License for the specific language governing permissions and 
  * limitations under the License.
  */
+require_once('filterParser.php');
+require_once('userrequests.php');
+require_once('accessgroups.php');
+require_once('accesstokens.php');
+require_once('voadmin.php');
+require_once('email_service.php');
+require_once('apikeyreq.php');
 
 class PeopleController extends Zend_Controller_Action
 {
@@ -26,6 +33,66 @@ class PeopleController extends Zend_Controller_Action
 						->addActionContext('details', 'xml')
                       ->initContext();
     }
+    
+    
+	private function sendUserInboxNotification($receiverid=null, $sendername=""){
+		if( $receiverid == null || is_numeric($receiverid) == false ) {
+			return;
+		}
+		
+		$receivers = new Default_Model_Researchers();
+		$receivers->filter->id->equals($receiverid);
+		if( count($receivers->items) == 0 ) {
+			return;
+		}
+		$receiver = $receivers->items[0];
+		
+		$mails = new Default_Model_MailSubscriptions();
+		$mails->filter->researcherid->equals($receiverid)->and($mails->filter->subjecttype->equals('inbox'));
+		if ( count($mails->items) == 0 ) {
+			return;
+		}
+		
+		$email = getPrimaryContact($receiverid);
+		if ( $email == null ) {
+			return;
+		}
+		
+		
+		$recipients = array($email);
+		
+		$ms=new Default_Model_Messages();
+		$ms->filter->receiverid->equals($receiverid);
+		$all = count($ms->items);
+		$unread = $ms->unreadCount();
+		
+		$subject = "EGI AppDB: New message from user";
+		
+		$text = "Dear " . $receiver->name .",\n";
+		$text .= "\n";
+		$text .= "you have a new message in your inbox";
+		if ( trim($sendername) !== "" ){
+			$text .= " by " . $sendername;
+		}
+		$text .= ".\n\n";
+		$text .= "You have " . $unread . " unread message" . ($unread == 1 ? "" : "s") . " out of a total of " . $all . " message" . ($all == 1 ? "" : "s") . " in your inbox.\n";
+		$text .= "To view your inbox, login to [1] and click on \n";
+		$text .= "the inbox icon, on the top of the page.\n";
+		$text .= "\n";
+		$text .= "Best regards,\n";
+		$text .= "The AppDB team\n";
+		
+		$body = preg_replace("/\[1\]/","<a href='http://" . $_SERVER["APPLICATION_UI_HOSTNAME"]."' target='_blank'>EGI Applications Database</a>", $text);
+		$body = "<html><head></head><body><pre>" . $body . "</pre></body></html>";
+		
+		$text = preg_replace("/\[1\]/", "EGI Applications Database [1]",$text);
+		$text .= "\n\n________________________________________________________________________________________________________\n";
+		$text .= "[1]. http://" . $_SERVER["APPLICATION_UI_HOSTNAME"];
+		
+		//sendMultipartMail($subject,$recipients,$text,$body,'appdb-reports@iasa.gr','enadyskolopassword');
+		EmailService::sendReport($subject, $recipients, $text, $body);
+	}
+
 
     public function nodisseminationAction() {
 		$this->_helper->layout->disableLayout();
@@ -448,7 +515,7 @@ class PeopleController extends Zend_Controller_Action
 		$ms->add($m);
 		
 		//Notify user for inbox message
-		sendUserInboxNotification($receiverID, $this->session->fullName);
+		$this->sendUserInboxNotification($receiverID, $this->session->fullName);
 		echo "ok";
     }
 

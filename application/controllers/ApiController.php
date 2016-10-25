@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+require_once('RESTProxy.php');
+
 class ApiController extends Zend_Controller_Action
 {
     private $entry;

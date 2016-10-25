@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and 
  * limitations under the License.
  */
+require_once('contextualizationscripts.php');
 ?><?php if ( $this->entryid == "0" ) $this->entryid = ''; ?>
 <?php $wiki = ApplicationConfiguration::app('wiki', ApplicationConfiguration::uiUrl()); ?>
 <?php if ( ( $this->entryid == '') && ($this->session->userid === null) ) { ?>

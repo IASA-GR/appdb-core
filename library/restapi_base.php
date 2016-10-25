@@ -15,6 +15,10 @@
  * limitations under the License.
  */
 
+require_once('iptools.php');
+require_once('filterParser.php');
+require_once('accesstokens.php');
+
 /**
  * Module providing base classes for RESTful, CRUDL compliant web API
  *
@@ -32,6 +36,19 @@
  * Delete       |   DELETE          |
  * List         |   GET             |   listmode=listing
  */
+
+ /**
+ * class APIKeyAuthMethods (enum)
+ */
+ class APIKeyAuthMethods {
+    const E_NONE = 0;
+    const E_SSO = 1;
+    const E_SYSTEM = 2;
+
+	public static function has($n,$m) {
+		return (($n & $m)==$m);
+	}
+}
 
 /**
  * interface iRestAPILogger

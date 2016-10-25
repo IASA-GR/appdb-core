@@ -1,4 +1,10 @@
 <?php
+require_once('newsfeed.php');
+require_once('vmcaster.php');
+require_once('vapplianceservice.php');
+require_once('contextualization.php');
+require_once('SimpleDOM.php');
+
 class RestAppReport extends RestROAuthResourceList {
     /**
      * realization of getDataType from iRestResource

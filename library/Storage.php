@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+require_once('contextualizationscripts.php');
+
 class Storage {
 	CONST DEFAULT_DRAFT_FOLDER = '/tmp/appdb/uploads/';
 	CONST DEFAULT_STORE_FOLDER = '/storage/';

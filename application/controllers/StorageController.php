@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+require_once('Storage.php');
+
 class StorageController extends Zend_Controller_Action{
 	private $target_directory;
 	//put your code here

@@ -18,6 +18,16 @@
 <script type="text/javascript" src="/js/jquery.tablesorter.js"></script>
 <?php 
 
+
+function is_weburl($s) {
+    $parts = @parse_url( $s );
+    if ( array_key_exists("scheme",$parts) ) {        
+        $ss = $parts["scheme"];
+        if ( $ss == "http" || $ss == "https" || $ss == "ftp" || $ss == "sftp" ) return true;
+    }
+    return false;
+}
+
 function isEmptyValue($value){
 	$v = null;
 	if( is_array($value) ){
@@ -33,6 +43,7 @@ function isEmptyValue($value){
 	}
 	return ( !$v || trim( str_replace("\n", "", $v) ) === "" );
 }
+
 function getHtmlValue($value, $context, $split = true){
 	if(isEmptyValue($value)){
 		return '<span class="emptyvalue">n/a</span>';
@@ -47,12 +58,14 @@ function getHtmlValue($value, $context, $split = true){
 		return "<span>". $context->escape(str_replace("\n","<br/>",$value)) . "</span>";
 	}
 }
+
 function getHtmlDateValue($value, $context){
 	if(isEmptyValue($value) || trim($value) == "0000-00-00 00:00:00"){
 		return getHtmlValue("");
 	}
 	return getHtmlValue($value, $context); 
 }
+
 ?>
 <?php if ($this->entry !== null) { ?>
 <div align="left" style="height:100%;padding:0px;">
@@ -185,7 +198,7 @@ function getHtmlDateValue($value, $context){
 	if ($this->entry->homepageUrl != null && trim($this->entry->homepageUrl)!="")	$s.='<a href="'.$this->escape($this->entry->homepageUrl).'" target="_blank" >Homepage</a> | ';
 	if ($this->entry->enrollmentUrl != null && trim($this->escape($this->entry->enrollmentUrl))!="") $s.='<a href="'.$this->escape($this->entry->enrollmentUrl).'" target="_blank">Enrollment</a> | ';
 	if ($this->entry->aup != null && trim($this->entry->aup)!="") {
-		if (is_weburl($this->entry->aup)) {
+		if ($this->is_weburl($this->entry->aup)) {
 			$s.='<a href="'.$this->escape($this->entry->aup).'" target="_blank" title="Acceptable Usage Policy">Acceptable Usage Policy</a> | ';
 		}
 	} else if( isEmptyValue($this->entry->aup) === false ) { 

@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 
+require_once('userinbox.php');
+require_once('samlauth.php');
+
 class UsersController extends Zend_Controller_Action
 {
 

@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+require_once('datasets.php');
 class DatasetsController extends Zend_Controller_Action{
 	//put your code here
 	public function init(){

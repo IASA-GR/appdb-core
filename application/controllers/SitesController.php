@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 
+require_once('gocdb.php');
+require_once('externdatanotif.php');
+
 class SitesController extends Zend_Controller_Action{
 	//put your code here
 	public function init(){

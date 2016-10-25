@@ -14,7 +14,16 @@
  * See the License for the specific language governing permissions and 
  * limitations under the License.
  */
- 
+require_once('filterParser.php');
+require_once('userrequests.php');
+require_once('vmcaster.php');
+require_once('contextualizationscripts.php');
+require_once('socialreport.php');
+require_once('voadmin.php');
+require_once('vaproviders.php');
+require_once('applicationmessage.php');
+require_once('outdatedapp.php');
+
 class AppsController extends Zend_Controller_Action
 {
 	public function buildlogocacheAction() {

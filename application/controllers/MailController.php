@@ -15,6 +15,10 @@
  * limitations under the License.
  */
 
+require_once('Mail.php');
+require_once('Mail/mime.php');
+require_once('email_configuration.php');
+
 class MailController extends Zend_Controller_Action
 {
 
@@ -31,8 +35,6 @@ class MailController extends Zend_Controller_Action
 
     public function sendAction()
     {
-        include('Mail.php');
-
         $data = $_POST;
 
         $headers['From']    = $data['username']; 
