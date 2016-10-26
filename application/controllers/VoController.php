@@ -666,12 +666,24 @@ class VoController extends Zend_Controller_Action
                         }
 					}
 					// sync vo_resources.
-					db()->query("DELETE FROM vo_resources WHERE void = (SELECT id FROM vos WHERE name = ? AND sourceid = 1)", array(strtolower(trim($att["Name"]))))->fetchAll();
-					if ( $xvo->Ressources ) {
-						$xres = $xmlobj->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper(trim($att["Name"]))."']/Ressources/*");
-						foreach ($xres as $xr) {
-							db()->query("INSERT INTO vo_resources (void, name, value) VALUES ((SELECT id FROM vos WHERE name = ? AND sourceid = 1), ?, ?)", array(strtolower(trim($att["Name"])), strval($xr->getName()), strval($xr)))->fetchAll();
+					db()->query("SAVEPOINT sync_egi_vos_resources");
+					$release_resources_savepoint = true;
+					try {
+						db()->query("DELETE FROM vo_resources WHERE void = (SELECT id FROM vos WHERE name = ? AND sourceid = 1)", array(strtolower(trim($att["Name"]))))->fetchAll();
+						if ( $xvo->Ressources ) {
+							$xres = $xmlobj->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper(trim($att["Name"]))."']/Ressources/*");
+							foreach ($xres as $xr) {
+								db()->query("INSERT INTO vo_resources (void, name, value) SELECT (SELECT id FROM vos WHERE name = ? AND sourceid = 1 AND NOT deleted), ?, ? WHERE NOT EXISTS (SELECT * FROM vo_resources WHERE void = (SELECT id FROM vos WHERE name = ? AND sourceid = 1 AND NOT deleted) AND name = ?)", array(strtolower(trim($att["Name"])), strval($xr->getName()), strval($xr), strtolower(trim($att["Name"])), strval($xr->getName())))->fetchAll();
+							}
 						}
+					} catch (Exception $e) {
+						error_log("Error while syncing EGI vo resources for VO ". $att["Name"]);
+						$release_resources_savepoint = false;
+						db()->query("ROLLBACK TO SAVEPOINT sync_egi_vos_resources");
+						
+					}
+					if ($release_resources_savepoint) {
+						db()->query("RELEASE SAVEPOINT sync_egi_vos_resources");
 					}
 					// sync vo / contacts relations.
 					$xcontacts = $xvo->xpath("./Contacts/Individuals/Contact");
