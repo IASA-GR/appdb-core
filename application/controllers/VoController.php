@@ -598,7 +598,8 @@ class VoController extends Zend_Controller_Action
 			$xml = $proc->transformToXml($xml2);
  */
 			// cache entries
-			@exec("rm ". $this->vofile . ".old");
+			// keep a backup of the old file, in order to revert it in case the transaction fails
+			@exec("mv -f " . $this->vofile . ".old " . $this->vofile . ".old.bak");
 			@exec("cp " . $this->vofile . " " . $this->vofile . ".old");
 			$f = fopen($this->vofile,"w");
 			fwrite($f,$xml);
@@ -716,6 +717,7 @@ class VoController extends Zend_Controller_Action
 				error_log("EGI VOs sync'ed");
 			} else {
 				// no need to sync
+				@exec("rm -f " . $this->vofile . ".old.bak");
 				return false;
 			}
 		} catch (Exception $e) {
@@ -728,9 +730,13 @@ class VoController extends Zend_Controller_Action
 			db()->query("ALTER TABLE egiops.vo_contacts ENABLE TRIGGER tr_egiops_vo_contacts_99_refresh_permissions");
 			db()->query("ALTER TABLE vos ENABLE TRIGGER rtr__vos_cache_delta");
 			db()->query("SELECT request_permissions_refresh()");
+			// transaction failed. revert XML files to previous state
+			@exec("mv -f " . $this->vofile . ".old " . $this->vofile);
+			@exec("mv -f " . $this->vofile . ".old.bak " . $this->vofile . ".old");
 			error_log('Error while syncing EGI VOs: '.$e);
 			ExternalDataNotification::sendNotification('VO::syncEGIVOs', $e->getMessage(), ExternalDataNotification::MESSAGE_TYPE_ERROR);
 		}
+		@exec("rm -f " . $this->vofile . ".old.bak");
 		return $xml;
 	}
 
