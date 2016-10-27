@@ -941,7 +941,7 @@ class VoController extends Zend_Controller_Action
 			}
 			if (@md5_file(APPLICATION_PATH . "/../cache/ebivo_users.xml") !== @md5_file(APPLICATION_PATH . "/../cache/ebivo_users.xml.old")) {
 				$xmldata = file_get_contents(APPLICATION_PATH . "/../cache/ebivo_users.xml");
-				if (mb_detect_encoding(file_get_contents($xmldata), "UTF-8", true) === false) {
+				if (mb_detect_encoding($xmldata, "UTF-8", true) === false) {
 					$xmldata = recode_string("iso8859-1..utf8", $xmldata);
 				}
 				$xml = new SimpleXMLElement($xmldata);
