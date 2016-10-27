@@ -15,10 +15,6 @@
  * limitations under the License.
  */
 
-require_once('newsfeed.php');
-require_once('email_configuration.php');
-require_once('email_service.php');
-
 class NewsController extends Zend_Controller_Action
 {
 	public function init()
@@ -31,13 +27,6 @@ class NewsController extends Zend_Controller_Action
 			session_write_close();
 		}
     }
-    
-    private function getFltHash($flt) {
-	db()->setFetchMode(Zend_Db::FETCH_BOTH);
-	$res = db()->query("SELECT flthash('" . str_replace("'", "''", $flt) . "') AS f;")->fetchall();
-	$res = $res[0][0];
-	return $res;
-}
 
     public function indexAction()
     {
@@ -398,7 +387,7 @@ class NewsController extends Zend_Controller_Action
 				$m->researcherid = $this->session->userid;
 				$m->flt = $flt;
 				$flt = str_replace('"', '”', $flt);
-				$m->flthash = $this->getFltHash($flt);
+				$m->flthash = getFltHash($flt);
 				$m->subjectType = $this->_getParam('subjecttype');
 				$m->events = $this->_getParam('events');
 				$m->delivery = $this->_getParam('delivery');
@@ -414,7 +403,7 @@ class NewsController extends Zend_Controller_Action
 				$m->delivery = $this->_getParam('delivery');
 				$mail->add($m);
 				$mail = new Default_Model_MailSubscriptions();
-				$mail->filter->researcherid->equals($this->session->userid)->and($mail->filter->flthash->equals($this->getFltHash($flt)));
+				$mail->filter->researcherid->equals($this->session->userid)->and($mail->filter->flthash->equals(getFltHash($flt)));
 				header ("Content-Type:text/xml");
 				echo '<?xml version="1.0" encoding="utf-8"?'.'>';
 				if($mail->count()>0){
@@ -446,7 +435,7 @@ class NewsController extends Zend_Controller_Action
 			$m = new Default_Model_MailSubscriptions();
 			$flt = trim(base64_decode($this->_getParam('flt')));
 			$flt = str_replace('"', '”', $flt);
-			$fhash = $this->getFltHash($flt);
+			$fhash = getFltHash($flt);
 			$m->filter->researcherid->equals($this->session->userid)->and($m->filter->subjecttype->equals($subjecttype))->and($m->filter->flthash->equals($fhash));
 			debug_log($m->filter->expr());
 			header ("Content-Type:text/xml");

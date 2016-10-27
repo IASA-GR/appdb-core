@@ -15,9 +15,6 @@
  * limitations under the License.
  */
 
-require_once('samlauth.php');
-require_once('voadmin.php');
-
 class SamlController extends Zend_Controller_Action
 {
 

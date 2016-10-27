@@ -15,15 +15,7 @@
  * limitations under the License.
  */
 
-require_once('seo.php');
-
- // check for appdbcached -- run it if not  already running
-$appdbcached = trim(`pidof appdbcached`);
-if ( $appdbcached == "" ) {
-	error_log('AppDB cache daemon not running. Starting it now');
-	$apppath = str_replace("\n", "", APPLICATION_PATH);
-	exec("bash -c 'cd $apppath/../bin; . deploy.ini; export PGPASSWORD DBNAME DBUSER DBPORT DBHOST; ./appdbcached >/dev/null 2>&1 &' >/dev/null 2>&1 &");
-}
+check_for_appdbcached();
 
 if ( isset($_GET['cb']) && $_GET['cb'] == "0"  ) {
 	$this->customBuild = false;

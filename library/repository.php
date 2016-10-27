@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-require_once('commrepo.php'); 
 require_once('../application/modules/repository/models/DbTable/ZendDBTableBase.php');
 class Repository_Db_Table_Row extends Zend_Db_Table_Row_Abstract{
 	private $_externalRowData = array();

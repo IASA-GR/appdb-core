@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-require_once('textPNG.php');
-
 class TexttoimageController extends Zend_Controller_Action
 {
 

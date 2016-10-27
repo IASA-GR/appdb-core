@@ -15,9 +15,6 @@
  * limitations under the License.
  */
 
-require_once('Storage.php');
-require_once('email_service.php');
-
 class ContextXMLParser {
 	public static function parse($xml){
 		$data = array(

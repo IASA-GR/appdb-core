@@ -15,10 +15,6 @@
  * limitations under the License.
  */
 
-require_once('vmcaster.php');
-require_once('voadmin.php');
-require_once('externdatanotif.php');
-
 class VoController extends Zend_Controller_Action
 {
     protected $vofile;

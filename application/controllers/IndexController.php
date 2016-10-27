@@ -14,10 +14,6 @@
  * See the License for the specific language governing permissions and 
  * limitations under the License.
  */
-require_once('seo.php');
-require_once('samlauth.php');
-require_once('email_configuration.php');
-require_once('email_service.php');
 
 class IndexController extends Zend_Controller_Action
 {

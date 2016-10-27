@@ -15,9 +15,6 @@
  * limitations under the License.
  */
 
-require_once('email_configuration.php');
-require_once('email_service.php');
-
 class AbuseController extends Zend_Controller_Action
 {
 	# reson enum
