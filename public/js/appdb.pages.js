@@ -1233,17 +1233,17 @@ appdb.pages.home = (function(){
 			"id": "recent",
 			"resource": "applications",
 			"method": "GET",
-			"param": getParams(recent.getDataQuery())
+			"param": $.merge(getParams(recent.getDataQuery()), [{"name": "listmode", "val": "listing"}])
 		},{
 			"id": "newest",
 			"resource": "applications",
 			"method": "GET",
-			"param": getParams(newest.getDataQuery())
+			"param": $.merge(getParams(newest.getDataQuery()), [{"name": "listmode", "val": "listing"}])
 		},{
 			"id": "toprated",
 			"resource": "applications",
 			"method": "GET",
-			"param": getParams(toprated.getDataQuery())
+			"param": $.merge(getParams(toprated.getDataQuery()), [{"name": "listmode", "val": "listing"}])
 		}];
 		var reqs = buildBrokerRequest(brokerRequests, usecache);
 		//load cached
