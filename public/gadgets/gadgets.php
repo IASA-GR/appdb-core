@@ -16,6 +16,7 @@
  */
 ?><?php
 try{
+date_default_timezone_set('Europe/Athens');
 include "GadgetFramework.php";
 GadgetBootLoader::GetBootLoader()->init()->run();
 }catch(Exception $e){
