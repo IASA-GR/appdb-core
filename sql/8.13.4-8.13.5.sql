@@ -20,48 +20,42 @@ Previous version: 8.13.4
 New version: 8.13.5
 Author: wvkarag@lovecraft.priv.iasa.gr
 */
--- Function: public.app_to_xml_list(integer[])
-
--- DROP FUNCTION public.app_to_xml_list(integer[]);
 
 START TRANSACTION;
 
-CREATE OR REPLACE FUNCTION public.app_to_xml_list(ids integer[])
-  RETURNS SETOF xml AS
+CREATE OR REPLACE FUNCTION public.publish_vowide_image_list(
+    _void integer,
+    _userid integer)
+  RETURNS integer AS
 $BODY$
-SELECT 
-XMLELEMENT(
-name "application:application",
-XMLATTRIBUTES(
-applications.id AS id, applications.rating, applications.ratingcount AS "ratingCount",
-applications.cname,
-applications.metatype,
-applications.hitcount,
-applications.moderated,
-applications.deleted,
-applications.guid
-), 
-XMLELEMENT(name "application:name", applications.name),
-XMLELEMENT(name "application:category", XMLATTRIBUTES(c.id, TRUE AS primary), c.name),
-CASE WHEN NOT (SELECT logo FROM applogos WHERE appid = applications.id) IS NULL THEN
-	XMLELEMENT(name "application:logo", 'https://' || (SELECT data FROM config WHERE var = 'ui-host') || '/apps/getlogo?id=' || applications.id::text)
-END
-)
-FROM applications 
-INNER JOIN LATERAL (SELECT id, name FROM categories WHERE id = ANY(applications.categoryid)
-AND EXISTS (SELECT * FROM appcategories WHERE isprimary AND appid = applications.id AND categoryid = categories.id)
-) AS c ON true
-WHERE applications.id = ANY(ids)
-ORDER BY idx(ids, applications.id)
+DECLARE listid INT;
+BEGIN
+	listid := (SELECT id FROM vowide_image_lists WHERE void = $1 AND state = 'draft');
+	IF NOT listid IS NULL THEN
+		UPDATE vowide_image_lists SET state = 'obsolete' WHERE void = $1 AND state = 'published';
+		DELETE FROM vowide_image_list_images WHERE vowide_image_list_id = listid AND vapplistid IN (
+			SELECT vapplistid 
+			FROM vaviews 
+			INNER JOIN applications ON applications.id = vaviews.appid
+			WHERE applications.deleted -- OR applications.moderated
+		);
+		UPDATE vowide_image_lists SET state = 'published', published_on = NOW(), publishedby = $2 WHERE id = listid;
+		NOTIFY clean_cache;
+		REFRESH MATERIALIZED VIEW vaviews;
+		RETURN listid;
+	ELSE 
+		RETURN NULL;
+	END IF;
+END;
 $BODY$
-  LANGUAGE sql VOLATILE
-  COST 100
-  ROWS 1000;
-ALTER FUNCTION public.app_to_xml_list(integer[])
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.publish_vowide_image_list(integer, integer)
   OWNER TO appdb;
+COMMENT ON FUNCTION public.publish_vowide_image_list(integer, integer) IS 'Sets currently published list to "obsolete" state, and promotes the draft version to "published". Returns the id of the published image list or NULL if no draft version exists';
 
 INSERT INTO version (major,minor,revision,notes) 
-	SELECT 8, 13, 5, E'Honor ordering in app_to_xml_list'
+	SELECT 8, 13, 5, E'Refresh vaviews materialized view after publishing a VO-wide image list'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=13 AND revision=5);
 
 COMMIT;

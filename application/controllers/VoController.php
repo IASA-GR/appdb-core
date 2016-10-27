@@ -124,7 +124,11 @@ class VoController extends Zend_Controller_Action
 	header('PRAGMA: NO-CACHE');
 	header('CACHE-CONTROL: NO-CACHE');
 	header('Content-type: image/png');
-	readfile($img);	
+	if (file_exists(APPLICATION_PATH . "/../public/" . $img)) {
+		readfile($img);	
+	} else {
+		readfile("images/disciplines/0.png");	
+	}
 }
 
     public function resourcesAction()    
@@ -215,13 +219,15 @@ class VoController extends Zend_Controller_Action
 		$minid = -1;
 		$minname = "Other";
 		$xdiscs = $voentry->xpath("./Disciplines");
-		$discs = $this->parseDisc($xdiscs[0]);
-		foreach ($discs as $d) {
-			if ($minid == -1 || $minid > $d["id"]) {
-				$minid = $d["id"];
-				$minname = $d["name"];
+		if (count($xdiscs) > 0) {
+			$discs = $this->parseDisc($xdiscs[0]);
+			foreach ($discs as $d) {
+				if ($minid == -1 || $minid > $d["id"]) {
+					$minid = $d["id"];
+					$minname = $d["name"];
+				}
+				$discnames[] = $d["name"];
 			}
-			$discnames[] = $d["name"];
 		}
 		$vo->disciplines = $discs;
 		//error_log(var_export($discs, true));
@@ -598,7 +604,8 @@ class VoController extends Zend_Controller_Action
 			$xml = $proc->transformToXml($xml2);
  */
 			// cache entries
-			@exec("rm ". $this->vofile . ".old");
+			// keep a backup of the old file, in order to revert it in case the transaction fails
+			@exec("mv -f " . $this->vofile . ".old " . $this->vofile . ".old.bak");
 			@exec("cp " . $this->vofile . " " . $this->vofile . ".old");
 			$f = fopen($this->vofile,"w");
 			fwrite($f,$xml);
@@ -666,12 +673,24 @@ class VoController extends Zend_Controller_Action
                         }
 					}
 					// sync vo_resources.
-					db()->query("DELETE FROM vo_resources WHERE void = (SELECT id FROM vos WHERE name = ? AND sourceid = 1)", array(strtolower(trim($att["Name"]))))->fetchAll();
-					if ( $xvo->Ressources ) {
-						$xres = $xmlobj->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper(trim($att["Name"]))."']/Ressources/*");
-						foreach ($xres as $xr) {
-							db()->query("INSERT INTO vo_resources (void, name, value) VALUES ((SELECT id FROM vos WHERE name = ? AND sourceid = 1), ?, ?)", array(strtolower(trim($att["Name"])), strval($xr->getName()), strval($xr)))->fetchAll();
+					db()->query("SAVEPOINT sync_egi_vos_resources");
+					$release_resources_savepoint = true;
+					try {
+						db()->query("DELETE FROM vo_resources WHERE void = (SELECT id FROM vos WHERE name = ? AND sourceid = 1)", array(strtolower(trim($att["Name"]))))->fetchAll();
+						if ( $xvo->Ressources ) {
+							$xres = $xmlobj->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper(trim($att["Name"]))."']/Ressources/*");
+							foreach ($xres as $xr) {
+								db()->query("INSERT INTO vo_resources (void, name, value) SELECT (SELECT id FROM vos WHERE name = ? AND sourceid = 1 AND NOT deleted), ?, ? WHERE NOT EXISTS (SELECT * FROM vo_resources WHERE void = (SELECT id FROM vos WHERE name = ? AND sourceid = 1 AND NOT deleted) AND name = ?)", array(strtolower(trim($att["Name"])), strval($xr->getName()), strval($xr), strtolower(trim($att["Name"])), strval($xr->getName())))->fetchAll();
+							}
 						}
+					} catch (Exception $e) {
+						error_log("Error while syncing EGI vo resources for VO ". $att["Name"]);
+						$release_resources_savepoint = false;
+						db()->query("ROLLBACK TO SAVEPOINT sync_egi_vos_resources");
+						
+					}
+					if ($release_resources_savepoint) {
+						db()->query("RELEASE SAVEPOINT sync_egi_vos_resources");
 					}
 					// sync vo / contacts relations.
 					$xcontacts = $xvo->xpath("./Contacts/Individuals/Contact");
@@ -704,6 +723,7 @@ class VoController extends Zend_Controller_Action
 				error_log("EGI VOs sync'ed");
 			} else {
 				// no need to sync
+				@exec("rm -f " . $this->vofile . ".old.bak");
 				return false;
 			}
 		} catch (Exception $e) {
@@ -716,9 +736,13 @@ class VoController extends Zend_Controller_Action
 			db()->query("ALTER TABLE egiops.vo_contacts ENABLE TRIGGER tr_egiops_vo_contacts_99_refresh_permissions");
 			db()->query("ALTER TABLE vos ENABLE TRIGGER rtr__vos_cache_delta");
 			db()->query("SELECT request_permissions_refresh()");
+			// transaction failed. revert XML files to previous state
+			@exec("mv -f " . $this->vofile . ".old " . $this->vofile);
+			@exec("mv -f " . $this->vofile . ".old.bak " . $this->vofile . ".old");
 			error_log('Error while syncing EGI VOs: '.$e);
 			ExternalDataNotification::sendNotification('VO::syncEGIVOs', $e->getMessage(), ExternalDataNotification::MESSAGE_TYPE_ERROR);
 		}
+		@exec("rm -f " . $this->vofile . ".old.bak");
 		return $xml;
 	}
 
@@ -921,7 +945,7 @@ class VoController extends Zend_Controller_Action
 			}
 			if (@md5_file(APPLICATION_PATH . "/../cache/ebivo_users.xml") !== @md5_file(APPLICATION_PATH . "/../cache/ebivo_users.xml.old")) {
 				$xmldata = file_get_contents(APPLICATION_PATH . "/../cache/ebivo_users.xml");
-				if (mb_detect_encoding(file_get_contents($xmldata), "UTF-8", true) === false) {
+				if (mb_detect_encoding($xmldata, "UTF-8", true) === false) {
 					$xmldata = recode_string("iso8859-1..utf8", $xmldata);
 				}
 				$xml = new SimpleXMLElement($xmldata);
