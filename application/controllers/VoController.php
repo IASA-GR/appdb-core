@@ -215,13 +215,15 @@ class VoController extends Zend_Controller_Action
 		$minid = -1;
 		$minname = "Other";
 		$xdiscs = $voentry->xpath("./Disciplines");
-		$discs = $this->parseDisc($xdiscs[0]);
-		foreach ($discs as $d) {
-			if ($minid == -1 || $minid > $d["id"]) {
-				$minid = $d["id"];
-				$minname = $d["name"];
+		if (count($xdiscs) > 0) {
+			$discs = $this->parseDisc($xdiscs[0]);
+			foreach ($discs as $d) {
+				if ($minid == -1 || $minid > $d["id"]) {
+					$minid = $d["id"];
+					$minname = $d["name"];
+				}
+				$discnames[] = $d["name"];
 			}
-			$discnames[] = $d["name"];
 		}
 		$vo->disciplines = $discs;
 		//error_log(var_export($discs, true));
