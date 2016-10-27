@@ -1307,7 +1307,7 @@ appdb.pages.home = (function(){
 		page.loadBanners(true, function(){
 			setTimeout(function(){
 				page.loadBanners(false, function(){}, false);
-			},1500);
+			},100);
 		});
 	};
 	page.immediateCustom = function(){
@@ -1452,7 +1452,7 @@ appdb.pages.home = (function(){
 		page.loadBanners(true, function(){
 			setTimeout(function(){
 				page.loadBanners(false, function(){}, false);
-			},1500);
+			},100);
 		});
 		//Sync load broker request maked with async=false
 		fetchbroker(false);
