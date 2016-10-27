@@ -57,3 +57,5 @@ COMMENT ON FUNCTION public.publish_vowide_image_list(integer, integer) IS 'Sets 
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 13, 5, E'Refresh vaviews materialized view after publishing a VO-wide image list'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=13 AND revision=5);
+
+COMMIT;
