@@ -124,7 +124,11 @@ class VoController extends Zend_Controller_Action
 	header('PRAGMA: NO-CACHE');
 	header('CACHE-CONTROL: NO-CACHE');
 	header('Content-type: image/png');
-	readfile($img);	
+	if (file_exists(APPLICATION_PATH . "/../public/" . $img)) {
+		readfile($img);	
+	} else {
+		readfile("images/disciplines/0.png");	
+	}
 }
 
     public function resourcesAction()    
