@@ -1230,7 +1230,7 @@ function sendMail($subject, $to, $body = '', $username, $password) {
         $params['password'] = $password;
 
         // Create the mail object using the Mail::factory method
-        $mail_object =& Mail::factory('smtp', $params);
+        $mail_object = Mail::factory('smtp', $params);
 		// Split mail sending operations in bunches of 10 recipients at a time
 		$rec = array();
 		$recipients2 = array_unique($recipients);
@@ -1304,7 +1304,7 @@ function sendMultipartMail($subject, $to, $txtbody='', $htmlbody='', $username, 
 		
 
         // Create the mail object using the Mail::factory method
-        $mail_object =& Mail::factory('smtp', $params);
+        $mail_object = Mail::factory('smtp', $params);
 		// Split mail sending operations in bunches of 10 recipients at a time
 		$rec = array();
 		$recipients2 = array_unique($recipients);
