@@ -81,6 +81,7 @@ class AppstatsController extends Zend_Controller_Action
 
 	public function pertimeAction()
 	{
+		return;
 		db()->exec("SELECT store_stats_graph('app', '2010-01-01', NOW()::date::text)");
 //		$stats = new Default_Model_AppStats($this->appType);
 //		$this->view->entries = $stats->perVO();
