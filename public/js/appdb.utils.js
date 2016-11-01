@@ -8564,6 +8564,29 @@ appdb.utils.GroupSiteImages = function(occiservices){
 		return res;
 	}
 	
+	function appendOccisToInstancesPerVO(instances, occis) {
+		var newInstances = [];
+
+		$.each(occis, function(occiIndex, occi) {
+			var foundInstances = $(instances).filter(function(instanceIndex, instance) {
+				if (!occi.vo || !occi.vo.id) {
+					return (!instance.vo || !instance.vo.id);
+				}
+				return occi.vo.id === instance.vo.id;
+			});
+
+			if (foundInstances.length > 0) {
+				$.each(foundInstances, function(foundInstIndex, foundInstance) {
+					foundInstance.items = foundInstance.items.concat(extendArray(occi.items));
+				});
+			} else {
+				newInstances = newInstances.concat(extendArray(occi));
+			}
+		});
+
+		return instances.concat(newInstances);
+	}
+
 	function groupByGoodId(images){
 		var res = {};
 		
@@ -8591,16 +8614,21 @@ appdb.utils.GroupSiteImages = function(occiservices){
 				res[e.goodid] = e;
 			} else {
 				if( appdb.config.features.groupvaprovidertemplates ){
-					res[e.goodid].instances[0].items = res[e.goodid].instances[0].items.concat( extendArray(e.occi[0].items) );
-					$.each(e.template, (function(eurl){ return function(i,t){
+					res[e.goodid].instances = appendOccisToInstancesPerVO(res[e.goodid].instances, e.occi);
+					//res[e.goodid].instances[0].items = res[e.goodid].instances[0].items.concat( extendArray(e.occi[0].items) );
+					$.each(e.template, (function(eurl){ return function(i,t) {
 						t.occi_endpoint_url = t.occi_endpoint_url || [];
 						t.occi_endpoint_url = $.isArray(t.occi_endpoint_url)?t.occi_endpoint_url:[t.occi_endpoint_url];
 						if( $.inArray(eurl, t.occi_endpoint_url) === -1 ){
 							t.occi_endpoint_url.push(eurl);
 						}
 						t.occi_endpoint_url = eurl;
+						e.template[i] = t;
 					};})(e.occi_endpoint_url));
-					res[e.goodid].instances[0].template = res[e.goodid].instances[0].template.concat(extendArray(e.template));
+					$.each(res[e.goodid].instances, function(instanceIndex, instance) {
+						res[e.goodid].instances[instanceIndex].template = instance.template.concat(extendArray(e.template));
+					});
+					//res[e.goodid].instances[0].template = res[e.goodid].instances[0].template.concat(extendArray(e.template));
 				}else {
 					res[e.goodid].instances = res[e.goodid].instances.concat( extendArray(e.occi) );
 				}
