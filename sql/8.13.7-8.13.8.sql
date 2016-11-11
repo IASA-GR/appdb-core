@@ -459,6 +459,9 @@ $BODY$
 ALTER FUNCTION public.target_privs_to_xml(uuid, integer, integer[])
   OWNER TO appdb;
 
+TRUNCATE TABLE cache.appprivsxmlcache;
+UPDATE config SET data = '0' WHERE var = 'permissions_cache_dirty';
+
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 13, 8, E'Do not use cache for application privileges (obsolete). Minor performance improvements for application privileges'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=13 AND revision=8);
