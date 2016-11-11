@@ -465,5 +465,3 @@ INSERT INTO version (major,minor,revision,notes)
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=13 AND revision=8);
 
 COMMIT;
-
-
