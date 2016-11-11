@@ -28,26 +28,24 @@ CREATE OR REPLACE FUNCTION public.app_target_privs_to_xml(
     _userid integer)
   RETURNS SETOF xml AS
 $BODY$
-BEGIN
-RETURN QUERY SELECT target_privs_to_xml(applications.guid, $2, app_actions()) FROM applications WHERE id = $1;
-END;
+SELECT target_privs_to_xml(applications.guid, $2, app_actions()) FROM applications WHERE id = $1;
 $BODY$
-  LANGUAGE plpgsql VOLATILE
+  LANGUAGE sql STABLE
   COST 100
   ROWS 1000;
 ALTER FUNCTION public.app_target_privs_to_xml(integer, integer)
   OWNER TO appdb;
 
-CREATE OR REPLACE FUNCTION request_permissions_refresh() RETURNS void                                                                                                                      
+CREATE OR REPLACE FUNCTION request_permissions_refresh() RETURNS void
 LANGUAGE plpgsql                                                                                                                                                            
 AS $$                                                                                                                                                                       
-BEGIN                                                                                                                                                                           
-	NOTIFY invalidate_cache, 'permissions';                                                                                                                                     
-END;                                                                                                                                                                            
+BEGIN
+	NOTIFY invalidate_cache, 'permissions';
+END;
 $$;
 
-DROP FUNCTION public.grant_privilege(integer, uuid, uuid, integer);
-DROP FUNCTION public.revoke_privilege(integer, uuid, uuid, integer);
+DROP FUNCTION IF EXISTS public.grant_privilege(integer, uuid, uuid, integer);
+DROP FUNCTION IF EXISTS public.revoke_privilege(integer, uuid, uuid, integer);
 
 CREATE OR REPLACE FUNCTION public.grant_privilege(
     _actionid integer,
@@ -453,7 +451,7 @@ BEGIN
 	ORDER BY actors.id;
 END;
 $BODY$
-  LANGUAGE plpgsql VOLATILE
+  LANGUAGE plpgsql STABLE
   COST 100
   ROWS 1000;
 ALTER FUNCTION public.target_privs_to_xml(uuid, integer, integer[])
