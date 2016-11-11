@@ -863,7 +863,7 @@ class SamlController extends Zend_Controller_Action
 						}
 
 						if ($userAccount) {
-							$attrs['entitlements'] = array('vo' => array('memberships' => VoAdmin::getUserMembership($userAccount->researcherid)));
+							$attrs['entitlements'] = array('vo' => array('contacts' => VoAdmin::getVOContacts($userAccount->researcherid) ,'memberships' => VoAdmin::getUserMembership($userAccount->researcherid)));
 						}
 					}catch(Exception $ex) {
 						
