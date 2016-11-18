@@ -7893,8 +7893,8 @@ class SamlAuth{
 		  $role = self::getEGIAAIVORoleMapping($matches[5]);
 		  $voname = $matches[6];
 		  
-		  if ($role === 'VM OPERATOR' && strpos($source, 'appdb') === false) {
-			//Do not accept role if it is not given by AppDB auth source
+		  if ($role === 'VM OPERATOR' && strpos($source, 'appdb_auth') === false) {
+			//Do not accept vm_operator role if it is not given by AppDB auth source
 			continue;
 		  }
 
