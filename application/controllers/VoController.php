@@ -673,7 +673,8 @@ class VoController extends Zend_Controller_Action
                         }
 					}
 					// sync vo_resources.
-					db()->query("SAVEPOINT sync_egi_vos_resources");
+					$sp_resources = "sync_egi_vos_resources" . (microtime(true) * 10000);
+					db()->query("SAVEPOINT $sp_resources");
 					$release_resources_savepoint = true;
 					try {
 						db()->query("DELETE FROM vo_resources WHERE void = (SELECT id FROM vos WHERE name = ? AND sourceid = 1)", array(strtolower(trim($att["Name"]))))->fetchAll();
@@ -686,11 +687,11 @@ class VoController extends Zend_Controller_Action
 					} catch (Exception $e) {
 						error_log("Error while syncing EGI vo resources for VO ". $att["Name"]);
 						$release_resources_savepoint = false;
-						db()->query("ROLLBACK TO SAVEPOINT sync_egi_vos_resources");
+						db()->query("ROLLBACK TO SAVEPOINT $sp_resources");
 						
 					}
 					if ($release_resources_savepoint) {
-						db()->query("RELEASE SAVEPOINT sync_egi_vos_resources");
+						db()->query("RELEASE SAVEPOINT $sp_resources");
 					}
 					// sync vo / contacts relations.
 					$xcontacts = $xvo->xpath("./Contacts/Individuals/Contact");
@@ -1306,82 +1307,102 @@ class VoController extends Zend_Controller_Action
 				'GLUE2ApplicationEnvironmentRepository'
 			);
 
-			$prod_sites = $this->getVAProvidersArray();
-			db()->query("TRUNCATE TABLE va_provider_images");
-			foreach ($prod_sites as $site) {
-				$basedn = 'GLUE2GroupID=cloud,GLUE2DomainID=' . $site["name"] . ',GLUE2GroupID=grid,o=glue';
-				if(trim($site["serviceid"]) != "") {
-					$basedn = 'GLUE2ServiceID=' . $site["serviceid"] . ',' . $basedn;
-				}
-				$result = $this->getTopBDIIData($basedn, $filter, $attrs);
-				if (!empty($result)) {
-					if (isset($result["count"])) {
-						for ($i = 0; $i < $result["count"]; $i++) {
-							$mpURI = $result[$i]["glue2applicationenvironmentrepository"][0];
-							$imageID = $result[$i]["glue2entityname"][0];
-
-							# parse mpURI and find type
-							$start = strpos($mpURI,"/store/") + strlen("/store/");
-							$len = strpos($mpURI,"/image/") - $start;
-							$type = substr($mpURI,$start,$len);
-
-							# parse mpURI and find instanceID
-							$mpURI_tmp = parse_url($mpURI,PHP_URL_PATH);
-							$params = substr($mpURI_tmp, strrpos($mpURI_tmp,'image/')+5);
-							if( strlen($params) > 1 ){
-								$params = explode('/',$params);
-								$params = explode(':',$params[1]);
-
-								if( count($params) > 1 ){
-									if( is_numeric($params[1])){
-										$instanceID = intval($params[1]);
-									}
-
-								}
+			try {
+				db()->beginTransaction();
+				$prod_sites = $this->getVAProvidersArray();
+				db()->query("TRUNCATE TABLE va_provider_images");
+				foreach ($prod_sites as $site) {
+					$basedn = 'GLUE2GroupID=cloud,GLUE2DomainID=' . $site["name"] . ',GLUE2GroupID=grid,o=glue';
+					if(trim($site["serviceid"]) != "") {
+						$basedn = 'GLUE2ServiceID=' . $site["serviceid"] . ',' . $basedn;
+					}
+					$result = $this->getTopBDIIData($basedn, $filter, $attrs);
+					if (!empty($result)) {
+						if (isset($result["count"])) {
+							if ($result["count"] <= 0) {
+								throw new Exception("Number of results returned by top-BDII is zero. Aborting operation.");
 							}
+							for ($i = 0; $i < $result["count"]; $i++) {
+								$mpURI = $result[$i]["glue2applicationenvironmentrepository"][0];
+								$imageID = $result[$i]["glue2entityname"][0];
 
-							$vowide_instanceID = null;
+								# parse mpURI and find type
+								$start = strpos($mpURI,"/store/") + strlen("/store/");
+								$len = strpos($mpURI,"/image/") - $start;
+								$type = substr($mpURI,$start,$len);
 
-							if ($type == "vo") {
-								$vowide_instanceID = $instanceID;
-								db()->setFetchMode(Zend_Db::FETCH_BOTH);							
-								$instanceID = db()->query("SELECT vapplists.vmiinstanceid FROM vowide_image_list_images INNER JOIN vapplists ON vapplists.id = vowide_image_list_images.vapplistid WHERE vowide_image_list_images.id = ?", array($instanceID))->fetchAll();								
-								if (count($instanceID) > 0) {
-									if (count($instanceID[0]) > 0) {
-										$instanceID = $instanceID[0][0];
+								# parse mpURI and find instanceID
+								$mpURI_tmp = parse_url($mpURI,PHP_URL_PATH);
+								$params = substr($mpURI_tmp, strrpos($mpURI_tmp,'image/')+5);
+								if( strlen($params) > 1 ){
+									$params = explode('/',$params);
+									$params = explode(':',$params[1]);
+
+									if( count($params) > 1 ){
+										if( is_numeric($params[1])){
+											$instanceID = intval($params[1]);
+										}
+
+									}
+								}
+
+								$vowide_instanceID = null;
+
+								if ($type == "vo") {
+									$vowide_instanceID = $instanceID;
+									db()->setFetchMode(Zend_Db::FETCH_BOTH);							
+									$instanceID = db()->query("SELECT vapplists.vmiinstanceid FROM vowide_image_list_images INNER JOIN vapplists ON vapplists.id = vowide_image_list_images.vapplistid WHERE vowide_image_list_images.id = ?", array($instanceID))->fetchAll();								
+									if (count($instanceID) > 0) {
+										if (count($instanceID[0]) > 0) {
+											$instanceID = $instanceID[0][0];
+										} else {
+											$instanceID = null;
+										}
 									} else {
 										$instanceID = null;
 									}
-								} else {
-									$instanceID = null;
 								}
-							}
-							try {
-								db()->query("INSERT INTO va_provider_images (va_provider_id, vmiinstanceid, content_type, va_provider_image_id, mp_uri, vowide_vmiinstanceid) VALUES (?, ?, ?, ?, ?, ?)", array($site["id"], $instanceID, $type, $imageID, $mpURI, $vowide_instanceID));
-							} catch (Exception $e) {
-								error_log("ERROR in 'INSERT INTO va_provider_images (va_provider_id, vmiinstanceid, content_type, va_provider_image_id, mp_uri, vowide_vmiinstanceid)'");
-								error_log("VALUES: " . 
-									"'" . var_export($site["id"], true) . "', " .  
-									"'" . var_export($instanceID, true) . "', " .
-									"'" . var_export($type, true) . "', " .
-									"'" . var_export($imageID, true) . "', " .
-									"'" . var_export($mpURI, true) . "', " .
-									"'" . var_export($vowide_instanceID, true) . "', "
-								);
+								$sp_vap_img = "sync_va_provider_images" . (microtime(true) * 10000);
+								db()->query("SAVEPOINT $sp_vap_img");
+								$release_vap_img = true;
+								try {
+									db()->query("INSERT INTO va_provider_images (va_provider_id, vmiinstanceid, content_type, va_provider_image_id, mp_uri, vowide_vmiinstanceid) VALUES (?, ?, ?, ?, ?, ?)", array($site["id"], $instanceID, $type, $imageID, $mpURI, $vowide_instanceID));
+								} catch (Exception $e) {
+									error_log("ERROR in 'INSERT INTO va_provider_images (va_provider_id, vmiinstanceid, content_type, va_provider_image_id, mp_uri, vowide_vmiinstanceid)' -- entry ignored");
+									error_log("VALUES: " . 
+										"'" . var_export($site["id"], true) . "', " .  
+										"'" . var_export($instanceID, true) . "', " .
+										"'" . var_export($type, true) . "', " .
+										"'" . var_export($imageID, true) . "', " .
+										"'" . var_export($mpURI, true) . "', " .
+										"'" . var_export($vowide_instanceID, true) . "', "
+									);
+									$release_vap_img = false;
+									db()->query("ROLLBACK TO SAVEPOINT $sp_vap_img");
+								}
+								if ($release_vap_img) {
+									db()->query("RELEASE SAVEPOINT $sp_vap_img");
+								}
 							}
 						}
 					}
 				}
-			}
-			error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images DONE [1/2]. Will refresh related materialized views");
-			error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images: Refreshing site_services_xml...");
-			db()->query("REFRESH MATERIALIZED VIEW site_services_xml;");
-			error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images: Refreshing site_service_images_xml...");
-			db()->query("REFRESH MATERIALIZED VIEW site_service_images_xml;");
-			error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images DONE [2/2]");
-			$this->makeVAprovidersCache();
-			if ( strtolower($_SERVER["SERVER_NAME"]) == "appdb.egi.eu" ) {
-                              web_get_contents("https://dashboard.appdb.egi.eu/services/appdb/sync/cloud");
+				error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images DONE [1/2]. Will refresh related materialized views");
+				error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images: Refreshing site_services_xml...");
+				db()->query("REFRESH MATERIALIZED VIEW site_services_xml;");
+				error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images: Refreshing site_service_images_xml...");
+				db()->query("REFRESH MATERIALIZED VIEW site_service_images_xml;");
+				error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images DONE [2/2]");
+				db()->commit();
+				sleep(2); // give the commit some time to settle before making next two calls
+				$this->makeVAprovidersCache();
+				if ( strtolower($_SERVER["SERVER_NAME"]) == "appdb.egi.eu" ) {
+					web_get_contents("https://dashboard.appdb.egi.eu/services/appdb/sync/cloud");
+				}
+			} catch (Exception $e) {
+				error_log($e->getMessage());
+				error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images FAILED");
+				db()->rollBack();
 			}
 		} else {
 			$this->getResponse()->clearAllHeaders();
@@ -1413,34 +1434,72 @@ class VoController extends Zend_Controller_Action
 			);
 
 			$prod_sites = $this->getVAProvidersArray();
-			db()->query("TRUNCATE TABLE va_provider_templates");
-			foreach($prod_sites as $site) {
-				$basedn = 'GLUE2GroupID=cloud,GLUE2DomainID=' . $site["name"] . ',GLUE2GroupID=grid,o=glue';
-				if(trim($site["serviceid"]) != "") {
-					$basedn = 'GLUE2ServiceID=' . $site["serviceid"] . ',' . $basedn;
-				}
-				$result = $this->getTopBDIIData($basedn, $filter, $attrs);
-				if (isset($result["count"])) {
-					for ($i = 0; $i < $result["count"]; $i++) {
-						db()->query("INSERT INTO va_provider_templates (va_provider_id, resource_name, memsize, logical_cpus, physical_cpus, cpu_multiplicity, resource_manager, computing_manager, os_family, connectivity_in, connectivity_out, cpu_model, resource_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", array(
-							$site["id"],
-							$result[$i]["glue2entityname"][0],
-							$result[$i]["glue2executionenvironmentmainmemorysize"][0],
-							$result[$i]["glue2executionenvironmentlogicalcpus"][0],
-							$result[$i]["glue2executionenvironmentphysicalcpus"][0],
-							$result[$i]["glue2executionenvironmentcpumultiplicity"][0],
-							$result[$i]["glue2resourcemanagerforeignkey"][0],
-							$result[$i]["glue2executionenvironmentcomputingmanagerforeignkey"][0],
-							$result[$i]["glue2executionenvironmentosfamily"][0],
-							$result[$i]["glue2executionenvironmentconnectivityin"][0],
-							$result[$i]["glue2executionenvironmentconnectivityout"][0],
-							$result[$i]["glue2executionenvironmentcpumodel"][0],
-							$result[$i]["glue2resourceid"][0]
-						));
+			try {
+				db()->beginTransaction();
+				db()->query("TRUNCATE TABLE va_provider_templates");
+				foreach($prod_sites as $site) {
+					$basedn = 'GLUE2GroupID=cloud,GLUE2DomainID=' . $site["name"] . ',GLUE2GroupID=grid,o=glue';
+					if(trim($site["serviceid"]) != "") {
+						$basedn = 'GLUE2ServiceID=' . $site["serviceid"] . ',' . $basedn;
 					}
-				}
-			}	
-			error_log("Sync VA Provider Templates DONE");
+					$result = $this->getTopBDIIData($basedn, $filter, $attrs);
+					if (isset($result["count"])) {
+						if ($result["count"] <= 0) {
+							throw new Exception("Number of results returned by top-BDII is zero. Aborting operation.");
+						}
+						for ($i = 0; $i < $result["count"]; $i++) {
+							$sp_vap_tmpl = "sync_va_provider_templates" . (microtime(true) * 10000);
+							db()->query("SAVEPOINT $sp_vap_tmpl");
+							$release_vap_tmpl = true;
+							try {
+								db()->query("INSERT INTO va_provider_templates (va_provider_id, resource_name, memsize, logical_cpus, physical_cpus, cpu_multiplicity, resource_manager, computing_manager, os_family, connectivity_in, connectivity_out, cpu_model, resource_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", array(
+									$site["id"],
+									$result[$i]["glue2entityname"][0],
+									$result[$i]["glue2executionenvironmentmainmemorysize"][0],
+									$result[$i]["glue2executionenvironmentlogicalcpus"][0],
+									$result[$i]["glue2executionenvironmentphysicalcpus"][0],
+									$result[$i]["glue2executionenvironmentcpumultiplicity"][0],
+									$result[$i]["glue2resourcemanagerforeignkey"][0],
+									$result[$i]["glue2executionenvironmentcomputingmanagerforeignkey"][0],
+									$result[$i]["glue2executionenvironmentosfamily"][0],
+									$result[$i]["glue2executionenvironmentconnectivityin"][0],
+									$result[$i]["glue2executionenvironmentconnectivityout"][0],
+									$result[$i]["glue2executionenvironmentcpumodel"][0],
+									$result[$i]["glue2resourceid"][0]
+								));
+							} catch (Exception $e) {
+								error_log("ERROR in 'INSERT INTO va_provider_templates (va_provider_id, resource_name, memsize, logical_cpus, physical_cpus, cpu_multiplicity, resource_manager, computing_manager, os_family, connectivity_in, connectivity_out, cpu_model, resource_id)' -- entry ignored");
+								error_log("VALUES: " . 
+									"'" . var_export($site["id"], true) . "', " .
+									"'" . var_export($result[$i]["glue2entityname"][0], true) . "', " .
+									"'" . var_export($result[$i]["glue2executionenvironmentmainmemorysize"][0], true) . "', " .
+									"'" . var_export($result[$i]["glue2executionenvironmentlogicalcpus"][0], true) . "', " .
+									"'" . var_export($result[$i]["glue2executionenvironmentphysicalcpus"][0], true) . "', " .
+									"'" . var_export($result[$i]["glue2executionenvironmentcpumultiplicity"][0], true) . "', " .
+									"'" . var_export($result[$i]["glue2resourcemanagerforeignkey"][0], true) . "', " .
+									"'" . var_export($result[$i]["glue2executionenvironmentcomputingmanagerforeignkey"][0], true) . "', " .
+									"'" . var_export($result[$i]["glue2executionenvironmentosfamily"][0], true) . "', " .
+									"'" . var_export($result[$i]["glue2executionenvironmentconnectivityin"][0], true) . "', " .
+									"'" . var_export($result[$i]["glue2executionenvironmentconnectivityout"][0], true) . "', " .
+									"'" . var_export($result[$i]["glue2executionenvironmentcpumodel"][0], true) . "', " .
+									"'" . var_export($result[$i]["glue2resourceid"][0], true) . "'"
+								);
+								$release_vap_tmpl = false;
+								db()->query("ROLLBACK TO SAVEPOINT $sp_vap_tmpl");
+							}
+							if ($release_vap_tmpl) {
+								db()->query("RELEASE SAVEPOINT $sp_vap_tmpl");
+							}
+						}
+					}
+				}	
+				error_log("Sync VA Provider Templates DONE");
+				db()->commit();
+			} catch (Exception $e) {
+				error_log($e->getMessage());
+				error_log("Sync VA Provider Templates FAILED");
+				db()->rollBack();
+			}
 		} else {
 			$this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 403 Forbidden");
@@ -1471,30 +1530,53 @@ class VoController extends Zend_Controller_Action
 			);
 
 			$prod_sites = $this->getVAProvidersArray();
-			db()->query("TRUNCATE TABLE va_provider_endpoints");
-			foreach($prod_sites as $site) {
-				$basedn='GLUE2GroupID=cloud,GLUE2DomainID='.$site["name"].',GLUE2GroupID=grid,o=glue';
-				$filter = '(&(objectClass=GLUE2Endpoint)(|(GLUE2EndpointInterfaceName=OCCI)))';
-				if ($site["url"] != '') {
-					$filter = '(&(objectClass=GLUE2Endpoint)(|(GLUE2EndpointID='.$site["url"].'*))(|(GLUE2EndpointInterfaceName=OCCI)))';
-				}
-				$result = $this->getTopBDIIData($basedn, $filter, $attrs);
-				if(isset($result["count"])){
-					for($i=0; $i<$result["count"];$i++){
-						db()->query("INSERT INTO va_provider_endpoints (va_provider_id, endpoint_url, deployment_type) VALUES (?, ?, ?)", array(							
-							$site["id"],
-							$result[$i]["glue2endpointurl"][0],
-							$result[$i]["glue2endpointimplementor"][0]
-						));
-						if(trim($result[$i]["glue2computingendpointcomputingserviceforeignkey"][0]) != ""){
-							db()->query("UPDATE gocdb.va_providers SET serviceid='".trim($result[$i]["glue2computingendpointcomputingserviceforeignkey"][0])."' WHERE gocdb.va_providers.pkey='".$site["id"]."'");
+			try {
+				db()->beginTransaction();
+				db()->query("TRUNCATE TABLE va_provider_endpoints");
+				foreach($prod_sites as $site) {
+					$basedn='GLUE2GroupID=cloud,GLUE2DomainID='.$site["name"].',GLUE2GroupID=grid,o=glue';
+					$filter = '(&(objectClass=GLUE2Endpoint)(|(GLUE2EndpointInterfaceName=OCCI)))';
+					if ($site["url"] != '') {
+						$filter = '(&(objectClass=GLUE2Endpoint)(|(GLUE2EndpointID='.$site["url"].'*))(|(GLUE2EndpointInterfaceName=OCCI)))';
+					}
+					$result = $this->getTopBDIIData($basedn, $filter, $attrs);
+					if(isset($result["count"])){
+						if ($result["count"] <= 0) {
+							throw new Exception("Number of results returned by top-BDII is zero. Aborting operation.");
+						}
+						for($i=0; $i<$result["count"];$i++) {
+							$sp_vap_endp = "sync_va_provider_endpoints" . (microtime(true) * 10000);
+							db()->query("SAVEPOINT $sp_vap_endp");
+							$release_vap_endp = true;
+							try {								
+								db()->query("INSERT INTO va_provider_endpoints (va_provider_id, endpoint_url, deployment_type) VALUES (?, ?, ?)", array(
+									$site["id"],
+									$result[$i]["glue2endpointurl"][0],
+									$result[$i]["glue2endpointimplementor"][0]
+								));
+								if(trim($result[$i]["glue2computingendpointcomputingserviceforeignkey"][0]) != ""){
+									db()->query("UPDATE gocdb.va_providers SET serviceid='".trim($result[$i]["glue2computingendpointcomputingserviceforeignkey"][0])."' WHERE gocdb.va_providers.pkey='".$site["id"]."'");
+								}
+							} catch (Exception $e) {
+								error_log("ERROR in 'INSERT INTO va_provider_endpoints(va_provider_id, vmiinstanceid, content_type, va_provider_image_id, mp_uri, vowide_vmiinstanceid)' -- entry ignored");
+								$release_vap_endp = false;
+								db()->query("ROLLBACK TO SAVEPOINT $sp_vap_endp");
+							}
+							if ($release_vap_endp) {
+								db()->query("RELEASE SAVEPOINT $sp_vap_endp");
+							}
 						}
 					}
 				}
+				db()->query("REFRESH MATERIALIZED VIEW CONCURRENTLY va_providers;");
+				db()->query("SELECT request_permissions_refresh();");
+				db()->commit();
+				error_log("Sync VA Provider Endpoints DONE");
+			} catch (Exception $e) {
+				error_log($e->getMessage());
+				error_log("Sync VA Provider Endpoints FAILED");
+				db()->rollBack();
 			}
-			db()->query("REFRESH MATERIALIZED VIEW CONCURRENTLY va_providers;");
-			db()->query("SELECT request_permissions_refresh();");
-			error_log("Sync VA Provider Endpoints DONE");
 		} else {
 			$this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 403 Forbidden");
