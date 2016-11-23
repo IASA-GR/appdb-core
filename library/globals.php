@@ -7841,7 +7841,7 @@ class SamlAuth{
 	//Extracts user entitlements from the saml login response if they exist.
 	//Returns an array with VO memberships and Site roles
 	private static function extractSamlEntitlements($attrs) {
-	  $res = array('vos' => array("members" => array(), "contacts" => array()), 'sites' => array(), 'groups' => array());
+	  $res = array('vos' => array("members" => array(), "contacts" => array(), "vmops" => array()), 'sites' => array(), 'groups' => array());
 
 	  if( !is_array($attrs) || !isset($attrs['idp:entitlement']) ){
 		return $res;
@@ -7901,8 +7901,12 @@ class SamlAuth{
 		  if( $role === 'member' ) {
 			$res['vos']['members'][] = array('scope' => $scope, 'source' => $source, 'vo' => $voname, 'group' => $group );
 		  } else if($role !== null) {
-			$res['vos']['contacts'][] = array('scope' => $scope, 'source' => $source, 'vo' => $voname, 'role' => $role, 'group' => $group );
-			$res['vos']['members'][] = array('scope' => $scope, 'source' => $source, 'vo' => $voname, 'group' => $group );
+			  if ($role === 'VM OPERATOR') {
+				$res['vos']['vmops'][] = array('scope' => $scope, 'source' => $source, 'vo' => $voname, 'role' => $role, 'group' => $group );
+			  } else {
+				$res['vos']['contacts'][] = array('scope' => $scope, 'source' => $source, 'vo' => $voname, 'role' => $role, 'group' => $group );
+				$res['vos']['members'][] = array('scope' => $scope, 'source' => $source, 'vo' => $voname, 'group' => $group );
+			  }
 		  }
 		  continue;
 		}
@@ -7910,8 +7914,53 @@ class SamlAuth{
 	  return $res;
 	}
 	
+	//Reject VM Operator if account is not entitled with VO membership
+	private static function validateEntitlements($user, $entitlements = array()) {
+			$vos = ((isset($entitlements['vos'])) ? $entitlements['vos'] : array());
+			$vmops = ((isset($vos['vmops'])) ? $vos['vmops'] : array());
+			$contacts = ((isset($vos['contacts'])) ? $vos['contacts'] : array());
+			$members = ((isset($vos['members'])) ? $vos['members'] : array());
+			$storedMembers = array();
+			$vomembers = array();
+
+			if (count($vmops) === 0 ) {
+			  return $entitlements;
+			}
+
+			//Get already stored (Operations Portal) VO memberships
+			if ($user !== null) {
+				$storedMembers = $user->getVOMemberships();
+				if (is_array($storedMembers)) {
+					foreach($storedMembers as $storedMember) {
+						$vomem = $storedMember->getVO();
+						if ($vomem !== null) {
+							$vomembers[] = $vomem->name;
+						}
+					}
+				}
+			}
+
+			//Get currently retrieved VO membership entitlements
+			foreach($members as $member) {
+				$vomembers[] = $member['vo'];
+			}
+
+			foreach($vmops as $vmop) {
+				//If a VO VM Operator is also entitled with membership add it to contacts
+				if (in_array($vmop['vo'], $vomembers) === true) {
+					$contacts[] = $vmop;
+				}
+			}
+
+			$vos['contacts'] = $contacts;
+			$entitlements['vos'] = $vos;
+
+			return $entitlements;
+	}
+
+
 	//Persist any VO related information from EGI AAI entitlements given for a specific uid in SAML returned attributes
-	private static function updateEGIAAIEntitlements($attrs, $entitlements = array()) {
+	private static function updateEGIAAIEntitlements($attrs, $entitlements = array(), $user = null) {
 		$vocontacts = array();
 		$vomembers = array();
 		$puid = ( isset($attrs["idp:uid"])?$attrs["idp:uid"][0]:"");
@@ -7922,7 +7971,9 @@ class SamlAuth{
 
 		//Clear any vo contact and membership information regarding given persisted uid
 		db()->query("SELECT clear_egiaai_user_info(?)", array($puid))->fetchAll();
-		
+
+		$entitlements = self::validateEntitlements($user, $entitlements);
+
 		//Check if entitlements have VO specific information
 		if($entitlements && isset($entitlements['vos'])) {
 			$voentitlements = $entitlements['vos'];
@@ -7947,6 +7998,8 @@ class SamlAuth{
 				db()->query("SELECT add_egiaai_user_vocontact_info(?, ?, ?, ?, ?)", array($puid, $name, $vocontact['vo'], $vocontact['role'], $email))->fetchAll();
 			}
 		}
+
+		return $entitlements;
 	}
 	
 	//Performs actions after successful SAML Authedication
@@ -8017,7 +8070,7 @@ class SamlAuth{
 		//Store user entitlements
 		$session->entitlements = self::extractSamlEntitlements($attrs);
 		if($accounttype === 'egi-aai') {
-			self::updateEGIAAIEntitlements($attrs, $session->entitlements);
+			$session->entitlements = self::updateEGIAAIEntitlements($attrs, $session->entitlements, $user);
 		}
 
 		//Check if user account is blocked and updates session
