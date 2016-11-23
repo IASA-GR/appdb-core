@@ -820,4 +820,17 @@ class NewsController extends Zend_Controller_Action
 			echo '<div><h3>No permission to view content</h3></div>';
 		}
 	}
+
+	function notifyusersAction() {
+   		$this->_helper->layout->disableLayout();
+		$this->_helper->viewRenderer->setNoRender();
+		if (file_exists(APPLICATION_PATH . "/notify_users_message.phtml")) {
+			$msg = file_get_contents(APPLICATION_PATH . "/notify_users_message.phtml");
+			echo $msg;
+		} else {
+			$this->getResponse()->clearAllHeaders();
+			$this->getResponse()->setRawHeader("HTTP/1.0 204 No Content");
+			$this->getResponse()->setHeader("Status","204 No Content");
+		}
+	}
 }

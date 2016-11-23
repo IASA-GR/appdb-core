@@ -7893,6 +7893,11 @@ class SamlAuth{
 		  $role = self::getEGIAAIVORoleMapping($matches[5]);
 		  $voname = $matches[6];
 		  
+		  if ($role === 'VM OPERATOR' && strpos($source, 'appdb_auth') === false) {
+			//Do not accept vm_operator role if it is not given by AppDB auth source
+			continue;
+		  }
+
 		  if( $role === 'member' ) {
 			$res['vos']['members'][] = array('scope' => $scope, 'source' => $source, 'vo' => $voname, 'group' => $group );
 		  } else if($role !== null) {
@@ -9719,7 +9724,7 @@ class VoAdmin{
 		return self::toJSON( array_merge($res, self::getVOContacts($user)), $toJSON );
 	}
 	
-	private static function getVOContacts($researcher){
+	public static function getVOContacts($researcher){
 		$res = array();
 		$user = self::getUser($researcher);
 		if( $user === null ) {

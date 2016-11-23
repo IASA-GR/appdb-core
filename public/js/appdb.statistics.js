@@ -1225,7 +1225,7 @@ appdb.statistics.charts.Sunburst = appdb.ExtendClass(appdb.View, "appdb.statisti
 				self.options.dom.svg
 					.transition()
 					.duration(300)
-					.attr("transform", "translate(" + self.options.width / 2 + "," + ( (Math.max(newheight,half) / 2 )+10) + ")")
+					.attr("transform", "translate(" + self.options.width / 2 + "," + ( (Math.max(newheight,half) / 2 )+30) + ")")
 					.each("end", function(){
 						//IE8 FIX: Adds an invalid div in body that distorts layout
 						if( $.browser.msie ){
