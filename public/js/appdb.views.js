@@ -14587,7 +14587,9 @@ appdb.views.VOMembershipList = appdb.ExtendClass(appdb.View, "appdb.views.VOMemb
 			if (!res[e.id]) {
 				res[e.id] = {id: e.id, name: e.name, discipline: e.discipline, member_since: e.member_since, roles: []};
 			}
-			res[e.id].roles.push(e.role);
+			if (res[e.id].roles.indexOf(e.role) === -1) {
+				res[e.id].roles.push(e.role);
+			}
 		});
 		var memberlist = [];
 		for (var i in res) {
