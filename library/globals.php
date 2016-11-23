@@ -9731,7 +9731,7 @@ class VoAdmin{
 			return $res;
 		}
 		
-		$vomems = $researcher->getVOContacts();
+		$vomems = $user->getVOContacts();
 		if( count($vomems) === 0 ){
 			return $res;
 		}

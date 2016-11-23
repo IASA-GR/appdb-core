@@ -126,6 +126,7 @@ function getHtmlDateValue($value, $context){
 										<?php if ( count($this->entry->contacts) > 0 ) {?>
 										<table border="0" width="99%" id="contactInfoTable<?php echo $this->dialogCount;?>">
 											<?php if ($this->entry->id != "") { if (is_array($this->entry->contacts)) { foreach ($this->entry->contacts as $contact) { ?> 
+											<?php if (strtolower(trim($contact->role)) === 'vm operator') { continue; } ?>
 											<tr>
 												<td align="right" style="text-align: right; width: 48%">
 													<span><?php 
