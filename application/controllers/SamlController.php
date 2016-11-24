@@ -124,13 +124,13 @@ class SamlController extends Zend_Controller_Action
 			
 			//Check if user is already logged in
 			if( SamlAuth::isAuthenticated() !== false ){
-				if( isset($this->session->authreferer) && trim($this->session->authreferer) !== ""){
+				/*if( isset($this->session->authreferer) && trim($this->session->authreferer) !== ""){
 					$this->session->authreferer = str_replace("http://", "https://", $this->session->authreferer);
 					header("Location: " . $this->session->authreferer);
 				}else{
 					header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
 				}
-				return;
+				return;*/
 			}else if( isset($this->session) && $this->session->isNewUser === true ){
 				header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
 				return;
