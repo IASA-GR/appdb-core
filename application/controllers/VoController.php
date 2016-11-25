@@ -1542,7 +1542,8 @@ class VoController extends Zend_Controller_Action
 					$result = $this->getTopBDIIData($basedn, $filter, $attrs);
 					if(isset($result["count"])){
 						if ($result["count"] <= 0) {
-							throw new Exception("Number of results returned by top-BDII is zero. Aborting operation.");
+							//throw new Exception("Number of results returned by top-BDII is zero. Aborting operation.");
+							error_log("Warning: Number of results returned by top-BDII is zero for " . $site["name"]);
 						}
 						for($i=0; $i<$result["count"];$i++) {
 							$sp_vap_endp = "sync_va_provider_endpoints" . (microtime(true) * 10000);
