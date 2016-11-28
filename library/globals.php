@@ -7396,6 +7396,23 @@ class SamlAuth{
 		}
 		return null;
 	}
+
+	//Get available user accounts for specific user
+	public static function getResearcherUserAccounts($userid, $accounttype = null){
+		$useraccounts = new Default_Model_UserAccounts();
+		$f1 = new Default_Model_UserAccountsFilter();
+		$f2 = new Default_Model_UserAccountsFilter();
+		$f1->researcherid->equals($userid);
+		$useraccounts->filter->chain($f1, "AND");
+		if($accounttype !== null) {
+			$f2->account_type->equals($accounttype);
+			$useraccounts->filter->chain($f2, "AND");
+		}
+		if( count( $useraccounts->items ) > 0 ){
+			return $useraccounts->items;
+		}
+		return array();
+	}
 	
 	//Get researcher entry for the given user account entry
 	public static function getUserByAccount($useraccount){

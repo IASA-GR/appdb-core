@@ -864,9 +864,15 @@ class SamlController extends Zend_Controller_Action
 
 						if ($userAccount) {
 							$attrs['entitlements'] = array('vo' => array('contacts' => VoAdmin::getVOContacts($userAccount->researcherid) ,'memberships' => VoAdmin::getUserMembership($userAccount->researcherid)));
+							$uaccounts = array();
+							$alluseraccounts = SamlAuth::getResearcherUserAccounts($userAccount->researcherid);
+							foreach($alluseraccounts  as $uaccount) {
+								$uaccounts[] = array('type' => $uaccount->accountTypeID, 'uid' => $uaccount->accountID);
+							}
+							$attrs['appdb:accounts'] = $uaccounts;
 						}
 					}catch(Exception $ex) {
-						
+						$attrs['error'] = $ex->getMessage();
 					}
 				}
 
