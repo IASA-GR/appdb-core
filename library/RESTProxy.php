@@ -45,7 +45,7 @@ class RESTProxy {
 	}
 
 	public function onError($errorDesc) {
-		echo $errorDesc;
+		return $errorDesc;
 	}
 
 	public function request($resource, $method = "GET", $data = array(), $immediate = true, $compression = "gzip") {
@@ -121,8 +121,9 @@ class RESTProxy {
 		}
         $result = curl_exec($ch);
 		if ( $result === false ) {
-			$result = curl_error($ch);
-			if ($immediate) $this->onError($result);
+//			$result = curl_error($ch);
+//			if ($immediate) $this->onError($result);
+			$result = $this->onError(curl_error($ch));
 		}
 		if ( isset($putstream) ) fclose($putstream);
 		curl_close($ch);
@@ -177,7 +178,7 @@ class AppDBRESTProxy extends RESTProxy {
 	}
 
 	public function onError($errorDesc) {
-		echo RestAPIHelper::responseHead("unknown", $error = "Internal Server Error", $exterror = $errorDesc) . RestAPIHelper::responseTail();
+		return RestAPIHelper::responseHead("unknown", null, null, null, null, "Internal Server Error", $errorDesc, null) . RestAPIHelper::responseTail();
 	}
 }
 ?>
