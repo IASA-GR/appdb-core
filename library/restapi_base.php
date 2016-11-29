@@ -83,9 +83,9 @@ interface iRestAPIHelper {
 	static public function getVersion();
 	static public function getFolder($folder);
 	static public function namespaces();
-	static public function responseHead($datatype, $type = null, $count = null, $pageLength = null, $pageOffset = null, $error = null, $exterror = null);
+	static public function responseHead($datatype, $type = null, $count = null, $pageLength = null, $pageOffset = null, $error = null, $exterror = null, $authenticated = null);
 	static public function responseTail();
-    public static function wrapResponse($response, $datatype = null, $type = null, $count = null, $pageLength = null, $pageOffset = null, $error = null, $exterror = null);
+	public static function wrapResponse($response, $datatype = null, $type = null, $count = null, $pageLength = null, $pageOffset = null, $error = null, $exterror = null, $authenticated = null);
 }
 
 /**
@@ -196,7 +196,10 @@ class RestAPIHelper implements iRestAPIHelper {
         return $ns;
     }
 
-	static public function responseHead($datatype, $type = null, $count = null, $pageLength = null, $pageOffset = null, $error = null, $exterror = null, $reqTime = null) {
+	static public function responseHead($datatype, $type = null, $count = null, $pageLength = null, $pageOffset = null, $error = null, $exterror = null, $reqTime = null, $authenticated = null) {
+		if (is_null($authenticated)) {
+			$authenticated = false;
+		}
 		$resTime = microtime(true);
 		if ( is_null($type) ) $type = "entry";
 		db()->setFetchMode(Zend_Db::FETCH_NUM);
@@ -228,6 +231,7 @@ class RestAPIHelper implements iRestAPIHelper {
 			'requestedOn="' . sprintf("%.3f", $reqTime) . '" ' .
 			'deliveredOn="' . sprintf("%.3f", $resTime) . '" ' .
 			'processingTime="' . sprintf("%.3f", $resTime - $reqTime) . '" ' .
+			($authenticated ? 'authenticated="true" ' : '') .
             'version="'.RestAPIHelper::VERSION.'" >';
     }
 
@@ -235,7 +239,10 @@ class RestAPIHelper implements iRestAPIHelper {
         return '</appdb:appdb>';
     }
 
-	static public function wrapResponse($response, $datatype = null, $type = null, $count = null, $pageLength = null, $pageOffset = null, $error = null, $exterror = null) {
+	static public function wrapResponse($response, $datatype = null, $type = null, $count = null, $pageLength = null, $pageOffset = null, $error = null, $exterror = null, $authenticated = null) {
+		if (is_null($authenticated)) {
+			$authenticated = false;
+		}
 		$reqTime = null;
         $originalResponse = $response;
 		$parent = null;
@@ -267,7 +274,7 @@ class RestAPIHelper implements iRestAPIHelper {
             if ( is_null($type) ) $type = "entry";
         }
         $response = array();
-        $response[] = RestAPIHelper::responseHead($datatype, $type, $count, $pageLength, $pageOffset, $error, $exterror, $reqTime);
+        $response[] = RestAPIHelper::responseHead($datatype, $type, $count, $pageLength, $pageOffset, $error, $exterror, $reqTime, $authenticated);
         if ( is_object($originalResponse) ) {
             $originalResponse = $originalResponse->getData();
         }
@@ -505,7 +512,22 @@ class XMLFragmentRestResponse extends XMLRestResponseBase {
     }
 
     public function finalize() {
-        return RestAPIHelper::wrapResponse($this);
+	$authed = false;
+	if (! is_null($this->_parent)) {
+		try {
+			$authed = $this->_parent->getUser();
+			if (! is_null($authed)) {
+				$authed = true;
+			} else {
+				$authed = false;
+			}
+		} catch (Exception $e) {
+			$authed = false;
+		}
+	//} else {
+		//error_log("Response parent is NULL");
+	}
+        return RestAPIHelper::wrapResponse($this, null, null, null, null, null, null, null, $authed);
     }
 }
 
@@ -1498,10 +1520,10 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
                 if ( count($keys->items) === 1 ) {
                     if ( $this->_validateAPIKey($keys->items[0]) ) {
 						$u = new Default_Model_UserCredentials();
-						$u->filter->researcherid->equals($this->getParam("userid"))->and($u->filter->sessionid->equals($this->getParam("sessionid"))->and($u->filter->token->equals($this->getParam("passwd"))));
+						$u->filter->researcherid->numequals($this->getParam("userid"))->and($u->filter->sessionid->equals($this->getParam("sessionid"))->and($u->filter->token->equals($this->getParam("passwd"))));
 						if( count($u->items) > 0 ) { 
 							$u = new Default_Model_Researchers();
-							$u->filter->id->equals($this->getParam("userid"));
+							$u->filter->id->numequals($this->getParam("userid"));
 							if (count($u->items) > 0) {
 								$this->_userid = $u->items[0]->id;
 								$this->_userGroups = $u->items[0]->actorGroups;

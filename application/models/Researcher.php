@@ -286,7 +286,7 @@ class Default_Model_Researcher extends Default_Model_ResearcherBase
 	public function getActorGroups() {
 		if ( $this->_actorGroups === null ) {
 			$ag = new Default_Model_ActorGroupMembers();
-			$ag->filter->actorid = $this->getGUID();
+			$ag->filter->actorid->numequals("'" . $this->getGUID() . "'");
 			$ag->refresh();
 			if ( count($ag->items) > 0 ) {
 				$this->_actorGroups = $ag->items;
