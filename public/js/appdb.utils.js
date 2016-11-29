@@ -7867,6 +7867,72 @@ appdb.utils.Vm2Appdb = (function(){
 	};
 })();
 
+appdb.utils.checkUserNotification = (function(){
+	var _timer = null;
+	var _interval = 60000; // once every minute
+	var _enabled = false;
+	var _loggedin = function(){};
+	var _loggedout = function(){};
+	var _xhr = null;
+	var _lastMsg = "";
+	var _init = function(){
+		if( _timer !== null ){clearTimeout(_timer);_timer = null;}
+		_timer = setTimeout(function(){
+			if( _xhr !== null ) _xhr.abort();
+			if( _enabled === false ) {clearTimeout(_timer);_timer = null;return;}
+			_xhr = $.ajax({
+				url: appdb.config.endpoint.base + "news/notifyusers",
+				success: function(d){
+					_xhr = null;
+					d = $.trim(d);
+					if (d != "") {
+						if (_lastMsg != d) {
+							_lastMsg = d;
+							alert(d);
+						};
+					};
+					_init();
+				},
+				error: function(){
+					_xhr = null;
+					_init();
+				}
+			});
+		}, _interval);
+	};
+
+	var enable = function(v){
+		var _start = false;
+		if( typeof v === "boolean" ){
+			if( v !== _enabled && v === true ){
+				_start = true;
+			}
+			_enabled = v;
+		}
+		
+		if( _start ){
+			_init();
+		}
+		return _enabled;
+	};
+	var interval = function(v){
+		if( typeof v === "number" && v > 1000 ){
+			_interval = v;
+		}
+		return _interval;
+	};
+	var _cancelCurrentRequest = function(){
+		if( _xhr && _xhr !== null && typeof _xhr.abort === "function"){
+			_xhr.abort();
+		}
+	};
+	return {
+		interval: interval,
+		enable: enable,
+		cancelCurrentRequest: _cancelCurrentRequest
+	};
+})();
+
 appdb.utils.checkSession = (function(){
 	var _timer = null;
 	var _interval = 8000;

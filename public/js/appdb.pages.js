@@ -1040,6 +1040,7 @@ appdb.pages.index = (function(){
 			}
 		});
 		page.initSessionChecker();
+		page.initUserNotificationChecker();
 	};
 	page.checkCategoriesUpdate = function(){
 		page.loadCategoryNavigationLists();
@@ -1092,6 +1093,9 @@ appdb.pages.index = (function(){
 			appdb.utils.checkSession.onLoggedOut(page.onLoggedOut);
 		}
 		appdb.utils.checkSession.enable(true);
+	};
+	page.initUserNotificationChecker = function() {
+		appdb.utils.checkUserNotification.enable(true);
 	};
 	return page;
 })();

@@ -826,7 +826,7 @@ class NewsController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender();
 		if (file_exists(APPLICATION_PATH . "/notify_users_message.phtml")) {
 			$msg = file_get_contents(APPLICATION_PATH . "/notify_users_message.phtml");
-			echo $msg;
+			echo trim($msg);
 		} else {
 			$this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 204 No Content");
