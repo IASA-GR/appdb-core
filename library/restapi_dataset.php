@@ -228,7 +228,7 @@ class RestDSXMLParser extends RestXMLParser {
 				$xmlver = $xml->xpath("//dataset:version");
 				if ( count($xmlver) > 0 ) {
 					foreach($xmlver as $x) {
-						$data = RestAPIHelper::responseHead("dataset") . $x->asXML() .  RestAPIHelper::responseTail();
+						$data = RestAPIHelper::responseHead("dataset", null, null, null, null, null, null, ! is_null($this->getUser())) . $x->asXML() .  RestAPIHelper::responseTail();
 						$verres = new RestDatasetVersionList(array_merge($this->_parent->getParams(), array('data' => $data, 'id' => $ds->id)));
 						if ($this->_parent->getMethod() === RestMethodEnum::RM_PUT) {
 							$verres->put();
@@ -627,7 +627,7 @@ class RestDSVerXMLParser extends RestXMLParser {
 						}
 					}
 					foreach($xmlloc as $x) {
-						$data = RestAPIHelper::responseHead("dataset") . $x->asXML() . RestAPIHelper::responseTail();
+						$data = RestAPIHelper::responseHead("dataset", null, null, null, null, null, null, ! is_null($this->getUser())) . $x->asXML() . RestAPIHelper::responseTail();
 						$locres = new RestDatasetLocationList(array_merge($this->_parent->getParams(), array('data' => $data, 'vid' => $ds->id)));
 						
 						if (isset($x->attributes()->id)) {

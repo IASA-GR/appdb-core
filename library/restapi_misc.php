@@ -878,7 +878,7 @@ class RestAppDBResourceList extends RestROResourceList {
 			$this->_pageOffset = 0;
 			$this->_pageLength = count($s);
 			$this->_total = count($s);
-			$s = RestAPIHelper::wrapResponse($s, "resource", "list", count($s));
+			$s = RestAPIHelper::wrapResponse($s, "resource", "list", count($s), null, null, null, null, ! is_null($this->getUser()));
 			return new XMLRestResponse($s, $this);
 		} else return false;
 	}
