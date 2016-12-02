@@ -7869,7 +7869,7 @@ appdb.utils.Vm2Appdb = (function(){
 
 appdb.utils.checkUserNotification = (function(){
 	var _timer = null;
-	var _interval = 60000; // once every minute
+	var _interval = 30000; // once every minute
 	var _enabled = false;
 	var _loggedin = function(){};
 	var _loggedout = function(){};
@@ -7882,15 +7882,36 @@ appdb.utils.checkUserNotification = (function(){
 			if( _enabled === false ) {clearTimeout(_timer);_timer = null;return;}
 			_xhr = $.ajax({
 				url: appdb.config.endpoint.base + "news/notifyusers",
-				success: function(d){
+				success: function(d, textStatus, jqXHR){
 					_xhr = null;
-					d = $.trim(d);
-					if (d != "") {
-						if (_lastMsg != d) {
-							_lastMsg = d;
-							alert(d);
+					if (jqXHR.status == 204) {
+						if ( $("#servicemsg").length > 0 ) {
+							$("#servicemsg")[0].remove();
+						};
+						$("body").attr("style", "cursor: default");
+					} else {
+						d = $.trim(d);
+						if (d != "") {
+							if (_lastMsg != d) {
+								_lastMsg = d;
+	//							alert(d);
+								if ( $("#servicemsg").length == 0 ) {
+									$("body").append('<div id="servicemsg">');
+									$("body").css({'position': 'absolute', 'top': '40px', 'height': '40px', 'left': '0px'})
+								}
+								$("#servicemsg").css({'position': 'fixed', 'top': '40px', 'height': '40px', 'left': '0px', 'width': '100%', 'line-height': '40px', 'text-align': 'center', 'background-color': 'red', 'font-size': '16pt', 'font-family': '"Arial", "Sans-serif" !important', 'z-index': 9999});
+								$("#servicemsg").text(d);
+							};
 						};
 					};
+					_init();
+				},
+				nocontent: function(){
+					_xhr = null;
+					if ( $("#servicemsg").length > 0 ) {
+						$("#servicemsg")[0].remove();
+					};
+					$("body").attr("style", "cursor: default");
 					_init();
 				},
 				error: function(){
