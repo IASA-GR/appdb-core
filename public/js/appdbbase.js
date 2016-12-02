@@ -1214,7 +1214,8 @@ appdb.components.People = appdb.ExtendClass(appdb.Component,"appdb.components.Pe
                 {name : "First Name" , value : "firstname", defaultOperation: "ASC"},
                 {name : "Last Name" , value : "lastname", defaultOperation: "ASC"},
                 {name : "ID" , value : "id", defaultOperation: "ASC"},
-                {name : "Date" , value : "dateinclusion", defaultOperation: "DESC"},
+                {name : "Date Added" , value : "dateinclusion", defaultOperation: "DESC"},
+                {name : "Last Updated" , value : "lastupdated", defaultOperation: "DESC"},
                 {name : "Unsorted" , value : "unsorted", defaultOperation: "ASC", hideOperation: true}
             ]
         });
