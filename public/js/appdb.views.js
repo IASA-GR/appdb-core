@@ -3515,7 +3515,18 @@ appdb.views.AppsList = appdb.ExtendClass(appdb.View, "appdb.views.AppsList", fun
 				$(a).append(ratingvotes);
 			}
 			if (d.hitcount) {
-				$(info).append("<div class='field'><span class='description'><span class='hits'>" + d.hitcount + "</span><span class='datatype'>visit" + ((d.hitcount != 1) ? "s" : "") + "</span></span></div>");
+				var visitLiteralLPad = ''
+			    if( d.hitcount > 100000) {
+					visitLiteralLPad = 'style="padding-left: 3px" ';
+				}
+				if (d.hitcount > 1000000) {
+					d.hitcount = Math.round(d.hitcount / 1000000 * 10) / 10 + 'M';
+				} else if (d.hitcount > 10000) {
+					d.hitcount = Math.round(d.hitcount / 1000) + 'k';
+				} else if (d.hitcount > 1000) {
+					d.hitcount = Math.round(d.hitcount / 1000 * 10) / 10 + 'k';
+				}
+				$(info).append("<div class='field'><span class='description'><span class='hits'>" + d.hitcount + "</span><span " + visitLiteralLPad + "class='datatype'>visit" + ((d.hitcount != 1) ? "s" : "") + "</span></span></div>");
 			}
 			if (parseFloat(d.rating) == 0.0) {
 				$(ratingcount).addClass("zero");
