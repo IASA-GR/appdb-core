@@ -262,20 +262,21 @@ if( $browserSupported == false ){
 				<ul class="leftalign">
 					<li class="leftalign"><a class="hidden"></a>
 						<div class="loginselector">
-							<div class="sourcetype egi-sso-login">
-								<a href="https://<?php echo  $_SERVER['HTTP_HOST']; ?>/saml/saml?source=egi-sso-ldap-sp" class="icontext" ><img src="/images/egilogo.png" alt=""/><span>EGI-SSO</span></a>
+							<div class="sourcetype egi-aai-login">
+								<a href="https://<?php echo  $_SERVER['HTTP_HOST']; ?>/saml/saml?source=egi-aai-sp" class="icontext"><img src="/images/egilogo.png" alt=""/><span >EGI AAI Check-in</span></a>
 								<div class="details">Create an EGI SSO account <a href="http://www.egi.eu/sso" target="_blank">here</a></div>
 							</div>
 							<div class="sourcetype digital-cert-login">
 								<a href="https://<?php echo  $_SERVER['HTTP_HOST']; ?>/saml/saml?source=x509-sp" class="icontext"><img src="/images/certificate.png" alt=""/><span>x509 Digital Certificates</span></a>
 							</div>
+							<?php if (ApplicationConfiguration::isProductionInstance() === false ) { ?>
+							<div class="sourcetype egi-sso-login">
+								<a href="https://<?php echo  $_SERVER['HTTP_HOST']; ?>/saml/saml?source=egi-sso-ldap-sp" class="icontext" ><img src="/images/egilogo.png" alt=""/><span>EGI-SSO</span></a>
+								<div class="details">Create an EGI SSO account <a href="http://www.egi.eu/sso" target="_blank">here</a></div>
+							</div>
 							<div class="sourcetype edugain-login">
 								<a href="https://<?php echo  $_SERVER['HTTP_HOST']; ?>/saml/saml?source=edugain-sp" class="icontext"><img src="/images/edugain_logo.png" alt=""/><span >Federation (eduGAIN)</span></a>
 							</div>
-							<div class="sourcetype egi-aai-login">
-								<a href="https://<?php echo  $_SERVER['HTTP_HOST']; ?>/saml/saml?source=egi-aai-sp" class="icontext"><img src="/images/egilogo.png" alt=""/><span >EGI AAI Check-in</span></a>
-							</div>
-							<?php if (ApplicationConfiguration::isProductionInstance() === false ) { ?>
 							<div class="sourcetype elixir-login">
 								<a href="https://<?php echo  $_SERVER['HTTP_HOST']; ?>/saml/saml?source=elixir-sp" class="icontext"><img src="/images/elixir.png" alt=""/><span >Elixir</span></a>
 							</div>
