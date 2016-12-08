@@ -5022,6 +5022,68 @@ class VMCaster{
 		
 		return $result;
 	}
+
+	//Update vmiinstance fields regarding integrity check state
+	private static function updateVMInstanceIntegrity($vmiinstance) {
+		//Check if given VMIInstance is a valid model instance
+		if (is_null($vmiinstance) || is_numeric($vmiinstance->id) === false ||  $vmiinstance->id < 1) {
+			error_log('[Globals::VMCaster::updateVMInstanceIntegrity] Invalid VMIInstance model instance given with id = ' . $vmiinstance->id);
+			return false;
+		}
+
+		return self::dbUpdateIntegrityCheck($vmiinstance->id, $vmiinstance->autointegrity, $vmiinstance->integrityStatus, $vmiinstance->integrityMessage);
+	}
+
+	//Update only specific given fields in vmiinstances regarding integrity check state
+	private static function dbUpdateIntegrityCheck($id, $autointegrity, $integrity_status = '', $integrity_message = '') {
+		$integrityStatus = '';
+		$integrityMessage = '';
+
+		//Normalize integrity status value
+		if (is_null($integrity_status)) {
+			$integrityStatus = '';
+		} else if (is_string($integrity_status)) {
+			$integrityStatus = trim($integrity_status);
+		} else {
+			$integrityStatus = $integrity_status;
+		}
+
+		//Normalize integrity message value
+		if (is_null($integrity_message)) {
+			$integrityMessage = '';
+		} else if (is_string($integrity_message)) {
+			$integrityMessage = trim($integrity_message);
+		} else {
+			$integrityMessage = $integrity_message;
+		}
+
+		//If all given parameters are valid proceed with update
+		if (is_numeric($id) && $id > 0 && is_bool($autointegrity) && is_string($integrityStatus) && is_string($integrityMessage)) {
+			//Prepare sql update statement
+			$sql = 'UPDATE vmiinstances SET autointegrity = ?, integrity_status = ?, integrity_message = ? WHERE vmiinstances.id = ' . $id;
+			$vals = array($autointegrity, $integrityStatus, $integrityMessage);
+			db()->beginTransaction();
+			try{
+				db()->query($sql, $vals)->fetchAll();
+				db()->commit();
+			} catch (Exception $ex) {
+				db()->rollback();
+				error_log("[Globals::VMCaster::dbUpdateIntegrityCheck] " . $ex->getMessage());
+				return false;
+			}
+		} else {
+			$err = "[Globals::VMCaster::dbUpdateIntegrityCheck] Invalid input parameters given";
+			$err .= " id=" . $id;
+			$err .= " autointegrity=" . $autointegrity;
+			$err .= " integrity_status=" . $integrity_status;
+			$err .= " integrity_message=" . $integrity_message;
+			error_log($err);
+			return false;
+		}
+
+		return true;
+	}
+
 	public static function clearIntegrityCheck($vaversionid){
 		$vapplists = new Default_Model_VALists();
 		$vapplists->filter->vappversionid->equals($vaversionid);
@@ -5033,7 +5095,7 @@ class VMCaster{
 					$instance->integrityStatus = "";
 				}
 				$instance->integrityMessage = "";
-				$instance->save();
+				self::updateVMInstanceIntegrity($instance);
 			}
 		}
 		$vaversions = new Default_Model_VAversions();
@@ -5108,7 +5170,7 @@ class VMCaster{
 							$instance->integrityStatus = "warning";
 						}
 						$instance->integrityMessage = $image["http"]["message"];//"Server responded with code: " . $image["http"]["code"];
-						$instance->save();
+						self::updateVMInstanceIntegrity($instance);
 					}
 				}else{
 					$allimagesfailed = false;
@@ -5276,7 +5338,7 @@ class VMCaster{
 				default:
 					continue;
 			}
-			$instance->save();
+			self::updateVMInstanceIntegrity($instance);
 		}
 		if( $isrunning === true ){
 			$res["status"] = "running";
@@ -5325,7 +5387,7 @@ class VMCaster{
 					if( $img->integrityStatus === "success"){
 						$img->autointegrity = false;
 						$img->integrityMessage = "current";
-						$img->save();
+						self::updateVMInstanceIntegrity($img);
 					}
 				}
 			}
