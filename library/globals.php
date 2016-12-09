@@ -5060,6 +5060,7 @@ class VMCaster{
 		//If all given parameters are valid proceed with update
 		if (is_numeric($id) && $id > 0 && is_bool($autointegrity) && is_string($integrityStatus) && is_string($integrityMessage)) {
 			//Prepare sql update statement
+			$autointegrity = (($autointegrity === true) ? 't' : 'f');
 			$sql = 'UPDATE vmiinstances SET autointegrity = ?, integrity_status = ?, integrity_message = ? WHERE vmiinstances.id = ' . $id;
 			$vals = array($autointegrity, $integrityStatus, $integrityMessage);
 			db()->beginTransaction();
@@ -5318,6 +5319,11 @@ class VMCaster{
 				case "success":
 					$instance->integrityStatus = "success";
 					$instance->integrityMessage = "current";
+					if (trim($instance->checksum) === "" || intval($instance->size) === 0) {
+						$instance->integrityStatus = "error";
+						$instance->integrityMessage = "Integrity check could not calculate the file checksum";
+						$hasimageerrors = true;
+					}
 					$successfulimages[] = $instance->id;
 					break;
 				case "cancelled":
