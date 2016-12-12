@@ -679,6 +679,7 @@ class RestBroker extends RestResourceList {
 				$xml = new SimpleXMLElement($this->getData());
 			} catch (Exception $e) {
 				$this->_error = RestErrorEnum::RE_INVALID_REPRESENTATION;
+				$this->_extError = $e->getMessage();
 				return false;
 			}
 			$xmli = $xml->xpath('//appdb:request');
