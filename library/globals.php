@@ -8932,20 +8932,30 @@ class AccessGroups{
 		
 		switch( $action ) {
 			case "include": //include to groups of ids
-				return self::includeUserInGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				$res = self::includeUserInGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				break;
 			case "exclude": //exclude from groups of ids
-				return self::excludeUserInGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				$res = self::excludeUserInGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				break;
 			case "request": //make request to be included in group ids (same user only)
-				return self::requestForGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				$res = self::requestForGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				break;
 			case "cancel": //cancel user's request to be included in group ids (same user only)
-				return self::cancelRequestForGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				$res = self::cancelRequestForGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				break;
 			case "accept": //accept a user's request to be included in group ids
-				return self::acceptRequestForGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				$res = self::acceptRequestForGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				break;
 			case "reject": //reject a user's request to be included in group ids 
-				return self::rejectRequestForGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				$res = self::rejectRequestForGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				break;
 			default:
-				return false;
+				$res = false;
 		}
+		if ($res) { // refresh permissions in case of non-failure
+			db()->exec('SELECT refresh_permissions()');
+		}
+		return $res;
 	}
 	/**
 	 * Include $targetUser in access groups given by $groupids by the $sourceUser.
