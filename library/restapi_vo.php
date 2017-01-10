@@ -451,13 +451,25 @@ class RestVOAppStatsList extends RestROResourceList {
 			if ($from == "") {
 				$from = "NULL";
 			} else {
-				$from = "'$from'::date";
+				if (validateISODate($from)) {
+					$from = "'$from'::date";
+				} else {
+					$this->setError(RestErrorEnum::RE_INVALID_RESOURCE);
+					$this->_extError = "Invalid `from' date. Valid date format is YYYY-MM-DD";
+					return false;
+				}
 			}
 			$to = $this->getParam("to");
 			if ($to == "") {
 				$to = "NULL";
 			} else {
-				$to = "'$to'::date";
+				if (validateISODate($to)) {
+					$to = "'$to'::date";
+				} else {
+					$this->setError(RestErrorEnum::RE_INVALID_RESOURCE);
+					$this->_extError = "Invalid `to' date. Valid date format is YYYY-MM-DD";
+					return false;
+				}
 			}
 			error_log("SELECT * FROM app_vo_stats_to_xml($void, $from, $to)");
 			db()->setFetchMode(Zend_Db::FETCH_NUM);
