@@ -436,11 +436,7 @@ class RestVOAppStatsList extends RestROResourceList {
 		return "app_vo_stats";
 	}
 
-	protected function _list() {
-		return $this->get();
-	}
-
-	public function get() {
+	protected function _doget($wantsDaily) {
 		if ( parent::get() !== false ) {
 			global $application;
 			$void = $this->getParam("id");
@@ -471,17 +467,29 @@ class RestVOAppStatsList extends RestROResourceList {
 					return false;
 				}
 			}
-			error_log("SELECT * FROM app_vo_stats_to_xml($void, $from, $to)");
 			db()->setFetchMode(Zend_Db::FETCH_NUM);
 			$res = db()->query("SELECT * FROM app_vo_stats_to_xml($void, $from, $to)")->fetchAll();
 			$ret = array();
 			foreach ($res as $r) {
 				if (is_array($r) && (count($r) > 0)) {
-					$ret[] = $r[0];				
+					$ret[] = $r[0];
 				}
+			}
+			if ($this->getParam("listmode") == "listing") {
+				$wantsDaily = false;
+			}
+			if (! $wantsDaily) {
+				$ret = preg_grep('/ stats="daily" /', $ret, PREG_GREP_INVERT);
 			}
 			return new XMLFragmentRestResponse($ret, $this);
 		} else return false;
 	}
-}
+	protected function _list() {
+		return $this->_doget(false);
+	}
 
+	public function get() {
+		return $this->_doget(true);
+	}
+
+}
