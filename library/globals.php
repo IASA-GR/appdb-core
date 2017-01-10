@@ -225,6 +225,11 @@ function _initLDAP($secure = true, $rdn = null, $pwd = null, $ldapError = null) 
 	return $ds;
 }
 
+function validateISODate($date)
+{
+    $d = DateTime::createFromFormat('Y-m-d', $date);
+    return $d && $d->format('Y-m-d') === $date;
+}
 
 class textPNG {
     public $font;
