@@ -430,3 +430,46 @@ class RestVOLogistics extends RestROResourceItem {
 		} else return false;
 	}
 }
+
+class RestVOAppStatsList extends RestROResourceList {
+	public function getDataType() {
+		return "app_vo_stats";
+	}
+
+	protected function _list() {
+		return $this->get();
+	}
+
+	public function get() {
+		if ( parent::get() !== false ) {
+			global $application;
+			$void = $this->getParam("id");
+			if ($void == "") {
+				$void = "NULL";
+			}
+			$from = $this->getParam("from");
+			if ($from == "") {
+				$from = "NULL";
+			} else {
+				$from = "'$from'::date";
+			}
+			$to = $this->getParam("to");
+			if ($to == "") {
+				$to = "NULL";
+			} else {
+				$to = "'$to'::date";
+			}
+			error_log("SELECT * FROM app_vo_stats_to_xml($void, $from, $to)");
+			db()->setFetchMode(Zend_Db::FETCH_NUM);
+			$res = db()->query("SELECT * FROM app_vo_stats_to_xml($void, $from, $to)")->fetchAll();
+			$ret = array();
+			foreach ($res as $r) {
+				if (is_array($r) && (count($r) > 0)) {
+					$ret[] = $r[0];				
+				}
+			}
+			return new XMLFragmentRestResponse($ret, $this);
+		} else return false;
+	}
+}
+
