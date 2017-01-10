@@ -98,10 +98,10 @@ SELECT
 		name "appdb:app_vo_stats",
 		XMLATTRIBUTES(
 			'period' AS "stats",
+			'daily' AS "granularity",
 			vos.id AS void,
 			COALESCE($2, NOW()::date)::date AS "from",
 			COALESCE($3, NOW()::date)::date AS "to",
-			'daily' AS "granularity",
 			COALESCE((SELECT s FROM thestats WHERE thestats.void = vos.id AND thestats.metatype = n AND NOT isdel), 0) AS "additions",
 			COALESCE((SELECT ABS(s) FROM thestats WHERE thestats.void = vos.id AND thestats.metatype = n AND isdel), 0) AS "removals",
 			CASE WHEN n = 1 THEN
@@ -121,7 +121,7 @@ SELECT
 						((COALESCE($2, NOW()::date)::date <= va_version_createdon) AND (va_version_createdon < COALESCE($3, NOW()::date)::date))						 
 					ORDER BY appid
 				) AS t_vaupdates)
-			END AS "updates",
+			END AS "vmi_updates",
 			CASE n
 				WHEN 0 THEN 'software item'
 				WHEN 1 THEN 'virtual appliance'
