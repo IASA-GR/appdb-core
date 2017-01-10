@@ -487,41 +487,35 @@
 	<comment>The grid Virtual Organization entry specified by parameter :id</comment>
 </route>
 <route type="rest" name="voappstats1" url="/:version/vos/:id/appstats/:from/:to">
-	<format xslt="vos">xml</format>
     <param name="id" fmt="\d+"/>
-    <param name="from" fmt="\s+"/>
-    <param name="to" fmt="\s+"/>
+	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<param name="to" fmt="\d\d\d\d-\d\d-\d\d"/>
 	<resource>RestVOAppStatsList</resource>
 	<comment>Application statistics for the grid Virtual Organization entry specified by parameter :id</comment>
 </route>
 <route type="rest" name="voappstats2" url="/:version/vos/:id/appstats/:from">
-	<format xslt="vos">xml</format>
     <param name="id" fmt="\d+"/>
-    <param name="from" fmt="\s+"/>
+	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
 	<resource>RestVOAppStatsList</resource>
 	<comment>Application statistics for the grid Virtual Organization entry specified by parameter :id</comment>
 </route>
 <route type="rest" name="voappstats3" url="/:version/vos/:id/appstats">
-	<format xslt="vos">xml</format>
     <param name="id" fmt="\d+"/>
 	<resource>RestVOAppStatsList</resource>
 	<comment>Application statistics for the grid Virtual Organization entry specified by parameter :id</comment>
 </route>
 <route type="rest" name="vosappstats1" url="/:version/vos/appstats/:from/:to">
-	<format xslt="vos">xml</format>
-    <param name="from" fmt="\s+"/>
-    <param name="to" fmt="\s+"/>
+	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<param name="to" fmt="\d\d\d\d-\d\d-\d\d"/>
 	<resource>RestVOAppStatsList</resource>
 	<comment>Application statistics for all grid Virtual Organization entries</comment>
 </route>
 <route type="rest" name="vosappstats2" url="/:version/vos/appstats/:from">
-	<format xslt="vos">xml</format>
-    <param name="from" fmt="\s+"/>
+	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
 	<resource>RestVOAppStatsList</resource>
 	<comment>Application statistics for all grid Virtual Organization entries</comment>
 </route>
 <route type="rest" name="vosappstats3" url="/:version/vos/appstats">
-	<format xslt="vos">xml</format>
 	<resource>RestVOAppStatsList</resource>
 	<comment>Application statistics for all grid Virtual Organization entries</comment>
 </route>
