@@ -225,6 +225,11 @@ function _initLDAP($secure = true, $rdn = null, $pwd = null, $ldapError = null) 
 	return $ds;
 }
 
+function validateISODate($date)
+{
+    $d = DateTime::createFromFormat('Y-m-d', $date);
+    return $d && $d->format('Y-m-d') === $date;
+}
 
 class textPNG {
     public $font;
@@ -5992,39 +5997,39 @@ class VMCasterNotifications{
 	 * or expires today (days = 0 )
 	 */
 	public static function getExpirationData($days = 5){
-		$query = 'SELECT DISTINCT researchers.id as id,
-			researchers.name as name,
-			researchers.cname as cname ,
-			contacts.data as email,
+		db()->exec('REFRESH MATERIALIZED VIEW vaviews');
+		$query = 'SELECT DISTINCT researchers.id AS id,
+			researchers.name AS name,
+			researchers.cname AS cname ,
+			contacts.data AS email,
 			(\'[\'::text || string_agg(DISTINCT ((((((((\'{"id":"\'::text || applications.id::text) || \'"\'::text) || \',"cname":"\'::text) || replace(applications.cname, \'"\'::text, \'\\"\'::text)) || \'"\'::text) || \',"name":"\'::text) || replace(applications.name, \'"\'::text, \'\\"\'::text)) || \'"\'::text)   || \'}\'::text, \',\'::text)) || \']\'::text AS apps
 		FROM 
 			applications 
 			INNER JOIN vaviews ON vaviews.appid = applications.id
 			INNER JOIN researchers_apps ON researchers_apps.appid = applications.id
 			INNER JOIN researchers ON researchers.id = researchers_apps.researcherid
-			INNER JOIN permissions ON (permissions.object = applications.guid OR permissions.object is null)
+			INNER JOIN permissions ON (permissions.object = applications.guid OR permissions.object IS NULL)
 			INNER JOIN contacts ON contacts.researcherid = researchers.id
 		WHERE 
 		permissions.actionid = 32 AND 
 		permissions.actor = researchers.guid AND
-		vaviews.va_version_published = TRUE AND 
-		vaviews.va_version_archived = FALSE AND 
-		contacts.isprimary = true AND 
-		{{expireson}}
-		GROUP BY researchers.id , contacts.data';
+		vaviews.va_version_published AND 
+		(NOT vaviews.va_version_archived) AND 
+		contacts.isprimary AND 
+		({{expireson}})
+		GROUP BY researchers.id, contacts.data';
 		
 		$expireson = "";
 		$qdays = intval(floor(abs($days)));
 		if( $days > 0 ){
-			$expireson = '(vaviews.va_version_expireson::date) = (now()::date + ' . $qdays . ') and vaviews.va_version_expireson > now()';
-		}else if ( $days < 0){
+			$expireson = "(vaviews.va_version_expireson::date) = (NOW()::date + '" . $qdays . " days'::INTERVAL) AND vaviews.va_version_expireson > NOW()";
+		} else if ( $days < 0){
 			if( $qdays > VMCasterNotifications::getMaxPastDays()){
-				$expireson = '(vaviews.va_version_expireson::date) < (now()::date - ' . VMCasterNotifications::getMaxPastDays() . ')';
+				$expireson = "(vaviews.va_version_expireson::date) < (NOW()::date - '" . VMCasterNotifications::getMaxPastDays() . " days'::INTERVAL)";
 			}else{
-				$expireson = '(vaviews.va_version_expireson::date) = (now()::date - ' . $qdays . ')';
+				$expireson = "(vaviews.va_version_expireson::date) = (NOW()::date - '" . $qdays . " days'::INTERVAL)";
 			}
-			
-		}else {
+		} else {
 			$expireson = '(vaviews.va_version_expireson::date) = (now()::date)';
 		}
 		$q = preg_replace('/\{\{expireson\}\}/i', $expireson, $query);
@@ -7978,7 +7983,7 @@ class SamlAuth{
 		  $role = self::getEGIAAIVORoleMapping($matches[5]);
 		  $voname = $matches[6];
 		  
-		  if ($role === 'VM OPERATOR' && strpos($source, 'appdb_auth') === false) {
+		  if ($role === 'VM OPERATOR' && strpos($source, 'appdb_auth') === false && strpos($source, 'unity.egi.eu') === false) {
 			//Do not accept vm_operator role if it is not given by AppDB auth source
 			continue;
 		  }
@@ -8932,20 +8937,30 @@ class AccessGroups{
 		
 		switch( $action ) {
 			case "include": //include to groups of ids
-				return self::includeUserInGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				$res = self::includeUserInGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				break;
 			case "exclude": //exclude from groups of ids
-				return self::excludeUserInGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				$res = self::excludeUserInGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				break;
 			case "request": //make request to be included in group ids (same user only)
-				return self::requestForGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				$res = self::requestForGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				break;
 			case "cancel": //cancel user's request to be included in group ids (same user only)
-				return self::cancelRequestForGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				$res = self::cancelRequestForGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				break;
 			case "accept": //accept a user's request to be included in group ids
-				return self::acceptRequestForGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				$res = self::acceptRequestForGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				break;
 			case "reject": //reject a user's request to be included in group ids 
-				return self::rejectRequestForGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				$res = self::rejectRequestForGroups($sourceUser, $targetUser, $groupIds, $accesspermissions);
+				break;
 			default:
-				return false;
+				$res = false;
 		}
+		if ($res) { // refresh permissions in case of non-failure
+			db()->exec('SELECT refresh_permissions()');
+		}
+		return $res;
 	}
 	/**
 	 * Include $targetUser in access groups given by $groupids by the $sourceUser.

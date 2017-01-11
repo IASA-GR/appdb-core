@@ -486,6 +486,39 @@
 	<resource>RestVOItem</resource>
 	<comment>The grid Virtual Organization entry specified by parameter :id</comment>
 </route>
+<route type="rest" name="voappstats1" url="/:version/vos/:id/appstats/:from/:to">
+    <param name="id" fmt="\d+"/>
+	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<param name="to" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<resource>RestVOAppStatsList</resource>
+	<comment>Application statistics for the grid Virtual Organization entry specified by parameter :id</comment>
+</route>
+<route type="rest" name="voappstats2" url="/:version/vos/:id/appstats/:from">
+    <param name="id" fmt="\d+"/>
+	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<resource>RestVOAppStatsList</resource>
+	<comment>Application statistics for the grid Virtual Organization entry specified by parameter :id</comment>
+</route>
+<route type="rest" name="voappstats3" url="/:version/vos/:id/appstats">
+    <param name="id" fmt="\d+"/>
+	<resource>RestVOAppStatsList</resource>
+	<comment>Application statistics for the grid Virtual Organization entry specified by parameter :id</comment>
+</route>
+<route type="rest" name="vosappstats1" url="/:version/vos/appstats/:from/:to">
+	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<param name="to" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<resource>RestVOAppStatsList</resource>
+	<comment>Application statistics for all grid Virtual Organization entries</comment>
+</route>
+<route type="rest" name="vosappstats2" url="/:version/vos/appstats/:from">
+	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<resource>RestVOAppStatsList</resource>
+	<comment>Application statistics for all grid Virtual Organization entries</comment>
+</route>
+<route type="rest" name="vosappstats3" url="/:version/vos/appstats">
+	<resource>RestVOAppStatsList</resource>
+	<comment>Application statistics for all grid Virtual Organization entries</comment>
+</route>
 <route type="rest" name="roles" url="/:version/people/roles">
 	<format xslt="persons">xml</format>
 	<resource>RestRoleList</resource>
