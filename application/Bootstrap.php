@@ -233,6 +233,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
                 $routeOpts["resource"] = "".strval($route->resource);
                 $routeOpts["controller"] = "api";
                 $routeOpts["action"] = "rest";
+                $routeOpts["uri"] = "".strval($route->attributes()->url);
                 if ( isset($route->format) ) {
 					if ( is_array($route->format) ) {
 						$format = $route->format;
