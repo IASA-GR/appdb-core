@@ -127,7 +127,7 @@ class RestVOItem extends RestROResourceItem {
 		if ( is_numeric($id) ) {
 	        $res->filter->id->equals($id);
 		} else {
-	        $res->filter->name->equals($id);
+	        $res->filter->name->equals(preg_replace('/^s:/', '', $id));
 		}
 		return $res;
     }
@@ -436,10 +436,21 @@ class RestVOAppStatsList extends RestROResourceList {
 		return "app_vo_stats";
 	}
 
-	protected function _doget($wantsDaily) {
+	protected function _doget() {
 		if ( parent::get() !== false ) {
 			global $application;
-			$void = $this->getParam("id");
+			if ( is_numeric($this->getParam("id")) ) {
+				$void = $this->getParam("id");
+			} else {
+				db()->setFetchMode(Zend_Db::FETCH_BOTH);
+				$void = db()->query("SELECT id FROM normalized_vos WHERE name = ? AND NOT deleted", array(preg_replace('/^s:/', '', $this->getParam("id"))))->fetchAll();
+				if (is_array($void) && (count($void) > 0)) {
+					$void = $void[0]; //row
+					$void = $void[0]; //column
+				} else {
+					$void = null;
+				}
+			}
 			if ($void == "") {
 				$void = "NULL";
 			}
@@ -477,19 +488,31 @@ class RestVOAppStatsList extends RestROResourceList {
 			}
 			if ($this->getParam("listmode") == "listing") {
 				$wantsDaily = false;
+			} else {
+				$wantsDaily = true;
+			}
+			if (preg_match('/nozero$/', $this->getParam("uri"))) {
+				$wantsZero = false;
+			} else {
+				$wantsZero = true;
 			}
 			if (! $wantsDaily) {
-				$ret = preg_grep('/ stats="daily" /', $ret, PREG_GREP_INVERT);
+				$ret = preg_grep('/[[:space:]]+stats="daily"[[:space:]]+/', $ret, PREG_GREP_INVERT);
+			}
+			if (! $wantsZero) {
+				$ret = preg_grep('/[[:space:]]+count="0"[[:space:]]/', $ret, PREG_GREP_INVERT);
+				$ret = preg_grep('/[[:space:]]+additions="0"[[:space:]]+removals="0"[[:space:]]+vmi_updates="0"[[:space:]]/', $ret, PREG_GREP_INVERT);
+				$ret = preg_grep('/[[:space:]]+additions="0"[[:space:]]+removals="0"[[:space:]]+type/', $ret, PREG_GREP_INVERT);
 			}
 			return new XMLFragmentRestResponse($ret, $this);
 		} else return false;
 	}
 	protected function _list() {
-		return $this->_doget(false);
+		return $this->_doget();
 	}
 
 	public function get() {
-		return $this->_doget(true);
+		return $this->_doget();
 	}
 
 }

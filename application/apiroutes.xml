@@ -482,25 +482,61 @@
 </route>
 <route type="rest" name="vo" url="/:version/vos/:id">
 	<format xslt="vos">xml</format>
-    <param name="id" fmt="\d+"/>
+    <param name="id" fmt="(\d+|s:.+)"/>
 	<resource>RestVOItem</resource>
 	<comment>The grid Virtual Organization entry specified by parameter :id</comment>
 </route>
+
+<route type="rest" name="voappstats1nz" url="/:version/vos/:id/appstats/:from/:to/nozero">
+	<param name="nozero" fmt="nozero"/>
+	<param name="id" fmt="(\d+|s:.+)"/>
+	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<param name="to" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<resource>RestVOAppStatsList</resource>
+	<comment>Application statistics for the grid Virtual Organization entry specified by parameter :id</comment>
+</route>
+<route type="rest" name="voappstats2nz" url="/:version/vos/:id/appstats/:from/nozero">
+    <param name="id" fmt="(\d+|s:.+)"/>
+	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<resource>RestVOAppStatsList</resource>
+	<comment>Application statistics for the grid Virtual Organization entry specified by parameter :id</comment>
+</route>
+<route type="rest" name="voappstats3nz" url="/:version/vos/:id/appstats/nozero">
+    <param name="id" fmt="(\d+|s:.+)"/>
+	<resource>RestVOAppStatsList</resource>
+	<comment>Application statistics for the grid Virtual Organization entry specified by parameter :id</comment>
+</route>
+<route type="rest" name="vosappstats1nz" url="/:version/vos/appstats/:from/:to/nozero">
+	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<param name="to" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<resource>RestVOAppStatsList</resource>
+	<comment>Application statistics for all grid Virtual Organization entries</comment>
+</route>
+<route type="rest" name="vosappstats2nz" url="/:version/vos/appstats/:from/nozero">
+	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<resource>RestVOAppStatsList</resource>
+	<comment>Application statistics for all grid Virtual Organization entries</comment>
+</route>
+<route type="rest" name="vosappstats3nz" url="/:version/vos/appstats/nozero">
+	<resource>RestVOAppStatsList</resource>
+	<comment>Application statistics for all grid Virtual Organization entries</comment>
+</route>
+
 <route type="rest" name="voappstats1" url="/:version/vos/:id/appstats/:from/:to">
-    <param name="id" fmt="\d+"/>
+    <param name="id" fmt="(\d+|s:.+)"/>
 	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
 	<param name="to" fmt="\d\d\d\d-\d\d-\d\d"/>
 	<resource>RestVOAppStatsList</resource>
 	<comment>Application statistics for the grid Virtual Organization entry specified by parameter :id</comment>
 </route>
 <route type="rest" name="voappstats2" url="/:version/vos/:id/appstats/:from">
-    <param name="id" fmt="\d+"/>
+    <param name="id" fmt="(\d+|s:.+)"/>
 	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
 	<resource>RestVOAppStatsList</resource>
 	<comment>Application statistics for the grid Virtual Organization entry specified by parameter :id</comment>
 </route>
 <route type="rest" name="voappstats3" url="/:version/vos/:id/appstats">
-    <param name="id" fmt="\d+"/>
+    <param name="id" fmt="(\d+|s:.+)"/>
 	<resource>RestVOAppStatsList</resource>
 	<comment>Application statistics for the grid Virtual Organization entry specified by parameter :id</comment>
 </route>
@@ -519,6 +555,7 @@
 	<resource>RestVOAppStatsList</resource>
 	<comment>Application statistics for all grid Virtual Organization entries</comment>
 </route>
+
 <route type="rest" name="roles" url="/:version/people/roles">
 	<format xslt="persons">xml</format>
 	<resource>RestRoleList</resource>
