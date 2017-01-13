@@ -491,19 +491,28 @@ class RestVOAppStatsList extends RestROResourceList {
 			} else {
 				$wantsDaily = true;
 			}
-			if (preg_match('/nozero$/', $this->getParam("uri"))) {
-				$wantsZero = false;
+			$flt = $this->getParam("flt");
+			if (preg_match('/(^| )omitzerocounts[[:space:]]*:"{0,1}[[:space:]]*(1|true)/i', $flt)) {
+				$wantsZeroCounts = false;
 			} else {
-				$wantsZero = true;
+				$wantsZeroCounts = true;
+			}
+			if (preg_match('/(^| )omitunchanged[[:space:]]*:"{0,1}[[:space:]]*(1|true)/i', $flt)) {
+				$wantsUnchanged = false;
+			} else {
+				$wantsUnchanged = true;
 			}
 			if (! $wantsDaily) {
 				$ret = preg_grep('/[[:space:]]+stats="daily"[[:space:]]+/', $ret, PREG_GREP_INVERT);
 			}
-			if (! $wantsZero) {
+			if (! $wantsZeroCounts) {
 				$ret = preg_grep('/[[:space:]]+count="0"[[:space:]]/', $ret, PREG_GREP_INVERT);
+			}
+			if (! $wantsUnchanged) {
 				$ret = preg_grep('/[[:space:]]+additions="0"[[:space:]]+removals="0"[[:space:]]+vmi_updates="0"[[:space:]]/', $ret, PREG_GREP_INVERT);
 				$ret = preg_grep('/[[:space:]]+additions="0"[[:space:]]+removals="0"[[:space:]]+type/', $ret, PREG_GREP_INVERT);
 			}
+			$this->total = count($ret);
 			return new XMLFragmentRestResponse($ret, $this);
 		} else return false;
 	}

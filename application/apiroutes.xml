@@ -495,67 +495,39 @@
 	<resource>RestVOAppStatsList</resource>
 	<comment>Application statistics for the grid Virtual Organization entry specified by parameter :id</comment>
 </route>
-<route type="rest" name="voappstats2nz" url="/:version/vos/:id/appstats/:from/nozero">
-    <param name="id" fmt="(\d+|s:.+)"/>
-	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
-	<resource>RestVOAppStatsList</resource>
-	<comment>Application statistics for the grid Virtual Organization entry specified by parameter :id</comment>
-</route>
-<route type="rest" name="voappstats3nz" url="/:version/vos/:id/appstats/nozero">
-    <param name="id" fmt="(\d+|s:.+)"/>
-	<resource>RestVOAppStatsList</resource>
-	<comment>Application statistics for the grid Virtual Organization entry specified by parameter :id</comment>
-</route>
-<route type="rest" name="vosappstats1nz" url="/:version/vos/appstats/:from/:to/nozero">
-	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
-	<param name="to" fmt="\d\d\d\d-\d\d-\d\d"/>
-	<resource>RestVOAppStatsList</resource>
-	<comment>Application statistics for all grid Virtual Organization entries</comment>
-</route>
-<route type="rest" name="vosappstats2nz" url="/:version/vos/appstats/:from/nozero">
-	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
-	<resource>RestVOAppStatsList</resource>
-	<comment>Application statistics for all grid Virtual Organization entries</comment>
-</route>
-<route type="rest" name="vosappstats3nz" url="/:version/vos/appstats/nozero">
-	<resource>RestVOAppStatsList</resource>
-	<comment>Application statistics for all grid Virtual Organization entries</comment>
-</route>
-
-<route type="rest" name="voappstats1" url="/:version/vos/:id/appstats/:from/:to">
+<route type="rest" name="voappstats1" url="/:version/stats/vos/:id/appstats/:from/:to">
     <param name="id" fmt="(\d+|s:.+)"/>
 	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
 	<param name="to" fmt="\d\d\d\d-\d\d-\d\d"/>
 	<resource>RestVOAppStatsList</resource>
 	<comment>Application statistics for the grid Virtual Organization entry specified by parameter :id</comment>
 </route>
-<route type="rest" name="voappstats2" url="/:version/vos/:id/appstats/:from">
+<route type="rest" name="voappstats2" url="/:version/stats/vos/:id/appstats/:from">
     <param name="id" fmt="(\d+|s:.+)"/>
 	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
 	<resource>RestVOAppStatsList</resource>
 	<comment>Application statistics for the grid Virtual Organization entry specified by parameter :id</comment>
 </route>
-<route type="rest" name="voappstats3" url="/:version/vos/:id/appstats">
+<route type="rest" name="voappstats3" url="/:version/stats/vos/:id/appstats">
     <param name="id" fmt="(\d+|s:.+)"/>
 	<resource>RestVOAppStatsList</resource>
 	<comment>Application statistics for the grid Virtual Organization entry specified by parameter :id</comment>
 </route>
-<route type="rest" name="vosappstats1" url="/:version/vos/appstats/:from/:to">
+<route type="rest" name="vosappstats1" url="/:version/stats/vos/appstats/:from/:to">
 	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
 	<param name="to" fmt="\d\d\d\d-\d\d-\d\d"/>
 	<resource>RestVOAppStatsList</resource>
 	<comment>Application statistics for all grid Virtual Organization entries</comment>
 </route>
-<route type="rest" name="vosappstats2" url="/:version/vos/appstats/:from">
+<route type="rest" name="vosappstats2" url="/:version/stats/vos/appstats/:from">
 	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
 	<resource>RestVOAppStatsList</resource>
 	<comment>Application statistics for all grid Virtual Organization entries</comment>
 </route>
-<route type="rest" name="vosappstats3" url="/:version/vos/appstats">
+<route type="rest" name="vosappstats3" url="/:version/stats/vos/appstats">
 	<resource>RestVOAppStatsList</resource>
 	<comment>Application statistics for all grid Virtual Organization entries</comment>
 </route>
-
 <route type="rest" name="roles" url="/:version/people/roles">
 	<format xslt="persons">xml</format>
 	<resource>RestRoleList</resource>
