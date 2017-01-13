@@ -271,6 +271,100 @@ class RestCategoryItem extends RestROResourceItem {
 	}
 }
 
+class RestCategoryAppStatsList extends RestROResourceList {
+	public function getDataType() {
+		return "app_category_stats";
+	}
+
+	protected function _doget() {
+		if ( parent::get() !== false ) {
+			global $application;
+			if ( is_numeric($this->getParam("id")) ) {
+				$void = $this->getParam("id");
+			} else {
+				db()->setFetchMode(Zend_Db::FETCH_BOTH);
+				$void = db()->query("SELECT id FROM categories WHERE name = ?", array(preg_replace('/^s:/', '', $this->getParam("id"))))->fetchAll();
+				if (is_array($void) && (count($void) > 0)) {
+					$void = $void[0]; //row
+					$void = $void[0]; //column
+				} else {
+					$void = null;
+				}
+			}
+			if ($void == "") {
+				$void = "NULL";
+			}
+			$from = $this->getParam("from");
+			if ($from == "") {
+				$from = "NULL";
+			} else {
+				if (validateISODate($from)) {
+					$from = "'$from'::date";
+				} else {
+					$this->setError(RestErrorEnum::RE_INVALID_RESOURCE);
+					$this->_extError = "Invalid `from' date. Valid date format is YYYY-MM-DD";
+					return false;
+				}
+			}
+			$to = $this->getParam("to");
+			if ($to == "") {
+				$to = "NULL";
+			} else {
+				if (validateISODate($to)) {
+					$to = "'$to'::date";
+				} else {
+					$this->setError(RestErrorEnum::RE_INVALID_RESOURCE);
+					$this->_extError = "Invalid `to' date. Valid date format is YYYY-MM-DD";
+					return false;
+				}
+			}
+			db()->setFetchMode(Zend_Db::FETCH_NUM);
+			$res = db()->query("SELECT * FROM app_cat_stats_to_xml($void, $from, $to)")->fetchAll();
+			$ret = array();
+			foreach ($res as $r) {
+				if (is_array($r) && (count($r) > 0)) {
+					$ret[] = $r[0];
+				}
+			}
+			if ($this->getParam("listmode") == "listing") {
+				$wantsDaily = false;
+			} else {
+				$wantsDaily = true;
+			}
+			$flt = $this->getParam("flt");
+			if (preg_match('/(^| )omitzerocounts[[:space:]]*:"{0,1}[[:space:]]*(1|true)/i', $flt)) {
+				$wantsZeroCounts = false;
+			} else {
+				$wantsZeroCounts = true;
+			}
+			if (preg_match('/(^| )omitunchanged[[:space:]]*:"{0,1}[[:space:]]*(1|true)/i', $flt)) {
+				$wantsUnchanged = false;
+			} else {
+				$wantsUnchanged = true;
+			}
+			if (! $wantsDaily) {
+				$ret = preg_grep('/[[:space:]]+stats="daily"[[:space:]]+/', $ret, PREG_GREP_INVERT);
+			}
+			if (! $wantsZeroCounts) {
+				$ret = preg_grep('/[[:space:]]+count="0"[[:space:]]/', $ret, PREG_GREP_INVERT);
+			}
+			if (! $wantsUnchanged) {
+				$ret = preg_grep('/[[:space:]]+additions="0"[[:space:]]+removals="0"[[:space:]]+vmi_updates="0"[[:space:]]/', $ret, PREG_GREP_INVERT);
+				$ret = preg_grep('/[[:space:]]+additions="0"[[:space:]]+removals="0"[[:space:]]+type/', $ret, PREG_GREP_INVERT);
+			}
+			$this->total = count($ret);
+			return new XMLFragmentRestResponse($ret, $this);
+		} else return false;
+	}
+	protected function _list() {
+		return $this->_doget();
+	}
+
+	public function get() {
+		return $this->_doget();
+	}
+
+}
 /**
  * class RestDisciplineList
  * derived class for lists of disciplines
@@ -334,6 +428,101 @@ class RestDisciplineItem extends RestROResourceItem {
 		} else return false;
 	}
     
+}
+
+class RestDisciplineAppStatsList extends RestROResourceList {
+	public function getDataType() {
+		return "app_discipline_stats";
+	}
+
+	protected function _doget() {
+		if ( parent::get() !== false ) {
+			global $application;
+			if ( is_numeric($this->getParam("id")) ) {
+				$void = $this->getParam("id");
+			} else {
+				db()->setFetchMode(Zend_Db::FETCH_BOTH);
+				$void = db()->query("SELECT id FROM disciplines WHERE name = ?", array(preg_replace('/^s:/', '', $this->getParam("id"))))->fetchAll();
+				if (is_array($void) && (count($void) > 0)) {
+					$void = $void[0]; //row
+					$void = $void[0]; //column
+				} else {
+					$void = null;
+				}
+			}
+			if ($void == "") {
+				$void = "NULL";
+			}
+			$from = $this->getParam("from");
+			if ($from == "") {
+				$from = "NULL";
+			} else {
+				if (validateISODate($from)) {
+					$from = "'$from'::date";
+				} else {
+					$this->setError(RestErrorEnum::RE_INVALID_RESOURCE);
+					$this->_extError = "Invalid `from' date. Valid date format is YYYY-MM-DD";
+					return false;
+				}
+			}
+			$to = $this->getParam("to");
+			if ($to == "") {
+				$to = "NULL";
+			} else {
+				if (validateISODate($to)) {
+					$to = "'$to'::date";
+				} else {
+					$this->setError(RestErrorEnum::RE_INVALID_RESOURCE);
+					$this->_extError = "Invalid `to' date. Valid date format is YYYY-MM-DD";
+					return false;
+				}
+			}
+			db()->setFetchMode(Zend_Db::FETCH_NUM);
+			$res = db()->query("SELECT * FROM app_disc_stats_to_xml($void, $from, $to)")->fetchAll();
+			$ret = array();
+			foreach ($res as $r) {
+				if (is_array($r) && (count($r) > 0)) {
+					$ret[] = $r[0];
+				}
+			}
+			if ($this->getParam("listmode") == "listing") {
+				$wantsDaily = false;
+			} else {
+				$wantsDaily = true;
+			}
+			$flt = $this->getParam("flt");
+			if (preg_match('/(^| )omitzerocounts[[:space:]]*:"{0,1}[[:space:]]*(1|true)/i', $flt)) {
+				$wantsZeroCounts = false;
+			} else {
+				$wantsZeroCounts = true;
+			}
+			if (preg_match('/(^| )omitunchanged[[:space:]]*:"{0,1}[[:space:]]*(1|true)/i', $flt)) {
+				$wantsUnchanged = false;
+			} else {
+				$wantsUnchanged = true;
+			}
+			if (! $wantsDaily) {
+				$ret = preg_grep('/[[:space:]]+stats="daily"[[:space:]]+/', $ret, PREG_GREP_INVERT);
+			}
+			if (! $wantsZeroCounts) {
+				$ret = preg_grep('/[[:space:]]+count="0"[[:space:]]/', $ret, PREG_GREP_INVERT);
+			}
+			if (! $wantsUnchanged) {
+				$ret = preg_grep('/[[:space:]]+additions="0"[[:space:]]+removals="0"[[:space:]]+vmi_updates="0"[[:space:]]/', $ret, PREG_GREP_INVERT);
+				$ret = preg_grep('/[[:space:]]+additions="0"[[:space:]]+removals="0"[[:space:]]+type/', $ret, PREG_GREP_INVERT);
+			}
+			$this->total = count($ret);
+			return new XMLFragmentRestResponse($ret, $this);
+		} else return false;
+	}
+	protected function _list() {
+		return $this->_doget();
+	}
+
+	public function get() {
+		return $this->_doget();
+	}
+
 }
 
 /**

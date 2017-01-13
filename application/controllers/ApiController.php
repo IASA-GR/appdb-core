@@ -87,7 +87,7 @@ class ApiController extends Zend_Controller_Action
 			$this->length = $r->pageLength;
 			$this->offset = $r->pageOffset;
 			$this->authenticated = $r->authenticate();
-        } else {
+		} else {
 			$this->Error = RestErrorEnum::toString(RestErrorEnum::RE_INVALID_RESOURCE);
 			$this->total = -1;
             $this->entry = RestAPIHelper::wrapResponse("", null, null, $this->total, null, null, RestErrorEnum::RE_INVALID_RESOURCE, null);
