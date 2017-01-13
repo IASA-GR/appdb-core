@@ -486,6 +486,39 @@
 	<resource>RestVOItem</resource>
 	<comment>The grid Virtual Organization entry specified by parameter :id</comment>
 </route>
+<route type="rest" name="disciplinevostats1" url="/:version/stats/disciplines/:id/vostats/:from/:to">
+    <param name="id" fmt="(\d+|s:.+)"/>
+	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<param name="to" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<resource>RestDisciplineVOStatsList</resource>
+	<comment>VO statistics by discipline specified by parameter :id</comment>
+</route>
+<route type="rest" name="disciplinevostats2" url="/:version/stats/disciplines/:id/vostats/:from">
+    <param name="id" fmt="(\d+|s:.+)"/>
+	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<resource>RestDisciplineVOStatsList</resource>
+	<comment>VO statistics by discipline specified by parameter :id</comment>
+</route>
+<route type="rest" name="disciplinevostats3" url="/:version/stats/disciplines/:id/vostats">
+    <param name="id" fmt="(\d+|s:.+)"/>
+	<resource>RestDisciplineVOStatsList</resource>
+	<comment>VO statistics by discipline specified by parameter :id</comment>
+</route>
+<route type="rest" name="disciplinesvostats1" url="/:version/stats/disciplines/vostats/:from/:to">
+	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<param name="to" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<resource>RestDisciplineVOStatsList</resource>
+	<comment>VO statistics by discipline</comment>
+</route>
+<route type="rest" name="disciplinesvostats2" url="/:version/stats/disciplines/vostats/:from">
+	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<resource>RestDisciplineVOStatsList</resource>
+	<comment>VO statistics by discipline</comment>
+</route>
+<route type="rest" name="disciplinesvostats3" url="/:version/stats/disciplines/vostats">
+	<resource>RestDisciplineVOStatsList</resource>
+	<comment>VO statistics by discipline</comment>
+</route>
 <route type="rest" name="disciplineappstats1" url="/:version/stats/disciplines/:id/appstats/:from/:to">
     <param name="id" fmt="(\d+|s:.+)"/>
 	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
