@@ -88,7 +88,7 @@ UNION
 
 SELECT
     2 AS ord1,
-    n AS ord2,
+    0 AS ord2,
     XMLELEMENT(
         name "appdb:vostats",
         XMLATTRIBUTES(
@@ -102,8 +102,7 @@ SELECT
             COALESCE((SELECT ABS(s) FROM thestats WHERE thestats.disciplineid = disciplines.id AND isdel), 0) AS "removals"
         )
     )::text
-    FROM UNNEST(ARRAY[0,1,2]) AS n
-    INNER JOIN disciplines ON (disciplines.id = $1) OR ($1 IS NULL)
+    FROM disciplines WHERE (disciplines.id = $1) OR ($1 IS NULL)
 
 ) AS x
 ORDER BY x.ord1, x.ord2
