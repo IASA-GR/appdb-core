@@ -123,7 +123,7 @@ class SamlController extends Zend_Controller_Action
 			}
 			
 			//Check if user is already logged in
-			if( SamlAuth::isAuthenticated() !== false ){
+			if( SamlAuth::isAuthenticated() !== false && $this->session->isNewUser !== true ){
 				/*if( isset($this->session->authreferer) && trim($this->session->authreferer) !== ""){
 					$this->session->authreferer = str_replace("http://", "https://", $this->session->authreferer);
 					header("Location: " . $this->session->authreferer);
@@ -344,12 +344,13 @@ class SamlController extends Zend_Controller_Action
 			//No need any more. Referer is stored in $inited variable
 			unset($this->session->authreferer);
 			
-			if( $inited !== false ){ 
+			if( $inited !== false && $this->session->isNewUser !== true ){ 
 				//Found user and a url referer. Redirect to referer
 				$this->_helper->layout->disableLayout();
 				$this->_helper->viewRenderer->setNoRender();
 				header("Location: " . $inited);
-			}else if( $this->session->isNewUser === true ){ 
+			}else if( $this->session->isNewUser === true ){
+				$this->session->authreferer = $inited;
 				// new user. First login. Redirect to new user account page
 				$this->_helper->redirector('newaccount');
 			}else if( $this->session->userid !== null &&  $this->session->userid > -1){ 
@@ -413,9 +414,6 @@ class SamlController extends Zend_Controller_Action
 		$referer = $this->_getParam("r");
 		if( trim($referer) !== "" ){
 			$this->session->authreferer = $referer;
-		}
-		if( isset($this->session->authreferer) === false ){
-			$this->session->authreferer = $_SERVER["HTTP_REFERER"];
 		}
 		if( $this->session->isNewUser !== true && $this->session->userid !== -1){
 			$this->_helper->layout->disableLayout();
