@@ -59,7 +59,7 @@ function getHtmlDateValue($value, $context){
 	<div id="navdiv<?php echo $this->dialogCount;?>" style="width:100%;height:auto;padding:0px;" class="entityvo<?php if( trim($this->entry->sourceid) !== '1' && trim($this->entry->name) !== 'vo.elixir-europe.org'){ echo ' nonegivo'; }?>" >
 	<ul>
 		<li><a href="#infodiv<?php echo $this->dialogCount;?>">Information</a></li>
-		<li><a href="#statsdiv<?php echo $this->dialogCount;?>">Statistics</a></li>
+		<li style="display: none"><a href="#statsdiv<?php echo $this->dialogCount;?>">Statistics</a></li>
 		<?php if( $this->canEdit === true ) { ?>
 		<li><a href="#imagelistdiv<?php echo $this->dialogCount;?>">Image List</a></li>
 		<?php } ?>

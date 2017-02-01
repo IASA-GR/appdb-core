@@ -4393,7 +4393,13 @@ appdb.pages.vo = (function(){
 		  var series1 = seriesNames.map(function(series) {
 			return data.map(function(d) {
 					if (d.metatype === series) {
-				  return {date: +d.date, cnt: +d.cnt};
+					  var ofs = 1.0 * seriesNames.indexOf(d.metatype);
+					  ofs = parseInt(ofs * (0.5 / seriesNames.length) * 100) * 1. / 100.;
+				      ofs = 0; 
+					  return {
+						date: +d.date, 
+						cnt: +d.cnt + ofs
+					  };
 					};
 			});
 		  });
@@ -4408,9 +4414,14 @@ appdb.pages.vo = (function(){
 		  x.domain(d3v4.extent(data, function(d) { return d.date; }));
 
 		  y.domain([
-				0,
+			0,
+//			d3v4.min(series, function(c) { return d3v4.min(c.values, function(d) { return d.cnt; }); }),
 			d3v4.max(series, function(c) { return d3v4.max(c.values, function(d) { return d.cnt; }); })
 		  ]);
+
+
+		  ;
+
 
 		  z.domain(series.map(function(c) { return c.id; }));
 
@@ -4427,7 +4438,14 @@ appdb.pages.vo = (function(){
 
 		  g.append("g")
 			  .attr("class", "axis axis--y")
-			  .call(d3v4.axisLeft(y))
+			  .call(
+				d3v4.axisLeft(y)
+//					.tickValues(d3.range(
+//						(d3v4.min(series, function(c) { return d3v4.min(c.values, function(d) { return d.cnt; }); }) - 3) < 0 ? 0 : d3v4.min(series, function(c) { return d3v4.min(c.values, function(d) { return d.cnt; }); }) - 3,
+//						d3v4.max(series, function(c) { return d3v4.max(c.values, function(d) { return d.cnt; }); }) + 3,
+//					    1
+//		  	  		))
+			)
 			.append("text")
 			  .attr("transform", "rotate(-90)")
 			  .attr("y", -40)
@@ -4465,7 +4483,15 @@ appdb.pages.vo = (function(){
 				.attr("cy", function(d) { return y(d.cnt) })
 				.attr("r", 3.5)
 				.style("fill", "white")
-				.style("stroke", function(d) { return z(this.parentNode.__data__.id); });
+				.style("stroke", function(d) { return z(this.parentNode.__data__.id); })
+				.append("svg:title")
+   				.text(function(d) { 
+					var theDate = new Date(parseInt(d.date));
+					var theDateString = theDate.getUTCFullYear() +"-"+
+  						("0" + (theDate.getUTCMonth() + 1)).slice(-2) +"-"+
+						("0" + theDate.getUTCDate()).slice(-2)
+					return theDateString + ": " + parseInt(d.cnt); 
+				});
 		});
 		};		
 
