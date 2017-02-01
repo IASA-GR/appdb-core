@@ -10599,32 +10599,34 @@ class VoAdminNotifications {
 			$message .= "    " . $notification["expired"] . " image" . ( ($notification["expired"]>1)?"s":"" ) . " from an expired virtual appliance version\n";
 		}
 		$message .= "\n  It is recommended to update and republish the vo image list by visiting the vo wide image list editor [1].";
-		$message .= "\n  A guide to managing VO image lists is available at [2].\n";
-		$message .= "\n  A comprehensive list of the virtual appliances to which the obsolete images belong may be found at the end of this message.\n\n";
-		$message .= "Best regards,\n";
+		$message .= "\n  A guide to managing VO image lists is available at [2].";
+		if ( (intval($notification["outdated"]) + intval($notification["expired"]) + intval($notification["deleted"])) > 0) {
+			$message .= "\n  A comprehensive list of the virtual appliances to which the obsolete images follows:";
+			if( $notification["outdated"] > 0 ) {
+				$message .= "\n\n  List of virtual appliances with outdated images:\n";
+				foreach($notification["outdatedVAs"] as $va) {
+					$message .= "\n\t$va";
+				}
+			}
+			if( $notification["deleted"] > 0 ) {
+				$message .= "\n\n  List of virtual appliances with deleted images:\n";
+				foreach($notification["deletedVAs"] as $va) {
+					$message .= "\n\t$va";
+				}
+			}
+			if( $notification["expired"] > 0 ) {
+				$message .= "\n\n  List of virtual appliances with expired images:\n";
+				foreach($notification["expiredVAs"] as $va) {
+					$message .= "\n\t$va";
+				}
+			}
+		}
+		$message .= "\n\nBest regards,\n";
 		$message .= "The AppDB team\n";
 		$message .= "\n_____________________________________________________________________________________________________________________\n";
 		$message .= "[1].https://" . $_SERVER["APPLICATION_UI_HOSTNAME"] . "/store/vo/" . $notification["voname"] . "/imagelist (login required)\n";
 		$message .= "[2].https://wiki.appdb.egi.eu/main:guides:manage_vo-wide_image_lists\n";
 
-		if( $notification["outdated"] > 0 ) {
-			$message .= "\n\n  List of virtual appliances with outdated images:\n";
-			foreach($notification["outdatedVAs"] as $va) {
-				$message .= "\n\t$va";
-			}
-		}
-		if( $notification["deleted"] > 0 ) {
-			$message .= "\n\n  List of virtual appliances with deleted images:\n";
-			foreach($notification["deletedVAs"] as $va) {
-				$message .= "\n\t$va";
-			}
-		}
-		if( $notification["expired"] > 0 ) {
-			$message .= "\n\n  List of virtual appliances with expired images:\n";
-			foreach($notification["expiredVAs"] as $va) {
-				$message .= "\n\t$va";
-			}
-		}
 		$notification["subject"] = $subject;
 		$notification["message"] = $message;
 		
@@ -10676,15 +10678,15 @@ class VoAdminNotifications {
 			foreach($apps as $a){
 				if( $a["expired"] == "true"){
 					$expired += 1;
-					$expiredVAs[] = $a->name . " (id: " . $a->id . ")";
+					$expiredVAs[] = $a["name"] . " (id: " . $a["id"] . ")";
 				}
 				if( $a["deleted"] == "true"){
 					$deleted += 1;
-					$deletedVAs[] = $a->name . " (id: " . $a->id . ")";
+					$deletedVAs[] = $a["name"] . " (id: " . $a["id"] . ")";
 				}
 				if( $a["outdated"] == "true"){
 					$outdated += 1;
-					$outdatedVAs[] = $a->name . " (id: " . $a->id . ")";
+					$outdatedVAs[] = $a["name"] . " (id: " . $a["id"] . ")";
 				}
 			}
 			if( ($deleted+$expired+$outdated) === 0 ){
