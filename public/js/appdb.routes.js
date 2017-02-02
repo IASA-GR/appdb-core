@@ -1564,7 +1564,8 @@ appdb.routing.addRoutes([{
 	resource: "Person",
 	action: "registernew"
 },{
-	path: "store/vo/:name/<section:information|statistics|imagelist>",
+//	path: "store/vo/:name/<section:information|statistics|imagelist>",
+	path: "store/vo/:name/<section:information|imagelist>",
 	resource: "Vo",
 	action: "details"
 },{

@@ -4059,11 +4059,11 @@ appdb.pages.vo = (function(){
 		switch(section.toLowerCase()){
 			case "imagelists":
 			case "imagelist":
-				tab_index = 2;
+				tab_index = 1; //2 if stats enabled 
 				break;
-			case "statistics":
-				tab_index = 1;
-				break;
+//			case "statistics":
+//				tab_index = 1;
+//				break;
 			default:
 				tab_index = 0;
 				break;
@@ -4077,12 +4077,12 @@ appdb.pages.vo = (function(){
 		if( typeof section === "undefined" ) section = 0;
 		if( typeof section === "number" ){
 			switch( section ){
-				case 2:
+				case 1: //2 if stats enabled
 					section = "imagelist";
 					break;
-				case 1:
-					section = "statistics";
-					break;
+//				case 1:
+//					section = "statistics";
+//					break;
 				case 0:
 				default:
 					section = "information";
@@ -4095,10 +4095,10 @@ appdb.pages.vo = (function(){
 			var sname = page.currentName(), curl = "/store/vo/" + sname, title = "VO " + sname;
 			if( $.trim(sname) !== "" ){
 				switch(section){
-					case "statistics":
-						curl += "/statistics";
-						title += " statistics";
-						break;
+//					case "statistics":
+//						curl += "/statistics";
+//						title += " statistics";
+//						break;
 					case "imagelists":
 					case "imagelist":
 						curl += "/imagelist";
@@ -4123,11 +4123,11 @@ appdb.pages.vo = (function(){
 			switch(r.parameters.section.toLowerCase()){
 				case "imagelists":
 				case "imagelist":
-					tab_index = 2;
+					tab_index = 1; //2 if stats enabled
 					break;
-				case "statistics":
-					tab_index = 1;
-					break;
+//				case "statistics":
+//					tab_index = 1;
+//					break;
 				default:
 					break;
 			}
@@ -4302,201 +4302,201 @@ appdb.pages.vo = (function(){
 			(new appdb.views.Permalink({container:$("<span></span>"),datatype:"vo"})).render({query:''+page.currentName()});
 		});
 	};
-	page.loadStats = function(VOid){
-		function trimArray(actual) {
-		  var newArray = new Array();
-		  for (var i = 0; i < actual.length; i++) {
-				if ((i == 0) || (i == actual.length - 1)) {
-				  newArray.push(actual[i]);
-				} else {
-				if (actual[i].cnt != oldVal) {
-				  newArray.push(actual[i]);
-				}
-				}
-				oldVal = actual[i].cnt;
-		  }
-		  return newArray;
-		}
-
-		function cleanArray(actual) {
-		  var newArray = new Array();
-		  for (var i = 0; i < actual.length; i++) {
-			if (actual[i]) {
-			  newArray.push(actual[i]);
-			}
-		  }
-		  return trimArray(newArray);
-		}
-
-		function plotVOAppStats(VOid, startDate, endDate) {
-		var margin = {top: 20, right: 20, bottom: 30, left: 40},
-			width = 860 - margin.left - margin.right,
-			height = 500 - margin.top - margin.bottom;
-
-		var svg = d3v4.select("svg");
-		svg.selectAll("*").remove();
-
-		var title = svg.append("text")
-			.attr("x", (width / 2))
-			.attr("y", 20)
-			.attr("text-anchor", "middle")  
-			.style("font-size", "16px") 
-			.text("");
-
-		var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + (margin.top + 20) + ")");
-
-		var parseTime = d3v4.timeParse("%Y%m%d");
-
-		var x = d3v4.scaleTime().range([0, width]),
-			y = d3v4.scaleLinear().range([height, 0]),
-			z = d3v4.scaleOrdinal(d3v4.schemeCategory10);
-
-		var line = d3v4.line()
-			.x(function(d) { return x(d.date); })
-			.y(function(d) { return y(d.cnt); });
-
-		var theDates = "";
-		if (startDate) {
-			theDates = theDates + startDate;
-			if (endDate) {
-				theDates = theDates + '/' + endDate;
-			}
-		};
-
-		d3v4.xml("https://appdb.egi.eu/rest/1.0/stats/vos/" + VOid + "/appstats/" + theDates + "?omitunchanged:1", function(error, data) {
-		  if (error) throw error;
-
-		  data = [].map.call(data.querySelectorAll("appstats[stats='daily']"), function(appstats) {
-			return {
-					voname: appstats.getAttribute("voname"),
-			  cnt: appstats.getAttribute("count"),
-			  date: parseTime(appstats.getAttribute("when").replace("-","").replace("-","")),
-					metatype: appstats.getAttribute("type")
-			};
-		  });
-
-			var voname;
-			if (data[0]) {
-				voname = data[0].voname;
-		  } else {
-			  voname = "undefined";
-		  }
-			title.text("Item statistics for " + voname + " VO").style("font-weight", "bold");
-			var seriesNames = [];
-			for (var i = 0; i < data.length; i++) {
-				if (! seriesNames.includes(data[i].metatype)) {
-					seriesNames.push(data[i].metatype);
-				};
-			};
-
-		  // Map the data to an array of arrays of {x, y} tuples.
-		  var series1 = seriesNames.map(function(series) {
-			return data.map(function(d) {
-					if (d.metatype === series) {
-					  var ofs = 1.0 * seriesNames.indexOf(d.metatype);
-					  ofs = parseInt(ofs * (0.5 / seriesNames.length) * 100) * 1. / 100.;
-				      ofs = 0; 
-					  return {
-						date: +d.date, 
-						cnt: +d.cnt + ofs
-					  };
-					};
-			});
-		  });
-
-			var series = [];
-			for (var i = 0; i < series1.length; i++) {
-			  series1[i] = cleanArray(series1[i]);
-				series.push({id: seriesNames[i], values: series1[i]});
-			};
-
-		  // Compute the scales’ domains.
-		  x.domain(d3v4.extent(data, function(d) { return d.date; }));
-
-		  y.domain([
-			0,
-//			d3v4.min(series, function(c) { return d3v4.min(c.values, function(d) { return d.cnt; }); }),
-			d3v4.max(series, function(c) { return d3v4.max(c.values, function(d) { return d.cnt; }); })
-		  ]);
-
-
-		  ;
-
-
-		  z.domain(series.map(function(c) { return c.id; }));
-
-			g.append("g")
-			  .attr("class", "axis axis--x")
-			  .attr("transform", "translate(0," + height + ")")
-			  .call(d3v4.axisBottom(x))
-					.append("text")
-			  .attr("y", 20)
-			  .attr("x", width)
-			  .attr("dy", "0.71em")
-			  .attr("fill", "#000")
-					.text("Date");
-
-		  g.append("g")
-			  .attr("class", "axis axis--y")
-			  .call(
-				d3v4.axisLeft(y)
-//					.tickValues(d3.range(
-//						(d3v4.min(series, function(c) { return d3v4.min(c.values, function(d) { return d.cnt; }); }) - 3) < 0 ? 0 : d3v4.min(series, function(c) { return d3v4.min(c.values, function(d) { return d.cnt; }); }) - 3,
-//						d3v4.max(series, function(c) { return d3v4.max(c.values, function(d) { return d.cnt; }); }) + 3,
-//					    1
-//		  	  		))
-			)
-			.append("text")
-			  .attr("transform", "rotate(-90)")
-			  .attr("y", -40)
-			  .attr("x", 6)
-			  .attr("dy", "0.71em")
-			  .attr("fill", "#000")
-			  .text("Item Count");
-
-		  var seriesData = g.selectAll(".seriesData")
-			.data(series)
-			.enter().append("g")
-			  .attr("class", "seriesData");
-
-		  seriesData.append("path")
-			  .attr("class", "line")
-			  .attr("d", function(d) { return line(d.values); })
-			  .style("fill", "none")
-			  .style("stroke", function(d) { return z(d.id); });
-
-		  seriesData.append("text")
-			  .datum(function(d) { return {id: d.id, value: d.values[d.values.length - 1]}; })
-					.attr("transform", function(d) { if (d.value) { return "translate(" + x(d.value.date) + "," + y(d.value.cnt) + ")"; } else { return "translate(0,0)"; }; })
-			  .attr("x", 9)
-			  .attr("dy", "0.35em")
-			  .style("font", "10px sans-serif")
-			  .text(function(d) { return d.id + "s"; });
-
-			var point = seriesData.append("g")
-				.attr("class", "line-point");
-
-			point.selectAll('circle')
-				.data(function(d){ return d.values})
-				.enter().append('circle')
-				.attr("cx", function(d) { return x(d.date) })
-				.attr("cy", function(d) { return y(d.cnt) })
-				.attr("r", 3.5)
-				.style("fill", "white")
-				.style("stroke", function(d) { return z(this.parentNode.__data__.id); })
-				.append("svg:title")
-   				.text(function(d) { 
-					var theDate = new Date(parseInt(d.date));
-					var theDateString = theDate.getUTCFullYear() +"-"+
-  						("0" + (theDate.getUTCMonth() + 1)).slice(-2) +"-"+
-						("0" + theDate.getUTCDate()).slice(-2)
-					return theDateString + ": " + parseInt(d.cnt); 
-				});
-		});
-		};		
-
-		plotVOAppStats(VOid, '2015-01-01');
-	};
+//	page.loadStats = function(VOid){
+//		function trimArray(actual) {
+//		  var newArray = new Array();
+//		  for (var i = 0; i < actual.length; i++) {
+//				if ((i == 0) || (i == actual.length - 1)) {
+//				  newArray.push(actual[i]);
+//				} else {
+//				if (actual[i].cnt != oldVal) {
+//				  newArray.push(actual[i]);
+//				}
+//				}
+//				oldVal = actual[i].cnt;
+//		  }
+//		  return newArray;
+//		}
+//
+//		function cleanArray(actual) {
+//		  var newArray = new Array();
+//		  for (var i = 0; i < actual.length; i++) {
+//			if (actual[i]) {
+//			  newArray.push(actual[i]);
+//			}
+//		  }
+//		  return trimArray(newArray);
+//		}
+//
+//		function plotVOAppStats(VOid, startDate, endDate) {
+//		var margin = {top: 20, right: 20, bottom: 30, left: 40},
+//			width = 860 - margin.left - margin.right,
+//			height = 500 - margin.top - margin.bottom;
+//
+//		var svg = d3v4.select("svg");
+//		svg.selectAll("*").remove();
+//
+//		var title = svg.append("text")
+//			.attr("x", (width / 2))
+//			.attr("y", 20)
+//			.attr("text-anchor", "middle")  
+//			.style("font-size", "16px") 
+//			.text("");
+//
+//		var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + (margin.top + 20) + ")");
+//
+//		var parseTime = d3v4.timeParse("%Y%m%d");
+//
+//		var x = d3v4.scaleTime().range([0, width]),
+//			y = d3v4.scaleLinear().range([height, 0]),
+//			z = d3v4.scaleOrdinal(d3v4.schemeCategory10);
+//
+//		var line = d3v4.line()
+//			.x(function(d) { return x(d.date); })
+//			.y(function(d) { return y(d.cnt); });
+//
+//		var theDates = "";
+//		if (startDate) {
+//			theDates = theDates + startDate;
+//			if (endDate) {
+//				theDates = theDates + '/' + endDate;
+//			}
+//		};
+//
+//		d3v4.xml("https://appdb.egi.eu/rest/1.0/stats/vos/" + VOid + "/appstats/" + theDates + "?omitunchanged:1", function(error, data) {
+//		  if (error) throw error;
+//
+//		  data = [].map.call(data.querySelectorAll("appstats[stats='daily']"), function(appstats) {
+//			return {
+//					voname: appstats.getAttribute("voname"),
+//			  cnt: appstats.getAttribute("count"),
+//			  date: parseTime(appstats.getAttribute("when").replace("-","").replace("-","")),
+//					metatype: appstats.getAttribute("type")
+//			};
+//		  });
+//
+//			var voname;
+//			if (data[0]) {
+//				voname = data[0].voname;
+//		  } else {
+//			  voname = "undefined";
+//		  }
+//			title.text("Item statistics for " + voname + " VO").style("font-weight", "bold");
+//			var seriesNames = [];
+//			for (var i = 0; i < data.length; i++) {
+//				if (! seriesNames.includes(data[i].metatype)) {
+//					seriesNames.push(data[i].metatype);
+//				};
+//			};
+//
+//		  // Map the data to an array of arrays of {x, y} tuples.
+//		  var series1 = seriesNames.map(function(series) {
+//			return data.map(function(d) {
+//					if (d.metatype === series) {
+//					  var ofs = 1.0 * seriesNames.indexOf(d.metatype);
+//					  ofs = parseInt(ofs * (0.5 / seriesNames.length) * 100) * 1. / 100.;
+//				      ofs = 0; 
+//					  return {
+//						date: +d.date, 
+//						cnt: +d.cnt + ofs
+//					  };
+//					};
+//			});
+//		  });
+//
+//			var series = [];
+//			for (var i = 0; i < series1.length; i++) {
+//			  series1[i] = cleanArray(series1[i]);
+//				series.push({id: seriesNames[i], values: series1[i]});
+//			};
+//
+//		  // Compute the scales’ domains.
+//		  x.domain(d3v4.extent(data, function(d) { return d.date; }));
+//
+//		  y.domain([
+//			0,
+////			d3v4.min(series, function(c) { return d3v4.min(c.values, function(d) { return d.cnt; }); }),
+//			d3v4.max(series, function(c) { return d3v4.max(c.values, function(d) { return d.cnt; }); })
+//		  ]);
+//
+//
+//		  ;
+//
+//
+//		  z.domain(series.map(function(c) { return c.id; }));
+//
+//			g.append("g")
+//			  .attr("class", "axis axis--x")
+//			  .attr("transform", "translate(0," + height + ")")
+//			  .call(d3v4.axisBottom(x))
+//					.append("text")
+//			  .attr("y", 20)
+//			  .attr("x", width)
+//			  .attr("dy", "0.71em")
+//			  .attr("fill", "#000")
+//					.text("Date");
+//
+//		  g.append("g")
+//			  .attr("class", "axis axis--y")
+//			  .call(
+//				d3v4.axisLeft(y)
+////					.tickValues(d3.range(
+////						(d3v4.min(series, function(c) { return d3v4.min(c.values, function(d) { return d.cnt; }); }) - 3) < 0 ? 0 : d3v4.min(series, function(c) { return d3v4.min(c.values, function(d) { return d.cnt; }); }) - 3,
+////						d3v4.max(series, function(c) { return d3v4.max(c.values, function(d) { return d.cnt; }); }) + 3,
+////					    1
+////		  	  		))
+//			)
+//			.append("text")
+//			  .attr("transform", "rotate(-90)")
+//			  .attr("y", -40)
+//			  .attr("x", 6)
+//			  .attr("dy", "0.71em")
+//			  .attr("fill", "#000")
+//			  .text("Item Count");
+//
+//		  var seriesData = g.selectAll(".seriesData")
+//			.data(series)
+//			.enter().append("g")
+//			  .attr("class", "seriesData");
+//
+//		  seriesData.append("path")
+//			  .attr("class", "line")
+//			  .attr("d", function(d) { return line(d.values); })
+//			  .style("fill", "none")
+//			  .style("stroke", function(d) { return z(d.id); });
+//
+//		  seriesData.append("text")
+//			  .datum(function(d) { return {id: d.id, value: d.values[d.values.length - 1]}; })
+//					.attr("transform", function(d) { if (d.value) { return "translate(" + x(d.value.date) + "," + y(d.value.cnt) + ")"; } else { return "translate(0,0)"; }; })
+//			  .attr("x", 9)
+//			  .attr("dy", "0.35em")
+//			  .style("font", "10px sans-serif")
+//			  .text(function(d) { return d.id + "s"; });
+//
+//			var point = seriesData.append("g")
+//				.attr("class", "line-point");
+//
+//			point.selectAll('circle')
+//				.data(function(d){ return d.values})
+//				.enter().append('circle')
+//				.attr("cx", function(d) { return x(d.date) })
+//				.attr("cy", function(d) { return y(d.cnt) })
+//				.attr("r", 3.5)
+//				.style("fill", "white")
+//				.style("stroke", function(d) { return z(this.parentNode.__data__.id); })
+//				.append("svg:title")
+//   				.text(function(d) { 
+//					var theDate = new Date(parseInt(d.date));
+//					var theDateString = theDate.getUTCFullYear() +"-"+
+//  						("0" + (theDate.getUTCMonth() + 1)).slice(-2) +"-"+
+//						("0" + theDate.getUTCDate()).slice(-2)
+//					return theDateString + ": " + parseInt(d.cnt); 
+//				});
+//		});
+//		};		
+//
+//		plotVOAppStats(VOid, '2015-01-01');
+//	};
 	page.loadImageLists = function(){
 		if( $(".voimagelistmanager").length === 0 ) return;
 		if( page.currentImageListManager() ){
@@ -4569,7 +4569,7 @@ appdb.pages.vo = (function(){
 				page.initSectionGroup();
 				page.loadImageLists();
 				page.renderDisciplines();
-				page.loadStats(o.id);
+//				page.loadStats(o.id);
 				setTimeout(function(){
 					$(".vo-group.groupcontainer > ul > li.contactinfo").removeClass("hiddengroup");
 				},100);
