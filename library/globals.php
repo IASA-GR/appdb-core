@@ -10588,34 +10588,54 @@ class VoAdminNotifications {
 		$subject = "[EGI AppDB] VO " . $notification["voname"] . " image list notification";
 		$message = "-- This is an automated message, please do not reply -- \n\n";
 		$message .= "Dear VO management team,\n\n";
-		$message .= "  the published image list of the VO " . $notification["voname"] . " contains one or more obsolete images as follows:\n\n";
+		$message .= "  the published image list of the VO " . $notification["voname"] . " contains one or more images that require your action. There are:\n\n";
 		if( $notification["outdated"] > 0 ){
-			$message .= "    " . $notification["outdated"] . " image" . ( ($notification["outdated"]>1)?"s":"" ) . " from an outdated virtual appliance version\n";
+//			$message .= "    " . $notification["outdated"] . " image" . ( ($notification["outdated"]>1)?"s":"" ) . " from an outdated virtual appliance version\n";
+			if (intval($notification["outdated"]) == 1) {
+				$S= "";
+			} else {
+				$S= "s";
+			}
+			$message .= "    " . $notification["outdated"] . " Virtual Appliance${S}" . ( ($notification["outdated"]>1)?"s":"" ) . " with a newer (updated) version\n";
 		}
 		if( $notification["deleted"] > 0 ){
-			$message .= "    " . $notification["deleted"] . " image" . ( ($notification["deleted"]>1)?"s":"" ) . " from a user deleted virtual appliance\n";
+//			$message .= "    " . $notification["deleted"] . " image" . ( ($notification["deleted"]>1)?"s":"" ) . " from a user deleted virtual appliance\n";
+			if (intval($notification["deleted"]) == 1) {
+				$S= "";
+			} else {
+				$S= "s";
+			}
+			$message .= "    " . $notification["deleted"] . " Virtual Appliance${S}" . ( ($notification["deleted"]>1)?"s":"" ) . " deleted by the owner\n";
 		}
 		if( $notification["expired"] > 0 ){
-			$message .= "    " . $notification["expired"] . " image" . ( ($notification["expired"]>1)?"s":"" ) . " from an expired virtual appliance version\n";
+//			$message .= "    " . $notification["expired"] . " image" . ( ($notification["expired"]>1)?"s":"" ) . " from an expired virtual appliance version\n";
+			if (intval($notification["expired"]) == 1) {
+				$TO_HAVE = "has";
+				$S= "";
+			} else {
+				$TO_HAVE = "have";
+				$S= "s";
+			}
+			$message .= "    " . $notification["expired"] . " Virtual Appliance${S}" . ( ($notification["expired"]>1)?"s":"" ) . " which ${TO_HAVE} expired\n";
 		}
 		$message .= "\n  It is recommended to update and republish the vo image list by visiting the vo wide image list editor [1].";
 		$message .= "\n  A guide to managing VO image lists is available at [2].";
 		if ( (intval($notification["outdated"]) + intval($notification["expired"]) + intval($notification["deleted"])) > 0) {
-			$message .= "\n  A comprehensive list of the virtual appliances to which the obsolete images follows:";
+			$message .= "\n  A comprehensive list of the virtual appliances, to which the obsolete images belong, follows:";
 			if( $notification["outdated"] > 0 ) {
-				$message .= "\n\n  List of virtual appliances with outdated images:\n";
+				$message .= "\n\n  List of virtual appliances which have updates:\n";
 				foreach($notification["outdatedVAs"] as $va) {
 					$message .= "\n\t$va";
 				}
 			}
 			if( $notification["deleted"] > 0 ) {
-				$message .= "\n\n  List of virtual appliances with deleted images:\n";
+				$message .= "\n\n  List of virtual appliances which have been deleted:\n";
 				foreach($notification["deletedVAs"] as $va) {
 					$message .= "\n\t$va";
 				}
 			}
 			if( $notification["expired"] > 0 ) {
-				$message .= "\n\n  List of virtual appliances with expired images:\n";
+				$message .= "\n\n  List of virtual appliances which have expired:\n";
 				foreach($notification["expiredVAs"] as $va) {
 					$message .= "\n\t$va";
 				}
