@@ -10591,32 +10591,20 @@ class VoAdminNotifications {
 		$message .= "  the published image list of the VO " . $notification["voname"] . " contains one or more images that require your action. There are:\n\n";
 		if( $notification["outdated"] > 0 ){
 //			$message .= "    " . $notification["outdated"] . " image" . ( ($notification["outdated"]>1)?"s":"" ) . " from an outdated virtual appliance version\n";
-			if (intval($notification["outdated"]) == 1) {
-				$S= "";
-			} else {
-				$S= "s";
-			}
-			$message .= "    " . $notification["outdated"] . " Virtual Appliance${S}" . ( ($notification["outdated"]>1)?"s":"" ) . " with a newer (updated) version\n";
+			$message .= "    " . $notification["outdated"] . " Virtual Appliance" . ( ($notification["outdated"]>1)?"s":"" ) . " with a newer (updated) version\n";
 		}
 		if( $notification["deleted"] > 0 ){
 //			$message .= "    " . $notification["deleted"] . " image" . ( ($notification["deleted"]>1)?"s":"" ) . " from a user deleted virtual appliance\n";
-			if (intval($notification["deleted"]) == 1) {
-				$S= "";
-			} else {
-				$S= "s";
-			}
-			$message .= "    " . $notification["deleted"] . " Virtual Appliance${S}" . ( ($notification["deleted"]>1)?"s":"" ) . " deleted by the owner\n";
+			$message .= "    " . $notification["deleted"] . " Virtual Appliance" . ( ($notification["deleted"]>1)?"s":"" ) . " deleted by the owner\n";
 		}
 		if( $notification["expired"] > 0 ){
 //			$message .= "    " . $notification["expired"] . " image" . ( ($notification["expired"]>1)?"s":"" ) . " from an expired virtual appliance version\n";
 			if (intval($notification["expired"]) == 1) {
 				$TO_HAVE = "has";
-				$S= "";
 			} else {
 				$TO_HAVE = "have";
-				$S= "s";
 			}
-			$message .= "    " . $notification["expired"] . " Virtual Appliance${S}" . ( ($notification["expired"]>1)?"s":"" ) . " which ${TO_HAVE} expired\n";
+			$message .= "    " . $notification["expired"] . " Virtual Appliance" . ( ($notification["expired"]>1)?"s":"" ) . " which ${TO_HAVE} expired\n";
 		}
 		$message .= "\n  It is recommended to update and republish the vo image list by visiting the vo wide image list editor [1].";
 		$message .= "\n  A guide to managing VO image lists is available at [2].";
