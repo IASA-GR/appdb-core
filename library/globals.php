@@ -156,7 +156,7 @@ function initLDAP($secure = true, $rdn = null, $pwd = null, $ldapError = null) {
 		$ldapCount = 0;
 		while($ldapCount < 10) { // try, try, try again
 			if ($ldapCount >= 0) {
-				error_log('Trying to set-up TLS ldap connection: attempt #' . $ldapCount);
+				error_log('Trying to set-up secure ldap connection: attempt #' . $ldapCount);
 			}
 			$ds = _initLDAP(true, $rdn, $pwd, $ldapError);
 			if (!is_null($ds)) { // non-null: no error, break
@@ -178,7 +178,29 @@ function _initLDAP($secure = true, $rdn = null, $pwd = null, $ldapError = null) 
 		call_user_func_array($ldapError, array(null, null)); // clear ldap error state
 	}
 	$ldap = ApplicationConfiguration::service('egi.ldap.host');
-	$ds = ldap_connect($ldap);
+	$ldapPort = ApplicationConfiguration::service('egi.ldap.port');
+	$ldapSecMode = ApplicationConfiguration::service('egi.ldap.secmode'); // 0 = SSL, 1 = START-TLS
+	if (($ldapSecMode = "") || (($ldapSecMode != 0) && ($ldapSecMode != 1))) {
+		// default to SSL (ldaps)
+		$ldapSecMode = 0;
+	}
+	if (($ldapPort == "") && $secure) {
+		switch ($ldapSecMode) {
+			case 1:
+				$ldapPort = 389; // default START-TLS port
+				break;
+			case 0:
+			default:
+				$ldapPort = 636; // default SSL (ldaps) port
+		}
+	} elseif ($ldapPort == "") {
+		$ldapPort = 389; // default unencrypted port
+	}
+	if ($secure && ($ldapSecMode == 0)) { // SSL (ldaps)
+		$ds = ldap_connect("ldaps://" . $ldap, $ldapPort);
+	} else {
+		$ds = ldap_connect($ldap);
+	}
 	if ($ds === false) {
 		if (! is_null($ldapError)) {
 			call_user_func_array($ldapError, array(null, "Could not initialize connection to the EGI SSO server"));
@@ -197,7 +219,7 @@ function _initLDAP($secure = true, $rdn = null, $pwd = null, $ldapError = null) 
 		}
 		return null;
 	}
-	if ($secure) {
+	if ($secure && ($ldapSecMode == 1)) { // START-TLS
 		if (! @ldap_start_tls($ds)) {
 			if (! is_null($ldapError)) {
 				call_user_func_array($ldapError, array($ds, "Could not establish a secure connection to the EGI SSO server"));
