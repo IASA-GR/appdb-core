@@ -153,10 +153,20 @@ function getAdminsAndManagers() {
  */
 function initLDAP($secure = true, $rdn = null, $pwd = null, $ldapError = null) {
 	if ($secure) {
+		$ldapSecMode = ApplicationConfiguration::service('egi.ldap.secmode'); // 0 = SSL, 1 = START-TLS
+		if ($ldapSecMode == "") {
+			// default to SSL (ldaps)
+			$ldapSecMode = "0";
+		}
+		if ($ldapSecMode == 0) {
+			$ssl = "SSL";
+		} else {
+			$ssl = "TLS";
+		}
 		$ldapCount = 0;
 		while($ldapCount < 10) { // try, try, try again
 			if ($ldapCount >= 0) {
-				error_log('Trying to set-up secure ldap connection: attempt #' . $ldapCount);
+				error_log('Trying to set-up secure ' . $ssl . ' ldap connection: attempt #' . $ldapCount);
 			}
 			$ds = _initLDAP(true, $rdn, $pwd, $ldapError);
 			if (!is_null($ds)) { // non-null: no error, break
@@ -180,7 +190,7 @@ function _initLDAP($secure = true, $rdn = null, $pwd = null, $ldapError = null) 
 	$ldap = ApplicationConfiguration::service('egi.ldap.host');
 	$ldapPort = ApplicationConfiguration::service('egi.ldap.port');
 	$ldapSecMode = ApplicationConfiguration::service('egi.ldap.secmode'); // 0 = SSL, 1 = START-TLS
-	if (($ldapSecMode = "") || (($ldapSecMode != 0) && ($ldapSecMode != 1))) {
+	if ($ldapSecMode == "") {
 		// default to SSL (ldaps)
 		$ldapSecMode = 0;
 	}
