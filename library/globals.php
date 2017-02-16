@@ -203,7 +203,11 @@ function _initLDAP($secure = true, $rdn = null, $pwd = null, $ldapError = null) 
 	}
 	if ($ds === false) {
 		if (! is_null($ldapError)) {
-			call_user_func_array($ldapError, array(null, "Could not initialize connection to the EGI SSO server"));
+			if ($secure && ($ldapSecMode == 0)) { // SSL (ldaps)
+				call_user_func_array($ldapError, array(null, "Could not initialize secure SSL connection to the EGI SSO server"));
+			} else {
+				call_user_func_array($ldapError, array(null, "Could not initialize connection to the EGI SSO server"));
+			}
 		}
 		return null;
 	}
@@ -222,7 +226,7 @@ function _initLDAP($secure = true, $rdn = null, $pwd = null, $ldapError = null) 
 	if ($secure && ($ldapSecMode == 1)) { // START-TLS
 		if (! @ldap_start_tls($ds)) {
 			if (! is_null($ldapError)) {
-				call_user_func_array($ldapError, array($ds, "Could not establish a secure connection to the EGI SSO server"));
+				call_user_func_array($ldapError, array($ds, "Could not establish a secure TLS connection to the EGI SSO server"));
 			}
 			return null;
 		}
@@ -232,9 +236,10 @@ function _initLDAP($secure = true, $rdn = null, $pwd = null, $ldapError = null) 
 	} else {
 		$ok = @ldap_bind($ds, $rdn, $pwd);
 	}
-	if (ldap_errno($ds) !== 0) {
+	$ldapErrorNo = ldap_errno($ds);
+	if ( $ldapErrorNo !== 0) {
 		if (! is_null($ldapError)) {
-			call_user_func_array($ldapError, array($ds, "Could not bind to the EGI SSO server"));
+			call_user_func_array($ldapError, array($ds, "Could not bind to the EGI SSO server. Error $ldapErrorNo :" . ldap_err2str($ldapErrorNo)));
 		}
 		@ldap_close($ds);
 		return null;
