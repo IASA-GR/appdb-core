@@ -164,7 +164,7 @@ function initLDAP($secure = true, $rdn = null, $pwd = null, $ldapError = null) {
 			$ssl = "TLS";
 		}
 		$ldapCount = 0;
-		while($ldapCount < 10) { // try, try, try again
+		while($ldapCount < 1) { // might need more trials (e.g. 10) when using START-TLS 
 			if ($ldapCount >= 0) {
 				error_log('Trying to set-up secure ' . $ssl . ' ldap connection: attempt #' . $ldapCount);
 			}
@@ -6047,7 +6047,8 @@ class VMCasterNotifications{
 			INNER JOIN researchers ON researchers.id = researchers_apps.researcherid
 			INNER JOIN permissions ON (permissions.object = applications.guid OR permissions.object IS NULL)
 			INNER JOIN contacts ON contacts.researcherid = researchers.id
-		WHERE 
+		WHERE
+        NOT (applications.deleted OR applications.moderated) AND 
 		permissions.actionid = 32 AND 
 		permissions.actor = researchers.guid AND
 		vaviews.va_version_published AND 
