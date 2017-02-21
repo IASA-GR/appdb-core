@@ -4330,20 +4330,20 @@ appdb.pages.vo = (function(){
 
 		function plotVOAppStats(VOid, startDate, endDate) {
 		var margin = {top: 20, right: 20, bottom: 30, left: 40},
-			width = 860 - margin.left - margin.right,
-			height = 500 - margin.top - margin.bottom;
+			width = 860 - margin.left - margin.right - 140,
+			height = 500 - margin.top - margin.bottom - 90;
 
 		var svg = d3v4.select("svg");
 		svg.selectAll("*").remove();
 
 		var title = svg.append("text")
-			.attr("x", (width / 2))
+			.attr("x", ((width + 140 * 2) / 2))
 			.attr("y", 20)
 			.attr("text-anchor", "middle")  
 			.style("font-size", "16px") 
 			.text("");
 
-		var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + (margin.top + 20) + ")");
+		var g = svg.append("g").attr("transform", "translate(" + (100 + margin.left) + "," + (margin.top + 50) + ")");
 
 		var parseTime = d3v4.timeParse("%Y%m%d");
 
@@ -4432,9 +4432,11 @@ appdb.pages.vo = (function(){
 					.append("text")
 			  .attr("y", 20)
 			  .attr("x", width)
-			  .attr("dy", "0.71em")
+			  .attr("dy", "1.71em")
 			  .attr("fill", "#000")
-					.text("Date");
+			  .attr("font-weight", "bold")
+			  .attr("font-size", "13")
+			  .text("Date");
 
 		  g.append("g")
 			  .attr("class", "axis axis--y")
@@ -4450,8 +4452,10 @@ appdb.pages.vo = (function(){
 			  .attr("transform", "rotate(-90)")
 			  .attr("y", -40)
 			  .attr("x", 6)
-			  .attr("dy", "0.71em")
+			  .attr("dy", "0.21em")
 			  .attr("fill", "#000")
+			  .attr("font-weight", "bold")
+			  .attr("font-size", "13")
 			  .text("Item Count");
 
 		  var seriesData = g.selectAll(".seriesData")
