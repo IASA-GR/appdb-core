@@ -4485,6 +4485,7 @@ appdb.pages.vo = (function(){
 				.enter().append('circle')
 				.attr("cx", function(d) { return x(d.date) })
 				.attr("cy", function(d) { return y(d.cnt) })
+			    .attr("cursor", "pointer")
 				.attr("r", 3.5)
 				.style("fill", "white")
 				.style("stroke", function(d) { return z(this.parentNode.__data__.id); })
