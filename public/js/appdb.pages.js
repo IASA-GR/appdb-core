@@ -4494,8 +4494,15 @@ appdb.pages.vo = (function(){
 					var theDateString = theDate.getUTCFullYear() +"-"+
   						("0" + (theDate.getUTCMonth() + 1)).slice(-2) +"-"+
 						("0" + theDate.getUTCDate()).slice(-2)
-					return theDateString + ": " + parseInt(d.cnt); 
+					return theDateString + ": " + "<b>" + parseInt(d.cnt) + " items</b>"; 
 				});
+
+			 $('circle').tipsy({
+			    html: true,
+				fade: true,
+			    gravity: 'sw',
+			  });
+
 		});
 		};		
 

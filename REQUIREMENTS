@@ -27,9 +27,11 @@ REQUIREMENTS
 	  from /opt/zend/externals/dojo/util/buildscripts
 
 - Javascript Libraries (public/js)
+	- tipsy (SVG compatible fork from https://github.com/bigmlcom/tipsy)
 	- plupload v.1.5.5 (.swf and .xap files must be in public and public/js folders)
 	- tinymce folder (v.3.4.9)
 	- shortcut.js
+	- d3 (v3 and v4)
 	- dijit (../zend/externals/dojo/release/dojo/dijit/)
 	- dojo (../zend/externals/dojo/release/dojo/dojo/)
 	- dojox (../zend/externals/dojo/release/dojo/dijit/)
