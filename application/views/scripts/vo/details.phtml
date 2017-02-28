@@ -359,9 +359,16 @@ function getHtmlDateValue($value, $context){
 			</div>
 	<?php }?>
 	</div> <!--pplInfo div closes -->
-        <div id="statsdiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" title="Statistics" selected="false">
-        <svg width="910" height="480"></svg>
-        </div>
+	<div id="statsdiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" title="Statistics" selected="false">
+		<div class="aboutpage statistics">
+			<div class="content">
+				<div class="title" style="margin-top: -20px; margin-bottom: 20px; width: 340px">The graph below displayes the evolution of software items, virtual appliances, and software appliances supported by this VO, with respect to time. You can hover each series' points to see detailed information.</div>
+				<div class="chartcontainer">
+					<svg width="910" height="480"></svg>
+				</div>
+			</div>
+		</div>
+	</div>
 	<?php if( $this->canEdit === true ) { ?>
 	<div id="imagelistdiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" title="Information" >
 		<div class="voimagelistmanager" >
