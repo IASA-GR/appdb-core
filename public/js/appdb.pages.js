@@ -4499,11 +4499,10 @@ appdb.pages.vo = (function(){
 				});
 
 			 $('circle').tipsy({
-			    html: true,
+				html: true,
 				fade: true,
-			    gravity: 'sw',
+				gravity: 'sw'
 			  });
-
 		});
 		};		
 
