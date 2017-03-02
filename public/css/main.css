@@ -886,7 +886,7 @@ html:not([ie8andbelow]) .mainheader .menucontainer.bottom {
 .egiacknowledge {
 	display: inline-block;
 	position: relative;
-	width: 290px;
+	width: 230px;
 	vertical-align: top;
 	overflow: visible;
 }
