@@ -486,6 +486,21 @@
 	<resource>RestVOItem</resource>
 	<comment>The grid Virtual Organization entry specified by parameter :id</comment>
 </route>
+<route type="rest" name="storestats1" url="/:version/stats/storestats/:from/:to">
+	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<param name="to" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<resource>RestStoreStatsList</resource>
+	<comment>Store statistics</comment>
+</route>
+<route type="rest" name="storestats2" url="/:version/stats/storestats/:from">
+	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
+	<resource>RestStoreStatsList</resource>
+	<comment>Store statistics</comment>
+</route>
+<route type="rest" name="storestats3" url="/:version/stats/storestats">
+	<resource>RestStoreStatsList</resource>
+	<comment>Store statistics</comment>
+</route>
 <route type="rest" name="disciplinevostats1" url="/:version/stats/disciplines/:id/vostats/:from/:to">
     <param name="id" fmt="(\d+|s:.+)"/>
 	<param name="from" fmt="\d\d\d\d-\d\d-\d\d"/>
