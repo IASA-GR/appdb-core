@@ -1455,7 +1455,7 @@ class VoController extends Zend_Controller_Action
 							db()->query("SAVEPOINT $sp_vap_tmpl");
 							$release_vap_tmpl = true;
 							try {
-								db()->query("INSERT INTO va_provider_templates (va_provider_id, resource_name, memsize, logical_cpus, physical_cpus, cpu_multiplicity, resource_manager, computing_manager, os_family, connectivity_in, connectivity_out, cpu_model, disc_size, resource_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", array(
+								db()->query("INSERT INTO va_provider_templates (va_provider_id, resource_name, memsize, logical_cpus, physical_cpus, cpu_multiplicity, resource_manager, computing_manager, os_family, connectivity_in, connectivity_out, cpu_model, disc_size, resource_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", array(
 									$site["id"],
 									$result[$i]["glue2entityname"][0],
 									$result[$i]["glue2executionenvironmentmainmemorysize"][0],
