@@ -7494,10 +7494,18 @@ class SamlAuth{
 	
 	//Get user account entry for given values
 	public static function getUserAccount($uid, $accounttype){
+		$res = self::_getUserAccount($uid, $accounttype, false);
+		if (is_null($res)) {
+		$res = self::_getUserAccount($uid, $accounttype, true);
+		}
+	}
+	private static function _getUserAccount($uid, $accounttype, $doEscape){
 		$useraccounts = new Default_Model_UserAccounts();
 		$f1 = new Default_Model_UserAccountsFilter();
 		$f2 = new Default_Model_UserAccountsFilter();
-		$f1->accountid->_escape_seq = "";
+		if (! $doEscape) {
+			$f1->accountid->_escape_seq = "";
+		}
 		$f1->accountid->equals($uid);
 		$f2->account_type->equals($accounttype);
 		$useraccounts->filter->chain($f1, "AND");
@@ -7823,56 +7831,81 @@ class SamlAuth{
 	//E.g. if a user signed in with an egi sso account there might be a usercertificate subject. 
 	//In this case store it as a x509 user account in the current profile.
 	public static function harvestSamlData($session, $user){
+		if (! self::_harvestSamlData($session, $user, 'egi-sso-ldap', false)) {
+			self::_harvestSamlData($session, $user, 'egi-sso-ldap', true);
+		}
+		if (! self::_harvestSamlData($session, $user, 'x509', false)) {
+			self::_harvestSamlData($session, $user, 'x509', true);
+		}
+	}
+	private static function _harvestSamlData($session, $user, $mode, $doEscape){
 		$attrs = $session->samlattrs;
 		$egiuid = ( (isset($attrs["idp:egiuid"])== true && count($attrs["idp:egiuid"]) > 0 )?$attrs["idp:egiuid"][0]:"");
 		$ucert = ( (isset($attrs["idp:userCertificateSubject"])== true && count($attrs["idp:userCertificateSubject"]) > 0 )?$attrs["idp:userCertificateSubject"][0]:"");
-		//collect egi sso ldap user account (possibly from x509 user account)
-		if( trim($egiuid) !== "" ){
-			$uacs = new Default_Model_UserAccounts();
-			$f1 = new Default_Model_UserAccountsFilter();
-			$f2 = new Default_Model_UserAccountsFilter();
-			$f3 = new Default_Model_UserAccountsFilter();
-			$f1->researcherid->equals($user->id);
-			$f2->account_type->equals("egi-sso-ldap");
-			$f3->accountid->_escape_seq = "";
-			$f3->accountid->equals($egiuid);
-			$uacs->filter->chain($f1, "AND");
-			$uacs->filter->chain($f2, "AND");
-			$uacs->filter->chain($f3, "AND");
-			if( count($uacs->items) === 0 ){
-				$uacc = new Default_Model_UserAccount();
-				$uacc->researcherid = $user->id;
-				$uacc->accountid = $egiuid;
-				$uacc->accounttypeid = "egi-sso-ldap";
-				$uacc->save();
+		$ret = false;
+		if ($mode === 'egi-sso-ldap') {
+			//collect egi sso ldap user account (possibly from x509 user account)
+			if( trim($egiuid) !== "" ){
+				$uacs = new Default_Model_UserAccounts();
+				$f1 = new Default_Model_UserAccountsFilter();
+				$f2 = new Default_Model_UserAccountsFilter();
+				$f3 = new Default_Model_UserAccountsFilter();
+				$f1->researcherid->equals($user->id);
+				$f2->account_type->equals("egi-sso-ldap");
+				if (! $doEscape) {
+					$f3->accountid->_escape_seq = "";
+				}
+				$f3->accountid->equals($egiuid);
+				$uacs->filter->chain($f1, "AND");
+				$uacs->filter->chain($f2, "AND");
+				$uacs->filter->chain($f3, "AND");
+				if( count($uacs->items) === 0 ){
+					$uacc = new Default_Model_UserAccount();
+					$uacc->researcherid = $user->id;
+					$uacc->accountid = $egiuid;
+					$uacc->accounttypeid = "egi-sso-ldap";
+					$uacc->save();
+					$ret = true;
+				}
+			}
+		} elseif ($mode === 'x509') {
+			//collect x509 user account (possibly from egi sso user account)
+			if( trim($ucert) !== "" ){
+				$uacs = new Default_Model_UserAccounts();
+				$f1 = new Default_Model_UserAccountsFilter();
+				$f2 = new Default_Model_UserAccountsFilter();
+				$f3 = new Default_Model_UserAccountsFilter();
+				$f1->researcherid->equals($user->id);
+				$f2->account_type->equals("x509");
+				if (! $doEscape) {
+					$f3->accountid->_escape_seq = "";
+				}
+				$f3->accountid->equals($ucert);
+				$uacs->filter->chain($f1, "AND");
+				$uacs->filter->chain($f2, "AND");
+				$uacs->filter->chain($f3, "AND");
+				if( count($uacs->items) === 0 ){
+					$uacc = new Default_Model_UserAccount();
+					$uacc->researcherid = $user->id;
+					$uacc->accountid = $ucert;
+					$uacc->accounttypeid = "x509";
+					$uacc->save();
+					$ret = true;
+				}
 			}
 		}
-		
-		//collect x509 user account (possibly from egi sso user account)
-		if( trim($ucert) !== "" ){
-			$uacs = new Default_Model_UserAccounts();
-			$f1 = new Default_Model_UserAccountsFilter();
-			$f2 = new Default_Model_UserAccountsFilter();
-			$f3 = new Default_Model_UserAccountsFilter();
-			$f1->researcherid->equals($user->id);
-			$f2->account_type->equals("x509");
-			$f3->accountid->_escape_seq = "";
-			$f3->accountid->equals($ucert);
-			$uacs->filter->chain($f1, "AND");
-			$uacs->filter->chain($f2, "AND");
-			$uacs->filter->chain($f3, "AND");
-			if( count($uacs->items) === 0 ){
-				$uacc = new Default_Model_UserAccount();
-				$uacc->researcherid = $user->id;
-				$uacc->accountid = $ucert;
-				$uacc->accounttypeid = "x509";
-				$uacc->save();
-			}
-		}
+		return $ret;
 	}
 	
 	//Return user account entry for current session user
 	public static function getCurrentAccount($session){
+		$res = self::_getCurrentAccount($session, false);
+		if (is_null($res)) {
+			$res = self::_getCurrentAccount($session, true);
+		}
+		return $res;
+	}
+	private static function _getCurrentAccount($session, $doEscape){
 		if( isset($session->userid) == false || $session->userid == null ){
 			return null;
 		}
@@ -7885,7 +7918,9 @@ class SamlAuth{
 		$useraccounts = new Default_Model_UserAccounts();
 		$f1 = new Default_Model_UserAccountsFilter();
 		$f2 = new Default_Model_UserAccountsFilter();
-		$f1->accountid->_escape_seq = "";
+		if (! $doEscape) {
+			$f1->accountid->_escape_seq = "";
+		}
 		$f1->accountid->equals($uid);
 		$f2->account_type->equals($accounttype);
 		$useraccounts->filter->chain($f1, "AND");
@@ -8250,6 +8285,13 @@ class AccountConnect {
 	//if the user has opened more than one sessions with the current account
 	//Returns false or the connected profile
 	public static function isConnected($session){
+		$res = self::_isConnected($session, false);
+		if (is_null($res)) {
+			$res = self::_isConnected($session, true);
+		}
+		return $res;
+	}
+	private static function _isConnected($session, $doEscape){
 		
 		$uid = trim($session->authUid);
 		$source = str_replace( "-sp", "", trim($session->authSource) );
@@ -8257,7 +8299,9 @@ class AccountConnect {
 		$uaccounts = new Default_Model_UserAccounts();
 		$f1 = new Default_Model_UserAccountsFilter();
 		$f2 = new Default_Model_UserAccountsFilter();
-		$f1->accountid->_escape_seq = "";
+		if (! $doEscape) {
+			$f1->accountid->_escape_seq = "";
+		}
 		$f1->accountid->equals($uid);
 		$f2->account_type->equals($source);
 		$uaccounts->filter->chain($f1, "AND");
@@ -8274,6 +8318,13 @@ class AccountConnect {
 	//Checks if the current user has a user account with the given values.
 	//Returns false or the connected user account
 	public static function isConnectedTo($session,$uid,$accounttype){
+		$res = self::_isConnectedTo($session, $uid, $accounttype, false);
+		if (is_null($res)) {
+			$res = self::_isConnectedTo($session, $uid, $accounttype, true);
+		}
+		return $res;
+	}
+	private static function _isConnectedTo($session,$uid,$accounttype, $doEscape){
 		$userid = trim($session->userid);
 		$uid = trim($uid);
 		$source = str_replace( "-sp", "", trim($accounttype) );
@@ -8284,7 +8335,9 @@ class AccountConnect {
 		$f3 = new Default_Model_UserAccountsFilter();
 		
 		$f1->researcherid->equals($userid);
-		$f2->accountid->_escape_seq = "";
+		if (! $doEscape) {
+			$f2->accountid->_escape_seq = "";
+		}
 		$f2->accountid->equals($uid);
 		$f3->account_type->equals($source);
 		$uaccounts->filter->chain($f1, "AND");
@@ -8298,13 +8351,22 @@ class AccountConnect {
 	
 	//Retrieves pending connection based on account uid and type
 	private static function getPendingConnection($accountuid, $accounttype){
+		$res = self::_getPendingConnection($accountuid, $accounttype, false);
+		if (is_null($res)) {
+			$res = self::_getPendingConnection($accountuid, $accounttype, true);
+		}
+		return $res;
+	}
+	private static function _getPendingConnection($accountuid, $accounttype, $doEscape){
 		$paccounts = new Default_Model_PendingAccounts();
 		$f1 = new Default_Model_PendingAccountsFilter();
 		$f2 = new Default_Model_PendingAccountsFilter();
 		$f3 = new Default_Model_PendingAccountsFilter();
 		$f4 = new Default_Model_PendingAccountsFilter();
-		
-		$f1->accountid->_escape_seq = "";
+
+		if (! $doEscape) {
+			$f1->accountid->_escape_seq = "";
+		}
 		$f1->accountid->equals($accountuid);
 		$f2->account_type->equals($accounttype);
 		$f3->resolved->equals(false);
