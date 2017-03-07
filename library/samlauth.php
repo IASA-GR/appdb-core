@@ -115,7 +115,7 @@ class SamlAuth{
 		$useraccounts = new Default_Model_UserAccounts();
 		$f1 = new Default_Model_UserAccountsFilter();
 		$f2 = new Default_Model_UserAccountsFilter();
-		$f1->accountid->_escape_seq = "";
+		$f1->accountid->overrideEscapeSeq("");
 		$f1->accountid->equals($uid);
 		$f2->account_type->equals($accounttype);
 		$useraccounts->filter->chain($f1, "AND");
@@ -435,7 +435,7 @@ class SamlAuth{
 			$f3 = new Default_Model_UserAccountsFilter();
 			$f1->researcherid->equals($user->id);
 			$f2->account_type->equals("egi-sso-ldap");
-			$f3->accountid->_escape_seq = "";
+			$f3->accountid->overrideEscapeSeq("");
 			$f3->accountid->equals($egiuid);
 			$uacs->filter->chain($f1, "AND");
 			$uacs->filter->chain($f2, "AND");
@@ -457,7 +457,7 @@ class SamlAuth{
 			$f3 = new Default_Model_UserAccountsFilter();
 			$f1->researcherid->equals($user->id);
 			$f2->account_type->equals("x509");
-			$f3->accountid->_escape_seq = "";
+			$f3->accountid->overrideEscapeSeq("");
 			$f3->accountid->equals($ucert);
 			$uacs->filter->chain($f1, "AND");
 			$uacs->filter->chain($f2, "AND");
@@ -486,7 +486,7 @@ class SamlAuth{
 		$useraccounts = new Default_Model_UserAccounts();
 		$f1 = new Default_Model_UserAccountsFilter();
 		$f2 = new Default_Model_UserAccountsFilter();
-		$f1->accountid->_escape_seq = "";
+		$f1->accountid->overrideEscapeSeq("");
 		$f1->accountid->equals($uid);
 		$f2->account_type->equals($accounttype);
 		$useraccounts->filter->chain($f1, "AND");

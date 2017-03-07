@@ -28,6 +28,7 @@ class Default_Model_FilterItem {
 	private $_ilike;
 	private $_rlike;
 	private $_charCast;
+	private $_escape_seq_overridden = false;
 
 	public function __construct($field, Default_Model_Filter $ancestor) {
 		$this->_ancestor = $ancestor;
@@ -70,18 +71,27 @@ class Default_Model_FilterItem {
 		$this->_dialect = $d;
 		switch ($this->_dialect) {
 		case 0:
-			$this->_escape_seq = "E";
+			if (! $this->_escape_seq_overridden) {
+				$this->_escape_seq = "E";
+			}
 			$this->_ilike = "LIKE";
 			$this->_rlike = "~*";
 			$this->_charCast = "TEXT";
 			break;
 		case 1:
-			$this->_escape_seq = "";
+			if (! $this->_escape_seq_overridden) {
+				$this->_escape_seq = "";
+			}
 			$this->_ilike = "LIKE";
 			$this->_rlike = "RLIKE";
 			$this->_charCast = "CHAR";
 			break;
 		}
+	}
+
+	public function overrideEscapeSeq($e) {
+		$this->_escape_seq = $e;
+		$this->_escape_seq_overridden = true;
 	}
 
 	private function _escape($val) {
