@@ -87,11 +87,13 @@ class Default_Model_FilterItem {
 			$this->_charCast = "CHAR";
 			break;
 		}
+		return $this;
 	}
 
 	public function overrideEscapeSeq($e) {
 		$this->_escape_seq = $e;
 		$this->_escape_seq_overridden = true;
+		return $this;
 	}
 
 	private function _escape($val) {

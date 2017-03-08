@@ -7505,9 +7505,10 @@ class SamlAuth{
 		$f1 = new Default_Model_UserAccountsFilter();
 		$f2 = new Default_Model_UserAccountsFilter();
 		if (! $doEscape) {
-			$f1->accountid->overrideEscapeSeq("");
+			$f1->accountid->overrideEscapeSeq("")->equals($uid);
+		} else {
+			$f1->accountid->equals($uid);
 		}
-		$f1->accountid->equals($uid);
 		$f2->account_type->equals($accounttype);
 		$useraccounts->filter->chain($f1, "AND");
 		$useraccounts->filter->chain($f2, "AND");
@@ -7854,9 +7855,10 @@ class SamlAuth{
 				$f1->researcherid->equals($user->id);
 				$f2->account_type->equals("egi-sso-ldap");
 				if (! $doEscape) {
-					$f3->accountid->overrideEscapeSeq("");
+					$f3->accountid->overrideEscapeSeq("")->equals($egiuid);
+				} else {
+					$f3->accountid->equals($egiuid);
 				}
-				$f3->accountid->equals($egiuid);
 				$uacs->filter->chain($f1, "AND");
 				$uacs->filter->chain($f2, "AND");
 				$uacs->filter->chain($f3, "AND");
@@ -7879,9 +7881,10 @@ class SamlAuth{
 				$f1->researcherid->equals($user->id);
 				$f2->account_type->equals("x509");
 				if (! $doEscape) {
-					$f3->accountid->overrideEscapeSeq("");
+					$f3->accountid->overrideEscapeSeq("")->equals($ucert);
+				} else {
+					$f3->accountid->equals($ucert);
 				}
-				$f3->accountid->equals($ucert);
 				$uacs->filter->chain($f1, "AND");
 				$uacs->filter->chain($f2, "AND");
 				$uacs->filter->chain($f3, "AND");
@@ -7920,9 +7923,10 @@ class SamlAuth{
 		$f1 = new Default_Model_UserAccountsFilter();
 		$f2 = new Default_Model_UserAccountsFilter();
 		if (! $doEscape) {
-			$f1->accountid->overrideEscapeSeq("");
+			$f1->accountid->overrideEscapeSeq("")->equals($uid);
+		} else {
+			$f1->accountid->equals($uid);
 		}
-		$f1->accountid->equals($uid);
 		$f2->account_type->equals($accounttype);
 		$useraccounts->filter->chain($f1, "AND");
 		$useraccounts->filter->chain($f2, "AND");
@@ -8301,9 +8305,10 @@ class AccountConnect {
 		$f1 = new Default_Model_UserAccountsFilter();
 		$f2 = new Default_Model_UserAccountsFilter();
 		if (! $doEscape) {
-			$f1->accountid->overrideEscapeSeq("");
+			$f1->accountid->overrideEscapeSeq("")->equals($uid);
+		} else {
+			$f1->accountid->equals($uid);
 		}
-		$f1->accountid->equals($uid);
 		$f2->account_type->equals($source);
 		$uaccounts->filter->chain($f1, "AND");
 		$uaccounts->filter->chain($f2, "AND");
@@ -8337,9 +8342,10 @@ class AccountConnect {
 		
 		$f1->researcherid->equals($userid);
 		if (! $doEscape) {
-			$f2->accountid->overrideEscapeSeq("");
+			$f2->accountid->overrideEscapeSeq("")->equals($uid);
+		} else {
+			$f2->accountid->equals($uid);
 		}
-		$f2->accountid->equals($uid);
 		$f3->account_type->equals($source);
 		$uaccounts->filter->chain($f1, "AND");
 		$uaccounts->filter->chain($f2, "AND");
@@ -8367,13 +8373,13 @@ class AccountConnect {
 
 		if (! $doEscape) {
 			error_log("------> WILL NOT ESCAPE");
-			$f1->accountid->overrideEscapeSeq("");
+			$f1->accountid->overrideEscapeSeq("")->equals($accountuid);
 		} else {
 			error_log("------> WILL ESCAPE");
+			$f1->accountid->equals($accountuid);
 		}
 		error_log("Daniele=============> ".$accountuid." account type:".$accounttype);
 		error_log('Daniele=============> '.$accountuid.' account type:'.$accounttype);
-		$f1->accountid->equals($accountuid);
 		$f2->account_type->equals($accounttype);
 		$f3->resolved->equals(false);
 		$f4->setExpr("pending_accounts.addedon > NOW() - '30 minutes'::INTERVAL");
