@@ -7832,73 +7832,53 @@ class SamlAuth{
 	//Collect and store implicit user accounts from current one.
 	//E.g. if a user signed in with an egi sso account there might be a usercertificate subject. 
 	//In this case store it as a x509 user account in the current profile.
-	public static function harvestSamlData($session, $user){
-		if (! self::_harvestSamlData($session, $user, 'egi-sso-ldap', false)) {
-			self::_harvestSamlData($session, $user, 'egi-sso-ldap', true);
-		}
-		if (! self::_harvestSamlData($session, $user, 'x509', false)) {
-			self::_harvestSamlData($session, $user, 'x509', true);
-		}
-	}
-	private static function _harvestSamlData($session, $user, $mode, $doEscape){
+	private static function harvestSamlData($session, $user){
 		$attrs = $session->samlattrs;
 		$egiuid = ( (isset($attrs["idp:egiuid"])== true && count($attrs["idp:egiuid"]) > 0 )?$attrs["idp:egiuid"][0]:"");
 		$ucert = ( (isset($attrs["idp:userCertificateSubject"])== true && count($attrs["idp:userCertificateSubject"]) > 0 )?$attrs["idp:userCertificateSubject"][0]:"");
-		$ret = false;
-		if ($mode === 'egi-sso-ldap') {
-			//collect egi sso ldap user account (possibly from x509 user account)
-			if( trim($egiuid) !== "" ){
-				$uacs = new Default_Model_UserAccounts();
-				$f1 = new Default_Model_UserAccountsFilter();
-				$f2 = new Default_Model_UserAccountsFilter();
-				$f3 = new Default_Model_UserAccountsFilter();
-				$f1->researcherid->equals($user->id);
-				$f2->account_type->equals("egi-sso-ldap");
-				if (! $doEscape) {
-					$f3->accountid->overrideEscapeSeq("")->equals($egiuid);
-				} else {
-					$f3->accountid->equals($egiuid);
-				}
-				$uacs->filter->chain($f1, "AND");
-				$uacs->filter->chain($f2, "AND");
-				$uacs->filter->chain($f3, "AND");
-				if( count($uacs->items) === 0 ){
-					$uacc = new Default_Model_UserAccount();
-					$uacc->researcherid = $user->id;
-					$uacc->accountid = $egiuid;
-					$uacc->accounttypeid = "egi-sso-ldap";
-					$uacc->save();
-					$ret = true;
-				}
-			}
-		} elseif ($mode === 'x509') {
-			//collect x509 user account (possibly from egi sso user account)
-			if( trim($ucert) !== "" ){
-				$uacs = new Default_Model_UserAccounts();
-				$f1 = new Default_Model_UserAccountsFilter();
-				$f2 = new Default_Model_UserAccountsFilter();
-				$f3 = new Default_Model_UserAccountsFilter();
-				$f1->researcherid->equals($user->id);
-				$f2->account_type->equals("x509");
-				if (! $doEscape) {
-					$f3->accountid->overrideEscapeSeq("")->equals($ucert);
-				} else {
-					$f3->accountid->equals($ucert);
-				}
-				$uacs->filter->chain($f1, "AND");
-				$uacs->filter->chain($f2, "AND");
-				$uacs->filter->chain($f3, "AND");
-				if( count($uacs->items) === 0 ){
-					$uacc = new Default_Model_UserAccount();
-					$uacc->researcherid = $user->id;
-					$uacc->accountid = $ucert;
-					$uacc->accounttypeid = "x509";
-					$uacc->save();
-					$ret = true;
-				}
+
+		//collect egi sso ldap user account (possibly from x509 user account)
+		if( trim($egiuid) !== "" ){
+			$uacs = new Default_Model_UserAccounts();
+			$f1 = new Default_Model_UserAccountsFilter();
+			$f2 = new Default_Model_UserAccountsFilter();
+			$f3 = new Default_Model_UserAccountsFilter();
+			$f1->researcherid->equals($user->id);
+			$f2->account_type->equals("egi-sso-ldap");
+			$f3->accountid->equals($egiuid)->or($f3->accountid->overrideEscapeSeq("")->equals($egiuid));
+			$uacs->filter->chain($f1, "AND");
+			$uacs->filter->chain($f2, "AND");
+			$uacs->filter->chain($f3, "AND");
+			if( count($uacs->items) === 0 ){
+				$uacc = new Default_Model_UserAccount();
+				$uacc->researcherid = $user->id;
+				$uacc->accountid = $egiuid;
+				$uacc->accounttypeid = "egi-sso-ldap";
+				$uacc->save();
 			}
 		}
-		return $ret;
+
+		//collect x509 user account (possibly from egi sso user account)
+		if( trim($ucert) !== "" ){
+			$uacs = new Default_Model_UserAccounts();
+			$f1 = new Default_Model_UserAccountsFilter();
+			$f2 = new Default_Model_UserAccountsFilter();
+			$f3 = new Default_Model_UserAccountsFilter();
+			$f1->researcherid->equals($user->id);
+			$f2->account_type->equals("x509");
+			$f3->accountid->equals($ucert)->or($f3->accountid->overrideEscapeSeq("")->equals($ucert));
+			$uacs->filter->chain($f1, "AND");
+			$uacs->filter->chain($f2, "AND");
+			$uacs->filter->chain($f3, "AND");
+			if( count($uacs->items) === 0 ){
+				$uacc = new Default_Model_UserAccount();
+				$uacc->researcherid = $user->id;
+				$uacc->accountid = $ucert;
+				$uacc->accounttypeid = "x509";
+				$uacc->save();
+			}
+		}
+
 	}
 	
 	//Return user account entry for current session user
@@ -8372,14 +8352,10 @@ class AccountConnect {
 		$f4 = new Default_Model_PendingAccountsFilter();
 
 		if (! $doEscape) {
-			error_log("------> WILL NOT ESCAPE");
 			$f1->accountid->overrideEscapeSeq("")->equals($accountuid);
 		} else {
-			error_log("------> WILL ESCAPE");
 			$f1->accountid->equals($accountuid);
 		}
-		error_log("Daniele=============> ".$accountuid." account type:".$accounttype);
-		error_log('Daniele=============> '.$accountuid.' account type:'.$accounttype);
 		$f2->account_type->equals($accounttype);
 		$f3->resolved->equals(false);
 		$f4->setExpr("pending_accounts.addedon > NOW() - '30 minutes'::INTERVAL");
@@ -8388,12 +8364,6 @@ class AccountConnect {
 		$paccounts->filter->chain($f3, "AND");
 		$paccounts->filter->chain($f4, "AND");
 		$paccounts->filter->orderBy("addedon DESC");
-		if ($doEscape) {
-			$escstr = "YES";
-		} else {
-			$escstr = "NO";
-		}
-		error_log("ESCAPED: $escstr =====================>".var_export($paccounts->filter->expr(), true));
 		if( count($paccounts->items) === 0 ){
 			return null;
 		}
