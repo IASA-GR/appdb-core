@@ -560,7 +560,7 @@ class SamlController extends Zend_Controller_Action
 		$useraccounts = new Default_Model_UserAccounts();
 		$f1 = new Default_Model_UserAccountsFilter();
 		$f2 = new Default_Model_UserAccountsFilter();
-		$f1->accountid->equals($uid);
+		$f1->accountid->equals($uid)->or($f1->accountid->overrideEscapeSeq("")->equals($uid));
 		$f2->accounttype->equals($source);
 		$useraccounts->filter->chain($f1, "AND");
 		$useraccounts->filter->chain($f2, "AND");
