@@ -29,6 +29,9 @@ include('contextualization.php');
 include('datasets.php');
 include('Storage.php');
 
+$aaimp = $this->getOption("aaimp");
+Zend_Registry::set('aaimp',$aaimp);
+
 $api = $this->getOption("api");
 Zend_Registry::set('api',$api);
 
