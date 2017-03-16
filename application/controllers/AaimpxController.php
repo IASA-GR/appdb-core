@@ -18,77 +18,92 @@
 class AaimpxController extends Zend_Controller_Action
 {
     private $_idp;
-    private $_base_url;
-    private $_redirect_uri;
+    private $_baseURL;
+    private $_redirectURI;
     private $_uid="";
-    private $_clientid;
-    private $_clientsecret;
+    private $_clientID;
+    private $_clientSecret;
+    private $_storagePath;
+    private $_vomsesBasePath;
+    private $_expirationThreshold;
+
     public function init()
     {
-                $this->_helper->layout->disableLayout();
-                //$this->_helper->viewRenderer->setNoRender();
-		$this->session = new Zend_Session_Namespace('default');
-		$aaimpConf = Zend_Registry::get("aaimp");
-		$this->_clientid= $aaimpConf["client_id"];
-		$this->_clientsecret = $aaimpConf["client_secret"];
-		$this->_idp = $aaimpConf["idp"];
-		$this->_base_url = $aaimpConf["base_url"];
-		$this->_redirect_uri = $aaimpConf["redirect_uri"];    
+	$this->session = new Zend_Session_Namespace('default');
+	$aaimpConf = Zend_Registry::get("aaimp");
+	$this->_clientID= $aaimpConf["client_id"];
+	$this->_clientSecret = $aaimpConf["client_secret"];
+	$this->_idp = $aaimpConf["idp"];
+	$this->_baseURL = $aaimpConf["base_url"];
+	$this->_redirectURI = $aaimpConf["redirect_uri"];    
+	$this->_storagePath = $aaimpConf["storage_path"];
+	if ($this->_storagePath == "") {
+		$this->_storagePath = "/tmp/certs";
+	}
+	$this->_vomsesBasePath = APPLICATION_PATH . "/../public/assets/ui/vomses/";
+	$this->_expirationThreshold = $aaimpConf["expiration_threshold"];
+	if ($this->_expirationThreshold == "") {
+		$this->_expirationThreshold = 1; // one hour
+	}
     }
 
     public function indexAction()
     {
-        trackPage('/aaimpx');
+	$this->_helper->layout->disableLayout();
 
 	$auth = SamlAuth::isAuthenticated();
-	if( $auth === false ){
-		 $this->view->auth=false;
-	}
-	else{
-		$this->view->auth=true;
+	if( ! $auth ) {
+		$this->view->auth = false;
+	} else {
+		$this->view->auth = true;
 		$this->view->done = false;
 
-		$this->_redirect_uri=urlencode($this->_redirect_uri);
-
+		$this->_redirectURI = urlencode($this->_redirectURI);
+		if( ! isset($this->session->samlattrs["idp:uid"][0]) || trim($this->session->samlattrs["idp:uid"][0]) == "" ){
+			$this->view->error = 1000;
+			$this->view->error_description = "invalid UID provided";
+			return;
+		}
 		$this->_uid = $this->session->samlattrs["idp:uid"][0];
 
-		if(isset($this->session->samlattrs['idp:traceidp'])){
-			$numofelems=count($this->session->samlattrs['idp:traceidp']);
-			if( $numofelems >= 2){
-				$this->_idp=$this->session->samlattrs['idp:traceidp'][($numofelems-2)];
-			}
-			else if ($numofelems == 1){
+		if (isset($this->session->samlattrs['idp:traceidp'])) {
+			$numofelems = count($this->session->samlattrs['idp:traceidp']);
+			if( $numofelems >= 2) {
+				$this->_idp=$this->session->samlattrs['idp:traceidp'][($numofelems - 2)];
+			} elseif ($numofelems == 1) {
 				$this->_idp=$this->session->samlattrs['idp:traceidp'][0];
 			}
 		}
 
-		if(isset($_GET['error']))
-			$this->view->error=$_GET['error'];
-		if(isset($_GET['error_description']))
-			$this->view->error_description=$_GET['error_description'];
+		if (isset($_GET['error'])) {
+			$this->view->error = $_GET['error'];
+		}
+		if (isset($_GET['error_description'])) {
+			$this->view->error_description = $_GET['error_description'];
+		}
 
 		if (isset($_GET['error'])) {
 			return;
 		}
 
-		if(isset($_GET['init'])){
+		if(isset($_GET['init'])) {
 			#echo "here is where we start......";
 			return;
-		}
-		else if (!isset($_GET['code'])) {
-	     		if (isset($_GET['appdbvo']) && trim($_GET['appdbvo']) !='')
-         			$_SESSION['appdbvo']=$_GET['appdbvo'];
-	     		else
+		} elseif (!isset($_GET['code'])) {
+	     		if (isset($_GET['appdbvo']) && trim($_GET['appdbvo']) !='') {
+         			$_SESSION['appdbvo'] = $_GET['appdbvo'];
+			} else {
          			$_SESSION['appdbvo']=false;
+			}
 		     	// authorize request
-		     	$url = $this->_base_url."/authorize";
+		     	$url = $this->_baseURL . "/authorize";
 	     		$fields = array(
 			//         'scope' => 'openid edu.uiuc.ncsa.myproxy.getcert',
 			//         'scope' => 'openid org.cilogon.userinfo edu.uiuc.ncsa.myproxy.getcert',
         		 	'scope' => 'openid email profile org.cilogon.userinfo edu.uiuc.ncsa.myproxy.getcert',
 	         		'response_type' => 'code',
-		         	'client_id' => $this->_clientid,
-		         	'redirect_uri' => $this->_redirect_uri,
+		         	'client_id' => $this->_clientID,
+		         	'redirect_uri' => $this->_redirectURI,
 	        	 	'state' => hash('sha256', session_id())
 		     	);
 			// Add specific IdP hint: this will bypass the WAYF
@@ -96,40 +111,36 @@ class AaimpxController extends Zend_Controller_Action
 	
      			//url-ify the data for the POST
      			$fields_string="";
-			foreach($fields as $key=>$value) {
-        			$fields_string .= $key.'='.$value.'&';
+			foreach ($fields as $key => $value) {
+        			$fields_string .= $key .'='. $value .'&';
      			}
 			rtrim($fields_string, '&');
 	
-	
-			var_export($fields);
-
 			// Redirect
-	     		header("Location: ".$url."?".$fields_string);
- 		}
-	        else{
-	            	$url = $this->_base_url."/token";
+	     		header("Location: " . $url ."?". $fields_string);
+ 		} else {
+	            	$url = $this->_baseURL . "/token";
 			$fields = array(
          			'grant_type' => 'authorization_code',
          			'code' => urlencode($_GET['code']),
-	         		'redirect_uri' => $this->_redirect_uri,
-        	 		'client_id' => "$this->_clientid",
-         			'client_secret' => "$this->_clientsecret"
+	         		'redirect_uri' => $this->_redirectURI,
+        	 		'client_id' => "$this->_clientID",
+         			'client_secret' => "$this->_clientSecret"
      			);
 			$status_code = $this->do_curl($url, $fields, $response, $error);
 			
-			if($this->parse_curl_status("token", $status_code, $response, $error) === false){
+			if($this->parse_curl_status("token", $status_code, $response, $error) === false) {
 				return;
 			}
 			// Decoded response
-			$values=json_decode($response, true);
+			$values = json_decode($response, true);
 				
 			// Get access token (and ID Token)
-			$access_token=$values['access_token'];
+			$access_token = $values['access_token'];
 			
 			
-			if (!isset($access_token)) {
-				$this->view->error=1000;				
+			if (! isset($access_token)) {
+				$this->view->error = 1000;				
          			$this->view->error_description .= "Cannot find token in response<br>";
 				$this->view->error_description .= "response=".$this->sanitize($response)."<br>";
      				$this->view->error_description .= "url=".$url."<br>";
@@ -144,21 +155,22 @@ class AaimpxController extends Zend_Controller_Action
 			//$this->print_token_response($values);
 
 			// getproxy request: either with or without VOMS extensions
-     			$url = $this->_base_url."/getproxy";
+     			$url = $this->_baseURL . "/getproxy";
 			$fields = array(
-         			'client_id' => "$this->_clientid",
-         			'client_secret' => "$this->_clientsecret",
+         			'client_id' => "$this->_clientID",
+         			'client_secret' => "$this->_clientSecret",
          			'access_token' => urlencode($access_token),
 				//'proxylifetime' => 86399,
      			);
 		
 			// Add voms request parameters when needed
      			if ($_SESSION['appdbvo'] !== false)    {
-				$fields['voname'] = $_SESSION['appdbvo'];
+				$fields['voname'] = trim($_SESSION['appdbvo']);
 				// make a query and get the correponding vomses
-			        $fields['vomses'] = '"fedcloud.egi.eu" "voms1.grid.cesnet.cz" "15002" "/DC=org/DC=terena/DC=tcs/OU=Domain Control Validated/CN=voms1.grid.cesnet.cz" "fedcloud.egi.eu" "24"';
+				$fields['vomses'] = $this->getVomses(trim($fields['voname']));
+				//$fields['vomses'] = '"fedcloud.egi.eu" "voms1.grid.cesnet.cz" "15002" "/DC=org/DC=terena/DC=tcs/OU=Domain Control Validated/CN=voms1.grid.cesnet.cz" "fedcloud.egi.eu" "24"';
      			}
-			
+
 			$status_code = $this->do_curl($url, $fields, $response, $error);
 
 			if($this->parse_curl_status("proxy", $status_code, $response, $error) === false){
@@ -170,12 +182,87 @@ class AaimpxController extends Zend_Controller_Action
 	}
     }
     
+	public function getproxyAction(){
+		$this->_helper->layout->disableLayout();
+
+	        $auth = SamlAuth::isAuthenticated();
+        	if( $auth === false ) {
+                	$this->view->auth = false;
+                        $this->view->type = 'error';
+                        $this->view->msg = 'not authenticated';
+			return;
+        	} else {	
+			$this->view->auth = true;
+			$this->_uid = $this->session->samlattrs["idp:uid"][0];
+			$path = $this->_storagePath;
+
+                        $vo = false;
+                        if (isset($_GET['appdbvo']) && trim($_GET['appdbvo']) !='') {
+                                $vo=$_GET['appdbvo'];
+			}
+                        if(! isset($vo) || $vo === false || trim($vo) == "") {
+                                $path .= "/novo";
+				$this->view->type = 'error';
+				$this->view->msg = 'no vo provided';
+				return;
+                        } else {
+                                $path .= "/".$vo;
+                        }
+
+                        $proxy = $path . '/x509up_u' . $this->_uid;
+                        if (!file_exists($proxy) || !file_exists($proxy."_meta")) {
+				// return notice not valid proxy
+				$this->view->type = 'notice';
+				$this->view->msg = 'not valid proxy - proxy file does not exist';
+				return;
+                        }
+
+                        $proxy_meta = parse_ini_file($proxy."_meta");
+			if ($proxy_meta['uid'] !== $this->_uid){
+				$this->view->type = 'error';
+				$this->view->msg = 'UID does not match';
+				return;
+			}
+
+			if($proxy_meta['valid_to'] - time() < ($this->_expirationThreshold * 60 * 60)) {
+				$this->view->type = 'notice';
+				$this->view->msg = 'not valid proxy - proxy has been expired';
+				return;
+			}
+			if(time() < $proxy_meta['valid_from']) {
+				$this->view->type = 'notice';
+				$this->view->msg = 'not valid proxy - proxy is not valid yet!!';
+				return;
+			}
+
+
+                        $this->view->type = 'ok';
+                        $this->view->msg = 'success';
+			$this->view->cert = file_get_contents($proxy);
+				
+		}
+	 }
+
+	 private function getVomses($vo)  {
+		$path = $this->_vomsesBasePath . $vo . ".*";	
+		$files = glob($path);
+
+		$vomses='';
+		foreach ($files as $file) {
+			if (file_exists($file)) {
+				$vomses .= trim(file_get_contents($file)) . '\n';
+			}
+		}
+
+		$vomses = rtrim($vomses, '\n');
+		return ''. $vomses . ''; 
+	 }
 
 
 	 private function do_curl($url, $fields, &$response, &$error)  {
 	     	//url-ify the data for the POST
-     		$fields_string="";
-		foreach($fields as $key=>$value) {
+     		$fields_string = "";
+		foreach ($fields as $key=>$value) {
          		$fields_string .= $key.'='.$value.'&';
      		}
 		rtrim($fields_string, '&');
@@ -219,7 +306,7 @@ class AaimpxController extends Zend_Controller_Action
 
  // Parses curl status code and prints error when available
  	private function parse_curl_status($type, $status_code, $response, $error) {
-		if ($status_code >= 300 || !empty($error)){ 
+		if ($status_code >= 300 || !empty($error)) {
 			$this->view->error=$status_code;
 		        $this->view->error_description .= "Error obtaining $type <br>";
 			if ($error) {
@@ -233,8 +320,9 @@ class AaimpxController extends Zend_Controller_Action
 						$this->view->error_description .= $this->sanitize($err['error'])."<br>";
 					if (isset($err['error_description']))
 						$this->view->error_description .= "Description: ".$this->sanitize(urldecode($err['error_description']))."<br>";
-				} else
+				} else {
 					$this->view->error_description .= "Response:".$this->sanitize($response)."<br>";
+				}
      			}
 			return false;
      		}
@@ -250,7 +338,7 @@ class AaimpxController extends Zend_Controller_Action
      		print("</pre>\n");
      		// Decoded ID token
      		print("<h2>Parsed ID Token:</h2>\n<pre>\n");
-     		foreach (explode(".", $values['id_token']) as $block)    {
+     		foreach (explode(".", $values['id_token']) as $block) {
          		$subblock=json_decode(base64_decode($block));
          		print($this->sanitize(print_r($subblock, true)));
      		}
@@ -259,22 +347,31 @@ class AaimpxController extends Zend_Controller_Action
 
 
 	private function store_proxy($datastore, $response, $uid, $vo){
-		if($datastore === 'fs'){
-			$path="/tmp/certs";
-			if(!isset($vo) || $vo === false || $trim($vo)===''){
+		if ($datastore === 'fs') {
+			$path = $this->_storagePath;
+			if (!isset($vo) || $vo === false || trim($vo) == "") {
 				$path .= "/novo";
-			}
-			else{
-				$path .= $vo;
+			} else {
+				$path .= "/".$vo;
 			}
 
 			if (!file_exists($path)) {
 				mkdir($path, 0777, true);
 			}
-			$proxy = $path . '/x509up_u' . $uid . '_r'.rand(100000,999999);
+			$proxy = $path . '/x509up_u' . $uid;
 			file_put_contents($proxy, $response);
-		}
-		else if($datastore === 'db'){
+
+			$certItems = openssl_x509_parse($response);
+		
+			$proxy_meta=$proxy."_meta";	
+			file_put_contents($proxy_meta,"[proxy]\n");
+			file_put_contents($proxy_meta,"file_name=\"".$proxy."\"\n", FILE_APPEND);
+			file_put_contents($proxy_meta,"uid=\"".$uid."\"\n", FILE_APPEND);
+			file_put_contents($proxy_meta,"dn=\"".$certItems['name']."\"\n", FILE_APPEND);
+			file_put_contents($proxy_meta,"valid_from=".$certItems['validFrom_time_t']."\n",FILE_APPEND);
+			file_put_contents($proxy_meta,"valid_to=".$certItems['validTo_time_t']."\n",FILE_APPEND);
+
+		} elseif($datastore === 'db') {
 			// TODO
 		}
 	}
@@ -283,4 +380,3 @@ class AaimpxController extends Zend_Controller_Action
      		return htmlspecialchars($input, ENT_QUOTES, "UTF-8");
     	}
 }
-
