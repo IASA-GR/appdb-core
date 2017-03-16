@@ -1,0 +1,18 @@
+	<?php 
+		header('Content-Type: application/json');
+		$json = array('type' => '', 'msg' => '', 'cert' => '');
+		
+		if($this->auth === true) {
+			$json['type'] = $this->type;
+			$json['msg'] = $this->msg;
+			$json['cert'] = ($this->cert == null?'':$this->cert);
+	     	}
+		else{
+			
+			$json['type'] = $this->type;
+			$json['msg'] = $this->msg;
+			$json['cert'] = '';
+		}
+		$jsonstring = json_encode($json);
+		echo $jsonstring;
+	?>
