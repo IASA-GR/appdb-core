@@ -59,19 +59,20 @@ class AaimpxController extends Zend_Controller_Action
 		$this->view->done = false;
 
 		$this->_redirectURI = urlencode($this->_redirectURI);
-		if( ! isset($this->session->samlattrs["idp:uid"][0]) || trim($this->session->samlattrs["idp:uid"][0]) == "" ){
+		$samlattrs = $auth->getAttributes();
+		if( ! isset($samlattrs["idp:uid"][0]) || trim($samlattrs["idp:uid"][0]) == "" ){
 			$this->view->error = 1000;
 			$this->view->error_description = "invalid UID provided";
 			return;
 		}
-		$this->_uid = $this->session->samlattrs["idp:uid"][0];
+		$this->_uid = $samlattrs["idp:uid"][0];
 
-		if (isset($this->session->samlattrs['idp:traceidp'])) {
-			$numofelems = count($this->session->samlattrs['idp:traceidp']);
+		if (isset($samlattrs['idp:traceidp'])) {
+			$numofelems = count($samlattrs['idp:traceidp']);
 			if( $numofelems >= 2) {
-				$this->_idp=$this->session->samlattrs['idp:traceidp'][($numofelems - 2)];
+				$this->_idp=$samlattrs['idp:traceidp'][($numofelems - 2)];
 			} elseif ($numofelems == 1) {
-				$this->_idp=$this->session->samlattrs['idp:traceidp'][0];
+				$this->_idp=$samlattrs['idp:traceidp'][0];
 			}
 		}
 
@@ -185,7 +186,7 @@ class AaimpxController extends Zend_Controller_Action
 	public function getproxyAction(){
 		$this->_helper->layout->disableLayout();
 
-	        $auth = SamlAuth::isAuthenticated();
+		$auth = SamlAuth::isAuthenticated();
         	if( $auth === false ) {
                 	$this->view->auth = false;
                         $this->view->type = 'error';
@@ -193,7 +194,8 @@ class AaimpxController extends Zend_Controller_Action
 			return;
         	} else {	
 			$this->view->auth = true;
-			$this->_uid = $this->session->samlattrs["idp:uid"][0];
+			$samlattrs = $auth->getAttributes();
+			$this->_uid = $samlattrs["idp:uid"][0];
 			$path = $this->_storagePath;
 
                         $vo = false;
@@ -304,7 +306,7 @@ class AaimpxController extends Zend_Controller_Action
 		return $status_code;
  	}
 
- // Parses curl status code and prints error when available
+        // Parses curl status code and prints error when available
  	private function parse_curl_status($type, $status_code, $response, $error) {
 		if ($status_code >= 300 || !empty($error)) {
 			$this->view->error=$status_code;
