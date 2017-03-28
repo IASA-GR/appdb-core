@@ -11568,7 +11568,8 @@ class Gocdb {
 	
 	private static function getXMLFilename(){
 		$now = "";
-		$filename = "../public/gocdbsites" . $now . ".xml";
+#		$filename = "../public/gocdbsites" . $now . ".xml";
+		$filename = APPLICATION_PATH . "/../cache/gocdbsites" . $now . ".xml";
 		return $filename;
 	}
 	//Calls GocDB PI method to retrieve xml for sites.
