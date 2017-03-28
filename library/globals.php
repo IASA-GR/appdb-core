@@ -11721,7 +11721,14 @@ class Gocdb {
 		$deletedcount = 0;
 		$sqls = self::createSQLStatements($data);
 		$ids = self::getFetchedIds($data);
-		
+
+		if ((count($ids) == 0) || (trim(implode(",", $ids) == ""))) {
+			error_log("[Gocdb::updateAppDB] WARNING: site ID data empty; aborting operation");
+			error_log("[Gocdb::updateAppDB] SITE DATA WAS =====================");
+			error_log(var_export($data, true));
+			error_log("[Gocdb::updateAppDB] ===================================");
+			return array("inserted"=>0, "updated"=>0, "deleted"=>0);
+		}
 		db()->beginTransaction();
 		try{
 			db()->query("UPDATE gocdb.sites SET deleted=TRUE, deletedon = now(), deletedby = 'gocdb' where deleted=FALSE AND pkey NOT IN (" . implode(",", $ids) . ");")->fetchAll();
