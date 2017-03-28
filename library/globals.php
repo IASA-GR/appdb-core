@@ -11566,7 +11566,7 @@ class VMCasterOsSelector {
 
 class Gocdb {
 	
-	private static function getXMLFileName(){
+	private static function getXMLFilename(){
 		$now = "";
 		$filename = "../public/gocdbsites" . $now . ".xml";
 		return $filename;
@@ -11763,7 +11763,7 @@ class Gocdb {
 	//error it returns false or description of error.
 	public static function syncSites($update = true, $force = false){
 		$xmldata = "";
-		if( $force === true || file_exists(self::getXMLFileName()) === false ) {
+		if( $force === true || file_exists(self::getXMLFilename()) === false ) {
 			$res = self::getSites($xmldata);
 			if( $res !== true ){
 				return $res;
