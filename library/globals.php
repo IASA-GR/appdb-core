@@ -11566,9 +11566,10 @@ class VMCasterOsSelector {
 
 class Gocdb {
 	
-	private static function getXMLFileName(){
+	private static function getXMLFilename(){
 		$now = "";
-		$filename = "../public/gocdbsites" . $now . ".xml";
+#		$filename = "../public/gocdbsites" . $now . ".xml";
+		$filename = APPLICATION_PATH . "/../cache/gocdbsites" . $now . ".xml";
 		return $filename;
 	}
 	//Calls GocDB PI method to retrieve xml for sites.
@@ -11721,7 +11722,14 @@ class Gocdb {
 		$deletedcount = 0;
 		$sqls = self::createSQLStatements($data);
 		$ids = self::getFetchedIds($data);
-		
+
+		if ((count($ids) == 0) || (trim(implode(",", $ids) == ""))) {
+			error_log("[Gocdb::updateAppDB] WARNING: site ID data empty; aborting operation");
+			error_log("[Gocdb::updateAppDB] SITE DATA WAS =====================");
+			error_log(var_export($data, true));
+			error_log("[Gocdb::updateAppDB] ===================================");
+			return array("inserted"=>0, "updated"=>0, "deleted"=>0);
+		}
 		db()->beginTransaction();
 		try{
 			db()->query("UPDATE gocdb.sites SET deleted=TRUE, deletedon = now(), deletedby = 'gocdb' where deleted=FALSE AND pkey NOT IN (" . implode(",", $ids) . ");")->fetchAll();
@@ -11763,7 +11771,7 @@ class Gocdb {
 	//error it returns false or description of error.
 	public static function syncSites($update = true, $force = false){
 		$xmldata = "";
-		if( $force === true || file_exists(self::getXMLFileName()) === false ) {
+		if( $force === true || file_exists(self::getXMLFilename()) === false ) {
 			$res = self::getSites($xmldata);
 			if( $res !== true ){
 				return $res;
