@@ -20782,8 +20782,10 @@ html.dj_ie .voimagelistcontainer td.customcell > .customcellwrap > .expandable:h
 	min-width: 140px;
 }
 .resourceproviders .va-image > ul > li > .template-cell.osfamily {
-	width: 155px;
-	min-width: 155px;
+	/*width: 155px;
+	min-width: 155px;*/
+	width : 80px !important;
+	min-width: 80px !important;
 }
 .resourceproviders .va-image > ul > li > .template-cell.action {
 	width: 60px;

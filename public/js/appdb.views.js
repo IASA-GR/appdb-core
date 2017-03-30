@@ -18367,7 +18367,24 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 		var cpustext = ($.trim(d.logical_cpus) === "" ? "-" : $.trim(d.logical_cpus)) + "/" + ($.trim(d.physical_cpus) === "" ? "-" : $.trim(d.physical_cpus));
 		var connectivitytext = ($.trim(d.connectivity_in).toUpperCase() === "FALSE" ? "no" : ($.trim(d.connectivity_in).toUpperCase() === "TRUE") ? "yes" : ($.trim(d.connectivity_in) || "-")) + "/" + ($.trim(d.connectivity_out).toUpperCase() === "FALSE" ? "no" : ($.trim(d.connectivity_out).toUpperCase() === "TRUE") ? "yes" : ($.trim(d.connectivity_out) || "-"));
 		var osfamilytext = ($.trim(d.os_family) === "" ? "-" : $.trim(d.os_family));
-
+	
+		var disk = $("<div class='template-cell disk'></div>");
+                var disktext = $("<span></span>").text($.trim(d.disk_size));
+                var diskSize = parseInt($.trim(d.disk_size) || "-1");
+                if (isNaN(diskSize) === false) {
+                  switch(diskSize) {
+                    case -1:
+                      disktext = $("<span></span>").append("<i>n/a</i>");
+                      break;
+                    case 0:
+                      disktext = $("<span></span>").append("<i>any</i>");
+                      break;
+                    default:
+                      disktext = $("<span></span>").text(diskSize + " GB");
+                      break;
+                  }
+                }
+                $(disk).append("<span></span>").append(disktext);	
 		$(memory).append($("<span></span>").text(memorytext));
 		$(cpus).append($("<span></span>").text(cpustext));
 		$(connectivity).append($("<span></span>").text(connectivitytext));
@@ -18377,7 +18394,7 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 		} else {
 			$(action).empty();
 		}
-		$(dom).append(memory).append(cpus).append(connectivity).append(osfamily).append(action);
+		$(dom).append(memory).append(disk).append(cpus).append(connectivity).append(osfamily).append(action);
 		$(action).find(".getids").unbind("click").bind("click", (function(self, cscript, instance) {
 			return function(ev) {
 				ev.preventDefault();
@@ -18394,7 +18411,7 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 		var d = data.templates || [];
 		var ul = $("<ul class='cancollapse'></ul>");
 		var liheader = $("<li class='va-template va-template-header'></li>");
-		this.renderTemplate(liheader, {main_memory_size: "Memory", logical_cpus: "Logical", physical_cpus: "/Physical CPUs", connectivity_in: "Connectivity In", connectivity_out: "/Out", os_family: "OS Family", noaction: "true"}, data);
+		this.renderTemplate(liheader, {main_memory_size: "Memory", disk_size: "Disk", logical_cpus: "Logical", physical_cpus: "/Physical CPUs", connectivity_in: "Connectivity In", connectivity_out: "/Out", os_family: "OS Family", noaction: "true"}, data);
 		$(ul).append(liheader);
 		if (d.length > 0) {
 			$.each(d, (function(self, container) {
@@ -18862,7 +18879,24 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 		var cpustext = ($.trim(d.logical_cpus) === "" ? "-" : $.trim(d.logical_cpus)) + "/" + ($.trim(d.physical_cpus) === "" ? "-" : $.trim(d.physical_cpus));
 		var connectivitytext = ($.trim(d.connectivity_in).toUpperCase() === "FALSE" ? "no" : ($.trim(d.connectivity_in).toUpperCase() === "TRUE") ? "yes" : ($.trim(d.connectivity_in) || "-")) + "/" + ($.trim(d.connectivity_out).toUpperCase() === "FALSE" ? "no" : ($.trim(d.connectivity_out).toUpperCase() === "TRUE") ? "yes" : ($.trim(d.connectivity_out) || "-"));
 		var osfamilytext = ($.trim(d.os_family) === "" ? "-" : $.trim(d.os_family));
-
+		
+		var disk = $("<div class='template-cell disk'></div>");
+		var disktext = $("<span></span>").text($.trim(d.disk_size));
+		var diskSize = parseInt($.trim(d.disk_size) || "-1");
+		if (isNaN(diskSize) === false) {
+		  switch(diskSize) {
+		    case -1:
+		      disktext = $("<span></span>").append("<i>n/a</i>");
+		      break;
+		    case 0:
+		      disktext = $("<span></span>").append("<i>any</i>");
+		      break;
+		    default:
+		      disktext = $("<span></span>").text(diskSize + " GB");
+		      break;
+		  }
+		}
+		$(disk).append("<span></span>").append(disktext);
 		$(memory).append($("<span></span>").text(memorytext));
 		$(cpus).append($("<span></span>").text(cpustext));
 		$(connectivity).append($("<span></span>").text(connectivitytext));
@@ -18872,7 +18906,7 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 		} else {
 			$(action).empty();
 		}
-		$(dom).append(memory).append(cpus).append(connectivity).append(osfamily).append(action);
+		$(dom).append(memory).append(disk).append(cpus).append(connectivity).append(osfamily).append(action);
 		$(action).find(".getids").unbind("click").bind("click", (function(self, cscript, instance) {
 			return function(ev) {
 				ev.preventDefault();
@@ -18890,7 +18924,7 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 		var d = this.options.instanceData.template || [];
 		var ul = $("<ul class='cancollapse'></ul>");
 		var liheader = $("<li class='va-template va-template-header'></li>");
-		this.renderTemplate(liheader, {main_memory_size: "Memory", logical_cpus: "Logical", physical_cpus: "/Physical CPUs", connectivity_in: "Connectivity In", connectivity_out: "/Out", os_family: "OS Family", noaction: "true"}, data);
+		this.renderTemplate(liheader, {main_memory_size: "Memory", disk_size: "Disk", logical_cpus: "Logical", physical_cpus: "/Physical CPUs", connectivity_in: "Connectivity In", connectivity_out: "/Out", os_family: "OS Family", noaction: "true"}, data);
 		$(ul).append(liheader);
 		if (d.length > 0) {
 			$.each(d, (function(self, container) {
