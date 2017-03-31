@@ -18298,7 +18298,7 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 		var temp = $("<div class='usagetemplate'></div>");
                 var td = $(el).closest(".va-template.va-template-data");
 
-                $(temp).append("<span>Memory: " + $(td).find(".template-cell.memory > span").text() + "</span><span>CPUs: " + $(td).find(".template-cell.cpus > span").text() + "</span><span> In\Out: " + $(td).find(".template-cell.connectivity > span").text() + "</span><span>OS: " + $(td).find(".template-cell.osfamily > span").text() +"</span>");
+                $(temp).append("<span>Memory: <b>" + $(td).find(".template-cell.memory > span").text() + "</b></span><span>Disk: <b>" + $(td).find(".template-cell.disk > span").text()  + "</b></span><span>CPUs: <b>" + $(td).find(".template-cell.cpus > span").text() + "</b></span><span> In\Out: <b>" + $(td).find(".template-cell.connectivity > span").text() + "</b></span><span>OS: <b>" + $(td).find(".template-cell.osfamily > span").text() +"</b></span>");
 
 		$(usageids).append(imageid).append(temp).append(listhtmllist);
 		var availablecontextscripts = this.getAvailableContextScripts(contextscript);
@@ -18836,7 +18836,7 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 		var temp = $("<div class='usagetemplate'></div>");
 		var td = $(el).closest(".va-template.va-template-data");
 		
-		$(temp).append("<span>Memory: " + $(td).find(".template-cell.memory > span").text() + "</span><span>CPUs: " + $(td).find(".template-cell.cpus > span").text() + "</span><span> In\Out: " + $(td).find(".template-cell.connectivity > span").text() + "</span><span>OS: " + $(td).find(".template-cell.osfamily > span").text() +"</span>");
+		$(temp).append("<span>Memory: <b>" + $(td).find(".template-cell.memory > span").text() + "</b></span><span>Disk: <b>" + $(td).find(".template-cell.disk > span").text()  + "</b></span><span>CPUs: <b>" + $(td).find(".template-cell.cpus > span").text() + "</b></span><span> In\Out: <b>" + $(td).find(".template-cell.connectivity > span").text() + "</b></span><span>OS: <b>" + $(td).find(".template-cell.osfamily > span").text() +"</b></span>");
 		
 		$(usageids).append(imageid).append(temp).append(listhtmllist);
 		var contextscripts = this.getAvailableContextScripts(contextscript);
