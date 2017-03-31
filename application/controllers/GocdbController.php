@@ -143,8 +143,10 @@ class GocdbController extends Zend_Controller_Action
 				db()->query("UPDATE gocdb.va_providers SET service_downtime = service_downtime | 2::bit(2) WHERE pkey = '$pkey';");
 			}
 
-			$wstart = date('Y-m-d');
-			$wend = date('Y-m-d');
+			$wstart = new DateTime('yesterday');
+			$wstart = $wstart->format('Y-m-d');
+			$wend = new DateTime('tomorrow');
+			$wend = $wend->format('Y-m-d');
 			$ch = curl_init();
 			$uri = "https://goc.egi.eu/gocdbpi/public/?method=get_downtime_nested_services&windowstart=$wstart&windowend=$wend";
 			curl_setopt($ch, CURLOPT_URL, $uri);
@@ -168,11 +170,21 @@ class GocdbController extends Zend_Controller_Action
 			}
 			@curl_close($ch);
 			$xml = new SimpleXMLElement($xml);
-			$xps = $xml->xpath("//SERVICE_TYPE[text()='eu.egi.cloud.vm-management.occi']/../PRIMARY_KEY");
+			$xps = $xml->xpath("//SERVICE_TYPE[text()='eu.egi.cloud.vm-management.occi']/../../../.");
 			foreach ($xps as $xp) {
-				error_log("Down sometime today: " . strval($xp));
-				$pkey = strval($xp);
-				db()->query("UPDATE gocdb.va_providers SET service_downtime = service_downtime | 1::bit(2) WHERE pkey = '$pkey';");
+				$dstart = strval(($xp->xpath("./START_DATE")[0]));
+				$dend = strval(($xp->xpath("./END_DATE")[0]));
+				$nowStart = time();
+				$nowEnd = strtotime('+1 day', time());
+				if (
+					(($dend >= $nowStart) && ($dend <= $nowEnd)) ||
+					(($dstart >= $nowStart) && ($dstart <= $nowEnd)) ||
+					(($dstart <= $nowStart) && ($dend >= $nowEnd))
+				) {
+					error_log('Down sometime between now and 24h from now: ' . strval($xp));
+					$pkey = strval(($xp->xpath("./SERVICES/SERVICE/SERVICE_TYPE[text()='eu.egi.cloud.vm-management.occi']/../PRIMARY_KEY")[0]));
+					db()->query("UPDATE gocdb.va_providers SET service_downtime = service_downtime | 1::bit(2) WHERE pkey = '$pkey';");
+				}
 			}
 			db()->commit();
 			db()->query("ALTER TABLE gocdb.va_providers ENABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;");
