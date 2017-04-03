@@ -58,6 +58,18 @@ class AaimpxController extends Zend_Controller_Action
 		$this->view->auth = true;
 		$this->view->done = false;
 
+		if (isset($_GET['appdbvo']) && trim($_GET['appdbvo']) !='') {
+         	       $_SESSION['appdbvo'] = $_GET['appdbvo'];
+                } else {
+ 	               $_SESSION['appdbvo']='none';
+                }
+		if($this->isValidVO($_SESSION['appdbvo']) == false){
+			$this->view->error = 1001;
+                        $this->view->error_description = "invalid VO provided";
+                        return;
+
+		}
+
 		$this->_redirectURI = urlencode($this->_redirectURI);
 		$samlattrs = $auth->getAttributes();
 		if( ! isset($samlattrs["idp:uid"][0]) || trim($samlattrs["idp:uid"][0]) == "" ){
@@ -91,11 +103,11 @@ class AaimpxController extends Zend_Controller_Action
 			#echo "here is where we start......";
 			return;
 		} elseif (!isset($_GET['code'])) {
-	     		if (isset($_GET['appdbvo']) && trim($_GET['appdbvo']) !='') {
-         			$_SESSION['appdbvo'] = $_GET['appdbvo'];
-			} else {
-         			$_SESSION['appdbvo']=false;
-			}
+	     	//	if (isset($_GET['appdbvo']) && trim($_GET['appdbvo']) !='') {
+         	//		$_SESSION['appdbvo'] = $_GET['appdbvo'];
+		//	} else {
+         	//		$_SESSION['appdbvo']=false;
+		//	}
 		     	// authorize request
 		     	$url = $this->_baseURL . "/authorize";
 	     		$fields = array(
@@ -202,14 +214,12 @@ class AaimpxController extends Zend_Controller_Action
                         if (isset($_GET['appdbvo']) && trim($_GET['appdbvo']) !='') {
                                 $vo=$_GET['appdbvo'];
 			}
-                        if(! isset($vo) || $vo === false || trim($vo) == "") {
-                                $path .= "/novo";
+			else{
 				$this->view->type = 'error';
 				$this->view->msg = 'no vo provided';
 				return;
-                        } else {
-                                $path .= "/".$vo;
                         }
+                        $path .= "/".$vo;
 
                         $proxy = $path . '/x509up_u' . $this->_uid;
                         if (!file_exists($proxy) || !file_exists($proxy."_meta")) {
@@ -245,6 +255,11 @@ class AaimpxController extends Zend_Controller_Action
 		}
 	 }
 
+
+	 private function isValidVO($vo){
+		$path = $this->_vomsesBasePath . $vo . ".*";
+		return glob($path);
+	 }
 	 private function getVomses($vo)  {
 		$path = $this->_vomsesBasePath . $vo . ".*";	
 		$files = glob($path);
