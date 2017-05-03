@@ -64,6 +64,7 @@ class SitesController extends Zend_Controller_Action{
 		db()->query("SELECT request_permissions_refresh();");
 		db()->query("REFRESH MATERIALIZED VIEW site_services_xml;");
 		db()->query("REFRESH MATERIALIZED VIEW site_service_images_xml;");
+		db()->query("DELETE FROM cache.filtercache WHERE m_from LIKE '%FROM sites%'");
 		if( is_array($result) ){
 			echo "<result success='true'";
 			if( isset($result["inserted"]) ){
