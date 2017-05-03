@@ -189,7 +189,7 @@ class GocdbController extends Zend_Controller_Action
 					// exclude current active downtime, if any
 					foreach($activeDTimes as $a) {
 						if ($a[2] == $pkey) {
-							if (($nowStart >= $a[0]) && ($nowStart =< $a[1])) {
+							if (($nowStart >= $a[0]) && ($nowStart <= $a[1])) {
 								continue;
 							}
 						}
