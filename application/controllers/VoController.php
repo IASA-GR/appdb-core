@@ -1395,6 +1395,7 @@ class VoController extends Zend_Controller_Action
 				db()->query("REFRESH MATERIALIZED VIEW site_service_images_xml;");
 				error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images DONE [2/2]");
 				db()->commit();
+				db()->query("DELETE FROM cache.filtercache WHERE m_from LIKE '%FROM sites%'");
 				sleep(2); // give the commit some time to settle before making next two calls
 				$this->makeVAprovidersCache();
 				if ( strtolower($_SERVER["SERVER_NAME"]) == "appdb.egi.eu" ) {
