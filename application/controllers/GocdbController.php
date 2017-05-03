@@ -136,10 +136,14 @@ class GocdbController extends Zend_Controller_Action
 			}
 			@curl_close($ch);
 			$xml = new SimpleXMLElement($xml);
-			$xps = $xml->xpath("//SERVICE_TYPE[text()='eu.egi.cloud.vm-management.occi']/../PRIMARY_KEY");
+			$xps = $xml->xpath("//SERVICE_TYPE[text()='eu.egi.cloud.vm-management.occi']/../../../.");
+			$activeDTimes = array();
 			foreach ($xps as $xp) {
-				error_log("Currently down: " . strval($xp));
-				$pkey = strval($xp);
+				$dstart = strval(($xp->xpath("./START_DATE")[0]));
+				$dend = strval(($xp->xpath("./END_DATE")[0]));
+				$pkey = strval(($xp->xpath("./SERVICES/SERVICE/SERVICE_TYPE[text()='eu.egi.cloud.vm-management.occi']/../PRIMARY_KEY")[0]));
+				$activeDTimes[] = array($dstart, $dend, $pkey);
+				error_log("Currently down: " . strval($pkey));
 				db()->query("UPDATE gocdb.va_providers SET service_downtime = service_downtime | 2::bit(2) WHERE pkey = '$pkey';");
 			}
 
@@ -181,8 +185,16 @@ class GocdbController extends Zend_Controller_Action
 					(($dstart >= $nowStart) && ($dstart <= $nowEnd)) ||
 					(($dstart <= $nowStart) && ($dend >= $nowEnd))
 				) {
-					error_log('Down sometime between now and 24h from now: ' . strval($xp));
 					$pkey = strval(($xp->xpath("./SERVICES/SERVICE/SERVICE_TYPE[text()='eu.egi.cloud.vm-management.occi']/../PRIMARY_KEY")[0]));
+					// exclude current active downtime, if any
+					foreach($activeDTimes as $a) {
+						if ($a[2] == $pkey) {
+							if (($nowStart >= $a[0]) && ($nowStart =< $a[1])) {
+								continue;
+							}
+						}
+					}
+					error_log('Down sometime between now and 24h from now: ' . strval($xp));
 					db()->query("UPDATE gocdb.va_providers SET service_downtime = service_downtime | 1::bit(2) WHERE pkey = '$pkey';");
 				}
 			}
