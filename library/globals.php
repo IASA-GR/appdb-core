@@ -5452,20 +5452,26 @@ class VMCaster{
 		return $res;
 	}
 	private static function publishVersion($version){
-		$vaversions = new Default_Model_VAversions();
-		$f = $vaversions->filter;
-		$f->vappid->equals($version->vappid)->and($f->published->equals(true)->and($f->archived->equals(false)->and($f->id->notequals($version->id))));
-		if( count( $vaversions->items ) > 0 ) {
-			$latestversion = $vaversions->items[0];
-			$latestversion->archived = true;
-			$latestversion->save();
+		try {
+			db()->exec("START TRANSACTION ISOLATION LEVEL SERIALIZABLE");
+			$vaversions = new Default_Model_VAversions();
+			$f = $vaversions->filter;
+			$f->vappid->equals($version->vappid)->and($f->published->equals(true)->and($f->archived->equals(false)->and($f->id->notequals($version->id))));
+			if( count( $vaversions->items ) > 0 ) {
+				$latestversion = $vaversions->items[0];
+				$latestversion->archived = true;
+				$latestversion->save();
+			}
+			$version->published = true;
+			$version->status = "verified";
+			$version->createdon = "now()";
+			$version->save();
+			VMCaster::createImageList($version->id, "published");
+			db()->exec("COMMIT");
+		} catch (Exception $e) {			
+			db()->exec("ROLLBACK");
 		}
-		$version->published = true;
-		$version->status = "verified";
-		$version->createdon = "now()";
-		$version->save();
 		
-		VMCaster::createImageList($version->id, "published");
 	}
 	public static function deleteVersion($version){
 		try{
