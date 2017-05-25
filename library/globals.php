@@ -5453,7 +5453,9 @@ class VMCaster{
 	}
 	private static function publishVersion($version){
 		try {
+			error_log("Starting SERIALIZABLE transaction to publish new VA version with ACCESS EXCLUSIVE lock on table");
 			db()->exec("START TRANSACTION ISOLATION LEVEL SERIALIZABLE");
+			db()->exec("LOCK TABLE vapp_versions IN ACCESS EXCLUSIVE MODE");
 			$vaversions = new Default_Model_VAversions();
 			$f = $vaversions->filter;
 			$f->vappid->equals($version->vappid)->and($f->published->equals(true)->and($f->archived->equals(false)->and($f->id->notequals($version->id))));
@@ -5466,12 +5468,23 @@ class VMCaster{
 			$version->status = "verified";
 			$version->createdon = "now()";
 			$version->save();
+			db()->exec("COMMIT");
+			error_log("Transaction complete, notifying VMCaster");
+		} catch (Exception $e) {
+				error_log("Transaction failed! Aborting");
+				db()->exec("ROLLBACK");
+				return;
+		}
+
+		try {
+			db()->exec("START TRANSACTION ISOLATION LEVEL REPEATABLE READ");
 			VMCaster::createImageList($version->id, "published");
 			db()->exec("COMMIT");
-		} catch (Exception $e) {			
+			error_log("VMCaster notified");
+		} catch (Exception $e) {
+			error_log("VMCaster notification failed!");
 			db()->exec("ROLLBACK");
 		}
-		
 	}
 	public static function deleteVersion($version){
 		try{
