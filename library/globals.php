@@ -10775,11 +10775,11 @@ class VoAdminNotifications {
 			}
 			$notification["vappliances"] = $apps;
 			$deleted = 0;
-			$deletedVAs = [];
+			$deletedVAs = array();
 			$expired = 0;
-			$expiredVAs = [];
+			$expiredVAs = array();
 			$outdated = 0;
-			$outdatedVAs = [];
+			$outdatedVAs = array();
 			foreach($apps as $a){
 				if( $a["expired"] == "true"){
 					$expired += 1;
