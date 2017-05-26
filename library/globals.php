@@ -5452,10 +5452,45 @@ class VMCaster{
 		return $res;
 	}
 	private static function publishVersion($version){
+		$err = "";
 		try {
-			error_log("Starting SERIALIZABLE transaction to publish new VA version with ACCESS EXCLUSIVE lock on table");
-			db()->exec("START TRANSACTION ISOLATION LEVEL SERIALIZABLE");
-			db()->exec("LOCK TABLE vapp_versions IN ACCESS EXCLUSIVE MODE");
+			error_log("Starting transaction to publish new VA version");
+			db()->exec("START TRANSACTION");
+			db()->setFetchMode(Zend_Db::FETCH_BOTH);
+
+//			$locked = db()->query("SELECT pg_locks.*, pg_class.relname FROM pg_locks INNER JOIN pg_class ON pg_class.oid = relation INNER JOIN pg_database ON pg_database.oid = database WHERE datname = 'appdb7' AND relname = 'vapp_versions'")->fetchAll();
+//			if (count($locked) > 0) {
+//				$locked = true;
+//			}
+//			$cnt = 0;
+//			while ($locked) {
+//				$cnt = $cnt + 1;
+//				error_log("Waiting to acquire exclusive lock on table vapp_versions... (" . strval($cnt) . ")");
+//				sleep(1);
+//				if ($cnt > 30) {
+//					db()->exec("ROLLBACK");
+//					$err = "Timeout while trying to acquire exclusive lock; table in use. Please try again later.";
+//					error_log($err);
+//					return $err;
+//				}
+//			}
+//			db()->exec("LOCK TABLE ONLY vapp_versions IN ACCESS EXCLUSIVE MODE NOWAIT");
+//			error_log("Table vapp_versions exclusive lock acquired!");
+
+//			$lockid = "vav" . $version->vappid;
+			$lockid = "vav" . $version->va->appid;
+			error_log("Issuing transaction-level advisory lock on VA with lock id " . $lockid);
+			$locked = db()->query("SELECT pg_advisory_xact_lock(CRC32('" . $lockid . "'))")->fetchAll();
+//			$locked = db()->query("SELECT pg_try_advisory_xact_lock(CRC32('" . $vav . "'))")->fetchAll();
+//			$locked = $locked[0]; //row
+//			$locked = $locked[0]; //column
+//			if ($locked) {
+//				db()->exec("ROLLBACK");
+//				$err = "VA with id " . $version->vappid. " is in use (locked), please try again later";
+//				error_log($err);
+//				return $err;
+//			}
+
 			$vaversions = new Default_Model_VAversions();
 			$f = $vaversions->filter;
 			$f->vappid->equals($version->vappid)->and($f->published->equals(true)->and($f->archived->equals(false)->and($f->id->notequals($version->id))));
@@ -5471,9 +5506,10 @@ class VMCaster{
 			db()->exec("COMMIT");
 			error_log("Transaction complete, notifying VMCaster");
 		} catch (Exception $e) {
-				error_log("Transaction failed! Aborting");
+				$err = "Transaction failed; aborting operation. Reason:" . trim($e->getMessage());
+				error_log($err);
 				db()->exec("ROLLBACK");
-				return;
+				return $err;
 		}
 
 		try {
@@ -5485,6 +5521,7 @@ class VMCaster{
 			error_log("VMCaster notification failed!");
 			db()->exec("ROLLBACK");
 		}
+		return true;
 	}
 	public static function deleteVersion($version){
 		try{

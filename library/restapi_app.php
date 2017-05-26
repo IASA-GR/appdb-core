@@ -5032,6 +5032,26 @@ class RestAppVAList extends RestResourceList {
 	public function get() {
 		if (parent::get() !== false) {
 			db()->setFetchMode(Zend_Db::FETCH_OBJ);
+			$locked = true;
+			$cnt = 0;
+			while ($locked) {
+				$cnt = $cnt + 1;
+				if ($cnt > 30) {
+	//				$this->setError(RestErrorEnum::RE_BACKEND_ERROR);
+	//				$this->_extError = "Item locked. Please try again later";
+					error_log("Rest API: Timeout on VA (" . $this->getParam("vappid") . ") lock. Breaking");
+	//				return false;
+					break;
+				}
+				$locked = db()->query("SELECT pg_locks.granted FROM pg_locks WHERE pg_locks.locktype = 'advisory' AND pg_locks.granted AND pg_locks.objid = CRC32('vav" . $this->getParam("id") . "')")->fetchAll();
+				$locked = (count($locked) > 0);
+				if ($locked) {
+					error_log("Rest API: VA for APP (" . $this->getParam("id") . ") locked (try: $cnt / 30)");
+					sleep(1);
+				}
+			}
+
+			db()->setFetchMode(Zend_Db::FETCH_OBJ);
 			$appid = $this->getParam("id");
 			if ( ! is_numeric($appid) ) {
 				$appid = "(SELECT id FROM applications WHERE cname ILIKE '" . pg_escape_string(substr($this->getParam("id"), 2)) . "' FETCH FIRST 1 ROWS ONLY)";
@@ -5254,7 +5274,6 @@ class RestAppVAItem extends RestResourceItem {
 
 	public function get() {
 		if (parent::get() !== false) {
-			db()->setFetchMode(Zend_Db::FETCH_OBJ);
 			$res = db()->query("SELECT vapp_to_xml(" . $this->getParam("vappid") . ", 'vapplications') AS xml;")->fetchAll();
 			$x = array();
 			foreach($res as $r) {
