@@ -868,6 +868,20 @@ class SamlController extends Zend_Controller_Action
 								$uaccounts[] = array('type' => $uaccount->accountTypeID, 'uid' => $uaccount->accountID);
 							}
 							$attrs['appdb:accounts'] = $uaccounts;
+							$researcher = $userAccount->getResearcher();
+							if ($researcher) {
+								$appdbGroups = array();
+								$actorGroups = $researcher->getActorGroups();
+								if ( count($actorGroups) > 0 ) {
+									foreach($actorGroups as $actorGroup) {
+										if ($actorGroup->id) {
+											$group = $actorGroup->getGroup();
+											$appdbGroups[] = array('id' => $group->id, 'name' => $group->name);
+										}
+									}
+								}
+								$attrs['appdb:roles'] = $appdbGroups;
+							}
 						}
 					}catch(Exception $ex) {
 						$attrs['error'] = $ex->getMessage();
