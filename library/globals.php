@@ -8100,11 +8100,11 @@ class SamlAuth{
 		  $role = self::getEGIAAIVORoleMapping($matches[5]);
 		  $voname = $matches[6];
 		  
-		  if ($role === 'VM OPERATOR' && strpos($source, 'appdb_auth') === false && strpos($source, 'unity.egi.eu') === false) {
+/*		  if ($role === 'VM OPERATOR' && strpos($source, 'appdb_auth') === false && strpos($source, 'unity.egi.eu') === false) {
 			//Do not accept vm_operator role if it is not given by AppDB auth source
 			continue;
 		  }
-
+*/
 		  if( $role === 'member' ) {
 			$res['vos']['members'][] = array('scope' => $scope, 'source' => $source, 'vo' => $voname, 'group' => $group );
 		  } else if($role !== null) {
