@@ -2225,6 +2225,7 @@ appdb.pages.application = (function(){
 			$(hpli).text(hypers.join(" \u2022 "));
 			$(hps).append(hpli);
 		}
+		$(panel).find(".fieldvalue.hypervisors > .value").empty();
 		$(panel).find(".fieldvalue.hypervisors > .value").append( hps );
 		$(panel).find(".fieldvalue.provider > .value").html("<a href='" + appdb.config.endpoint.vmcaster + "store/vappliance/" + appdb.pages.application.currentCName() + "/image.list' title='View image list' target='_blank'>image list</a>");
 		
