@@ -23,12 +23,15 @@ Author: wvkarag@kadath.priv.iasa.gr
 
 START TRANSACTION;
 
+UPDATE relationtypes SET actionid = 39 WHERE id = 1;
+UPDATE relationtypes SET actionid = 38 WHERE id IN (2,3);
+
 CREATE OR REPLACE FUNCTION public.ppl_actions()
  RETURNS integer[]
  LANGUAGE sql
  IMMUTABLE
 AS $function$
-SELECT ARRAY[1, 2, 18, 21, 38, 39];
+SELECT ARRAY[1, 21, 38, 39];
 $function$;
 
 DROP MATERIALIZED VIEW public.permissions CASCADE;
@@ -121,9 +124,9 @@ CREATE MATERIALIZED VIEW public.permissions AS
                     r2.guid AS object
                    FROM actors r1
                      CROSS JOIN researchers r2
-                     CROSS JOIN unnest(ARRAY[21, 40, 41]) act(act)
+                     CROSS JOIN unnest(ppl_actions()) act(act)
                      JOIN actor_group_members agm1 ON agm1.actorid = r1.guid
-                  WHERE agm1.groupid = '-3'::integer AND r2.countryid::text = agm1.payload AND NOT (r2.guid IN ( SELECT agm2.actorid
+                  WHERE act.act <> 1 AND agm1.groupid = '-3'::integer AND r2.countryid::text = agm1.payload AND NOT (r2.guid IN ( SELECT agm2.actorid
                            FROM actor_group_members agm2
                           WHERE agm2.groupid = ANY (ARRAY['-1'::integer, '-2'::integer])))
                 UNION
@@ -132,7 +135,8 @@ CREATE MATERIALIZED VIEW public.permissions AS
                     act.act AS actionid,
                     researchers.guid AS object
                    FROM researchers
-                     CROSS JOIN unnest(ARRAY[21, 40, 41]) act(act)
+                     CROSS JOIN unnest(ppl_actions()) act(act)
+					WHERE act.act <> 1
                 UNION
                  SELECT '-8'::integer AS id,
                     actors.guid AS actor,
@@ -184,15 +188,7 @@ CREATE MATERIALIZED VIEW public.permissions AS
                     34 AS actionid,
                     privileges.object
                    FROM privileges
-                  WHERE privileges.actionid = 32
-	       UNION
-	       SELECT '-23'::integer AS id,
-                    researchers.guid AS actor,
-                    actions.id AS actionid,
-                    researchers.guid AS object
-                    FROM researchers
-                    CROSS JOIN actions
-                    WHERE actions.id = ANY (ppl_actions())) __permissions
+                  WHERE privileges.actionid = 32) __permissions
           WHERE NOT ((__permissions.actor, __permissions.actionid, __permissions.object) IN ( SELECT privileges.actor,
                     privileges.actionid,
                     targets.guid
