@@ -21,6 +21,8 @@ New version: 8.14.6
 Author: root@appdb.marie.hellasgrid.gr
 */
 
+START TRANSACTION;
+
 DROP INDEX IF EXISTS idx_vaviews_unique;
 CREATE UNIQUE INDEX idx_vaviews_unique ON vaviews (vapplistid, vmiinstanceid, vmiflavourid, vmiid, va_id, vappversionid, appid);
 
@@ -33,7 +35,7 @@ BEGIN
         IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN RETURN NEW; ELSE RETURN OLD; END IF;
 END;
 $function$;
-ALTER FUNCTION trfn_refresh_vaviews OWNER TO appdb;
+ALTER FUNCTION trfn_refresh_vaviews() OWNER TO appdb;
 
 CREATE OR REPLACE FUNCTION CRC32(text_string text)
  RETURNS bigint
@@ -72,9 +74,11 @@ BEGIN
     END LOOP;
     RETURN (tmp # 4294967295);
 END
-$function$
+$function$;
 ALTER FUNCTION CRC32(text) OWNER TO appdb;
 
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 14, 6, E'Added CRC32 function. Added unique index to vaviews materialized view'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=14 AND revision=6);
+
+COMMIT;
