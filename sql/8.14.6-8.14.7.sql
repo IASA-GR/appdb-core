@@ -162,9 +162,9 @@ CREATE MATERIALIZED VIEW public.permissions AS
                     privileges.actionid,
                     privileges.object
                    FROM privileges
-                     JOIN actor_group_members agm ON agm.payload = (( SELECT __va_providers.id
-                           FROM __va_providers
-                          WHERE __va_providers.guid = privileges.actor))
+                     JOIN actor_group_members agm ON agm.payload = (( SELECT __sites.id
+                           FROM __sites  
+                          WHERE __sites.guid = privileges.actor))
                      JOIN researchers ON agm.actorid = researchers.guid
                   WHERE agm.groupid = '-10'::integer AND (privileges.actionid = ANY (ARRAY[36, 37])) AND NOT privileges.revoked
                 UNION
