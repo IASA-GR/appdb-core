@@ -16157,6 +16157,59 @@ ul.metro.menu .loginselector a:hover{
     text-align: right;
     width: 100%;
 }
+ul > li.active > a + ul li  .loginselector .sourcetype.egi-sso-checkin-login {
+    min-width: 300px;
+    text-align: center;
+    line-height: 20px;
+    min-height: 20px;
+    padding: 0 10px;
+}
+
+ul > li.active > a + ul li .loginselector .sourcetype.egi-sso-checkin-login > a.icontext {
+    margin: 10px 0;
+    padding: 0;
+    border-radius: 1px;
+    line-height: 44px;
+    vertical-align: middle;
+    font-size: 13px;
+    font-weight: bold;
+    background: #405C69;
+    color: whitesmoke;
+    
+}
+ul > li.active > a + ul li .loginselector .sourcetype.egi-sso-checkin-login > .sep {
+    margin: 0;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    border-top: 1px solid #a0a0a0;
+    width: 100%;
+}
+ul > li.active > a + ul li .loginselector .sourcetype.egi-sso-checkin-login > .details:first-child {
+    padding-top: 10px;
+    border-top: 2px solid whitsmoke;
+}
+ul > li.active > a + ul li .loginselector .sourcetype.egi-sso-checkin-login > .details {
+    padding: 3px 0;
+    text-align: right;
+    background-color: transparent;
+}
+ul > li.active > a + ul li .loginselector .sourcetype.egi-sso-checkin-login > .details > a {
+    font-size: 11px;
+    line-height: 11px;
+    color: white;
+}
+
+ul > li.active > a + ul li .loginselector .sourcetype.egi-sso-checkin-login > .details > a:hover {
+    background-color: transparent;
+    color: #ffaa29;
+}
+
+ul > li.active > a + ul li .loginselector .sourcetype.egi-sso-checkin-login > a.icontext:hover {
+    background: #688390;
+    background-color: #688390;
+    color: white;
+}
+
 .connectedaccounts {
 	margin-top: 30px;
 }
