@@ -16124,14 +16124,19 @@ ul.metro.menu .loginselector a:hover{
 }
 .loginselector .sourcetype{
 	position: relative;
+        width: 100%;
+        height: 45px;
+        padding: 2px 0;
+        border-radius: 3px;
+        min-width: 180px;
 }
 .loginselector .sourcetype.egi-sso-login{
-	width: 180px;
-	height: 45px;
-	border: 1px solid #f0f0f0;
+	/*width: 180px;
 	padding: 2px;
 	padding-right: 5px;
-	border-radius: 3px;
+	border-radius: 3px;*/
+        height: 45px;
+	border: 1px solid #f0f0f0;
 }
 .loginselector .sourcetype.egi-sso-login:hover{
 	border-color: #e0e0e0;
@@ -16159,9 +16164,11 @@ ul.metro.menu .loginselector a:hover{
 }
 ul > li.active > a + ul li  .loginselector .sourcetype.egi-sso-checkin-login {
     min-width: 300px;
+    width: 300px;
     text-align: center;
     line-height: 20px;
-    min-height: 20px;
+    min-height: 45px;
+    height: auto;
     padding: 0 10px;
 }
 
@@ -16186,7 +16193,7 @@ ul > li.active > a + ul li .loginselector .sourcetype.egi-sso-checkin-login > .s
 }
 ul > li.active > a + ul li .loginselector .sourcetype.egi-sso-checkin-login > .details:first-child {
     padding-top: 10px;
-    border-top: 2px solid whitsmoke;
+    border-top: 2px solid whitesmoke;
 }
 ul > li.active > a + ul li .loginselector .sourcetype.egi-sso-checkin-login > .details {
     padding: 3px 0;
