@@ -120,8 +120,8 @@ appdb.config.defaults.api.category = appdb.config.defaults.api.__all__;
 
 appdb.config.accounts = {
 	available: [
-		{ id: "x509-sp", source: "x509", name:"X509 Digital Certificate", image: "/images/certificate.png", canAdd: true, canRemove: true, connectMessage: "" },
-		{ id: "egi-aai-sp", source: "egi-aai", name:"EGI AAI", image: "/images/egilogo.png", canAdd: true, canRemove: true, displayName: true, connectMessage: "If you are already signed in EGI AAI the system will try to connect to the signed in account of EGI AAI. Otherwise, please consider to be signed out from EGI AAI." }
+		{ id: "x509-sp", source: "x509", name:"X509 Digital Certificate", image: "/images/certificate.png", canAdd: false, canRemove: true, connectMessage: ""},
+		{ id: "egi-aai-sp", source: "egi-aai", name:"EGI AAI", image: "/images/egilogo.png", canAdd: true, canRemove: true, displayName: true, connectMessage: "If you are already signed in EGI AAI the system will try to connect to the signed in account of EGI AAI. Otherwise, please consider to be signed out from EGI AAI.", alwaysVisible: true, connectUrl: "https://aai.egi.eu/registry" }
 	],
 	egiaai: {
 		idp: 'https://aai.egi.eu/proxy/metadata.php',
@@ -141,11 +141,11 @@ appdb.config.accounts = {
 	}
 };
 <?php if ( ApplicationConfiguration::isProductionInstance() === false ) { ?>
-appdb.config.accounts.available.push({ id: "egi-sso-ldap-sp", source: "egi-sso-ldap", name: "EGI SSO", image: "/images/egilogo.png", canAdd: true, canRemove: true, connectMessage: "" });
-appdb.config.accounts.available.push({ id: "edugain-sp", source: "edugain", name:"Federation (eduGAIN)", image: "/images/edugain_logo.png", canAdd: true, canRemove: true, displayName: true, connectMessage: "If you are already signed with the federation (eduGAIN) , the system will try to connect to the signed in federation account. Otherwise, please consider to be signed out from the federated acount." });
-appdb.config.accounts.available.push({ id: "elixir-sp", source: "elixir", name:"Elixir", image: "/images/elixir.png", canAdd: true, canRemove: true, displayName: true, connectMessage: "If you are already signed in Elixir the system will try to connect to the signed in account of Elixir. Otherwise, please consider to be signed out from Elixir." });
-appdb.config.accounts.available.push({ id: "facebook-sp", source: "facebook", name:"Facebook", image: "/images/social_facebook.png", canAdd: true, canRemove: true, displayName: true, connectMessage: "If you are already signed in Facebook the system will try to connect to the signed in account of Facebook. Otherwise, please consider to be signed out from Facebook." });
-appdb.config.accounts.available.push({ id: "linkedin-sp", source: "linkedin", name:"LinkedIn", image: "/images/social_linkedin.png", canAdd: true, canRemove: true, displayName: true, connectMessage: "If you are already signed in LinkedIn the system will try to connect to the signed in account of LinkedIn. Otherwise, please consider to be signed out from LinkedIn." });
+appdb.config.accounts.available.push({ id: "egi-sso-ldap-sp", source: "egi-sso-ldap", name: "EGI SSO", image: "/images/egilogo.png", canAdd: false, canRemove: true, connectMessage: "" });
+appdb.config.accounts.available.push({ id: "edugain-sp", source: "edugain", name:"Federation (eduGAIN)", image: "/images/edugain_logo.png", canAdd: false, canRemove: true, displayName: true, connectMessage: "If you are already signed with the federation (eduGAIN) , the system will try to connect to the signed in federation account. Otherwise, please consider to be signed out from the federated acount." });
+appdb.config.accounts.available.push({ id: "elixir-sp", source: "elixir", name:"Elixir", image: "/images/elixir.png", canAdd: false, canRemove: true, displayName: true, connectMessage: "If you are already signed in Elixir the system will try to connect to the signed in account of Elixir. Otherwise, please consider to be signed out from Elixir." });
+appdb.config.accounts.available.push({ id: "facebook-sp", source: "facebook", name:"Facebook", image: "/images/social_facebook.png", canAdd: false, canRemove: true, displayName: true, connectMessage: "If you are already signed in Facebook the system will try to connect to the signed in account of Facebook. Otherwise, please consider to be signed out from Facebook." });
+appdb.config.accounts.available.push({ id: "linkedin-sp", source: "linkedin", name:"LinkedIn", image: "/images/social_linkedin.png", canAdd: false, canRemove: true, displayName: true, connectMessage: "If you are already signed in LinkedIn the system will try to connect to the signed in account of LinkedIn. Otherwise, please consider to be signed out from LinkedIn." });
 <?php } ?>
 
 appdb.config.cache = {
