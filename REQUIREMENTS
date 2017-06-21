@@ -18,6 +18,9 @@ REQUIREMENTS
 		- gd
 		- process
 
+- Perl Modules
+	- perl-Text-Unidecode (on PostgreSQL server machine)
+
 - Zend Framework v1.11.10 with DoJo
 	- apply zend patches
 	- copy Dialog.js into /opt/zend/externals/dojo/dojox/
