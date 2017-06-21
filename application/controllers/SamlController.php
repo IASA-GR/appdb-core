@@ -818,6 +818,40 @@ class SamlController extends Zend_Controller_Action
 		header('Content-type: application/json');
 		echo json_encode($result);
 	}
+
+        private function getUserVOInfo($uid, $infoType = 'memberships') {
+            switch($infoType) {
+                case "contacts":
+                    $q = "SELECT
+                        vos.id as id,
+                        vos.name AS name,
+                        domains.name AS discipline,
+                        egiaai.vo_contacts.role AS role 
+                       FROM egiaai.vo_contacts
+                        INNER JOIN vos ON vos.name = egiaai.vo_contacts.vo
+                        INNER JOIN domains ON domains.id = vos.domainid
+                       WHERE
+                        deleted = FALSE AND
+                        egiaai.vo_contacts.puid = ?";
+                    break;
+                case "memberships":
+                    $q = "SELECT
+                        vos.id as id,
+                        vos.name AS name,
+                        domains.name AS discipline
+                       FROM egiaai.vo_members
+                        INNER JOIN vos ON vos.name = egiaai.vo_members.vo
+                        INNER JOIN domains ON domains.id = vos.domainid
+                       WHERE
+                        deleted = FALSE AND
+                        egiaai.vo_members.puid = ?";
+                    break;
+                default:
+                    return array();
+            }
+
+            return db()->query($q, array($uid))->fetchAll();
+        }
 	public function isloggedinAction(){
 		if(trim($_SERVER['REQUEST_METHOD']) === "GET"){
 			if ($this->session->isLocked()) {
@@ -861,7 +895,11 @@ class SamlController extends Zend_Controller_Action
 						}
 
 						if ($userAccount) {
-							$attrs['entitlements'] = array('vo' => array('contacts' => VoAdmin::getVOContacts($userAccount->researcherid) ,'memberships' => VoAdmin::getUserMembership($userAccount->researcherid)));
+                                                        if ($sourceIdentifier === 'egi-aai') {
+                                                            $attrs['entitlements'] = array('vo' => array('contacts' => $this->getUserVOInfo($uid, 'contacts') ,'memberships' => $this->getUserVOInfo($uid, 'memberships')));
+                                                        } else {
+                                                            $attrs['entitlements'] = array('vo' => array('contacts' => VoAdmin::getVOContacts($userAccount->researcherid) ,'memberships' => VoAdmin::getUserMembership($userAccount->researcherid)));
+                                                        }
 							$uaccounts = array();
 							$alluseraccounts = SamlAuth::getResearcherUserAccounts($userAccount->researcherid);
 							foreach($alluseraccounts  as $uaccount) {
