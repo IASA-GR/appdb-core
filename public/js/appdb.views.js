@@ -14145,7 +14145,7 @@ appdb.views.ConnectedAccountTypeListItem = appdb.ExtendClass(appdb.View, "appdb.
 		}
 	};
 	this.canRenderActions = function() {
-		return !(
+		return (
 			this.options.meta &&
 			this.options.meta.source === 'egi-aai' &&
 			appdb.config.deploy.instance === 'production' &&
