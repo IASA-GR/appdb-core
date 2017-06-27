@@ -55,7 +55,7 @@ flow enum:
 2 -> outbound
 ';
 
-CREATE FUNCTION net_protocols(t vmi_net_traffic) RETURNS TEXT[] AS
+CREATE OR REPLACE FUNCTION net_protocols(t vmi_net_traffic) RETURNS TEXT[] AS
 $$
 DECLARE ret TEXT[];
 BEGIN
@@ -75,7 +75,7 @@ END;
 $$
 LANGUAGE plpgsql STABLE;
 
-CREATE FUNCTION flow(t vmi_net_traffic) RETURNS TEXT[] AS
+CREATE OR REPLACE FUNCTION flow(t vmi_net_traffic) RETURNS TEXT[] AS
 $$
 DECLARE ret TEXT[];
 BEGIN
@@ -688,8 +688,8 @@ CREATE OR REPLACE VIEW public.vapp_to_xml AS
 	SELECT vmiinstanceid, xmlagg(XMLELEMENT(NAME "virtualization:network_traffic", XMLATTRIBUTES(flow AS direction, net_protocols AS protocols, ip_range AS ip_range, ports AS port_range))) AS x FROM (
 	SELECT DISTINCT 
 		t.vmiinstanceid, 
-		array_to_string(t.flow, ',') AS flow, 
-		array_to_string(t.net_protocols, ',') AS net_protocols, 
+		array_to_string(t.flow, ' ') AS flow, 
+		array_to_string(t.net_protocols, ' ') AS net_protocols, 
 		t.ip_range AS ip_range, 
 		t.ports AS ports 
 	FROM vmi_net_traffic AS t

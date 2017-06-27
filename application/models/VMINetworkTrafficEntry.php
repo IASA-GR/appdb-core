@@ -26,7 +26,7 @@ class Default_Model_VMINetworkTrafficEntry extends Default_Model_VMINetworkTraff
 		if (! is_array($value)) {
 			$v = $value;
 			$value = array();
-			foreach (explode(",", $v) as $vv) {
+			foreach (explode(" ", $v) as $vv) {
 				$value[] = trim($vv);
 			}
 		}
