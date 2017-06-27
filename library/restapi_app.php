@@ -1,4 +1,20 @@
 <?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+
 class RestAppReport extends RestROAuthResourceList {
     /**
      * realization of getDataType from iRestResource
@@ -50,22 +66,6 @@ class RestAppReport extends RestROAuthResourceList {
         return $res;
     }
 }
-
-/**
- * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and 
- * limitations under the License.
- */
 
 function normalizeAppID($resource, $paramName = "id") {
 	$id = $resource->getParam($paramName);
@@ -4338,7 +4338,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 						return $this->_setErrorMessage($e->getMessage());
 					}
 				} else {
-					error_log("no flow");
+					return $this->_setErrorMessage("Required entity virtualization:network_traffic@direction is missing");
 				}
 				if (strlen(trim(strval($nt->attributes()->ip_range))) > 0) {
 					$mnt->ipRange = trim(strval($nt->attributes()->ip_range));
