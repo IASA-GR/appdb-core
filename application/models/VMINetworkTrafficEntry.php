@@ -54,10 +54,7 @@ class Default_Model_VMINetworkTrafficEntry extends Default_Model_VMINetworkTraff
 			}
 		}
 		$this->_netProtocols = $value;
-		$this->_netProtocolBits = decbin($bits);
-		while (strlen($this->_netProtocolBits) < 32) {
-			$this->_netProtocolBits = "0" . $this->_netProtocolBits;
-		}
+		$this->_netProtocolBits = sprintf("%032d", decbin($bits));
 	}
 
 	public function getNetProtocols() {
@@ -82,10 +79,7 @@ class Default_Model_VMINetworkTrafficEntry extends Default_Model_VMINetworkTraff
 				throw new Exception("network traffic flow must be one of \`Inbound, Outbound, Both'");
 		}
 		$this->_flow = $value;
-		$this->_flowBits = decbin($bits);
-		while (strlen($this->_flowBits) < 2) {
-			$this->_flowBits = "0" . $this->_flowBits;
-		}
+		$this->_flowBits = sprintf("%02d", decbin($bits));
 	}
 
 	public function getFlow() {
@@ -95,10 +89,7 @@ class Default_Model_VMINetworkTrafficEntry extends Default_Model_VMINetworkTraff
 	public function setNetProtocolBits($value)
 	{
 		if (! is_string($value)) {
-			$value = decbin($value);
-			while (strlen($value) < 32) {
-				$value = "0" . $value;
-			}			
+			$value = sprintf("%032d", decbin($value));
 		}
 		$this->_netProtocolBits = $value;
 		return $this;
@@ -107,10 +98,7 @@ class Default_Model_VMINetworkTrafficEntry extends Default_Model_VMINetworkTraff
 	public function setFlowBits($value)
 	{
 		if (! is_string($value)) {
-			$value = decbin($value);
-			while (strlen($value) < 2) {
-				$value = "0" . $value;
-			}			
+			$value = sprintf("%02d", decbin($value));
 		}
 		$this->_flowBits = $value;		
 		return $this;
