@@ -60,7 +60,7 @@ $$
 DECLARE ret TEXT[];
 BEGIN
 	IF t.net_protocol_bits & 15::bit(32) = 15::bit(32) THEN
-		ret := '{Any}'::TEXT[];
+		ret := '{any}'::TEXT[];
 	ELSE
 		IF (t.net_protocol_bits & 1::bit(32))::int::bool THEN ret := array_append(ret, 'TCP'); END IF;
 		IF (t.net_protocol_bits & 2::bit(32))::int::bool THEN ret := array_append(ret, 'UDP'); END IF;
@@ -68,7 +68,7 @@ BEGIN
 		IF (t.net_protocol_bits & 8::bit(32))::int::bool THEN ret := array_append(ret, 'IPSec'); END IF;
 	END IF;
 	IF array_length(ret, 1) = 0 THEN
-		ret = '{None}'::TEXT[];
+		ret = '{none}'::TEXT[];
 	END IF;
 	RETURN ret;
 END;
@@ -80,13 +80,13 @@ $$
 DECLARE ret TEXT[];
 BEGIN
 	IF t.flow_bits & 3::bit(2) = 3::bit(2) THEN
-		ret := '{Both}'::TEXT[];
+		ret := '{both}'::TEXT[];
 	ELSE
-		IF (t.flow_bits & 1::bit(2))::int::bool  THEN ret := array_append(ret, 'Inbound'); END IF;
-		IF (t.flow_bits & 2::bit(2))::int::bool THEN ret := array_append(ret, 'Outbound'); END IF;
+		IF (t.flow_bits & 1::bit(2))::int::bool  THEN ret := array_append(ret, 'inbound'); END IF;
+		IF (t.flow_bits & 2::bit(2))::int::bool THEN ret := array_append(ret, 'outbound'); END IF;
 	END IF;
 	IF array_length(ret, 1) = 0 THEN
-		ret = '{None}'::TEXT[];
+		ret = '{none}'::TEXT[];
 	END IF;
 	RETURN ret;
 END;
@@ -668,30 +668,7 @@ CREATE OR REPLACE VIEW public.vapp_to_xml AS
 ', XMLELEMENT(NAME "virtualization:autointegrity", vmiinstances.autointegrity), '
 ', XMLELEMENT(NAME "virtualization:ovf", XMLATTRIBUTES(vmiinstances.ovfurl AS url)), '
 ', XMLELEMENT(NAME "virtualization:accelerators", XMLATTRIBUTES(vmiinstances.rec_acc_type AS type, vmiinstances.min_acc AS minimum, vmiinstances.rec_acc AS recommended)), '
-', CASE WHEN EXISTS (SELECT * FROM vmi_net_traffic WHERE vmiinstanceid = vmiinstances.id AND flow_bits::int = 1) THEN XMLELEMENT(NAME "virtualization:network_traffic",
-	XMLATTRIBUTES(
-		array_to_string(vmi_nt1.flow, ',') AS direction,
-		array_to_string(vmi_nt1.net_protocols, ',') AS protocols,
-		array_to_string(vmi_nt1.ip_range, ',') AS ip_range,
-		array_to_string(vmi_nt1.ports, ',') AS port_range
-	)
-   ) END, '
-', CASE WHEN EXISTS (SELECT * FROM vmi_net_traffic WHERE vmiinstanceid = vmiinstances.id AND flow_bits::int = 2) THEN XMLELEMENT(NAME "virtualization:network_traffic",
-	XMLATTRIBUTES(
-		array_to_string(vmi_nt2.flow, ',') AS direction,
-		array_to_string(vmi_nt2.net_protocols, ',') AS protocols,
-		array_to_string(vmi_nt2.ip_range, ',') AS ip_range,
-		array_to_string(vmi_nt2.ports, ',') AS port_range
-	)
-   ) END, '
-', CASE WHEN EXISTS (SELECT * FROM vmi_net_traffic WHERE vmiinstanceid = vmiinstances.id AND flow_bits::int = 3) THEN XMLELEMENT(NAME "virtualization:network_traffic",
-	XMLATTRIBUTES(
-		array_to_string(vmi_nt3.flow, ',') AS direction,
-		array_to_string(vmi_nt3.net_protocols, ',') AS protocols,
-		array_to_string(vmi_nt3.ip_range, ',') AS ip_range,
-		array_to_string(vmi_nt3.ports, ',') AS port_range
-	)
-   ) END, '
+', vmi_nt.x,'
 ', vmiinst_cntxscripts_to_xml(vmiinstances.id), '
 '))) AS xml
    FROM vmiinstances
@@ -708,14 +685,16 @@ CREATE OR REPLACE VIEW public.vapp_to_xml AS
      LEFT JOIN vmiflavor_hypervisor_xml hypervisors ON hypervisors.vmiflavourid = vmiflavours.id
      LEFT JOIN vmiformats ON vmiformats.name::text = vmiflavours.format
      LEFT JOIN (
-	SELECT DISTINCT t.vmiinstanceid, flow_bits, array_agg(DISTINCT t.flow) AS flow, array_agg(DISTINCT t.net_protocols) AS net_protocols, array_agg(DISTINCT t.ip_range) AS ip_range, array_agg(DISTINCT t.ports) AS ports FROM vmi_net_traffic AS t WHERE flow_bits::int = 1 GROUP BY vmiinstanceid, flow_bits
-     ) AS vmi_nt1 ON vmi_nt1.vmiinstanceid = vmiinstances.id
-     LEFT JOIN (
-	SELECT DISTINCT t.vmiinstanceid, flow_bits, array_agg(DISTINCT t.flow) AS flow, array_agg(DISTINCT t.net_protocols) AS net_protocols, array_agg(DISTINCT t.ip_range) AS ip_range, array_agg(DISTINCT t.ports) AS ports FROM vmi_net_traffic AS t WHERE flow_bits::int = 2 GROUP BY vmiinstanceid, flow_bits
-     ) AS vmi_nt2 ON vmi_nt2.vmiinstanceid = vmiinstances.id
-     LEFT JOIN (
-	SELECT DISTINCT t.vmiinstanceid, flow_bits, array_agg(DISTINCT t.flow) AS flow, array_agg(DISTINCT t.net_protocols) AS net_protocols, array_agg(DISTINCT t.ip_range) AS ip_range, array_agg(DISTINCT t.ports) AS ports FROM vmi_net_traffic AS t WHERE flow_bits::int = 3 GROUP BY vmiinstanceid, flow_bits
-     ) AS vmi_nt3 ON vmi_nt3.vmiinstanceid = vmiinstances.id
+	SELECT vmiinstanceid, xmlagg(XMLELEMENT(NAME "virtualization:network_traffic", XMLATTRIBUTES(flow AS direction, net_protocols AS protocols, ip_range AS ip_range, ports AS port_range))) AS x FROM (
+	SELECT DISTINCT 
+		t.vmiinstanceid, 
+		array_to_string(t.flow, ',') AS flow, 
+		array_to_string(t.net_protocols, ',') AS net_protocols, 
+		t.ip_range AS ip_range, 
+		t.ports AS ports 
+	FROM vmi_net_traffic AS t
+	) AS tt GROUP BY vmiinstanceid
+     ) AS vmi_nt ON vmi_nt.vmiinstanceid = vmiinstances.id
   GROUP BY applications.id, vapplications.id, vapp_versions.published, vapp_versions.version, applications.guid, vapplications.name, vapp_versions.id, vapp_versions.createdon, vapp_versions.expireson, vapp_versions.status, vapp_versions.enabled, vapp_versions.archived
   ORDER BY vapp_versions.published, vapp_versions.archived, vapp_versions.archivedon DESC;
 
@@ -742,4 +721,4 @@ Added extra metadata for VMIs (accel, net_traffic)
 
 DELETE FROM vmi_net_traffic;
 
-INSERT INTO vmi_net_traffic(net_protocol_bits, flow_bits, ip_range, ports, vmiinstanceid) VALUES (1::bit(32), 1::bit(2), '127.0.0.1/32', '10000:11000', 6184);
+INSERT INTO vmi_net_traffic(net_protocol_bits, flow_bits, ip_range, ports, vmiinstanceid) VALUES (3::bit(32), 3::bit(2), '127.0.0.1/32', '10000:11000', 6184);
