@@ -69,7 +69,8 @@ class Default_Model_VMIinstance extends Default_Model_VMIinstanceBase
 
 	public function deleteNetworkTraffic() {
 		$nts = new Default_Model_VMINetworkTraffic();
-		foreach ($this->getNetworkTraffic() as $nt) {
+		$x = $this->getNetworkTraffic();
+		foreach ($x as $nt) {
 			$nts->remove($nt);
 		}
 	}

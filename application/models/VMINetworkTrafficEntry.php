@@ -24,7 +24,7 @@ class Default_Model_VMINetworkTrafficEntry extends Default_Model_VMINetworkTraff
 
 	public function setNetProtocols($value) {
 		if (! is_array($value)) {
-			$v = $value;
+			$v = trim(str_replace(",", " ", $value));
 			$value = array();
 			foreach (explode(" ", $v) as $vv) {
 				$value[] = trim($vv);
