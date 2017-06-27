@@ -4316,14 +4316,17 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		if ( count($xml->xpath('/virtualization:network_traffic[@xsi:nil="true"]')) != 0 ) {
 			$m->deleteNetworkTraffic();
-		elseif ( count( $xml->xpath('./virtualization:network_traffic') ) > 0 ) {
+		} elseif ( count( $xml->xpath('./virtualization:network_traffic') ) > 0 ) {
+			$m->deleteNetworkTraffic();
 			$nts = $xml->xpath('./virtualization:network_traffic');
 			foreach ($nts as $nt) {
 				$mnt = new Default_Model_VMINetworkTrafficEntry();
+				$mnt->VMIinstanceID = $m->id;
 				if (strlen(trim(strval($nt->attributes()->protocols))) > 0) {
 					try {
 						$mnt->netProtocols = trim(strval($nt->attributes()->protocols));
 					} catch (Exception $e) {
+						error_log($e->getMessage());
 						return $this->_setErrorMessage($e->getMessage());
 					}
 				}
@@ -4331,16 +4334,20 @@ class RestAppVAXMLParser extends RestXMLParser {
 					try {		
 						$mnt->flow = trim(strval($nt->attributes()->direction));
 					} catch (Exception $e) {
+						error_log($e->getMessage());
 						return $this->_setErrorMessage($e->getMessage());
 					}
+				} else {
+					error_log("no flow");
 				}
 				if (strlen(trim(strval($nt->attributes()->ip_range))) > 0) {
-					$mnt->ip_ranges = trim(strval($nt->attributes()->ip_range));
+					$mnt->ipRange = trim(strval($nt->attributes()->ip_range));
 				}
 				if (strlen(trim(strval($nt->attributes()->port_range))) > 0) {
 					$mnt->ports = trim(strval($nt->attributes()->port_range));
 				}
-				$m->NetworkTraffic->add($mnt);
+				$mnt->save();
+//				$m->NetworkTraffic->add($mnt);
 			}
 		}
 		if( count( $xml->xpath('./virtualization:ram') ) > 0 ){

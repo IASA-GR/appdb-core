@@ -18,5 +18,4 @@
 <?php
 class Default_Model_VMINetworkTrafficMapper extends Default_Model_VMINetworkTrafficMapperBase
 {
-
 }

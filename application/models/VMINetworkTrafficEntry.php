@@ -17,7 +17,7 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VMINetworkTraffic extends Default_Model_VMINetworkTrafficBase
+class Default_Model_VMINetworkTrafficEntry extends Default_Model_VMINetworkTrafficEntryBase
 {
 	protected $_netProtocols;
 	protected $_flow;
@@ -26,7 +26,9 @@ class Default_Model_VMINetworkTraffic extends Default_Model_VMINetworkTrafficBas
 		if (! is_array($value)) {
 			$v = $value;
 			$value = array();
-			$value[] = $v;
+			foreach (explode(",", $v) as $vv) {
+				$value[] = trim($vv);
+			}
 		}
 		$bits = 0;
 		foreach ($value as $v) {
@@ -47,12 +49,15 @@ class Default_Model_VMINetworkTraffic extends Default_Model_VMINetworkTrafficBas
 					$bits |= 15;
 					break;
 				default:
+					error_log($v);
 					throw new Exception("network traffic protocol must be one of \`Any, TCP, UDP, ICMP, IPsec'");
 			}
 		}
 		$this->_netProtocols = $value;
-		$this->_netProtocolBits = $bits;
-		$this->save();
+		$this->_netProtocolBits = decbin($bits);
+		while (strlen($this->_netProtocolBits) < 32) {
+			$this->_netProtocolBits = "0" . $this->_netProtocolBits;
+		}
 	}
 
 	public function getNetProtocols() {
@@ -77,8 +82,10 @@ class Default_Model_VMINetworkTraffic extends Default_Model_VMINetworkTrafficBas
 				throw new Exception("network traffic flow must be one of \`Inbound, Outbound, Both'");
 		}
 		$this->_flow = $value;
-		$this->_flowBits = $bits;
-		$this->save();
+		$this->_flowBits = decbin($bits);
+		while (strlen($this->_flowBits) < 2) {
+			$this->_flowBits = "0" . $this->_flowBits;
+		}
 	}
 
 	public function getFlow() {

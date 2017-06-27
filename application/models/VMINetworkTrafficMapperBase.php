@@ -50,11 +50,11 @@ class Default_Model_VMINetworkTrafficMapperBase
 		global $application;
 		$data = array();
 		if ( ! isnull($value->getId()) ) $data['id'] = $value->getId();
-		if ( ! isnull($value->getName()) ) $data['name'] = $value->getName();
-		if ( ! isnull($value->getAppID()) ) $data['appid'] = $value->getAppID();
-		if ( ! isnull($value->getImgLstPrivate()) ) $data['imglst_private'] = $this->pgBool($value->getImgLstPrivate());
-		if ( ! isnull($value->getGuID()) ) $data['guid'] = $value->getGuID();
-
+		if ( ! isnull($value->getVMIinstanceID()) ) $data['vmiinstanceid'] = $value->getVMIinstanceID();
+		if ( ! isnull($value->getFlowBits()) ) $data['flow_bits'] = $value->getFlowBits();
+		if ( ! isnull($value->getNetProtocolBits()) ) $data['net_protocol_bits'] = $value->getNetProtocolBits();
+		if ( ! isnull($value->getIPrange()) ) $data['ip_range'] = $value->getIPrange();
+		if ( ! isnull($value->getPorts()) ) $data['ports'] = $value->getPorts();
 
 		$q1 = 'id = ?';
 		$q2 = $value->id;
@@ -78,10 +78,11 @@ class Default_Model_VMINetworkTrafficMapperBase
 	public function populate(&$entry,$row)
 	{
 		$entry->setId($row->id);
-		$entry->setName($row->name);
-		$entry->setAppID($row->appid);
-		$entry->setImgLstPrivate($row->imglst_private);
-		$entry->setGuID($row->guid);
+		$entry->setVMIinstanceID($row->vmiinstanceid);
+		$entry->setPorts($row->ports);
+		$entry->setIPrange($row->ip_range);
+		$entry->setFlowBits($row->flow_bits);
+		$entry->setNetProtocolBits($row->net_protocol_bits);
 	}
 
 	public function find($id, Default_Model_VMINetworkTraffic &$value)

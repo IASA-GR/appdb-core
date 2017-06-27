@@ -7,5 +7,5 @@ class Default_Model_DbTable_Row_VMINetworkTraffic extends Zend_Db_Table_Row_Abst
 
 class Default_Model_DbTable_VMINetworkTraffic extends Default_Model_DbTable_VMINetworkTrafficBase
 {
-	protected $_rowClass = 'Default_Model_DbTable_Row_VMINetworkTraffic;
+	protected $_rowClass = 'Default_Model_DbTable_Row_VMINetworkTraffic';
 }

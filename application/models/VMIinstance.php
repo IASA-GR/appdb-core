@@ -61,10 +61,10 @@ class Default_Model_VMIinstance extends Default_Model_VMIinstanceBase
 	public function getNetworkTraffic() {
 		if ($this->_networkTraffic === null) {
 			$nt = new Default_Model_VMINetworkTraffic();
-			$nt->vmiinstanceid->numequals($this->id);
-			$this->_networkTraffic = $nt->items;
+			$nt->filter->vmiinstanceid->numequals($this->id);
+			$this->_networkTraffic = $nt;
 		}
-		return $this->_networkTraffic;
+		if (is_array($this->_networkTraffic)) return $this->_networkTraffic; else return $this->_networkTraffic->items;
 	}
 
 	public function deleteNetworkTraffic() {

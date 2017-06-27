@@ -16,7 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VMINetworkTrafficBase
+class Default_Model_VMINetworkTrafficEntryBase
 {
 	protected $_mapper;
 	protected $_id;
