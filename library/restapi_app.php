@@ -4268,6 +4268,81 @@ class RestAppVAXMLParser extends RestXMLParser {
 				}
 			}
 		}
+		if( count( $xml->xpath('./virtualization:accelerators') ) > 0 ){
+			$accelerators = $xml->xpath('./virtualization:accelerators');
+			$accelerators = $accelerators[0];
+			if( strlen( trim( strval($accelerators->attributes()->minimum) ) ) > 0 ){
+				$acceleratorsmin = strval($accelerators->attributes()->minimum);
+				if( is_numeric($acceleratorsmin) && intval($acceleratorsmin) >= 0 ){
+					if( trim($m->accelMinimum) !== "" && intval($m->accelMinimum) != intval($acceleratorsmin) ){
+						$isupdated = true;
+						debug_log("last updated  accel min");
+					}
+					$m->accelMinimum = intval($acceleratorsmin);
+				}else{
+					return $this->_setErrorMessage("Minimum accelerators value must be a positive number");
+				}
+			}
+			if( strlen( trim( strval($accelerators->attributes()->recommended) ) ) > 0 ){
+				$acceleratorsrecom = strval($accelerators->attributes()->recommended);
+				if( is_numeric($acceleratorsrecom) && intval($acceleratorsrecom) >= 0 ){
+					if( trim($m->accelRecommend) !== "" && intval($m->accelRecommend) != intval($acceleratorsrecom) ){
+						$isupdated = true;
+						debug_log("last updated  accel recom");
+					}
+					$m->accelRecommend = intval($acceleratorsrecom);
+				}else{
+					return $this->_setErrorMessage("Recommended accelerators value must be a positive number");
+				}
+			}
+			if( strlen( trim( strval($accelerators->attributes()->type) ) ) > 0 ){
+				$validAccels = array();
+				db()->setFetchMode(Zend_Db::FETCH_NUM);
+				$validAccelRS = db()->query("SELECT value::text FROM accelerators")->fetchAll();
+				foreach ($validAccelRS as $validAccel) {
+					$validAccels[] = $validAccel[0];
+				}
+				$acceleratorstype = strval($accelerators->attributes()->type);
+				if( in_array($acceleratorstype, $validAccels) ){
+					if( (trim($m->accelType) !== "") && ($m->accelType != $acceleratorstype) ){
+						$isupdated = true;
+						debug_log("last updated  accel type");
+					}
+					$m->accelType = $acceleratorstype;
+				}else{
+					return $this->_setErrorMessage("\`type' attribute of \`virtualization::accelerator' must be one of: \`" . implode(", ", $validAccels) . "'");
+				}
+			}
+		}
+		if ( count($xml->xpath('/virtualization:network_traffic[@xsi:nil="true"]')) != 0 ) {
+			$m->deleteNetworkTraffic();
+		elseif ( count( $xml->xpath('./virtualization:network_traffic') ) > 0 ) {
+			$nts = $xml->xpath('./virtualization:network_traffic');
+			foreach ($nts as $nt) {
+				$mnt = new Default_Model_VMINetworkTrafficEntry();
+				if (strlen(trim(strval($nt->attributes()->protocols))) > 0) {
+					try {
+						$mnt->netProtocols = trim(strval($nt->attributes()->protocols));
+					} catch (Exception $e) {
+						return $this->_setErrorMessage($e->getMessage());
+					}
+				}
+				if (strlen(trim(strval($nt->attributes()->direction))) > 0) {
+					try {		
+						$mnt->flow = trim(strval($nt->attributes()->direction));
+					} catch (Exception $e) {
+						return $this->_setErrorMessage($e->getMessage());
+					}
+				}
+				if (strlen(trim(strval($nt->attributes()->ip_range))) > 0) {
+					$mnt->ip_ranges = trim(strval($nt->attributes()->ip_range));
+				}
+				if (strlen(trim(strval($nt->attributes()->port_range))) > 0) {
+					$mnt->ports = trim(strval($nt->attributes()->port_range));
+				}
+				$m->NetworkTraffic->add($mnt);
+			}
+		}
 		if( count( $xml->xpath('./virtualization:ram') ) > 0 ){
 			$ram = $xml->xpath('./virtualization:ram');
 			$ram = $ram[0];

@@ -19,6 +19,8 @@
 // PUT YOUR CUSTOM CODE HERE
 class Default_Model_VMIinstance extends Default_Model_VMIinstanceBase
 {
+	protected $_networkTraffic;
+
 	public function delete(){
 		$valists = new Default_Model_VALists();
 		$valists->filter->vmiinstanceid->numequals($this->id);
@@ -54,5 +56,34 @@ class Default_Model_VMIinstance extends Default_Model_VMIinstanceBase
 			$version = $item->getVAversion();
 		}
 		return $version;
+	}
+
+	public function getNetworkTraffic() {
+		if ($this->_networkTraffic === null) {
+			$nt = new Default_Model_VMINetworkTraffic();
+			$nt->vmiinstanceid->numequals($this->id);
+			$this->_networkTraffic = $nt->items;
+		}
+		return $this->_networkTraffic;
+	}
+
+	public function deleteNetworkTraffic() {
+		$nts = new Default_Model_VMINetworkTraffic();
+		foreach ($this->getNetworkTraffic() as $nt) {
+			$nts->remove($nt);
+		}
+	}
+
+	public function getSites()
+	{
+		if ($this->_sites === null) {
+			$sites = new Default_Model_Sites();
+			$f = new Default_Model_VOsFilter();
+			$f->id->equals($this->id);
+			$sites->filter->chain($f,"AND");
+			$sites->filter->orderBy(array("name ASC"));
+			$this->_sites = $sites->items;
+		}
+		return $this->_sites;
 	}
 }
