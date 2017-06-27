@@ -91,4 +91,30 @@ class Default_Model_VMINetworkTrafficEntry extends Default_Model_VMINetworkTraff
 	public function getFlow() {
 		return $this->_flow();
 	}
+
+	public function setNetProtocolBits($value)
+	{
+		if (! is_string($value)) {
+			$value = decbin($value);
+			while (strlen($value) < 32) {
+				$value = "0" . $value;
+			}			
+		}
+		$this->_netProtocolBits = $value;
+		return $this;
+	}
+
+	public function setFlowBits($value)
+	{
+		if (! is_string($value)) {
+			$value = decbin($value);
+			while (strlen($value) < 2) {
+				$value = "0" . $value;
+			}			
+		}
+		$this->_flowBits = $value;		
+		return $this;
+	}
+
+
 }
