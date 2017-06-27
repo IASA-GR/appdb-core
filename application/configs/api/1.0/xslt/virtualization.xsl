@@ -164,12 +164,14 @@
 							<xsl:attribute name="recommended"><xsl:value-of select="virtualization:cores/@recommended"/></xsl:attribute>
 						</xsl:element>
 						<xsl:if test="virtualization:network_traffic" >
-							<xsl:element name="virtualization:network_traffic">
-								<xsl:attribute name="direction"><xsl:value-of select="virtualization:network_traffic/@direction"/></xsl:attribute>
-								<xsl:attribute name="protocols"><xsl:value-of select="virtualization:network_traffic/@protocols"/></xsl:attribute>
-								<xsl:attribute name="ip_range"><xsl:value-of select="virtualization:network_traffic/@ip_range"/></xsl:attribute>
-								<xsl:attribute name="port_range"><xsl:value-of select="virtualization:network_traffic/@port_range"/></xsl:attribute>
-							</xsl:element>
+							<xsl:for-each select="virtualization:network_traffic">
+								<xsl:element name="virtualization:network_traffic">
+									<xsl:attribute name="direction"><xsl:value-of select="@direction"/></xsl:attribute>
+									<xsl:attribute name="protocols"><xsl:value-of select="@protocols"/></xsl:attribute>
+									<xsl:attribute name="ip_range"><xsl:value-of select="@ip_range"/></xsl:attribute>
+									<xsl:attribute name="port_range"><xsl:value-of select="@port_range"/></xsl:attribute>
+								</xsl:element>
+							</xsl:for-each>
 						</xsl:if>
 						<xsl:element name="virtualization:accelerators">
 							<xsl:attribute name="minimum"><xsl:value-of select="virtualization:accelerators/@minimum"/></xsl:attribute>
