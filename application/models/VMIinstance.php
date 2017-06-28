@@ -75,6 +75,12 @@ class Default_Model_VMIinstance extends Default_Model_VMIinstanceBase
 		}
 	}
 
+	public function unsetAccel() {
+		if (is_numeric($this->_id)) {
+			db()->exec("UPDATE vmiinstances SET min_acc = NULL, rec_acc = NULL, rec_acc_type = NULL WHERE id = " . $this->_id);
+		}
+	}
+
 	public function getSites()
 	{
 		if ($this->_sites === null) {

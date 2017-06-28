@@ -161,8 +161,8 @@
 			<xs:element name="url" type="virtualization:urlType" minOccurs="1" maxOccurs="unbounded"/>
 			<xs:element name="checksum" type="virtualization:checksumType" minOccurs="1" maxOccurs="unbounded"/>
 			<xs:element name="cores" type="virtualization:minmaxType" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="network_traffic" type="virtualization:nettrafficType" minOccurs="0" maxOccurs="unbounded"/>
-			<xs:element name="accelerators" type="virtualization:accelType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="network_traffic" type="virtualization:nettrafficType" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+			<xs:element name="accelerators" type="virtualization:accelType" minOccurs="0" maxOccurs="1" nillable="true"/>
 			<xs:element name="ram" type="virtualization:minmaxType" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="ovf" type="virtualization:ovfType" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="title" type="xs:string" minOccurs="0" maxOccurs="1"/>
