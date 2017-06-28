@@ -23,12 +23,12 @@ Author: wvkarag@kadath.priv.iasa.gr
 
 START TRANSACTION;
 
-ALTER TABLE vmiinstances ADD COLUMN min_acc int NOT NULL DEFAULT 0;
-ALTER TABLE vmiinstances ADD COLUMN rec_acc int NOT NULL DEFAULT 0;
+ALTER TABLE vmiinstances ADD COLUMN min_acc int;
+ALTER TABLE vmiinstances ADD COLUMN rec_acc int;
 
 CREATE TYPE e_acc_type AS ENUM ('GPU');
 
-ALTER TABLE vmiinstances ADD COLUMN rec_acc_type e_acc_type NOT NULL DEFAULT 'GPU';
+ALTER TABLE vmiinstances ADD COLUMN rec_acc_type e_acc_type;
 
 CREATE INDEX idx_vmiinstances_rec_acc ON vmiinstances(rec_acc);
 CREATE INDEX idx_vmiinstances_min_acc ON vmiinstances(min_acc);
@@ -667,7 +667,7 @@ CREATE OR REPLACE VIEW public.vapp_to_xml AS
         END, '
 ', XMLELEMENT(NAME "virtualization:autointegrity", vmiinstances.autointegrity), '
 ', XMLELEMENT(NAME "virtualization:ovf", XMLATTRIBUTES(vmiinstances.ovfurl AS url)), '
-', XMLELEMENT(NAME "virtualization:accelerators", XMLATTRIBUTES(vmiinstances.rec_acc_type AS type, vmiinstances.min_acc AS minimum, vmiinstances.rec_acc AS recommended)), '
+', CASE WHEN (vmiinstances.rec_acc_type,vmiinstances.min_acc, vmiinstances.rec_acc) IS DISTINCT FROM (NULL, NULL, NULL) THEN XMLELEMENT(NAME "virtualization:accelerators", XMLATTRIBUTES(vmiinstances.rec_acc_type AS type, vmiinstances.min_acc AS minimum, vmiinstances.rec_acc AS recommended)) END, '
 ', vmi_nt.x,'
 ', vmiinst_cntxscripts_to_xml(vmiinstances.id), '
 '))) AS xml
@@ -714,11 +714,4 @@ INSERT INTO version (major,minor,revision,notes)
 	SELECT 8, 15, 0, E'Added extra metadata for VMIs (accel, net_traffic)'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=15 AND revision=0);
 
-ROLLBACK;
-
-
-Added extra metadata for VMIs (accel, net_traffic)
-
-DELETE FROM vmi_net_traffic;
-
-INSERT INTO vmi_net_traffic(net_protocol_bits, flow_bits, ip_range, ports, vmiinstanceid) VALUES (3::bit(32), 3::bit(2), '127.0.0.1/32', '10000:11000', 6184);
+COMMIT;
