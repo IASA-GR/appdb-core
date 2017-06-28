@@ -4270,47 +4270,55 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		if( count( $xml->xpath('./virtualization:accelerators') ) > 0 ){
 			$accelerators = $xml->xpath('./virtualization:accelerators');
-			$accelerators = $accelerators[0];
-			if( strlen( trim( strval($accelerators->attributes()->minimum) ) ) > 0 ){
-				$acceleratorsmin = strval($accelerators->attributes()->minimum);
-				if( is_numeric($acceleratorsmin) && intval($acceleratorsmin) >= 0 ){
-					if( trim($m->accelMinimum) !== "" && intval($m->accelMinimum) != intval($acceleratorsmin) ){
-						$isupdated = true;
-						debug_log("last updated  accel min");
+			if ( (count($accelerators) === 1) && ($accelerators[0]->attributes(RestAPIHelper::XMLNS_XSI())->nil) && (strval($accelerators[0]->attributes(RestAPIHelper::XMLNS_XSI())->nil) == "true") ) {
+				$m->accelRecommend = "NULL";
+				$m->accelMinimum = "NULL";
+				$m->accelType = "NULL";
+			}  elseif (count($accelerators) > 0) {
+				return $this->_setErrorMessage("Cardinality error for \`virtualization::accelerator' element");
+			} else {
+				$accelerators = $accelerators[0];
+				if( strlen( trim( strval($accelerators->attributes()->minimum) ) ) > 0 ) {
+					$acceleratorsmin = strval($accelerators->attributes()->minimum);
+					if( is_numeric($acceleratorsmin) && intval($acceleratorsmin) >= 0 ){
+						if( trim($m->accelMinimum) !== "" && intval($m->accelMinimum) != intval($acceleratorsmin) ){
+							$isupdated = true;
+							debug_log("last updated  accel min");
+						}
+						$m->accelMinimum = intval($acceleratorsmin);
+					}else{
+						return $this->_setErrorMessage("Minimum accelerators value must be a positive number");
 					}
-					$m->accelMinimum = intval($acceleratorsmin);
-				}else{
-					return $this->_setErrorMessage("Minimum accelerators value must be a positive number");
 				}
-			}
-			if( strlen( trim( strval($accelerators->attributes()->recommended) ) ) > 0 ){
-				$acceleratorsrecom = strval($accelerators->attributes()->recommended);
-				if( is_numeric($acceleratorsrecom) && intval($acceleratorsrecom) >= 0 ){
-					if( trim($m->accelRecommend) !== "" && intval($m->accelRecommend) != intval($acceleratorsrecom) ){
-						$isupdated = true;
-						debug_log("last updated  accel recom");
+				if( strlen( trim( strval($accelerators->attributes()->recommended) ) ) > 0 ){
+					$acceleratorsrecom = strval($accelerators->attributes()->recommended);
+					if( is_numeric($acceleratorsrecom) && intval($acceleratorsrecom) >= 0 ){
+						if( trim($m->accelRecommend) !== "" && intval($m->accelRecommend) != intval($acceleratorsrecom) ){
+							$isupdated = true;
+							debug_log("last updated  accel recom");
+						}
+						$m->accelRecommend = intval($acceleratorsrecom);
+					}else{
+						return $this->_setErrorMessage("Recommended accelerators value must be a positive number");
 					}
-					$m->accelRecommend = intval($acceleratorsrecom);
-				}else{
-					return $this->_setErrorMessage("Recommended accelerators value must be a positive number");
 				}
-			}
-			if( strlen( trim( strval($accelerators->attributes()->type) ) ) > 0 ){
-				$validAccels = array();
-				db()->setFetchMode(Zend_Db::FETCH_NUM);
-				$validAccelRS = db()->query("SELECT value::text FROM accelerators")->fetchAll();
-				foreach ($validAccelRS as $validAccel) {
-					$validAccels[] = $validAccel[0];
-				}
-				$acceleratorstype = strval($accelerators->attributes()->type);
-				if( in_array($acceleratorstype, $validAccels) ){
-					if( (trim($m->accelType) !== "") && ($m->accelType != $acceleratorstype) ){
-						$isupdated = true;
-						debug_log("last updated  accel type");
+				if( strlen( trim( strval($accelerators->attributes()->type) ) ) > 0 ){
+					$validAccels = array();
+					db()->setFetchMode(Zend_Db::FETCH_NUM);
+					$validAccelRS = db()->query("SELECT value::text FROM accelerators")->fetchAll();
+					foreach ($validAccelRS as $validAccel) {
+						$validAccels[] = $validAccel[0];
 					}
-					$m->accelType = $acceleratorstype;
-				}else{
-					return $this->_setErrorMessage("\`type' attribute of \`virtualization::accelerator' must be one of: \`" . implode(", ", $validAccels) . "'");
+					$acceleratorstype = strval($accelerators->attributes()->type);
+					if( in_array($acceleratorstype, $validAccels) ){
+						if( (trim($m->accelType) !== "") && ($m->accelType != $acceleratorstype) ){
+							$isupdated = true;
+							debug_log("last updated  accel type");
+						}
+						$m->accelType = $acceleratorstype;
+					}else{
+						return $this->_setErrorMessage("\`type' attribute of \`virtualization::accelerator' must be one of: \`" . implode(", ", $validAccels) . "'");
+					}
 				}
 			}
 		}
