@@ -93,6 +93,25 @@ END;
 $$
 LANGUAGE plpgsql STABLE;
 
+CREATE TABLE vmi_supported_context_fmt (
+	vmiinstanceid int NOT NULL REFERENCES vmiinstances(id),
+	fmtid int NOT NULL REFERENCES contextformats(id),
+	PRIMARY KEY (vmiinstanceid, fmtid)
+);
+
+ALTER TABLE vmi_supported_context_fmt OWNER TO appdb;
+
+CREATE FUNCTION contextfmts(v vmiinstances) RETURNS TEXT[] AS
+$$
+	SELECT array_agg(DISTINCT cf.name)
+	FROM vmi_supported_context_fmt AS f 
+	INNER JOIN contextformats AS cf ON cf.id = f.fmtid
+	WHERE f.vmiinstanceid = v.id
+$$
+LANGUAGE sql STABLE;
+ALTER FUNCTION contextfmts(vmiinstances) OWNER TO appdb;
+
+
 -- View: public.__vaviews
 
 CREATE OR REPLACE VIEW public.__vaviews AS
@@ -156,7 +175,8 @@ CREATE OR REPLACE VIEW public.__vaviews AS
     applications.name AS appname,
     applications.cname AS appcname,
     vmiinstances.min_acc,
-    vmiinstances.rec_acc
+    vmiinstances.rec_acc,
+    vmiinstances.contextfmts
    FROM vapplists
      JOIN vmiinstances ON vmiinstances.id = vapplists.vmiinstanceid
      JOIN vmiflavours ON vmiflavours.id = vmiinstances.vmiflavourid
@@ -236,7 +256,8 @@ CREATE MATERIALIZED VIEW public.vaviews AS
     __vaviews.appname,
     __vaviews.appcname,
     __vaviews.min_acc,
-    __vaviews.rec_acc
+    __vaviews.rec_acc,
+    __vaviews.contextfmts
    FROM __vaviews
 WITH DATA;
 
@@ -669,6 +690,7 @@ CREATE OR REPLACE VIEW public.vapp_to_xml AS
 ', XMLELEMENT(NAME "virtualization:ovf", XMLATTRIBUTES(vmiinstances.ovfurl AS url)), '
 ', CASE WHEN (vmiinstances.rec_acc_type,vmiinstances.min_acc, vmiinstances.rec_acc) IS DISTINCT FROM (NULL, NULL, NULL) THEN XMLELEMENT(NAME "virtualization:accelerators", XMLATTRIBUTES(vmiinstances.rec_acc_type AS type, vmiinstances.min_acc AS minimum, vmiinstances.rec_acc AS recommended)) END, '
 ', vmi_nt.x,'
+', vmiinstances.contextfmtsxml, '
 ', vmiinst_cntxscripts_to_xml(vmiinstances.id), '
 '))) AS xml
    FROM vmiinstances
@@ -711,7 +733,7 @@ CREATE VIEW accelerators AS
   WHERE t.typname = 'e_acc_type'::name;
 
 INSERT INTO version (major,minor,revision,notes) 
-	SELECT 8, 15, 0, E'Added extra metadata for VMIs (accel, net_traffic)'
+	SELECT 8, 15, 0, E'Added extra metadata for VMIs (accel, net_traffic, supported context fmts)'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=15 AND revision=0);
 
 COMMIT;
