@@ -12206,11 +12206,17 @@ vappliance.singlevmipolicy .property > .loader, .vappliance .vappliance-version 
 	width: 200px;
 	margin-right: 0px;
 }
+.vappliance.singlevmipolicy .vaversion-vmiversion .verticalpanel.osinfo.extended {
+    width: 330px;
+    min-width: 330px;
+    max-wodth: 330px;
+}
 .vappliance .vaversion-vmiversion .verticalpanel.osinfo > .property {
 	text-align: left;
 }
 .vappliance .vaversion-vmiversion .verticalpanel.osinfo > .property > .header{
 	min-width: 15px;
+        max-width: 220px;
 	text-align: right;
 	color: #444;
 }
@@ -14232,6 +14238,66 @@ vappliance.singlevmipolicy .property > .loader, .vappliance .vappliance-version 
 	display: inline-block;
 	max-width: 88px;
 	letter-spacing: normal !important;
+}
+.fieldvalueset {
+    display: block;
+}
+.fieldvalueset > .header {
+    display: block;
+    padding: 5px 0px;
+    margin: 2px auto;
+    border: none;
+    vertical-align: middle;
+    font-size: 14px;
+    line-height: 14px;
+    color: #222;
+}
+
+.fieldvalueset > .contents {
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: row;
+    padding: 0px 10px;
+    margin: 0 auto;
+    margin-bottom: 15px;
+    border: none;
+    border-top: 1px solid #aaa;
+}
+
+.fieldvalueset > .contents > .property.fieldnamevalue {
+    -webkit-flex: 1;  /* Safari 6.1+ */
+    -ms-flex: 1;  /* IE 10 */
+    flex: 1;
+    flex-shrink: 1;
+}
+.fieldvalueset > .contents > div.property.compact.disabled > .header {
+    color: #aaa;
+}
+.fieldvalueset > .contents > .property.fieldnamevalue > .value {
+    margin-right: 5px;
+}
+.vappliance .vaversion-vmiversionlist > ul > li > div.vaversion-vmiversion .property.vmiversion-minram > .header,
+.vappliance .vaversion-vmiversionlist > ul > li > div.vaversion-vmiversion .property.vmiversion-recomram > .header,
+.fieldvalueset > .contents > .property.fieldnamevalue,
+.fieldvalueset > .contents > .property.fieldnamevalue > .value,
+.fieldvalueset > .contents > .property.fieldnamevalue > .value > .dijit{
+    width: auto !important;
+    max-width: initial !important;
+    min-width: initial !important;
+}
+
+.vappliance .vaversion-vmiversionlist > ul > li > div.vaversion-vmiversion .property.vmiversion-acctype > .value > .dijitSelect{
+    width: 99% !important;
+    margin-right: 5px;
+}
+.fieldvalueset > .contents > .property.fieldnamevalue > .header {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+.fieldvalueset > .contents > .property.fieldnamevalue > .header,
+.fieldvalueset > .contents > .property.fieldnamevalue > .value{
+    display: block;
+    color: #444;
 }
 .vappliance .property.vaversion-vmiversion.selectedguid{
 	border-color:#FFBD99;/*#FF8A4C;*/

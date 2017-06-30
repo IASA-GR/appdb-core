@@ -4432,7 +4432,90 @@ appdb.vappliance.ui.views.DataValueHandlerVmidescription = appdb.ExtendClass(app
 		$(this.dom).closest('.property').addClass('hidden');
 	};
 });
+appdb.vappliance.ui.views.DataValueHandlerAcceleratorstype = appdb.ExtendClass(appdb.vappliance.ui.views.DataValueHandlerList, "appdb.vappliance.ui.views.DataValueHandlerAcceleratorstype", function(o) {
+	this.renderEditor = function(dom){
+		var selid = ( ( !$.isPlainObject(this.options.dataCurrentValue) && typeof this.options.dataCurrentValue !== 'undefined' )?this.options.dataCurrentValue:-1 );
+		if( $.isArray(this.options.dataSource) ){
+			var selobj = null;
+			var selopts = [];
+			$.each(this.options.dataSource, function(i,e){
+				var val = e.val();
+				val = val.replace(/\</g,"&lt;").replace(/\>/g,"&gt;");
+				selopts.push({
+					label: "<span>" + val + "</span>",
+					value: e.id,
+					selected: (('' + e.id) === ('' + selid))
+				});
+				if( ('' + e.id) === ('' + selid) ){
+					selid = selopts[selopts.length - 1].value;
+					selobj = e;
+				}
+			});
+			this.options.dataCurrentValue = selobj;
+			this.editor = new dijit.form.Select({
+				options: selopts,
+				onFocus: (function(self){
+					return function(){
+						self.parent.setFocus(true);
+					};
+				})(this),
+				onBlur:  (function(self){
+					return function(){
+						self.parent.setFocus(false);
+					};
+				})(this),
+				onChange: (function(self){
+					return function(v){
+						var res = v;
+						if( self.options.dataSource ){
+							$.each(self.options.dataSource, function(i,e){
+								if( e.id === res ){
+									res = e;
+								}
+							});
+						}
+						self.options.dataCurrentValue = res;
+						self.onValueChange();
+						self.parent.setFocus(true);
+					};
+				})(this)
+			}, dom);
+			this.onValueChange();
+		}
+	};
+	this.onValueChange = function(v){
+		v = v || this.options.dataCurrentValue;
+		if( $.isPlainObject(v) && 'id' in v) {
+		    v = v.id;
+		}
+		if( $.trim(v) === "" ){
+			v =  this.editor.get("value");
+			v = v.replace(/\</g,"&lt;").replace(/\>/g,"&gt;");
+			this.options.dataCurrentValue = v;
+		}else{
+			this.options.dataCurrentValue = v;
+		}
+		this.onValidate();
+		var siblings = $(this.dom).closest('.property').siblings('[data-path^="accelerators."]');
+		if ($.trim(v) === '-1') {
+		    $(siblings).addClass('disabled');
+		    $(siblings).find('.value > .dijit').each(function(index, el) {
+			dijit.byNode(el).set('disabled', true);
+		    });
+		} else {
+		    $(siblings).removeClass('disabled');
+		    $(siblings).find('.value > .dijit').each(function(index, el) {
+			dijit.byNode(el).set('disabled', false);
+		    });
+		}
 
+		if( $.trim(this.editor.get("value")) === "" ){
+			$(this.dom).addClass("isempty");
+		}else{
+			$(this.dom).removeClass("isempty");
+		}
+	};
+});
 appdb.vappliance.ui.views.DataProperty = appdb.ExtendClass(appdb.View, "appdb.vappliance.ui.views.DataProperty", function(o){
 	this.options = {
 		container: $(o.container),
@@ -4865,6 +4948,7 @@ appdb.vappliance.ui.views.DataPropertyContainer = appdb.ExtendClass(appdb.View,"
 			props[i].subscribe({event: "valuechanged", callback: function(v){
 				if( typeof v.value === "undefined" && v.oldValue === "" ) return;
 				this.dispatchDataBind(v);
+				this.onPropertyValueChange(v);
 			}, caller: this});
 		}
 	};
@@ -4881,6 +4965,9 @@ appdb.vappliance.ui.views.DataPropertyContainer = appdb.ExtendClass(appdb.View,"
 	};
 	this.isValid = function(){
 		return true;
+	};
+	this.onPropertyValueChange = function(v) {
+	    //to be overriden
 	};
 	this.onValidationError = function(){
 		
@@ -5172,6 +5259,10 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 		var coresmin = props.coresminimum || "0";
 		var coresrecommended = props.coresrecommended || "0";
 		var ovfurl = $.trim(props.ovfurl) || "";
+		var accelerators = {type: props.acceleratorstype || 'None', minimum: (props.accminimum || 0), recommended: (props.accrecommended || 0)};
+		if (!accelerators || accelerators.type === 'None' || $.trim(accelerators.type) === '-1') {
+		    accelerators = null;
+		}
 		var res = {
 			id: props.id || d.id,
 			version: props.version || d.version,
@@ -5190,10 +5281,14 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 			addedon: d.addedon || "",
 			addedby: d.addedby,
 			integrity: integrity,
+			accelerators: accelerators,
 			ram: {minimum: rammin , recommended: ramrecommended},
 			cores: {minimum: coresmin, recommended: coresrecommended },
 			ovf: { url: ovfurl }
 		};
+		if (res.accelerators === null) {
+		    res.accelerators = null;
+		}
 		if( appdb.config.features.singleVMIPolicy === true ) {
 			if( $.trim(d.prevUrl) !== "" ) {
 				res.prevUrl = $.trim(d.prevUrl);
@@ -5255,6 +5350,7 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 		var viewcoresrecommended = $(this.options.container).find("div[data-name='viewcoresrecommended'] > .value");
 		var viewramminimum = $(this.options.container).find("div[data-name='viewramminimum'] > .value");
 		var viewramrecommended = $(this.options.container).find("div[data-name='viewramrecommended'] > .value");
+		var viewacctype = $(this.options.container).find("div[data-name='viewacctype'] > .value");
 		if( $.trim($(viewramminimum).html()) === "0" || $.trim($(viewramminimum).html()) === ""){
 			$(viewramminimum).html("<span class='notavailable'>n/a</span>");
 			$(viewramminimum).siblings(".unit").remove();
@@ -5270,6 +5366,9 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 		if( $.trim($(viewcoresrecommended).html()) === "0" || $.trim($(viewcoresrecommended).html()) === ""){
 			$(viewcoresrecommended).html("<span class='notavailable'>n/a</span>");
 			$(viewcoresrecommended).siblings(".unit").remove();
+		}
+		if( $.trim($(viewacctype).html()) === "None" || $.trim($(viewacctype).html()) === ""){
+		    $(viewacctype).closest('.accelerators.group').remove();
 		}
 		$(this.dom).removeClass("isprotected isprivate");
 		if( this.isPrivate() ){
