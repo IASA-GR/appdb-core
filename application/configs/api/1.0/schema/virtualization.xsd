@@ -134,6 +134,12 @@
 		<xs:attribute name="name" type="xs:string" use="optional"/>
 	</xs:complexType>
 
+	<xs:complexType name="contextformatType" mixed="true">
+		<xs:attribute name="id" type="xs:integer" use="required"/>
+		<xs:attribute name="name" type="xs:string" use="optional"/>
+		<xs:attribute name="supported" type="xs:string" use="required"/>
+	</xs:complexType>
+
 	<xs:complexType name="contextscriptType" mixed="false">
 		<xs:sequence>
 			<xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1"/>
@@ -172,6 +178,7 @@
 			<xs:element name="addedby" type="person:personType" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="lastupdatedon" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="lastupdatedby" type="person:personType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="contextformat" type="virtualization:contextformatType" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:element name="contextscript" type="virtualization:contextscriptType" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:integer" use="required" />

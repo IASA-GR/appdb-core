@@ -280,6 +280,7 @@
             <xs:attribute name="requestedOn" type="xs:float" use="optional" />
             <xs:attribute name="deliveredOn" type="xs:float" use="optional" />
             <xs:attribute name="processingTime" type="xs:float" use="optional" />
+            <xs:attribute name="authenticated" type="xs:boolean" use="optional" />
         </xs:complexType>
     </xs:element>
 </xs:schema>

@@ -225,6 +225,16 @@
 								</xsl:when>
 							</xsl:choose>
 						</xsl:element>
+						<xsl:if test="virtualization:contextformat" >
+							<xsl:for-each select="virtualization:contextformat">
+								<xsl:element name="virtualization:contextformat">
+									<xsl:value-of select="." />
+									<xsl:attribute name="id"><xsl:value-of select="@id"/></xsl:attribute>
+									<xsl:attribute name="name"><xsl:value-of select="@name"/></xsl:attribute>
+									<xsl:attribute name="supported"><xsl:value-of select="@supported"/></xsl:attribute>
+								</xsl:element>
+							</xsl:for-each>
+						</xsl:if>
 						<xsl:if test="virtualization:contextscript/@id">
 							<xsl:for-each select="virtualization:contextscript[not(application:application)]">
 							<xsl:element name="virtualization:contextscript">
