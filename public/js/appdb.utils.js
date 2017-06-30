@@ -3822,6 +3822,7 @@ appdb.EntityType = function(o){
 		var meta = this;
 		var inst = function(){
 				this._meta_ = meta;
+				this._data_ = d || null;
 				for(var i in _fields){
 					this[_fields[i].getName()] = _fields[i].createDataWrapper(d || {});
 				}
@@ -4082,6 +4083,11 @@ appdb.entity.VirtualApplianceCores = appdb.EntityTypes.define("virtualappliancec
 	{name: "minimum", canRef:true},
 	{name: "recommended", canRef:true}
 ], {displayName:"cores"});
+appdb.entity.VirtualApplianceAccelerators = appdb.EntityTypes.define("virtualapplianceaccelerators",[
+	{name:"type", canRef: true},
+	{name: "minimum", canRef:true},
+	{name: "recommended", canRef:true}
+], {displayName:"accelerators"});
 appdb.entity.VirtualApplianceOvf = appdb.EntityTypes.define("virtualapplianceovf",[
 	{name:"id", canRef: true},
 	{name: "url", canRef:true}
@@ -4118,6 +4124,7 @@ appdb.entity.VirtualApplianceImageInstance = appdb.EntityTypes.define("virtualap
 	{name:"size", canRef: true},
 	{name:"ram", ref:"virtualapplianceram", canRef:true},
 	{name:"cores", ref:"virtualappliancecores", canRef:true},
+	{name:"accelerators", ref: "virtualapplianceaccelerators", canRef:true, isNullable: true},
 	{name:"ovf", ref:"virtualapplianceovf", canRef:true},
 	{name:"contextscript", ref:"virtualappliancecontextscript", canRef: true}	
 ], {displayName: "instance"});
@@ -4382,6 +4389,11 @@ appdb.utils.EntitySerializer = (function(defaultApiVersion){
 			"virtualapplianceram":{
 				namespace: "http://appdb.egi.eu/api/{:version}/virtualization",
 				attributes: ["id","minimum", "recommended"]
+			},
+			"virtualapplianceaccelerators":{
+				namespace: "http://appdb.egi.eu/api/{:version}/virtualization",
+				uses: ["xsi"],
+				attributes: ["type","minimum", "recommended"]
 			},
 			"virtualapplianceovf":{
 				namespace: "http://appdb.egi.eu/api/{:version}/virtualization",
@@ -4797,7 +4809,12 @@ appdb.utils.EntitySerializer = (function(defaultApiVersion){
 								var val = vals[j];
 								var p = (f.isExternalRef())?this._getPrefixByEntityName(val._meta_.getName()):prefix;
 								var t = (f.isExternalRef())?val._meta_.getName():f.getName();
-								inner +=  "\n" + this.toXmlElement(val, p, t, (f.getFieldPrefix() || undefined));	
+								if (val._data_ === null && f.isNullable()) {
+								    inner += "\n"+ this.toXmlNull(f,entity);
+								} else {
+								    inner +=  "\n" + this.toXmlElement(val, p, t, (f.getFieldPrefix() || undefined));
+								}
+
 							}
 						}else if(entity[f.getName()]()===null && (f.isList() || f.isNullable())){
 							inner += this.tab() + "\t"+ this.toXmlNull(f,entity);
