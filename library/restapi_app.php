@@ -5041,7 +5041,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 				$xml->registerXPathNamespace('virtualization','http://appdb.egi.eu/api/1.0/virtualization');
 			} catch (Exception $e) {
 				$this->_error = RestErrorEnum::RE_INVALID_REPRESENTATION;
-				$this->_extError = 'Could not parse xml';
+				$this->_extError = 'Could not parse XML: ' . $e->getMessage();
 				return new Default_Model_VA();
             }
             $this->_xml = $xml;
@@ -5053,7 +5053,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 					$this->isexternalrequest = true;
 				} catch (Exception $e) {
 					$this->_error = RestErrorEnum::RE_INVALID_REPRESENTATION;
-					$this->_extError = 'Could not parse xml';
+					$this->_extError = 'Could not parse XML: ' . $e->getMessage();
 					return new Default_Model_VA();
 				}
 			}
@@ -5486,7 +5486,7 @@ class RestAppContextScriptXMLParser extends RestXMLParser {
 				$xml->registerXPathNamespace('virtualization','http://appdb.egi.eu/api/1.0/virtualization');
 				$xml->registerXPathNamespace('contextualization','http://appdb.egi.eu/api/1.0/contextualization');
 			} catch (Exception $e) {
-				return $this->_setErrorMessage("Could not parse XML",RestErrorEnum::RE_INVALID_REPRESENTATION);
+				return $this->_setErrorMessage("Could not parse XML: " . $e->getMessage() ,RestErrorEnum::RE_INVALID_REPRESENTATION);
             }
             
 			$cs = ContextScriptXMLParser::parse($xml);
@@ -5516,7 +5516,7 @@ class RestAppContextXMLParser extends RestXMLParser{
 				$xml->registerXPathNamespace('virtualization','http://appdb.egi.eu/api/1.0/virtualization');
 				$xml->registerXPathNamespace('contextualization','http://appdb.egi.eu/api/1.0/contextualization');
 			} catch (Exception $e) {
-				return $this->_setErrorMessage("Could not parse XML",RestErrorEnum::RE_INVALID_REPRESENTATION);
+				return $this->_setErrorMessage("Could not parse XML: " . $e->getMessage(), RestErrorEnum::RE_INVALID_REPRESENTATION);
             }
             
 			$cs = ContextXMLParser::parse($xml);
