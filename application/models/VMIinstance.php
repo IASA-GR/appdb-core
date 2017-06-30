@@ -75,7 +75,10 @@ class Default_Model_VMIinstance extends Default_Model_VMIinstanceBase
 		}
 	}
 
-	public function unsetAccel() {
+	public function deleteAccel() {
+		$this->_accelRecommend = null;
+		$this->_accelMinimum = null;
+		$this->_accelType = null;
 		if (is_numeric($this->_id)) {
 			db()->exec("UPDATE vmiinstances SET min_acc = NULL, rec_acc = NULL, rec_acc_type = NULL WHERE id = " . $this->_id);
 		}

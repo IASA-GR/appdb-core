@@ -4271,7 +4271,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 		if( count( $xml->xpath('./virtualization:accelerators') ) > 0 ){
 			$accelerators = $xml->xpath('./virtualization:accelerators');
 			if ( (count($accelerators) === 1) && ($accelerators[0]->attributes(RestAPIHelper::XMLNS_XSI())->nil) && (strval($accelerators[0]->attributes(RestAPIHelper::XMLNS_XSI())->nil) == "true") ) {
-				$m->unsetAccel();
+				$m->deleteAccel();
 			}  elseif (count($accelerators) > 1) {
 				return $this->_setErrorMessage("Cardinality error for \`virtualization::accelerator' element");
 			} else {
