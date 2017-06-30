@@ -1240,7 +1240,8 @@ appdb.model.StaticList = {
 	ExchangeFormats: [],
 	ConnectionTypes: [],
 	SiteList: [],
-	DatasetList: []
+	DatasetList: [],
+	VmiAccelerators: [{id: -1, val: function() { return 'None';}}, {id: 'GPU', val: function() {return 'GPU';}}]
 };
 appdb.model.VirtualAppliance = function(opts,ext){
 	var _init = function(){
