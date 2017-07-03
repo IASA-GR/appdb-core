@@ -5409,7 +5409,17 @@ class RestAppVAItem extends RestResourceItem {
 			$res = db()->query("SELECT vapp_to_xml(" . $this->getParam("vappid") . ", 'vapplications') AS xml;")->fetchAll();
 			$x = array();
 			foreach($res as $r) {
-				$x[] = $r->xml;
+				if (is_object($r)) {
+					$x[] = $r->xml;
+				} elseif (is_array($r)) {
+					if (array_key_exists("xml", $r)) {
+						$x[] = $r["xml"];
+					} else {
+						error_log("[RestAppVAItem::get] WARNING: r is an array but has no \`xml' key!");
+					}
+				} else {
+					error_log("[RestAppVAItem::get] WARNING: r is not an object!");
+				}
 			}
 /*			$reply = new XMLFragmentRestResponse($x, $this);
 			
