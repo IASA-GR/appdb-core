@@ -6139,30 +6139,34 @@ class RestAppVAVersionItem extends RestAppVAItem {
      * @overrides delete() from RestResource
      */
 	public function delete() {
-		db()->beginTransaction();
-		try{
-			if ($this->_res->published) {
-				$this->setError(RestErrorEnum::RE_INVALID_OPERATION, "Removing a VA version that has been published is not allowed", false);
-				return false;
-			} else {
-				$vapplists = new Default_Model_VALists();
-				$vapplists->filter->vappversionid->equals($this->_res->id);
-				if( count($vapplists->items) > 0 ){
-					for($i=0; $i<count($vapplists->items); $i+=1){
-						$vapplist = $vapplists->items[$i];
-						$this->deleteVALists($vapplist);
+		if (! is_null($this->_res)) {
+			db()->beginTransaction();
+			try{
+				if ($this->_res->published) {
+					$this->setError(RestErrorEnum::RE_INVALID_OPERATION, "Removing a VA version that has been published is not allowed", false);
+					return false;
+				} else {
+					$vapplists = new Default_Model_VALists();
+					$vapplists->filter->vappversionid->equals($this->_res->id);
+					if( count($vapplists->items) > 0 ){
+						for($i=0; $i<count($vapplists->items); $i+=1){
+							$vapplist = $vapplists->items[$i];
+							$this->deleteVALists($vapplist);
+						}
 					}
+					$this->_res->delete();
 				}
-				$this->_res->delete();
+				db()->commit();
+			}catch(Exception $e){
+				db()->rollBack();
+				error_log($e->getMessage());
+				$this->setError(RestErrorEnum::RE_BACKEND_ERROR, $e->getMessage(), false);
+				return false;
 			}
-			db()->commit();
-		}catch(Exception $e){
-			db()->rollBack();
-			error_log($e->getMessage());
-			$this->setError(RestErrorEnum::RE_BACKEND_ERROR, $e->getMessage(), false);
+				return true;
+		} else {
 			return false;
 		}
-		return true;
 	}
 	private function deleteVALists($item){
 		$inst = $item->getVMIInstance();
