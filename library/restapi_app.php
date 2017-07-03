@@ -6142,7 +6142,7 @@ class RestAppVAVersionItem extends RestAppVAItem {
 		db()->beginTransaction();
 		try{
 			if ($this->_res->published) {
-				$this->setError(RestErrorEnum::RE_INVALID_OPERATION, "Removing a VA version that has been published is not allowed");
+				$this->setError(RestErrorEnum::RE_INVALID_OPERATION, "Removing a VA version that has been published is not allowed", false);
 				return false;
 			} else {
 				$vapplists = new Default_Model_VALists();
