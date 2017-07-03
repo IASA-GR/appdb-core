@@ -846,7 +846,7 @@ class AppsController extends Zend_Controller_Action
 			$this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 500 Internal server error");
 			$this->getResponse()->setHeader("Status","500 Internal server error");
-			echo base64_encode(encrypt($e, ApplicationConfiguration::api('key','')));
+			echo base64_encode(encrypt($e, substr(ApplicationConfiguration::api('key',''), 0, 8)));
 			error_log("Transaction ROLLBACKed: $e");
 		}
     }

@@ -1718,7 +1718,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
 		$this->_error = $e;
 		if ( ! is_null($ext) ) {
 			if ( $enc ) {
-				$this->_extError = "DEBUG DATA: ".base64_encode(encrypt($ext,ApplicationConfiguration::api('key','')));
+				$this->_extError = "DEBUG DATA: ".base64_encode(encrypt($ext, substr(ApplicationConfiguration::api('key',''), 0, 8)));
 			} else {
 				$this->_extError = $ext;
 			}
