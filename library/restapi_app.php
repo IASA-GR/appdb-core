@@ -4276,7 +4276,35 @@ class RestAppVAXMLParser extends RestXMLParser {
 				}
 			}
 		}
-		if( count( $xml->xpath('./virtualization:accelerators') ) > 0 ){
+		if (count( $xml->xpath('./virtualization:contextformat') ) > 0) {
+			$cformats = $xml->xpath('./virtualization:contextformat');
+			if ( (count($cformats) === 1) && ($cformats[0]->attributes(RestAPIHelper::XMLNS_XSI())->nil) && (strval($cformats[0]->attributes(RestAPIHelper::XMLNS_XSI())->nil) == "true") ) {
+				$cfs = new Default_Model_VMISupportedContextFormats();
+				foreach ($m->ContextFormats as $cformat) {
+					$cfs->remove($cformat);
+				}
+			} else {
+				foreach ($cformats as $cformat) {
+					$supported = strval($cformat->attributes()->supported);
+					$fmtid = strval($cformat->attributes()->id);
+					if (($supported = "true") && ($fmtid != "")) {
+						if (! is_numeric($fmtid)) {
+							return $this->_setErrorMessage("Invalid id attribute \`$fmtid' for supported context format element \`virtualization:contextformat'");
+						}
+						$cf = new Default_Model_VMISupportedContextFormat();
+						$cf->vmiinstanceID = $m->id;
+						$cf->fmtid = strval($cformat->attributes()->id);
+						try {
+							$cf->save();
+						} catch (Exception $e) {
+							error_log($e);
+							return $this->_setErrorMessage("Invalid id attribute \`$fmtid' for supported context format element \`virtualization:contextformat'", RestErrorEnum::RE_BACKEND_ERROR);
+						}
+					}
+				}
+			}
+		}
+		if (count( $xml->xpath('./virtualization:accelerators') ) > 0) {
 			$accelerators = $xml->xpath('./virtualization:accelerators');
 			if ( (count($accelerators) === 1) && ($accelerators[0]->attributes(RestAPIHelper::XMLNS_XSI())->nil) && (strval($accelerators[0]->attributes(RestAPIHelper::XMLNS_XSI())->nil) == "true") ) {
 				$m->deleteAccel();
@@ -6142,9 +6170,21 @@ class RestAppVAVersionItem extends RestAppVAItem {
 		if( count($instances->items) === 0 ){
 			$this->deleteFlavour($item->getFlavour(),$item);
 		}
+		$this->deleteContextFormats($item->id);
 		$this->deleteContextScripts($item->id);
 		$item->delete();
 		
+	}
+	private function deleteContextFormats($vmiinstanceid){
+		$scriptids = array();
+		$vmicfs = new Default_Model_VMISupportedContextFormats();
+		$vmicfs->filter->vmiinstanceid->numequals($vmiinstanceid);
+		if( count($vmicfs->items) > 0 ){
+			foreach($vmicfs->items as $item){
+				$cfids[] = $item->fmtid;
+				$vmicfs->remove($item);
+			}
+		}
 	}
 	private function deleteContextScripts($vmiinstanceid){
 		$scriptids = array();

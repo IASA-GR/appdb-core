@@ -20,6 +20,7 @@
 class Default_Model_VMIinstance extends Default_Model_VMIinstanceBase
 {
 	protected $_networkTraffic;
+	protected $_supportedContextFormats;
 
 	public function delete(){
 		$valists = new Default_Model_VALists();
@@ -56,6 +57,15 @@ class Default_Model_VMIinstance extends Default_Model_VMIinstanceBase
 			$version = $item->getVAversion();
 		}
 		return $version;
+	}
+
+	public function getSupportedContextFormats() {
+		if ($this->_supportedContextFormats === null) {
+			$cf = new Default_Model_VMISupportedContextFormats();
+			$cf->filter->vmiinstanceid->numequals($this->id);
+			$this->_supportedContextFormats = $cf;
+		}
+		if (is_array($this->_supportedContextFormats)) return $this->_supportedContextFormats; else return $this->_supportedContextFormats->items;
 	}
 
 	public function getNetworkTraffic() {
