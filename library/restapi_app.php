@@ -6141,16 +6141,21 @@ class RestAppVAVersionItem extends RestAppVAItem {
 	public function delete() {
 		db()->beginTransaction();
 		try{
-		$vapplists = new Default_Model_VALists();
-		$vapplists->filter->vappversionid->equals($this->_res->id);
-		if( count($vapplists->items) > 0 ){
-			for($i=0; $i<count($vapplists->items); $i+=1){
-				$vapplist = $vapplists->items[$i];
-				$this->deleteVALists($vapplist);
+			if ($this->_res->published) {
+				$this->setError(RestErrorEnum::RE_INVALID_OPERATION, "Removing a VA version that has been published is not allowed");
+				return false;
+			} else {
+				$vapplists = new Default_Model_VALists();
+				$vapplists->filter->vappversionid->equals($this->_res->id);
+				if( count($vapplists->items) > 0 ){
+					for($i=0; $i<count($vapplists->items); $i+=1){
+						$vapplist = $vapplists->items[$i];
+						$this->deleteVALists($vapplist);
+					}
+				}
+				$this->_res->delete();
 			}
-		}
-		$this->_res->delete();
-		db()->commit();
+			db()->commit();
 		}catch(Exception $e){
 			db()->rollBack();
 			error_log($e->getMessage());
