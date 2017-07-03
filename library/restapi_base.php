@@ -734,6 +734,11 @@ class RestErrorEnum {
      */
     const RE_BACKEND_ERROR = 6;
     /**
+     * the operation is not allowed (data soundness)
+     * etc)
+     */
+    const RE_INVALID_OPERATION = 7;
+    /**
      * holds the error state set at construction time
      */
 	private $_state;
