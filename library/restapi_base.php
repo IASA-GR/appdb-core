@@ -782,6 +782,7 @@ class RestErrorEnum {
 			case RestErrorEnum::RE_INVALID_METHOD: return "Method not allowed";
 			case RestErrorEnum::RE_INVALID_RESOURCE: return "Requested invalid resource";
 			case RestErrorEnum::RE_BACKEND_ERROR: return "Backend error";
+			case RestErrorEnum::RE_INVALID_OPERATION: return "Invalid operation";
 			default: return "Unknown error";
 		}
 	}
@@ -1723,7 +1724,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
 				$this->_extError = $ext;
 			}
 		} else {
-			$ext = null;
+			$this->_extError = null;
 		}
 		switch($e){
 			case RestErrorEnum::RE_OK:
@@ -1740,6 +1741,9 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
 				break;
 			case RestErrorEnum::RE_INVALID_METHOD:
 				header("HTTP/1.0 405 Method Not Allowed");
+				break;
+			case RestErrorEnum::RE_INVALID_OPERATION:
+				header("HTTP/1.0 403 Forbidden");
 				break;
 			default:
 				header("HTTP/1.0 500 Internal Server Error");
