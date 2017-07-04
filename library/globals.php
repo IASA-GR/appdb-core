@@ -7888,6 +7888,76 @@ class SamlAuth{
 		return $researcher;
 	}
 	
+        //Retrieve X509 CNs from login response attributes and create X509 user accounts
+        //in case they don't already exists for the current user profile.
+        public static function harvestX509UserAccounts($session, $user) {
+                $attrs = $session->samlattrs;
+                $source = strtolower(trim($session->samlauthsource));
+                $ucerts = ( (isset($attrs["idp:userCertificateSubject"])== true && $attrs["idp:userCertificateSubject"])?$attrs["idp:userCertificateSubject"]:array());
+                $existingaccounts = array();
+                $newaccounts = array();
+
+                //Ignore and return if user is already logged using x509-sp
+                if ($source === 'x509-sp') {
+                        return;
+                }
+
+                //Ensure useCertificateSubject is an array
+                if (is_array($ucerts) === false) {
+                        if (trim($ucerts) === "") {
+                                $ucerts = array();
+                        } else {
+                                $ucerts = array($ucerts);
+                        }
+                }
+
+                //Ignore and return if no useCertificateSubjects are given
+                if (count($ucerts) === 0) {
+                        return;
+                }
+
+                //Collect current user's x509 registered accounts
+                $uaccounts = new Default_Model_UserAccounts();
+                $f1 = new Default_Model_UserAccountsFilter();
+                $f2 = new Default_Model_UserAccountsFilter();
+                $f1->account_type->equals("x509");
+                $f2->researcherid->numequals(intval($user->id));
+                $uaccounts->filter->chain($f1, "AND");
+                $uaccounts->filter->chain($f2, "AND");
+
+                if (count($uaccounts->items) > 0) {
+                        //Collect the registered DNs
+                        foreach($uaccounts->items as $uaccount) {
+                                $existingaccounts[] = $uaccount->accountid;
+                        }
+                        //Check which userCertificateSubjects are not in the
+                        //existing accounts list and add them to the newaccounts list
+                        foreach($ucerts as $ucert) {
+                                if (in_array($ucert, $existingaccounts) === false) {
+                                        $newaccounts[] = $ucert;
+                                }
+                        }
+                } else {
+                        //Since there are no x509 registered all userCertificateSubjects
+                        //should be marked as new and be added in the newaccounts list
+                        $newaccounts = $ucerts;
+                }
+
+                //If there are userCertificates in newaccounts list
+                //add them as new x509 useraccounts
+                if (count($newaccounts) > 0) {
+                    foreach($newaccounts as $newaccount) {
+                            $uaccount = new Default_Model_UserAccount();
+                            $uaccount->researcherid = $user->id;
+                            $uaccount->accountid = $newaccount;
+                            $uaccount->accounttypeid = 'x509';
+                            $uaccount->accountname = trim($session->userFirstName . " " . $session->userLastName);
+                            $uaccount->comment = 'Implicit::' . $source . '::' . date('Y-m-d H:i:s');
+                            $uaccount->save();
+                    }
+                }
+        }
+
 	//Collect and store implicit user accounts from current one.
 	//E.g. if a user signed in with an egi sso account there might be a usercertificate subject. 
 	//In this case store it as a x509 user account in the current profile.
@@ -8265,11 +8335,13 @@ class SamlAuth{
 		if( $user!==null && $user->id ){
 			if($accounttype !== 'egi-aai') {
 				self::harvestSamlData($session, $user);
-			}
+			} else {
+                                self::harvestX509UserAccounts($session, $user);
+                        }
 			self::setupSamlSession($session, $useraccount, $user);
 			if( $_COOKIE["SimpleSAMLAuthToken"] ){
 				self::setupSamlUserCredentials($user, $session);
-			}
+                        }
 		}else{
 			self::setupSamlNewUserSession($session, $accounttype);
 		}
