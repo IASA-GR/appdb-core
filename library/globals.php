@@ -76,7 +76,22 @@ if ($php_major <= 5) {
 
 
 function decodeUTF8($str) {
-	return `echo $'$str' | recode utf8..utf8`;
+	$s = "";
+	for ($i = 0; $i < strlen($a); $i = $i + 1) {
+		if ((substr($a, $i, 2) == '\x') && (substr($a, $i + 4, 2) == '\x')) {
+			$s = $s . hex2bin(substr($a, $i + 2, 2) . substr($a, $i + 6, 2));
+			$i = $i + 7;
+		} elseif (substr($a, $i, 2) == '\x') {
+			$s = $s . hex2bin(substr($a, $i + 2, 2));
+			$i = $i + 3;
+		} else {
+			$s = $s . substr($a, $i, 1);
+		}
+	}
+	return $s;
+	// 	Alternatively, the following line uses the recode tool in a subshell to do the same thing
+	// 	Unfortunatelly the PHP binding (recode_string) does not seem to recognize \x encoded data
+//	return `echo $'$str' | recode utf8..utf8`;
 }
 
 function web_get_contents($url) {
