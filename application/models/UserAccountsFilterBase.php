@@ -27,13 +27,14 @@ class Default_Model_UserAccountsFilterBase extends Default_Model_Filter {
 		$this->_fields[] = 'accountname';
 		$this->_fields[] = 'stateid';
 		$this->_fields[] = 'idptrace';
+		$this->_fields[] = 'comment';
 		$this->_fieldTypes['id'] = 'integer';
 		$this->_fieldTypes['researcherid'] = 'string';
 		$this->_fieldTypes['accountid'] = 'string';
 		$this->_fieldTypes['account_type'] = 'string';
 		$this->_fieldTypes['accountname'] = 'string';
 		$this->_fieldTypes['stateid'] = 'bigint';
-		$this->_fieldTypes['idptrace'] = 'string';
+		$this->_fieldTypes['comment'] = 'string';
 		$this->_table = 'user_accounts';
 	}
 }
