@@ -3472,7 +3472,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	}
 	 */
 	/* UNUSED 
-	public function canPublishVersion(){
+	private function canPublishVersion(){
 		$res = false;
 		$vaversions = new Default_Model_VAversions();
 		$vaversions->filter->id->equals($this->vappversionid);
@@ -3489,7 +3489,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	/*
 	 * Helper function to set errors for the API call
 	 */
-	public function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
+	private function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
 		$this->_error = $type;
 		$this->_extError = $msg;
 		return false;
@@ -3497,7 +3497,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	/*
 	 * Check if is PUT request
 	 */
-	public function isPUT(){
+	private function isPUT(){
 		return ( $this->HTTPMETHOD === RestMethodEnum::RM_PUT )?true:false;
 	}
 	/*
@@ -3789,7 +3789,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	 * value under the same virtual appliance
 	 */
 	/* UNUSED
-	public function VMIExists($vmi){
+	private function VMIExists($vmi){
 		$vmiid = $vmi->id;
 		$vmidescr = strtolower( trim($vmi->groupname) );
 		$vmis = new Default_Model_VMIs();
@@ -3823,7 +3823,8 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		return null;
 	}
-	public function VAVersionExists($vaversion){
+	/* UNUSED
+	private function VAVersionExists($vaversion){
 		$vaversionid = $vaversion->id;
 		$vaversionver = strtolower( trim($vaversion->version) );
 		$vappid = $vaversion->vappid;
@@ -3842,6 +3843,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		return false;
 	}
+	 */
 	private function versionHasImages($version = null){
 		if( $version == null ){
 			return false;
@@ -5536,7 +5538,7 @@ class RestAppVAItem extends RestResourceItem {
 }
 
 class RestAppContextScriptXMLParser extends RestXMLParser {
-	public function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
+	private function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
 		$this->_error = $type;
 		$this->_extError = $msg;
 		return false;
@@ -5567,7 +5569,7 @@ class RestAppContextScriptXMLParser extends RestXMLParser {
 	}
 }
 class RestAppContextXMLParser extends RestXMLParser{
-	public function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
+	private function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
 		$this->_error = $type;
 		$this->_extError = $msg;
 		return false;
@@ -5599,7 +5601,7 @@ class RestAppContextXMLParser extends RestXMLParser{
 
 class RestAppContext extends RestResourceList{
 	private $_app;
-	public function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
+	private function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
 		$this->_error = $type;
 		$this->_extError = $msg;
 		return false;
@@ -5737,7 +5739,7 @@ class RestAppContext extends RestResourceList{
 class RestAppContextScriptItem extends RestResourceItem{
 	private $_app;
 	private $_contextscript;
-	public function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
+	private function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
 		$this->_error = $type;
 		$this->_extError = $msg;
 		return false;
@@ -5896,7 +5898,7 @@ class RestAppContextScriptItem extends RestResourceItem{
 
 class RestAppContextScriptList extends RestResourceList{
 	private $_app;
-	public function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
+	private function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
 		$this->_error = $type;
 		$this->_extError = $msg;
 		return false;
