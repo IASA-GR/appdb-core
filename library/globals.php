@@ -7941,7 +7941,12 @@ class SamlAuth{
                                 $isnewaccount = true;
 
                                 foreach($existingaccounts as $existingaccount) {
-                                        if (decodeUTF8($ucert) == decodeUTF8($existingaccount)) {
+					if (
+						(decodeUTF8($ucert) == decodeUTF8($existingaccount)) ||
+						($ucert == decodeUTF8($existingaccount)) ||
+						(decodeUTF8($ucert) == $existingaccount) ||
+						($ucert == $existingaccount) 
+					) {
                                                 $isnewaccount = false;
                                                 break;
                                         }
