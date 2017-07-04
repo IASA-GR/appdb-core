@@ -7952,6 +7952,7 @@ class SamlAuth{
                             $uaccount->accountid = $newaccount;
                             $uaccount->accounttypeid = 'x509';
                             $uaccount->accountname = trim($session->userFirstName . " " . $session->userLastName);
+                            $uaccount->IDPTrace = $session->idptrace;
                             $uaccount->comment = 'Implicit::' . $source . '::' . date('Y-m-d H:i:s');
                             $uaccount->save();
                     }
