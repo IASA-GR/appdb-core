@@ -1042,7 +1042,7 @@ class RestAppXMLParser extends RestXMLParser {
 							
 							if( $targuid === "" ){
 								$rel["subjectguid"] = $subguid;
-							}else if( $subguid === "" ){
+							}elseif( $subguid === "" ){
 								$rel["targetguid"] = $targuid;
 							}
 							
@@ -3260,7 +3260,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	private $isexternalrequest=false;
 	public $HTTPMETHOD = null;
 	
-	public function validateNotes($d="", $type=""){
+	private function validateNotes($d="", $type=""){
 		if( is_string($d) ) {
 			$l = strlen( trim($d) );
 			if( $type === "vmi"){
@@ -3270,32 +3270,32 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		return false;
 	}
-	public function validateVersion($d=""){
+	private function validateVersion($d=""){
 		if( is_string($d) ) {
 			$l = strlen( trim($d) );
 			return ( $l >= RestAppVAXMLParser::VA_VERSION_MIN_SIZE && $l <= RestAppVAXMLParser::VA_VERSION_MAX_SIZE );
 		}
 		return false;
 	}
-	public function validateAccelerators($d=""){
+	private function validateAccelerators($d=""){
                 if( is_numeric($d) ) {
 			$l = intval( trim($d) );
 			return ( $l >= RestAppVAXMLParser::VA_VMI_ACCELERATORS_MIN_SIZE && $l <= RestAppVAXMLParser::VA_VMI_ACCELERATORS_MAX_SIZE );
 		}
 		return false;
         }
-	public function isUsedVaVersion($appid, $d="") {
+	private function isUsedVaVersion($appid, $d="") {
 		$usedversions = VApplianceVersionState::getVapplianceUsedVersions($appid);
 		return in_array(trim($d), $usedversions);
 	}
-	public function validateDescription($d=""){
+	private function validateDescription($d=""){
 		if( is_string($d) ) {
 			$l = strlen( trim($d) );
 			return ( $l >= RestAppVAXMLParser::VA_DESCR_MIN_SIZE && $l <= RestAppVAXMLParser::VA_DESCR_MAX_SIZE );
 		}
 		return false;
 	}
-	public function validateIdentifier($guid){
+	private function validateIdentifier($guid){
 		//TODO: Add valid identifier regex compatible with vmcasters
 		return true;
 		if (preg_match('/^\{?[A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}\}?$/', $guid)) {
@@ -3303,20 +3303,20 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		return false;
 	}
-	public function validateUrl($d=""){
+	private function validateUrl($d=""){
 		if( strlen(trim($d)) > 0 && filter_var($d, FILTER_VALIDATE_URL)) {
 			return true;
 		}
 		return false;
 	}
-	public function validateGroupname($d=""){
+	private function validateGroupname($d=""){
 		if( is_string($d) ) {
 			$l = strlen( trim($d) );
 			return ( $l >= RestAppVAXMLParser::VA_GROUP_MIN_SIZE && $l <= RestAppVAXMLParser::VA_GROUP_MAX_SIZE );
 		}
 		return false;
 	}
-	public function validateTitle($d=""){
+	private function validateTitle($d=""){
 		if( is_string($d) ) {
 			$l = strlen( trim($d) );
 			return ( $l >= RestAppVAXMLParser::VA_TITLE_MIN_SIZE && $l <= RestAppVAXMLParser::VA_TITLE_MAX_SIZE );
@@ -3333,11 +3333,11 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		return $this->vappliance_service;
 	}
-	public function validateStatusChange($vaversion, $newstatus){
+	private function validateStatusChange($vaversion, $newstatus){
 		//todo: add valid status flow
 		if( $vaversion->status === $newstatus ){
 			return true;
-		}else if( $newstatus === "verify" || $newstatus === "verifypublish" ){
+		}elseif( $newstatus === "verify" || $newstatus === "verifypublish" ){
 			return true;
 		}
 		if( (trim($vaversion->status) === '' || $vaversion->status === "verifing" || $vaversion->status === "verifingpublish" || $vaversion->status === "canceled" || $vaversion->status === "failed" || $vaversion->status === "verified" ) && $newstatus === "init"){ //canceling running integrity check
@@ -3346,7 +3346,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 		return false;
 	}
 	//Check if identifier is used inside a VO wide image list
-	public function VOGuidExists($guid){
+	private function VOGuidExists($guid){
 		$vowideimagelists = new Default_Model_VOWideImageLists();
 		$vowideimagelists->fitler->guid->equals($guid);
 		if( count($vowideimagelists->items) > 0 ){
@@ -3376,7 +3376,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 		
 		return false;
 	}
-	public function isGroupNameUnique( $vmi, $vmiversion ){
+	private function isGroupNameUnique( $vmi, $vmiversion ){
 		if( trim($vmi->groupname) === "" ) return true;
 		$vappviews = new Default_Model_Vappviews();
 		$f1 = new Default_Model_VappviewsFilter();
@@ -3397,7 +3397,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 		return true;
 	}
 	
-	public function canIncludeImageInstance($instance,$parent){
+	private function canIncludeImageInstance($instance,$parent){
 		$m = null;
 		$insts = new Default_Model_VMIinstances();
 		$imageid = null;
@@ -3448,14 +3448,15 @@ class RestAppVAXMLParser extends RestXMLParser {
 		//Output error
 		if( $imageid !== null){
 			return "Cannot include image instance with id: " . $imageid .". is already in use by another virtual appliance version." ;
-		}else if( $imageguid !== null ){
+		}elseif( $imageguid !== null ){
 			return "Cannot include image instance with guid: " . $imageguid .". is already in use by another virtual appliance version." ;
 		}else{
 			return "Cannot include image instance that is already in use by another virtual appliance version." ;
 		}
 		
 	}
-	public function needsVerification(){
+	/* UNUSED 
+	private function needsVerification(){
 		$instances = new Default_Model_Vappviews();
 		$instances->filter->vappversionid->equals($this->vappversionid);
 		if( count($instances->items) > 0  ){
@@ -3469,8 +3470,9 @@ class RestAppVAXMLParser extends RestXMLParser {
 			return false;
 		}
 	}
-	
-	public function canPublishVersion(){
+	 */
+	/* UNUSED 
+	private function canPublishVersion(){
 		$res = false;
 		$vaversions = new Default_Model_VAversions();
 		$vaversions->filter->id->equals($this->vappversionid);
@@ -3482,10 +3484,12 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		return $res;
 	}
+	 */
+
 	/*
 	 * Helper function to set errors for the API call
 	 */
-	public function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
+	private function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
 		$this->_error = $type;
 		$this->_extError = $msg;
 		return false;
@@ -3493,7 +3497,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	/*
 	 * Check if is PUT request
 	 */
-	public function isPUT(){
+	private function isPUT(){
 		return ( $this->HTTPMETHOD === RestMethodEnum::RM_PUT )?true:false;
 	}
 	/*
@@ -3569,7 +3573,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 					if( count($m->items) > 0 ){
 						return $m->items[0];
 					}
-				}else if( $this->vappid > -1 ){
+				}elseif( $this->vappid > -1 ){
 					$vas = new Default_Model_VAs();
 					$vas->filter->id->equals($this->vappid);
 					if( count($vas->items) > 0 ){
@@ -3623,7 +3627,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 					$m = new Default_Model_Archs();
 					if( is_numeric($id) && intval($id) > 0 ){
 						$m->filter->id->equals($id);
-					}else if( $val !== ""){
+					}elseif( $val !== ""){
 						$m->filter->name->ilike($val);
 					}
 					if( count($m->items) > 0 ){
@@ -3641,7 +3645,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 					$m = new Default_Model_OSes();
 					if( is_numeric($id) && intval($id) > 0 ){
 						$m->filter->id->equals($id);
-					}else if($val !== ""){
+					}elseif($val !== ""){
 						$m->filter->name->ilike($val);
 					}
 					if( count($m->items) > 0 ){
@@ -3670,7 +3674,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 					$m = new Default_Model_Hypervisors();
 					if( is_numeric($id) && intval($id) > 0 ){
 						$m->filter->id->equals($id);
-					}else if($val !== ""){
+					}elseif($val !== ""){
 						$val = trim(str_replace(",", "-", $val));
 						$m->filter->name->ilike($val);
 					}
@@ -3694,7 +3698,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	 * Deletes any existing relations f VAVersion with VMIInstances
 	 * and replaces it with the new ones given as $vmiinstances parameter
 	 */
-	public function setupVAppList($vappversion, $vmiinstances = array()){
+	private function setupVAppList($vappversion, $vmiinstances = array()){
 		$versionid = $vappversion->id;
 		$instids = array();
 		//Get stored vmi instances in vapplists for specific version
@@ -3721,7 +3725,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	 * Checks if there is another virtual appliance image instance 
 	 * with the same image file url under the same VMI.
 	 */
-	public function VMIInstanceUrlExists($instance, $image){
+	private function VMIInstanceUrlExists($instance, $image){
 		$flavour = $instance->getFlavour();
 		$hypervisors =  $flavour->getHypervisors();
 		if(is_string($hypervisors) ){
@@ -3756,7 +3760,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		return false;
 	}
-	public function versionHasUniqueUrls(){
+	private function versionHasUniqueUrls(){
 		$collect = array();
 		$vapplists = new Default_Model_VALists();
 		$vapplists->filter->vappversionid->equals($this->vappversionid);
@@ -3784,7 +3788,8 @@ class RestAppVAXMLParser extends RestXMLParser {
 	 * Checks if there is another VMI with the same groupname(group) 
 	 * value under the same virtual appliance
 	 */
-	public function VMIExists($vmi){
+	/* UNUSED
+	private function VMIExists($vmi){
 		$vmiid = $vmi->id;
 		$vmidescr = strtolower( trim($vmi->groupname) );
 		$vmis = new Default_Model_VMIs();
@@ -3802,11 +3807,13 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		return false;
 	}
+	 */
+
 	/*
 	 * Checks if there is another VaVersion item with the same 
 	 * version value under the same Virtual Appliance.
 	 */
-	public function getCurrentVAVersion() {
+	private function getCurrentVAVersion() {
 		if( intval($this->vappversionid) > 0){
 			$vaversions = new Default_Model_VAversions();
 			$vaversions->filter->id->numequals($this->vappversionid);
@@ -3816,7 +3823,8 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		return null;
 	}
-	public function VAVersionExists($vaversion){
+	/* UNUSED
+	private function VAVersionExists($vaversion){
 		$vaversionid = $vaversion->id;
 		$vaversionver = strtolower( trim($vaversion->version) );
 		$vappid = $vaversion->vappid;
@@ -3835,7 +3843,8 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		return false;
 	}
-	public function versionHasImages($version = null){
+	 */
+	private function versionHasImages($version = null){
 		if( $version == null ){
 			return false;
 		}
@@ -3846,7 +3855,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		return true;
 	}
-	public function deleteVMIs($ids){
+	private function deleteVMIs($ids){
 		$vmis = new Default_Model_VMIs();
 		$vmis->filter->id->in($ids);
 		if( count($vmis->items) > 0 ){
@@ -3856,8 +3865,9 @@ class RestAppVAXMLParser extends RestXMLParser {
 			}
 		}
 	}
-	
-	public function getPublishedVersion(){
+
+	/* UNUSED	
+	private function getPublishedVersion(){
 		$versions = new Default_Model_VAversions();
 		$versions->filter->vappid->equals($this->vappid);
 		if( count($versions->items) > 0 ){
@@ -3870,7 +3880,9 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		return null;
 	}
-	public function getWorkingVersion(){
+	 */
+
+	private function getWorkingVersion(){
 		$versions = new Default_Model_VAversions();
 		$versions->filter->vappid->equals($this->vappid);
 		if( count($versions->items) > 0 ){
@@ -3889,7 +3901,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	 * filled with the XML data.
 	 * !!!Flavour->Id is ignored!!!
 	 */
-	public function createVersionState($version){
+	private function createVersionState($version){
 		$old = new Default_Model_VAversion();
 		$old->id = $version->id;
 		$old->version = $version->version;
@@ -3909,7 +3921,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		$this->vappversion_state = new VApplianceVersionState($old);
 	}
-	public function getContextScriptById($id){
+	private function getContextScriptById($id){
 		$scripts = new Default_Model_ContextScripts();
 		$scripts->filter->id->numequals(intval($id));
 		if( count($scripts->items) > 0 ){
@@ -3917,7 +3929,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		return null;
 	}
-	public function findContextScriptByUrl($url){
+	private function findContextScriptByUrl($url){
 		$scripts = new Default_Model_ContextScripts();
 		$scripts->filter->url->equals(trim($url));
 		if( count($scripts->items) > 0 ){
@@ -3925,7 +3937,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		return null;
 	}
-	public function createContextScript($contextscriptxml){
+	private function createContextScript($contextscriptxml){
 		//create new context script
 		$contextscript = new Default_Model_ContextScript();
 
@@ -3993,7 +4005,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 
 		return $contextscript;
 	}
-	public function deleteContextScriptRelation($vmiinstanceid){
+	private function deleteContextScriptRelation($vmiinstanceid){
 		if( $vmiinstanceid ){
 			$scriptids = array();
 			$vmiscripts = new Default_Model_VMIinstanceContextScripts();
@@ -4022,7 +4034,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 			}
 		}
 	}
-	public function syncContextScript($contextscriptxml, $vmiinstance){
+	private function syncContextScript($contextscriptxml, $vmiinstance){
 		if( $contextscriptxml === null || !$vmiinstance){
 			return true;
 		}
@@ -4046,7 +4058,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 					VapplianceStorage::store($contextscript, $vmiinstance->id, $contextscript->addedbyid);
 				}
 			}
-		} else if( is_numeric($id) && intval($id) > 0 ){
+		} elseif( is_numeric($id) && intval($id) > 0 ){
 			$contextscript = $this->getContextScriptById($id);
 		}
 		
@@ -4079,7 +4091,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		return true;
 	}
-	public function getOsInformation($xml){
+	private function getOsInformation($xml){
 		$osversion = $this->getItem("osversion", $xml);
 		$osversion = ( (trim($osversion) === "")?null:trim($osversion) );
 		$os = null;
@@ -4098,7 +4110,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 		$info = VMCasterOsSelector::getOsInfo($osfamily, $os, $osversion);
 		return $info;
 	}
-	public function parseVAppFlavour($xml, $parent = null){
+	private function parseVAppFlavour($xml, $parent = null){
 		$hypervisor = $this->getItem("hypervisor", $xml);
 		if( !is_numeric($hypervisor->id) || intval($hypervisor->id) <0 ){
 			return $this->_setErrorMessage('Invalid hypervisor for VMI Instance.');
@@ -4110,10 +4122,10 @@ class RestAppVAXMLParser extends RestXMLParser {
 		if( is_string($osinfo) === true ){
 			//An error returned 
 			return $this->_setErrorMessage($osinfo);
-		} else if( $osinfo === false || $osinfo === null || !$osinfo ){
+		} elseif( $osinfo === false || $osinfo === null || !$osinfo ){
 			//Something went wrong. Unhandled error.
 			return $this->_setErrorMessage('Invalid OS information given for VMI Instance.');
-		} else if( is_array($osinfo) === true ){
+		} elseif( is_array($osinfo) === true ){
 			//We can ignore the os family in osinfo. It will always be relative to the os.
 			if( isset($osinfo["os"])===false || $osinfo["os"] === null ){
 				return $this->_setErrorMessage('Could not identify os for VMI Instance.');
@@ -4183,7 +4195,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	 * based on the given XML data.
 	 * Returns a Default_Model_VMIinstance item.
 	 */
-	public function parseVAppImageInstance($xml, $parent = null){
+	private function parseVAppImageInstance($xml, $parent = null){
 		$isupdated = false;
 		$contextscript = null;
 		$flavour = $this->parseVAppFlavour($xml, $parent);
@@ -4202,7 +4214,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 				$m->version = $wver->version;
 				$m->description = $wver->notes;
 			}
-		} else if( $this->validateVersion($version) === false ){
+		} elseif( $this->validateVersion($version) === false ){
 			return $this->_setErrorMessage("Invalid version value for VMI Instance.");
 		}else{
 			$m->version = $version;
@@ -4537,7 +4549,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 			}
 			$m->initialchecksum = $m->checksum;
 			$m->initialsize = $m->size;
-		}else if($isupdated === true ){
+		}elseif($isupdated === true ){
 			$lastupdatedby = $this->_parent->getUser();
 			if( $lastupdatedby && intval($lastupdatedby->id) > 0 ){
 				$m->lastUpdatedByID = $lastupdatedby->id;
@@ -4583,7 +4595,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 		$synccontextscript = $this->syncContextScript($contextscript, $m);
 		if( $synccontextscript === null || $synccontextscript === false){
 			return $this->_setErrorMessage("Could not relate context scripts to vmi instance " .  $m->id);
-		}else if(is_string($synccontextscript) ){
+		}elseif(is_string($synccontextscript) ){
 			return $this->_setErrorMessage($synccontextscript);
 		}
 		
@@ -4594,7 +4606,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	 * based on the given XML data.
 	 * Returns a Default_Model_VMI item.
 	 */
-	public function parseVAppImage($xml, $parent = null){
+	private function parseVAppImage($xml, $parent = null){
 		$m = $this->getItem("vmi",$xml );
 		
 		if( count($xml->xpath('./virtualization:notes')) > 0 ){
@@ -4668,10 +4680,10 @@ class RestAppVAXMLParser extends RestXMLParser {
 					return $this->_setErrorMessage("Image identifier " . $m->guid . " is already used by another virtual appliance image.");
 				}
 				//Check if identifier is used inside a VO wide image list
-				$voexists = self::VOGuidExists($m->guid);
+				$voexists = $this->VOGuidExists($m->guid);
 				if( $voexists === true ){
 					return $this->_setErrorMessage("Image identifier " . $m->guid . " is already used in a virtual organization image list.");
-				}else if( is_string($voexists) ){
+				}elseif( is_string($voexists) ){
 					return $this->_setErrorMessage("Image identifier " . $m->guid . " is already used by " . $voexists . " virtual organization image list.");
 				}
 			}
@@ -4764,7 +4776,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	 * based on the given XML data.
 	 * Returns a Default_Model_VAVersion item.
 	 */
-	public function parseVAppVersion($xml, $parent = null){
+	private function parseVAppVersion($xml, $parent = null){
 		$m = $this->getItem("vaversion", $xml);
 		
 		if( !$this->isPUT() && $this->isexternalrequest===false && ( !is_numeric($m->id) || intval($m->id)<=0 )  ){
@@ -4786,7 +4798,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 					$m->save();
 					$this->vappversion_state->setVersionNewState($m);
 					return $m;
-				}else if( $enabled == "false" && $m->enabled === true){
+				}elseif( $enabled == "false" && $m->enabled === true){
 					$this->createVersionState($m);
 					$m->enabled = false;
 					$m->save();
@@ -4840,7 +4852,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 				$enabled = strtolower(trim(strval($xml->attributes()->enabled)));
 				if( $enabled == "true" ){
 					$m->enabled = true;
-				}else if( $m->enabled == "false" ){
+				}elseif( $m->enabled == "false" ){
 					$m->enabled = false;
 				}
 			}
@@ -4854,7 +4866,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 			$validstatus = $this->validateStatusChange($m, $status);
 			if( $validstatus === true ){
 				$m->status = $status;
-			}else if ( strlen(trim(strval($validstatus))) > 0 ) {
+			}elseif ( strlen(trim(strval($validstatus))) > 0 ) {
 				return $this->_setErrorMessage($validstatus);
 			}else{
 				return $this->_setErrorMessage("Invalid status value given.");
@@ -4919,10 +4931,10 @@ class RestAppVAXMLParser extends RestXMLParser {
 					return $this->_setErrorMessage("Version identifier " . $m->guid . " is already used by another version.");
 				}
 				//Check if identifier is used inside a VO wide image list
-				$voexists = self::VOGuidExists($m->guid);
+				$voexists = $this->VOGuidExists($m->guid);
 				if( $voexists === true ){
 					return $this->_setErrorMessage("Version identifier " . $m->guid . " is already used in a virtual organization image list.");
-				}else if( is_string($voexists) ){
+				}elseif( is_string($voexists) ){
 					return $this->_setErrorMessage("Version identifier " . $m->guid . " is already used by " . $voexists . " virtual organization image list.");
 				}
 			}
@@ -5017,7 +5029,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	 * based on the given XML data.
 	 * Returns a Default_Model_VA item.
 	 */
-	public function parseVAppliance($xml){
+	private function parseVAppliance($xml){
 		$m = $this->getItem("va",$xml);
 		$isput = $this->isPUT();
 		
@@ -5027,9 +5039,9 @@ class RestAppVAXMLParser extends RestXMLParser {
 		
 		if( is_numeric($m->id) && $m->id > 0 && $isput ){ //PUT with ID
 			//return $this->_setErrorMessage('Cannot add existing virtual appliance.');
-		}else if( !$isput && (!is_numeric($m->id) || intval($m->id) <= 0 ) ){ //POST without ID
+		}elseif( !$isput && (!is_numeric($m->id) || intval($m->id) <= 0 ) ){ //POST without ID
 			return $this->_setErrorMessage('No virtual appliance id given for update action.');
-		}else if( $isput && ( !is_numeric($m->appid) || intval($m->appid) <=0 ) ){//NO APPID
+		}elseif( $isput && ( !is_numeric($m->appid) || intval($m->appid) <=0 ) ){//NO APPID
 			return $this->_setErrorMessage('No software id given to create new virtual appliance.');
 		}
 		
@@ -5456,7 +5468,7 @@ class RestAppVAItem extends RestResourceItem {
 	public function canAccessPrivateData(){
 		if( $this->_res === null || $this->_res->imglstprivate == false) {
 			return true;
-		}else if( $this->getUser() === null ) {
+		}elseif( $this->getUser() === null ) {
 			return false;
 		}
 		
@@ -5526,7 +5538,7 @@ class RestAppVAItem extends RestResourceItem {
 }
 
 class RestAppContextScriptXMLParser extends RestXMLParser {
-	public function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
+	private function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
 		$this->_error = $type;
 		$this->_extError = $msg;
 		return false;
@@ -5546,7 +5558,7 @@ class RestAppContextScriptXMLParser extends RestXMLParser {
 			$cs = ContextScriptXMLParser::parse($xml);
 			if( $cs === false ){
 				return $this->_setErrorMessage("Could not parse XML", RestErrorEnum::RE_INVALID_REPRESENTATION);
-			} else if( $cs !== true && is_string($cs) ){
+			} elseif( $cs !== true && is_string($cs) ){
 				return $this->_setErrorMessage($cs, RestErrorEnum::RE_BACKEND_ERROR);
 			}
 			return $cs;
@@ -5557,7 +5569,7 @@ class RestAppContextScriptXMLParser extends RestXMLParser {
 	}
 }
 class RestAppContextXMLParser extends RestXMLParser{
-	public function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
+	private function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
 		$this->_error = $type;
 		$this->_extError = $msg;
 		return false;
@@ -5576,7 +5588,7 @@ class RestAppContextXMLParser extends RestXMLParser{
 			$cs = ContextXMLParser::parse($xml);
 			if( $cs === false ){
 				return $this->_setErrorMessage("Could not parse XML", RestErrorEnum::RE_INVALID_REPRESENTATION);
-			} else if( $cs !== true && is_string($cs) ){
+			} elseif( $cs !== true && is_string($cs) ){
 				return $this->_setErrorMessage($cs, RestErrorEnum::RE_BACKEND_ERROR);
 			}
 			return $cs;
@@ -5589,7 +5601,7 @@ class RestAppContextXMLParser extends RestXMLParser{
 
 class RestAppContext extends RestResourceList{
 	private $_app;
-	public function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
+	private function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
 		$this->_error = $type;
 		$this->_extError = $msg;
 		return false;
@@ -5687,7 +5699,7 @@ class RestAppContext extends RestResourceList{
 			db()->rollBack();
 			$this->setError($this->_parser->getError(), $this->_parser->getExtError(), false);
 			$ret = false;
-		} else if( !is_array ($data)) {
+		} elseif( !is_array ($data)) {
 			db()->rollBack();
 			return $this->_setErrorMessage($data,RestErrorEnum::RE_BACKEND_ERROR);
 		} else {
@@ -5696,7 +5708,7 @@ class RestAppContext extends RestResourceList{
 				if( $result === false ){
 					db()->rollBack();
 					return $this->_setErrorMessage("Could not complete request",RestErrorEnum::RE_BACKEND_ERROR);
-				}else if( is_string($result) ){
+				}elseif( is_string($result) ){
 					db()->rollBack();
 					return $this->_setErrorMessage($result, RestErrorEnum::RE_BACKEND_ERROR);
 				}
@@ -5727,7 +5739,7 @@ class RestAppContext extends RestResourceList{
 class RestAppContextScriptItem extends RestResourceItem{
 	private $_app;
 	private $_contextscript;
-	public function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
+	private function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
 		$this->_error = $type;
 		$this->_extError = $msg;
 		return false;
@@ -5767,7 +5779,7 @@ class RestAppContextScriptItem extends RestResourceItem{
 		}
 		return $options;
 	}
-	public function getNamedAction($method){
+	private function getNamedAction($method){
 		$action = strtolower(trim($this->getParam("act")));
 		switch($method){
 			case RestMethodEnum::RM_POST:
@@ -5790,7 +5802,7 @@ class RestAppContextScriptItem extends RestResourceItem{
 		}
 		return $namedaction;
 	}
-	public function getActionArguments($method){
+	private function getActionArguments($method){
 		$result = array();
 		$namedaction = $this->getNamedAction($method);
 		switch($namedaction){
@@ -5842,7 +5854,7 @@ class RestAppContextScriptItem extends RestResourceItem{
 			if( $result === false ){
 				db()->rollBack();
 				return $this->_setErrorMessage("Could not complete request",RestErrorEnum::RE_BACKEND_ERROR);
-			}else if( is_string($result) ){
+			}elseif( is_string($result) ){
 				db()->rollBack();
 				return $this->_setErrorMessage($result, RestErrorEnum::RE_BACKEND_ERROR);
 			}
@@ -5886,7 +5898,7 @@ class RestAppContextScriptItem extends RestResourceItem{
 
 class RestAppContextScriptList extends RestResourceList{
 	private $_app;
-	public function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
+	private function _setErrorMessage($msg, $type = RestErrorEnum::RE_INVALID_REPRESENTATION){
 		$this->_error = $type;
 		$this->_extError = $msg;
 		return false;
@@ -5906,7 +5918,7 @@ class RestAppContextScriptList extends RestResourceList{
 	public function _list() { 
 		return $this->get();
 	}
-	public function getNamedAction($method){
+	private function getNamedAction($method){
 		$action = strtolower(trim($this->getParam("act")));
 		switch($method){
 			case RestMethodEnum::RM_POST:
@@ -5944,7 +5956,7 @@ class RestAppContextScriptList extends RestResourceList{
 			db()->rollBack();
 			$this->setError($this->_parser->getError(), $this->_parser->getExtError(), false);
 			$ret = false;
-		} else if( !is_array ($data)) {
+		} elseif( !is_array ($data)) {
 			db()->rollBack();
 			return $this->_setErrorMessage($data,RestErrorEnum::RE_BACKEND_ERROR);
 		} else {
@@ -5953,7 +5965,7 @@ class RestAppContextScriptList extends RestResourceList{
 				if( $result === false ){
 					db()->rollBack();
 					return $this->_setErrorMessage("Could not complete request",RestErrorEnum::RE_BACKEND_ERROR);
-				}else if( is_string($result) ){
+				}elseif( is_string($result) ){
 					db()->rollBack();
 					return $this->_setErrorMessage($result, RestErrorEnum::RE_BACKEND_ERROR);
 				}
