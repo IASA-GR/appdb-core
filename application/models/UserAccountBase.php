@@ -28,6 +28,7 @@ class Default_Model_UserAccountBase
 	protected $_accountname;
 	protected $_stateID;
 	protected $_idptrace;
+	protected $_comment;
 
 	public function __set($name,$value)
 	{
@@ -179,6 +180,19 @@ class Default_Model_UserAccountBase
 		return $this->_idptrace;
 	}
 
+	public function setComment($value)
+	{
+		/* if ( $value === null ) {
+			$this->_comment = 'NULL';
+		} else */ $this->_comment = $value;
+		return $this;
+	}
+
+	public function getComment()
+	{
+		return $this->_comment;
+	}
+
 
 	public function setMapper($mapper)
 	{
@@ -223,7 +237,7 @@ class Default_Model_UserAccountBase
 		if ( ! ($this->_accountType === null) ) $XML .= $this->_accountType->toXML();
 		if ($this->_accountname !== null) $XML .= "<accountname>".recode_string("utf8..xml",$this->_accountname)."</accountname>\n";
 		if ($this->_stateID !== null) $XML .= "<stateID>".$this->_stateID."</stateID>\n";
-		if ($this->_idptrace !== null) $XML .= "<IDPTrace>".$this->_idptrace."</IDPTrace>\n";
+		if ($this->_comment !== null) $XML .= "<comment>".$this->_comment."</comment>\n";
 		$XML .= "</UserAccount>\n";
 		return $XML;
 	}
