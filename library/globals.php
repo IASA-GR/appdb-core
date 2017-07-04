@@ -7938,7 +7938,16 @@ class SamlAuth{
                         //Check which userCertificateSubjects are not in the
                         //existing accounts list and add them to the newaccounts list
                         foreach($ucerts as $ucert) {
-                                if (in_array($ucert, $existingaccounts) === false) {
+                                $isnewaccount = true;
+
+                                foreach($existingaccounts as $existingaccount) {
+                                        if (decodeUTF8($ucert) == decodeUTF8($existingaccount)) {
+                                                $isnewaccount = false;
+                                                break;
+                                        }
+                                }
+
+                                if ($isnewaccount) {
                                         $newaccounts[] = $ucert;
                                 }
                         }
