@@ -74,6 +74,11 @@ if ($php_major <= 5) {
 	}
 }
 
+
+function decodeUTF8($str) {
+	return `echo $'$str' | recode utf8..utf8`;
+}
+
 function web_get_contents($url) {
 	$arrContextOptions=array(
 		"ssl"=>array(
