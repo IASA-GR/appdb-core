@@ -1901,11 +1901,11 @@ appdb.vappliance.components.LatestVersion = appdb.ExtendClass(appdb.vappliance.c
 		}, caller: this}).subscribe({event: "error", callback: function(d){
 			//Called upon ajax error of both virtual appliance update or insert action. E.g. HTTP 500 - Internal Server Error
 		}, caller: this});
-	
+
 		//Determine type of request and perform it.
 		this.model.update({query: modelOpts, data: {data: encodeURIComponent(xml)}});	
 	};
-	
+
 	this.renderToolbar = function(display){
 		$(this.dom).find(".toolbar > .actions > .action.disable").unbind("click").bind("click", (function(self){
 			return function(ev){
@@ -3418,6 +3418,71 @@ appdb.vappliance.ui.views.DataValueHandlerList = appdb.ExtendClass(appdb.vapplia
 					};
 				})(this)
 			}, dom);
+		}
+	};
+	this.postRenderEditor = function(){
+		this.onValueChange();
+	};
+});
+appdb.vappliance.ui.views.DataValueHandlerValuelist = appdb.ExtendClass(appdb.vappliance.ui.views.DataValueHandler,"appdb.vappliance.ui.views.DataValueHandlerValuelist", function(o){
+	this.getTypedValue = function(v) {
+	    var dataType = ((this.options.constraints || {}).dataType || 'string');
+	    switch(dataType) {
+		case 'number':
+		    return parseInt(v);
+		case 'float':
+		    return parseFloat(v);
+		case 'string':
+		default:
+		    return $.trim(v);
+	    }
+	};
+	this.onValueChange = function(v){
+		this.options.dataCurrentValue = $.trim(v).replace(/\</g,"&lt;").replace(/\>/g,"&gt;");
+		this.onValidate();
+	};
+	this.renderEditor = function(dom){
+		var selid = ( (typeof this.options.dataCurrentValue !== '' && !$.isPlainObject(this.options.dataCurrentValue))?this.options.dataCurrentValue:'' );
+		if( $.isArray(this.options.dataSource) ){
+			var selobj = null;
+			var selopts = [];
+			$.each(this.options.dataSource, function(i,val){
+				val = $.trim('' + val).replace(/\</g,"&lt;").replace(/\>/g,"&gt;");
+				selopts.push({
+					label: "<span>" + val + "</span>",
+					value: this.getTypedValue(val),
+					selected: ( (selid !== '')?(val === selid):(i===0) )
+				});
+				if( selid === '' || selopts[selopts.length - 1].selected === true){
+					selid = selopts[selopts.length - 1].value;
+					selobj = val;
+				}
+			}.bind(this));
+			this.options.dataCurrentValue = this.getTypedValue(selobj);
+			this.editor = new dijit.form.Select({
+				options: selopts,
+				onFocus: (function(self){
+					return function(){
+						self.parent.setFocus(true);
+					};
+				})(this),
+				onBlur:  (function(self){
+					return function(){
+						self.parent.setFocus(false);
+					};
+				})(this),
+				onChange: (function(self){
+					return function(v){
+						var res = $.trim('' + v);
+						self.options.dataCurrentValue = res;
+						self.onValidate();
+						self.parent.setFocus(true);
+					};
+				})(this)
+			}, dom);
+			this.options.dataCurrentValue = this.getTypedValue(selobj);
+			this.options.dataValue = this.getTypedValue(this.options.dataValue);
+			this.editor.set('displayValue', this.options.dataCurrentValue);
 		}
 	};
 	this.postRenderEditor = function(){

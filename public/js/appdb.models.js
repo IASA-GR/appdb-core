@@ -1241,7 +1241,8 @@ appdb.model.StaticList = {
 	ConnectionTypes: [],
 	SiteList: [],
 	DatasetList: [],
-	VmiAccelerators: [{id: -1, val: function() { return 'None';}}, {id: 'GPU', val: function() {return 'GPU';}}]
+	VmiAccelerators: [{id: -1, val: function() { return 'None';}}, {id: 'GPU', val: function() {return 'GPU';}}],
+	VMCores: [0,1,2,4,8,16]
 };
 appdb.model.VirtualAppliance = function(opts,ext){
 	var _init = function(){

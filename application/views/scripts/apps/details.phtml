@@ -590,7 +590,7 @@
 			</div>
 		</div>
 		<div class="vappliance-templates hidden">
-			<div data-template="vappliance-vmiversion">
+                        <div data-template="vappliance-vmiversion">
 				<div class="vaversion-vmiversion property<?php echo ( Supports::singleVMIPolicy()?' detailsview':'' )?>" data-list="true">
 					<?php if( Supports::singleVMIPolicy() === false ) { ?>
 					<div class="actions showonedit">
@@ -863,11 +863,11 @@
                                                     <div class="fieldvalueset">
                                                         <div class="header">Number of cores</div>
                                                         <div class="contents">
-                                                            <div class="property vmiversion-mincores fieldnamevalue compact two column" data-path="cores.minimum" data-name="coresminimum" data-editable="true" data-type="number" data-datatype="number" data-minsize="0" data-maxsize="1000" data-default="0">
+                                                            <div class="property vmiversion-mincores fieldnamevalue compact two column" data-path="cores.minimum" data-name="coresminimum" data-editable="true" data-type="valuelist" data-default="0" data-source="appdb.model.StaticList.VMCores">
                                                                     <div class="header">Minimum:</div>
                                                                     <div class="value" ></div>
                                                             </div>
-                                                            <div class="property vmiversion-recomcores fieldnamevalue compact two column" data-path="cores.recommended" data-name="coresrecommended" data-editable="true" data-type="number" data-datatype="number" data-minsize="0" data-maxsize="100000" data-default="0">
+                                                            <div class="property vmiversion-recomcores fieldnamevalue compact two column" data-path="cores.recommended" data-name="coresrecommended" data-editable="true" data-type="valuelist" data-default="0" data-source="appdb.model.StaticList.VMCores">
                                                                     <div class="header">Recommended:</div>
                                                                     <div class="value" ></div>
                                                             </div>
