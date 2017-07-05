@@ -5480,6 +5480,47 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 			return false;
 		});
 	};
+	this.filterNetworkTraffic = function(direction, data) {
+	    data = data || this.options.data || {};
+	    var rules = data.network_traffic || [];
+	    rules = Array.isArray(rules) ? rules : [rules];
+	    var direction = ('' + direction).toLowerCase();
+
+	    if ($.trim(direction) !== '') {
+		return rules.filter(function(item) {
+		    return (item.direction === direction);
+		 });
+	    }
+
+	    return rules;
+	};
+	this.renderNetworkTraffic = function() {
+	    if (this.options.inboundNetworkTraffic) {
+		this.options.inboundNetworkTraffic.reset();
+		this.options.inboundNetworkTraffic = null;
+	    }
+	    this.options.inboundNetworkTraffic = new appdb.vappliance.ui.views.VMITrafficRules({
+		container: $(this.dom).find('.trafficrules-component[data-direction="inbound"]'),
+		parent: this,
+		editable: this.canEdit(),
+		data: this.filterNetworkTraffic('inbound', this.options.data),
+		itemTemplate: $(this.dom).find('.vmiversion-vmitrafficrules .trafficrule-item').clone(true)
+	    });
+	    this.options.inboundNetworkTraffic.render();
+
+	    if (this.options.outboundNetworkTraffic) {
+		this.options.outboundNetworkTraffic.reset();
+		this.options.outboundNetworkTraffic = null;
+	    }
+	    this.options.outboundNetworkTraffic = new appdb.vappliance.ui.views.VMITrafficRules({
+		container: $(this.dom).find('.trafficrules-component[data-direction="outbound"]'),
+		parent: this,
+		editable: this.canEdit(),
+		data: this.filterNetworkTraffic('outbound', this.options.data),
+		itemTemplate: $(this.dom).find('.vmiversion-vmitrafficrules .trafficrule-item').clone(true)
+	    });
+	    this.options.outboundNetworkTraffic.render();
+	};
 	this.render = function(d){
 		$(this.dom).attr("data-id",d.id);
 		this.renderProperties(d);
@@ -5487,6 +5528,7 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 		this.initActions();
 		this.renderPrivacy();
 		this.renderAdvancedPanel();
+		//this.renderNetworkTraffic();
 		setTimeout((function(self){
 			return function(){
 				self.initializeSubscriptions();
@@ -8088,7 +8130,7 @@ appdb.vappliance.ui.views.ContextualizationScriptRemover = appdb.ExtendClass(app
 				return false;
 			};
 		})(this));
-		
+
 		$(cancel).unbind("click").bind("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
@@ -8134,4 +8176,136 @@ appdb.vappliance.ui.views.ContextualizationScriptRemover = appdb.ExtendClass(app
 	this._init();
 },{
 	dialog: null
+});
+
+appdb.vappliance.ui.views.VMITrafficRulesItem = appdb.ExtendClass(appdb.vappliance.ui.views.DataPropertyContainer, "appdb.vappliance.ui.views.VMITrafficRulesItem", function(o) {
+    this.options = {
+		container: $(o.container),
+		parent: o.parent || null,
+		data: o.data || {},
+		isEditable: ( (typeof o.editable === "boolean")?o.editable:false )
+	};
+	this.getData = function(){
+		var props = this.getPropertyData();
+		var d = this.options.data;
+		var res = {
+			type: d.type,
+			protocols: props.protocols,
+			ip_range: props.ip_range,
+			port_range: props.port_ranges
+		};
+		return res;
+	};
+	this.initActions = function(){
+		$(this.dom).children(".actions").children(".action.remove").unbind("click").bind("click", (function(self){
+			return function(ev){
+				ev.preventDefault();
+				self.parent.removeItem(self);
+				return false;
+			};
+		})(this));
+	};
+	this.render = function(d){
+		$(this.dom).data("inst", this);
+		this.renderProperties(d || this.options.data);
+		this.initActions();
+		setTimeout(function(){
+			appdb.vappliance.ui.CurrentVAVersionValidatorRegister.check();
+		},10);
+	};
+	this._init = function(){
+		this.dom = $(this.options.container);
+		this.parent = this.options.parent;
+	};
+	this._init();
+});
+
+appdb.vappliance.ui.views.VMITrafficRules = appdb.ExtendClass(appdb.View, "appdb.vappliance.ui.views.VMITrafficRules", function(o) {
+    this.options = {
+	container: $(o.container),
+	    parent: o.parent || null,
+	    data: o.data || {},
+	    isEditable: ( (typeof o.editable === "boolean")?o.editable:false ),
+	    items: [],
+	    itemTemplate: o.itemTemplate,
+	    importer: null,
+	    dom:{
+		list: $(document.createElement("ul"))
+	    }
+    };
+    this.removeItem = function(item) {
+	alert('remove item ' + JSON.stringify(item.options.data || {}));
+    };
+    this.addItem = function(rule, index) {
+	    var cont = $(this.options.itemTemplate).clone(true);
+	    var item = new appdb.vappliance.ui.views.VMITrafficRulesItem({
+		    container: cont,
+		    parent: this,
+		    editable: true,
+		    data: rule,
+		    index: index
+	    });
+	    this.subviews.push(item);
+	    item.render();
+	    if( rule.isNew === true ){
+		    item.setFocus(true);
+	    }
+	    appdb.vappliance.ui.CurrentVAVersionValidatorRegister.check();
+
+	    return cont;
+    };
+    this.renderEmpty = function() {
+	$(this.dom).find('.emptymessage').remove();
+	$(this.dom).append($('<div class="emptymessage">No network traffic rules found</div>'));
+    }
+    this.render = function() {
+	    this.reset();
+	    $(this.dom).children("ul").remove();
+	    this.options.dom.list = $(document.createElement("ul"));
+	    $(this.dom).append(this.options.dom.list);
+	    var rules = this.options.data || [];
+	    rules = [].concat(Array.isArray(rules) ? rules : [rules]);
+
+	    if( rules.length === 0){
+		    this.renderEmpty();
+	    } else {
+		rules = [rules[0]];console.log(rules[0]);
+		$.each(rules, (function(self){
+			return function(i,e){
+				var rule = self.addItem(e, i);
+				if( rule ){
+					var li = $(document.createElement("li"));
+					$(li).append(rule);
+					$(self.options.dom.list).append(li);
+				}
+			};
+		})(this));
+
+		$.each(this.subviews, function(i, v) {
+		   v.edit();
+		});
+	    }
+
+	//this.initActions();
+	/*setTimeout(function(){
+		appdb.vappliance.ui.CurrentVAVersionValidatorRegister.check();
+	},10);*/
+    };
+    this.initContainer = function() {
+	var tempname = $.trim( $(this.dom).data("usetemplate") );
+	if( tempname !== "" ){
+		var tempdom = appdb.vappliance.ui.CurrentVAManager.getTemplate(tempname);
+		if( $(tempdom).length > 0 ){
+			this.options.itemTemplate = $(tempdom).clone(true);
+		}
+	}
+	$(this.dom).append(this.options.dom.list);
+    };
+    this._init = function() {
+	this.dom = $(this.options.container);
+	this.parent = this.options.parent;
+	this.subviews = [];
+	this.initContainer();
+    };
+    this._init();
 });
