@@ -633,6 +633,19 @@ CREATE INDEX idx_vaviews_vmiinstanceid
   USING btree
   (vmiinstanceid);
 
+CREATE OR REPLACE FUNCTION contextfmtsxml(v vmiinstances)
+ RETURNS xml
+ LANGUAGE sql
+ STABLE
+AS $function$
+        SELECT array_to_string(array_agg(XMLELEMENT(name "virtualization:contextformat", XMLATTRIBUTES(f.fmtid AS id, cf.name AS name, true AS "supported"), cf.description)::text), '')::XML
+        FROM vmi_supported_context_fmt AS f
+        INNER JOIN contextformats AS cf ON cf.id = f.fmtid
+        WHERE f.vmiinstanceid = v.id
+$function$;
+ALTER FUNCTION contextfmtsxml(vmiinstances) OWNER TO appdb;
+
+
 CREATE OR REPLACE VIEW public.vapp_to_xml AS
  SELECT applications.id AS appid,
     vapplications.id AS vappid,
