@@ -5494,11 +5494,17 @@ class RestAppVAItem extends RestResourceItem {
      * @overrides delete() from RestResource
      */
 	public function delete() {
+		// We do not want to allow removing the vappliance (and all it's versions) at once.
+		// Users should delete individual VA versions, where applicable.
+		$this->setError(RestErrorEnum::RE_INVALID_OPERATION);
+		return false;
+		/*
 		if ( parent::delete() !== false ) {
 			$ret = $this->get();
-			//$this->_resParent->remove($this->_res);
+			$this->_resParent->remove($this->_res);
 			return $ret;
 		} else return false;
+		*/
 	}
 
 	/**
@@ -6162,6 +6168,7 @@ class RestAppVAVersionItem extends RestAppVAItem {
      */
 	public function delete() {
 		if (! is_null($this->_res)) {
+			$ret = $this->_res->get();
 			db()->beginTransaction();
 			try{
 				if ($this->_res->published) {
@@ -6185,7 +6192,7 @@ class RestAppVAVersionItem extends RestAppVAItem {
 				$this->setError(RestErrorEnum::RE_BACKEND_ERROR, $e->getMessage(), false);
 				return false;
 			}
-				return true;
+			return $ret;
 		} else {
 			return false;
 		}
@@ -6333,7 +6340,8 @@ class RestAppVAVersionIntegrityItem extends RestResourceItem {
 
 	public function get() {
 		if (parent::get() !== false) {
-			error_log("[RestAppVAVersionIntegrityItem]: INTEGRITY CHECK FOR vappid: " . $this->_res->vappid . " versionid: " . $this->_res->id);
+			error_log("STUB: RestAppVAVersionIntegrityItem::get()");
+			//error_log("[RestAppVAVersionIntegrityItem]: INTEGRITY CHECK FOR vappid: " . $this->_res->vappid . " versionid: " . $this->_res->id);
 			//db()->setFetchMode(Zend_Db::FETCH_OBJ);
 			//$res = db()->query("SELECT vapp_to_xml(" . $this->getParam("vappid") . ", 'vapplications') AS xml;")->fetchAll();
 			$x = array();
@@ -6353,7 +6361,12 @@ class RestAppVAVersionIntegrityItem extends RestResourceItem {
      * @overrides delete() from RestResource
      */
 	public function delete() {
-		return true;
+		if (parent::delete() !== false) {
+			$ret = $this->get();
+			// do the actual "DELETE" stuff... (i.e. cancel integrity check)
+			error_log("STUB: RestAppVAVersionIntegrityItem::delete()");
+			return $ret;
+		} else return false;
 	}
 	
 	/**
