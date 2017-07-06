@@ -736,12 +736,12 @@
 							<div class="property viewondetails hideonedit group ram">
 								<div class="header"><div class="title">Ram:</div></div>
 								<div class="value">
-									<div class="property fieldnamevalue compact viewondetails hideonedit" data-path="ram.minimum" data-name="viewramminimum" data-editable="false" >
-										<div class="header">Minimum (bytes):</div>
+									<div class="property fieldnamevalue compact viewondetails hideonedit" data-path="ram.minimum" data-name="viewramminimum" data-normalize="appdb.vappliance.utils.normalization.viewram"  data-source="appdb.model.StaticList.VMRams" data-editable="false" >
+										<div class="header">Minimum:</div>
 										<div class="value" ></div>
 									</div>
-									<div class="property fieldnamevalue compact viewondetails hideonedit" data-path="ram.recommended" data-name="viewramrecommended" data-editable="false" >
-										<div class="header">Recommended (bytes):</div>
+									<div class="property fieldnamevalue compact viewondetails hideonedit" data-path="ram.recommended" data-name="viewramrecommended" data-normalize="appdb.vappliance.utils.normalization.viewram"  data-source="appdb.model.StaticList.VMRams" data-editable="false" >
+										<div class="header">Recommended:</div>
 										<div class="value" ></div>
 									</div>
 								</div>
@@ -876,12 +876,12 @@
                                                     <div class="fieldvalueset">
                                                         <div class="header">Amount of RAM</div>
                                                         <div class="contents">
-                                                            <div class="property vmiversion-minram fieldnamevalue compact " data-path="ram.minimum" data-name="ramminimum" data-editable="true" data-type="number" data-datatype="number" data-minsize="0" data-default="0" data-maxsize="9223372036854775000">
-                                                                <div class="header">Minimum (bytes):</div>
+                                                            <div class="property vmiversion-minram fieldnamevalue compact " data-path="ram.minimum" data-name="ramminimum" data-normalize="appdb.vappliance.utils.normalization.ram" data-editable="true" data-type="valuelist" data-default="0" data-source="appdb.model.StaticList.VMRams" >
+                                                                <div class="header">Minimum:</div>
 								<div class="value" ></div>
                                                             </div>
-                                                            <div class="property vmiversion-recomram fieldnamevalue compact " data-path="ram.recommended" data-name="ramrecommended" data-editable="true" data-type="number" data-datatype="number" data-minsize="0" data-default="0" data-maxsize="9223372036854775000">
-                                                                <div class="header">Recommended (bytes):</div>
+                                                            <div class="property vmiversion-recomram fieldnamevalue compact " data-path="ram.recommended" data-name="ramrecommended" data-normalize="appdb.vappliance.utils.normalization.ram"  data-editable="true" data-type="valuelist" data-default="0" data-source="appdb.model.StaticList.VMRams">
+                                                                <div class="header">Recommended:</div>
                                                                 <div class="value" ></div>
                                                             </div>
                                                         </div>

@@ -14123,11 +14123,11 @@ vappliance.singlevmipolicy .property > .loader, .vappliance .vappliance-version 
 	max-width:210px;
 	min-width: 210px;
 }
-.vappliance .vaversion-vmiversionlist > ul > li > div.vaversion-vmiversion .property.vmiversion-minram > .value,
+/*.vappliance .vaversion-vmiversionlist > ul > li > div.vaversion-vmiversion .property.vmiversion-minram > .value,
 .vappliance .vaversion-vmiversionlist > ul > li > div.vaversion-vmiversion .property.vmiversion-recomram > .value{
 	display: inline-block;
 	max-width: 160px;
-}
+}*/
 .vappliance .vaversion-vmiversionlist > ul > li > div.vaversion-vmiversion .property.vmiversion-minram > .unit,
 .vappliance .vaversion-vmiversionlist > ul > li > div.vaversion-vmiversion .property.vmiversion-recomram > .unit,
 .vappliance .vaversion-vmiversionlist > ul > li > div.vaversion-vmiversion .details .unit{
@@ -14259,7 +14259,7 @@ vappliance.singlevmipolicy .property > .loader, .vappliance .vappliance-version 
     flex-direction: row;
     padding: 0px 10px;
     margin: 0 auto;
-    margin-bottom: 15px;
+    margin-bottom: 30px;
     border: none;
     border-top: 1px solid #aaa;
 }
@@ -14280,7 +14280,7 @@ vappliance.singlevmipolicy .property > .loader, .vappliance .vappliance-version 
 .vappliance .vaversion-vmiversionlist > ul > li > div.vaversion-vmiversion .property.vmiversion-recomram > .header,
 .fieldvalueset > .contents > .property.fieldnamevalue,
 .fieldvalueset > .contents > .property.fieldnamevalue > .value,
-.fieldvalueset > .contents > .property.fieldnamevalue > .value > .dijit{
+.fieldvalueset > .contents > .property.fieldnamevalue > .value > .dijit:not(.dijitSelect){
     width: auto !important;
     max-width: initial !important;
     min-width: initial !important;

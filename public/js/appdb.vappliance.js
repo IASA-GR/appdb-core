@@ -24,6 +24,32 @@ appdb.vappliance.utils.formatSizeUnits = function(bytes,displayunit){
 	var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
 	return Math.round(bytes / Math.pow(1024, i), 2) + ((displayunit===true)?' ' + sizes[i]:'');
 };
+appdb.vappliance.utils.normalization = {};
+appdb.vappliance.utils.normalization.ram = function(v) {
+    var val = parseInt(v);
+    return appdb.config.normalization.vappliance.vmi.ram[$.trim(val)] || $.trim(val);
+};
+appdb.vappliance.utils.normalization.viewram = function(v, prop) {
+    var val = parseInt(v);
+    var res = v;
+    if (appdb.config.normalization.vappliance.vmi.ram[$.trim(val)]) {
+	return res + ' bytes';
+    }
+    if (prop.options.dataSource) {
+	var res = null;
+	var ds = prop.options.dataSource || [];
+	ds = $.isArray(ds) ? ds : [ds];
+	$.each(ds, function(i, d){
+	   if (res === null && typeof d.id !== 'undefined' && d.id == v) {
+	       res = (typeof d.val === 'function') ? d.val() : d.id;
+	   }
+	});
+    }
+    if (res === null || res === 'None') {
+	return 0;
+    }
+    return res;
+};
 appdb.vappliance.model.VirtualAppliance = appdb.model.VirtualAppliance;
 appdb.vappliance.FindData = appdb.FindData;
 appdb.vappliance.validators = {};
@@ -2621,6 +2647,7 @@ appdb.vappliance.ui.views.DataValueHandler = appdb.DefineClass("appdb.vappliance
 		dataCurrentValue: o.dataValue,
 		dataType: o.dataType || "text",
 		dataSource: o.dataSource || null,
+		dataNormalize: o.dataNormalize || null,
 		isMandatory: o.mandatory || false,
 		validators: o.validators || [],
 		editor: null,
@@ -2772,7 +2799,7 @@ appdb.vappliance.ui.views.DataValueHandler = appdb.DefineClass("appdb.vappliance
 	};
 	this.onValueChange = function(v){
 		v = v || this.editor.get("displayedValue");
-		v = v.replace(/\</g,"&lt;").replace(/\>/g,"&gt;");
+		v = $.trim(v).replace(/\</g,"&lt;").replace(/\>/g,"&gt;");
 		this.options.dataCurrentValue = v;
 		this.onValidate();
 	};
@@ -2954,7 +2981,7 @@ appdb.vappliance.ui.views.DataValueHandler = appdb.DefineClass("appdb.vappliance
 				displayValue = "";
 			}
 		}
-		$(this.dom).append(displayValue);
+		$(this.dom).append(this.normalizeValue(displayValue));
 	};
 	this.preRenderEditor = function(){
 		this.initDefaultConstraints();
@@ -3048,6 +3075,12 @@ appdb.vappliance.ui.views.DataValueHandler = appdb.DefineClass("appdb.vappliance
 	this.render = function(){
 		this.renderView();
 	};
+	this.normalizeValue = function(v) {
+	    if (typeof this.options.dataNormalize === 'function') {
+		return this.options.dataNormalize(v, this);
+	    }
+	    return v;
+	};
 	this.getValue = function(){
 		return this.options.dataCurrentValue;
 	};
@@ -3055,7 +3088,7 @@ appdb.vappliance.ui.views.DataValueHandler = appdb.DefineClass("appdb.vappliance
 		if( typeof d === "string" ){
 			d = d.replace(/\</g,"&lt;").replace(/\>/g,"&gt;");
 		}
-		this.options.dataCurrentValue = d;
+		this.options.dataCurrentValue = this.normalizeValue(d);
 	};
 	this._init = function(){
 		this.dom = $(this.options.container);
@@ -3064,6 +3097,12 @@ appdb.vappliance.ui.views.DataValueHandler = appdb.DefineClass("appdb.vappliance
 			var ds = appdb.FindNS(this.options.dataSource);
 			if( ds ){
 				this.options.dataSource = ds;
+			}
+		}
+		if (typeof(this.options.dataNormalize) === "string") {
+			var ds = appdb.FindNS(this.options.dataNormalize);
+			if( ds ){
+			    this.options.dataNormalize = ds;
 			}
 		}
 	};
@@ -3438,27 +3477,36 @@ appdb.vappliance.ui.views.DataValueHandlerValuelist = appdb.ExtendClass(appdb.va
 	    }
 	};
 	this.onValueChange = function(v){
-		this.options.dataCurrentValue = $.trim(v).replace(/\</g,"&lt;").replace(/\>/g,"&gt;");
 		this.onValidate();
 	};
 	this.renderEditor = function(dom){
-		var selid = ( (typeof this.options.dataCurrentValue !== '' && !$.isPlainObject(this.options.dataCurrentValue))?this.options.dataCurrentValue:'' );
+		var selid = '';
+		if ($.isPlainObject(this.options.dataCurrentValue)) {
+		    if (this.options.dataCurrentValue.id) {
+			selid = this.options.dataCurrentValue.id;
+		    }
+		} else {
+		    selid = $.trim(this.options.dataCurrentValue);
+		}
+		selid = this.normalizeValue(selid);
 		if( $.isArray(this.options.dataSource) ){
 			var selobj = null;
 			var selopts = [];
 			$.each(this.options.dataSource, function(i,val){
-				val = $.trim('' + val).replace(/\</g,"&lt;").replace(/\>/g,"&gt;");
+				var value = ($.isPlainObject(val)) ? val.id : val;
+				var displayValue= ($.isPlainObject(val) && typeof val.val === 'function') ? val.val() : value; 
+				val = $.trim('' + value).replace(/\</g,"&lt;").replace(/\>/g,"&gt;");
 				selopts.push({
-					label: "<span>" + val + "</span>",
-					value: this.getTypedValue(val),
-					selected: ( (selid !== '')?(val === selid):(i===0) )
+					label: "<span>" + displayValue + "</span>",
+					value: value,
+					selected: ( (selid !== '')?(value === selid):(i === 0) )
 				});
 				if( selid === '' || selopts[selopts.length - 1].selected === true){
 					selid = selopts[selopts.length - 1].value;
-					selobj = val;
+					selobj = value;
 				}
 			}.bind(this));
-			this.options.dataCurrentValue = this.getTypedValue(selobj);
+			this.options.dataCurrentValue = selobj;
 			this.editor = new dijit.form.Select({
 				options: selopts,
 				onFocus: (function(self){
@@ -3480,8 +3528,7 @@ appdb.vappliance.ui.views.DataValueHandlerValuelist = appdb.ExtendClass(appdb.va
 					};
 				})(this)
 			}, dom);
-			this.options.dataCurrentValue = this.getTypedValue(selobj);
-			this.options.dataValue = this.getTypedValue(this.options.dataValue);
+			this.options.dataCurrentValue = selobj;
 			this.editor.set('displayValue', this.options.dataCurrentValue);
 		}
 	};
@@ -4592,6 +4639,7 @@ appdb.vappliance.ui.views.DataProperty = appdb.ExtendClass(appdb.View, "appdb.va
 		dataPath: $(o.container).data("path") || "",
 		dataEditable: (typeof o.editable==="boolean")?o.editable:($(o.container).data("editable") || false),
 		dataSource: o.dataSource || $(o.container).data("source"),
+		dataNormalize: o.dataNormalize || $(o.container).data("normalize"),
 		dataModelProperty: o.dataModelProperty || $(o.container).data("modelproperty"),
 		dataMandatory: (typeof o.mandatory === "boolean")?o.mandatory:($(o.container).data("mandatory") || $(o.container).hasClass("mandatory") ),
 		dataValidation: o.dataValidation || $(o.container).data("validation") || false,
@@ -5319,10 +5367,10 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 		if(typeof chk === "string" ){
 			chk = { hash:"sha512", val: (function(cc){ return function() {return cc; }; })(chk)};
 		}
-		var rammin = props.ramminimum || "0";
-		var ramrecommended = props.ramrecommended  || "0";
-		var coresmin = props.coresminimum || "0";
-		var coresrecommended = props.coresrecommended || "0";
+		var rammin = (props.ramminimum && props.ramminimum.id) ? props.ramminimum.id : (props.ramminimum || "0");
+		var ramrecommended = (props.ramrecommended && props.ramrecommended.id) ? props.ramrecommended.id : (props.ramrecommended || "0");
+		var coresmin = (props.coresminimum && props.coresminimum.id) ? props.coresminimum.id : (props.coresminimum || "0");
+		var coresrecommended = (props.coresrecommended && props.coresrecommended.id) ? props.coresrecommended.id : (props.coresrecommended || "0");
 		var ovfurl = $.trim(props.ovfurl) || "";
 		var accelerators = {type: props.acceleratorstype || 'None', minimum: (props.accminimum || 0), recommended: (props.accrecommended || 0)};
 		if (!accelerators || accelerators.type === 'None' || $.trim(accelerators.type) === '-1') {
