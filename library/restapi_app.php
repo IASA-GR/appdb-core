@@ -3249,7 +3249,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	CONST VA_TITLE_MIN_SIZE = 0;
 	CONST VA_TITLE_MAX_SIZE = 1000;
         CONST VA_VMI_ACCELERATORS_MIN_SIZE = 0;
-        CONST VA_VMI_ACCELERATORS_MAX_SIZE = 10;
+        CONST VA_VMI_ACCELERATORS_MAX_SIZE = 32;
 	
 	private $vappid = -1;
 	private $vappversionid = -1;
