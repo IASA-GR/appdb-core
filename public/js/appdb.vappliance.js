@@ -2567,6 +2567,11 @@ appdb.vappliance.components.WorkingVersion = appdb.ExtendClass(appdb.vappliance.
 		} else {
 			this.renderLoading(true, "Saving version");
 		}
+		//Determine type of request and perform it.
+		var isinsert = false;
+		if( !(colData.instance && colData.instance[0].id && colData.instance[0].id > 0) ){
+			isinsert = true;
+		}
 		
 		this.model = new appdb.model.VirtualAppliance(modelOpts);
 		this.model.subscribe({event: "update", callback:function(d){
@@ -2592,13 +2597,19 @@ appdb.vappliance.components.WorkingVersion = appdb.ExtendClass(appdb.vappliance.
 				this.postSave(d);
 			}
 		}, caller: this}).subscribe({event: "error", callback: function(d){
+			//Called upon HTTP error when inserting a new virtual appliance or updating an old one
+			var d = (d && d.response) ? d.response : d;
+			if(d && d.error){
+				(new appdb.views.ErrorHandler()).handle({
+					"status": ((isinsert) ? "Cannot register new virtual appliance version " : "Cannot update virtual appliance version "), 
+					"description": d.errordesc
+				});
+				this.postSave();
+			}else{
+				this.postSave(d);
+			}
 		}, caller: this});
 	
-		//Determine type of request and perform it.
-		var isinsert = false;
-		if( !(colData.instance && colData.instance[0].id && colData.instance[0].id > 0) ){
-			isinsert = true;
-		}
 		//if(mapper.entity.id()==='0' || !mapper.entity.id() ){
 		if( isinsert === true ){
 			this.model.insert({query: modelOpts, data: {data: xml}});	

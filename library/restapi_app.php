@@ -3249,7 +3249,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	CONST VA_TITLE_MIN_SIZE = 0;
 	CONST VA_TITLE_MAX_SIZE = 1000;
         CONST VA_VMI_ACCELERATORS_MIN_SIZE = 0;
-        CONST VA_VMI_ACCELERATORS_MAX_SIZE = 10;
+        CONST VA_VMI_ACCELERATORS_MAX_SIZE = 32;
 	
 	private $vappid = -1;
 	private $vappversionid = -1;
@@ -6203,13 +6203,15 @@ class RestAppVAVersionItem extends RestAppVAItem {
 		$item->delete();
 	}
 	private function deleteVMIInstance($item){
-		$instances = new Default_Model_VMIInstances();
+                $this->deleteContextFormats($item->id);
+                $this->deleteContextScripts($item->id);
+
+                $instances = new Default_Model_VMIInstances();
 		$instances->filter->vmiflavourid->equals($item->vmiflavourid)->and($instances->filter->id->notequals($item->id));
 		if( count($instances->items) === 0 ){
 			$this->deleteFlavour($item->getFlavour(),$item);
 		}
-		$this->deleteContextFormats($item->id);
-		$this->deleteContextScripts($item->id);
+
 		$item->delete();
 		
 	}
@@ -6229,9 +6231,9 @@ class RestAppVAVersionItem extends RestAppVAItem {
 		$vmiscripts = new Default_Model_VMIinstanceContextScripts();
 		$vmiscripts->filter->vmiinstanceid->numequals($vmiinstanceid);
 		if( count($vmiscripts->items) > 0 ){
-			foreach($vmiscripts->items as $item){
+                        foreach($vmiscripts->items as $item){
 				$scriptids[] = $item->contextscriptid;
-				$vmiscripts->remove($item);
+                                $vmiscripts->remove($item);
 			}
 		}
 		$scriptids = array_unique($scriptids);
@@ -6241,7 +6243,7 @@ class RestAppVAVersionItem extends RestAppVAItem {
 			$vmiscripts = new Default_Model_VMIinstanceContextScripts();
 			$vmiscripts->filter->contextscriptid->numequals($id);
 			if( count($vmiscripts->items) === 0 ){
-				$scripts = new Default_Model_ContextScripts();
+                                $scripts = new Default_Model_ContextScripts();
 				$scripts->filter->id->numequals($id);
 				if( count($scripts->items) > 0 ){
 					$scripts->remove($scripts->items[0]);
@@ -6257,7 +6259,7 @@ class RestAppVAVersionItem extends RestAppVAItem {
 			$item->delete();
 		}
 	}
-	private function deleteVMI($item, $parent){
+	private function deleteVMI($item, $parent = null){
 		$item->delete();
 	}
 	/**

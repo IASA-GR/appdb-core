@@ -1241,10 +1241,11 @@ appdb.model.StaticList = {
 	ConnectionTypes: [],
 	SiteList: [],
 	DatasetList: [],
-	VmiAccelerators: [
+	VMAcceleratorTypes: [
 	    {id: -1, val: function() { return 'None';}},
 	    {id: 'GPU', val: function() {return 'GPU';}}
 	],
+	VMAcceleratorAmounts: ['0', '1', '2', '4', '8', '16', '32'],
 	VMCores: [
 	    {id: '0', val: function() {return 'None';}},
 	    '1', '2', '4', '8', '16', '32'
