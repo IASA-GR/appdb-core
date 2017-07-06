@@ -6168,7 +6168,7 @@ class RestAppVAVersionItem extends RestAppVAItem {
      */
 	public function delete() {
 		if (! is_null($this->_res)) {
-			$ret = $this->_res->get();
+			$ret = $this->get();
 			db()->beginTransaction();
 			try{
 				if ($this->_res->published) {
