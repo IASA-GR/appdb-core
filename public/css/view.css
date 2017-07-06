@@ -14241,6 +14241,7 @@ vappliance.singlevmipolicy .property > .loader, .vappliance .vappliance-version 
 }
 .fieldvalueset {
     display: block;
+    margin-bottom: 20px;
 }
 .fieldvalueset > .header {
     display: block;
@@ -14252,16 +14253,19 @@ vappliance.singlevmipolicy .property > .loader, .vappliance .vappliance-version 
     line-height: 14px;
     color: #222;
 }
-
 .fieldvalueset > .contents {
     display: flex;
     display: -webkit-flex;
     flex-direction: row;
     padding: 0px 10px;
     margin: 0 auto;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
     border: none;
     border-top: 1px solid #aaa;
+}
+
+.fieldvalueset > .contents.noborder{
+    border: none;
 }
 
 .fieldvalueset > .contents > .property.fieldnamevalue {
@@ -15622,6 +15626,10 @@ color: #555;
 .vappliance.viewmode .detailsview .property.viewondetails{
 	display: block;
 }
+.vappliance.viewmode .detailsview .property.viewondetails.hideonedit.group.accelerators > .value > .property > .emptymessage {
+        line-height: 18px;
+        padding: 0px 4px;
+}
 .vappliance.viewmode .property.group {
 	
 }
@@ -15655,9 +15663,6 @@ color: #555;
 	border-bottom: 1px solid #f0f0f0;
 	padding-top: 5px;
 	padding-bottom: 5px;
-}
-.vappliance.viewmode .detailsview .property.group.ram{
-	border-bottom: none;
 }
 .entityvirtualappliance .information .vappliance,
 .entityvirtualappliance .information .vappliance.groupcontainer{

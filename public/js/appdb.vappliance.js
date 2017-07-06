@@ -4608,7 +4608,7 @@ appdb.vappliance.ui.views.DataValueHandlerAcceleratorstype = appdb.ExtendClass(a
 			this.options.dataCurrentValue = v;
 		}
 		this.onValidate();
-		var siblings = $(this.dom).closest('.property').siblings('[data-path^="accelerators."]');
+		var siblings = $(this.dom).closest('.fieldvalueset').find('[data-path^="accelerators."]').not('[data-path="accelerators.type"]');
 		if ($.trim(v) === '-1') {
 		    $(siblings).addClass('disabled');
 		    $(siblings).find('.value > .dijit').each(function(index, el) {
@@ -5481,7 +5481,9 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 			$(viewcoresrecommended).siblings(".unit").remove();
 		}
 		if( $.trim($(viewacctype).html()) === "None" || $.trim($(viewacctype).html()) === ""){
-		    $(viewacctype).closest('.accelerators.group').remove();
+		    $(viewacctype).closest('.accelerators.group').find('[data-path="accelerators.type"] .header').remove();
+		    $(viewacctype).closest('.accelerators.group').find('[data-path="accelerators.minimum"]').remove();
+		    $(viewacctype).closest('.accelerators.group').find('[data-path="accelerators.recommended"]').remove();
 		}
 		$(this.dom).removeClass("isprotected isprivate");
 		if( this.isPrivate() ){
