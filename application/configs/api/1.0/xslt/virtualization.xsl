@@ -163,6 +163,23 @@
 							<xsl:attribute name="minimum"><xsl:value-of select="virtualization:cores/@minimum"/></xsl:attribute>
 							<xsl:attribute name="recommended"><xsl:value-of select="virtualization:cores/@recommended"/></xsl:attribute>
 						</xsl:element>
+						<xsl:if test="virtualization:network_traffic" >
+							<xsl:for-each select="virtualization:network_traffic">
+								<xsl:element name="virtualization:network_traffic">
+									<xsl:attribute name="direction"><xsl:value-of select="@direction"/></xsl:attribute>
+									<xsl:attribute name="protocols"><xsl:value-of select="@protocols"/></xsl:attribute>
+									<xsl:attribute name="ip_range"><xsl:value-of select="@ip_range"/></xsl:attribute>
+									<xsl:attribute name="port_range"><xsl:value-of select="@port_range"/></xsl:attribute>
+								</xsl:element>
+							</xsl:for-each>
+						</xsl:if>
+						<xsl:if test="virtualization:accelerators" >
+							<xsl:element name="virtualization:accelerators">
+								<xsl:attribute name="minimum"><xsl:value-of select="virtualization:accelerators/@minimum"/></xsl:attribute>
+								<xsl:attribute name="recommended"><xsl:value-of select="virtualization:accelerators/@recommended"/></xsl:attribute>
+								<xsl:attribute name="type"><xsl:value-of select="virtualization:accelerators/@type"/></xsl:attribute>
+							</xsl:element>
+						</xsl:if>
 						<xsl:element name="virtualization:ram">
 							<xsl:attribute name="minimum"><xsl:value-of select="virtualization:ram/@minimum"/></xsl:attribute>
 							<xsl:attribute name="recommended"><xsl:value-of select="virtualization:ram/@recommended"/></xsl:attribute>
@@ -208,6 +225,16 @@
 								</xsl:when>
 							</xsl:choose>
 						</xsl:element>
+						<xsl:if test="virtualization:contextformat" >
+							<xsl:for-each select="virtualization:contextformat">
+								<xsl:element name="virtualization:contextformat">
+									<xsl:value-of select="." />
+									<xsl:attribute name="id"><xsl:value-of select="@id"/></xsl:attribute>
+									<xsl:attribute name="name"><xsl:value-of select="@name"/></xsl:attribute>
+									<xsl:attribute name="supported"><xsl:value-of select="@supported"/></xsl:attribute>
+								</xsl:element>
+							</xsl:for-each>
+						</xsl:if>
 						<xsl:if test="virtualization:contextscript/@id">
 							<xsl:for-each select="virtualization:contextscript[not(application:application)]">
 							<xsl:element name="virtualization:contextscript">

@@ -24,6 +24,32 @@ appdb.vappliance.utils.formatSizeUnits = function(bytes,displayunit){
 	var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
 	return Math.round(bytes / Math.pow(1024, i), 2) + ((displayunit===true)?' ' + sizes[i]:'');
 };
+appdb.vappliance.utils.normalization = {};
+appdb.vappliance.utils.normalization.ram = function(v) {
+    var val = parseInt(v);
+    return appdb.config.normalization.vappliance.vmi.ram[$.trim(val)] || $.trim(val);
+};
+appdb.vappliance.utils.normalization.viewram = function(v, prop) {
+    var val = parseInt(v);
+    var res = v;
+    if (appdb.config.normalization.vappliance.vmi.ram[$.trim(val)]) {
+	return res + ' bytes';
+    }
+    if (prop.options.dataSource) {
+	var res = null;
+	var ds = prop.options.dataSource || [];
+	ds = $.isArray(ds) ? ds : [ds];
+	$.each(ds, function(i, d){
+	   if (res === null && typeof d.id !== 'undefined' && d.id == v) {
+	       res = (typeof d.val === 'function') ? d.val() : d.id;
+	   }
+	});
+    }
+    if (res === null || res === 'None') {
+	return 0;
+    }
+    return res;
+};
 appdb.vappliance.model.VirtualAppliance = appdb.model.VirtualAppliance;
 appdb.vappliance.FindData = appdb.FindData;
 appdb.vappliance.validators = {};
@@ -1901,11 +1927,11 @@ appdb.vappliance.components.LatestVersion = appdb.ExtendClass(appdb.vappliance.c
 		}, caller: this}).subscribe({event: "error", callback: function(d){
 			//Called upon ajax error of both virtual appliance update or insert action. E.g. HTTP 500 - Internal Server Error
 		}, caller: this});
-	
+
 		//Determine type of request and perform it.
 		this.model.update({query: modelOpts, data: {data: encodeURIComponent(xml)}});	
 	};
-	
+
 	this.renderToolbar = function(display){
 		$(this.dom).find(".toolbar > .actions > .action.disable").unbind("click").bind("click", (function(self){
 			return function(ev){
@@ -2541,6 +2567,11 @@ appdb.vappliance.components.WorkingVersion = appdb.ExtendClass(appdb.vappliance.
 		} else {
 			this.renderLoading(true, "Saving version");
 		}
+		//Determine type of request and perform it.
+		var isinsert = false;
+		if( !(colData.instance && colData.instance[0].id && colData.instance[0].id > 0) ){
+			isinsert = true;
+		}
 		
 		this.model = new appdb.model.VirtualAppliance(modelOpts);
 		this.model.subscribe({event: "update", callback:function(d){
@@ -2566,13 +2597,19 @@ appdb.vappliance.components.WorkingVersion = appdb.ExtendClass(appdb.vappliance.
 				this.postSave(d);
 			}
 		}, caller: this}).subscribe({event: "error", callback: function(d){
+			//Called upon HTTP error when inserting a new virtual appliance or updating an old one
+			var d = (d && d.response) ? d.response : d;
+			if(d && d.error){
+				(new appdb.views.ErrorHandler()).handle({
+					"status": ((isinsert) ? "Cannot register new virtual appliance version " : "Cannot update virtual appliance version "), 
+					"description": d.errordesc
+				});
+				this.postSave();
+			}else{
+				this.postSave(d);
+			}
 		}, caller: this});
 	
-		//Determine type of request and perform it.
-		var isinsert = false;
-		if( !(colData.instance && colData.instance[0].id && colData.instance[0].id > 0) ){
-			isinsert = true;
-		}
 		//if(mapper.entity.id()==='0' || !mapper.entity.id() ){
 		if( isinsert === true ){
 			this.model.insert({query: modelOpts, data: {data: xml}});	
@@ -2621,6 +2658,7 @@ appdb.vappliance.ui.views.DataValueHandler = appdb.DefineClass("appdb.vappliance
 		dataCurrentValue: o.dataValue,
 		dataType: o.dataType || "text",
 		dataSource: o.dataSource || null,
+		dataNormalize: o.dataNormalize || null,
 		isMandatory: o.mandatory || false,
 		validators: o.validators || [],
 		editor: null,
@@ -2772,7 +2810,7 @@ appdb.vappliance.ui.views.DataValueHandler = appdb.DefineClass("appdb.vappliance
 	};
 	this.onValueChange = function(v){
 		v = v || this.editor.get("displayedValue");
-		v = v.replace(/\</g,"&lt;").replace(/\>/g,"&gt;");
+		v = $.trim(v).replace(/\</g,"&lt;").replace(/\>/g,"&gt;");
 		this.options.dataCurrentValue = v;
 		this.onValidate();
 	};
@@ -2954,7 +2992,7 @@ appdb.vappliance.ui.views.DataValueHandler = appdb.DefineClass("appdb.vappliance
 				displayValue = "";
 			}
 		}
-		$(this.dom).append(displayValue);
+		$(this.dom).append(this.normalizeValue(displayValue));
 	};
 	this.preRenderEditor = function(){
 		this.initDefaultConstraints();
@@ -3048,6 +3086,12 @@ appdb.vappliance.ui.views.DataValueHandler = appdb.DefineClass("appdb.vappliance
 	this.render = function(){
 		this.renderView();
 	};
+	this.normalizeValue = function(v) {
+	    if (typeof this.options.dataNormalize === 'function') {
+		return this.options.dataNormalize(v, this);
+	    }
+	    return v;
+	};
 	this.getValue = function(){
 		return this.options.dataCurrentValue;
 	};
@@ -3055,7 +3099,7 @@ appdb.vappliance.ui.views.DataValueHandler = appdb.DefineClass("appdb.vappliance
 		if( typeof d === "string" ){
 			d = d.replace(/\</g,"&lt;").replace(/\>/g,"&gt;");
 		}
-		this.options.dataCurrentValue = d;
+		this.options.dataCurrentValue = this.normalizeValue(d);
 	};
 	this._init = function(){
 		this.dom = $(this.options.container);
@@ -3064,6 +3108,12 @@ appdb.vappliance.ui.views.DataValueHandler = appdb.DefineClass("appdb.vappliance
 			var ds = appdb.FindNS(this.options.dataSource);
 			if( ds ){
 				this.options.dataSource = ds;
+			}
+		}
+		if (typeof(this.options.dataNormalize) === "string") {
+			var ds = appdb.FindNS(this.options.dataNormalize);
+			if( ds ){
+			    this.options.dataNormalize = ds;
 			}
 		}
 	};
@@ -3418,6 +3468,79 @@ appdb.vappliance.ui.views.DataValueHandlerList = appdb.ExtendClass(appdb.vapplia
 					};
 				})(this)
 			}, dom);
+		}
+	};
+	this.postRenderEditor = function(){
+		this.onValueChange();
+	};
+});
+appdb.vappliance.ui.views.DataValueHandlerValuelist = appdb.ExtendClass(appdb.vappliance.ui.views.DataValueHandler,"appdb.vappliance.ui.views.DataValueHandlerValuelist", function(o){
+	this.getTypedValue = function(v) {
+	    var dataType = ((this.options.constraints || {}).dataType || 'string');
+	    switch(dataType) {
+		case 'number':
+		    return parseInt(v);
+		case 'float':
+		    return parseFloat(v);
+		case 'string':
+		default:
+		    return $.trim(v);
+	    }
+	};
+	this.onValueChange = function(v){
+		this.onValidate();
+	};
+	this.renderEditor = function(dom){
+		var selid = '';
+		if ($.isPlainObject(this.options.dataCurrentValue)) {
+		    if (this.options.dataCurrentValue.id) {
+			selid = this.options.dataCurrentValue.id;
+		    }
+		} else {
+		    selid = $.trim(this.options.dataCurrentValue);
+		}
+		selid = this.normalizeValue(selid);
+		if( $.isArray(this.options.dataSource) ){
+			var selobj = null;
+			var selopts = [];
+			$.each(this.options.dataSource, function(i,val){
+				var value = ($.isPlainObject(val)) ? val.id : val;
+				var displayValue= ($.isPlainObject(val) && typeof val.val === 'function') ? val.val() : value; 
+				val = $.trim('' + value).replace(/\</g,"&lt;").replace(/\>/g,"&gt;");
+				selopts.push({
+					label: "<span>" + displayValue + "</span>",
+					value: value,
+					selected: ( (selid !== '')?(value === selid):(i === 0) )
+				});
+				if( selid === '' || selopts[selopts.length - 1].selected === true){
+					selid = selopts[selopts.length - 1].value;
+					selobj = value;
+				}
+			}.bind(this));
+			this.options.dataCurrentValue = selobj;
+			this.editor = new dijit.form.Select({
+				options: selopts,
+				onFocus: (function(self){
+					return function(){
+						self.parent.setFocus(true);
+					};
+				})(this),
+				onBlur:  (function(self){
+					return function(){
+						self.parent.setFocus(false);
+					};
+				})(this),
+				onChange: (function(self){
+					return function(v){
+						var res = $.trim('' + v);
+						self.options.dataCurrentValue = res;
+						self.onValidate();
+						self.parent.setFocus(true);
+					};
+				})(this)
+			}, dom);
+			this.options.dataCurrentValue = selobj;
+			this.editor.set('displayValue', this.options.dataCurrentValue);
 		}
 	};
 	this.postRenderEditor = function(){
@@ -4432,7 +4555,90 @@ appdb.vappliance.ui.views.DataValueHandlerVmidescription = appdb.ExtendClass(app
 		$(this.dom).closest('.property').addClass('hidden');
 	};
 });
+appdb.vappliance.ui.views.DataValueHandlerAcceleratorstype = appdb.ExtendClass(appdb.vappliance.ui.views.DataValueHandlerList, "appdb.vappliance.ui.views.DataValueHandlerAcceleratorstype", function(o) {
+	this.renderEditor = function(dom){
+		var selid = ( ( !$.isPlainObject(this.options.dataCurrentValue) && typeof this.options.dataCurrentValue !== 'undefined' )?this.options.dataCurrentValue:-1 );
+		if( $.isArray(this.options.dataSource) ){
+			var selobj = null;
+			var selopts = [];
+			$.each(this.options.dataSource, function(i,e){
+				var val = e.val();
+				val = val.replace(/\</g,"&lt;").replace(/\>/g,"&gt;");
+				selopts.push({
+					label: "<span>" + val + "</span>",
+					value: e.id,
+					selected: (('' + e.id) === ('' + selid))
+				});
+				if( ('' + e.id) === ('' + selid) ){
+					selid = selopts[selopts.length - 1].value;
+					selobj = e;
+				}
+			});
+			this.options.dataCurrentValue = selobj;
+			this.editor = new dijit.form.Select({
+				options: selopts,
+				onFocus: (function(self){
+					return function(){
+						self.parent.setFocus(true);
+					};
+				})(this),
+				onBlur:  (function(self){
+					return function(){
+						self.parent.setFocus(false);
+					};
+				})(this),
+				onChange: (function(self){
+					return function(v){
+						var res = v;
+						if( self.options.dataSource ){
+							$.each(self.options.dataSource, function(i,e){
+								if( e.id === res ){
+									res = e;
+								}
+							});
+						}
+						self.options.dataCurrentValue = res;
+						self.onValueChange();
+						self.parent.setFocus(true);
+					};
+				})(this)
+			}, dom);
+			this.onValueChange();
+		}
+	};
+	this.onValueChange = function(v){
+		v = v || this.options.dataCurrentValue;
+		if( $.isPlainObject(v) && 'id' in v) {
+		    v = v.id;
+		}
+		if( $.trim(v) === "" ){
+			v =  this.editor.get("value");
+			v = v.replace(/\</g,"&lt;").replace(/\>/g,"&gt;");
+			this.options.dataCurrentValue = v;
+		}else{
+			this.options.dataCurrentValue = v;
+		}
+		this.onValidate();
+		var siblings = $(this.dom).closest('.fieldvalueset').find('[data-path^="accelerators."]').not('[data-path="accelerators.type"]');
+		if ($.trim(v) === '-1') {
+		    $(siblings).addClass('disabled');
+		    $(siblings).find('.value > .dijit').each(function(index, el) {
+			dijit.byNode(el).set('disabled', true);
+		    });
+		} else {
+		    $(siblings).removeClass('disabled');
+		    $(siblings).find('.value > .dijit').each(function(index, el) {
+			dijit.byNode(el).set('disabled', false);
+		    });
+		}
 
+		if( $.trim(this.editor.get("value")) === "" ){
+			$(this.dom).addClass("isempty");
+		}else{
+			$(this.dom).removeClass("isempty");
+		}
+	};
+});
 appdb.vappliance.ui.views.DataProperty = appdb.ExtendClass(appdb.View, "appdb.vappliance.ui.views.DataProperty", function(o){
 	this.options = {
 		container: $(o.container),
@@ -4444,6 +4650,7 @@ appdb.vappliance.ui.views.DataProperty = appdb.ExtendClass(appdb.View, "appdb.va
 		dataPath: $(o.container).data("path") || "",
 		dataEditable: (typeof o.editable==="boolean")?o.editable:($(o.container).data("editable") || false),
 		dataSource: o.dataSource || $(o.container).data("source"),
+		dataNormalize: o.dataNormalize || $(o.container).data("normalize"),
 		dataModelProperty: o.dataModelProperty || $(o.container).data("modelproperty"),
 		dataMandatory: (typeof o.mandatory === "boolean")?o.mandatory:($(o.container).data("mandatory") || $(o.container).hasClass("mandatory") ),
 		dataValidation: o.dataValidation || $(o.container).data("validation") || false,
@@ -4865,6 +5072,7 @@ appdb.vappliance.ui.views.DataPropertyContainer = appdb.ExtendClass(appdb.View,"
 			props[i].subscribe({event: "valuechanged", callback: function(v){
 				if( typeof v.value === "undefined" && v.oldValue === "" ) return;
 				this.dispatchDataBind(v);
+				this.onPropertyValueChange(v);
 			}, caller: this});
 		}
 	};
@@ -4881,6 +5089,9 @@ appdb.vappliance.ui.views.DataPropertyContainer = appdb.ExtendClass(appdb.View,"
 	};
 	this.isValid = function(){
 		return true;
+	};
+	this.onPropertyValueChange = function(v) {
+	    //to be overriden
 	};
 	this.onValidationError = function(){
 		
@@ -5167,11 +5378,15 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 		if(typeof chk === "string" ){
 			chk = { hash:"sha512", val: (function(cc){ return function() {return cc; }; })(chk)};
 		}
-		var rammin = props.ramminimum || "0";
-		var ramrecommended = props.ramrecommended  || "0";
-		var coresmin = props.coresminimum || "0";
-		var coresrecommended = props.coresrecommended || "0";
+		var rammin = (props.ramminimum && props.ramminimum.id) ? props.ramminimum.id : (props.ramminimum || "0");
+		var ramrecommended = (props.ramrecommended && props.ramrecommended.id) ? props.ramrecommended.id : (props.ramrecommended || "0");
+		var coresmin = (props.coresminimum && props.coresminimum.id) ? props.coresminimum.id : (props.coresminimum || "0");
+		var coresrecommended = (props.coresrecommended && props.coresrecommended.id) ? props.coresrecommended.id : (props.coresrecommended || "0");
 		var ovfurl = $.trim(props.ovfurl) || "";
+		var accelerators = {type: props.acceleratorstype || 'None', minimum: (props.accminimum || 0), recommended: (props.accrecommended || 0)};
+		if (!accelerators || accelerators.type === 'None' || $.trim(accelerators.type) === '-1') {
+		    accelerators = null;
+		}
 		var res = {
 			id: props.id || d.id,
 			version: props.version || d.version,
@@ -5190,10 +5405,14 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 			addedon: d.addedon || "",
 			addedby: d.addedby,
 			integrity: integrity,
+			accelerators: accelerators,
 			ram: {minimum: rammin , recommended: ramrecommended},
 			cores: {minimum: coresmin, recommended: coresrecommended },
 			ovf: { url: ovfurl }
 		};
+		if (res.accelerators === null) {
+		    res.accelerators = null;
+		}
 		if( appdb.config.features.singleVMIPolicy === true ) {
 			if( $.trim(d.prevUrl) !== "" ) {
 				res.prevUrl = $.trim(d.prevUrl);
@@ -5255,6 +5474,7 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 		var viewcoresrecommended = $(this.options.container).find("div[data-name='viewcoresrecommended'] > .value");
 		var viewramminimum = $(this.options.container).find("div[data-name='viewramminimum'] > .value");
 		var viewramrecommended = $(this.options.container).find("div[data-name='viewramrecommended'] > .value");
+		var viewacctype = $(this.options.container).find("div[data-name='viewacctype'] > .value");
 		if( $.trim($(viewramminimum).html()) === "0" || $.trim($(viewramminimum).html()) === ""){
 			$(viewramminimum).html("<span class='notavailable'>n/a</span>");
 			$(viewramminimum).siblings(".unit").remove();
@@ -5270,6 +5490,11 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 		if( $.trim($(viewcoresrecommended).html()) === "0" || $.trim($(viewcoresrecommended).html()) === ""){
 			$(viewcoresrecommended).html("<span class='notavailable'>n/a</span>");
 			$(viewcoresrecommended).siblings(".unit").remove();
+		}
+		if( $.trim($(viewacctype).html()) === "None" || $.trim($(viewacctype).html()) === ""){
+		    $(viewacctype).closest('.accelerators.group').find('[data-path="accelerators.type"] .header').remove();
+		    $(viewacctype).closest('.accelerators.group').find('[data-path="accelerators.minimum"]').remove();
+		    $(viewacctype).closest('.accelerators.group').find('[data-path="accelerators.recommended"]').remove();
 		}
 		$(this.dom).removeClass("isprotected isprivate");
 		if( this.isPrivate() ){
@@ -5381,6 +5606,47 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 			return false;
 		});
 	};
+	this.filterNetworkTraffic = function(direction, data) {
+	    data = data || this.options.data || {};
+	    var rules = data.network_traffic || [];
+	    rules = Array.isArray(rules) ? rules : [rules];
+	    var direction = ('' + direction).toLowerCase();
+
+	    if ($.trim(direction) !== '') {
+		return rules.filter(function(item) {
+		    return (item.direction === direction);
+		 });
+	    }
+
+	    return rules;
+	};
+	this.renderNetworkTraffic = function() {
+	    if (this.options.inboundNetworkTraffic) {
+		this.options.inboundNetworkTraffic.reset();
+		this.options.inboundNetworkTraffic = null;
+	    }
+	    this.options.inboundNetworkTraffic = new appdb.vappliance.ui.views.VMITrafficRules({
+		container: $(this.dom).find('.trafficrules-component[data-direction="inbound"]'),
+		parent: this,
+		editable: this.canEdit(),
+		data: this.filterNetworkTraffic('inbound', this.options.data),
+		itemTemplate: $(this.dom).find('.vmiversion-vmitrafficrules .trafficrule-item').clone(true)
+	    });
+	    this.options.inboundNetworkTraffic.render();
+
+	    if (this.options.outboundNetworkTraffic) {
+		this.options.outboundNetworkTraffic.reset();
+		this.options.outboundNetworkTraffic = null;
+	    }
+	    this.options.outboundNetworkTraffic = new appdb.vappliance.ui.views.VMITrafficRules({
+		container: $(this.dom).find('.trafficrules-component[data-direction="outbound"]'),
+		parent: this,
+		editable: this.canEdit(),
+		data: this.filterNetworkTraffic('outbound', this.options.data),
+		itemTemplate: $(this.dom).find('.vmiversion-vmitrafficrules .trafficrule-item').clone(true)
+	    });
+	    this.options.outboundNetworkTraffic.render();
+	};
 	this.render = function(d){
 		$(this.dom).attr("data-id",d.id);
 		this.renderProperties(d);
@@ -5388,6 +5654,7 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 		this.initActions();
 		this.renderPrivacy();
 		this.renderAdvancedPanel();
+		//this.renderNetworkTraffic();
 		setTimeout((function(self){
 			return function(){
 				self.initializeSubscriptions();
@@ -7989,7 +8256,7 @@ appdb.vappliance.ui.views.ContextualizationScriptRemover = appdb.ExtendClass(app
 				return false;
 			};
 		})(this));
-		
+
 		$(cancel).unbind("click").bind("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
@@ -8035,4 +8302,136 @@ appdb.vappliance.ui.views.ContextualizationScriptRemover = appdb.ExtendClass(app
 	this._init();
 },{
 	dialog: null
+});
+
+appdb.vappliance.ui.views.VMITrafficRulesItem = appdb.ExtendClass(appdb.vappliance.ui.views.DataPropertyContainer, "appdb.vappliance.ui.views.VMITrafficRulesItem", function(o) {
+    this.options = {
+		container: $(o.container),
+		parent: o.parent || null,
+		data: o.data || {},
+		isEditable: ( (typeof o.editable === "boolean")?o.editable:false )
+	};
+	this.getData = function(){
+		var props = this.getPropertyData();
+		var d = this.options.data;
+		var res = {
+			type: d.type,
+			protocols: props.protocols,
+			ip_range: props.ip_range,
+			port_range: props.port_ranges
+		};
+		return res;
+	};
+	this.initActions = function(){
+		$(this.dom).children(".actions").children(".action.remove").unbind("click").bind("click", (function(self){
+			return function(ev){
+				ev.preventDefault();
+				self.parent.removeItem(self);
+				return false;
+			};
+		})(this));
+	};
+	this.render = function(d){
+		$(this.dom).data("inst", this);
+		this.renderProperties(d || this.options.data);
+		this.initActions();
+		setTimeout(function(){
+			appdb.vappliance.ui.CurrentVAVersionValidatorRegister.check();
+		},10);
+	};
+	this._init = function(){
+		this.dom = $(this.options.container);
+		this.parent = this.options.parent;
+	};
+	this._init();
+});
+
+appdb.vappliance.ui.views.VMITrafficRules = appdb.ExtendClass(appdb.View, "appdb.vappliance.ui.views.VMITrafficRules", function(o) {
+    this.options = {
+	container: $(o.container),
+	    parent: o.parent || null,
+	    data: o.data || {},
+	    isEditable: ( (typeof o.editable === "boolean")?o.editable:false ),
+	    items: [],
+	    itemTemplate: o.itemTemplate,
+	    importer: null,
+	    dom:{
+		list: $(document.createElement("ul"))
+	    }
+    };
+    this.removeItem = function(item) {
+	alert('remove item ' + JSON.stringify(item.options.data || {}));
+    };
+    this.addItem = function(rule, index) {
+	    var cont = $(this.options.itemTemplate).clone(true);
+	    var item = new appdb.vappliance.ui.views.VMITrafficRulesItem({
+		    container: cont,
+		    parent: this,
+		    editable: true,
+		    data: rule,
+		    index: index
+	    });
+	    this.subviews.push(item);
+	    item.render();
+	    if( rule.isNew === true ){
+		    item.setFocus(true);
+	    }
+	    appdb.vappliance.ui.CurrentVAVersionValidatorRegister.check();
+
+	    return cont;
+    };
+    this.renderEmpty = function() {
+	$(this.dom).find('.emptymessage').remove();
+	$(this.dom).append($('<div class="emptymessage">No network traffic rules found</div>'));
+    }
+    this.render = function() {
+	    this.reset();
+	    $(this.dom).children("ul").remove();
+	    this.options.dom.list = $(document.createElement("ul"));
+	    $(this.dom).append(this.options.dom.list);
+	    var rules = this.options.data || [];
+	    rules = [].concat(Array.isArray(rules) ? rules : [rules]);
+
+	    if( rules.length === 0){
+		    this.renderEmpty();
+	    } else {
+		rules = [rules[0]];console.log(rules[0]);
+		$.each(rules, (function(self){
+			return function(i,e){
+				var rule = self.addItem(e, i);
+				if( rule ){
+					var li = $(document.createElement("li"));
+					$(li).append(rule);
+					$(self.options.dom.list).append(li);
+				}
+			};
+		})(this));
+
+		$.each(this.subviews, function(i, v) {
+		   v.edit();
+		});
+	    }
+
+	//this.initActions();
+	/*setTimeout(function(){
+		appdb.vappliance.ui.CurrentVAVersionValidatorRegister.check();
+	},10);*/
+    };
+    this.initContainer = function() {
+	var tempname = $.trim( $(this.dom).data("usetemplate") );
+	if( tempname !== "" ){
+		var tempdom = appdb.vappliance.ui.CurrentVAManager.getTemplate(tempname);
+		if( $(tempdom).length > 0 ){
+			this.options.itemTemplate = $(tempdom).clone(true);
+		}
+	}
+	$(this.dom).append(this.options.dom.list);
+    };
+    this._init = function() {
+	this.dom = $(this.options.container);
+	this.parent = this.options.parent;
+	this.subviews = [];
+	this.initContainer();
+    };
+    this._init();
 });

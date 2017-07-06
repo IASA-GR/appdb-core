@@ -16,25 +16,22 @@
  */
 ?>
 <?php
-class Default_Model_UserAccountsFilterBase extends Default_Model_Filter {
+class Default_Model_VMINetworkTrafficFilterBase extends Default_Model_Filter {
 	public function __construct() {
 		parent::__construct();
 		$this->setDialect(0);
 		$this->_fields[] = 'id';
-		$this->_fields[] = 'researcherid';
-		$this->_fields[] = 'accountid';
-		$this->_fields[] = 'account_type';
-		$this->_fields[] = 'accountname';
-		$this->_fields[] = 'stateid';
-		$this->_fields[] = 'idptrace';
-		$this->_fields[] = 'comment';
+		$this->_fields[] = 'flow_bits';
+		$this->_fields[] = 'net_protocol_bits';
+		$this->_fields[] = 'ip_range';
+		$this->_fields[] = 'ports';
+		$this->_fields[] = 'vmiinstanceid';
 		$this->_fieldTypes['id'] = 'integer';
-		$this->_fieldTypes['researcherid'] = 'string';
-		$this->_fieldTypes['accountid'] = 'string';
-		$this->_fieldTypes['account_type'] = 'string';
-		$this->_fieldTypes['accountname'] = 'string';
-		$this->_fieldTypes['stateid'] = 'bigint';
-		$this->_fieldTypes['comment'] = 'string';
-		$this->_table = 'user_accounts';
+		$this->_fieldTypes['flow_bits'] = 'string';
+		$this->_fieldTypes['net_protocol_bits'] = 'string';
+		$this->_fieldTypes['ip_range'] = 'string';
+		$this->_fieldTypes['ports'] = 'string';
+		$this->_fieldTypes['vmiinstanceid'] = 'integer';		
+		$this->_table = 'vmi_net_traffic';
 	}
 }

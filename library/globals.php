@@ -74,6 +74,26 @@ if ($php_major <= 5) {
 	}
 }
 
+
+function decodeUTF8($str) {
+	$s = "";
+	for ($i = 0; $i < strlen($a); $i = $i + 1) {
+		if ((substr($a, $i, 2) == '\x') && (substr($a, $i + 4, 2) == '\x')) {
+			$s = $s . hex2bin(substr($a, $i + 2, 2) . substr($a, $i + 6, 2));
+			$i = $i + 7;
+		} elseif (substr($a, $i, 2) == '\x') {
+			$s = $s . hex2bin(substr($a, $i + 2, 2));
+			$i = $i + 3;
+		} else {
+			$s = $s . substr($a, $i, 1);
+		}
+	}
+	return $s;
+	// 	Alternatively, the following line uses the recode tool in a subshell to do the same thing
+	// 	Unfortunatelly the PHP binding (recode_string) does not seem to recognize \x encoded data
+//	return `echo $'$str' | recode utf8..utf8`;
+}
+
 function web_get_contents($url) {
 	$arrContextOptions=array(
 		"ssl"=>array(
@@ -5452,20 +5472,76 @@ class VMCaster{
 		return $res;
 	}
 	private static function publishVersion($version){
-		$vaversions = new Default_Model_VAversions();
-		$f = $vaversions->filter;
-		$f->vappid->equals($version->vappid)->and($f->published->equals(true)->and($f->archived->equals(false)->and($f->id->notequals($version->id))));
-		if( count( $vaversions->items ) > 0 ) {
-			$latestversion = $vaversions->items[0];
-			$latestversion->archived = true;
-			$latestversion->save();
+		$err = "";
+		try {
+			error_log("Starting transaction to publish new VA version");
+			db()->exec("START TRANSACTION");
+			db()->setFetchMode(Zend_Db::FETCH_BOTH);
+
+//			$locked = db()->query("SELECT pg_locks.*, pg_class.relname FROM pg_locks INNER JOIN pg_class ON pg_class.oid = relation INNER JOIN pg_database ON pg_database.oid = database WHERE datname = 'appdb7' AND relname = 'vapp_versions'")->fetchAll();
+//			if (count($locked) > 0) {
+//				$locked = true;
+//			}
+//			$cnt = 0;
+//			while ($locked) {
+//				$cnt = $cnt + 1;
+//				error_log("Waiting to acquire exclusive lock on table vapp_versions... (" . strval($cnt) . ")");
+//				sleep(1);
+//				if ($cnt > 30) {
+//					db()->exec("ROLLBACK");
+//					$err = "Timeout while trying to acquire exclusive lock; table in use. Please try again later.";
+//					error_log($err);
+//					return $err;
+//				}
+//			}
+//			db()->exec("LOCK TABLE ONLY vapp_versions IN ACCESS EXCLUSIVE MODE NOWAIT");
+//			error_log("Table vapp_versions exclusive lock acquired!");
+
+//			$lockid = "vav" . $version->vappid;
+			$lockid = "vav" . $version->va->appid;
+			error_log("Issuing transaction-level advisory lock on VA with lock id " . $lockid);
+			$locked = db()->query("SELECT pg_advisory_xact_lock(CRC32('" . $lockid . "'))")->fetchAll();
+//			$locked = db()->query("SELECT pg_try_advisory_xact_lock(CRC32('" . $vav . "'))")->fetchAll();
+//			$locked = $locked[0]; //row
+//			$locked = $locked[0]; //column
+//			if ($locked) {
+//				db()->exec("ROLLBACK");
+//				$err = "VA with id " . $version->vappid. " is in use (locked), please try again later";
+//				error_log($err);
+//				return $err;
+//			}
+
+			$vaversions = new Default_Model_VAversions();
+			$f = $vaversions->filter;
+			$f->vappid->equals($version->vappid)->and($f->published->equals(true)->and($f->archived->equals(false)->and($f->id->notequals($version->id))));
+			if( count( $vaversions->items ) > 0 ) {
+				$latestversion = $vaversions->items[0];
+				$latestversion->archived = true;
+				$latestversion->save();
+			}
+			$version->published = true;
+			$version->status = "verified";
+			$version->createdon = "now()";
+			$version->save();
+			db()->exec("COMMIT");
+			error_log("Transaction complete, notifying VMCaster");
+		} catch (Exception $e) {
+				$err = "Transaction failed; aborting operation. Reason:" . trim($e->getMessage());
+				error_log($err);
+				db()->exec("ROLLBACK");
+				return $err;
 		}
-		$version->published = true;
-		$version->status = "verified";
-		$version->createdon = "now()";
-		$version->save();
-		
-		VMCaster::createImageList($version->id, "published");
+
+		try {
+			db()->exec("START TRANSACTION ISOLATION LEVEL REPEATABLE READ");
+			VMCaster::createImageList($version->id, "published");
+			db()->exec("COMMIT");
+			error_log("VMCaster notified");
+		} catch (Exception $e) {
+			error_log("VMCaster notification failed!");
+			db()->exec("ROLLBACK");
+		}
+		return true;
 	}
 	public static function deleteVersion($version){
 		try{
@@ -7832,6 +7908,91 @@ class SamlAuth{
 		return $researcher;
 	}
 	
+        //Retrieve X509 CNs from login response attributes and create X509 user accounts
+        //in case they don't already exists for the current user profile.
+        public static function harvestX509UserAccounts($session, $user) {
+                $attrs = $session->samlattrs;
+                $source = strtolower(trim($session->samlauthsource));
+                $ucerts = ( (isset($attrs["idp:userCertificateSubject"])== true && $attrs["idp:userCertificateSubject"])?$attrs["idp:userCertificateSubject"]:array());
+                $existingaccounts = array();
+                $newaccounts = array();
+
+                //Ignore and return if user is already logged using x509-sp
+                if ($source === 'x509-sp') {
+                        return;
+                }
+
+                //Ensure useCertificateSubject is an array
+                if (is_array($ucerts) === false) {
+                        if (trim($ucerts) === "") {
+                                $ucerts = array();
+                        } else {
+                                $ucerts = array($ucerts);
+                        }
+                }
+
+                //Ignore and return if no useCertificateSubjects are given
+                if (count($ucerts) === 0) {
+                        return;
+                }
+
+                //Collect current user's x509 registered accounts
+                $uaccounts = new Default_Model_UserAccounts();
+                $f1 = new Default_Model_UserAccountsFilter();
+                $f2 = new Default_Model_UserAccountsFilter();
+                $f1->account_type->equals("x509");
+                $f2->researcherid->numequals(intval($user->id));
+                $uaccounts->filter->chain($f1, "AND");
+                $uaccounts->filter->chain($f2, "AND");
+
+                if (count($uaccounts->items) > 0) {
+                        //Collect the registered DNs
+                        foreach($uaccounts->items as $uaccount) {
+                                $existingaccounts[] = $uaccount->accountid;
+                        }
+                        //Check which userCertificateSubjects are not in the
+                        //existing accounts list and add them to the newaccounts list
+                        foreach($ucerts as $ucert) {
+                                $isnewaccount = true;
+
+                                foreach($existingaccounts as $existingaccount) {
+					if (
+						(decodeUTF8($ucert) == decodeUTF8($existingaccount)) ||
+						($ucert == decodeUTF8($existingaccount)) ||
+						(decodeUTF8($ucert) == $existingaccount) ||
+						($ucert == $existingaccount) 
+					) {
+                                                $isnewaccount = false;
+                                                break;
+                                        }
+                                }
+
+                                if ($isnewaccount) {
+                                        $newaccounts[] = $ucert;
+                                }
+                        }
+                } else {
+                        //Since there are no x509 registered all userCertificateSubjects
+                        //should be marked as new and be added in the newaccounts list
+                        $newaccounts = $ucerts;
+                }
+
+                //If there are userCertificates in newaccounts list
+                //add them as new x509 useraccounts
+                if (count($newaccounts) > 0) {
+                    foreach($newaccounts as $newaccount) {
+                            $uaccount = new Default_Model_UserAccount();
+                            $uaccount->researcherid = $user->id;
+                            $uaccount->accountid = $newaccount;
+                            $uaccount->accounttypeid = 'x509';
+                            $uaccount->accountname = trim($session->userFirstName . " " . $session->userLastName);
+                            $uaccount->IDPTrace = $session->idptrace;
+                            $uaccount->comment = 'Implicit::' . $source . '::' . date('Y-m-d H:i:s');
+                            $uaccount->save();
+                    }
+                }
+        }
+
 	//Collect and store implicit user accounts from current one.
 	//E.g. if a user signed in with an egi sso account there might be a usercertificate subject. 
 	//In this case store it as a x509 user account in the current profile.
@@ -8044,11 +8205,11 @@ class SamlAuth{
 		  $role = self::getEGIAAIVORoleMapping($matches[5]);
 		  $voname = $matches[6];
 		  
-		  if ($role === 'VM OPERATOR' && strpos($source, 'appdb_auth') === false && strpos($source, 'unity.egi.eu') === false) {
+/*		  if ($role === 'VM OPERATOR' && strpos($source, 'appdb_auth') === false && strpos($source, 'unity.egi.eu') === false) {
 			//Do not accept vm_operator role if it is not given by AppDB auth source
 			continue;
 		  }
-
+*/
 		  if( $role === 'member' ) {
 			$res['vos']['members'][] = array('scope' => $scope, 'source' => $source, 'vo' => $voname, 'group' => $group );
 		  } else if($role !== null) {
@@ -8209,11 +8370,13 @@ class SamlAuth{
 		if( $user!==null && $user->id ){
 			if($accounttype !== 'egi-aai') {
 				self::harvestSamlData($session, $user);
-			}
+			} else {
+                                self::harvestX509UserAccounts($session, $user);
+                        }
 			self::setupSamlSession($session, $useraccount, $user);
 			if( $_COOKIE["SimpleSAMLAuthToken"] ){
 				self::setupSamlUserCredentials($user, $session);
-			}
+                        }
 		}else{
 			self::setupSamlNewUserSession($session, $accounttype);
 		}
@@ -10769,11 +10932,11 @@ class VoAdminNotifications {
 			}
 			$notification["vappliances"] = $apps;
 			$deleted = 0;
-			$deletedVAs = [];
+			$deletedVAs = array();
 			$expired = 0;
-			$expiredVAs = [];
+			$expiredVAs = array();
 			$outdated = 0;
-			$outdatedVAs = [];
+			$outdatedVAs = array();
 			foreach($apps as $a){
 				if( $a["expired"] == "true"){
 					$expired += 1;

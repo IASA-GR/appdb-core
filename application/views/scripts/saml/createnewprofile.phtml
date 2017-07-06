@@ -21,6 +21,10 @@
 	$source = str_replace("-sp", "", $source);
 	$source = str_replace("-", " ", $source);
 	$source = str_replace("ldap", "", $source);
+	$referer = $session->authreferer;
+	if( trim($referer) == "" ){
+		$referer = "https://" . $_SERVER["HTTP_HOST"];
+	}
 	if( count($errors) > 0 ){
 ?>
 <div class='createnewprofile response error notifydialog display'>
@@ -50,7 +54,7 @@
 			You can visit your <a style="font-size:15px;" href="https://<?php echo $_SERVER['HTTP_HOST'];?>/store/person/<?php echo $session->usercname;?>" title="Your profile page"><span>profile</span></a> to add more information about yourself or even connect to other accounts. 
 		</div>
 		<div class="actions">
-			<a class="action close icontext" href="https://<?php echo $_SERVER['HTTP_HOST'];?>" title="Go to EGI Applications Database" >close</a>
+			<a class="action close icontext" href="<?php echo $referer;?>" >close</a>
 		</div>
 	</div>
 </div>

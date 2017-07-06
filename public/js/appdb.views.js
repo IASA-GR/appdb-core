@@ -14145,7 +14145,7 @@ appdb.views.ConnectedAccountTypeListItem = appdb.ExtendClass(appdb.View, "appdb.
 		}
 	};
 	this.canRenderActions = function() {
-		return !(
+		return (
 			this.options.meta &&
 			this.options.meta.source === 'egi-aai' &&
 			appdb.config.deploy.instance === 'production' &&
@@ -14160,24 +14160,40 @@ appdb.views.ConnectedAccountTypeListItem = appdb.ExtendClass(appdb.View, "appdb.
 		$(this.options.dom.actions).empty();
 		if (this.isEmpty() === false && ($.trim(samlLoginSourceType).toLowerCase() === "x509" || this.options.meta.id === "x509-sp"))
 			return;
-		var connect = $("<a href='#' title='Connect to a new " + this.options.meta.name + " account' class='action icontext'><img src='/images/addnew.png' alt=''/><span>Add account</span></a>");
-		$(connect).unbind("click").bind("click", (function(self) {
-			return function(ev) {
-				ev.preventDefault();
-				self.parent.connectAccount(self.options.meta);
-				return false;
-			};
-		})(this));
-		$(this.options.dom.actions).append(connect);
+                if (this.options.meta.canAdd === true) {
+                    var connect = $("<a href='#' title='Connect to a new " + this.options.meta.name + " account' class='action icontext'><img src='/images/addnew.png' alt=''/><span>Add account</span></a>");
+                    $(connect).unbind("click").bind("click", (function(self) {
+                        return function(ev) {
+                            ev.preventDefault();
+                            self.parent.connectAccount(self.options.meta);
+                            return false;
+                        };
+                    })(this));
+                    $(this.options.dom.actions).append(connect);
+                }
 	};
+        this.canRender = function() {
+	   this.options.meta = this.options.meta || {};
+           return (
+		(
+		   this.isEmpty() &&
+		   this.options.meta.canAdd !== true &&
+		   this.options.meta.alwaysVisible !== true
+		) === false
+	    );
+        };
 	this.render = function() {
-		this.clearItems();
+	    this.clearItems();
 
+	    if (this.canRender()) {
 		this.renderHeader();
 		this.renderList();
 		this.renderFooter();
 		this.renderEmpty();
 		this.renderActions();
+	    } else {
+		$(this.dom).empty();
+	    }
 	};
 	this._initContainer = function() {
 		$(this.dom).addClass("accounttypeitem");
@@ -14300,7 +14316,7 @@ appdb.views.ConnectedAccountTypeList = appdb.ExtendClass(appdb.View, "appdb.view
 	this.doConnectAccount = function(accounttype) {
 		this.renderProcess(true, "Connecting " + accounttype.name);
 		setTimeout(function() {
-			window.location.href = appdb.config.endpoint.base + "/saml/connect?source=" + accounttype.id;
+		    window.location.href = accounttype.connectUrl || (appdb.config.endpoint.base + "/saml/connect?source=" + accounttype.id);
 		}, 400);
 	};
 	this.getConnectMessage = function(accounttype) {
@@ -14313,6 +14329,9 @@ appdb.views.ConnectedAccountTypeList = appdb.ExtendClass(appdb.View, "appdb.view
 		var cmessage = "In order to connect a new account to your profile you will be redirected to " + accounttype.name + " portal for authentication.<br/><br/>" + this.getConnectMessage(accounttype) + "<br/>";
 		if ($.trim(accounttype.id).toLowerCase() === "x509-sp") {
 			cmessage = "In order to connect a new digital certificate to your profile, you need to import the certificate to your browser.<br/><br/> If your browser has many digital certificates, you will be prompted to select one to connect.";
+		}
+		if($.trim(accounttype.id).toLowerCase() === 'egi-aai-sp') {
+		    cmessage = "The connection/linking of a new account has been changed and is now managed by <i>COmanage</i>.<br/><br/>Please, click the <i>Connect</i> button bellow to be redirected to the COmanage. If you need further instructions please click <a style='font-size:15px;' href='https://wiki.egi.eu/wiki/AAI_usage_guide#Linking_Additional_Organisational.2FSocial_Identities_to_your_EGI_Account' target='_blank'>here</a>.";
 		}
 		appdb.utils.ShowNotificationDialog({
 			title: "<span style='vertical-align: middle;'><span>Connecting to a new </span><img src='" + accounttype.image + "' alt='' style='padding: 0px 5px;width:16px;height:16px;border:none;vertical-align:middle;'/><span>" + accounttype.name + " account</span></span>",

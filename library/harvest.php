@@ -863,6 +863,18 @@ class EntityRelations{
 		} else {
 			$res = false;
 		}
+		// if not permission set, refresh permissions and check again
+		if (! $res) {
+			db()->setFetchMode(Zend_Db::FETCH_BOTH);
+			$res = db()->exec("REFRESH MATERIALIZED VIEW CONCURRENTLY permissions;");
+			$res = db()->query("SELECT EXISTS (SELECT * FROM permissions WHERE actor = '".$uguid . "' AND actionid = " .$actionid." AND (object = '".$sguid."' OR object IS NULL)) AS result;")->fetchAll();
+			$row = $res[0];
+			if ( $row['result'] == "1" || $row['result'] ===  true) {
+				$res = true;
+			} else {
+				$res = false;
+			}
+		}
 		db()->setFetchMode($fmode);
 		return $res;
 	}

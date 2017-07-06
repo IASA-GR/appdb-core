@@ -225,13 +225,13 @@ class ApiController extends Zend_Controller_Action
 			$rx = RestBroker::matchResource($url, $apiroutes, $pars);
 			if (! is_null($rx)) {
 				// FIXME: workaround for erroneous people canonical URLs with query strings
-				if (($rx->resource == "RestPplItem") && ($method = "get")) {
+				if (($rx->resource == "RestPplItem") && ($method == "get")) {
 					$qs = null;
 				}
 			}
 		} else {
 			// FIXME: workaround for erroneous people canonical URLs with query strings
-			if (($rx->resource == "RestPplItem") && ($method = "get")) {
+			if (($rx->resource == "RestPplItem") && ($method == "get")) {
 				$qs = null;
 			}
 		}

@@ -1627,8 +1627,10 @@
 		<?php } ?>
 		<?php 
 			$accessgroupslist = array();
-			foreach($this->entry->actorGroups as $g) {
-				$accessgroupslist[] = array("id"=> $g->group->id,"name"=>$g->group->name,"payload"=>$g->payload, "suid"=>$g->actorguid);
+			if ($this->entry->id != "") {
+				foreach($this->entry->actorGroups as $g) {
+					$accessgroupslist[] = array("id"=> $g->group->id,"name"=>$g->group->name,"payload"=>$g->payload, "suid"=>$g->actorguid);
+				}
 			}
 			
 		?>

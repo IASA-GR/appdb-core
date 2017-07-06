@@ -60,9 +60,9 @@ class AaimpxController extends Zend_Controller_Action
 
 		if (isset($_GET['appdbvo']) && trim($_GET['appdbvo']) !='') {
          	       $_SESSION['appdbvo'] = $_GET['appdbvo'];
-                } else {
- 	               $_SESSION['appdbvo']='none';
-                }
+                } //else {
+ 	        //       $_SESSION['appdbvo']='none';
+               // }
 		if($this->isValidVO($_SESSION['appdbvo']) == false){
 			$this->view->error = 1001;
                         $this->view->error_description = "invalid VO provided";

@@ -187,14 +187,16 @@ class GocdbController extends Zend_Controller_Action
 				) {
 					$pkey = strval(($xp->xpath("./SERVICES/SERVICE/SERVICE_TYPE[text()='eu.egi.cloud.vm-management.occi']/../PRIMARY_KEY")[0]));
 					// exclude current active downtime, if any
+					$exclude = false;
 					foreach($activeDTimes as $a) {
 						if ($a[2] == $pkey) {
 							if (($nowStart >= $a[0]) && ($nowStart <= $a[1])) {
-								continue;
+								$exclude = true;
 							}
 						}
 					}
-					error_log('Down sometime between now and 24h from now: ' . strval($xp));
+					if ($exclude) continue;
+					error_log('Down sometime between now and 24h from now: ' . strval($pkey));
 					db()->query("UPDATE gocdb.va_providers SET service_downtime = service_downtime | 1::bit(2) WHERE pkey = '$pkey';");
 				}
 			}
