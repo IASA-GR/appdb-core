@@ -55,6 +55,23 @@
 					<xsl:if test="@expireson">
 						<xsl:attribute name="expireson"><xsl:value-of select="@expireson" /></xsl:attribute>
 					</xsl:if>
+
+					<xsl:element name="virtualization:publishedby">
+						<xsl:choose>
+							<xsl:when test="person:publishedby">
+								<xsl:attribute name="id"><xsl:value-of select="person:publishedby/@id" /></xsl:attribute>
+								<xsl:attribute name="cname"><xsl:value-of select="person:publishedby/@cname" /></xsl:attribute>
+								<xsl:element name="person:firstname"><xsl:value-of select="person:publishedby/person:firstname" /></xsl:element>
+								<xsl:element name="person:lastname"><xsl:value-of select="person:publishedby/person:lastname" /></xsl:element>
+								<xsl:element name="person:institute"><xsl:value-of select="person:publishedby/person:institute" /></xsl:element>
+								<xsl:element name="person:role">
+									<xsl:attribute name="id"><xsl:value-of select="person:publishedby/person:role/@id" /></xsl:attribute>
+									<xsl:attribute name="type"><xsl:value-of select="person:publishedby/person:role/@type" /></xsl:attribute>
+								</xsl:element>
+							</xsl:when>
+						</xsl:choose>
+					</xsl:element>
+					
 					<xsl:element name="virtualization:identifier">
 						<xsl:value-of select="virtualization:identifier" />
 					</xsl:element>
