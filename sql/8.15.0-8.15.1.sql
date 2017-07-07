@@ -681,6 +681,33 @@ tenabledby.firstname,
 applications.id, vapplications.id, vapp_versions.published, vapp_versions.publishedby, vapp_versions.publishedon, vapp_versions.enabledby, vapp_versions.enabledon, vapp_versions.version, applications.guid, vapplications.name, vapp_versions.id, vapp_versions.createdon, vapp_versions.expireson, vapp_versions.status, vapp_versions.enabled, vapp_versions.archived
   ORDER BY vapp_versions.published, vapp_versions.archived, vapp_versions.archivedon DESC;
 
+CREATE OR REPLACE FUNCTION trfn_vapp_versions_set_timestamps()
+RETURNS TRIGGER
+AS
+$$
+BEGIN
+	IF TG_OP = "INSERT" THEN
+		IF NEW.enabled THEN 
+			NEW.enabledon = NOW(); 
+		END IF;
+		IF NEW.published THEN 
+			NEW.publishedon = NOW(); 
+		END IF;
+	ELSIF TG_OP = "UPDATE" THEN
+		IF NEW.enabled IS DISTINCT FROM OLD.enabled THEN 
+			NEW.enabledon = NOW(); 
+		END IF;
+		IF (NEW.published) AND (OLD.published IS DISTINCT FROM TRUE) THEN
+			NEW.publishedon = NOW(); 
+		END IF;
+	END IF;
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+ALTER FUNCTION trfn_vapp_versions_set_timestamps() OWNER TO appdb;
+
+CREATE TRIGGER rtr_vapp_versions_10_set_timestamps BEFORE INSERT OR UPDATE ON vapp_versions 
+FOR EACH ROW EXECUTE PROCEDURE trfn_vapp_versions_set_timestamps();
 
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 15, 1, E'Added columns to vapp_versions (enabledby, enabledon, publishedby, publishedon)'
