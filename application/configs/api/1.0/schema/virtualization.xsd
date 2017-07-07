@@ -212,6 +212,8 @@
 
 	<xs:complexType name="applianceInstanceType" mixed="true">
 		<xs:sequence>
+			<xs:element name="publishedby" type="person:personType" />
+			<xs:element name="enabledby" type="person:personType" />
 			<xs:element name="identifier" type="xs:string" />
 			<xs:element name="notes" type="xs:string" minOccurs="0" maxOccurs="1" />
 			<xs:element name="image" type="virtualization:imageType" minOccurs="0" maxOccurs="unbounded" />

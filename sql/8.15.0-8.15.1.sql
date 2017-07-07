@@ -584,7 +584,7 @@ CREATE OR REPLACE VIEW public.vapp_to_xml AS
 ', CASE WHEN NOT vapp_versions.publishedby IS NULL THEN XMLELEMENT(NAME "person:publishedby", XMLATTRIBUTES(vapp_versions.publishedby AS id, tpublishedby.cname AS cname), XMLELEMENT(NAME "person:firstname", tpublishedby.firstname), XMLELEMENT(NAME "person:lastname", tpublishedby.lastname), XMLELEMENT(NAME "person:institute", tpublishedby.institution), XMLELEMENT(NAME "person:role", XMLATTRIBUTES(tpublishedby.positiontypeid AS id, ( SELECT positiontypes.description
            FROM positiontypes
           WHERE positiontypes.id = tpublishedby.positiontypeid) AS type))) END, '
-', CASE WHEN NOT vapp_versions.enabledby IS NULL THEN XMLELEMENT(NAME "person:publishedby", XMLATTRIBUTES(vapp_versions.publishedby AS id, tenabledby.cname AS cname), XMLELEMENT(NAME "person:firstname", tenabledby.firstname), XMLELEMENT(NAME "person:lastname", tenabledby.lastname), XMLELEMENT(NAME "person:institute", tenabledby.institution), XMLELEMENT(NAME "person:role", XMLATTRIBUTES(tenabledby.positiontypeid AS id, ( SELECT positiontypes.description
+', CASE WHEN NOT vapp_versions.enabledby IS NULL THEN XMLELEMENT(NAME "person:enabledby", XMLATTRIBUTES(vapp_versions.enabledby AS id, tenabledby.cname AS cname), XMLELEMENT(NAME "person:firstname", tenabledby.firstname), XMLELEMENT(NAME "person:lastname", tenabledby.lastname), XMLELEMENT(NAME "person:institute", tenabledby.institution), XMLELEMENT(NAME "person:role", XMLATTRIBUTES(tenabledby.positiontypeid AS id, ( SELECT positiontypes.description
            FROM positiontypes
           WHERE positiontypes.id = tenabledby.positiontypeid) AS type))) END, '
 ', XMLELEMENT(NAME "virtualization:identifier", vapp_versions.guid), '
@@ -653,8 +653,8 @@ CREATE OR REPLACE VIEW public.vapp_to_xml AS
      LEFT JOIN archs ON archs.id = vmiflavours.archid
      LEFT JOIN oses ON oses.id = vmiflavours.osid
      LEFT JOIN researchers taddedby ON taddedby.id = vmiinstances.addedby
-LEFT JOIN researchers tpublishedby ON tpublishedby.id = vapp_versions.publishedby
-LEFT JOIN researchers tenabledby ON tenabledby.id = vapp_versions.enabledby
+	 LEFT JOIN researchers tpublishedby ON tpublishedby.id = vapp_versions.publishedby
+	 LEFT JOIN researchers tenabledby ON tenabledby.id = vapp_versions.enabledby
      LEFT JOIN researchers tlastupdatedby ON tlastupdatedby.id = vmiinstances.lastupdatedby
      LEFT JOIN vmiflavor_hypervisor_xml hypervisors ON hypervisors.vmiflavourid = vmiflavours.id
      LEFT JOIN vmiformats ON vmiformats.name::text = vmiflavours.format
