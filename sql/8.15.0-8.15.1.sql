@@ -723,8 +723,6 @@ WHERE vapp_versions.published AND NOT vapp_versions.archived;
 
 ALTER TABLE vapp_versions ENABLE TRIGGER USER;
 
-SELECT publishedby,id FROM vapp_versions WHERE NOT publishedby IS NULL;	
-
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 15, 1, E'Added columns to vapp_versions (enabledby, enabledon, publishedby, publishedon)'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=15 AND revision=1);
