@@ -709,6 +709,22 @@ ALTER FUNCTION trfn_vapp_versions_set_timestamps() OWNER TO appdb;
 CREATE TRIGGER rtr_vapp_versions_10_set_timestamps BEFORE INSERT OR UPDATE ON vapp_versions 
 FOR EACH ROW EXECUTE PROCEDURE trfn_vapp_versions_set_timestamps();
 
+-- Initialize publishedby to the user who added images to each vapp version, for those that are published and not archived
+
+ALTER TABLE vapp_versions DISABLE TRIGGER USER;
+
+UPDATE vapp_versions SET publishedby = (
+SELECT DISTINCT vmii.addedby
+FROM vapp_versions AS vav
+LEFT OUTER JOIN vapplists AS val ON val.vappversionid = vav.id
+LEFT OUTER JOIN vmiinstances AS vmii ON vmii.id = val.vmiinstanceid
+WHERE vav.id = vapp_versions.id)
+WHERE vapp_versions.published AND NOT vapp_versions.archived;
+
+ALTER TABLE vapp_versions ENABLE TRIGGER USER;
+
+SELECT publishedby,id FROM vapp_versions WHERE NOT publishedby IS NULL;	
+
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 15, 1, E'Added columns to vapp_versions (enabledby, enabledon, publishedby, publishedon)'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=15 AND revision=1);
