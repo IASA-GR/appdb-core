@@ -7128,14 +7128,14 @@ appdb.views.ApiNetFilterRegister = appdb.ExtendClass(appdb.View, "appdb.views.Ap
 	},
 	labels: {
 		inputWaterMask: "Please enter the netfilter value...",
-		description: "<span>Please provide a netfilter, to be associated it with the current API key. Its value can be a simple IP address, a CIDR formatted address, a (sub)domain name, or a host name. <span class='viewexamples hide'>Click <a class='cidrexamples' href='#'>here</a> for examples.</span></span>",
+		description: "<span>Although this is optional please consider providing a netfilter in order to restrict access to the current access token. Its value can be a simple IP address, a CIDR formatted address, a (sub)domain name, or a host name. <span class='viewexamples hide'>Click <a class='cidrexamples' href='#'>here</a> for examples.</span></span>",
 		validation: "<div class='validation'></div>",
 		examples: "<div class='netfilters examples'>The following are some valid netfilter values:<br/><span><a href='http://en.wikipedia.org/wiki/Domain_name' target='_blank'>Domain name</a>:</span>" +
-				"<ul><li>mydomain.eu</li><li>subdomain.mydomain.eu</li></ul>" +
+				"<ul><li>mydomain.eu</li><li>subdomain.mydomain.eu</li><li>iasa.gr</li></ul>" +
 				"<span><a href='http://en.wikipedia.org/wiki/Cidr' target='_blank'>CIDR</a>:</span>" +
-				"<ul><li>10.0.0.0/24</li><li>32.0.0.0/8</li></ul>" +
+				"<ul><li>195.134.89.0/24</li><li>195.251.54.0/25</li></ul>" +
 				"<span><a href='http://en.wikipedia.org/wiki/IP_address' target='_blank'>IP Address</a>:</span>" +
-				"<ul><li>172.16.254.1</li><li>192.168.2.25</li></ul>" +
+				"<ul><li>195.134.89.11</li><li>195.251.54.93</li></ul>" +
 				"</div>"
 	},
 	tips: null
@@ -8450,14 +8450,14 @@ appdb.views.TokenNetFilterRegister = appdb.ExtendClass(appdb.View, "appdb.views.
 	},
 	labels: {
 		inputWaterMask: "Please enter the netfilter value...",
-		description: "<span>Please provide a netfilter, to be associated it with the current access token. Its value can be a simple IP address, a CIDR formatted address, a (sub)domain name, or a host name. <span class='viewexamples hide'>Click <a class='cidrexamples' href='#'>here</a> for examples.</span></span>",
+		description: "<span>Although this is optional please consider providing a netfilter in order to restrict access to the current access token. Its value can be a simple IP address, a CIDR formatted address, a (sub)domain name, or a host name. <span class='viewexamples hide'>Click <a class='cidrexamples' href='#'>here</a> for examples.</span></span>",
 		validation: "<div class='validation'></div>",
 		examples: "<div class='netfilters examples'>The following are some valid netfilter values:<br/><span><a href='http://en.wikipedia.org/wiki/Domain_name' target='_blank'>Domain name</a>:</span>" +
-				"<ul><li>mydomain.eu</li><li>subdomain.mydomain.eu</li></ul>" +
+				"<ul><li>mydomain.eu</li><li>subdomain.mydomain.eu</li><li>iasa.gr</li></ul>" +
 				"<span><a href='http://en.wikipedia.org/wiki/Cidr' target='_blank'>CIDR</a>:</span>" +
-				"<ul><li>10.0.0.0/24</li><li>32.0.0.0/8</li></ul>" +
+				"<ul><li>195.134.89.0/24</li><li>195.251.54.0/25</li></ul>" +
 				"<span><a href='http://en.wikipedia.org/wiki/IP_address' target='_blank'>IP Address</a>:</span>" +
-				"<ul><li>172.16.254.1</li><li>192.168.2.25</li></ul>" +
+				"<ul><li>195.134.89.11</li><li>195.251.54.93</li></ul>" +
 				"</div>"
 	},
 	tips: null
