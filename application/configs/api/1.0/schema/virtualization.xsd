@@ -212,8 +212,8 @@
 
 	<xs:complexType name="applianceInstanceType" mixed="true">
 		<xs:sequence>
-			<xs:element name="publishedby" type="person:personType" />
-			<xs:element name="enabledby" type="person:personType" />
+			<xs:element name="publishedby" type="person:personType" minOccurs="0" maxOccurs="1" />
+			<xs:element name="enabledby" type="person:personType" minOccurs="0" maxOccurs="1" />
 			<xs:element name="identifier" type="xs:string" />
 			<xs:element name="notes" type="xs:string" minOccurs="0" maxOccurs="1" />
 			<xs:element name="image" type="virtualization:imageType" minOccurs="0" maxOccurs="unbounded" />
@@ -221,8 +221,10 @@
 		<xs:attribute name="id" type="xs:integer" use="required" />
 		<xs:attribute name="version" type="xs:string" use="required" />
 		<xs:attribute name="published" type="xs:boolean" use="required" />
+		<xs:attribute name="publishedon" type="xs:dateTime" use="required" />
 		<xs:attribute name="createdon" type="xs:dateTime" use="required" />
 		<xs:attribute name="enabled" type="xs:boolean" use="required" />
+		<xs:attribute name="enabledon" type="xs:dateTime" use="required" />
 		<xs:attribute name="archived" type="xs:boolean" use="required" />
 		<xs:attribute name="archivedon" type="xs:dateTime" use="optional" />
 		<xs:attribute name="status" type="xs:string" use="required" />
