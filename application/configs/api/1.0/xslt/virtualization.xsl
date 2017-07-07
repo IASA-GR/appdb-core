@@ -55,7 +55,7 @@
 					<xsl:if test="@expireson">
 						<xsl:attribute name="expireson"><xsl:value-of select="@expireson" /></xsl:attribute>
 					</xsl:if>
-					<xsl:if test="person:published/@id">
+					<xsl:if test="person:publishedby/@id">
 						<xsl:element name="virtualization:publishedby">
 							<xsl:choose>
 								<xsl:when test="person:publishedby">
