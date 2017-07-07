@@ -14280,6 +14280,42 @@ vappliance.singlevmipolicy .property > .loader, .vappliance .vappliance-version 
 .fieldvalueset > .contents > .property.fieldnamevalue > .value {
     margin-right: 5px;
 }
+.fieldvalueset .property-validator {
+    display: none;
+}
+.fieldvalueset.invalid  >.contents{
+    background-color: #F9F7BA;
+    padding-bottom: 10px;
+    margin-bottom: 0;
+    border: 1px solid #DB5B00;
+    border-bottom: none;
+    border-top: none;
+}
+.fieldvalueset.invalid  > .contents:nth-child(even){
+    border-top: 1px solid #DB5B00;
+}
+.fieldvalueset.invalid .property-validator {
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+.fieldvalueset.invalid .property-validator > .warning {
+    margin: 0 auto;
+    padding: 5px;
+    border: 1px solid transparent;
+    border-radius: 0;
+    background-color: #d96b00; /*#F9F7BA;*/
+    border: 1px solid #DB5B00;
+    color: #fff;
+    font-size: 12px;
+}
+.fieldvalueset.invalid .property-validator > .warning > img {
+    width: 16px;
+    height: 16px;
+}
+.fieldvalueset.invalid .property-validator > .warning > * {
+    display: inline;
+}
 .vappliance .vaversion-vmiversionlist > ul > li > div.vaversion-vmiversion .property.vmiversion-minram > .header,
 .vappliance .vaversion-vmiversionlist > ul > li > div.vaversion-vmiversion .property.vmiversion-recomram > .header,
 .fieldvalueset > .contents > .property.fieldnamevalue,

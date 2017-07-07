@@ -26,7 +26,13 @@ class Default_Model_VAversionBase
 	protected $_vappID;
 	protected $_va;
 	protected $_published;
+	protected $_publishedbyID;
+	protected $_publishedby;
 	protected $_createdon;
+	protected $_publishedon;
+	protected $_enabledon;
+	protected $_enabledbyID;
+	protected $_enabledby;
 	protected $_expireson;
 	protected $_enabled;
 	protected $_archived;
@@ -179,6 +185,38 @@ class Default_Model_VAversionBase
 		}
 	}
 
+	public function setPublishedByID($value)
+	{
+		/* if ( $value === null ) {
+			$this->_publishedbyID = 'NULL';
+		} else */ $this->_publishedbyID = $value;
+		return $this;
+	}
+
+	public function getPublishedByID()
+	{
+		return $this->_publishedbyID;
+	}
+
+	public function getPublishedBy()
+	{
+		if ( $this->_publishedby === null ) {
+			$Researchers = new Default_Model_Researchers();
+			$Researchers->filter->id->equals($this->getPublishedByID());
+			if ($Researchers->count() > 0) $this->_publishedby = $Researchers->items[0];
+		}
+		return $this->_publishedby;
+	}
+
+	public function setPublishedBy($value)
+	{
+		if ( $value === null ) {
+			$this->setPublishedByID(null);
+		} else {
+			$this->setPublishedByID($value->getId());
+		}
+	}
+
 	public function setCreatedon($value)
 	{
 		/* if ( $value === null ) {
@@ -191,6 +229,65 @@ class Default_Model_VAversionBase
 	{
 		return $this->_createdon;
 	}
+
+	public function setPublishedOn($value)
+	{
+		/* if ( $value === null ) {
+			$this->_publishedon = 'NULL';
+		} else */ $this->_publishedon = $value;
+		return $this;
+	}
+
+	public function getPublishedOn()
+	{
+		return $this->_publishedon;
+	}
+
+	public function setEnabledOn($value)
+	{
+		/* if ( $value === null ) {
+			$this->_enabledon = 'NULL';
+		} else */ $this->_enabledon = $value;
+		return $this;
+	}
+
+	public function getEnabledOn()
+	{
+		return $this->_enabledon;
+	}
+
+	public function setEnabledByID($value)
+	{
+		/* if ( $value === null ) {
+			$this->_enabledbyID = 'NULL';
+		} else */ $this->_enabledbyID = $value;
+		return $this;
+	}
+
+	public function getEnabledByID()
+	{
+		return $this->_enabledbyID;
+	}
+
+	public function getEnabledBy()
+	{
+		if ( $this->_enabledby === null ) {
+			$Researchers = new Default_Model_Researchers();
+			$Researchers->filter->id->equals($this->getEnabledByID());
+			if ($Researchers->count() > 0) $this->_enabledby = $Researchers->items[0];
+		}
+		return $this->_enabledby;
+	}
+
+	public function setEnabledBy($value)
+	{
+		if ( $value === null ) {
+			$this->setEnabledByID(null);
+		} else {
+			$this->setEnabledByID($value->getId());
+		}
+	}
+
 
 	public function setExpireson($value)
 	{
@@ -345,9 +442,17 @@ class Default_Model_VAversionBase
 		if ( $recursive ) if ( $this->_va === null ) $this->getVa();
 		if ( ! ($this->_va === null) ) $XML .= $this->_va->toXML();
 		if ($this->_published !== null) $XML .= "<published>".$this->_published."</published>\n";
+		if ($this->_publishedon !== null) $XML .= "<publishedon>".$this->_publishedon."</publishedon>\n";
+		if ($this->_publishedbyID !== null) $XML .= "<publishedbyID>".$this->_publishedbyID."</publishedbyID>\n";
+		if ( $recursive ) if ( $this->_publishedby === null ) $this->getPublishedBy();
+		if ( ! ($this->_publishedby === null) ) $XML .= $this->_publishedby->toXML();
 		if ($this->_createdon !== null) $XML .= "<createdon>".recode_string("utf8..xml",$this->_createdon)."</createdon>\n";
 		if ($this->_expireson !== null) $XML .= "<expireson>".recode_string("utf8..xml",$this->_expireson)."</expireson>\n";
 		if ($this->_enabled !== null) $XML .= "<enabled>".$this->_enabled."</enabled>\n";
+		if ($this->_enabledon !== null) $XML .= "<enabledon>".$this->_enabledon."</enabledon>\n";
+		if ($this->_enabledbyID !== null) $XML .= "<enabledbyID>".$this->_enabledbyID."</enabledbyID>\n";
+		if ( $recursive ) if ( $this->_enabledby === null ) $this->getenabledBy();
+		if ( ! ($this->_enabledby === null) ) $XML .= $this->_enabledby->toXML();
 		if ($this->_archived !== null) $XML .= "<archived>".$this->_archived."</archived>\n";
 		if ($this->_status !== null) $XML .= "<status>".recode_string("utf8..xml",$this->_status)."</status>\n";
 		if ($this->_archivedon !== null) $XML .= "<archivedon>".recode_string("utf8..xml",$this->_archivedon)."</archivedon>\n";

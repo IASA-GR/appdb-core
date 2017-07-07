@@ -6524,17 +6524,23 @@ class VApplianceService{
 	private $state = null;
 	private $version = null;
 	private $latestversion = null;
+	private $userid;
 	/*
 	 * Needs VApplianceVersionState object to check which action to take
 	 */
-	function __construct(VApplianceVersionState $state) {
+	function __construct(VApplianceVersionState $state, $userid) {
 		$this->state = $state;
+		if (! is_numeric($userid)) {
+			error_log("[VApplianceService::__construct] userid is invalid (or missing)");
+		}
+		$this->userid = $userid;
 	}
 	
 	public function publish(){
 		$version = $this->getVAVersion();
 		$version->status = "verified";
 		$version->createdon = "now()";
+		$version->publishedbyID = $this->userid;
 		$version->save();
 		$result = $this->archiveLatestVersion();
 		$va = $version->getVa();
@@ -6554,6 +6560,7 @@ class VApplianceService{
 		$version->published = false;
 		if($version->status === "verifypublish" ){ //if request was made for publishing
 			$version->status = "verifingpublish";
+			$version->publishedByID = $this->userid;
 		}else{
 			$version->status = "verifing";
 		}
@@ -6565,6 +6572,7 @@ class VApplianceService{
 		$version->published = false;
 		$version->status = "init";
 		$version->save();
+		db()->exec("UPDATE vapp_versions SET publishedby = NULL WHERE id = " . $version->id);
 		VMCaster::cancelIntegrityCheck($version->id);
 		return true;
 	}
@@ -6580,12 +6588,14 @@ class VApplianceService{
 	public function disable(){
 		$version = $this->getVAVersion();
 		$version->enabled = false;
+		$version->enabledbyID = $this->userid;
 		$version->save();
 		return true;
 	}
 	public function enable(){
 		$version = $this->getVAVersion();
 		$version->enabled = true;
+		$version->enabledbyID = $this->userid;
 		$version->save();
 		return true;
 	}
