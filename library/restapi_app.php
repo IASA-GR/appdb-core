@@ -4818,14 +4818,14 @@ class RestAppVAXMLParser extends RestXMLParser {
 				if( $enabled == "true" && $m->enabled === false ){
 					$this->createVersionState($m);
 					$m->enabled = true;
-					$m->enabledbyID = $userid;
+					$m->enabledByID = $userid;
 					$m->save();
 					$this->vappversion_state->setVersionNewState($m);
 					return $m;
 				}elseif( $enabled == "false" && $m->enabled === true){
 					$this->createVersionState($m);
 					$m->enabled = false;
-					$m->enabledbyID = $userid;
+					$m->enabledByID = $userid;
 					$m->save();
 					$this->vappversion_state->setVersionNewState($m);
 					return $m;
@@ -4836,7 +4836,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 				if( $this->isexternalrequest === true || $this->isPUT() === true){
 					$ident = $m->guid;					
 					$m = new Default_Model_VAversion();
-					$m->publishedbyID = $userid;
+					$m->publishedByID = $userid;
 					$m->guid = $ident;
 				}else{
 					return $this->_setErrorMessage("Cannot edit published version");

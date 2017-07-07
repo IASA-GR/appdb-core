@@ -5277,7 +5277,7 @@ class VMCaster{
 		return $result;
 	}
 	
-	public static function statusIntegrityCheck($vaversionid){
+	public static function statusIntegrityCheck($vaversionid, $userid){
 		$url = VMCaster::getVMCasterUrl() . "/integrity/statusimageList/".$vaversionid."/xml";
 		try{
 			$xml = web_get_contents($url);		
@@ -5290,7 +5290,7 @@ class VMCaster{
 			return $result;
 		}
 		
-		$newres = VMCaster::syncStatusIntegrityCheck($result);
+		$newres = VMCaster::syncStatusIntegrityCheck($result, $userid);
 		return $newres;
 	}
 	private static function getVerifiedResponse($version){
@@ -5342,7 +5342,7 @@ class VMCaster{
 		}
 		return $newimagelist;
 	}
-	private static function syncStatusIntegrityCheck($res){
+	private static function syncStatusIntegrityCheck($res, $userid){
 		$tobepublished = false;
 		if( !$res || (is_array($res) && ( !isset($res["images"]) || !isset($res["status"]) || !isset($res["id"]) ) ) ) return;
 		$versions = new Default_Model_VAversions();
@@ -5464,14 +5464,14 @@ class VMCaster{
 			}
 		}
 		if( $tobepublished === true ){
-			self::publishVersion($version);
+			self::publishVersion($version, $userid);
 			$res["published"] = "true";
 		}else if($version->published === true){
 			$res["published"] = "true";
 		}
 		return $res;
 	}
-	private static function publishVersion($version){
+	private static function publishVersion($version, $userid){
 		$err = "";
 		try {
 			error_log("Starting transaction to publish new VA version");
@@ -5522,6 +5522,7 @@ class VMCaster{
 			$version->published = true;
 			$version->status = "verified";
 			$version->createdon = "now()";
+			$version->publishedByID = $userid;
 			$version->save();
 			db()->exec("COMMIT");
 			error_log("Transaction complete, notifying VMCaster");
