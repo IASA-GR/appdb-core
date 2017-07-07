@@ -686,14 +686,14 @@ RETURNS TRIGGER
 AS
 $$
 BEGIN
-	IF TG_OP = "INSERT" THEN
+	IF TG_OP = 'INSERT' THEN
 		IF NEW.enabled THEN 
 			NEW.enabledon = NOW(); 
 		END IF;
 		IF NEW.published THEN 
 			NEW.publishedon = NOW(); 
 		END IF;
-	ELSIF TG_OP = "UPDATE" THEN
+	ELSIF TG_OP = 'UPDATE' THEN
 		IF NEW.enabled IS DISTINCT FROM OLD.enabled THEN 
 			NEW.enabledon = NOW(); 
 		END IF;
