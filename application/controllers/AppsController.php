@@ -1873,7 +1873,7 @@ class AppsController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender();
 		
 		if( isset($_GET["versionid"]) && is_numeric($_GET["versionid"])){
-			$res = VMCaster::statusIntegrityCheck($_GET["versionid"], $this->session->userid);
+			$res = VMCaster::statusIntegrityCheck($_GET["versionid"]);
 			header('Content-type: application/json');
 			echo json_encode($res,JSON_HEX_TAG | JSON_NUMERIC_CHECK );
 		}else{

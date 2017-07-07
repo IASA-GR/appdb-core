@@ -5277,7 +5277,7 @@ class VMCaster{
 		return $result;
 	}
 	
-	public static function statusIntegrityCheck($vaversionid, $userid){
+	public static function statusIntegrityCheck($vaversionid){
 		$url = VMCaster::getVMCasterUrl() . "/integrity/statusimageList/".$vaversionid."/xml";
 		try{
 			$xml = web_get_contents($url);		
@@ -5290,7 +5290,7 @@ class VMCaster{
 			return $result;
 		}
 		
-		$newres = VMCaster::syncStatusIntegrityCheck($result, $userid);
+		$newres = VMCaster::syncStatusIntegrityCheck($result);
 		return $newres;
 	}
 	private static function getVerifiedResponse($version){
@@ -5342,7 +5342,7 @@ class VMCaster{
 		}
 		return $newimagelist;
 	}
-	private static function syncStatusIntegrityCheck($res, $userid){
+	private static function syncStatusIntegrityCheck($res){
 		$tobepublished = false;
 		if( !$res || (is_array($res) && ( !isset($res["images"]) || !isset($res["status"]) || !isset($res["id"]) ) ) ) return;
 		$versions = new Default_Model_VAversions();
@@ -5464,14 +5464,14 @@ class VMCaster{
 			}
 		}
 		if( $tobepublished === true ){
-			self::publishVersion($version, $userid);
+			self::publishVersion($version);
 			$res["published"] = "true";
 		}else if($version->published === true){
 			$res["published"] = "true";
 		}
 		return $res;
 	}
-	private static function publishVersion($version, $userid){
+	private static function publishVersion($version){
 		$err = "";
 		try {
 			error_log("Starting transaction to publish new VA version");
@@ -5522,7 +5522,6 @@ class VMCaster{
 			$version->published = true;
 			$version->status = "verified";
 			$version->createdon = "now()";
-			$version->publishedByID = $userid;
 			$version->save();
 			db()->exec("COMMIT");
 			error_log("Transaction complete, notifying VMCaster");
@@ -6537,7 +6536,7 @@ class VApplianceService{
 		$this->userid = $userid;
 	}
 	
-	public function publish($userid){
+	public function publish(){
 		$version = $this->getVAVersion();
 		$version->status = "verified";
 		$version->createdon = "now()";
@@ -6561,6 +6560,7 @@ class VApplianceService{
 		$version->published = false;
 		if($version->status === "verifypublish" ){ //if request was made for publishing
 			$version->status = "verifingpublish";
+			$version->publishedByID = $this->userid;
 		}else{
 			$version->status = "verifing";
 		}
@@ -6572,6 +6572,7 @@ class VApplianceService{
 		$version->published = false;
 		$version->status = "init";
 		$version->save();
+		db()->exec("UPDATE vapp_versions SET publishedby = NULL WHERE id = " . $version->id);
 		VMCaster::cancelIntegrityCheck($version->id);
 		return true;
 	}
