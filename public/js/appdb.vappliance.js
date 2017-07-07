@@ -3488,7 +3488,8 @@ appdb.vappliance.ui.views.DataValueHandlerValuelist = appdb.ExtendClass(appdb.va
 	    }
 	};
 	this.onValueChange = function(v){
-		this.onValidate();
+		this.parent.options.currentValue = v;
+		this.onValidate(v);
 	};
 	this.renderEditor = function(dom){
 		var selid = '';
@@ -3534,7 +3535,7 @@ appdb.vappliance.ui.views.DataValueHandlerValuelist = appdb.ExtendClass(appdb.va
 					return function(v){
 						var res = $.trim('' + v);
 						self.options.dataCurrentValue = res;
-						self.onValidate();
+						self.onValueChange(self.options.dataCurrentValue);
 						self.parent.setFocus(true);
 					};
 				})(this)
@@ -3544,7 +3545,7 @@ appdb.vappliance.ui.views.DataValueHandlerValuelist = appdb.ExtendClass(appdb.va
 		}
 	};
 	this.postRenderEditor = function(){
-		this.onValueChange();
+		this.onValueChange(this.options.dataCurrentValue);
 	};
 });
 appdb.vappliance.ui.views.DataValueHandlerFilterlist = appdb.ExtendClass(appdb.vappliance.ui.views.DataValueHandler,"appdb.vappliance.ui.views.DataValueHandlerFilterlist", function(o){
@@ -4598,7 +4599,7 @@ appdb.vappliance.ui.views.DataValueHandlerAcceleratorstype = appdb.ExtendClass(a
 							});
 						}
 						self.options.dataCurrentValue = res;
-						self.onValueChange();
+						self.onValueChange(self.options.dataCurrentValue);
 						self.parent.setFocus(true);
 					};
 				})(this)
@@ -4618,7 +4619,8 @@ appdb.vappliance.ui.views.DataValueHandlerAcceleratorstype = appdb.ExtendClass(a
 		}else{
 			this.options.dataCurrentValue = v;
 		}
-		this.onValidate();
+		this.parent.options.currentValue = v;
+		this.onValidate(v);
 		var siblings = $(this.dom).closest('.fieldvalueset').find('[data-path^="accelerators."]').not('[data-path="accelerators.type"]');
 		if ($.trim(v) === '-1') {
 		    $(siblings).addClass('disabled');
@@ -4637,6 +4639,9 @@ appdb.vappliance.ui.views.DataValueHandlerAcceleratorstype = appdb.ExtendClass(a
 		}else{
 			$(this.dom).removeClass("isempty");
 		}
+	};
+	this.postRenderEditor = function(){
+		this.onValueChange(this.options.dataCurrentValue);
 	};
 });
 appdb.vappliance.ui.views.DataProperty = appdb.ExtendClass(appdb.View, "appdb.vappliance.ui.views.DataProperty", function(o){
@@ -5357,6 +5362,11 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 		parent: o.parent || null,
 		data: o.data || {},
 		index: o.index || -1,
+		validRanges: {
+		    'ram': true,
+		    'cores': true,
+		    'accelerators': true
+		},
 		isEditable: ( (typeof o.editable === "boolean")?o.editable:false )
 	};
 	this.getData = function(){
@@ -5448,6 +5458,51 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 			};
 		})(this));
 		this.renderDownloadButton();
+	};
+	this.isValid = function() {
+	    var ranges = this.options.validRanges || {};
+	    return ranges.ram && ranges.cores && ranges.accelerators;
+	};
+	this.validateRanges = function(name) {
+	   var isValid = true;
+	   var data = this.getData() || {};
+	   var d = Object.assign({minimum: 0, recommended: 0}, data[name] || {});
+	   if (name === 'ram') {
+	       d.minimum = appdb.vappliance.utils.normalization.ram(d.minimum);
+	       d.recommended = appdb.vappliance.utils.normalization.ram(d.recommended);
+	   }
+
+	   d.minimum = parseInt(d.minimum || 0);
+	   d.recommended = parseInt(d.recommended || 0);
+
+	   isValid = (d.minimum <=0 || d.recommended <= 0 || d.minimum <= d.recommended);
+	   if (name === 'accelerators' && !d.type) {
+	       isValid = true;
+	   }
+
+	   $(this.dom).find('.fieldvalueset.' + name + '-valueset').toggleClass('invalid', !isValid);
+
+	   return isValid;
+	};
+	this.onPropertyValueChange = function(v) {
+	    var prop = v.property || {options: {}};
+	    var propName = (prop.options || {}).dataPath || null;
+	    switch(propName) {
+		case 'ram.minimum':
+		case 'ram.recommended':
+		case 'cores.minimum':
+		case 'cores.recommended':
+		case 'accelerators.type':
+		case 'accelerators.minimum':
+		case 'accelerators.recommended':
+		    this.options.validRanges.ram = this.validateRanges('ram');
+		    this.options.validRanges.cores = this.validateRanges('cores');
+		    this.options.validRanges.accelerators = this.validateRanges('accelerators');
+		    appdb.vappliance.ui.CurrentVAVersionValidatorRegister.check();
+		    break;
+		default:
+		    break;
+	    }
 	};
 	this.renderDownloadButton = function(){
 		$(this.dom).find(".downloadbutton > .format").addClass("hidden");
