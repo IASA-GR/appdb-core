@@ -55,13 +55,13 @@ class Default_Model_VAversionsMapperBase
 		if ( ! isnull($value->getNotes()) ) $data['notes'] = $value->getNotes();
 		if ( ! isnull($value->getVappID()) ) $data['vappid'] = $value->getVappID();
 		if ( ! isnull($value->getPublished()) ) $data['published'] = $this->pgBool($value->getPublished());
-		if ( ! isnull($value->getPublishedOn()) ) $data['publishedon'] = $this->pgBool($value->getPublishedOn());
-		if ( ! isnull($value->getPublishedByID()) ) $data['publishedby'] = $this->pgBool($value->getPublishedByID());
+		if ( ! isnull($value->getPublishedOn()) ) $data['publishedon'] = $value->getPublishedOn();
+		if ( ! isnull($value->getPublishedByID()) ) $data['publishedby'] = $value->getPublishedByID();
 		if ( ! isnull($value->getCreatedon()) ) $data['createdon'] = $value->getCreatedon();
 		if ( ! isnull($value->getExpireson()) ) $data['expireson'] = $value->getExpireson();
 		if ( ! isnull($value->getEnabled()) ) $data['enabled'] = $this->pgBool($value->getEnabled());
-		if ( ! isnull($value->getEnabledOn()) ) $data['enabledon'] = $this->pgBool($value->getEnabledOn());
-		if ( ! isnull($value->getEnabledByID()) ) $data['enabledby'] = $this->pgBool($value->getEnabledByID());
+		if ( ! isnull($value->getEnabledOn()) ) $data['enabledon'] = $value->getEnabledOn();
+		if ( ! isnull($value->getEnabledByID()) ) $data['enabledby'] = $value->getEnabledByID();
 		if ( ! isnull($value->getArchived()) ) $data['archived'] = $this->pgBool($value->getArchived());
 		if ( ! isnull($value->getStatus()) ) $data['status'] = $value->getStatus();
 		if ( ! isnull($value->getArchivedon()) ) $data['archivedon'] = $value->getArchivedon();
