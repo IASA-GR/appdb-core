@@ -2933,7 +2933,7 @@ appdb.components.RelatedContacts = appdb.ExtendClass(appdb.Component,"appdb.comp
 			container: $(this.dom).find(".resCount")
 		});
 		v.peopleList = new appdb.views.RelatedContactList({container : $(this.dom).find("ul.list:last")[0], disableCheckForChanges:this.disableCheckForChanges, permissions : {action : [{id:17}]}, canSetContactPoint : false, excluded : o.excluded, onExclude : o.onExclude || function(li){
-				$(li.dom).find(".item a").unbind("click").css({"cursor":"default"}).attr("title","Already associated with the software");
+				$(li.dom).find(".item a").unbind("click").bind('click', function(ev){ev.preventDefault();ev.stopPropagation();return false;}).css({"cursor":"default"}).attr("title","Already associated with the software");
 				$(li.dom).css({"cursor":"default"}).find(".item:last").append("<div class='info'>Already associated with the software</div>");
 		}});
         v.pagerview = new appdb.views.PagerPane({container : $(this.dom).find(".pager:last")[0]});
@@ -8331,7 +8331,7 @@ appdb.components.EntityPrivileges = appdb.ExtendClass(appdb.Component, "appdb.co
 							assocDesc = $.trim(u[0].associationDescription);
 						}
 					}
-					$(li.dom).find(".item a").unbind("click").css({"cursor":"default"}).attr("title",assocDesc);
+					$(li.dom).find(".item a").unbind("click").bind('click', function(ev){ev.preventDefault(); ev.stopPopagation();return false;}).css({"cursor":"default"}).attr("title",assocDesc);
 					$(li.dom).css({"cursor":"default"}).find(".item:last").append("<div class='info'>" + assocDesc + "</div>");
 				},ext:{mainTitle: "Include users in the explicit permissions list"}});
 				relcon.subscribe({event:"close", callback : function(v){
