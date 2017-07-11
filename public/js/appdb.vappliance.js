@@ -5393,7 +5393,7 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 		var coresmin = (props.coresminimum && props.coresminimum.id) ? props.coresminimum.id : (props.coresminimum || "0");
 		var coresrecommended = (props.coresrecommended && props.coresrecommended.id) ? props.coresrecommended.id : (props.coresrecommended || "0");
 		var ovfurl = $.trim(props.ovfurl) || "";
-		var accelerators = {type: props.acceleratorstype || 'None', minimum: (props.accminimum || 0), recommended: (props.accrecommended || 0)};
+		var accelerators = {type: props.acceleratorstype || 'None', minimum: (props.accminimum || "-1"), recommended: (props.accrecommended || "-1")};
 		if (!accelerators || accelerators.type === 'None' || $.trim(accelerators.type) === '-1') {
 		    accelerators = null;
 		}
@@ -5476,13 +5476,17 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 	   d.recommended = parseInt(d.recommended || 0);
 
 	   isValid = (d.minimum <=0 || d.recommended <= 0 || d.minimum <= d.recommended);
-	   if (name === 'accelerators' && !d.type) {
-	       isValid = true;
-	   }
+	   if (name === 'accelerators'){
+		if (!d.type) {
+		    isValid = true;
+		} else {
+		    isValid = (d.minimum <0 || d.recommended < 0 || d.minimum <= d.recommended);
+		}
+	    }
 
-	   $(this.dom).find('.fieldvalueset.' + name + '-valueset').toggleClass('invalid', !isValid);
+	    $(this.dom).find('.fieldvalueset.' + name + '-valueset').toggleClass('invalid', !isValid);
 
-	   return isValid;
+	    return isValid;
 	};
 	this.onPropertyValueChange = function(v) {
 	    var prop = v.property || {options: {}};
@@ -5530,6 +5534,8 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 		var viewramminimum = $(this.options.container).find("div[data-name='viewramminimum'] > .value");
 		var viewramrecommended = $(this.options.container).find("div[data-name='viewramrecommended'] > .value");
 		var viewacctype = $(this.options.container).find("div[data-name='viewacctype'] > .value");
+		var viewaccmin = $(this.options.container).find("div[data-name='viewaccminimum'] > .value");
+		var viewaccrec = $(this.options.container).find("div[data-name='viewaccrecommended'] > .value");
 		if( $.trim($(viewramminimum).html()) === "0" || $.trim($(viewramminimum).html()) === ""){
 			$(viewramminimum).html("<span class='notavailable'>n/a</span>");
 			$(viewramminimum).siblings(".unit").remove();
@@ -5547,9 +5553,18 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 			$(viewcoresrecommended).siblings(".unit").remove();
 		}
 		if( $.trim($(viewacctype).html()) === "None" || $.trim($(viewacctype).html()) === ""){
-		    $(viewacctype).closest('.accelerators.group').find('[data-path="accelerators.type"] .header').remove();
-		    $(viewacctype).closest('.accelerators.group').find('[data-path="accelerators.minimum"]').remove();
-		    $(viewacctype).closest('.accelerators.group').find('[data-path="accelerators.recommended"]').remove();
+			$(viewacctype).closest('.accelerators.group').find('[data-path="accelerators.type"] .header').remove();
+			$(viewacctype).closest('.accelerators.group').find('[data-path="accelerators.minimum"]').remove();
+			$(viewacctype).closest('.accelerators.group').find('[data-path="accelerators.recommended"]').remove();
+		} else {
+			if( $.trim($(viewaccmin).html()) === "-1" || $.trim($(viewaccmin).html()) === ""){
+				$(viewaccmin).html("<span class='notavailable'>n/a</span>");
+				$(viewaccmin).siblings(".unit").remove();
+			}
+			if( $.trim($(viewaccrec).html()) === "-1" || $.trim($(viewaccrec).html()) === ""){
+				$(viewaccrec).html("<span class='notavailable'>n/a</span>");
+				$(viewaccrec).siblings(".unit").remove();
+			}
 		}
 		$(this.dom).removeClass("isprotected isprivate");
 		if( this.isPrivate() ){
