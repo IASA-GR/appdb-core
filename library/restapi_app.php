@@ -3248,7 +3248,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	CONST VA_GROUP_MAX_SIZE = 50;
 	CONST VA_TITLE_MIN_SIZE = 0;
 	CONST VA_TITLE_MAX_SIZE = 1000;
-        CONST VA_VMI_ACCELERATORS_MIN_SIZE = -1;
+        CONST VA_VMI_ACCELERATORS_MIN_SIZE = 0;
         CONST VA_VMI_ACCELERATORS_MAX_SIZE = 32;
 	
 	private $vappid = -1;
@@ -4336,9 +4336,9 @@ class RestAppVAXMLParser extends RestXMLParser {
 			} else {
 				$accelerators = $accelerators[0];
 				if( strlen( trim( strval($accelerators->attributes()->minimum) ) ) > 0 ) {
-                                        $acceleratorsmin_error_messsage = "Minimum accelerators value must be a positive number between 0 and " . RestAppVAXMLParser::VA_VMI_ACCELERATORS_MAX_SIZE;
+                                        $acceleratorsmin_error_messsage = "Minimum accelerators value must be a positive number between " . RestAppVAXMLParser::VA_VMI_ACCELERATORS_MIN_SIZE . " and " . RestAppVAXMLParser::VA_VMI_ACCELERATORS_MAX_SIZE;
 					$acceleratorsmin = strval($accelerators->attributes()->minimum);
-					if( is_numeric($acceleratorsmin) && intval($acceleratorsmin) >= -1 ){
+					if( is_numeric($acceleratorsmin) && intval($acceleratorsmin) >= 0 ){
                                                 if ($this->validateAccelerators($acceleratorsmin) === false) {
                                                     return $this->_setErrorMessage($acceleratorsmin_error_messsage);
                                                 }
@@ -4352,9 +4352,9 @@ class RestAppVAXMLParser extends RestXMLParser {
 					}
 				}
 				if( strlen( trim( strval($accelerators->attributes()->recommended) ) ) > 0 ){
-                                        $acceleratorsrecom_error_message = "Recommended accelerators value must be a positive number between 0 and " . RestAppVAXMLParser::VA_VMI_ACCELERATORS_MAX_SIZE;
+                                        $acceleratorsrecom_error_message = "Recommended accelerators value must be a positive number between " . RestAppVAXMLParser::VA_VMI_ACCELERATORS_MIN_SIZE . " and " . RestAppVAXMLParser::VA_VMI_ACCELERATORS_MAX_SIZE;
 					$acceleratorsrecom = strval($accelerators->attributes()->recommended);
-					if( is_numeric($acceleratorsrecom) && intval($acceleratorsrecom) >= -1 ){
+					if( is_numeric($acceleratorsrecom) && intval($acceleratorsrecom) >= 0 ){
                                                 if ($this->validateAccelerators($acceleratorsrecom) === false) {
                                                     return $this->_setErrorMessage($acceleratorsrecom_error_message);
                                                 }
