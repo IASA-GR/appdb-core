@@ -5464,23 +5464,23 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 	    return ranges.ram && ranges.cores && ranges.accelerators;
 	};
 	this.validateRanges = function(name) {
-	   var isValid = true;
-	   var data = this.getData() || {};
-	   var d = Object.assign({minimum: 0, recommended: 0}, data[name] || {});
-	   if (name === 'ram') {
-	       d.minimum = appdb.vappliance.utils.normalization.ram(d.minimum);
-	       d.recommended = appdb.vappliance.utils.normalization.ram(d.recommended);
-	   }
+	    var isValid = true;
+	    var data = this.getData() || {};
+	    var d = Object.assign({minimum: 0, recommended: 0}, data[name] || {});
+	    if (name === 'ram') {
+		d.minimum = appdb.vappliance.utils.normalization.ram(d.minimum);
+		d.recommended = appdb.vappliance.utils.normalization.ram(d.recommended);
+	    }
 
-	   d.minimum = parseInt(d.minimum || 0);
-	   d.recommended = parseInt(d.recommended || 0);
+	    d.minimum = parseInt(d.minimum || 0);
+	    d.recommended = parseInt(d.recommended || 0);
 
-	   isValid = (d.minimum <=0 || d.recommended <= 0 || d.minimum <= d.recommended);
-	   if (name === 'accelerators'){
-		if (!d.type) {
+	    isValid = (d.minimum <=0 || d.recommended <= 0 || d.minimum <= d.recommended);
+	    if (name === 'accelerators'){
+		if(!d.type) {
 		    isValid = true;
 		} else {
-		    isValid = (d.minimum <0 || d.recommended < 0 || d.minimum <= d.recommended);
+		    isValid = (d.minimum <= d.recommended);
 		}
 	    }
 
