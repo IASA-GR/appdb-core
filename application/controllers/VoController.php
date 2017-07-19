@@ -1260,9 +1260,11 @@ class VoController extends Zend_Controller_Action
 		echo json_encode(array("result"=>"error", "message"=>"Image not found"));
 	}
 
-	private function getVAProvidersArray() {
+	private function getVAProvidersArray($inprodOnly = true) {
 		$vaps = new Default_Model_VaProviders();
-		$vaps->filter->in_production->equals(true);
+		if ($inprodOnly === true) {
+			$vaps->filter->in_production->equals(true);
+		}
 		$ret = array();
 		foreach ($vaps->items as $vap) {
 			$url=trim(substr($vap->url,0,(strpos($vap->url,"?") == true ? strpos($vap->url,"?") : strlen($vap->url))),'/');
