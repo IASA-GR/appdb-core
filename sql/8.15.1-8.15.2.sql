@@ -39,8 +39,6 @@ BEFORE INSERT ON egiaai.vo_members
 FOR EACH ROW
 EXECUTE PROCEDURE trfn_egiaai_vo_members_set_last_updated();
 
-ALTER TRIGGER rtr_egiaai_vo_members_10_set_last_updated OWNER TO appdb;
-
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 15, 2, E'Set last_updated to NOW() via trigger when inserting new rows to egiaai.vo_members'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=15 AND revision=2);
