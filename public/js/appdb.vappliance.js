@@ -17,6 +17,29 @@ appdb.vappliance = {};
 appdb.vappliance.components = {};
 appdb.vappliance.model = {};
 appdb.vappliance.utils = {};
+appdb.vappliance.utils.sortNetworkTrafficRules = function(d) {
+	d = d || [];
+	d = $.isArray(d) ? d : [d];
+
+	//Sort by direction
+	d.sort(function(a, b) {
+	    //Sort by direction
+	    if (a.direction > b.direction) return 1;
+	    if (a.direction < b.direction) return -1;
+
+	    //Sort be protocols
+	    if (a.protocols > b.protocols) return 1;
+	    if (a.protocols < b.protocols) return -1;
+
+	    //Sort by ports ranges
+	    if (a.port_ranges > b.port_ranges) return 1;
+	    if (a.port_ranges < b.port_ranges) return -1;
+
+	    return 0;
+	});
+
+	return d;
+};
 appdb.vappliance.utils.formatSizeUnits = function(bytes,displayunit){
 	displayunit = (typeof displayunit === "boolean")?displayunit:true;
 	var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -2609,7 +2632,7 @@ appdb.vappliance.components.WorkingVersion = appdb.ExtendClass(appdb.vappliance.
 				this.postSave(d);
 			}
 		}, caller: this});
-	
+
 		//if(mapper.entity.id()==='0' || !mapper.entity.id() ){
 		if( isinsert === true ){
 			this.model.insert({query: modelOpts, data: {data: xml}});	
@@ -4644,6 +4667,121 @@ appdb.vappliance.ui.views.DataValueHandlerAcceleratorstype = appdb.ExtendClass(a
 		this.onValueChange(this.options.dataCurrentValue);
 	};
 });
+appdb.vappliance.ui.views.DataValueHandlerTrafficrules = appdb.ExtendClass(appdb.vappliance.ui.views.DataValueHandlerText,"appdb.vappliance.ui.views.DataValueHandlerTrafficrules", function(o){
+	this.getDataArray = function() {
+		var vals = ((this.parent.options.data || {}).network_traffic || []);
+		vals = [].concat($.isArray(vals)?vals:[vals]);
+		vals = appdb.vappliance.utils.sortNetworkTrafficRules(vals);
+		return vals;
+	}
+	this.filterByDirection = function(direction, data) {
+		var vals = data || this.getDataArray();
+		var result = [];
+		$.each(vals, function(i,v) {
+		    if (v.direction === direction) {
+			 result.push(v);
+		    }
+		});
+		return result;
+	};
+	this.getPortRange = function(d) {
+		var ds = d.split(':');
+		var res = {
+			from: (ds.length > 0) ? ds[0] : '',
+		};
+
+		res.from = res.from || '';
+
+		if (ds.length > 1) {
+			res.to = ds[1] || '';
+		} else {
+			res.to = '' + res.from ;
+		}
+
+		return res;
+	}
+	this.renderTable = function(data, title) {
+		var table = $('<table></table>');
+		var thead = $('<thead><tr><th colspan="3" class="title">' + title + '</th></tr><tr><th rowspan="1" class="protocol">Protocol</th><th>From</th><th>To</th></tr></thead>');
+		var tbody = $('<tbody></tbody>');
+
+		$.each(data, function(i, v) {
+			var tr = $('<tr></tr>');
+			var ranges = v.port_range.split(';');
+			var trClass = ( ( (i % 2) === 0 ) ? 'even' : 'odd' );
+			$(tr).addClass(trClass).append( $('<td rowspan="'+ ranges.length +'"></td>').addClass('protocol').addClass('first').text(v.protocols) );
+			$(tbody).append( tr );
+			if (v.protocols === 'ICMP') {
+				$(tr).append( $('<td colspan="2"></td>') );
+			} else {
+				$.each(ranges, function(i, rangeData) {
+					var range = this.getPortRange(rangeData);
+					if (i === 0) {
+					    $(tr).append( $('<td></td>').addClass('first').text(range.from) );
+					    $(tr).append( $('<td></td>').addClass('first').text(range.to) );
+					} else {
+					    var tr2 = $('<tr></tr>').addClass(trClass);
+					    $(tr2).append( $('<td></td>').text(range.from) );
+					    $(tr2).append( $('<td></td>').text(range.to) );
+					    $(tbody).append(tr2);
+					}
+				}.bind(this));
+			}
+		}.bind(this));
+
+		$(table).append( thead );
+		$(table).append( tbody );
+
+		var container = $('<div class="table-container"></div>');
+		var containerHeader = $('<div class="table-container-header"></div>');
+		var containerBody = $('<div class="table-container-body"></div>');
+		var sudoTable = $('<table></table>');
+
+		sudoTable.append($(table).children('thead').clone());
+		$(container).append(containerHeader).append(containerBody);
+		$(containerHeader).append(sudoTable);
+		$(containerBody).append(table);
+
+		return container;
+	};
+	this.getUIData = function() {
+		var data = this.getDataArray();
+		var meta = {
+			direction: $.trim($(this.dom).parent().data('direction')) || '',
+			data: []
+		};
+		meta.title = $.trim($(this.dom).parent().data('title')) || meta.direction;
+
+		if (!meta.direction) {
+			meta = [
+				{direction: 'inbound', title: 'Incoming', data: this.filterByDirection('inbound', data)},
+				{direction: 'outbound', title: 'Outgoing', data: this.filterByDirection('outbound', data)}
+			];
+		} else {
+			meta.data = this.filterByDirection(meta.direction, data);
+		}
+
+		return $.isArray(meta) ? meta : [meta];
+	};
+	this.renderViewer = function(dom){
+		var uiData = this.getUIData()
+		var isEmpty = true;
+
+		var v = $("<div class='trafficrules viewer'>");
+		$.each(uiData, function(i, d) {
+			if (d.data.length > 0 ) {
+				isEmpty = false;
+			}
+			$(v).append( this.renderTable(d.data, d.title) );
+		}.bind(this));
+
+		if (!isEmpty) {
+			$(this.dom).append(v);
+		} else {
+			$(this.dom).append($('<div class="emptymessage">No information provided yet</div>'));
+		}
+	};
+});
 appdb.vappliance.ui.views.DataProperty = appdb.ExtendClass(appdb.View, "appdb.vappliance.ui.views.DataProperty", function(o){
 	this.options = {
 		container: $(o.container),
@@ -5367,6 +5505,7 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 		    'cores': true,
 		    'accelerators': true
 		},
+		networkTraffic: null,
 		isEditable: ( (typeof o.editable === "boolean")?o.editable:false )
 	};
 	this.getData = function(){
@@ -5397,6 +5536,11 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 		if (!accelerators || accelerators.type === 'None' || $.trim(accelerators.type) === '-1') {
 		    accelerators = null;
 		}
+		var network_traffic = [].concat(this.options.networkTraffic.harvestData());
+		if (network_traffic.length === 0) {
+		    network_traffic = null;
+		}
+
 		var res = {
 			id: props.id || d.id,
 			version: props.version || d.version,
@@ -5415,6 +5559,7 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 			addedon: d.addedon || "",
 			addedby: d.addedby,
 			integrity: integrity,
+			network_traffic: network_traffic,
 			accelerators: accelerators,
 			ram: {minimum: rammin , recommended: ramrecommended},
 			cores: {minimum: coresmin, recommended: coresrecommended },
@@ -5461,7 +5606,11 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 	};
 	this.isValid = function() {
 	    var ranges = this.options.validRanges || {};
-	    return ranges.ram && ranges.cores && ranges.accelerators;
+	    var validRanges =  ranges.ram && ranges.cores && ranges.accelerators;
+	    if (validRanges === true) {
+		return (this.options.networkTraffic.isValid() === true);
+	    }
+	    return validRanges;
 	};
 	this.validateRanges = function(name) {
 	    var isValid = true;
@@ -5502,6 +5651,9 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 		    this.options.validRanges.ram = this.validateRanges('ram');
 		    this.options.validRanges.cores = this.validateRanges('cores');
 		    this.options.validRanges.accelerators = this.validateRanges('accelerators');
+		    appdb.vappliance.ui.CurrentVAVersionValidatorRegister.check();
+		    break;
+		case 'trafficRules':
 		    appdb.vappliance.ui.CurrentVAVersionValidatorRegister.check();
 		    break;
 		default:
@@ -5672,50 +5824,40 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 		var toggler = $(panel).find(".toggler");
 		$(toggler).unbind("click").bind("click", function(ev){
 			ev.preventDefault();
-			$(this).closest(".advancedpanel").toggleClass("expand");
+			//$(this).closest(".advancedpanel").toggleClass("expand");
 			return false;
 		});
 	};
 	this.filterNetworkTraffic = function(direction, data) {
-	    data = data || this.options.data || {};
-	    var rules = data.network_traffic || [];
-	    rules = Array.isArray(rules) ? rules : [rules];
-	    var direction = ('' + direction).toLowerCase();
+		data = data || this.options.data || {};
+		var rules = data.network_traffic || [];
+		rules = Array.isArray(rules) ? rules : [rules];
+		var direction = ('' + direction).toLowerCase();
 
-	    if ($.trim(direction) !== '') {
-		return rules.filter(function(item) {
-		    return (item.direction === direction);
-		 });
-	    }
+		if ($.trim(direction) !== '') {
+			return rules.filter(function(item) {
+			        return (item.direction === direction || direction === '*');
+			});
+		}
 
-	    return rules;
+		return rules;
 	};
 	this.renderNetworkTraffic = function() {
-	    if (this.options.inboundNetworkTraffic) {
-		this.options.inboundNetworkTraffic.reset();
-		this.options.inboundNetworkTraffic = null;
-	    }
-	    this.options.inboundNetworkTraffic = new appdb.vappliance.ui.views.VMITrafficRules({
-		container: $(this.dom).find('.trafficrules-component[data-direction="inbound"]'),
-		parent: this,
-		editable: this.canEdit(),
-		data: this.filterNetworkTraffic('inbound', this.options.data),
-		itemTemplate: $(this.dom).find('.vmiversion-vmitrafficrules .trafficrule-item').clone(true)
-	    });
-	    this.options.inboundNetworkTraffic.render();
+		if (this.options.networkTraffic) {
+			this.options.networkTraffic.reset();
+			this.options.networkTraffic = null;
+		}
+		this.options.networkTraffic = new appdb.vappliance.ui.views.VMITrafficRulesEditor({
+			container: $(this.dom).find('.trafficrules-component').first(),
+			parent: this,
+			editable: this.canEdit(),
+			direction: 'inbound',
+			data: this.filterNetworkTraffic('*', this.options.data),
+			itemTemplate: $(this.dom).find('.trafficrule-item').clone(true)
+		});
+		this.options.networkTraffic.render();
 
-	    if (this.options.outboundNetworkTraffic) {
-		this.options.outboundNetworkTraffic.reset();
-		this.options.outboundNetworkTraffic = null;
-	    }
-	    this.options.outboundNetworkTraffic = new appdb.vappliance.ui.views.VMITrafficRules({
-		container: $(this.dom).find('.trafficrules-component[data-direction="outbound"]'),
-		parent: this,
-		editable: this.canEdit(),
-		data: this.filterNetworkTraffic('outbound', this.options.data),
-		itemTemplate: $(this.dom).find('.vmiversion-vmitrafficrules .trafficrule-item').clone(true)
-	    });
-	    this.options.outboundNetworkTraffic.render();
+		appdb.vappliance.ui.CurrentVAVersionValidatorRegister.register({isValid: function() {return this.isValid(); }.bind(this.options.networkTraffic), reset: function() { }.bind(this.options.networkTraffic)});
 	};
 	this.render = function(d){
 		$(this.dom).attr("data-id",d.id);
@@ -5724,7 +5866,7 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 		this.initActions();
 		this.renderPrivacy();
 		this.renderAdvancedPanel();
-		//this.renderNetworkTraffic();
+		this.renderNetworkTraffic();
 		setTimeout((function(self){
 			return function(){
 				self.initializeSubscriptions();
@@ -8360,7 +8502,6 @@ appdb.vappliance.ui.views.ContextualizationScriptRemover = appdb.ExtendClass(app
 		$(this.dom).append(this.options.dom.main);
 		$(this.dom).append(this.options.dom.validator);
 		$(this.dom).append(this.options.dom.actions);
-		
 	};
 	
 	this._init = function(){
@@ -8374,23 +8515,390 @@ appdb.vappliance.ui.views.ContextualizationScriptRemover = appdb.ExtendClass(app
 	dialog: null
 });
 
-appdb.vappliance.ui.views.VMITrafficRulesItem = appdb.ExtendClass(appdb.vappliance.ui.views.DataPropertyContainer, "appdb.vappliance.ui.views.VMITrafficRulesItem", function(o) {
-    this.options = {
+appdb.vappliance.ui.views.PortRangeListItem = appdb.ExtendClass(appdb.View, "appdb.vappliance.ui.views.PortRangeListItem", function(o) {
+	this.options = {
 		container: $(o.container),
 		parent: o.parent || null,
 		data: o.data || {},
-		isEditable: ( (typeof o.editable === "boolean")?o.editable:false )
+		canRemove: (typeof o.canRemove === 'boolean') ? o.canRemove : true,
+		editor: {
+			from: null,
+			to: null,
+			error: null
+		}
 	};
+
+	this.enable = function(enable) {
+	    enable = (typeof enable === 'boolean') ? enable : true;
+	    this.options.editor.from.set('disabled', !enable);
+	    this.options.editor.to.set('disabled', !enable);
+	};
+
+	this.canRemove = function(removable) {
+	    if (typeof removable !== 'undefined') {
+		this.options.canRemove = ((typeof removable === 'boolean') ? removable : true);
+		$(this.dom).find('.action.remove').toggleClass('hidden', !removable);
+	    }
+	    return this.options.canRemove;
+	};
+
+	this.getData = function() {
+		var d = Object.assign({}, this.options.data);
+
+		if ($.trim(d.to) === '') {
+		    d.to = '' + d.from;
+		}
+
+		if ($.trim(d.from) && $.trim(d.to)) {
+		    return $.trim('' + d.from + ':' + d.to);
+		}
+
+		return '';
+	};
+
+	this.validate = function() {
+		var from = $.trim('' + this.options.data.from);
+		var to = $.trim('' + this.options.data.to);
+		var intTest = /^\d+$/;
+		var typeErrMsg = 'Port values must be positive integers between 1 and 65535';
+		var rangeERRmSG = 'Second port value must be equal or less than first port value';
+
+		if (!from && !to) {
+		    return true;//'No ports given';
+		}
+
+		if ((from && !intTest.test(from)) || (to && !intTest.test(to))) {
+		    return typeErrMsg;
+		}
+
+		var fromNum = parseInt(from || 0);
+		var toNum = parseInt(to || 0);
+
+		if (from && to && fromNum > toNum) {
+		    return rangeERRmSG;
+		}
+
+		if (fromNum > 65535 || toNum > 65535) {
+		    return typeErrMsg;
+		}
+
+		if ((from && fromNum <=0) || (to && toNum <= 0)) {
+		    return typeErrMsg;
+		}
+
+		return true;
+	};
+
+	this.isValid = function() {
+		$(this.dom).find('.portrangeitem .validationmessage.tooltip').remove();
+		var isValid = this.validate();
+		if (isValid !== true) {
+		    $(this.dom).find('.portrangeitem').append('<div class="validationmessage tooltip"><img src="/images/vappliance/warning.png" alt=""><div class="validationerrormessage"><span>'+isValid+'</span></div><div class="arrow"></div></div>')
+		}
+		return (isValid===true);
+	};
+
+	this.onValueChange = function() {
+		this.options.data.from = $.trim(this.options.editor.from.get('displayedValue'));
+		this.options.data.to = $.trim(this.options.editor.to.get('displayedValue'));
+		this.parent.onValueChange(this);
+	};
+	this.setFocused = function(isFocused) {
+	    isFocused = (typeof isFocused === 'boolean') ? isFocused : true;
+	    $(this.dom).find('.portrangeitem').toggleClass('focused', isFocused);
+	};
+	this.render = function() {
+		var dom = $('<div class="portrangeitem"><div class="from"></div><div class="sep">:</div><div class="to"></div><a class="action remove btn btn-danger btn-compact hidden">X</a></div>');
+		$(this.dom).empty();
+		$(this.dom).append(dom);
+
+		this.options.editor.from = new dijit.form.ValidationTextBox({
+			value: this.options.data.from,
+			placeHolder: 'from',
+			onFocus: (function(self){
+				return function(){
+					self.setFocused(true);
+					self.onValueChange();
+				};
+			})(this),
+			onBlur:  (function(self){
+				return function(){
+					self.setFocused(false);
+					self.onValueChange();
+				};
+			})(this),
+			onChange : (function(self){
+				return function(v){
+					self.onValueChange(v);
+				};
+			})(this),
+			onKeyUp: (function(self){
+				return function(v){
+					self.onValueChange();
+				};
+			})(this),
+			onMouseUp: (function(self){
+				return function(v){
+					self.onValueChange();
+				};
+			})(this),
+		}, $(dom).find('.from')[0]);
+		this.options.editor.to = new dijit.form.ValidationTextBox({
+			value: this.options.data.to,
+			placeHolder: 'to',
+			onFocus: (function(self){
+				return function(){
+					self.setFocused(true);
+					self.onValueChange();
+				};
+			})(this),
+			onBlur:  (function(self){
+				return function(){
+					self.setFocused(false);
+					self.onValueChange();
+				};
+			})(this),
+			onChange : (function(self){
+				return function(v){
+					self.onValueChange(v);
+				};
+			})(this),
+			onKeyUp: (function(self){
+				return function(v){
+					self.onValueChange();
+				};
+			})(this),
+			onMouseUp: (function(self){
+				return function(v){
+					self.onValueChange();
+				};
+			})(this),
+		}, $(dom).find('.to')[0]);
+
+		$(dom).find('.action.remove').unbind('click').bind('click', function(ev) {
+		    ev.preventDefault();
+		    ev.stopPropagation();
+		    this.parent.removeItem(this);
+		    return false;
+		}.bind(this));
+
+		setTimeout(function() {
+		    this.onValueChange();
+		}.bind(this),1);
+	};
+
+	this._init = function() {
+		this.dom = $(this.options.container);
+		this.parent = this.options.parent;
+		if (typeof this.options.data === 'string') {
+			var tmp = this.options.data.split(':');
+			this.options.data = {
+				from: tmp[0],
+				to: (tmp.length > 1) ? tmp[1] : tmp[0]
+			};
+		}
+	};
+	this._init();
+});
+appdb.vappliance.ui.views.PortRangeList = appdb.ExtendClass(appdb.View, "appdb.vappliance.ui.views.PortRangeList", function(o) {
+	this.options = {
+		container: $(o.container),
+		parent: o.parent || null,
+		data: o.data || [],
+		items: [],
+		isValid: true,
+		dom: {
+		    list: $('<ul></ul>'),
+		    footer: $('<div class="footer"></div>')
+		}
+	};
+
+	this.enable = function(enable) {
+	    enable = (typeof enable === 'boolean') ? enable : true;
+	    $.each(this.options.items, function(i,v) {
+		v.enable(enable);
+	    });
+	    $(this.dom).toggleClass('disabled', !enable);
+	};
+
+	this.getData = function() {
+	   var ranges = [];
+
+	   $.each(this.options.items, function(i, v) {
+	       var d = v.getData();
+	       if (d) {
+		    ranges.push(v.getData());
+	       }
+	   });
+
+	   return ranges.join(';');
+	};
+
+	this.validate = function() {
+	    this.options.isValid = this.isValid();
+	};
+
+	this.isValid = function() {
+		var isValid = true;
+
+		$.each(this.options.items, function(i, v) {
+		    var itemIsValid = (v.isValid) ? v.isValid() : true;
+		    isValid = (isValid === true && v.isValid) ? itemIsValid : isValid;
+		    $(v.dom).find('.portrangeitem').toggleClass('isinvalid', (itemIsValid !== true));
+		});
+
+		return isValid;
+	};
+
+	this.refreshUI = function() {
+	    if (this.options.items.length === 0) {
+		this.addItem();
+	    }
+
+	    if (this.options.items.length === 1) {
+		this.options.items[0].canRemove(false);
+	    } else {
+		$.each(this.options.items, function(i, v) {
+			v.canRemove(true);
+		});
+	    }
+	};
+
+	this.onValueChange = function() {
+		this.validate();
+		this.refreshUI();
+		this.parent.onValueChange(this);
+	};
+
+	this.addItem = function(d, index, removable) {
+		d = d || "";
+		var li = $('<li></li>');
+		index = (index >= 0) ? index : $(this.options.dom.list).children('li').length;
+		$(this.options.dom.list).append(li);
+
+		var item = new appdb.vappliance.ui.views.PortRangeListItem({
+			container: li,
+			parent: this,
+			index: index,
+			canRemove: removable,
+			data: d
+		});
+
+		item.render();
+
+		this.options.items.push(item);
+		this.refreshUI();
+		return li;
+	};
+
+	this.removeItem = function(item) {
+	   var foundIndex = -1;
+
+	   $.each(this.options.items, function(i, v) {
+	       foundIndex = (foundIndex === -1 && item === v) ? i : foundIndex;
+	   });
+
+	   if (foundIndex > -1) {
+	       this.options.items[foundIndex].reset();
+	       $(this.options.items[foundIndex].dom).remove();
+	       this.options.items[foundIndex] = null;
+	       this.options.items.splice(foundIndex, 1);
+	       this.refreshUI();
+	   }
+	};
+
+	this.renderFooter = function() {
+		var actions = $('<div class="actions"></div>');
+		var addNew = $('<a class="action add" title="Add new port range">add new port range</a>');
+		var errormessage = $('<div class="errormessage hidden"></div>');
+		$(actions).append(addNew);
+		$(this.options.dom.footer).empty();
+		$(this.options.dom.footer).append(errormessage).append(actions);
+		$(addNew).unbind('click').bind('click', function(ev) {
+			ev.preventDefault();
+			ev.stopPropagation();
+			this.addItem();
+			return false;
+		}.bind(this));
+	};
+
+	this.render = function() {
+		this.reset();
+		this.options.data = $.isArray(this.options.data) ? this.options.data : [this.options.data];
+		var hasMany = (this.options.data.length > 1);
+		$(this.dom).empty();
+		$(this.dom).append('<span class="header">Ports:</span>');
+		$(this.options.dom.list).empty();
+		$(this.dom).append(this.options.dom.list);
+		$(this.dom).append(this.options.dom.footer);
+
+		$.each(this.options.data, function(i, v) {
+			this.addItem(v, i, (hasMany && i > 0));
+		}.bind(this));
+
+		this.renderFooter();
+		this.refreshUI();
+	};
+
+	this.initContainer = function() {
+
+	};
+
+	this._init = function() {
+		this.dom = $(this.options.container);
+		this.parent = this.options.parent;
+		this.initContainer();
+	};
+	this._init();
+});
+appdb.vappliance.ui.views.VMITrafficRulesItem = appdb.ExtendClass(appdb.vappliance.ui.views.DataPropertyContainer, "appdb.vappliance.ui.views.VMITrafficRulesItem", function(o) {
+	this.options = {
+		container: $(o.container),
+		parent: o.parent || null,
+		data: o.data || {},
+		isEditable: ( (typeof o.editable === "boolean")?o.editable:false ),
+		dom: {
+		   direction: null,
+		   protocols: null,
+		   portranges: null
+		},
+		editor: {
+		    direction: null,
+		    protocols: null,
+		    portranges: null
+		}
+	};
+
+	this.validate = function() {
+
+	};
+
+	this.isValid = function() {
+		if (this.options.data.protocols !== 'ICMP') {
+			return this.options.editor.portranges.isValid();
+		}
+		return true;
+	};
+
+	this.onValueChange = function(item) {
+		this.validate();
+		var d = this.getData();
+		this.options.editor.portranges.enable((d.protocols !== 'ICMP'));
+		this.parent.onValueChange(this);
+	};
+
 	this.getData = function(){
-		var props = this.getPropertyData();
-		var d = this.options.data;
-		var res = {
-			type: d.type,
-			protocols: props.protocols,
-			ip_range: props.ip_range,
-			port_range: props.port_ranges
+		var d =  {
+			direction: this.options.editor.direction.get('value'),//this.options.data.direction,
+			protocols: this.options.editor.protocols.get('value'),
+			ip_range: '0.0.0.0/0',
+			port_range: this.options.editor.portranges.getData()
 		};
-		return res;
+
+		if (d.protocols === 'ICMP') {
+		    d.port_range = '';
+		}
+		return d;
 	};
 	this.initActions = function(){
 		$(this.dom).children(".actions").children(".action.remove").unbind("click").bind("click", (function(self){
@@ -8401,107 +8909,285 @@ appdb.vappliance.ui.views.VMITrafficRulesItem = appdb.ExtendClass(appdb.vapplian
 			};
 		})(this));
 	};
+	this.renderDirections = function() {
+		var dom = $("<div></div>");
+		var directions = [];
+		var selectedValue = $.trim(this.options.data.direction).toLowerCase();
+
+		$(this.dom).append(dom);
+
+		$.each([{id: 'inbound', name: 'Incoming'}, {id: 'outbound', name: 'Outgoing'}], function(i, v) {
+			directions.push({
+				label: "<span>" + v.name + "</span>",
+				value: v.id,
+				selected: ( (selectedValue !== '')?(v.id === selectedValue):(i === 0) )
+			});
+		});
+
+		this.options.editor.direction = new dijit.form.Select({
+			options: directions,
+			onFocus: (function(self){
+				return function(){
+					self.onValueChange();
+				};
+			})(this),
+			onBlur:  (function(self){
+				return function(){
+					self.onValueChange();
+				};
+			})(this),
+			onChange: (function(self){
+				return function(v){
+					var res = $.trim('' + v.id);
+					self.options.data.direction = res;
+					self.onValueChange();
+				};
+			})(this)
+		}, $(dom)[0]);
+	};
+
+	this.renderProtocols = function() {
+		var dom = $("<div></div>");
+		var protocols = [];
+		var selectedValue = this.options.data.protocols.split(' ');
+
+		if (selectedValue.length === 0) {
+			selectedValue = '';
+		} else {
+			selectedValue = selectedValue[0];
+		}
+
+		$(this.dom).append(dom);
+
+		$.each(appdb.model.StaticList.VMNetworkProtocols, function(i, v) {
+			protocols.push({
+				label: "<span>" + v + "</span>",
+				value: v,
+				selected: ( (selectedValue !== '')?(v === selectedValue):(i === 0) )
+			});
+		});
+
+		this.options.editor.protocols = new dijit.form.Select({
+			options: protocols,
+			onFocus: (function(self){
+				return function(){
+					self.onValueChange();
+				};
+			})(this),
+			onBlur:  (function(self){
+				return function(){
+					self.onValueChange();
+				};
+			})(this),
+			onChange: (function(self){
+				return function(v){
+					var res = $.trim('' + v);
+					self.options.data.protocols = res;
+					self.onValueChange();
+				};
+			})(this)
+		}, $(dom)[0]);
+ 	};
+
+	this.renderPortRanges = function() {
+		var dom = $('<div class="fielditem portrange"></div>');
+		var portRanges = this.options.data.port_range || [];
+		if(typeof this.options.data.port_range === 'string') {
+		    portRanges = $.trim(this.options.data.port_range).split(';');
+		}
+		$(this.dom).append(dom);
+		this.options.editor.portranges = new appdb.vappliance.ui.views.PortRangeList({
+			container: dom,
+			parent: this,
+			data: portRanges
+		});
+		this.options.editor.portranges.render();
+	};
+
+	this.renderActions = function() {
+		var dom = $('<div class="fielditem actions"></div>');
+		var remove = $('<a class="action remove btn btn-danger btn-compact">X</div>');
+		$(dom).append(remove);
+		$(this.dom).append(dom);
+	};
+
 	this.render = function(d){
 		$(this.dom).data("inst", this);
-		this.renderProperties(d || this.options.data);
+		$(this.dom).empty();
+		this.renderActions();
+		this.renderDirections();
+		this.renderProtocols();
+		this.renderPortRanges();
 		this.initActions();
+		this.validate();
+		var d = this.getData();
+		this.options.editor.portranges.enable((d.protocols !== 'ICMP'));
 		setTimeout(function(){
 			appdb.vappliance.ui.CurrentVAVersionValidatorRegister.check();
 		},10);
 	};
+
 	this._init = function(){
 		this.dom = $(this.options.container);
 		this.parent = this.options.parent;
 	};
 	this._init();
 });
-
-appdb.vappliance.ui.views.VMITrafficRules = appdb.ExtendClass(appdb.View, "appdb.vappliance.ui.views.VMITrafficRules", function(o) {
-    this.options = {
-	container: $(o.container),
-	    parent: o.parent || null,
-	    data: o.data || {},
-	    isEditable: ( (typeof o.editable === "boolean")?o.editable:false ),
-	    items: [],
-	    itemTemplate: o.itemTemplate,
-	    importer: null,
-	    dom:{
-		list: $(document.createElement("ul"))
-	    }
-    };
-    this.removeItem = function(item) {
-	alert('remove item ' + JSON.stringify(item.options.data || {}));
-    };
-    this.addItem = function(rule, index) {
-	    var cont = $(this.options.itemTemplate).clone(true);
-	    var item = new appdb.vappliance.ui.views.VMITrafficRulesItem({
-		    container: cont,
-		    parent: this,
-		    editable: true,
-		    data: rule,
-		    index: index
-	    });
-	    this.subviews.push(item);
-	    item.render();
-	    if( rule.isNew === true ){
-		    item.setFocus(true);
-	    }
-	    appdb.vappliance.ui.CurrentVAVersionValidatorRegister.check();
-
-	    return cont;
-    };
-    this.renderEmpty = function() {
-	$(this.dom).find('.emptymessage').remove();
-	$(this.dom).append($('<div class="emptymessage">No network traffic rules found</div>'));
-    }
-    this.render = function() {
-	    this.reset();
-	    $(this.dom).children("ul").remove();
-	    this.options.dom.list = $(document.createElement("ul"));
-	    $(this.dom).append(this.options.dom.list);
-	    var rules = this.options.data || [];
-	    rules = [].concat(Array.isArray(rules) ? rules : [rules]);
-
-	    if( rules.length === 0){
-		    this.renderEmpty();
-	    } else {
-		rules = [rules[0]];console.log(rules[0]);
-		$.each(rules, (function(self){
-			return function(i,e){
-				var rule = self.addItem(e, i);
-				if( rule ){
-					var li = $(document.createElement("li"));
-					$(li).append(rule);
-					$(self.options.dom.list).append(li);
-				}
-			};
-		})(this));
-
-		$.each(this.subviews, function(i, v) {
-		   v.edit();
-		});
-	    }
-
-	//this.initActions();
-	/*setTimeout(function(){
-		appdb.vappliance.ui.CurrentVAVersionValidatorRegister.check();
-	},10);*/
-    };
-    this.initContainer = function() {
-	var tempname = $.trim( $(this.dom).data("usetemplate") );
-	if( tempname !== "" ){
-		var tempdom = appdb.vappliance.ui.CurrentVAManager.getTemplate(tempname);
-		if( $(tempdom).length > 0 ){
-			this.options.itemTemplate = $(tempdom).clone(true);
+appdb.vappliance.ui.views.VMITrafficRulesEditor = appdb.ExtendClass(appdb.View, "appdb.vappliance.ui.views.VMITrafficRulesEditor", function(o) {
+	this.options = {
+		container: $(o.container),
+		parent: o.parent,
+		isEditable: ( (typeof o.editable === "boolean")?o.editable:false ),
+		items: [],
+		itemTemplate: o.itemTemplate,
+		direction: o.direction || 'inbound',
+		data: o.data || [],
+		dom: {
+			emptyMessage: $('<div class="emptymessage">No network traffic rules defined.</div>'),
+			list: $('<ul class="ruleslist"></ul>'),
+			footer: $('<div class="footer"><div class="warning icontext"><img src="/images/vappliance/warning.png" /><span>Some of the provided rules are invalid.</span></div><div class="actions inline-block"><a class="action add btn btn-primary btn-compact">add new rule</a></div></div>'),
 		}
-	}
-	$(this.dom).append(this.options.dom.list);
-    };
-    this._init = function() {
-	this.dom = $(this.options.container);
-	this.parent = this.options.parent;
-	this.subviews = [];
-	this.initContainer();
-    };
-    this._init();
+	};
+	this.harvestData = function() {
+		var data = [];
+		$.each(this.options.items, function(i, v) {
+			data.push(v.getData());
+		});
+
+		this.options.data = data;
+		return this.options.data;
+	};
+
+	this.getData = function() {
+		return this.options.data;
+	};
+
+	this.hasChanges = function() {
+		var hasChanges = false;
+
+		$.each(this.options.items, function(i,v) {
+		       hasChanges = (!hasChanges && v.hasChanges && v.hasChanges());
+		});
+
+		return hasChanges;
+	};
+
+	this.onValueChange = function(item) {
+		var isValid = this.validate();
+		$(this.dom).find('.action.add').each(function(i, el) {
+			$(el).toggleClass('disabled', !isValid);
+		});
+		$(this.dom).toggleClass('invalid', !isValid);
+		this.harvestData();
+		this.parent.onPropertyValueChange({property: {options: { dataPath: 'trafficRules'}}});
+		this.refreshUI();
+	};
+	this.isValid = function() {
+	    var isValid = true;
+
+	    $.each(this.options.items, function(i,v) {
+		   isValid = (!!isValid && v.isValid && v.isValid());
+	    });
+
+	    return isValid;
+	};
+
+	this.validate = function() {
+	    return this.isValid();
+	};
+	this.removeItem = function(item) {
+		var foundIndex = -1;
+
+		$.each(this.options.items, function(i, v) {
+			foundIndex = (foundIndex === -1 && v === item) ? i : foundIndex;
+		});
+
+		if (foundIndex > -1) {
+			item.reset();
+			$(item.dom).remove();
+			item = null;
+			this.options.items.splice(foundIndex, 1);
+			this.onValueChange();
+		}
+	};
+
+	this.addItem = function(d, index) {
+		if (!d) {
+			d = { direction: o.direction || '', protocols: 'TCP', ip_range: '', port_range: '' };
+		}
+		var li = $('<li></li>');
+		$(this.options.dom.list).append(li);
+		var item = new appdb.vappliance.ui.views.VMITrafficRulesItem({
+			container: li,
+			data: d,
+			parent: this,
+			index: index
+		});
+		this.options.items.push(item);
+		item.render();
+		this.onValueChange();
+	};
+
+	this.refreshUI = function() {
+		var isEmpty = (this.options.items.length === 0);
+		this.renderFooter(isEmpty);
+		if (isEmpty) {
+			$(this.dom).find('.emptymessage').removeClass('hidden');
+		} else {
+			$(this.dom).find('.emptymessage').addClass('hidden');
+		}
+	};
+	this.renderActions = function(container) {};
+	this.renderFooter = function(isEmpty) {
+	    isEmpty = (typeof isEmpty === 'boolean') ? isEmpty : false;
+	    $(this.options.dom.footer).children('.actions').find('.action.add').unbind('click').bind('click', function(ev) {
+			ev.preventDefault();
+			ev.stopPropagation();
+			if ($(ev.target).hasClass('disabled') === false) {
+				this.addItem();
+				this.refreshUI();
+			}
+			return false;
+		}.bind(this));
+	};
+	this.sortData = function(d) {
+	    return appdb.vappliance.utils.sortNetworkTrafficRules(d);
+	};
+	this.render = function(d) {
+		this.reset();
+		d = d || this.options.data;
+		d = $.isArray(d) ? d : [d];
+		this.sortData(d);
+		$(this.dom).append(this.options.dom.emptyMessage);
+		$(this.options.dom.list).empty();
+		$(this.dom).find('.ruleslist').empty();
+		$(this.dom).append(this.options.dom.list);
+		$.each((this.options.data || []), function(i, v) {
+			this.addItem(v, i);
+		}.bind(this));
+
+		$(this.dom).append(this.options.dom.footer);
+		this.refreshUI();
+	};
+
+	this.initContainer = function() {
+		var tempname = $.trim( $(this.dom).data("usetemplate") );
+
+		if( tempname !== "" ){
+			var tempdom = appdb.vappliance.ui.CurrentVAManager.getTemplate(tempname);
+			if( $(tempdom).length > 0 ){
+				this.options.itemTemplate = $(tempdom).clone(true);
+			}
+		}
+
+		$(this.dom).append(this.options.dom.list);
+	};
+
+	this._init = function() {
+		this.dom = $(this.options.container);
+		this.parent = this.options.parent;
+		this.subviews = [];
+		this.initContainer();
+	};
+	this._init();
 });
