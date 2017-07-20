@@ -1260,9 +1260,11 @@ class VoController extends Zend_Controller_Action
 		echo json_encode(array("result"=>"error", "message"=>"Image not found"));
 	}
 
-	private function getVAProvidersArray() {
+	private function getVAProvidersArray($inprodOnly = true) {
 		$vaps = new Default_Model_VaProviders();
-		$vaps->filter->in_production->equals(true);
+		if ($inprodOnly === true) {
+			$vaps->filter->in_production->equals(true);
+		}
 		$ret = array();
 		foreach ($vaps->items as $vap) {
 			$url=trim(substr($vap->url,0,(strpos($vap->url,"?") == true ? strpos($vap->url,"?") : strlen($vap->url))),'/');
@@ -1315,6 +1317,8 @@ class VoController extends Zend_Controller_Action
 					$basedn = 'GLUE2GroupID=cloud,GLUE2DomainID=' . $site["name"] . ',GLUE2GroupID=grid,o=glue';
 					if(trim($site["serviceid"]) != "") {
 						$basedn = 'GLUE2ServiceID=' . $site["serviceid"] . ',' . $basedn;
+					} else {
+						continue; // if there is no service id, no images should be queried
 					}
 					$result = $this->getTopBDIIData($basedn, $filter, $attrs);
 					if (!empty($result)) {
@@ -1443,6 +1447,8 @@ class VoController extends Zend_Controller_Action
 					$basedn = 'GLUE2GroupID=cloud,GLUE2DomainID=' . $site["name"] . ',GLUE2GroupID=grid,o=glue';
 					if(trim($site["serviceid"]) != "") {
 						$basedn = 'GLUE2ServiceID=' . $site["serviceid"] . ',' . $basedn;
+					} else {
+						continue; // if there is no service id, no templates should be queried
 					}
 					$result = $this->getTopBDIIData($basedn, $filter, $attrs);
 					$disc_size = null; // FIXME: set proper value from GLUE schema when implemented
@@ -1535,7 +1541,7 @@ class VoController extends Zend_Controller_Action
 				'GLUE2EndpointImplementor'
 			);
 
-			$prod_sites = $this->getVAProvidersArray();
+			$prod_sites = $this->getVAProvidersArray(false);
 			try {
 				db()->beginTransaction();
 				db()->query("TRUNCATE TABLE va_provider_endpoints");
