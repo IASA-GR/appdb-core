@@ -7787,7 +7787,7 @@ class SamlAuth{
 		}
 	}
 	
-	//Clears any transaction variables before authentication setup
+	//Clears any transaction variables before authedication setup
 	//called from SamlAuth::setupSamlSession
 	public static function clearSession($session){
 		unset($session->isNewUser);
@@ -8324,10 +8324,10 @@ class SamlAuth{
 		return $entitlements;
 	}
 	
-	//Performs actions after successful SAML Authentication
+	//Performs actions after successful SAML Authedication
 	//Decides if the authedicated user is a new or an old
 	//user and fills the session accordingly.
-	//Returns the url before authentication initialization.
+	//Returns the url before authedication initialization.
 	public static function setupSamlAuth($session){
 		$attrs = $session->samlattrs;
 		$source = strtolower(trim($session->samlauthsource));
