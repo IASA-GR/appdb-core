@@ -2082,6 +2082,7 @@ class AppsController extends Zend_Controller_Action
 				$this->revokePrivs($cuser, $target, $actorsuid, $revokeids);
 			}
 		}
+		db()->exec("SELECT refresh_permissions()");
 		return true;
 	}
 	

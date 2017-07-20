@@ -26,7 +26,11 @@ class Default_Model_VAversionsFilterBase extends Default_Model_Filter {
 		$this->_fields[] = 'notes';
 		$this->_fields[] = 'vappid';
 		$this->_fields[] = 'published';
+		$this->_fields[] = 'publishedby';
 		$this->_fields[] = 'createdon';
+		$this->_fields[] = 'publishedon';
+		$this->_fields[] = 'enabledon';
+		$this->_fields[] = 'enabledby';
 		$this->_fields[] = 'expireson';
 		$this->_fields[] = 'enabled';
 		$this->_fields[] = 'archived';
@@ -40,7 +44,11 @@ class Default_Model_VAversionsFilterBase extends Default_Model_Filter {
 		$this->_fieldTypes['notes'] = 'string';
 		$this->_fieldTypes['vappid'] = 'integer';
 		$this->_fieldTypes['published'] = 'boolean';
+		$this->_fieldTypes['publishedby'] = 'integer';
 		$this->_fieldTypes['createdon'] = 'string';
+		$this->_fieldTypes['publishedon'] = 'string';
+		$this->_fieldTypes['enabledon'] = 'string';
+		$this->_fieldTypes['enabledby'] = 'integer';
 		$this->_fieldTypes['expireson'] = 'string';
 		$this->_fieldTypes['enabled'] = 'boolean';
 		$this->_fieldTypes['archived'] = 'boolean';

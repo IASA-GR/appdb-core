@@ -19,17 +19,112 @@ require_once(APPLICATION_PATH . "/../library/argo.php");
 
 class GocdbController extends Zend_Controller_Action
 {
+	private $vaSyncScopes;
 
     public function init()
     {
         /* Initialize action controller here */
         $this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
-        $this->session = new Zend_Session_Namespace('default');
+		$this->session = new Zend_Session_Namespace('default');
+
+		$this->vaSyncScopes = Zend_Registry::get("app");
+		$this->vaSyncScopes = $this->vaSyncScopes['va_sync_scopes'];
+
+		if (trim($this->vaSyncScopes) == "") {
+			$this->vaSyncScopes = 'FedCloud';
+		} else {
+			if (strpos($this->vaSyncScopes, ",") !== false) {
+				$this->vaSyncScopes = explode(",", $this->vaSyncScopes);
+			}
+		}
+
+	}
+	/**
+	* checks to see if a VA provider a certain scope or set of scopes
+	* @hay where to search; may be a VA provider XML element or alternatively it's "SCOPES" or "SCOPE" XML element, or even an array of strings or a simple string
+	* @needle what to search for; may be a string or an array of strings
+	*
+	* @return bool
+	*/
+	function vaProviderHasScope($hay, $needle) {
+		if (is_null($hay) || is_null($needle)) {
+//			echo "NULL input" . "\n";
+			return false;
+		}
+		
+		if (is_object($hay)) {
+//			echo "hay is object" . "\n";
+			if (isset($hay->SCOPES)) {
+				$tmp = $hay->SCOPES;
+				if (is_object($tmp)) {
+					if (isset($tmp->SCOPE)) {
+//						echo "found hay->scopes->scope" . "\n";
+						$hay = array();
+						foreach ($tmp->SCOPE as $t) {
+							$hay[] = strval($t);
+						}
+					} else {
+//						echo "hay->scopes is object and has no scope" . "\n";
+						return false;
+					}
+				} elseif (is_array($tmp)) {
+//					echo "hay->scopes is an array" . "\n";
+					$hay = $tmp;
+				} elseif (is_string($tmp) || is_numeric($tmp)) {
+//					echo "hay->scopes is simple string. constructing array" . "\n";
+					$hay = array();
+					$hay[] = $tmp;
+				} else {
+					return false;
+				}
+			} elseif (isset($hay->SCOPE)) {
+//				echo "found hay->scope" . "\n";
+				$tmp = $hay->SCOPE;
+				$hay = array();
+				foreach ($tmp as $t) {
+					$hay[] = strval($t);
+				}
+			} else {
+//				echo "Unknown hay object (no scope or scopes)" . "\n";
+				if (count($hay) > 0) {
+					$tmp = $hay;
+					$hay = array();
+					for ($i = 0; $i < count($tmp); $i = $i + 1) {
+						$hay[] = strval($tmp[$i]);
+					}
+				} else {
+					return false;
+				}
+			}
+		} 
+
+		if (! is_array($hay)) {
+//			echo "constructing array for hay" . "\n";
+			$tmp = $hay;
+			$hay = array();
+			$hay[] = $tmp;
+		}
+
+		if (! is_array($needle)) {
+//			echo "constructing array for needle" . "\n";
+			$tmp = $needle;
+			$needle = array();
+			$needle[] = $tmp;
+		}
+
+		foreach ($hay as $h) {
+			foreach ($needle as $n) {
+				if (trim(strtolower($h)) == trim(strtolower($n))) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public function testAction() {
-		$this->syncSiteContacts();
+		//$this->syncSiteContacts();
 	}
 
 	private function syncSiteContacts() {
@@ -249,7 +344,9 @@ class GocdbController extends Zend_Controller_Action
 					db()->query("DELETE FROM gocdb.va_providers;");
 					foreach($rows as $row) {
 						db()->query("INSERT INTO oses (name) SELECT '" . pg_escape_string(trim($row->HOST_OS)) . "' WHERE '" . pg_escape_string(trim($row->HOST_OS)) . "' <> '' AND '" . pg_escape_string(trim($row->HOST_OS)) . "' NOT IN (SELECT name FROM oses)", array(trim($row->HOST_OS)));
-						db()->query("INSERT INTO gocdb.va_providers(pkey,hostname,gocdb_url,host_dn,host_os,host_arch,beta,service_type,host_ip,in_production,node_monitored,sitename,country_name,country_code,roc_name,url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", array(trim($row->PRIMARY_KEY), trim($row->HOSTNAME), trim($row->GOCDB_PORTAL_URL), trim($row->HOSTDN), trim($row->HOST_OS), trim($row->HOST_ARCH), trim($row->BETA), trim($row->SERVICE_TYPE), trim($row->HOST_IP), trim($row->IN_PRODUCTION), trim($row->NODE_MONITORED), trim($row->SITENAME), trim($row->COUNTRY_NAME), trim($row->COUNTRY_CODE), trim($row->ROC_NAME), trim($row->URL)));
+						if (vaProviderHasScope($row, $this->vaSyncScopes)) {
+							db()->query("INSERT INTO gocdb.va_providers(pkey,hostname,gocdb_url,host_dn,host_os,host_arch,beta,service_type,host_ip,in_production,node_monitored,sitename,country_name,country_code,roc_name,url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", array(trim($row->PRIMARY_KEY), trim($row->HOSTNAME), trim($row->GOCDB_PORTAL_URL), trim($row->HOSTDN), trim($row->HOST_OS), trim($row->HOST_ARCH), trim($row->BETA), trim($row->SERVICE_TYPE), trim($row->HOST_IP), trim($row->IN_PRODUCTION), trim($row->NODE_MONITORED), trim($row->SITENAME), trim($row->COUNTRY_NAME), trim($row->COUNTRY_CODE), trim($row->ROC_NAME), trim($row->URL)));
+						}
 					}
 					db()->commit();
 					db()->query("ALTER TABLE gocdb.va_providers ENABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;");

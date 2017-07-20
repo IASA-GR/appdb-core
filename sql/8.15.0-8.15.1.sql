@@ -1,4 +1,4 @@
-﻿/*
+/*
  Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,103 +16,22 @@
 
 /* 
 EGI AppDB incremental SQL script
-Previous version: 8.14.8
-New version: 8.15.0
-Author: wvkarag@kadath.priv.iasa.gr
+Previous version: 8.15.0
+New version: 8.15.1
+Author: wvkarag@lovecraft.priv.iasa.gr
 */
 
 START TRANSACTION;
 
-ALTER TABLE vmiinstances ADD COLUMN min_acc int;
-ALTER TABLE vmiinstances ADD COLUMN rec_acc int;
+ALTER TABLE vapp_versions ADD COLUMN publishedby INT REFERENCES researchers(id);
+ALTER TABLE vapp_versions ADD COLUMN publishedon timestamp;
+ALTER TABLE vapp_versions ADD COLUMN enabledby INT REFERENCES researchers(id);
+ALTER TABLE vapp_versions ADD COLUMN enabledon timestamp;
 
-CREATE TYPE e_acc_type AS ENUM ('GPU');
-
-ALTER TABLE vmiinstances ADD COLUMN rec_acc_type e_acc_type;
-
-CREATE INDEX idx_vmiinstances_rec_acc ON vmiinstances(rec_acc);
-CREATE INDEX idx_vmiinstances_min_acc ON vmiinstances(min_acc);
-
-CREATE TABLE vmi_net_traffic(
-	id SERIAL PRIMARY KEY,
-	net_protocol_bits bit(32),
-	flow_bits bit(2) NOT NULL,
-	ip_range text,
-	ports text,
-	vmiinstanceid int NOT NULL REFERENCES vmiinstances(id)
-);
-
-ALTER TABLE vmi_net_traffic OWNER TO appdb;
-COMMENT ON TABLE vmi_net_traffic IS '
-net_protocol enum:
-tcp -> 1
-udp -> 2
-icmp -> 4
-ipsec -> 8
---
-flow enum:
-1-> inbound,
-2 -> outbound
-';
-
-CREATE OR REPLACE FUNCTION net_protocols(t vmi_net_traffic) RETURNS TEXT[] AS
-$$
-DECLARE ret TEXT[];
-BEGIN
-	IF t.net_protocol_bits & 15::bit(32) = 15::bit(32) THEN
-		ret := '{any}'::TEXT[];
-	ELSE
-		IF (t.net_protocol_bits & 1::bit(32))::int::bool THEN ret := array_append(ret, 'TCP'); END IF;
-		IF (t.net_protocol_bits & 2::bit(32))::int::bool THEN ret := array_append(ret, 'UDP'); END IF;
-		IF (t.net_protocol_bits & 4::bit(32))::int::bool THEN ret := array_append(ret, 'ICMP'); END IF;
-		IF (t.net_protocol_bits & 8::bit(32))::int::bool THEN ret := array_append(ret, 'IPSec'); END IF;
-	END IF;
-	IF array_length(ret, 1) = 0 THEN
-		ret = '{none}'::TEXT[];
-	END IF;
-	RETURN ret;
-END;
-$$
-LANGUAGE plpgsql STABLE;
-
-CREATE OR REPLACE FUNCTION flow(t vmi_net_traffic) RETURNS TEXT[] AS
-$$
-DECLARE ret TEXT[];
-BEGIN
-	IF t.flow_bits & 3::bit(2) = 3::bit(2) THEN
-		ret := '{both}'::TEXT[];
-	ELSE
-		IF (t.flow_bits & 1::bit(2))::int::bool  THEN ret := array_append(ret, 'inbound'); END IF;
-		IF (t.flow_bits & 2::bit(2))::int::bool THEN ret := array_append(ret, 'outbound'); END IF;
-	END IF;
-	IF array_length(ret, 1) = 0 THEN
-		ret = '{none}'::TEXT[];
-	END IF;
-	RETURN ret;
-END;
-$$
-LANGUAGE plpgsql STABLE;
-
-CREATE TABLE vmi_supported_context_fmt (
-	vmiinstanceid int NOT NULL REFERENCES vmiinstances(id),
-	fmtid int NOT NULL REFERENCES contextformats(id),
-	PRIMARY KEY (vmiinstanceid, fmtid)
-);
-
-ALTER TABLE vmi_supported_context_fmt OWNER TO appdb;
-
-CREATE FUNCTION contextfmts(v vmiinstances) RETURNS TEXT[] AS
-$$
-	SELECT array_agg(DISTINCT cf.name)
-	FROM vmi_supported_context_fmt AS f 
-	INNER JOIN contextformats AS cf ON cf.id = f.fmtid
-	WHERE f.vmiinstanceid = v.id
-$$
-LANGUAGE sql STABLE;
-ALTER FUNCTION contextfmts(vmiinstances) OWNER TO appdb;
-
-
--- View: public.__vaviews
+CREATE INDEX idx_vapp_versions_enabledby ON vapp_versions(enabledby);
+CREATE INDEX idx_vapp_versions_enabledon ON vapp_versions(enabledon);
+CREATE INDEX idx_vapp_versions_publishedby ON vapp_versions(publishedby);
+CREATE INDEX idx_vapp_versions_publishedon ON vapp_versions(publishedon);
 
 CREATE OR REPLACE VIEW public.__vaviews AS
  SELECT vapplists.id AS vapplistid,
@@ -176,7 +95,11 @@ CREATE OR REPLACE VIEW public.__vaviews AS
     applications.cname AS appcname,
     vmiinstances.min_acc,
     vmiinstances.rec_acc,
-    vmiinstances.contextfmts
+    contextfmts(vmiinstances.*) AS contextfmts,
+    vapp_versions.enabledon AS va_version_enabledon,
+    vapp_versions.enabledby AS va_version_enabledby,
+    vapp_versions.publishedon AS va_version_publishedon,
+    vapp_versions.publishedby AS va_version_publishedby
    FROM vapplists
      JOIN vmiinstances ON vmiinstances.id = vapplists.vmiinstanceid
      JOIN vmiflavours ON vmiflavours.id = vmiinstances.vmiflavourid
@@ -189,7 +112,6 @@ CREATE OR REPLACE VIEW public.__vaviews AS
 
 ALTER TABLE public.__vaviews
   OWNER TO appdb;
-
 
 -- Materialized View: public.vaviews
 
@@ -257,7 +179,11 @@ CREATE MATERIALIZED VIEW public.vaviews AS
     __vaviews.appcname,
     __vaviews.min_acc,
     __vaviews.rec_acc,
-    __vaviews.contextfmts
+    __vaviews.contextfmts,
+    __vaviews.va_version_enabledon,
+    __vaviews.va_version_enabledby,
+    __vaviews.va_version_publishedon,
+    __vaviews.va_version_publishedby
    FROM __vaviews
 WITH DATA;
 
@@ -633,27 +559,34 @@ CREATE INDEX idx_vaviews_vmiinstanceid
   USING btree
   (vmiinstanceid);
 
-CREATE OR REPLACE FUNCTION contextfmtsxml(v vmiinstances)
- RETURNS xml
- LANGUAGE sql
- STABLE
-AS $function$
-        SELECT array_to_string(array_agg(XMLELEMENT(name "virtualization:contextformat", XMLATTRIBUTES(f.fmtid AS id, cf.name AS name, true AS "supported"), cf.description)::text), '')::XML
-        FROM vmi_supported_context_fmt AS f
-        INNER JOIN contextformats AS cf ON cf.id = f.fmtid
-        WHERE f.vmiinstanceid = v.id
-$function$;
-ALTER FUNCTION contextfmtsxml(vmiinstances) OWNER TO appdb;
-
-
-CREATE OR REPLACE VIEW public.vapp_to_xml AS
+CREATE OR REPLACE VIEW public.vapp_to_xml AS 
  SELECT applications.id AS appid,
     vapplications.id AS vappid,
-    XMLELEMENT(NAME "virtualization:appliance", XMLATTRIBUTES(vapp_versions.published AS published, vapp_versions.version AS version, vapplications.id AS vappid, applications.id AS appid, vapp_versions.id AS vaversionid, timezone('UTC'::text, vapp_versions.createdon::timestamp with time zone) AS createdon, vapp_versions.expireson AS expireson, vapp_versions.status AS status, vapp_versions.enabled AS enabled, vapp_versions.archived AS archived,
+    XMLELEMENT(NAME "virtualization:appliance", XMLATTRIBUTES(
+	vapp_versions.published AS published, 
+	vapp_versions.publishedon AS publishedon, 
+	vapp_versions.version AS version, 
+	vapplications.id AS vappid, 
+	applications.id AS appid, 
+	vapp_versions.id AS vaversionid, 
+	timezone('UTC'::text, 
+	vapp_versions.createdon::timestamp with time zone) AS createdon, 
+	vapp_versions.expireson AS expireson, 
+	vapp_versions.status AS status, 
+	vapp_versions.enabled AS enabled, 
+	vapp_versions.enabledon AS enabledon, 
+	vapp_versions.archived AS archived,
         CASE
             WHEN NOT vapp_versions.archivedon IS NULL THEN timezone('UTC'::text, vapp_versions.archivedon::timestamp with time zone)
             ELSE NULL::timestamp without time zone
-        END AS archivedon, vapplications.guid AS vappidentifier, vapplications.imglst_private AS "imageListsPrivate"), '
+        END AS archivedon, vapplications.guid AS vappidentifier, vapplications.imglst_private AS "imageListsPrivate"
+), '
+', CASE WHEN NOT vapp_versions.publishedby IS NULL THEN XMLELEMENT(NAME "person:publishedby", XMLATTRIBUTES(vapp_versions.publishedby AS id, tpublishedby.cname AS cname), XMLELEMENT(NAME "person:firstname", tpublishedby.firstname), XMLELEMENT(NAME "person:lastname", tpublishedby.lastname), XMLELEMENT(NAME "person:institute", tpublishedby.institution), XMLELEMENT(NAME "person:role", XMLATTRIBUTES(tpublishedby.positiontypeid AS id, ( SELECT positiontypes.description
+           FROM positiontypes
+          WHERE positiontypes.id = tpublishedby.positiontypeid) AS type))) END, '
+', CASE WHEN NOT vapp_versions.enabledby IS NULL THEN XMLELEMENT(NAME "person:enabledby", XMLATTRIBUTES(vapp_versions.enabledby AS id, tenabledby.cname AS cname), XMLELEMENT(NAME "person:firstname", tenabledby.firstname), XMLELEMENT(NAME "person:lastname", tenabledby.lastname), XMLELEMENT(NAME "person:institute", tenabledby.institution), XMLELEMENT(NAME "person:role", XMLATTRIBUTES(tenabledby.positiontypeid AS id, ( SELECT positiontypes.description
+           FROM positiontypes
+          WHERE positiontypes.id = tenabledby.positiontypeid) AS type))) END, '
 ', XMLELEMENT(NAME "virtualization:identifier", vapp_versions.guid), '
 ', XMLELEMENT(NAME "virtualization:name", vapplications.name), '
 ', XMLELEMENT(NAME "virtualization:notes", vapp_versions.notes), '
@@ -701,9 +634,13 @@ CREATE OR REPLACE VIEW public.vapp_to_xml AS
         END, '
 ', XMLELEMENT(NAME "virtualization:autointegrity", vmiinstances.autointegrity), '
 ', XMLELEMENT(NAME "virtualization:ovf", XMLATTRIBUTES(vmiinstances.ovfurl AS url)), '
-', CASE WHEN (vmiinstances.rec_acc_type,vmiinstances.min_acc, vmiinstances.rec_acc) IS DISTINCT FROM (NULL, NULL, NULL) THEN XMLELEMENT(NAME "virtualization:accelerators", XMLATTRIBUTES(vmiinstances.rec_acc_type AS type, vmiinstances.min_acc AS minimum, vmiinstances.rec_acc AS recommended)) END, '
-', vmi_nt.x,'
-', vmiinstances.contextfmtsxml, '
+',
+        CASE
+            WHEN vmiinstances.rec_acc_type IS DISTINCT FROM NULL::e_acc_type OR vmiinstances.min_acc IS DISTINCT FROM NULL::integer OR vmiinstances.rec_acc IS DISTINCT FROM NULL::integer THEN XMLELEMENT(NAME "virtualization:accelerators", XMLATTRIBUTES(vmiinstances.rec_acc_type AS type, vmiinstances.min_acc AS minimum, vmiinstances.rec_acc AS recommended))
+            ELSE NULL::xml
+        END, '
+', vmi_nt.x, '
+', contextfmtsxml(vmiinstances.*), '
 ', vmiinst_cntxscripts_to_xml(vmiinstances.id), '
 '))) AS xml
    FROM vmiinstances
@@ -716,37 +653,78 @@ CREATE OR REPLACE VIEW public.vapp_to_xml AS
      LEFT JOIN archs ON archs.id = vmiflavours.archid
      LEFT JOIN oses ON oses.id = vmiflavours.osid
      LEFT JOIN researchers taddedby ON taddedby.id = vmiinstances.addedby
+	 LEFT JOIN researchers tpublishedby ON tpublishedby.id = vapp_versions.publishedby
+	 LEFT JOIN researchers tenabledby ON tenabledby.id = vapp_versions.enabledby
      LEFT JOIN researchers tlastupdatedby ON tlastupdatedby.id = vmiinstances.lastupdatedby
      LEFT JOIN vmiflavor_hypervisor_xml hypervisors ON hypervisors.vmiflavourid = vmiflavours.id
      LEFT JOIN vmiformats ON vmiformats.name::text = vmiflavours.format
-     LEFT JOIN (
-	SELECT vmiinstanceid, xmlagg(XMLELEMENT(NAME "virtualization:network_traffic", XMLATTRIBUTES(flow AS direction, net_protocols AS protocols, ip_range AS ip_range, ports AS port_range))) AS x FROM (
-	SELECT DISTINCT 
-		t.vmiinstanceid, 
-		array_to_string(t.flow, ' ') AS flow, 
-		array_to_string(t.net_protocols, ' ') AS net_protocols, 
-		t.ip_range AS ip_range, 
-		t.ports AS ports 
-	FROM vmi_net_traffic AS t
-	) AS tt GROUP BY vmiinstanceid
-     ) AS vmi_nt ON vmi_nt.vmiinstanceid = vmiinstances.id
-  GROUP BY applications.id, vapplications.id, vapp_versions.published, vapp_versions.version, applications.guid, vapplications.name, vapp_versions.id, vapp_versions.createdon, vapp_versions.expireson, vapp_versions.status, vapp_versions.enabled, vapp_versions.archived
+     LEFT JOIN ( SELECT tt.vmiinstanceid,
+            xmlagg(XMLELEMENT(NAME "virtualization:network_traffic", XMLATTRIBUTES(tt.flow AS direction, tt.net_protocols AS protocols, tt.ip_range AS ip_range, tt.ports AS port_range))) AS x
+           FROM ( SELECT DISTINCT t.vmiinstanceid,
+                    array_to_string(flow(t.*), ' '::text) AS flow,
+                    array_to_string(net_protocols(t.*), ' '::text) AS net_protocols,
+                    t.ip_range,
+                    t.ports
+                   FROM vmi_net_traffic t) tt
+          GROUP BY tt.vmiinstanceid) vmi_nt ON vmi_nt.vmiinstanceid = vmiinstances.id
+  GROUP BY 
+tpublishedby.institution,
+tpublishedby.positiontypeid,
+tpublishedby.lastname, 
+tpublishedby.cname, 
+tpublishedby.firstname, 
+tenabledby.institution,
+tenabledby.positiontypeid,
+tenabledby.lastname, 
+tenabledby.cname, 
+tenabledby.firstname, 
+applications.id, vapplications.id, vapp_versions.published, vapp_versions.publishedby, vapp_versions.publishedon, vapp_versions.enabledby, vapp_versions.enabledon, vapp_versions.version, applications.guid, vapplications.name, vapp_versions.id, vapp_versions.createdon, vapp_versions.expireson, vapp_versions.status, vapp_versions.enabled, vapp_versions.archived
   ORDER BY vapp_versions.published, vapp_versions.archived, vapp_versions.archivedon DESC;
 
-ALTER TABLE public.vapp_to_xml
-  OWNER TO appdb;
+CREATE OR REPLACE FUNCTION trfn_vapp_versions_set_timestamps()
+RETURNS TRIGGER
+AS
+$$
+BEGIN
+	IF TG_OP = 'INSERT' THEN
+		IF NEW.enabled THEN 
+			NEW.enabledon = NOW(); 
+		END IF;
+		IF NEW.published THEN 
+			NEW.publishedon = NOW(); 
+		END IF;
+	ELSIF TG_OP = 'UPDATE' THEN
+		IF NEW.enabled IS DISTINCT FROM OLD.enabled THEN 
+			NEW.enabledon = NOW(); 
+		END IF;
+		IF (NEW.published) AND (OLD.published IS DISTINCT FROM TRUE) THEN
+			NEW.publishedon = NOW(); 
+		END IF;
+	END IF;
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+ALTER FUNCTION trfn_vapp_versions_set_timestamps() OWNER TO appdb;
 
+CREATE TRIGGER rtr_vapp_versions_10_set_timestamps BEFORE INSERT OR UPDATE ON vapp_versions 
+FOR EACH ROW EXECUTE PROCEDURE trfn_vapp_versions_set_timestamps();
 
-CREATE VIEW accelerators AS
- SELECT e.enumsortorder AS id,
-    e.enumlabel AS name,
-    e.enumlabel::e_acc_type AS value
-   FROM pg_enum e
-     JOIN pg_type t ON e.enumtypid = t.oid
-  WHERE t.typname = 'e_acc_type'::name;
+-- Initialize publishedby to the user who added images to each vapp version, for those that are published and not archived
+
+ALTER TABLE vapp_versions DISABLE TRIGGER USER;
+
+UPDATE vapp_versions SET publishedby = (
+SELECT DISTINCT vmii.addedby
+FROM vapp_versions AS vav
+LEFT OUTER JOIN vapplists AS val ON val.vappversionid = vav.id
+LEFT OUTER JOIN vmiinstances AS vmii ON vmii.id = val.vmiinstanceid
+WHERE vav.id = vapp_versions.id)
+WHERE vapp_versions.published AND NOT vapp_versions.archived;
+
+ALTER TABLE vapp_versions ENABLE TRIGGER USER;
 
 INSERT INTO version (major,minor,revision,notes) 
-	SELECT 8, 15, 0, E'Added extra metadata for VMIs (accel, net_traffic, supported context fmts)'
-	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=15 AND revision=0);
+	SELECT 8, 15, 1, E'Added columns to vapp_versions (enabledby, enabledon, publishedby, publishedon)'
+	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=15 AND revision=1);
 
-COMMIT;
+COMMIT;	

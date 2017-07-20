@@ -860,7 +860,7 @@
 							</div>
 						</div>
 						<div class="verticalpanel osinfo extended">
-                                                    <div class="fieldvalueset">
+                                                    <div class="fieldvalueset cores-valueset">
                                                         <div class="header">Number of cores</div>
                                                         <div class="contents">
                                                             <div class="property vmiversion-mincores fieldnamevalue compact two column" data-path="cores.minimum" data-name="coresminimum" data-editable="true" data-type="valuelist" data-default="0" data-source="appdb.model.StaticList.VMCores">
@@ -872,37 +872,55 @@
                                                                     <div class="value" ></div>
                                                             </div>
                                                         </div>
+                                                        <div class="property-validator vmiversion-cores-validator icontext">
+                                                            <div class="warning icontext">
+                                                                    <img src="/images/vappliance/warning.png" alt="">
+                                                                    <span class="message">Minimum number of CPU cores must be less or equal to the recommended one</span>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <div class="fieldvalueset">
+                                                    <div class="fieldvalueset ram-valueset">
                                                         <div class="header">Amount of RAM</div>
                                                         <div class="contents">
                                                             <div class="property vmiversion-minram fieldnamevalue compact " data-path="ram.minimum" data-name="ramminimum" data-normalize="appdb.vappliance.utils.normalization.ram" data-editable="true" data-type="valuelist" data-default="0" data-source="appdb.model.StaticList.VMRams" >
                                                                 <div class="header">Minimum:</div>
 								<div class="value" ></div>
                                                             </div>
-                                                            <div class="property vmiversion-recomram fieldnamevalue compact " data-path="ram.recommended" data-name="ramrecommended" data-normalize="appdb.vappliance.utils.normalization.ram"  data-editable="true" data-type="valuelist" data-default="0" data-source="appdb.model.StaticList.VMRams">
+                                                            <div class="property vmiversion-recomram fieldnamevalue compact " data-path="ram.recommended" data-name="ramrecommended" data-normalize="appdb.vappliance.utils.normalization.ram" data-editable="true" data-type="valuelist" data-default="0" data-source="appdb.model.StaticList.VMRams">
                                                                 <div class="header">Recommended:</div>
                                                                 <div class="value" ></div>
                                                             </div>
                                                         </div>
+                                                        <div class="property-validator vmiversion-ram-validator icontext">
+                                                            <div class="warning icontext">
+                                                                    <img src="/images/vappliance/warning.png" alt="">
+                                                                    <span class="message">Minimum amount of RAM must be less or equal to the recommended one</span>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <div class="fieldvalueset">
+                                                    <div class="fieldvalueset accelerators-valueset">
                                                         <div class="header">Accelerators</div>
                                                         <div class="contents subcontent">
-                                                              <div class="property vmiversion-acctype fieldnamevalue compact" data-path="accelerators.type" data-type="acceleratorstype" data-source="appdb.model.StaticList.VmiAccelerators"  data-editable="true" data-default='-1'>
+                                                              <div class="property vmiversion-acctype fieldnamevalue compact" data-path="accelerators.type" data-type="acceleratorstype" data-source="appdb.model.StaticList.VMAcceleratorTypes"  data-editable="true" data-default='-1'>
                                                                 <div class="header">Type:</div>
-                                                                <div class="value" style="font-size: 10px;margin-top:-3px;"></div>
+                                                                <div class="value"></div>
                                                             </div>
                                                             <div class="property fieldnamevalue compact"></div>
                                                         </div>
                                                         <div class="contents noborder">
-                                                            <div class="property vmiversion-minacc fieldnamevalue compact" data-path="accelerators.minimum" data-name="accminimum" data-editable="true" data-type="number" data-datatype="number" data-minsize="0" data-default="0" data-maxsize="10">
+                                                            <div class="property vmiversion-minacc fieldnamevalue compact" data-path="accelerators.minimum" data-name="accminimum" data-editable="true" data-default="0" data-type="valuelist" data-source="appdb.model.StaticList.VMAcceleratorAmounts" >
                                                                 <div class="header">Minimum amount:</div>
                                                                 <div class="value"></div>
                                                             </div>
-                                                            <div class="property vmiversion-recomacc fieldnamevalue compact" data-path="accelerators.recommended" data-name="accrecommended" data-editable="true" data-type="number" data-datatype="number" data-minsize="0" data-default="0" data-maxsize="10">
+                                                            <div class="property vmiversion-recomacc fieldnamevalue compact" data-path="accelerators.recommended" data-name="accrecommended" data-editable="true" data-default="0" data-type="valuelist" data-source="appdb.model.StaticList.VMAcceleratorAmounts">
                                                                     <div class="header">Recommended amount:</div>
                                                                     <div class="value"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="property-validator vmiversion-accelerators-validator icontext">
+                                                            <div class="warning icontext">
+                                                                    <img src="/images/vappliance/warning.png" alt="">
+                                                                    <span class="message">Minimum number of accelerators must be less or equal to the recommended one</span>
                                                             </div>
                                                         </div>
                                                     </div>

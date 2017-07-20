@@ -3249,7 +3249,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	CONST VA_TITLE_MIN_SIZE = 0;
 	CONST VA_TITLE_MAX_SIZE = 1000;
         CONST VA_VMI_ACCELERATORS_MIN_SIZE = 0;
-        CONST VA_VMI_ACCELERATORS_MAX_SIZE = 10;
+        CONST VA_VMI_ACCELERATORS_MAX_SIZE = 32;
 	
 	private $vappid = -1;
 	private $vappversionid = -1;
@@ -3329,7 +3329,18 @@ class RestAppVAXMLParser extends RestXMLParser {
 	}
 	private function createVApplianceService(){
 		if( $this->vappversion_state !== null ){
-			$this->vappliance_service = new VApplianceService($this->vappversion_state);
+			$userid = null;
+			if (! is_null($this->_parent)) {
+				$user = $this->_parent->getUser();
+				if (! is_null($user)) {
+					$userid = $user->id;
+				} else {
+					error_log("[RestAppVAXMLParser::createVApplianceService] Error: _parent->_user is NULL");
+				}
+			} else {
+				error_log("[RestAppVAXMLParser::createVApplianceService] Error: _parent is NULL");
+			}
+			$this->vappliance_service = new VApplianceService($this->vappversion_state, $userid);
 		}
 		return $this->vappliance_service;
 	}
@@ -4777,6 +4788,18 @@ class RestAppVAXMLParser extends RestXMLParser {
 	 * Returns a Default_Model_VAVersion item.
 	 */
 	private function parseVAppVersion($xml, $parent = null){
+		$userid = null;
+		if (! is_null($this->_parent)) {
+			$user = $this->_parent->getUser();
+			if (! is_null($user)) {
+				$userid = $user->id;
+			} else {
+				error_log("[RestAppVAXMLParser::parseVAppVersion] Error: _parent->_user is NULL");
+			}
+		} else {
+			error_log("[RestAppVAXMLParser::parseVAppVersion] Error: _parent is NULL");
+		}
+
 		$m = $this->getItem("vaversion", $xml);
 		
 		if( !$this->isPUT() && $this->isexternalrequest===false && ( !is_numeric($m->id) || intval($m->id)<=0 )  ){
@@ -4795,12 +4818,14 @@ class RestAppVAXMLParser extends RestXMLParser {
 				if( $enabled == "true" && $m->enabled === false ){
 					$this->createVersionState($m);
 					$m->enabled = true;
+					$m->enabledByID = $userid;
 					$m->save();
 					$this->vappversion_state->setVersionNewState($m);
 					return $m;
 				}elseif( $enabled == "false" && $m->enabled === true){
 					$this->createVersionState($m);
 					$m->enabled = false;
+					$m->enabledByID = $userid;
 					$m->save();
 					$this->vappversion_state->setVersionNewState($m);
 					return $m;
@@ -4809,8 +4834,9 @@ class RestAppVAXMLParser extends RestXMLParser {
 			//Check if published
 			if( $m->published == true && $m->archived == false && $m->status == "verified" ){
 				if( $this->isexternalrequest === true || $this->isPUT() === true){
-					$ident = $m->guid;
+					$ident = $m->guid;					
 					$m = new Default_Model_VAversion();
+					$m->publishedByID = $userid;
 					$m->guid = $ident;
 				}else{
 					return $this->_setErrorMessage("Cannot edit published version");
@@ -6168,7 +6194,7 @@ class RestAppVAVersionItem extends RestAppVAItem {
      */
 	public function delete() {
 		if (! is_null($this->_res)) {
-			$ret = $this->_res->get();
+			$ret = $this->get();
 			db()->beginTransaction();
 			try{
 				if ($this->_res->published) {
@@ -6203,13 +6229,15 @@ class RestAppVAVersionItem extends RestAppVAItem {
 		$item->delete();
 	}
 	private function deleteVMIInstance($item){
-		$instances = new Default_Model_VMIInstances();
+                $this->deleteContextFormats($item->id);
+                $this->deleteContextScripts($item->id);
+
+                $instances = new Default_Model_VMIInstances();
 		$instances->filter->vmiflavourid->equals($item->vmiflavourid)->and($instances->filter->id->notequals($item->id));
 		if( count($instances->items) === 0 ){
 			$this->deleteFlavour($item->getFlavour(),$item);
 		}
-		$this->deleteContextFormats($item->id);
-		$this->deleteContextScripts($item->id);
+
 		$item->delete();
 		
 	}
@@ -6229,9 +6257,9 @@ class RestAppVAVersionItem extends RestAppVAItem {
 		$vmiscripts = new Default_Model_VMIinstanceContextScripts();
 		$vmiscripts->filter->vmiinstanceid->numequals($vmiinstanceid);
 		if( count($vmiscripts->items) > 0 ){
-			foreach($vmiscripts->items as $item){
+                        foreach($vmiscripts->items as $item){
 				$scriptids[] = $item->contextscriptid;
-				$vmiscripts->remove($item);
+                                $vmiscripts->remove($item);
 			}
 		}
 		$scriptids = array_unique($scriptids);
@@ -6241,7 +6269,7 @@ class RestAppVAVersionItem extends RestAppVAItem {
 			$vmiscripts = new Default_Model_VMIinstanceContextScripts();
 			$vmiscripts->filter->contextscriptid->numequals($id);
 			if( count($vmiscripts->items) === 0 ){
-				$scripts = new Default_Model_ContextScripts();
+                                $scripts = new Default_Model_ContextScripts();
 				$scripts->filter->id->numequals($id);
 				if( count($scripts->items) > 0 ){
 					$scripts->remove($scripts->items[0]);
@@ -6257,7 +6285,7 @@ class RestAppVAVersionItem extends RestAppVAItem {
 			$item->delete();
 		}
 	}
-	private function deleteVMI($item, $parent){
+	private function deleteVMI($item, $parent = null){
 		$item->delete();
 	}
 	/**
