@@ -8028,7 +8028,7 @@ appdb.views.ApiKeyItem = appdb.ExtendClass(appdb.View, "appdb.views.ApiKeyItem",
 			};
 		})(this));
 	};
-	this.renderAuthedication = function(d) {
+	this.renderAuthentication = function(d) {
 		var a = new appdb.views.ApiKeyAuthentication({container: $(this.dom).find(".authenticationcontainer")[0], "apikey": d.key});
 		a.subscribe({
 			"event": "insertuser",
@@ -8135,7 +8135,7 @@ appdb.views.ApiKeyItem = appdb.ExtendClass(appdb.View, "appdb.views.ApiKeyItem",
 			"caller": this
 		});
 		$(this.dom).append(div);
-		this.renderAuthedication(d);
+		this.renderAuthentication(d);
 	};
 	this._init = function() {
 		this._index = (typeof o.index === "undefined") ? -1 : o.index;
@@ -8145,8 +8145,8 @@ appdb.views.ApiKeyItem = appdb.ExtendClass(appdb.View, "appdb.views.ApiKeyItem",
 		if (!appdb.views.ApiKeyItem.actions) {
 			appdb.views.ApiKeyItem.actions = {};
 		}
-		if ((typeof o.hideAuthedication !== "undefined" && o.hideAuthedication == false) == true) {
-			this.renderAuthedication = function() {
+		if ((typeof o.hideAuthentication !== "undefined" && o.hideAuthentication == false) == true) {
+			this.renderAuthentication = function() {
 			};
 		}
 	};
