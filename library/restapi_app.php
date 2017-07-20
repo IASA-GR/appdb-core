@@ -4376,7 +4376,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 				}
 			}
 		}
-		if ( count($xml->xpath('/virtualization:network_traffic[@xsi:nil="true"]')) != 0 ) {
+		if ( count($xml->xpath('./virtualization:network_traffic[@xsi:nil="true"]')) != 0 ) {
 			$m->deleteNetworkTraffic();
 		} elseif ( count( $xml->xpath('./virtualization:network_traffic') ) > 0 ) {
 			$m->deleteNetworkTraffic();
