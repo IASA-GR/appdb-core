@@ -13,7 +13,7 @@ REQUIREMENTS
 
 	- other PHP modules 
 		- mbstring
-		- recode
+		- recode 
 		- mcrypt
 		- gd
 		- process

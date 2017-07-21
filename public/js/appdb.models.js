@@ -1241,6 +1241,13 @@ appdb.model.StaticList = {
 	ConnectionTypes: [],
 	SiteList: [],
 	DatasetList: [],
+	VMNetworkProtocols: [
+	    //'ALL',
+	    'TCP',
+	    'UDP',
+	    'ICMP'//,
+	    //'IPSEC'
+	],
 	VMAcceleratorTypes: [
 	    {id: -1, val: function() { return 'None';}},
 	    {id: 'GPU', val: function() {return 'GPU';}}

@@ -4207,6 +4207,8 @@ class RestAppVAXMLParser extends RestXMLParser {
 	 * Returns a Default_Model_VMIinstance item.
 	 */
 	private function parseVAppImageInstance($xml, $parent = null){
+		$deferredNetTraf = array();
+		$deferredCFs = array();
 		$isupdated = false;
 		$contextscript = null;
 		$flavour = $this->parseVAppFlavour($xml, $parent);
@@ -4318,7 +4320,12 @@ class RestAppVAXMLParser extends RestXMLParser {
 						$cf->vmiinstanceID = $m->id;
 						$cf->fmtid = strval($cformat->attributes()->id);
 						try {
-							$cf->save();
+							// if this is an update (we have a VMI instance id),save network traffic now, or else defer it for after saving the VMI instance
+							if( trim($m->id) == "" || trim($m->id)==="-1"  ) {
+								$cf->save();
+							} else {
+								$deferredCFs[] = $cf;
+							}
 						} catch (Exception $e) {
 							error_log($e);
 							return $this->_setErrorMessage("Invalid id attribute \`$fmtid' for supported context format element \`virtualization:contextformat'", RestErrorEnum::RE_BACKEND_ERROR);
@@ -4387,7 +4394,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 				}
 			}
 		}
-		if ( count($xml->xpath('/virtualization:network_traffic[@xsi:nil="true"]')) != 0 ) {
+		if ( count($xml->xpath('./virtualization:network_traffic[@xsi:nil="true"]')) != 0 ) {
 			$m->deleteNetworkTraffic();
 		} elseif ( count( $xml->xpath('./virtualization:network_traffic') ) > 0 ) {
 			$m->deleteNetworkTraffic();
@@ -4419,8 +4426,12 @@ class RestAppVAXMLParser extends RestXMLParser {
 				if (strlen(trim(strval($nt->attributes()->port_range))) > 0) {
 					$mnt->ports = trim(strval($nt->attributes()->port_range));
 				}
-				$mnt->save();
-//				$m->NetworkTraffic->add($mnt);
+				// if this is an update (we have a VMI instance id),save network traffic now, or else defer it for after saving the VMI instance
+				if( !is_numeric($m->id) || intval($m->id) <=0 ){ /*new instance*/
+                                    $deferredNetTraf[] = $mnt;
+				} else {
+                                    $mnt->save();
+				}
 			}
 		}
 		if( count( $xml->xpath('./virtualization:ram') ) > 0 ){
@@ -4582,7 +4593,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		//Save optional Context Script 
 		//Only in case of a new version
-		if( trim($m->id) === "" || trim($m->id)==="-1"  ){
+		if( !is_numeric($m->id) || intval($m->id) <=0 ){ /*new instance*/
 			if( count( $xml->xpath('./virtualization:contextscript') ) > 0 ){
 				$contextscript = $xml->xpath('./virtualization:contextscript');
 				$contextscript = $contextscript[0];
@@ -4602,6 +4613,20 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		
 		$m->save();
+		// save deferred network traffic data and other stuff
+		foreach ($deferredNetTraf as $d) {
+			$d->VMIinstanceID = $m->id;
+			$d->save();
+		}
+		foreach ($deferredCFs as $d) {
+			$d->vmiinstanceID = $m->id;
+			try {
+				$d->save();
+			} catch (Exception $e) {
+				error_log($e);
+				return $this->_setErrorMessage("Invalid id attribute \`" . $d->fmtid . "' for supported context format element \`virtualization:contextformat'", RestErrorEnum::RE_BACKEND_ERROR);
+			}
+		}
 		
 		$synccontextscript = $this->syncContextScript($contextscript, $m);
 		if( $synccontextscript === null || $synccontextscript === false){
@@ -6223,25 +6248,30 @@ class RestAppVAVersionItem extends RestAppVAItem {
 			return false;
 		}
 	}
-	private function deleteVALists($item){
+
+	private function deleteVALists($item) {
 		$inst = $item->getVMIInstance();
 		$this->deleteVMIInstance($inst);
 		$item->delete();
 	}
-	private function deleteVMIInstance($item){
-                $this->deleteContextFormats($item->id);
-                $this->deleteContextScripts($item->id);
 
-                $instances = new Default_Model_VMIInstances();
+	private function deleteVMIInstance($item) {
+		$this->deleteContextFormats($item->id);
+		$this->deleteContextScripts($item->id);
+
+		// also delete the VMI instance's flavor, if not in use by other instances (flavors are shared)
+		$instances = new Default_Model_VMIInstances();
 		$instances->filter->vmiflavourid->equals($item->vmiflavourid)->and($instances->filter->id->notequals($item->id));
-		if( count($instances->items) === 0 ){
+		if( count($instances->items) === 0 ) {
 			$this->deleteFlavour($item->getFlavour(),$item);
 		}
 
+		$item->deleteNetworkTraffic();
 		$item->delete();
 		
 	}
-	private function deleteContextFormats($vmiinstanceid){
+
+	private function deleteContextFormats($vmiinstanceid) {
 		$scriptids = array();
 		$vmicfs = new Default_Model_VMISupportedContextFormats();
 		$vmicfs->filter->vmiinstanceid->numequals($vmiinstanceid);
