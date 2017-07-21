@@ -12110,6 +12110,14 @@ vappliance.singlevmipolicy .property > .loader, .vappliance .vappliance-version 
 	border-bottom: 1px solid transparent;
 	border-radius: 3px 3px 0px 0px;
 }
+.vappliance .property.popupvalue.popup-top > .header.selected:hover,
+.vappliance .property.popupvalue.popup-top > .header.selected,
+.vappliance .propertypopupvalue.popup-top > .header.selected:hover,
+.vappliance .propertypopupvalue.popup-top > .header.selected {
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid #aaa;
+    border-radius: 0px 0px 3px 3px;
+}
 .vappliance .property.popupvalue > .header,
 .vappliance .propertypopupvalue > .header{
 	padding-right:1px;
@@ -12172,7 +12180,26 @@ vappliance.singlevmipolicy .property > .loader, .vappliance .vappliance-version 
 .vappliance .propertypopupvalue > .header.selected > .popup > .value{
 	display: block;
 }
-
+.vappliance .property.popupvalue.popup-top > .header > .popup > .value,
+.vappliance .propertypopupvalue.popup-top > .header > .popup > .value {
+        margin-top: 0;
+        margin-bottom: -3px;
+        top: auto;
+        bottom: 100%;
+        border-radius: 3px 3px 0px 0px;
+}
+.vappliance .property.popupvalue.popup-top > .header > .popup {
+        margin: -1px -1px 0px -1px;
+}
+.vappliance .property.popupvalue > .header > .popup > .value > span > .emptymessage {
+    padding: 8px 16px;
+    background: none;
+    background-color: #efefef;
+    margin: -7px;
+    text-align: center;
+    font-style: italic;
+    border: 1px solid #dfdfdf;
+}
 .vappliance .property > .helppopup{
 	vertical-align: middle;
 }
@@ -19542,13 +19569,13 @@ body[data-content='software'] *[data-forentity='vappliance'] {
 	height: 20px;
 }
 
-.vappliance .advancedpanel > .advancedtoggler > .togglecontainer > .left,
+/*.vappliance .advancedpanel > .advancedtoggler > .togglecontainer > .left,
 .vappliance .advancedpanel > .advancedtoggler > .togglecontainer > .right{
 	display: none;
 }
 .vappliance .advancedpanel > .advancedtoggler > .togglecontainer > * > hr{
 	display: none;
-}
+}*/
 .vappliance .advancedpanel > .advancedtoggler{ 
 	position: absolute;
 	bottom: 6px;
@@ -19613,7 +19640,7 @@ body[data-content='software'] *[data-forentity='vappliance'] {
 	border-bottom: 0;
 }
 .vappliance .advancedpanel > .advancedtoggler > .togglecontainer > .toggler{ 
-	max-width: 85px;
+	/*max-width: 85px;
 	min-width: 85px;
 	width: 85px;
 	height: 20px;
@@ -19621,8 +19648,21 @@ body[data-content='software'] *[data-forentity='vappliance'] {
 	margin: 0 5px;
 	border: 1px solid transparent;
 	cursor: pointer;
-	border-radius: 0px 0px 0px 4px;
+	border-radius: 0px 0px 0px 4px;*/
+       max-width: 150px;
+       min-width: 150px;
+       width: 150px;
+       height: 20px;
+       text-align: center;
+       margin: 0 5px;
+       border: 1px solid transparent;
+       color: #404040;
+       font-size: 12px;
+       line-height: 22px;
+       background-color: #e2e8ef;
+       border-radius: 3px;
 }
+/*
 .vappliance .advancedpanel.expand > .advancedtoggler > .togglecontainer > .toggler{
 	border-radius: 0px;
 }
@@ -19647,7 +19687,7 @@ body[data-content='software'] *[data-forentity='vappliance'] {
 }
 .vappliance .advancedpanel:hover > .advancedtoggler > .togglecontainer > .toggler:hover{ 
 	border-color: #F2B529;
-}
+}*/
 .vappliance .advancedpanel > .verticalpanel{
 	display: none;
 }
@@ -24163,4 +24203,329 @@ a.helperlink.wikilink:hover{
 
 .latestversion .vaversion-vmiversion .property.vmiversion-version{
 	display: none;
+}
+.fieldvalueset.trafficrules {
+        margin-top: -4px;
+}
+.trafficrules-container {
+        margin: 0 3px;
+}
+.trafficrules-container > .header {
+        display: block;
+        padding: 10px 0;
+        margin: 0 auto;
+        border: none;
+        vertical-align: middle;
+        font-size: 12px;
+        line-height: 12px;
+        color: #444;
+        border-bottom: 1px solid #aaa;
+}
+.trafficrules-component {
+        min-width: 600px;
+        max-width: 600px;
+        width: 600px;
+}
+.vappliance.canedit.editmode .property .trafficrules-component .emptymessage{
+        display: block;
+        height: 50px;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 12px;
+        color: #555;
+        font-style: italic;
+        line-height: 50px;
+        background-color: #fafafa;
+        padding: 3px 0;
+}
+.trafficrules-component .emptymessage.hidden {
+        display: none;
+}
+.trafficrules-component ul.ruleslist,
+.trafficrules-component ul.ruleslist > li > .fielditem.portrange > ul{
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        vertical-align: top;
+}
+.trafficrules-component ul.ruleslist > li > ul,
+.trafficrules-component ul.ruleslist > li > .fielditem,
+.trafficrules-component ul.ruleslist > li > .fielditem.portrange > ul,
+.trafficrules-component ul.ruleslist > li > .fielditem.portrange,
+.trafficrules-component ul.ruleslist > li > .fielditem.portrange > ul > li .portrangeitem > *{
+        display: inline-block;
+        vertical-align: top;
+}
+.trafficrules-component ul.ruleslist > li > .fielditem.portrange > ul > li .portrangeitem {
+        position: relative;
+        padding: 5px;
+        padding-top: 0;
+}
+.trafficrules-component ul.ruleslist > li > .fielditem.actions {
+        padding: 0;
+}
+.trafficrules-component ul.ruleslist > li > .fielditem.actions > .action.btn.btn-compact {
+        line-height: 20px;
+        font-size: 12px;
+        color: white;
+}
+.trafficrules-component ul.ruleslist > li > ul {
+        list-style: none;
+        padding: 0 5px;
+        margin: 0;
+}
+.trafficrules-component ul.ruleslist > li > table {
+        margin: 0px 25px 0px 0px;
+}
+.trafficrules-component ul.ruleslist > li .dijitTextBox,
+.trafficrules-component ul.ruleslist > li .dijitSelect .dijitButtonContents
+{
+        height: 21px;
+        width: 100px;
+}
+.trafficrules-component ul.ruleslist > li .dijitTextBox .dijitInputInner,
+.trafficrules-component ul.ruleslist > li .dijitTextBox .dijitPlaceHolder.dijitInputField,
+.trafficrules-component ul.ruleslist > li .dijitTextBox .dijitInputContainer{
+        line-height: 22px;
+        padding: 0 3px;
+}
+.trafficrules-component ul.ruleslist > li .fielditem.portrange > .header {
+        display: inline-block;
+        line-height: 22px;
+        color: #333;
+}
+.trafficrules-component ul.ruleslist > li .fielditem.portrange > ul {
+        padding-top: 0;
+}
+.trafficrules-component ul.ruleslist > li .fielditem.portrange > ul > li:last-child > .portrangeitem { 
+        padding-bottom: 0;
+}
+.trafficrules-component {
+        border: 1px solid #ddd;
+        border-radius: 0px 0px 3px 3px;
+}
+.trafficrules-component > .footer {
+        background-color: #eee;
+        border-top: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 0px 0px 3px 3px;
+}
+.trafficrules-component > .footer > .warning {
+    color: #481414;
+    position: absolute;
+    display: none;
+}
+.trafficrules-component.invalid > .footer > .warning {
+    display: block;
+}
+.trafficrules-component > .footer > .actions,
+.trafficrules-component > .footer > .actions > .action.add.btn.btn-compact{
+        position: relative;
+        text-align: right;
+        color: white;
+        font-size: 12px;
+        line-height: 14px;
+}
+.trafficrules-component > .footer > .actions > .action.add.btn.btn-compact.disabled {
+        background-color: #ddd;
+        color: #999;
+        border-color: #ccc;
+}
+.trafficrules-component .fielditem.portrange .footer > .actions {
+        padding: 0 10px;
+        padding-bottom: 5px;
+        text-align: right;
+}
+.trafficrules-component .fielditem.portrange .footer > .actions > .action {
+        cursor: pointer;
+}
+.trafficrules-component .fielditem.portrange .footer > .actions > .action:hover {
+        text-decoration: none;
+        color: #073f80;
+}
+.trafficrules-component .fielditem.portrange .footer > .actions > .action > * {
+        display: inline-block;
+}
+.trafficrules-component .fielditem.portrange .footer > .actions > .action > img {
+        width: 12px;
+        height: 12px;
+        margin-right: 5px;
+}
+.trafficrules-component .fielditem.portrange.disabled > .footer{
+        display: none;
+}
+.trafficrules-component .fielditem.portrange.disabled .portrangeitem .action {
+        visibility: hidden;
+}
+.trafficrules-component .fielditem.portrange:not(.disabled) .portrangeitem.isinvalid .dijitTextBox{
+        background: none;
+        background-color: #F9F7BA;
+}
+.trafficrules-component .fielditem.portrange:not(.disabled) .portrangeitem .action.hidden,
+.trafficrules-component .fielditem.portrange:not(.disabled) .portrangeitem .action{
+        display: inline-block !important;
+        visibility: hidden;
+}
+.trafficrules-component .fielditem.portrange:not(.disabled) li:hover > .portrangeitem .action:not(.hidden) {
+        display: inline-block !important;
+        visibility: visible;
+        color: white;
+}
+.trafficrules-component .fielditem.portrange > .footer .action.add {
+        margin-right: 20px;
+}
+.trafficrules-component ul.ruleslist > li:nth-child(odd) {
+        background: #f5f5f5;
+}
+.trafficrules-component ul.ruleslist > li:nth-child(even) {
+        background: #fff;
+}
+.trafficrules-component ul.ruleslist > li {
+        border: 1px solid #aaa;
+        border-right-color: transparent;
+        border-left-color: transparent;
+        border-top: none;
+        padding: 3px;
+        min-height: 50px;
+}
+.trafficrules-component .fielditem.portrange .portrangeitem .validationmessage.tooltip{
+        display: none;
+        position: absolute;
+        bottom: 100%;
+        left: 0px;
+        border: 1px solid #DB5B00;
+        color: #fcfcfc;
+        border-radius: 3px;
+        padding: 3px;
+        padding-bottom: 5px;
+        z-index: 99999999;
+        background: rgb(216,93,10);
+        background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJod…EiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+        background: -moz-linear-gradient(top, rgba(216,93,10,1) 0%, rgba(216,140,88,1) 47%, rgba(219,91,0,1) 100%);
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(216,93,10,1)), color-stop(47%,rgba(216,140,88,1)), color-stop(100%,rgba(219,91,0,1)));
+        background: -webkit-linear-gradient(top, rgba(216,93,10,1) 0%,rgba(216,140,88,1) 47%,rgba(219,91,0,1) 100%);
+        background: -o-linear-gradient(top, rgba(216,93,10,1) 0%,rgba(216,140,88,1) 47%,rgba(219,91,0,1) 100%);
+        background: -ms-linear-gradient(top, rgba(216,93,10,1) 0%,rgba(216,140,88,1) 47%,rgba(219,91,0,1) 100%);
+        background: linear-gradient(to bottom, rgba(216,93,10,1) 0%,rgba(216,140,88,1) 47%,rgba(219,91,0,1) 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d85d0a', endColorstr='#db5b00',GradientType=0 );
+        width: auto;
+        min-width: 130px;
+        max-width: 350px;
+        margin-bottom: 7px;
+}
+.trafficrules-component .fielditem.portrange .portrangeitem.focused .validationmessage.tooltip {
+        display: block;
+}
+.trafficrules-component .fielditem.portrange .portrangeitem .validationmessage.tooltip > .arrow {
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-top: 10px solid #DB5B00;
+        top: 100%;
+        position: absolute;
+}
+
+.trafficrules-component .fielditem.portrange .portrangeitem .validationmessage.tooltip > img {
+        width: 16px;
+        height: 16px;
+}
+
+.trafficrules-component .fielditem.portrange .portrangeitem .validationmessage > .validationerrormessage {
+        display: inline;
+        padding: 0px;
+        padding-left: 5px;
+        vertical-align: middle;
+        color: #fafafa;
+        font-size: 12px;
+        font-family: Arial;
+}
+.trafficrules.viewer {
+        width: 200px;
+        padding: 0px;
+        margin: -8px;
+}
+.trafficrules.viewer table{
+        width: 100%;
+        margin: 0 auto;
+        table-layout: fixed;
+        border-collapse: collapse;
+        border: 1px solid #999;
+}
+.trafficrules.viewer table th {
+        padding: 5px;
+        vertical-align: bottom;
+        font-weight: normal;
+        background-color: #ccdbe8;
+        text-align: center;
+}
+.trafficrules.viewer table th.title {
+        text-align: center;
+        background-color: #7f9cbd;
+        color: white;
+        padding: 10px;
+        font-size: 14px;
+}
+.trafficrules.viewer table th.portranges {
+        padding: 0;
+        padding-left: 8px;
+}
+.trafficrules.viewer table > tbody > tr > td.protocol {
+        border-right: 1px solid #ccc;
+}
+.trafficrules.viewer table > tbody > tr.odd{
+        background-color: #f0f0f0;
+}
+.trafficrules.viewer table > tbody > tr > td {
+        text-align: center;
+}
+.trafficrules.viewer table > tbody > tr.even > td,
+.trafficrules.viewer table > tbody > tr.odd > td{
+        padding: 3px;
+        border-top: 1px solid #999;
+}
+.trafficrules.viewer table > tbody > tr.even > td:not(.first),
+.trafficrules.viewer table > tbody > tr.odd  > td:not(.first){
+        border-top: 1px solid #ccc;
+}
+.trafficrules.viewer > .table-container,
+.trafficrules.viewer > .table-container > .table-container-body,
+.trafficrules.viewer > .table-container > .table-container-header{
+        margin: 0;
+        padding: 0;
+        width: 100%;
+}
+.trafficrules.viewer > .table-container > .table-container-body {
+        overflow-y: auto;
+        max-height: 300px;
+}
+.trafficrules.viewer > .table-container > .table-container-body > table > thead {
+        display: none;
+}
+
+.trafficrules.viewer > .emptymessage {
+        padding: 10px;
+        font-style: italic;
+        color: #444;
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        margin: -7px;
+        text-align: center;
+}
+.property.viewondetails.hideonedit.group.trafficrules > .header {
+        line-height: 26px;
+        vertical-align: middle;
+}
+.vappliance .property.group.trafficrules .property.popupvalue > .header.selected > .popup > .field {
+        z-index: 1066;
+}
+.vappliance .property.group.trafficrules .property.popupvalue > .header.selected > .popup > .value{
+        z-index: 1060;
+}
+.property.viewondetails.hideonedit.group.trafficrules > .value > * {
+        display: inline-block;
+        margin-right: 5px;
+        width: auto;
+        min-width: auto;
 }

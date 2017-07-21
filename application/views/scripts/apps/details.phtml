@@ -763,6 +763,19 @@
 									</div>
 								</div>
 							</div>
+                                                        <div class="property viewondetails hideonedit group trafficrules">
+								<div class="header"><div class="title">Traffic rules:</div></div>
+								<div class="value">
+                                                                         <div class="property vmiversion-trafficrules-inbound fieldnamevalue small compact popupvalue popup-top hideonedit" data-path="network_traffic" data-direction='inbound' data-title='Incoming traffic rules' data-name="trafficrulesinboundview"  data-editable="false" data-type="trafficrules">
+                                                                                <div class="header">Incoming:</div>
+                                                                                <div class="value" ></div>
+                                                                        </div>
+									<div class="property vmiversion-trafficrules-outbound fieldnamevalue small compact popupvalue popup-top hideonedit" data-path="network_traffic" data-direction='outbound' data-title='Outgoing traffic rules' data-name="trafficrulesoutboundview"  data-editable="false" data-type="trafficrules">
+                                                                                <div class="header">Outgoing:</div>
+                                                                                <div class="value" ></div>
+                                                                        </div>
+								</div>
+							</div>
 							<div class="property vmiversion-ovfurl fieldnamevalue compact viewondetails hidden" data-path="ovf.url" data-name='ovfurl' data-type="genericurl" data-editable="true" data-validator="url">
 								<div class="header">OVF File Url:</div>
 								<div class="value"></div>
@@ -836,7 +849,7 @@
 							<div class="togglecontainer">
 								<div class="left" ><hr/></div>
 								<?php if( Supports::singleVMIPolicy() ) { ?>
-								<div class="toggler icontext">Optional</div>
+								<div class="toggler icontext">Optional Information</div>
 								<?php } else { ?>
 								<div class="toggler icontext">Advanced ▼</div>
 								<?php } ?>
@@ -858,6 +871,17 @@
 								<div class="header">Comments:</div>
 								<div class="value" ></div>
 							</div>
+                                                    <div class="fieldvalueset trafficrules">
+                                                        <div class="header">Requested traffic rules</div>
+                                                        <div class="contents">
+                                                            <div class="trafficrules-container">
+                                                                <div class="header">Please provide the network traffic rules that the VM instance might require in order to function properly.</div>
+                                                                <div class="trafficrules-component">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 						</div>
 						<div class="verticalpanel osinfo extended">
                                                     <div class="fieldvalueset cores-valueset">

@@ -4088,6 +4088,12 @@ appdb.entity.VirtualApplianceAccelerators = appdb.EntityTypes.define("virtualapp
 	{name: "minimum", canRef:true},
 	{name: "recommended", canRef:true}
 ], {displayName:"accelerators"});
+appdb.entity.VirtualApplianceTrafficRules = appdb.EntityTypes.define("virtualappliancetrafficrules",[
+	{name:"direction", canRef: true},
+	{name: "protocols", canRef:true},
+	{name: "ip_range", canRef:true},
+	{name: "port_range", canRef:true}
+], {displayName:"network_traffic"});
 appdb.entity.VirtualApplianceOvf = appdb.EntityTypes.define("virtualapplianceovf",[
 	{name:"id", canRef: true},
 	{name: "url", canRef:true}
@@ -4125,6 +4131,7 @@ appdb.entity.VirtualApplianceImageInstance = appdb.EntityTypes.define("virtualap
 	{name:"ram", ref:"virtualapplianceram", canRef:true},
 	{name:"cores", ref:"virtualappliancecores", canRef:true},
 	{name:"accelerators", ref: "virtualapplianceaccelerators", canRef:true, isNullable: true},
+	{name:"network_traffic", ref: "virtualappliancetrafficrules", canRef:true, isList:true, isNullable: true},
 	{name:"ovf", ref:"virtualapplianceovf", canRef:true},
 	{name:"contextscript", ref:"virtualappliancecontextscript", canRef: true}	
 ], {displayName: "instance"});
@@ -4394,6 +4401,11 @@ appdb.utils.EntitySerializer = (function(defaultApiVersion){
 				namespace: "http://appdb.egi.eu/api/{:version}/virtualization",
 				uses: ["xsi"],
 				attributes: ["type","minimum", "recommended"]
+			},
+			"virtualappliancetrafficrules": {
+				namespace: "http://appdb.egi.eu/api/{:version}/virtualization",
+				uses: ["xsi"],
+				attributes: ["direction", "protocols", "ip_range", "port_range"]
 			},
 			"virtualapplianceovf":{
 				namespace: "http://appdb.egi.eu/api/{:version}/virtualization",
