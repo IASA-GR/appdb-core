@@ -6223,25 +6223,30 @@ class RestAppVAVersionItem extends RestAppVAItem {
 			return false;
 		}
 	}
-	private function deleteVALists($item){
+
+	private function deleteVALists($item) {
 		$inst = $item->getVMIInstance();
 		$this->deleteVMIInstance($inst);
 		$item->delete();
 	}
-	private function deleteVMIInstance($item){
-                $this->deleteContextFormats($item->id);
-                $this->deleteContextScripts($item->id);
 
-                $instances = new Default_Model_VMIInstances();
+	private function deleteVMIInstance($item) {
+		$this->deleteContextFormats($item->id);
+		$this->deleteContextScripts($item->id);
+
+		// also delete the VMI instance's flavor, if not in use by other instances (flavors are shared)
+		$instances = new Default_Model_VMIInstances();
 		$instances->filter->vmiflavourid->equals($item->vmiflavourid)->and($instances->filter->id->notequals($item->id));
-		if( count($instances->items) === 0 ){
+		if( count($instances->items) === 0 ) {
 			$this->deleteFlavour($item->getFlavour(),$item);
 		}
 
+		$item->deleteNetworkTraffic();
 		$item->delete();
 		
 	}
-	private function deleteContextFormats($vmiinstanceid){
+
+	private function deleteContextFormats($vmiinstanceid) {
 		$scriptids = array();
 		$vmicfs = new Default_Model_VMISupportedContextFormats();
 		$vmicfs->filter->vmiinstanceid->numequals($vmiinstanceid);
