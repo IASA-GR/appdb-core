@@ -4428,9 +4428,9 @@ class RestAppVAXMLParser extends RestXMLParser {
 				}
 				// if this is an update (we have a VMI instance id),save network traffic now, or else defer it for after saving the VMI instance
 				if( !is_numeric($m->id) || intval($m->id) <=0 ){ /*new instance*/
-					$mnt->save();
+                                    $deferredNetTraf[] = $mnt;
 				} else {
-					$deferredNetTraf[] = $mnt;
+                                    $mnt->save();
 				}
 			}
 		}
