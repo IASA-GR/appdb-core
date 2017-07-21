@@ -23,17 +23,18 @@ Author: wvkarag@lovecraft.priv.iasa.gr
 
 START TRANSACTION;
 
-CREATE FUNCTION trfn_egiaai_vo_members_set_last_updated() 
+CREATE OR REPLACE FUNCTION trfn_egiaai_vo_members_set_last_updated() 
 RETURNS TRIGGER
 AS
 $$
 BEGIN
-	NEW.last_updated = NOW();
+	NEW.last_update = NOW();
 	RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 ALTER FUNCTION trfn_egiaai_vo_members_set_last_updated() OWNER TO appdb;
 
+DROP TRIGGER IF EXISTS rtr_egiaai_vo_members_10_set_last_updated ON egiaai.vo_members;
 CREATE TRIGGER rtr_egiaai_vo_members_10_set_last_updated
 BEFORE INSERT ON egiaai.vo_members
 FOR EACH ROW
