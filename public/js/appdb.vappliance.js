@@ -8641,7 +8641,7 @@ appdb.vappliance.ui.views.PortRangeListItem = appdb.ExtendClass(appdb.View, "app
 				return function(v){
 					self.onValueChange();
 				};
-			})(this),
+			})(this)
 		}, $(dom).find('.from')[0]);
 		this.options.editor.to = new dijit.form.ValidationTextBox({
 			value: this.options.data.to,
@@ -8672,7 +8672,7 @@ appdb.vappliance.ui.views.PortRangeListItem = appdb.ExtendClass(appdb.View, "app
 				return function(v){
 					self.onValueChange();
 				};
-			})(this),
+			})(this)
 		}, $(dom).find('.to')[0]);
 
 		$(dom).find('.action.remove').unbind('click').bind('click', function(ev) {
@@ -9045,7 +9045,7 @@ appdb.vappliance.ui.views.VMITrafficRulesEditor = appdb.ExtendClass(appdb.View, 
 		dom: {
 			emptyMessage: $('<div class="emptymessage">No network traffic rules defined.</div>'),
 			list: $('<ul class="ruleslist"></ul>'),
-			footer: $('<div class="footer"><div class="warning icontext"><img src="/images/vappliance/warning.png" /><span>Some of the provided rules are invalid.</span></div><div class="actions inline-block"><a class="action add btn btn-primary btn-compact">add new rule</a></div></div>'),
+			footer: $('<div class="footer"><div class="warning icontext"><img src="/images/vappliance/warning.png" /><span>Some of the provided rules are invalid.</span></div><div class="actions inline-block"><a class="action add btn btn-primary btn-compact">add new rule</a></div></div>')
 		}
 	};
 	this.harvestData = function() {
