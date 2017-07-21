@@ -4687,7 +4687,7 @@ appdb.vappliance.ui.views.DataValueHandlerTrafficrules = appdb.ExtendClass(appdb
 	this.getPortRange = function(d) {
 		var ds = d.split(':');
 		var res = {
-			from: (ds.length > 0) ? ds[0] : '',
+			from: (ds.length > 0) ? ds[0] : ''
 		};
 
 		res.from = res.from || '';
