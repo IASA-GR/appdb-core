@@ -8564,7 +8564,7 @@ appdb.vappliance.ui.views.PortRangeListItem = appdb.ExtendClass(appdb.View, "app
 		var rangeERRmSG = 'Second port value must be equal or less than first port value';
 
 		if (!from && !to) {
-		    return true;//'No ports given';
+		    return typeErrMsg;//'No ports given';
 		}
 
 		if ((from && !intTest.test(from)) || (to && !intTest.test(to))) {
@@ -8584,6 +8584,10 @@ appdb.vappliance.ui.views.PortRangeListItem = appdb.ExtendClass(appdb.View, "app
 
 		if ((from && fromNum <=0) || (to && toNum <= 0)) {
 		    return typeErrMsg;
+		}
+
+		if (this.parent.portRangeExists(this)) {
+		    return 'Port range is already defined for this rule';
 		}
 
 		return true;
@@ -8722,20 +8726,34 @@ appdb.vappliance.ui.views.PortRangeList = appdb.ExtendClass(appdb.View, "appdb.v
 	};
 
 	this.getData = function() {
-	   var ranges = [];
+	    var ranges = [];
 
-	   $.each(this.options.items, function(i, v) {
-	       var d = v.getData();
-	       if (d) {
-		    ranges.push(v.getData());
-	       }
-	   });
+	    $.each(this.options.items, function(i, v) {
+		    var d = v.getData();
+		    if (d) {
+			    ranges.push(v.getData());
+		    }
+	    });
 
-	   return ranges.join(';');
+	    if (ranges.length === 0) {
+		    return '';
+	    }
+
+	    return ranges.join(';');
 	};
 
 	this.validate = function() {
 	    this.options.isValid = this.isValid();
+	};
+
+	this.portRangeExists = function(item) {
+	    var exists = false;
+
+	    $.each(this.options.items, function(i, v) {
+		exists = ((exists === false && v !== item && v.getData() === item.getData()) ? true : false);
+	    });
+
+	    return exists;
 	};
 
 	this.isValid = function() {
@@ -8762,6 +8780,8 @@ appdb.vappliance.ui.views.PortRangeList = appdb.ExtendClass(appdb.View, "appdb.v
 			v.canRemove(true);
 		});
 	    }
+
+	    $(this.dom).toggleClass('invalid', !this.options.isValid);
 	};
 
 	this.onValueChange = function() {
@@ -8787,7 +8807,7 @@ appdb.vappliance.ui.views.PortRangeList = appdb.ExtendClass(appdb.View, "appdb.v
 		item.render();
 
 		this.options.items.push(item);
-		this.refreshUI();
+		this.onValueChange();
 		return li;
 	};
 
@@ -8803,7 +8823,7 @@ appdb.vappliance.ui.views.PortRangeList = appdb.ExtendClass(appdb.View, "appdb.v
 	       $(this.options.items[foundIndex].dom).remove();
 	       this.options.items[foundIndex] = null;
 	       this.options.items.splice(foundIndex, 1);
-	       this.refreshUI();
+	       this.onValueChange();
 	   }
 	};
 
@@ -8817,7 +8837,9 @@ appdb.vappliance.ui.views.PortRangeList = appdb.ExtendClass(appdb.View, "appdb.v
 		$(addNew).unbind('click').bind('click', function(ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
-			this.addItem();
+			if ($(this.dom).hasClass('invalid') === false) {
+				this.addItem();
+			}
 			return false;
 		}.bind(this));
 	};
@@ -8889,7 +8911,7 @@ appdb.vappliance.ui.views.VMITrafficRulesItem = appdb.ExtendClass(appdb.vapplian
 
 	this.getData = function(){
 		var d =  {
-			direction: this.options.editor.direction.get('value'),//this.options.data.direction,
+			direction: this.options.editor.direction.get('value'),
 			protocols: this.options.editor.protocols.get('value'),
 			ip_range: '0.0.0.0/0',
 			port_range: this.options.editor.portranges.getData()
@@ -8897,7 +8919,10 @@ appdb.vappliance.ui.views.VMITrafficRulesItem = appdb.ExtendClass(appdb.vapplian
 
 		if (d.protocols === 'ICMP') {
 		    d.port_range = '';
+		} else if ($.trim(d.port_range) === '') {
+		    d = {};
 		}
+
 		return d;
 	};
 	this.initActions = function(){
@@ -9051,7 +9076,10 @@ appdb.vappliance.ui.views.VMITrafficRulesEditor = appdb.ExtendClass(appdb.View, 
 	this.harvestData = function() {
 		var data = [];
 		$.each(this.options.items, function(i, v) {
-			data.push(v.getData());
+			var d = v.getData();
+			if (!!d.protocols) {
+				data.push(d);
+			}
 		});
 
 		this.options.data = data;

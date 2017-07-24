@@ -24256,6 +24256,14 @@ a.helperlink.wikilink:hover{
         display: inline-block;
         vertical-align: top;
 }
+.trafficrules-component ul.ruleslist > li > .fielditem.portrange > .footer > .actions > .action.add {
+    outline: none;
+}
+.trafficrules-component ul.ruleslist > li > .fielditem.portrange.invalid > .footer > .actions > .action.add {
+    color: #888;
+    font-style: italic;
+    cursor: default;
+}
 .trafficrules-component ul.ruleslist > li > .fielditem.portrange > ul > li .portrangeitem {
         position: relative;
         padding: 5px;
