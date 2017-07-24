@@ -3250,7 +3250,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	CONST VA_TITLE_MAX_SIZE = 1000;
         CONST VA_VMI_ACCELERATORS_MIN_SIZE = 0;
         CONST VA_VMI_ACCELERATORS_MAX_SIZE = 32;
-	
+
 	private $vappid = -1;
 	private $vappversionid = -1;
 	private $appid = -1;
@@ -3283,6 +3283,34 @@ class RestAppVAXMLParser extends RestXMLParser {
 			return ( $l >= RestAppVAXMLParser::VA_VMI_ACCELERATORS_MIN_SIZE && $l <= RestAppVAXMLParser::VA_VMI_ACCELERATORS_MAX_SIZE );
 		}
 		return false;
+        }
+        private function normalizePortRanges($port_ranges) {
+            $ranges = explode(';', trim($port_ranges));
+            $res = array();
+            foreach($ranges as $range) {
+                $r = explode(':', $range);
+                if (count($r) === 1) {
+                    $from = intval($r[0]);
+                    $to = intval($r[0]);
+                } else if (count($r) === 2) {
+                    $from = intval($r[0]);
+                    $to = intval($r[1]);
+                } else {
+                    return "Invalid port range format given for VMI network traffic rule";
+                }
+
+                if ($from <=0 || $to <=0 || $from  > 65535 || $to > 65535) {
+                    return "Port range of a VMI network traffice rule must be a number between 1 and 65535";
+                }
+
+                if ($from > $to) {
+                    return "Invalid port range values given for VMI network traffic rule. Starting port must be less or equal to ending port.";
+                }
+
+                $res[] = trim('' . $from . ':' . $to);
+            }
+
+            return $res;
         }
 	private function isUsedVaVersion($appid, $d="") {
 		$usedversions = VApplianceVersionState::getVapplianceUsedVersions($appid);
@@ -4422,10 +4450,33 @@ class RestAppVAXMLParser extends RestXMLParser {
 				}
 				if (strlen(trim(strval($nt->attributes()->ip_range))) > 0) {
 					$mnt->ipRange = trim(strval($nt->attributes()->ip_range));
-				}
-				if (strlen(trim(strval($nt->attributes()->port_range))) > 0) {
-					$mnt->ports = trim(strval($nt->attributes()->port_range));
-				}
+				} else {
+                                        //Set default IP range if none given
+                                        $mnt->ipRange = "0.0.0.0/0";
+                                }
+                                //If protocol is not ICMP check for port ranges
+                                if (strtoupper(trim(implode('', $mnt->netProtocols))) !== 'ICMP') {
+                                        $normalizedPortRanges = array();
+                                        if (strlen(trim(strval($nt->attributes()->port_range))) > 0) {
+                                                //Validate and normalize port ranges
+                                                $normalizedPortRanges = $this->normalizePortRanges(trim(strval($nt->attributes()->port_range)));
+                                        }
+                                        //If validation did not return an array of normalized port ranges
+                                        //it means an error occured.
+                                        if (is_string($normalizedPortRanges)) {
+                                                return $this->_setErrorMessage($mnt->ports);
+                                        } else if (is_array($normalizedPortRanges)) {
+                                                //Check if any valid port range is given
+                                                if (count($normalizedPortRanges) === 0) {
+                                                   return $this->_setErrorMessage('Port ranges must be provided for ' . implode(' ', $mnt->netProtocols) . ' in VMI network traffic rule');
+                                                }
+                                                //Port ranges are valid
+                                                $mnt->ports = implode(';', $normalizedPortRanges);
+                                        } else {
+                                                //Unhandled validation error
+                                                return $this->_setErrorMessage('Invalid port ranges given for VMI network traffic rule');
+                                        }
+                                }
 				// if this is an update (we have a VMI instance id),save network traffic now, or else defer it for after saving the VMI instance
 				if( !is_numeric($m->id) || intval($m->id) <=0 ){ /*new instance*/
                                     $deferredNetTraf[] = $mnt;
