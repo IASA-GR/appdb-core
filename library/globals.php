@@ -76,7 +76,22 @@ if ($php_major <= 5) {
 
 
 function decodeUTF8($str) {
-	return `echo $'$str' | recode utf8..utf8`;
+	$s = "";
+	for ($i = 0; $i < strlen($a); $i = $i + 1) {
+		if ((substr($a, $i, 2) == '\x') && (substr($a, $i + 4, 2) == '\x')) {
+			$s = $s . hex2bin(substr($a, $i + 2, 2) . substr($a, $i + 6, 2));
+			$i = $i + 7;
+		} elseif (substr($a, $i, 2) == '\x') {
+			$s = $s . hex2bin(substr($a, $i + 2, 2));
+			$i = $i + 3;
+		} else {
+			$s = $s . substr($a, $i, 1);
+		}
+	}
+	return $s;
+	// 	Alternatively, the following line uses the recode tool in a subshell to do the same thing
+	// 	Unfortunatelly the PHP binding (recode_string) does not seem to recognize \x encoded data
+//	return `echo $'$str' | recode utf8..utf8`;
 }
 
 function web_get_contents($url) {
@@ -6509,17 +6524,23 @@ class VApplianceService{
 	private $state = null;
 	private $version = null;
 	private $latestversion = null;
+	private $userid;
 	/*
 	 * Needs VApplianceVersionState object to check which action to take
 	 */
-	function __construct(VApplianceVersionState $state) {
+	function __construct(VApplianceVersionState $state, $userid) {
 		$this->state = $state;
+		if (! is_numeric($userid)) {
+			error_log("[VApplianceService::__construct] userid is invalid (or missing)");
+		}
+		$this->userid = $userid;
 	}
 	
 	public function publish(){
 		$version = $this->getVAVersion();
 		$version->status = "verified";
 		$version->createdon = "now()";
+		$version->publishedbyID = $this->userid;
 		$version->save();
 		$result = $this->archiveLatestVersion();
 		$va = $version->getVa();
@@ -6539,6 +6560,7 @@ class VApplianceService{
 		$version->published = false;
 		if($version->status === "verifypublish" ){ //if request was made for publishing
 			$version->status = "verifingpublish";
+			$version->publishedByID = $this->userid;
 		}else{
 			$version->status = "verifing";
 		}
@@ -6550,6 +6572,7 @@ class VApplianceService{
 		$version->published = false;
 		$version->status = "init";
 		$version->save();
+		db()->exec("UPDATE vapp_versions SET publishedby = NULL WHERE id = " . $version->id);
 		VMCaster::cancelIntegrityCheck($version->id);
 		return true;
 	}
@@ -6565,12 +6588,14 @@ class VApplianceService{
 	public function disable(){
 		$version = $this->getVAVersion();
 		$version->enabled = false;
+		$version->enabledbyID = $this->userid;
 		$version->save();
 		return true;
 	}
 	public function enable(){
 		$version = $this->getVAVersion();
 		$version->enabled = true;
+		$version->enabledbyID = $this->userid;
 		$version->save();
 		return true;
 	}
@@ -7762,7 +7787,7 @@ class SamlAuth{
 		}
 	}
 	
-	//Clears any transaction variables before authedication setup
+	//Clears any transaction variables before authentication setup
 	//called from SamlAuth::setupSamlSession
 	public static function clearSession($session){
 		unset($session->isNewUser);
@@ -8299,10 +8324,10 @@ class SamlAuth{
 		return $entitlements;
 	}
 	
-	//Performs actions after successful SAML Authedication
+	//Performs actions after successful SAML Authentication
 	//Decides if the authedicated user is a new or an old
 	//user and fills the session accordingly.
-	//Returns the url before authedication initialization.
+	//Returns the url before authentication initialization.
 	public static function setupSamlAuth($session){
 		$attrs = $session->samlattrs;
 		$source = strtolower(trim($session->samlauthsource));

@@ -55,6 +55,7 @@ app.pngfont='wine-tahoma'
 app.timezone='UTC';
 app.argo_api_key='';
 app.argo_api_endpoint='';
+app.va_sync_scopes='CommaSepareted,StringOf,Scopes"
 
 [staging : production]
 

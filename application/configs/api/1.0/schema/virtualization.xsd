@@ -65,13 +65,44 @@
 		</xs:restriction>
 	</xs:simpleType>
 
+	<xs:simpleType name="acceltypeType">
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="GPU" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="netproctypeType">
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="TCP" />
+			<xs:enumeration value="UDP" />
+			<xs:enumeration value="ICMP" />
+			<xs:enumeration value="IPSec" />
+			<xs:enumeration value="any" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="directiontypeType">
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="inbound" />
+			<xs:enumeration value="outbound" />
+			<xs:enumeration value="both" />
+		</xs:restriction>
+	</xs:simpleType>
+
 	<xs:complexType name="checksumType" mixed="true">
-		<xs:attribute name="hash" type="virtualization:hashType" />		
+		<xs:attribute name="hash" type="virtualization:hashType" />
+		<xs:attribute name="hashtype" type="virtualization:hashType" />
 	</xs:complexType>
 
 	<xs:complexType name="minmaxType" mixed="false" >
 		<xs:attribute name="minimum" type="xs:string" use="required"/>
 		<xs:attribute name="recommended" type="xs:string" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="accelType" mixed="false" >
+		<xs:attribute name="minimum" type="xs:string" use="required"/>
+		<xs:attribute name="recommended" type="xs:string" use="required" />
+		<xs:attribute name="type" type="virtualization:acceltypeType" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="urlType" mixed="true">
@@ -81,6 +112,47 @@
 	<xs:complexType name="ovfType" mixed="true">
 		<xs:attribute name="protected" type="xs:boolean" use="optional" />
 		<xs:attribute name="url" type="xs:string" use="optional" />
+	</xs:complexType>
+
+	<xs:simpleType name="directionType">
+		<xs:list itemType="virtualization:directiontypeType"/>
+	</xs:simpleType>
+	
+	<xs:simpleType name="netprocType">
+		<xs:list itemType="virtualization:netproctypeType"/>
+	</xs:simpleType>
+	
+	<xs:complexType name="nettrafficType" mixed="false">
+		<xs:attribute name="direction" type="virtualization:directionType" use="required" />
+		<xs:attribute name="protocols" type="virtualization:netprocType" use="optional" />
+		<xs:attribute name="ip_range" type="xs:string" use="optional" />
+		<xs:attribute name="port_range" type="xs:string" use="optional" />
+	</xs:complexType>
+
+	<xs:complexType name="formatType" mixed="false">
+		<xs:attribute name="id" type="xs:integer" use="required"/>
+		<xs:attribute name="name" type="xs:string" use="optional"/>
+	</xs:complexType>
+
+	<xs:complexType name="contextformatType" mixed="true">
+		<xs:attribute name="id" type="xs:integer" use="required"/>
+		<xs:attribute name="name" type="xs:string" use="optional"/>
+		<xs:attribute name="supported" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="contextscriptType" mixed="false">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="url" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="title" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="format" type="virtualization:formatType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="checksum" type="virtualization:checksumType" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="size" type="xs:integer" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="addedby" type="person:personType" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:integer" use="required" />
+		<xs:attribute name="addedon" type="xs:dateTime" use="optional" />
+		<xs:attribute name="relationid" type="xs:integer" use="required" />
 	</xs:complexType>
 	
 	<xs:complexType name="imageInstanceType" mixed="true">
@@ -95,19 +167,27 @@
 			<xs:element name="url" type="virtualization:urlType" minOccurs="1" maxOccurs="unbounded"/>
 			<xs:element name="checksum" type="virtualization:checksumType" minOccurs="1" maxOccurs="unbounded"/>
 			<xs:element name="cores" type="virtualization:minmaxType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="network_traffic" type="virtualization:nettrafficType" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+			<xs:element name="accelerators" type="virtualization:accelType" minOccurs="0" maxOccurs="1" nillable="true"/>
 			<xs:element name="ram" type="virtualization:minmaxType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="ovf" type="virtualization:ovfType" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="title" type="xs:string" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="notes" type="xs:string" minOccurs="0" maxOccurs="1" />
 			<xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="addedon" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="addedby" type="person:personType" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="ovf" type="virtualization:ovfType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="lastupdatedon" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="lastupdatedby" type="person:personType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="contextformat" type="virtualization:contextformatType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="contextscript" type="virtualization:contextscriptType" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:integer" use="required" />
 		<xs:attribute name="flavourid" type="xs:integer" use="required" />
 		<xs:attribute name="version" type="xs:string" use="required" />
 		<xs:attribute name="integrity" type="xs:boolean" use="required" />
 		<xs:attribute name="enabled" type="xs:boolean" use="required" />
+		<xs:attribute name="isprivate" type="xs:boolean" use="required" />
+		<xs:attribute name="protected" type="xs:boolean" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="personrefType" mixed="true" >
@@ -132,6 +212,8 @@
 
 	<xs:complexType name="applianceInstanceType" mixed="true">
 		<xs:sequence>
+			<xs:element name="publishedby" type="person:personType" minOccurs="0" maxOccurs="1" />
+			<xs:element name="enabledby" type="person:personType" minOccurs="0" maxOccurs="1" />
 			<xs:element name="identifier" type="xs:string" />
 			<xs:element name="notes" type="xs:string" minOccurs="0" maxOccurs="1" />
 			<xs:element name="image" type="virtualization:imageType" minOccurs="0" maxOccurs="unbounded" />
@@ -139,11 +221,14 @@
 		<xs:attribute name="id" type="xs:integer" use="required" />
 		<xs:attribute name="version" type="xs:string" use="required" />
 		<xs:attribute name="published" type="xs:boolean" use="required" />
+		<xs:attribute name="publishedon" type="xs:dateTime" use="required" />
 		<xs:attribute name="createdon" type="xs:dateTime" use="required" />
 		<xs:attribute name="enabled" type="xs:boolean" use="required" />
+		<xs:attribute name="enabledon" type="xs:dateTime" use="required" />
 		<xs:attribute name="archived" type="xs:boolean" use="required" />
 		<xs:attribute name="archivedon" type="xs:dateTime" use="optional" />
 		<xs:attribute name="status" type="xs:string" use="required" />
+		<xs:attribute name="expireson" type="xs:dateTime" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="applianceType" mixed="true">

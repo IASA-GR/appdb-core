@@ -71,6 +71,9 @@ class Default_Model_VMIinstancesMapperBase
 		if ( ! isnull($value->getIntegrityMessage()) ) $data['integrity_message'] = $value->getIntegrityMessage();
 		if ( ! isnull($value->getRAMrecommend()) ) $data['ramrecommend'] = $value->getRAMrecommend();
 		if ( ! isnull($value->getCoreRecommend()) ) $data['corerecommend'] = $value->getCoreRecommend();
+		if ( ! isnull($value->getAccelRecommend()) ) $data['rec_acc'] = $value->getAccelRecommend();
+		if ( ! isnull($value->getAccelMinimum()) ) $data['min_acc'] = $value->getAccelMinimum();
+		if ( ! isnull($value->getAccelType()) ) $data['rec_acc_type'] = $value->getAccelType();
 		if ( ! isnull($value->getAccessinfo()) ) $data['accessinfo'] = $value->getAccessinfo();
 		if ( ! isnull($value->getEnabled()) ) $data['enabled'] = $this->pgBool($value->getEnabled());
 		if ( ! isnull($value->getInitialsize()) ) $data['initialsize'] = $value->getInitialsize();
@@ -121,6 +124,9 @@ class Default_Model_VMIinstancesMapperBase
 		$entry->setIntegrityMessage($row->integrity_message);
 		$entry->setRAMrecommend($row->ramrecommend);
 		$entry->setCoreRecommend($row->corerecommend);
+		$entry->setAccelRecommend($row->rec_acc);
+		$entry->setAccelType($row->rec_acc_type);
+		$entry->setAccelMinimum($row->min_acc);
 		$entry->setAccessinfo($row->accessinfo);
 		$entry->setEnabled($row->enabled);
 		$entry->setInitialsize($row->initialsize);

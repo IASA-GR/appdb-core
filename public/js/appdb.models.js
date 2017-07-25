@@ -1240,7 +1240,43 @@ appdb.model.StaticList = {
 	ExchangeFormats: [],
 	ConnectionTypes: [],
 	SiteList: [],
-	DatasetList: []
+	DatasetList: [],
+	VMNetworkProtocols: [
+	    //'ALL',
+	    'TCP',
+	    'UDP',
+	    'ICMP'//,
+	    //'IPSEC'
+	],
+	VMAcceleratorTypes: [
+	    {id: -1, val: function() { return 'None';}},
+	    {id: 'GPU', val: function() {return 'GPU';}}
+	],
+	VMAcceleratorAmounts: ['0', '1', '2', '4', '8', '16', '32'],
+	VMCores: [
+	    {id: '0', val: function() {return 'None';}},
+	    '1', '2', '4', '8', '16', '32'
+	],
+	VMRams: [
+	    {id: '0', val: function() { return 'None'; }},
+	    {id: '67108864',  val: function() { return '64 MB'; }},
+	    {id: '134217728', val: function() { return '128 MB'; }},
+	    {id: '268435456', val: function() { return '256 MB'; }},
+	    {id: '536870912', val: function() { return '512 MB'; }},
+	    {id: '1073741824', val: function() { return '1 GB'; }},
+	    {id: '2147483648', val: function() { return '2 GB'; }},
+	    {id: '3221225472', val: function() { return '3 GB'; }},
+	    {id: '4294967296', val: function() { return '4 GB'; }},
+	    {id: '5368709120', val: function() { return '5 GB'; }},
+	    {id: '6442450944', val: function() { return '6 GB'; }},
+	    {id: '8589934592', val: function() { return '8 GB'; }},
+	    {id: '10737418240', val: function() { return '10 GB'; }},
+	    {id: '12884901888', val: function() { return '12 GB'; }},
+	    {id: '15032385536', val: function() { return '14 GB'; }},
+	    {id: '17179869184', val: function() { return '16 GB'; }},
+	    {id: '25769803776', val: function() { return '24 GB'; }},
+	    {id: '34359738368', val: function() { return '32 GB'; }}
+	]
 };
 appdb.model.VirtualAppliance = function(opts,ext){
 	var _init = function(){

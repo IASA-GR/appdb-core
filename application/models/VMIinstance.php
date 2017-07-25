@@ -19,6 +19,9 @@
 // PUT YOUR CUSTOM CODE HERE
 class Default_Model_VMIinstance extends Default_Model_VMIinstanceBase
 {
+	protected $_networkTraffic;
+	protected $_supportedContextFormats;
+
 	public function delete(){
 		$valists = new Default_Model_VALists();
 		$valists->filter->vmiinstanceid->numequals($this->id);
@@ -54,5 +57,53 @@ class Default_Model_VMIinstance extends Default_Model_VMIinstanceBase
 			$version = $item->getVAversion();
 		}
 		return $version;
+	}
+
+	public function getSupportedContextFormats() {
+		if ($this->_supportedContextFormats === null) {
+			$cf = new Default_Model_VMISupportedContextFormats();
+			$cf->filter->vmiinstanceid->numequals($this->id);
+			$this->_supportedContextFormats = $cf;
+		}
+		if (is_array($this->_supportedContextFormats)) return $this->_supportedContextFormats; else return $this->_supportedContextFormats->items;
+	}
+
+	public function getNetworkTraffic() {
+		if ($this->_networkTraffic === null) {
+			$nt = new Default_Model_VMINetworkTraffic();
+			$nt->filter->vmiinstanceid->numequals($this->id);
+			$this->_networkTraffic = $nt;
+		}
+		if (is_array($this->_networkTraffic)) return $this->_networkTraffic; else return $this->_networkTraffic->items;
+	}
+
+	public function deleteNetworkTraffic() {
+		$nts = new Default_Model_VMINetworkTraffic();
+		$x = $this->getNetworkTraffic();
+		foreach ($x as $nt) {
+			$nts->remove($nt);
+		}
+	}
+
+	public function deleteAccel() {
+		$this->_accelRecommend = null;
+		$this->_accelMinimum = null;
+		$this->_accelType = null;
+		if (is_numeric($this->_id)) {
+			db()->exec("UPDATE vmiinstances SET min_acc = NULL, rec_acc = NULL, rec_acc_type = NULL WHERE id = " . $this->_id);
+		}
+	}
+
+	public function getSites()
+	{
+		if ($this->_sites === null) {
+			$sites = new Default_Model_Sites();
+			$f = new Default_Model_VOsFilter();
+			$f->id->equals($this->id);
+			$sites->filter->chain($f,"AND");
+			$sites->filter->orderBy(array("name ASC"));
+			$this->_sites = $sites->items;
+		}
+		return $this->_sites;
 	}
 }

@@ -590,7 +590,7 @@
 			</div>
 		</div>
 		<div class="vappliance-templates hidden">
-			<div data-template="vappliance-vmiversion">
+                        <div data-template="vappliance-vmiversion">
 				<div class="vaversion-vmiversion property<?php echo ( Supports::singleVMIPolicy()?' detailsview':'' )?>" data-list="true">
 					<?php if( Supports::singleVMIPolicy() === false ) { ?>
 					<div class="actions showonedit">
@@ -736,14 +736,44 @@
 							<div class="property viewondetails hideonedit group ram">
 								<div class="header"><div class="title">Ram:</div></div>
 								<div class="value">
-									<div class="property fieldnamevalue compact viewondetails hideonedit" data-path="ram.minimum" data-name="viewramminimum" data-editable="false" >
-										<div class="header">Minimum (bytes):</div>
+									<div class="property fieldnamevalue compact viewondetails hideonedit" data-path="ram.minimum" data-name="viewramminimum" data-normalize="appdb.vappliance.utils.normalization.viewram"  data-source="appdb.model.StaticList.VMRams" data-editable="false" >
+										<div class="header">Minimum:</div>
 										<div class="value" ></div>
 									</div>
-									<div class="property fieldnamevalue compact viewondetails hideonedit" data-path="ram.recommended" data-name="viewramrecommended" data-editable="false" >
-										<div class="header">Recommended (bytes):</div>
+									<div class="property fieldnamevalue compact viewondetails hideonedit" data-path="ram.recommended" data-name="viewramrecommended" data-normalize="appdb.vappliance.utils.normalization.viewram"  data-source="appdb.model.StaticList.VMRams" data-editable="false" >
+										<div class="header">Recommended:</div>
 										<div class="value" ></div>
 									</div>
+								</div>
+							</div>
+                                                        <div class="property viewondetails hideonedit group accelerators">
+								<div class="header"><div class="title">Accelerators:</div></div>
+								<div class="value">
+                                                                        <div class="property fieldnamevalue compact viewondetails hideonedit" data-path="accelerators.type" data-name="viewacctype" data-editable="false" >
+										<div class="header">Type:</div>
+										<div class="value" ></div>
+									</div>
+									<div class="property fieldnamevalue compact viewondetails hideonedit" data-path="accelerators.minimum" data-name="viewaccminimum" data-editable="false" >
+										<div class="header">Minimum:</div>
+										<div class="value" ></div>
+									</div>
+									<div class="property fieldnamevalue compact viewondetails hideonedit" data-path="accelerators.recommended" data-name="viewaccrecommended" data-editable="false" >
+										<div class="header">Recommended:</div>
+										<div class="value" ></div>
+									</div>
+								</div>
+							</div>
+                                                        <div class="property viewondetails hideonedit group trafficrules">
+								<div class="header"><div class="title">Traffic rules:</div></div>
+								<div class="value">
+                                                                         <div class="property vmiversion-trafficrules-inbound fieldnamevalue small compact popupvalue popup-top hideonedit" data-path="network_traffic" data-direction='inbound' data-title='Incoming traffic rules' data-name="trafficrulesinboundview"  data-editable="false" data-type="trafficrules">
+                                                                                <div class="header">Incoming:</div>
+                                                                                <div class="value" ></div>
+                                                                        </div>
+									<div class="property vmiversion-trafficrules-outbound fieldnamevalue small compact popupvalue popup-top hideonedit" data-path="network_traffic" data-direction='outbound' data-title='Outgoing traffic rules' data-name="trafficrulesoutboundview"  data-editable="false" data-type="trafficrules">
+                                                                                <div class="header">Outgoing:</div>
+                                                                                <div class="value" ></div>
+                                                                        </div>
 								</div>
 							</div>
 							<div class="property vmiversion-ovfurl fieldnamevalue compact viewondetails hidden" data-path="ovf.url" data-name='ovfurl' data-type="genericurl" data-editable="true" data-validator="url">
@@ -819,7 +849,7 @@
 							<div class="togglecontainer">
 								<div class="left" ><hr/></div>
 								<?php if( Supports::singleVMIPolicy() ) { ?>
-								<div class="toggler icontext">Optional</div>
+								<div class="toggler icontext">Optional Information</div>
 								<?php } else { ?>
 								<div class="toggler icontext">Advanced ▼</div>
 								<?php } ?>
@@ -841,24 +871,83 @@
 								<div class="header">Comments:</div>
 								<div class="value" ></div>
 							</div>
+                                                    <div class="fieldvalueset trafficrules">
+                                                        <div class="header">Requested traffic rules</div>
+                                                        <div class="contents">
+                                                            <div class="trafficrules-container">
+                                                                <div class="header">Please provide the network traffic rules that the VM instance might require in order to function properly.</div>
+                                                                <div class="trafficrules-component">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 						</div>
-						<div class="verticalpanel osinfo">
-							<div class="property vmiversion-mincores fieldnamevalue compact " data-path="cores.minimum" data-name="coresminimum" data-editable="true" data-type="number" data-datatype="number" data-minsize="0" data-maxsize="1000" data-default="0">
-								<div class="header">Minimum cores:</div>
+						<div class="verticalpanel osinfo extended">
+                                                    <div class="fieldvalueset cores-valueset">
+                                                        <div class="header">Number of cores</div>
+                                                        <div class="contents">
+                                                            <div class="property vmiversion-mincores fieldnamevalue compact two column" data-path="cores.minimum" data-name="coresminimum" data-editable="true" data-type="valuelist" data-default="0" data-source="appdb.model.StaticList.VMCores">
+                                                                    <div class="header">Minimum:</div>
+                                                                    <div class="value" ></div>
+                                                            </div>
+                                                            <div class="property vmiversion-recomcores fieldnamevalue compact two column" data-path="cores.recommended" data-name="coresrecommended" data-editable="true" data-type="valuelist" data-default="0" data-source="appdb.model.StaticList.VMCores">
+                                                                    <div class="header">Recommended:</div>
+                                                                    <div class="value" ></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="property-validator vmiversion-cores-validator icontext">
+                                                            <div class="warning icontext">
+                                                                    <img src="/images/vappliance/warning.png" alt="">
+                                                                    <span class="message">Minimum number of CPU cores must be less or equal to the recommended one</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="fieldvalueset ram-valueset">
+                                                        <div class="header">Amount of RAM</div>
+                                                        <div class="contents">
+                                                            <div class="property vmiversion-minram fieldnamevalue compact " data-path="ram.minimum" data-name="ramminimum" data-normalize="appdb.vappliance.utils.normalization.ram" data-editable="true" data-type="valuelist" data-default="0" data-source="appdb.model.StaticList.VMRams" >
+                                                                <div class="header">Minimum:</div>
 								<div class="value" ></div>
-							</div>
-							<div class="property vmiversion-recomcores fieldnamevalue compact " data-path="cores.recommended" data-name="coresrecommended" data-editable="true" data-type="number" data-datatype="number" data-minsize="0" data-maxsize="100000" data-default="0">
-								<div class="header">Recommended cores:</div>
-								<div class="value" ></div>
-							</div>
-							<div class="property vmiversion-minram fieldnamevalue compact " data-path="ram.minimum" data-name="ramminimum" data-editable="true" data-type="number" data-datatype="number" data-minsize="0" data-default="0" data-maxsize="9223372036854775000">
-								<div class="header">Minimum ram (bytes):</div>
-								<div class="value" ></div>
-							</div>
-							<div class="property vmiversion-recomram fieldnamevalue compact " data-path="ram.recommended" data-name="ramrecommended" data-editable="true" data-type="number" data-datatype="number" data-minsize="0" data-default="0" data-maxsize="9223372036854775000">
-								<div class="header">Recommended ram (bytes):</div>
-								<div class="value" ></div>
-							</div>
+                                                            </div>
+                                                            <div class="property vmiversion-recomram fieldnamevalue compact " data-path="ram.recommended" data-name="ramrecommended" data-normalize="appdb.vappliance.utils.normalization.ram" data-editable="true" data-type="valuelist" data-default="0" data-source="appdb.model.StaticList.VMRams">
+                                                                <div class="header">Recommended:</div>
+                                                                <div class="value" ></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="property-validator vmiversion-ram-validator icontext">
+                                                            <div class="warning icontext">
+                                                                    <img src="/images/vappliance/warning.png" alt="">
+                                                                    <span class="message">Minimum amount of RAM must be less or equal to the recommended one</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="fieldvalueset accelerators-valueset">
+                                                        <div class="header">Accelerators</div>
+                                                        <div class="contents subcontent">
+                                                              <div class="property vmiversion-acctype fieldnamevalue compact" data-path="accelerators.type" data-type="acceleratorstype" data-source="appdb.model.StaticList.VMAcceleratorTypes"  data-editable="true" data-default='-1'>
+                                                                <div class="header">Type:</div>
+                                                                <div class="value"></div>
+                                                            </div>
+                                                            <div class="property fieldnamevalue compact"></div>
+                                                        </div>
+                                                        <div class="contents noborder">
+                                                            <div class="property vmiversion-minacc fieldnamevalue compact" data-path="accelerators.minimum" data-name="accminimum" data-editable="true" data-default="0" data-type="valuelist" data-source="appdb.model.StaticList.VMAcceleratorAmounts" >
+                                                                <div class="header">Minimum amount:</div>
+                                                                <div class="value"></div>
+                                                            </div>
+                                                            <div class="property vmiversion-recomacc fieldnamevalue compact" data-path="accelerators.recommended" data-name="accrecommended" data-editable="true" data-default="0" data-type="valuelist" data-source="appdb.model.StaticList.VMAcceleratorAmounts">
+                                                                    <div class="header">Recommended amount:</div>
+                                                                    <div class="value"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="property-validator vmiversion-accelerators-validator icontext">
+                                                            <div class="warning icontext">
+                                                                    <img src="/images/vappliance/warning.png" alt="">
+                                                                    <span class="message">Minimum number of accelerators must be less or equal to the recommended one</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 						</div>
 					</div>
 				</div>

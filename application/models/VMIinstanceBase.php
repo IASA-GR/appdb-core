@@ -49,6 +49,9 @@ class Default_Model_VMIinstanceBase
 	protected $_initialsize;
 	protected $_initialchecksum;
 	protected $_ovfurl;
+	protected $_accelType;
+	protected $_accelMinimum;
+	protected $_accelRecommend;
 
 	public function __set($name,$value)
 	{
@@ -305,6 +308,19 @@ class Default_Model_VMIinstanceBase
 		return $this->_coreMinimum;
 	}
 
+	public function getAccelMinimum()
+	{
+		return $this->_accelMinimum;
+	}
+
+	public function setAccelMinimum($value)
+	{
+		/* if ( $value === null ) {
+			$this->_accelMinimum = 'NULL';
+		} else */ $this->_accelMinimum = $value;
+		return $this;
+	}
+
 	public function setRAMminimum($value)
 	{
 		/* if ( $value === null ) {
@@ -434,6 +450,31 @@ class Default_Model_VMIinstanceBase
 		/* if ( $value === null ) {
 			$this->_coreRecommend = 'NULL';
 		} else */ $this->_coreRecommend = $value;
+		return $this;
+	}
+
+	public function getAccelRecommend()
+	{
+		return $this->_accelRecommend;
+	}
+
+	public function setAccelRecommend($value)
+	{
+		/* if ( $value === null ) {
+			$this->_accelRecommend = 'NULL';
+		} else */ $this->_accelRecommend = $value;
+		return $this;
+	}
+
+	public function getAccelType() {
+		return $this->_accelType;		
+	}
+
+	public function setAccelType($value)
+	{
+		/* if ( $value === null ) {
+			$this->_accelType = 'NULL';
+		} else */ $this->_accelType = $value;
 		return $this;
 	}
 
@@ -580,6 +621,9 @@ class Default_Model_VMIinstanceBase
 		if ($this->_initialsize !== null) $XML .= "<initialsize>".recode_string("utf8..xml",$this->_initialsize)."</initialsize>\n";
 		if ($this->_initialchecksum !== null) $XML .= "<initialchecksum>".recode_string("utf8..xml",$this->_initialchecksum)."</initialchecksum>\n";
 		if ($this->_ovfurl !== null) $XML .= "<ovfurl>".recode_string("utf8..xml",$this->_ovfurl)."</ovfurl>\n";
+		if ($this->_accelMinimum !== null) $XML .= "<accelminimum>".recode_string("utf8..xml",$this->_accelMinimum)."</accelminimum>\n";
+		if ($this->_accelRecommend !== null) $XML .= "<accelrecommend>".recode_string("utf8..xml",$this->_accelRecommend)."</accelrecommend>\n";
+		if ($this->_accelType !== null) $XML .= "<acceltype>".recode_string("utf8..xml",$this->_accelType)."</acceltype>\n";
 		$XML .= "</VMIinstance>\n";
 		return $XML;
 	}
