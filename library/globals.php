@@ -77,15 +77,15 @@ if ($php_major <= 5) {
 
 function decodeUTF8($str) {
 	$s = "";
-	for ($i = 0; $i < strlen($a); $i = $i + 1) {
-		if ((substr($a, $i, 2) == '\x') && (substr($a, $i + 4, 2) == '\x')) {
-			$s = $s . hex2bin(substr($a, $i + 2, 2) . substr($a, $i + 6, 2));
+	for ($i = 0; $i < strlen($str); $i = $i + 1) {
+		if ((substr($str, $i, 2) == '\x') && (substr($str, $i + 4, 2) == '\x')) {
+			$s = $s . hex2bin(substr($str, $i + 2, 2) . substr($str, $i + 6, 2));
 			$i = $i + 7;
-		} elseif (substr($a, $i, 2) == '\x') {
-			$s = $s . hex2bin(substr($a, $i + 2, 2));
+		} elseif (substr($str, $i, 2) == '\x') {
+			$s = $s . hex2bin(substr($str, $i + 2, 2));
 			$i = $i + 3;
 		} else {
-			$s = $s . substr($a, $i, 1);
+			$s = $s . substr($str, $i, 1);
 		}
 	}
 	return $s;
