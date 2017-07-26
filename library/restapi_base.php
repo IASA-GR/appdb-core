@@ -437,7 +437,7 @@ abstract class XMLRestResponseBase extends RestResponse {
 						$data = $this->_parent->hideWorkingVersion($data);
 					}
 				}
-				$data = str_replace('<?xml version="1.0"?'.'>', '', $data);
+				$data = str_replace('<'. '?xml version="1.0"?'.'>', '', $data);
 			} else {
 				error_log('Cannot find '.$xslt);
 			}
@@ -475,12 +475,12 @@ class XMLRestResponse extends XMLRestResponseBase {
 		if ( isset($this->_parent) ) {
 			if ($this->_parent->isCacheable()) {
 				try {
-					$cachefile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '/query_' . get_class($this->_parent) . '_' . md5(var_export($this->_parent->getParams(), true)) . '.xml';
+					$cachefile = $this->_parent->cachefile();
 					if ( ! file_exists($cachefile) ) {
 						debug_log("caching API response in '$cachefile'");
 						$f = @fopen($cachefile, "w");
 						if (! is_null($f)) {
-							$ss = str_replace('<appdb:appdb ', '<appdb:appdb cached="' . time() . '" ', $s);
+							$ss = str_replace('<appdb:appdb ', '<appdb:appdb cached="' . time() . '" cachekey="' . $this->_parent->cachekey() . '" ', $s);
 							fwrite($f, $ss);
 							fclose($f);
 						} else {
@@ -1771,6 +1771,26 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
 		return $this->_pars;
 	}
 
+	/** 
+	 * returns a "key" which identifies a request cache file, based on the request's parameters
+	 *
+	 * @return string
+	 * @access public
+	 */
+	public function cachekey() {
+		return md5(var_export($this->_pars,true));
+	}
+
+	/** 
+	 * returns the name of the request's cache file. File existence is based on isCachable attribute
+	 *
+	 * @return string
+	 * @access public
+	 */	
+	public function cachefile() {
+		return RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '/query_' . get_class($this) . '_' . $this->cachekey() . '.xml';
+	}
+
     /**
      * realization of get() from iRestResource. If authorization succeeds, then 
      * sets the GET model. Calls accessDenied() and returns FALSE otherwise.
@@ -1779,7 +1799,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
         $this->_list = false;
 		$this->_method = RestMethodEnum::RM_GET;
 		if ($this->authorize(RestMethodEnum::RM_GET)) {
-			$cachefile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '/query_' . get_class($this) . '_' . md5(var_export($this->_pars,true)) . '.xml';
+			$cachefile = $this->cachefile();
 			//debug_log("checking API cache file '" . $cachefile . "'");
 			if ( file_exists( $cachefile ) && $this->isCacheable() ) {
 				$cache = file_get_contents($cachefile);

@@ -46,8 +46,37 @@ class VoController extends Zend_Controller_Action
 		}
 		error_log('VA providers RESTful API XML cache STARTED');
 		$result = curl_exec($ch);
-		curl_close($ch);
 		error_log('VA providers RESTful API XML cache DONE');
+		$result = curl_exec($ch);
+		$ck = "";
+		try {
+			$xmlresult = new SimpleXMLElement($result);
+			$appdb = $xmlresult->xpath("//appdb:appdb");
+			if (count($appdb) > 0) {
+				$appdb = $appdb[0];
+				$ck = trim(strval($appdb->attributes()->cachekey));
+				if ($ck != "") {
+					debug_log("[makeVAprovidersCache] cache key is " . $ck);
+				} else {
+					error_log("[makeVAprovidersCache] Did not find cache key in XML response");
+				}
+			} else {
+				error_log("[makeVAprovidersCache] Could not find appdb:appdb root element in XML response");
+			}
+		} catch (Exception $e) {
+			error_log("[makeVAprovidersCache] Could not parse respone as XML. Reason: " . $e->getMessage());
+		}
+		curl_close($ch);
+		if ($ck != "") {
+			if (!@copy(RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) .'/query_RestVAProvidersList_' . $ck . '.xml', RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/va_providers.xml')) {
+				$errors= error_get_last();
+				error_log("[makeVAprovidersCache] Could not copy VA providers cache file into assets/rp. Reason: " . $errors['message']);
+			} else {
+				debug_log("Copied VA providers cache file into assets/rp");
+			}
+		} else {
+				error_log("[makeVAprovidersCache] No VA providers cache file to copy into assets/rp");
+		}
 	}
 
     public function init()

@@ -276,6 +276,8 @@
             <xs:attribute name="host" type="xs:string" use="optional" />
             <xs:attribute name="apihost" type="xs:string" use="optional" />
             <xs:attribute name="cacheState" type="xs:integer" use="optional" />
+            <xs:attribute name="cached" type="xs:dateTime" use="optional" />
+            <xs:attribute name="cachekey" type="xs:string" use="optional" />
             <xs:attribute name="permsState" type="xs:integer" use="optional" />
             <xs:attribute name="requestedOn" type="xs:float" use="optional" />
             <xs:attribute name="deliveredOn" type="xs:float" use="optional" />
