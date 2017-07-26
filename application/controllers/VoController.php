@@ -24,7 +24,15 @@ class VoController extends Zend_Controller_Action
 		$copyfile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/va_providers.xml';
 		$hashfile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/datahash';
 
-		@unlink($hashfile);
+		# truncate data hash file (i.e. sync operation in progress)
+		$f_hashfile = @fopen($hashfile, "w");
+		if ($f_hashfile !== false) { 
+			fwrite("", $hash);
+			fclose($f_hashfile);
+		} else {
+			$errors = error_get_last();
+			error_log("[makeVAprovidersCache] Could not open+truncate VA providers cache data hash file. Reason: " . $errors['message']);
+		}
 		$uri = 'https://' . $_SERVER['APPLICATION_API_HOSTNAME'] . '/rest/latest/va_providers?listmode=details';
 		$ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $uri);
@@ -79,17 +87,25 @@ class VoController extends Zend_Controller_Action
 		curl_close($ch);
 		if ($ck != "") {
 			if (!@copy(RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) .'/query_RestVAProvidersList_' . $ck . '.xml', $copyfile)) {
-				$errors= error_get_last();
+				$errors = error_get_last();
 				error_log("[makeVAprovidersCache] Could not copy VA providers cache file into assets. Reason: " . $errors['message']);
 			} else {
-				$f_hashfile = fopen($hashfile, "w");
-				fwrite($f_hashfile, $hash);
-				fclose($f_hashfile);
+				$f_hashfile = @fopen($hashfile, "w");
+				if ($f_hasfile !== false) {
+					fwrite($f_hashfile, $hash);
+					fclose($f_hashfile);
+				} else {
+					$errors = error_get_last();
+					error_log("[makeVAprovidersCache] Could not open+write VA providers cache data hash file. Reason: " . $errors['message']);
+				}
 				debug_log("Copied VA providers cache file into assets");
 				debug_log("Data md5 is $hash");
 			}
 		} else {
-				error_log("[makeVAprovidersCache] No VA providers cache file to copy into assets");
+			error_log("[makeVAprovidersCache] No VA providers cache file to copy into assets");
+			$f_hashfile = @fopen($hashfile, "w");
+			@fwrite("ERROR", $hash);
+			fclose($f_hashfile);
 		}
 	}
 
