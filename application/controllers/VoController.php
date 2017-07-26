@@ -21,7 +21,7 @@ class VoController extends Zend_Controller_Action
     protected $xml;
 
 	private function makeVAprovidersCache() {
-		$copy = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/va_providers.xml';
+		$copyfile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/va_providers.xml';
 		$hashfile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/datahash';
 
 		@unlink($hashfile);
@@ -78,18 +78,18 @@ class VoController extends Zend_Controller_Action
 		}
 		curl_close($ch);
 		if ($ck != "") {
-			if (!@copy(RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) .'/query_RestVAProvidersList_' . $ck . '.xml', RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/va_providers.xml')) {
+			if (!@copy(RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) .'/query_RestVAProvidersList_' . $ck . '.xml', $copyfile)) {
 				$errors= error_get_last();
-				error_log("[makeVAprovidersCache] Could not copy VA providers cache file into assets/rp. Reason: " . $errors['message']);
+				error_log("[makeVAprovidersCache] Could not copy VA providers cache file into assets. Reason: " . $errors['message']);
 			} else {
 				$f_hashfile = fopen($hashfile, "w");
 				fwrite($f_hashfile, $hash);
 				fclose($f_hashfile);
-				debug_log("Copied VA providers cache file into assets/rp");
+				debug_log("Copied VA providers cache file into assets");
 				debug_log("Data md5 is $hash");
 			}
 		} else {
-				error_log("[makeVAprovidersCache] No VA providers cache file to copy into assets/rp");
+				error_log("[makeVAprovidersCache] No VA providers cache file to copy into assets");
 		}
 	}
 
