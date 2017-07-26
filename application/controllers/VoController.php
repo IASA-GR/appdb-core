@@ -21,6 +21,10 @@ class VoController extends Zend_Controller_Action
     protected $xml;
 
 	private function makeVAprovidersCache() {
+		$copy = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/va_providers.xml';
+		$hashfile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/datahash';
+
+		@unlink($hashfile);
 		$uri = 'https://' . $_SERVER['APPLICATION_API_HOSTNAME'] . '/rest/latest/va_providers?listmode=details';
 		$ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $uri);
@@ -42,7 +46,7 @@ class VoController extends Zend_Controller_Action
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $h);
 		// remove existing cachefiles before making API call, or else this will not work
 		foreach ( glob(RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) .'/query_RestVAProvidersList_*.xml') as $cachefile ) {
-			unlink($cachefile);
+			@unlink($cachefile);
 		}
 		error_log('VA providers RESTful API XML cache STARTED');
 		$result = curl_exec($ch);
@@ -52,6 +56,12 @@ class VoController extends Zend_Controller_Action
 		try {
 			$xmlresult = new SimpleXMLElement($result);
 			$appdb = $xmlresult->xpath("//appdb:appdb");
+			$vadata = $xmlresult->xpath("//virtualization:provider");
+			$vadatastring = "";
+			foreach ($vadata as $vadatum) {
+				$vadatastring .= $vadatum->asXML();
+			}
+			$hash = md5($vadatastring);
 			if (count($appdb) > 0) {
 				$appdb = $appdb[0];
 				$ck = trim(strval($appdb->attributes()->cachekey));
@@ -72,7 +82,11 @@ class VoController extends Zend_Controller_Action
 				$errors= error_get_last();
 				error_log("[makeVAprovidersCache] Could not copy VA providers cache file into assets/rp. Reason: " . $errors['message']);
 			} else {
+				$f_hashfile = fopen($hashfile, "w");
+				fwrite($f_hashfile, $hash);
+				fclose($f_hashfile);
 				debug_log("Copied VA providers cache file into assets/rp");
+				debug_log("Data md5 is $hash");
 			}
 		} else {
 				error_log("[makeVAprovidersCache] No VA providers cache file to copy into assets/rp");
