@@ -7991,14 +7991,19 @@ class SamlAuth{
                 //add them as new x509 useraccounts
                 if (count($newaccounts) > 0) {
                     foreach($newaccounts as $newaccount) {
-                            $uaccount = new Default_Model_UserAccount();
-                            $uaccount->researcherid = $user->id;
-                            $uaccount->accountid = $newaccount;
-                            $uaccount->accounttypeid = 'x509';
-                            $uaccount->accountname = trim($session->userFirstName . " " . $session->userLastName);
-                            $uaccount->IDPTrace = $session->idptrace;
-                            $uaccount->comment = 'Implicit::' . $source . '::' . date('Y-m-d H:i:s');
-                            $uaccount->save();
+                            try {
+                                    $uaccount = new Default_Model_UserAccount();
+                                    $uaccount->researcherid = $user->id;
+                                    $uaccount->accountid = $newaccount;
+                                    $uaccount->accounttypeid = 'x509';
+                                    $uaccount->accountname = trim($session->userFirstName . " " . $session->userLastName);
+                                    $uaccount->IDPTrace = $session->idptrace;
+                                    $uaccount->comment = 'Implicit::' . $source . '::' . date('Y-m-d H:i:s');
+                                    $uaccount->save();
+                            } catch(Exception $e) {
+                                    error_log('[Saml::harvestX509UserAccounts]: Could not add implicit X509 account for profile ID: ' . $user->id . ') with DN: ' . $newaccount);
+                                    error_log('[Saml::harvestX509UserAccounts]: ' . $e->getMessage());
+                            }
                     }
                 }
         }
