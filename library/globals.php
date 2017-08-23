@@ -10127,21 +10127,19 @@ class VoAdmin{
 		}
 		
 		$vomems = $user->getVOMemberships();
-		if( count($vomems) === 0 ){
-			return self::toJSON($res, $toJSON);
-		}
-		
-		foreach($vomems as $mem){
-			if( !$mem->vo ) {
-				continue;
+		if( count($vomems) > 0 ){
+			foreach($vomems as $mem){
+				if( !$mem->vo ) {
+					continue;
+				}
+
+				$vom = array();
+				$vom["id"] = $mem->void;
+				$vom["discipline"] = $mem->vo->domain->name;
+				$vom["member_since"] = $mem->membersince;
+				$vom["name"] = $mem->vo->name;
+				array_push($res, $vom);
 			}
-			
-			$vom = array();
-			$vom["id"] = $mem->void;
-			$vom["discipline"] = $mem->vo->domain->name;
-			$vom["member_since"] = $mem->membersince;
-			$vom["name"] = $mem->vo->name;
-			array_push($res, $vom);
 		}
 		return self::toJSON( array_merge($res, self::getVOContacts($user)), $toJSON );
 	}
