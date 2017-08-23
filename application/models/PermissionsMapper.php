@@ -18,7 +18,7 @@
 <?php
 class Default_Model_PermissionsMapper extends Default_Model_PermissionsMapperBase
 {
-	public function fetchAll($filter = null)
+	public function fetchAll($filter = null, $format = '')
 	{
 		$select = $this->getDbTable()->select();
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
