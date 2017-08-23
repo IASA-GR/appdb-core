@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 ?>
-<?
+<?php
 class Default_Model_RelatedApplication extends Default_Model_Application {
 	protected $_rank;
 
