@@ -908,6 +908,12 @@ class SamlController extends Zend_Controller_Action
 							$attrs['appdb:accounts'] = $uaccounts;
 							$researcher = $userAccount->getResearcher();
 							if ($researcher) {
+                                                                $currentHostName = 'https://'.$_SERVER['HTTP_HOST'];
+                                                                $attrs['appdb:cname'] = $researcher->cname;
+                                                                $attrs['appdb:refs'] = array(
+                                                                  "profile" => $currentHostName .'/store/person/' . $researcher->cname,
+                                                                  "image" => $currentHostName .'/people/getimage?id=' . $researcher->id
+                                                                );
 								$appdbGroups = array();
 								$actorGroups = $researcher->getActorGroups();
 								if ( count($actorGroups) > 0 ) {
