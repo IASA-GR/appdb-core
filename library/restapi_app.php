@@ -4359,9 +4359,9 @@ class RestAppVAXMLParser extends RestXMLParser {
 						try {
 							// if this is an update (we have a VMI instance id),save network traffic now, or else defer it for after saving the VMI instance
 							if( trim($m->id) == "" || trim($m->id)==="-1"  ) {
-								$cf->save();
-							} else {
 								$deferredCFs[] = $cf;
+							} else {
+								$cf->save();
 							}
 						} catch (Exception $e) {
 							error_log($e);
