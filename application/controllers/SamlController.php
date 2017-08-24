@@ -895,7 +895,7 @@ class SamlController extends Zend_Controller_Action
 						}
 
 						if ($userAccount) {
-                                                        if ($sourceIdentifier === 'egi-aai') {
+                                                        if ($sourceIdentifier === 'egi-aai' || ($sourceIdentifier === 'egi-sso-ldap' && ApplicationConfiguration::isEnviroment('production') === false)) {
                                                             $attrs['entitlements'] = array('vo' => array('contacts' => $this->getUserVOInfo($uid, 'contacts') ,'memberships' => $this->getUserVOInfo($uid, 'memberships')));
                                                         } else {
                                                             $attrs['entitlements'] = array('vo' => array('contacts' => VoAdmin::getVOContacts($userAccount->researcherid) ,'memberships' => VoAdmin::getUserMembership($userAccount->researcherid)));

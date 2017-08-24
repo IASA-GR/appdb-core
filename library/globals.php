@@ -8317,12 +8317,12 @@ class SamlAuth{
 
 			//Update the VO memberships for the given EGI AAI persistend uid.
 			foreach($vomembers as $vomember) {
-				db()->query("SELECT add_egiaai_user_vomember_info(?, ?, ?)", array($puid, $name, $vomember['vo']))->fetchAll();
+                                db()->query("SELECT add_egiaai_user_vomember_info(?, ?, ?)", array($puid, $name, $vomember['vo']))->fetchAll();
 			}
 
 			//Update the VO contacts for the given EGI AAI persistend uid.
 			foreach($vocontacts as $vocontact) {
-				db()->query("SELECT add_egiaai_user_vocontact_info(?, ?, ?, ?, ?)", array($puid, $name, $vocontact['vo'], $vocontact['role'], $email))->fetchAll();
+                                db()->query("SELECT add_egiaai_user_vocontact_info(?, ?, ?, ?, ?)", array($puid, $name, $vocontact['vo'], $vocontact['role'], $email))->fetchAll();
 			}
 		}
 
@@ -8395,10 +8395,10 @@ class SamlAuth{
 		}else{
 			self::setupSamlNewUserSession($session, $accounttype);
 		}
-		
+
 		//Store user entitlements
 		$session->entitlements = self::extractSamlEntitlements($attrs);
-		if($accounttype === 'egi-aai') {
+		if($accounttype === 'egi-aai' || ($accounttype === 'egi-sso-ldap' && ApplicationConfiguration::isEnviroment('production') === false)) {
 			$session->entitlements = self::updateEGIAAIEntitlements($attrs, $session->entitlements, $user);
 		}
 
