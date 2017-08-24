@@ -83,7 +83,7 @@ class Default_Model_VMINetworkTrafficEntry extends Default_Model_VMINetworkTraff
 	}
 
 	public function getFlow() {
-		return $this->_flow();
+		return $this->_flow;
 	}
 
 	public function setNetProtocolBits($value)
@@ -101,6 +101,20 @@ class Default_Model_VMINetworkTrafficEntry extends Default_Model_VMINetworkTraff
 			$value = sprintf("%02d", decbin($value));
 		}
 		$this->_flowBits = $value;		
+		switch ($value) {
+			case 1:
+				$this->_flow = "inbound";
+				break;
+			case 2:
+				$this->_flow = "outbound";
+				break;
+			case 3:
+				$this->_flow = "both";
+				break;
+			case 0:
+			default:
+				$this->_flow = "none";
+		}
 		return $this;
 	}
 
