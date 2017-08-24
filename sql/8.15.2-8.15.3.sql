@@ -666,6 +666,8 @@ CREATE OR REPLACE VIEW public.vapp_to_xml AS
 ALTER TABLE public.vapp_to_xml
   OWNER TO appdb;
 
+INSERT INTO vmi_supported_context_fmt (vmiinstanceid, fmtid) SELECT id, 1 FROM vmiinstances WHERE NOT EXISTS (SELECT * FROM vmi_supported_context_fmt WHERE vmiinstanceid = vmiinstances.id);
+
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 15, 3, E'Added default_access column to vmiinstances table'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=15 AND revision=3);
