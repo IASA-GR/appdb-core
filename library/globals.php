@@ -5872,6 +5872,34 @@ class VMCaster{
 		
 		return $sites;
 	}
+        private static function getImageAccelerators($img) {
+            if ($img !== null && $img->accelType !== null && trim($img->accelType) !== '') {
+                return array("minimum" => $img->accelMinimum, "recommended" => $img->accelRecommend, "type" => $img->accelType);
+            }
+
+            return null;
+        }
+        private static function getImageNetworkTraffic($img) {
+            if ($img === null) {
+                return array();
+            }
+            $nettraffic = $img->getNetworkTraffic();
+            $result = array();
+
+            foreach($nettraffic as $traffic) {
+                $item = array(
+                    "direction" => $traffic->flow,
+                    "protocols" => $traffic->netProtocols,
+                    "ip_range" => $traffic->IPrange,
+                    "port_range" => $traffic->Ports
+                );
+                if ( is_array($item["protocols"]) ){
+                    $item["protocols"] = implode(" ", $item["protocols"]);
+                }
+                $result[] = $item;
+            }
+            return $result;
+        }
 	public static function convertImage($data, $format='xml'){
 		$result = "";
 		$img = $data["image"];
@@ -5886,6 +5914,8 @@ class VMCaster{
 		$app = $vapp->getApplication();
 		$addedby = $img->getAddedBy();
 		$updatedby = $img->getLastUpdatedBy();
+                $network_traffic = self::getImageNetworkTraffic($img);
+                $accelerators = self::getImageAccelerators($img);
 		$d = array(
 			"id" => $img->id,
 			"identifier" => $img->guid,
@@ -5902,14 +5932,20 @@ class VMCaster{
 			"description" => $img->description,
 			"cores" => array( "minimum" => $img->coreMinimum, "recommended" => $img->coreRecommend ),
 			"ram" => array( "minimum" => $img->RAMminimum, "recommended" => $img->RAMrecommend ),
-			"addedon" => str_replace("+00:00","Z",gmdate("c", strtotime($img->addedon))),
+                        "addedon" => str_replace("+00:00","Z",gmdate("c", strtotime($img->addedon))),
 			"addedby" => array( "id" => $addedby->id, "cname" => $addedby->cname, "firstname" => $addedby->firstname, "lastname" => $addedby->lastname, "gender" => $addedby->gender, "permalink" =>  'https://'.$_SERVER['HTTP_HOST'].'/store/person/'.$addedby->cname),
 			"published" => $ver->published,
 			"archived" => $ver->archived,
 			"vappliance" => array( "version" => $ver->version,),
 			"application" => array( "id" => $app->id, "name" => $app->name, "cname" => $app->cname )
 		);
-		if( isset($d["hypervisor"]) ){
+                if ( $accelerators !== null ){
+                    $d["accelerators"] = $accelerators;
+                }
+                if ( $network_traffic !== null && is_array($network_traffic) && count($network_traffic) > 0 ){
+                    $d["network_traffic"] = $network_traffic;
+                }
+                if( isset($d["hypervisor"]) ){
 			if( is_array($d["hypervisor"]) ){
 				$d["hypervisor"] = implode(",",$d["hypervisor"]);
 			}
