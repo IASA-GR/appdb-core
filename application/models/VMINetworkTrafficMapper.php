@@ -25,6 +25,6 @@ class Default_Model_VMINetworkTrafficMapper extends Default_Model_VMINetworkTraf
 		$res = db()->query("SELECT vmi_net_traffic.net_protocols FROM vmi_net_traffic WHERE id = " . $row->id)->fetchAll();
 		$res = $res[0];
 		$res = $res[0];
-		$entry->setNetProtocols($res);
+		$entry->setNetProtocols(implode(",", pg_to_php_array($res)));
 	}
 }

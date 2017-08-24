@@ -105,6 +105,37 @@
 				<xsl:attribute name="minimum"><xsl:value-of select="./ram/minimum"/></xsl:attribute>
 				<xsl:attribute name="recommended"><xsl:value-of select="./ram/recommended"/></xsl:attribute>
 			</xsl:element>
+                        <xsl:if test='./accelerators/type'>
+                            <xsl:element name="virtualization:accelerators">
+                                <xsl:attribute name='minimum'>
+                                    <xsl:value-of select='./accelerators/minimum'></xsl:value-of>
+                                </xsl:attribute>
+                                <xsl:attribute name='recommended'>
+                                    <xsl:value-of select='./accelerators/recommended'></xsl:value-of>
+                                </xsl:attribute>
+                                <xsl:attribute name='type'>
+                                    <xsl:value-of select='./accelerators/type'></xsl:value-of>
+                                </xsl:attribute>
+                            </xsl:element>
+                        </xsl:if>
+                        <xsl:if test='./network_traffic'>
+                            <xsl:for-each select="./network_traffic/*">
+                                <xsl:element name="virtualization:network_traffic">
+                                    <xsl:attribute name='direction'>
+                                        <xsl:value-of select='./direction'></xsl:value-of>
+                                    </xsl:attribute>
+                                    <xsl:attribute name='protocols'>
+                                        <xsl:value-of select='./protocols'></xsl:value-of>
+                                    </xsl:attribute>
+                                    <xsl:attribute name='ip_range'>
+                                        <xsl:value-of select='./ip_range'></xsl:value-of>
+                                    </xsl:attribute>
+                                    <xsl:attribute name='port_range'>
+                                        <xsl:value-of select='./port_range'></xsl:value-of>
+                                    </xsl:attribute>
+                                </xsl:element>
+                            </xsl:for-each>
+                        </xsl:if>
 			<xsl:element name="virtualization:addedon"><xsl:value-of select="./addedon" /></xsl:element>
 			<xsl:choose>
 				<xsl:when test="./addedby">
