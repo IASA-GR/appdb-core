@@ -4330,13 +4330,12 @@ class RestAppVAXMLParser extends RestXMLParser {
 			}
 		}
 		if (count( $xml->xpath('./virtualization:contextformat') ) == 0) {
-			debug_log("No <virtualization:contextformat> given, defaulting to Cloud-Init");
+			debug_log("[RestAppVAXMLParser::parseVAppImageInstance] No <virtualization:contextformat> given in put/post, defaulting to Cloud-Init");
 			// default to Cloud-Init if unspecified
 			$CFXMLSTUB = '<virtualization:contextformat id="1" name="Cloud-Init" supported="true" />';
 			$CFXMLSTUB = strval(RestAPIHelper::wrapResponse($CFXMLSTUB));
 			$cfxml=new SimpleXMLElement($CFXMLSTUB);
 			$cformats = $cfxml->xpath('./virtualization:contextformat');
-			debug_log(var_export($cformats, true));
 		} elseif (count( $xml->xpath('./virtualization:contextformat') ) > 0) {
 			$cformats = $xml->xpath('./virtualization:contextformat');
 		}
