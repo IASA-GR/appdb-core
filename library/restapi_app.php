@@ -4639,6 +4639,15 @@ class RestAppVAXMLParser extends RestXMLParser {
 			}
 		}
 		
+		//Save optional default access string
+		if( count( $xml->xpath('./virtualization:defaultaccess') ) > 0 ){
+			$defacc = $xml->xpath('./virtualization:defaultaccess');
+			$defacc = strval($defacc[0]);
+		}else{
+			$defacc = "None";
+		}
+		$m->defaultAccess = $defacc;
+
 		//Save optional Ovf file url
 		if( count( $xml->xpath('./virtualization:ovf') ) > 0 ){
 			$ovf = $xml->xpath('./virtualization:ovf');
