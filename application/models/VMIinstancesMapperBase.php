@@ -79,6 +79,7 @@ class Default_Model_VMIinstancesMapperBase
 		if ( ! isnull($value->getInitialsize()) ) $data['initialsize'] = $value->getInitialsize();
 		if ( ! isnull($value->getInitialchecksum()) ) $data['initialchecksum'] = $value->getInitialchecksum();
 		if ( ! isnull($value->getOVFURL()) ) $data['ovfurl'] = $value->getOVFURL();
+		if ( ! isnull($value->getDefaultAccess()) ) $data['default_access'] = $value->getDefaultAccess();
 
 
 		$q1 = 'id = ?';
@@ -132,6 +133,7 @@ class Default_Model_VMIinstancesMapperBase
 		$entry->setInitialsize($row->initialsize);
 		$entry->setInitialchecksum($row->initialchecksum);
 		$entry->setOVFURL($row->ovfurl);
+		$entry->setDefaultAccess($row->default_access);
 	}
 
 	public function find($id, Default_Model_VMIinstances &$value)

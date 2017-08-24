@@ -54,6 +54,7 @@ class Default_Model_VAviewBase
 	protected $_initialsize;
 	protected $_initialchecksum;
 	protected $_ovfurl;
+	protected $_defaultAccess;
 	protected $_vmiID;
 	protected $_vmi;
 	protected $_hypervisors;
@@ -638,6 +639,20 @@ class Default_Model_VAviewBase
 	{
 		return $this->_ovfurl;
 	}
+
+	public function setDefaultAccess($value)
+	{
+		/* if ( $value === null ) {
+			$this->_defaultAccess = 'NULL';
+		} else */ $this->_defaultAccess = $value;
+		return $this;
+	}
+
+	public function getDefaultAccess()
+	{
+		return $this->_defaultAccess;
+	}
+
 
 	public function setVmiID($value)
 	{
@@ -1232,6 +1247,7 @@ class Default_Model_VAviewBase
 		if ($this->_initialsize !== null) $XML .= "<initialsize>".$this->_initialsize."</initialsize>\n";
 		if ($this->_initialchecksum !== null) $XML .= "<initialchecksum>".recode_string("utf8..xml",$this->_initialchecksum)."</initialchecksum>\n";
 		if ($this->_ovfurl !== null) $XML .= "<ovfurl>".recode_string("utf8..xml",$this->_ovfurl)."</ovfurl>\n";
+		if ($this->_defaultAccess !== null) $XML .= "<defaultAccess>".recode_string("utf8..xml",$this->_defaultAccess)."</defaultAccess>\n";
 		if ($this->_vmiID !== null) $XML .= "<vmiID>".$this->_vmiID."</vmiID>\n";
 		if ( $recursive ) if ( $this->_vmi === null ) $this->getVmi();
 		if ( ! ($this->_vmi === null) ) $XML .= $this->_vmi->toXML();

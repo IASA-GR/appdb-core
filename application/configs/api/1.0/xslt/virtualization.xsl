@@ -45,8 +45,10 @@
 					<xsl:attribute name="id"><xsl:value-of select="@vaversionid" /></xsl:attribute>
 					<xsl:attribute name="version"><xsl:value-of select="@version" /></xsl:attribute>
 					<xsl:attribute name="published"><xsl:value-of select="@published" /></xsl:attribute>
+					<xsl:attribute name="publishedon"><xsl:value-of select="@publishedon" /></xsl:attribute>
 					<xsl:attribute name="createdon"><xsl:value-of select="@createdon" /></xsl:attribute>
 					<xsl:attribute name="enabled"><xsl:value-of select="@enabled" /></xsl:attribute>
+					<xsl:attribute name="enabledon"><xsl:value-of select="@enabledon" /></xsl:attribute>
 					<xsl:attribute name="archived"><xsl:value-of select="@archived" /></xsl:attribute>
 					<xsl:if test="@archivedon">
 						<xsl:attribute name="archivedon"><xsl:value-of select="@archivedon" /></xsl:attribute>
@@ -225,6 +227,7 @@
 							</xsl:if>
 							<xsl:attribute name="url"><xsl:value-of select="virtualization:ovf/@url"/></xsl:attribute>
 						</xsl:element>
+						<xsl:element name="virtualization:defaultaccess"><xsl:value-of select="virtualization:defaultaccess" /></xsl:element>
 						<xsl:element name="virtualization:title"><xsl:value-of select="virtualization:releasetitle" /></xsl:element>
 						<xsl:element name="virtualization:notes"><xsl:value-of select="virtualization:releasenotes" /></xsl:element>
 						<xsl:element name="virtualization:description"><xsl:value-of select="virtualization:releasedescription" /></xsl:element>
@@ -244,22 +247,26 @@
 								</xsl:when>
 							</xsl:choose>
 						</xsl:element>
-						<xsl:element name="virtualization:lastupdatedon"><xsl:value-of select="virtualization:lastupdatedon" /></xsl:element>
-						<xsl:element name="virtualization:lastupdatedby">
-							<xsl:choose>
-								<xsl:when test="person:lastupdatedby">
-									<xsl:attribute name="id"><xsl:value-of select="person:lastupdatedby/@id" /></xsl:attribute>
-									<xsl:attribute name="cname"><xsl:value-of select="person:lastupdatedby/@cname" /></xsl:attribute>
-									<xsl:element name="person:firstname"><xsl:value-of select="person:lastupdatedby/person:firstname" /></xsl:element>
-									<xsl:element name="person:lastname"><xsl:value-of select="person:lastupdatedby/person:lastname" /></xsl:element>
-									<xsl:element name="person:institute"><xsl:value-of select="person:lastupdatedby/person:institute" /></xsl:element>
-									<xsl:element name="person:role">
-										<xsl:attribute name="id"><xsl:value-of select="person:lastupdatedby/person:role/@id" /></xsl:attribute>
-										<xsl:attribute name="type"><xsl:value-of select="person:lastupdatedby/person:role/@type" /></xsl:attribute>
-									</xsl:element>
-								</xsl:when>
-							</xsl:choose>
-						</xsl:element>
+						<xsl:if test="virtualization:lastupdatedon">
+							<xsl:element name="virtualization:lastupdatedon"><xsl:value-of select="virtualization:lastupdatedon" /></xsl:element>
+						</xsl:if>
+						<xsl:if test="virtualization:lastupdatedby/@id">
+							<xsl:element name="virtualization:lastupdatedby">
+								<xsl:choose>
+									<xsl:when test="person:lastupdatedby">
+										<xsl:attribute name="id"><xsl:value-of select="person:lastupdatedby/@id" /></xsl:attribute>
+										<xsl:attribute name="cname"><xsl:value-of select="person:lastupdatedby/@cname" /></xsl:attribute>
+										<xsl:element name="person:firstname"><xsl:value-of select="person:lastupdatedby/person:firstname" /></xsl:element>
+										<xsl:element name="person:lastname"><xsl:value-of select="person:lastupdatedby/person:lastname" /></xsl:element>
+										<xsl:element name="person:institute"><xsl:value-of select="person:lastupdatedby/person:institute" /></xsl:element>
+										<xsl:element name="person:role">
+											<xsl:attribute name="id"><xsl:value-of select="person:lastupdatedby/person:role/@id" /></xsl:attribute>
+											<xsl:attribute name="type"><xsl:value-of select="person:lastupdatedby/person:role/@type" /></xsl:attribute>
+										</xsl:element>
+									</xsl:when>
+								</xsl:choose>
+							</xsl:element>
+						</xsl:if>
 						<xsl:if test="virtualization:contextformat" >
 							<xsl:for-each select="virtualization:contextformat">
 								<xsl:element name="virtualization:contextformat">

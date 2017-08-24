@@ -49,6 +49,7 @@ class Default_Model_VAviewsFilterBase extends Default_Model_Filter {
 		$this->_fields[] = 'initialsize';
 		$this->_fields[] = 'initialchecksum';
 		$this->_fields[] = 'ovfurl';
+		$this->_fields[] = 'default_access';
 		$this->_fields[] = 'vmiid';
 		$this->_fields[] = 'hypervisors';
 		$this->_fields[] = 'archid';
@@ -106,6 +107,7 @@ class Default_Model_VAviewsFilterBase extends Default_Model_Filter {
 		$this->_fieldTypes['initialsize'] = 'bigint';
 		$this->_fieldTypes['initialchecksum'] = 'string';
 		$this->_fieldTypes['ovfurl'] = 'string';
+		$this->_fieldTypes['default_access'] = 'string';
 		$this->_fieldTypes['vmiid'] = 'integer';
 		$this->_fieldTypes['hypervisors'] = 'e_hypervisors[]';
 		$this->_fieldTypes['archid'] = 'integer';

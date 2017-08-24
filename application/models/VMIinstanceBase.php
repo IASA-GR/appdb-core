@@ -52,6 +52,7 @@ class Default_Model_VMIinstanceBase
 	protected $_accelType;
 	protected $_accelMinimum;
 	protected $_accelRecommend;
+	protected $_defaultAccess;
 
 	public function __set($name,$value)
 	{
@@ -550,6 +551,20 @@ class Default_Model_VMIinstanceBase
 		return $this;
 	}
 
+	public function getDefaultAccess()
+	{
+		return $this->_defaultAccess;
+	}
+
+	public function setDefaultAccess($value)
+	{
+		/* if ( $value === null ) {
+			$this->_defaultAccess = 'NULL';
+		} else */ $this->_defaultAccess = $value;
+		return $this;
+	}
+
+
 	public function getInitialchecksum()
 	{
 		return $this->_initialchecksum;
@@ -624,6 +639,7 @@ class Default_Model_VMIinstanceBase
 		if ($this->_accelMinimum !== null) $XML .= "<accelminimum>".recode_string("utf8..xml",$this->_accelMinimum)."</accelminimum>\n";
 		if ($this->_accelRecommend !== null) $XML .= "<accelrecommend>".recode_string("utf8..xml",$this->_accelRecommend)."</accelrecommend>\n";
 		if ($this->_accelType !== null) $XML .= "<acceltype>".recode_string("utf8..xml",$this->_accelType)."</acceltype>\n";
+		if ($this->_defaultAccess !== null) $XML .= "<defaultAccess>".recode_string("utf8..xml",$this->_defaultAccess)."</defaultAccess>\n";
 		$XML .= "</VMIinstance>\n";
 		return $XML;
 	}

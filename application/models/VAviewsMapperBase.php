@@ -78,6 +78,7 @@ class Default_Model_VAviewsMapperBase
 		if ( ! isnull($value->getInitialsize()) ) $data['initialsize'] = $value->getInitialsize();
 		if ( ! isnull($value->getInitialchecksum()) ) $data['initialchecksum'] = $value->getInitialchecksum();
 		if ( ! isnull($value->getOvfurl()) ) $data['ovfurl'] = $value->getOvfurl();
+		if ( ! isnull($value->getDefaultAccess()) ) $data['default_access'] = $value->getDefaultAccess();
 		if ( ! isnull($value->getVmiID()) ) $data['vmiid'] = $value->getVmiID();
 		if ( ! isnull($value->getHypervisors()) ) $data['hypervisors'] = $value->getHypervisors();
 		if ( ! isnull($value->getArchID()) ) $data['archid'] = $value->getArchID();
@@ -158,6 +159,7 @@ class Default_Model_VAviewsMapperBase
 		$entry->setInitialsize($row->initialsize);
 		$entry->setInitialchecksum($row->initialchecksum);
 		$entry->setOvfurl($row->ovfurl);
+		$entry->setDefaultAccess($row->default_access);
 		$entry->setVmiID($row->vmiid);
 		$entry->setHypervisors($row->hypervisors);
 		$entry->setArchID($row->archid);

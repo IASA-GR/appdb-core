@@ -47,6 +47,7 @@ class Default_Model_VMIinstancesFilterBase extends Default_Model_Filter {
 		$this->_fields[] = 'initialsize';
 		$this->_fields[] = 'initialchecksum';
 		$this->_fields[] = 'ovfurl';
+		$this->_fields[] = 'default_access';
 		$this->_fieldTypes['id'] = 'integer';
 		$this->_fieldTypes['size'] = 'bigint';
 		$this->_fieldTypes['uri'] = 'string';
@@ -74,6 +75,7 @@ class Default_Model_VMIinstancesFilterBase extends Default_Model_Filter {
 		$this->_fieldTypes['initialsize'] = 'string';
 		$this->_fieldTypes['initialchecksum'] = 'string';
 		$this->_fieldTypes['ovfurl'] = 'string';
+		$this->_fieldTypes['default_access'] = 'string';
 		$this->_table = 'vmiinstances';
 	}
 }
