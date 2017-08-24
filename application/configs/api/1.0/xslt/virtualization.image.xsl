@@ -136,6 +136,17 @@
                                 </xsl:element>
                             </xsl:for-each>
                         </xsl:if>
+                        <xsl:element name="virtualization:defaultaccess">
+                            <xsl:value-of select="./defaultaccess"></xsl:value-of>
+                        </xsl:element>
+                        <xsl:if test="./contextformat">
+                            <xsl:for-each select="./contextformat/*">
+                                <xsl:element name="virtualization:contextformat">
+                                    <xsl:attribute name="id"><xsl:value-of select="./id" /></xsl:attribute>
+                                    <xsl:attribute name="name"><xsl:value-of select="./name" /></xsl:attribute>
+                                </xsl:element>
+                            </xsl:for-each>
+                        </xsl:if>
 			<xsl:element name="virtualization:addedon"><xsl:value-of select="./addedon" /></xsl:element>
 			<xsl:choose>
 				<xsl:when test="./addedby">

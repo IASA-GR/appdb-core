@@ -5900,6 +5900,22 @@ class VMCaster{
             }
             return $result;
         }
+        private static function getImageSupportedContextFormats($img) {
+            if ($img === null) {
+                return array();
+            }
+
+            $result = array();
+            foreach($img->supportedContextFormats as $formatrelation) {
+                $format = $formatrelation->getContextFormat();
+                $result[] = array(
+                    "id" => $format->id,
+                    "name" => $format->name
+                );
+            }
+
+            return $result;
+        }
 	public static function convertImage($data, $format='xml'){
 		$result = "";
 		$img = $data["image"];
@@ -5932,6 +5948,8 @@ class VMCaster{
 			"description" => $img->description,
 			"cores" => array( "minimum" => $img->coreMinimum, "recommended" => $img->coreRecommend ),
 			"ram" => array( "minimum" => $img->RAMminimum, "recommended" => $img->RAMrecommend ),
+                        "defaultaccess" => $img->defaultAccess,
+                        "contextformat" => self::getImageSupportedContextFormats($img),
                         "addedon" => str_replace("+00:00","Z",gmdate("c", strtotime($img->addedon))),
 			"addedby" => array( "id" => $addedby->id, "cname" => $addedby->cname, "firstname" => $addedby->firstname, "lastname" => $addedby->lastname, "gender" => $addedby->gender, "permalink" =>  'https://'.$_SERVER['HTTP_HOST'].'/store/person/'.$addedby->cname),
 			"published" => $ver->published,
