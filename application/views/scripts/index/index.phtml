@@ -265,8 +265,11 @@ if( $browserSupported == false ){
                                                         <div class="sourcetype egi-sso-checkin-login">
 								<a class="icontext" href="https://<?php echo  $_SERVER['HTTP_HOST']; ?>/saml/saml?source=egi-aai-sp"><span >Sign in with EGI CHECK-IN</span></a>
                                                                 <div class="sep"></div>
+                                                                <div style="padding: 5px;white-space: pre-wrap;margin-bottom: -5px">By logging into the service means that you agree with the <a href="https://documents.egi.eu/public/ShowDocument?docid=2623" style="background-color: rgba(0, 0, 0, 0);color: #FFA41A;text-decoration: none;" target="_blank">terms of use</a>.</div>
+                                                                <div class="sep"></div>
                                                                 <div class="details"><a href="http://aai<?php echo ((ApplicationConfiguration::isProductionInstance() === false )?'-dev': ''); ?>.egi.eu/signup" target="_blank">Not signed up yet?</a></div>
                                                                 <div class="details"><a href="https://wiki.egi.eu/wiki/AAI_usage_guide" target="_blank">Need help on signing up?</a></div>
+                                                                <div class="details"><a href="https://documents.egi.eu/public/ShowDocument?docid=2623" target="_blank">View the terms of use</a></div>
 							</div>
 							<?php if (ApplicationConfiguration::saml('support.sources', false) === 'all' && ApplicationConfiguration::isProductionInstance() === false ) { ?>
                                                         <div class="sourcetype egi-aai-login egi-sso-login">
