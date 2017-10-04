@@ -14,6 +14,17 @@
  * See the License for the specific language governing permissions and 
  * limitations under the License.
  */
+ 
+ 
+/** Needed for VA sync'ing */ 
+require_once "PHPCouch/PHPOnCouch/Couch.php";
+require_once "PHPCouch/PHPOnCouch/CouchClient.php";
+require_once "PHPCouch/PHPOnCouch/CouchDocument.php";
+require_once "PHPCouch/PHPOnCouch/Config.php";
+//We import the classes that we need
+use PHPOnCouch\CouchClient;
+use PHPOnCouch\Exceptions; 
+/***************************/
 
 class VoController extends Zend_Controller_Action
 {
@@ -1657,7 +1668,7 @@ class VoController extends Zend_Controller_Action
 	}
 	
 	public function dispatchobsoleteimagelistAction(){
-		$this->_helper->layout->disableLayout();
+	$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
 		$dispatch = ( ( isset( $_GET["dispatch"] )  )?( $_GET["dispatch"] ) : "false" );
 		$islocal = localRequest();
@@ -1689,6 +1700,54 @@ class VoController extends Zend_Controller_Action
 			}
 		}else{
 			VoAdminNotifications::sendVOObsoleteNotifications();
+		}
+	}
+	
+	public function newsyncvasAction() {
+		$this->_helper->layout->disableLayout();
+		$this->_helper->viewRenderer->setNoRender();
+		$couchHost = 'http://10.0.0.73:5050/';
+		$couchDB = 'testdb';
+		$glueVer = '2.0';
+		$client = new CouchClient($couchHost, $couchDB);
+		try{
+			$selector = [
+					'meta.collection'=>['$eq'=>'egi.goc.vaproviders'],
+			];
+			//$docs = $client->limit(1000)->fields(['_id', 'info.images.[].GLUE2ApplicationEnvironmentRepository'])->find($gselector);
+			$docs = $client->limit(1000)->find($selector);
+			foreach ($docs as $doc) {
+				$id = $doc->_id;
+				echo "$id ";
+				db()->query('INSERT INTO vapj (pkey,j,h) SELECT ?, ?, ? WHERE NOT EXISTS (SELECT * FROM vapj WHERE pkey = ?);', array(
+					$doc->info->endpoint_pkey,
+					json_encode($doc),
+					$doc->meta->hash,
+					$doc->info->endpoint_pkey
+				));
+				$tid = str_replace('egi.goc.vaproviders.', 'egi.top.vaproviders.', $id) . '.glue' . $glueVer;
+				echo "$tid\n";
+				try {
+					$tdoc = $client->getDoc($tid);
+					db()->query('INSERT INTO tvapj (pkey,j,h) SELECT ?, ?, ? WHERE NOT EXISTS (SELECT * FROM tvapj WHERE pkey = ?);', array(
+						$tdoc->info->endpoint_pkey,
+						json_encode($tdoc),
+						$tdoc->meta->hash,
+						$tdoc->info->endpoint_pkey
+				));
+				} catch(Exceptions\CouchNotFoundException $ex){
+					if($ex->getCode() == 404) {
+						echo "Top BDII Document not found!\n";
+					}
+				}
+				echo "Document retrieved: ".print_r($tdoc,true)."\n";
+			}
+			//$docs = $client->getDoc('egi.top.vaproviders.100it.8253g0.glue2.0');
+			//echo 'Document found';
+		} catch(Exceptions\CouchNotFoundException $ex){
+			if($ex->getCode() == 404) {
+				echo "GOCDB Document not found!\n";
+			}
 		}
 	}
 }
