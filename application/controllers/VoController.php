@@ -1706,48 +1706,85 @@ class VoController extends Zend_Controller_Action
 	public function newsyncvasAction() {
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
-		$couchHost = 'http://10.0.0.73:5050/';
-		$couchDB = 'testdb';
-		$glueVer = '2.0';
+		//$couchHost = 'http://10.0.0.73:5050/';
+		$config = Zend_Registry::get("infosys");
+		$couchHost = $config["host"];
+		$couchDB = $config["db"];
+		$glueVer = $config["glueVersion"];
 		$client = new CouchClient($couchHost, $couchDB);
+		$inTransaction = false;
+		$release_sp_vap = false;
+		$startTime = microtime(true);
+		$success = true;
 		try{
+			db()->beginTransaction();
+			$inTransaction = true;
 			$selector = [
 					'meta.collection'=>['$eq'=>'egi.goc.vaproviders'],
 			];
-			//$docs = $client->limit(1000)->fields(['_id', 'info.images.[].GLUE2ApplicationEnvironmentRepository'])->find($gselector);
 			$docs = $client->limit(1000)->find($selector);
 			foreach ($docs as $doc) {
 				$id = $doc->_id;
-				echo "$id ";
-				db()->query('INSERT INTO vapj (pkey,j,h) SELECT ?, ?, ? WHERE NOT EXISTS (SELECT * FROM vapj WHERE pkey = ?);', array(
+				db()->query('INSERT INTO vapj (pkey,j,h) VALUES (?, ?, ?)', array(
 					$doc->info->endpoint_pkey,
 					json_encode($doc),
-					$doc->meta->hash,
-					$doc->info->endpoint_pkey
+					$doc->meta->hash
 				));
 				$tid = str_replace('egi.goc.vaproviders.', 'egi.top.vaproviders.', $id) . '.glue' . $glueVer;
-				echo "$tid\n";
 				try {
+					$sp_vap = "sync_egi_vap_tvapj" . (microtime(true) * 10000);
+					db()->query("SAVEPOINT $sp_vap");
+					$release_sp_vap = true;
 					$tdoc = $client->getDoc($tid);
-					db()->query('INSERT INTO tvapj (pkey,j,h) SELECT ?, ?, ? WHERE NOT EXISTS (SELECT * FROM tvapj WHERE pkey = ?);', array(
+					db()->query('INSERT INTO tvapj (pkey,j,h) VALUES (?, ?, ?)', array(
 						$tdoc->info->endpoint_pkey,
 						json_encode($tdoc),
-						$tdoc->meta->hash,
-						$tdoc->info->endpoint_pkey
+						$tdoc->meta->hash
 				));
-				} catch(Exceptions\CouchNotFoundException $ex){
-					if($ex->getCode() == 404) {
-						echo "Top BDII Document not found!\n";
+				} catch(Exceptions\CouchNotFoundException $e){
+					if($e->getCode() == 404) {
+						error_log("[syncvaprovidersAction] Sync operation exception while querying $tid due to CouchDB error. Reason: TopBDII document not found. Operation will continue." );
+					} else {
+						error_log("[syncvaprovidersAction] Sync operation exception while querying $tid due to CouchDB error. Reason: " . $e->getMessage() . ". Operation will continue.");
 					}
+					$release_sp_vap = false;
+					db()->query("ROLLBACK TO SAVEPOINT $sp_vap");
+				} catch(Exception $e){
+					error_log("[syncvaprovidersAction] Sync operation exception while querying $tid. Reason: " . $e->getMessage . ". Operation will continue." );
+					$release_sp_vap = false;
+					db()->query("ROLLBACK TO SAVEPOINT $sp_vap");
 				}
-				echo "Document retrieved: ".print_r($tdoc,true)."\n";
+				if ($release_sp_vap) {
+					db()->query("RELEASE SAVEPOINT $sp_vap");
+				}
 			}
-			//$docs = $client->getDoc('egi.top.vaproviders.100it.8253g0.glue2.0');
-			//echo 'Document found';
-		} catch(Exceptions\CouchNotFoundException $ex){
-			if($ex->getCode() == 404) {
-				echo "GOCDB Document not found!\n";
+			db()->commit();
+			db()->query("SELECT refresh_va_providers()"); 
+		} catch(Exceptions\CouchNotFoundException $e) {
+			$success = false;
+			if($e->getCode() == 404) {
+				error_log("[syncvaprovidersAction] Sync operation failed due to CouchDB error. Reason: GOCDB document not found. Operation aborted." );
+			} else {
+				error_log("[syncvaprovidersAction] Sync operation failed due to CouchDB error. Reason: " . $e->getMessage() . ". Operation aborted.");
 			}
+			if ($inTransaction) {
+				db()->rollBack();
+			}
+		} catch(Exception $e){
+			$success = false;
+			if ($inTransaction) {
+				db()->rollBack();
+			}
+			error_log("[syncvaprovidersAction] Sync operation failed. Reason: " . $e->getMessage() . ". Operation aborted.");
 		}
+		if ($success) {
+			echo "Success!\n";
+		} else {
+			echo "Failure!\n";
+		}
+		$endTime = microtime(true);
+		$dt = ($endTime - $startTime);
+		echo "Time: " . $dt ."s";
+
 	}
 }

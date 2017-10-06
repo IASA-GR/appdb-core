@@ -38,6 +38,9 @@ Zend_Registry::set('api',$api);
 $app = $this->getOption("app");
 Zend_Registry::set('app',$app);
 
+$infosys = $this->getOption("infosys");
+Zend_Registry::set('infosys',$infosys);
+
 if (isset($app["timezone"])) {
 	date_default_timezone_set($app["timezone"]);
 } else {
