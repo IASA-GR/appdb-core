@@ -1,78 +1,159 @@
-/*
- Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
- 
- http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and 
- limitations under the License.
-*/
-
-/* 
-EGI AppDB incremental SQL script
-Previous version: 8.15.4
-New version: 8.16.0
-Author: wvkarag@lovecraft.priv.iasa.gr
-*/
-
 START TRANSACTION;
 
 DROP FUNCTION IF EXISTS group_hash(va_provider_templates);
-DROP TABLE IF EXISTS va_provider_templates;
+-- DROP TABLE IF EXISTS va_provider_templates;
+DROP SEQUENCE IF EXISTS va_provider_templates_id_seq CASCADE;
 CREATE SEQUENCE va_provider_templates_id_seq;
 ALTER SEQUENCE va_provider_templates_id_seq OWNER TO appdb;
 DROP MATERIALIZED VIEW site_services_xml;
 DROP MATERIALIZED VIEW site_service_images_xml;
 DROP FUNCTION IF EXISTS good_vmiinstanceid(va_provider_images);
-DROP TABLE IF EXISTS va_provider_images;
+-- DROP TABLE IF EXISTS va_provider_images;
+DROP SEQUENCE IF EXISTS va_provider_images_id_seq CASCADE;
 CREATE SEQUENCE va_provider_images_id_seq;
 ALTER SEQUENCE va_provider_images_id_seq OWNER TO appdb;
-DROP TABLE IF EXISTS va_provider_endpoints;
+-- DROP TABLE IF EXISTS va_provider_endpoints;
+DROP SEQUENCE IF EXISTS va_provider_endpoints_id_seq CASCADE;
 CREATE SEQUENCE va_provider_endpoints_id_seq;
 ALTER SEQUENCE va_provider_endpoints_id_seq OWNER TO appdb;
 
-DROP TABLE IF EXISTS vapj;
+DROP TABLE IF EXISTS vapj CASCADE;
 CREATE TABLE vapj (
 	pkey TEXT NOT NULL PRIMARY KEY,
-	j JSON NOT NULL,
+	j JSONB NOT NULL,
 	h TEXT NOT NULL,
-	lastseen TIMESTAMP
+	lastseen TIMESTAMP DEFAULT NOW()
 );
 ALTER TABLE vapj OWNER TO appdb;
+CREATE INDEX idx_vapj_info ON vapj USING gin (((j ->> 'info')::jsonb));
+CREATE INDEX idx_vapj_lastseen ON vapj USING btree(lastseen);
 
-DROP TABLE IF EXISTS tvapj;
+CREATE OR REPLACE FUNCTION trfn_vapj_upsert() RETURNS TRIGGER AS
+$$
+BEGIN
+	IF EXISTS (SELECT 1 FROM vapj WHERE pkey = NEW.pkey) THEN
+		
+		IF NEW.h = (SELECT h FROM vapj WHERE pkey = NEW.pkey) THEN
+--			RAISE NOTICE 'existing unmodded entry, updating lastseen';
+			UPDATE vapj
+				SET lastseen = NOW()
+				WHERE pkey = NEW.pkey;
+			RETURN NULL;
+		ELSE
+--			RAISE NOTICE 'existing modded entry, updating data and lastseen';
+			UPDATE vapj 
+				SET j = NEW.j, h = NEW.h, lastseen = NOW()
+				WHERE pkey = NEW.pkey;
+			RETURN NULL;
+		END IF;
+	ELSE
+--		RAISE NOTICE 'new entry';
+		NEW.lastseen = NOW();
+		RETURN NEW;
+	END IF;
+END;
+$$
+LANGUAGE plpgsql;
+ALTER FUNCTION trfn_vapj_upsert() OWNER TO appdb;
+
+DROP TRIGGER IF EXISTS rtr_vapj_10_upsert ON vapj;
+CREATE TRIGGER rtr_vapj_10_upsert BEFORE INSERT ON vapj
+FOR EACH ROW EXECUTE PROCEDURE trfn_vapj_upsert();
+
+DROP TABLE IF EXISTS tvapj CASCADE;
 CREATE TABLE tvapj (
 	pkey TEXT NOT NULL PRIMARY KEY,
-	j JSON NOT NULL,
-	h TEXT NOT NULL
+	j JSONB NOT NULL,
+	h TEXT NOT NULL,
+	lastseen TIMESTAMP DEFAULT NOW()
 );
 ALTER TABLE tvapj OWNER TO appdb;
+CREATE INDEX idx_tvapj_info ON tvapj USING gin (((j ->> 'info')::jsonb));
+CREATE INDEX idx_tvapj_lastseen ON tvapj USING btree(lastseen);
+
+CREATE OR REPLACE FUNCTION trfn_tvapj_upsert() RETURNS TRIGGER AS
+$$
+BEGIN
+	IF EXISTS (SELECT 1 FROM tvapj WHERE pkey = NEW.pkey) THEN
+		IF NEW.h = (SELECT h FROM tvapj WHERE pkey = NEW.pkey) THEN
+			RETURN NULL;
+		ELSE
+			UPDATE tvapj 
+				SET j = NEW.j, h = NEW.h, lastseen = NOW()
+				WHERE pkey = NEW.pkey;
+			RETURN NULL;
+		END IF;
+	ELSE
+		NEW.lastseen = NOW();
+		RETURN NEW;
+	END IF;
+END;
+$$
+LANGUAGE plpgsql;
+ALTER FUNCTION trfn_tvapj_upsert() OWNER TO appdb;
+
+DROP TRIGGER IF EXISTS rtr_tvapj_10_upsert ON tvapj;
+CREATE TRIGGER rtr_tvapj_10_upsert BEFORE INSERT ON tvapj
+FOR EACH ROW EXECUTE PROCEDURE trfn_tvapj_upsert();
+
+CREATE OR REPLACE FUNCTION trfn_gocdb_va_providers_upsert() RETURNS TRIGGER AS
+$$
+BEGIN
+	IF EXISTS (SELECT 1 FROM gocdb.va_providers WHERE pkey = NEW.pkey) THEN
+		UPDATE gocdb.va_providers SET 
+		  hostname = NEW.hostname,
+		  gocdb_url = NEW.gocdb_url,
+		  host_dn = NEW.host_dn,
+		  host_os = NEW.host_os,
+		  host_arch = NEW.host_arch,
+		  beta = NEW.beta,
+		  service_type = NEW.service_type,
+		  host_ip = NEW.host_ip,
+		  in_production = NEW.in_production,
+		  node_monitored = NEW.node_monitored,
+		  sitename = NEW.sitename,
+		  country_name = NEW.country_name,
+		  country_code = NEW.country_code,
+		  roc_name = NEW.roc_name,
+		  url = NEW.url,
+		  serviceid = NEW.serviceid
+		WHERE pkey = NEW.pkey;
+		RETURN NULL;
+	ELSE		
+		RETURN NEW;
+	END IF;
+END;
+$$
+LANGUAGE plpgsql;
+ALTER FUNCTION trfn_gocdb_va_providers_upsert() OWNER TO appdb;
+
+DROP TRIGGER IF EXISTS rtr_gocdb_va_providers_10_upsert ON gocdb.va_providers;
+CREATE TRIGGER rtr_gocdb_va_providers_10_upsert BEFORE INSERT ON gocdb.va_providers
+FOR EACH ROW EXECUTE PROCEDURE trfn_gocdb_va_providers_upsert();
 
 DROP MATERIALIZED VIEW IF EXISTS va_provider_templates;
-CREATE MATERIALIZED VIEW va_provider_templates AS
+CREATE MATERIALIZED VIEW va_provider_templates AS 
 SELECT
   nextval('va_provider_templates_id_seq'::regclass) AS id,
-  pkey AS va_provider_id,
-  (json_array_elements(((j->>'info')::json->>'templates')::json)->>'GLUE2EntityName')::text AS resource_name,
-  (json_array_elements(((j->>'info')::json->>'templates')::json)->>'GLUE2ExecutionEnvironmentMainMemorySize')::text AS memsize,
-  (json_array_elements(((j->>'info')::json->>'templates')::json)->>'GLUE2ExecutionEnvironmentLogicalCPUs')::text AS logical_cpus,
-  (json_array_elements(((j->>'info')::json->>'templates')::json)->>'GLUE2ExecutionEnvironmentPhysicalCPUs')::text AS physical_cpus,
-  (json_array_elements(((j->>'info')::json->>'templates')::json)->>'GLUE2ExecutionEnvironmentCPUMultiplicity')::text AS cpu_multiplicity,
-  (json_array_elements(((j->>'info')::json->>'templates')::json)->>'GLUE2ResourceManagerForeignKey')::text AS resource_manager,
-  (json_array_elements(((j->>'info')::json->>'templates')::json)->>'GLUE2ExecutionEnvironmentComputingManagerForeignKey')::text AS computing_manager,
-  (json_array_elements(((j->>'info')::json->>'templates')::json)->>'GLUE2ExecutionEnvironmentOSFamily')::text AS os_family,
-  (json_array_elements(((j->>'info')::json->>'templates')::json)->>'GLUE2ExecutionEnvironmentConnectivityIn')::text AS connectivity_in,
-  (json_array_elements(((j->>'info')::json->>'templates')::json)->>'GLUE2ExecutionEnvironmentConnectivityOut')::text AS connectivity_out,
-  (json_array_elements(((j->>'info')::json->>'templates')::json)->>'GLUE2ExecutionEnvironmentCPUModel')::text AS cpu_model,
-  (json_array_elements(((j->>'info')::json->>'templates')::json)->>'GLUE2ResourceID')::text AS resource_id,
-  (json_array_elements(((j->>'info')::json->>'templates')::json)->>'GLUE2ExecutionEnvironmentDiskSize')::text AS disc_size
-FROM tvapj;
+  g.pkey AS va_provider_id,
+  (jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2EntityName')::text AS resource_name,
+  (jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ExecutionEnvironmentMainMemorySize')::text AS memsize,
+  (jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ExecutionEnvironmentLogicalCPUs')::text AS logical_cpus,
+  (jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ExecutionEnvironmentPhysicalCPUs')::text AS physical_cpus,
+  (jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ExecutionEnvironmentCPUMultiplicity')::text AS cpu_multiplicity,
+  (jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ResourceManagerForeignKey')::text AS resource_manager,
+  (jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ExecutionEnvironmentComputingManagerForeignKey')::text AS computing_manager,
+  (jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ExecutionEnvironmentOSFamily')::text AS os_family,
+  (jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ExecutionEnvironmentConnectivityIn')::text AS connectivity_in,
+  (jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ExecutionEnvironmentConnectivityOut')::text AS connectivity_out,
+  (jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ExecutionEnvironmentCPUModel')::text AS cpu_model,
+  (jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ResourceID')::text AS resource_id,
+  (jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ExecutionEnvironmentDiskSize')::text AS disc_size
+FROM vapj AS g
+LEFT OUTER JOIN tvapj AS t ON t.pkey = g.pkey
+WHERE 
+	(COALESCE(TRIM(((t.j->>'info')::jsonb->>'GLUE2ComputingEndpointComputingServiceForeignKey')::text), '') <> '') AND
+	(COALESCE(((g.j->>'info')::jsonb->>'in_production')::text, 'FALSE')::boolean IS DISTINCT FROM FALSE);
 ALTER MATERIALIZED VIEW va_provider_templates OWNER TO appdb;
 CREATE INDEX "idx_va_provider_templates_va_provider_id" ON va_provider_templates USING btree (va_provider_id);
 CREATE INDEX "idx_va_provider_templates_va_provider_id_textops" ON va_provider_templates USING btree (va_provider_id text_pattern_ops);
@@ -82,10 +163,12 @@ DROP MATERIALIZED VIEW IF EXISTS va_provider_endpoints;
 CREATE MATERIALIZED VIEW va_provider_endpoints AS
 SELECT
   nextval('va_provider_endpoints_id_seq'::regclass) AS id,
-  pkey AS va_provider_id,
-  ((j->>'info')::json->>'GLUE2EndpointURL')::text AS endpoint_url,
-  ((j->>'info')::json->>'GLUE2EndpointImplementor')::text AS deployment_type
-FROM tvapj;
+  t.pkey AS va_provider_id,
+  ((t.j->>'info')::jsonb->>'GLUE2EndpointURL')::text AS endpoint_url,
+  ((t.j->>'info')::jsonb->>'GLUE2EndpointImplementor')::text AS deployment_type
+FROM vapj AS g
+LEFT OUTER JOIN tvapj AS t ON g.pkey = t.pkey
+WHERE ((t.j->>'info')::jsonb->>'GLUE2EndpointInterfaceName')::text = 'OCCI';
 ALTER MATERIALIZED VIEW va_provider_endpoints OWNER TO appdb;
 CREATE INDEX "idx_va_provider_endpoints_va_provider_id" ON va_provider_endpoints USING btree (va_provider_id);
 CREATE INDEX "idx_va_provider_endpoints_va_provider_id_textops" ON va_provider_endpoints USING btree (va_provider_id text_pattern_ops);
@@ -93,15 +176,52 @@ CREATE INDEX "idx_va_provider_endpoints_va_provider_id_trgmops" ON va_provider_e
 
 DROP MATERIALIZED VIEW IF EXISTS va_provider_images;
 CREATE MATERIALIZED VIEW va_provider_images AS
-SELECT
-  nextval('va_provider_images_id_seq'::regclass) AS id,
-  pkey AS va_provider_id,
-  (json_array_elements(((j->>'info')::json->>'images')::json)->'vmi_instance_id')::text::int AS vmiinstanceid,
-  (json_array_elements(((j->>'info')::json->>'images')::json)->>'content_type')::text AS content_type,
-  (json_array_elements(((j->>'info')::json->>'images')::json)->>'GLUE2EntityName')::text AS va_provider_image_id,
-  (json_array_elements(((j->>'info')::json->>'images')::json)->>'GLUE2ApplicationEnvironmentRepository')::text AS mp_uri,
-  (json_array_elements(((j->>'info')::json->>'images')::json)->'vowide_vmi_instance_id')::text::int AS vowide_vmiinstanceid
-FROM tvapj;
+SELECT 
+	id, va_provider_id,
+	CASE WHEN TRIM(COALESCE(vmiinstanceid, '')) = '' THEN
+		NULL::int
+	ELSE
+		vmiinstanceid::int
+	END AS vmiinstanceid,
+	content_type, va_provider_image_id, mp_uri, 
+	CASE WHEN LOWER(vowide_vmiinstanceid::text) = 'null' THEN NULL::int ELSE vowide_vmiinstanceid::int END AS vowide_vmiinstanceid
+FROM (
+	SELECT 
+		id, va_provider_id,
+		CASE WHEN LOWER(vmiinstanceid) = 'null' THEN
+			CASE LOWER(content_type)
+				WHEN 'vo' THEN
+					(
+						SELECT vapplists.vmiinstanceid 
+						FROM vowide_image_list_images 
+						INNER JOIN vapplists ON vapplists.id = vowide_image_list_images.vapplistid 
+						WHERE vowide_image_list_images.id::text = ((SELECT REGEXP_SPLIT_TO_ARRAY(REPLACE((REGEXP_MATCHES(mp_uri, ':[0-9]+[:/]*[0-9]*', '')::text[])[1], '/', ''), ':', '')::text[]))[2]
+					)::text
+				ELSE
+					((SELECT REGEXP_SPLIT_TO_ARRAY(REPLACE((REGEXP_MATCHES(mp_uri, ':[0-9]+[:/]*[0-9]*', '')::text[])[1], '/', ''), ':', '')::text[]))[2]	
+			END
+		ELSE 
+			vmiinstanceid
+		END AS vmiinstanceid,
+		CASE LOWER(content_type) WHEN 'vm' THEN 'va' ELSE LOWER(content_type) END AS content_type,
+		va_provider_image_id, mp_uri, 
+		CASE WHEN LOWER(vowide_vmiinstanceid) = 'null' THEN NULL::int ELSE vowide_vmiinstanceid::int END AS vowide_vmiinstanceid	
+	FROM (
+		SELECT 
+		  nextval('va_provider_images_id_seq'::regclass) AS id,
+		  g.pkey AS va_provider_id,
+		  (jsonb_array_elements(((t.j->>'info')::jsonb->>'images')::jsonb)->'vmi_instance_id')::text AS vmiinstanceid,
+		  (jsonb_array_elements(((t.j->>'info')::jsonb->>'images')::jsonb)->>'content_type')::text AS content_type,
+		  (jsonb_array_elements(((t.j->>'info')::jsonb->>'images')::jsonb)->>'GLUE2EntityName')::text AS va_provider_image_id,
+		  (jsonb_array_elements(((t.j->>'info')::jsonb->>'images')::jsonb)->>'GLUE2ApplicationEnvironmentRepository')::text AS mp_uri,
+		  (jsonb_array_elements(((t.j->>'info')::jsonb->>'images')::jsonb)->'vowide_vmi_instance_id')::text AS vowide_vmiinstanceid
+		FROM vapj AS g
+		LEFT OUTER JOIN tvapj AS t ON g.pkey = t.pkey
+		WHERE 
+			(COALESCE(TRIM(((t.j->>'info')::jsonb->>'GLUE2ComputingEndpointComputingServiceForeignKey')::text), '') <> '') AND
+			(COALESCE(((g.j->>'info')::jsonb->>'in_production')::text, 'FALSE')::boolean IS DISTINCT FROM FALSE)
+	) AS x
+) AS xx;
 ALTER MATERIALIZED VIEW va_provider_images OWNER TO appdb;
 CREATE INDEX "idx_va_provider_images_va_provider_id" ON va_provider_images USING btree(va_provider_id);
 CREATE INDEX "idx_va_provider_images_va_provider_id_textops" ON va_provider_images USING btree(va_provider_id text_pattern_ops);
@@ -115,14 +235,14 @@ CREATE OR REPLACE FUNCTION group_hash(v va_provider_templates)
  STABLE
 AS $function$
 SELECT md5(
-COALESCE(v.memsize, '') || '_' ||
-COALESCE(v.logical_cpus, '') || '_' ||
-COALESCE(v.physical_cpus,'') || '_' ||
-COALESCE(v.cpu_multiplicity, '') || '_' ||
-COALESCE(v.os_family, '') || '_' ||
-COALESCE(v.connectivity_in, '') || '_' ||
-COALESCE(v.connectivity_out, '') || '_' ||
-COALESCE(v.cpu_model, '') || '_' ||
+COALESCE(v.memsize, '') || '_' || 
+COALESCE(v.logical_cpus, '') || '_' || 
+COALESCE(v.physical_cpus,'') || '_' || 
+COALESCE(v.cpu_multiplicity, '') || '_' || 
+COALESCE(v.os_family, '') || '_' || 
+COALESCE(v.connectivity_in, '') || '_' || 
+COALESCE(v.connectivity_out, '') || '_' || 
+COALESCE(v.cpu_model, '') || '_' || 
 COALESCE(v.disc_size, '')
 );
 $function$;
@@ -138,7 +258,7 @@ AS $function$
                         SELECT max(t1.id) as goodid FROM vmiinstances AS t1
                         INNER JOIN vmiinstances AS t2 ON t1.checksum = t2.checksum AND t1.guid = t2.guid AND t2.id = $1.vmiinstanceid
                         INNER JOIN vapplists ON t1.id = vapplists.vmiinstanceid
-                        INNER JOIN vapp_versions ON vapplists.vappversionid = vapp_versions.id
+                        INNER JOIN vapp_versions ON vapplists.vappversionid = vapp_versions.id 
                         WHERE vapp_versions.published
         ) AS t
 $function$;
@@ -196,38 +316,46 @@ CREATE MATERIALIZED VIEW site_service_images_xml AS
   GROUP BY siteimages.va_provider_id;
 ALTER MATERIALIZED VIEW site_service_images_xml OWNER TO appdb;
 
-CREATE FUNCTION refresh_va_providers() RETURNS VOID AS
-$$
+CREATE OR REPLACE FUNCTION refresh_va_providers() RETURNS VOID AS
+$$ 
+DECLARE deltime TEXT;
 BEGIN
+	deltime := '1 minute';
 	ALTER TABLE gocdb.va_providers
 		DISABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;
-
-	TRUNCATE TABLE gocdb.va_providers;
+		
+	-- TRUNCATE TABLE gocdb.va_providers;
+	DELETE FROM gocdb.va_providers 
+	WHERE pkey IN (
+		SELECT pkey 
+			FROM vapj
+			WHERE ((NOW() - lastseen)::INTERVAL > deltime::INTERVAL)
+	) OR pkey NOT IN (SELECT pkey FROM vapj);
+	
 	INSERT INTO gocdb.va_providers
 	SELECT
 		g.pkey,
-		((g.j->>'info')::json->>'hostname')::text AS hostname,
-		((g.j->>'info')::json->>'goc_portal_url')::text AS gocdb_url,
-		((g.j->>'info')::json->>'hostdn')::text AS host_dn,
-		((g.j->>'info')::json->>'host_os')::text AS host_os,
-		((g.j->>'info')::json->>'host_arch')::text AS host_arch,
-		((g.j->>'info')::json->'beta')::text::int::boolean AS beta,
-		((g.j->>'info')::json->>'service_type')::text AS service_type,
-		((g.j->>'info')::json->>'host_ip')::text AS host_ip,
-		((g.j->>'info')::json->'in_production')::text::int::boolean AS in_production,
-		((g.j->>'info')::json->'node_monitored')::text::int::boolean AS node_monitored,
-		((g.j->>'info')::json->>'site_name')::text AS sitename,
-		((g.j->>'info')::json->>'country_name')::text AS country_name,
-		((g.j->>'info')::json->>'country_code')::text AS country_code,
-		((g.j->>'info')::json->>'roc_name')::text AS roc_name,
-		((g.j->>'info')::json->>'url')::text AS url,
-		((t.j->>'info')::json->>'GLUE2EndpointServiceForeignKey')::text AS serviceid
+		((g.j->>'info')::jsonb->>'hostname')::text AS hostname,
+		((g.j->>'info')::jsonb->>'goc_portal_url')::text AS gocdb_url,
+		((g.j->>'info')::jsonb->>'hostdn')::text AS host_dn,
+		((g.j->>'info')::jsonb->>'host_os')::text AS host_os,
+		((g.j->>'info')::jsonb->>'host_arch')::text AS host_arch,
+		((g.j->>'info')::jsonb->>'beta')::text::boolean AS beta,
+		((g.j->>'info')::jsonb->>'service_type')::text AS service_type,
+		((g.j->>'info')::jsonb->>'host_ip')::text AS host_ip,
+		((g.j->>'info')::jsonb->>'in_production')::text::boolean AS in_production,
+		((g.j->>'info')::jsonb->>'node_monitored')::text::boolean AS node_monitored,
+		((g.j->>'info')::jsonb->>'site_name')::text AS sitename,
+		((g.j->>'info')::jsonb->>'country_name')::text AS country_name,
+		((g.j->>'info')::jsonb->>'country_code')::text AS country_code,
+		((g.j->>'info')::jsonb->>'roc_name')::text AS roc_name,
+		((g.j->>'info')::jsonb->>'url')::text AS url,
+		((t.j->>'info')::jsonb->>'GLUE2ComputingEndpointComputingServiceForeignKey')::text AS serviceid
 	FROM vapj AS g
 	LEFT OUTER JOIN tvapj AS t ON t.pkey = g.pkey
-	WHERE (NOW() - lastseen)::INTERVAL < '6 hours'::INTERVAL;
-
+	WHERE (NOW() - g.lastseen)::INTERVAL <= deltime::INTERVAL;
+	
 	REFRESH MATERIALIZED VIEW va_providers;
-
 	REFRESH MATERIALIZED VIEW va_provider_endpoints;
 	REFRESH MATERIALIZED VIEW va_provider_images;
 	REFRESH MATERIALIZED VIEW va_provider_templates;
@@ -240,23 +368,21 @@ BEGIN
         REFRESH MATERIALIZED VIEW CONCURRENTLY permissions;
 
 	--
-	-- These materialized views also depend on va providers, but are very slow to refresh
-	-- Most probably we only want to refresh them when sync'ing sites instead
+	-- These materialized views also depend on va providers, but are slow to refresh
+	-- Might want to only refresh them when sync'ing sites instead
 	--
-	-- REFRESH MATERIALIZED VIEW site_services_xml;
-	-- REFRESH MATERIALIZED VIEW site_service_images_xml;
+	REFRESH MATERIALIZED VIEW site_services_xml;
+	REFRESH MATERIALIZED VIEW site_service_images_xml;
 
 END;
 $$
 LANGUAGE plpgsql VOLATILE;
-ALTER FUNCTION refresh_va_providers OWNER TO appdb;
-
-REFRESH MATERIALIZED VIEW site_services_xml;
-REFRESH MATERIALIZED VIEW site_service_images_xml;
+ALTER FUNCTION refresh_va_providers() OWNER TO appdb;
 
 SELECT refresh_va_providers();
 
-ROLLBACK;
-INSERT INTO version (major,minor,revision,notes) 
-	SELECT 8, 16, 0, E'Refactor va providers, based on new JSON information system data'
-	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=16 AND revision=0);
+INSERT INTO version (major,minor,revision,notes)
+       SELECT 8, 16, 0, E'Refactor va providers, based on new JSON information system data'
+       WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=16 AND revision=0);
+
+COMMIT;
