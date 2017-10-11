@@ -727,11 +727,12 @@ function localRequest() {
 	$local = false;
 	if ( array_key_exists('REMOTE_ADDR',$_SERVER) ) {
 		$addr = $_SERVER['REMOTE_ADDR'];
+		//debug_log("LocalRequest: remote addr is $addr");
 		if ( ($addr==="::1") || ($addr === "127.0.0.1") || (substr($addr,0,3) === "10.") || (substr($addr,0,7) === "172.16.") || (substr($addr,0,8) === "192.168.") || ($addr === "195.251.54.91") || ($addr === "195.251.54.93") ) {
 			$local = true;
 		}
-		return $local;
 	}
+	return $local;
 }
 
 function browserName() {
