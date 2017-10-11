@@ -1,4 +1,29 @@
+/*
+ Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and 
+ limitations under the License.
+*/
+
+/* 
+EGI AppDB incremental SQL script
+Previous version: 8.15.4
+New version: 8.16.0
+Author: wvkarag@lovecraft.priv.iasa.gr
+*/
+
 START TRANSACTION;
+
+DROP TRIGGER IF EXISTS tr_gocdb_va_providers_99_refresh_permissions ON gocdb.va_providers;
 
 DROP FUNCTION IF EXISTS group_hash(va_provider_templates);
 -- DROP TABLE IF EXISTS va_provider_templates;
@@ -31,23 +56,22 @@ CREATE INDEX idx_vapj_lastseen ON vapj USING btree(lastseen);
 CREATE OR REPLACE FUNCTION trfn_vapj_upsert() RETURNS TRIGGER AS
 $$
 BEGIN
-	IF EXISTS (SELECT 1 FROM vapj WHERE pkey = NEW.pkey) THEN
-		
+	IF EXISTS (SELECT * FROM vapj WHERE TRIM(pkey) = TRIM(NEW.pkey)) THEN		
 		IF NEW.h = (SELECT h FROM vapj WHERE pkey = NEW.pkey) THEN
---			RAISE NOTICE 'existing unmodded entry, updating lastseen';
+			-- RAISE NOTICE 'existing unmodded entry, updating lastseen for %', pkey;
 			UPDATE vapj
 				SET lastseen = NOW()
 				WHERE pkey = NEW.pkey;
 			RETURN NULL;
 		ELSE
---			RAISE NOTICE 'existing modded entry, updating data and lastseen';
+			-- RAISE NOTICE 'existing modded entry, updating data and lastseen for %', pkey;
 			UPDATE vapj 
 				SET j = NEW.j, h = NEW.h, lastseen = NOW()
 				WHERE pkey = NEW.pkey;
 			RETURN NULL;
 		END IF;
 	ELSE
---		RAISE NOTICE 'new entry';
+		-- RAISE NOTICE 'new entry';
 		NEW.lastseen = NOW();
 		RETURN NEW;
 	END IF;
@@ -99,7 +123,9 @@ FOR EACH ROW EXECUTE PROCEDURE trfn_tvapj_upsert();
 CREATE OR REPLACE FUNCTION trfn_gocdb_va_providers_upsert() RETURNS TRIGGER AS
 $$
 BEGIN
+	-- RAISE NOTICE 'processing pkey: %;', NEW.pkey;
 	IF EXISTS (SELECT 1 FROM gocdb.va_providers WHERE pkey = NEW.pkey) THEN
+		-- RAISE NOTICE 'existing pkey: %;', NEW.pkey;
 		UPDATE gocdb.va_providers SET 
 		  hostname = NEW.hostname,
 		  gocdb_url = NEW.gocdb_url,
@@ -120,6 +146,7 @@ BEGIN
 		WHERE pkey = NEW.pkey;
 		RETURN NULL;
 	ELSE		
+		-- RAISE NOTICE 'new pkey: %;', NEW.pkey;
 		RETURN NEW;
 	END IF;
 END;
@@ -148,6 +175,12 @@ SELECT
   (jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ExecutionEnvironmentConnectivityOut')::text AS connectivity_out,
   (jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ExecutionEnvironmentCPUModel')::text AS cpu_model,
   (jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ResourceID')::text AS resource_id,
+  /*CASE (SELECT TRIM((jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ExecutionEnvironmentDiskSize')::text))
+	WHEN '0' THEN 'unlimited'
+	WHEN NULL::text THEN 'unspecified'
+	ELSE
+		((SELECT jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ExecutionEnvironmentDiskSize')::text) || ' GiB'
+  END AS disc_size*/
   (jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ExecutionEnvironmentDiskSize')::text AS disc_size
 FROM vapj AS g
 LEFT OUTER JOIN tvapj AS t ON t.pkey = g.pkey
@@ -155,7 +188,7 @@ WHERE
 	(COALESCE(TRIM(((t.j->>'info')::jsonb->>'GLUE2ComputingEndpointComputingServiceForeignKey')::text), '') <> '') AND
 	(COALESCE(((g.j->>'info')::jsonb->>'in_production')::text, 'FALSE')::boolean IS DISTINCT FROM FALSE);
 ALTER MATERIALIZED VIEW va_provider_templates OWNER TO appdb;
-CREATE INDEX "idx_va_provider_templates_va_provider_id" ON va_provider_templates USING btree (va_provider_id);
+CREATE UNIQUE INDEX "idx_va_provider_templates_id" ON va_provider_templates USING btree (id);
 CREATE INDEX "idx_va_provider_templates_va_provider_id_textops" ON va_provider_templates USING btree (va_provider_id text_pattern_ops);
 CREATE INDEX "idx_va_provider_templates_va_provider_id_trgmops" ON va_provider_templates USING gin (va_provider_id gin_trgm_ops);
 
@@ -170,6 +203,7 @@ FROM vapj AS g
 LEFT OUTER JOIN tvapj AS t ON g.pkey = t.pkey
 WHERE ((t.j->>'info')::jsonb->>'GLUE2EndpointInterfaceName')::text = 'OCCI';
 ALTER MATERIALIZED VIEW va_provider_endpoints OWNER TO appdb;
+CREATE UNIQUE INDEX "idx_va_provider_endpoints_id" ON va_provider_endpoints USING btree (id);
 CREATE INDEX "idx_va_provider_endpoints_va_provider_id" ON va_provider_endpoints USING btree (va_provider_id);
 CREATE INDEX "idx_va_provider_endpoints_va_provider_id_textops" ON va_provider_endpoints USING btree (va_provider_id text_pattern_ops);
 CREATE INDEX "idx_va_provider_endpoints_va_provider_id_trgmops" ON va_provider_endpoints USING gin (va_provider_id gin_trgm_ops);
@@ -223,6 +257,7 @@ FROM (
 	) AS x
 ) AS xx;
 ALTER MATERIALIZED VIEW va_provider_images OWNER TO appdb;
+CREATE UNIQUE INDEX "idx_va_provider_images_id" ON va_provider_images USING btree (id);
 CREATE INDEX "idx_va_provider_images_va_provider_id" ON va_provider_images USING btree(va_provider_id);
 CREATE INDEX "idx_va_provider_images_va_provider_id_textops" ON va_provider_images USING btree(va_provider_id text_pattern_ops);
 CREATE INDEX "idx_va_provider_images_va_provider_id_trgmops" ON va_provider_images USING gin(va_provider_id gin_trgm_ops);
@@ -265,13 +300,14 @@ $function$;
 ALTER FUNCTION good_vmiinstanceid(va_provider_images) OWNER TO appdb;
 
 CREATE MATERIALIZED VIEW site_services_xml AS
- SELECT __va_providers.sitename,
+ SELECT __va_providers.id, __va_providers.sitename,
     XMLELEMENT(NAME "site:service", XMLATTRIBUTES('occi' AS type, __va_providers.id AS id, __va_providers.hostname AS host, count(DISTINCT good_vmiinstanceid(va_provider_images.*)) AS instances, __va_providers.beta AS beta, __va_providers.in_production AS in_production, __va_providers.service_downtime::integer AS service_downtime, __va_providers.service_status AS service_status, __va_providers.service_status_date AS service_status_date), xmlagg(XMLELEMENT(NAME "siteservice:image", XMLATTRIBUTES(va_provider_images.vmiinstanceid AS id, good_vmiinstanceid(va_provider_images.*) AS goodid)))) AS x
    FROM __va_providers
      LEFT JOIN va_provider_images ON va_provider_images.va_provider_id = __va_providers.id AND (va_provider_images.vmiinstanceid IN ( SELECT __vaviews.vmiinstanceid
            FROM __vaviews))
   GROUP BY __va_providers.id, __va_providers.hostname, __va_providers.beta, __va_providers.in_production, __va_providers.service_downtime, __va_providers.sitename, __va_providers.service_status, __va_providers.service_status_date;
 ALTER MATERIALIZED VIEW site_services_xml OWNER TO appdb;
+CREATE UNIQUE INDEX "idx_site_services_xml_id" ON site_services_xml USING btree (id);
 CREATE INDEX "idx_site_services_xml_sitename" ON site_services_xml USING btree (sitename);
 CREATE INDEX "idx_site_services_xml_sitename_textops" ON site_services_xml USING btree (sitename text_pattern_ops);
 CREATE INDEX "idx_site_services_xml_sitename_trgmops" ON site_services_xml USING gin (sitename gin_trgm_ops);
@@ -315,25 +351,224 @@ CREATE MATERIALIZED VIEW site_service_images_xml AS
           GROUP BY __va_providers.id, __vaviews.vappversionid, __vaviews.va_version_archived, __vaviews.va_version_enabled, __vaviews.va_version_expireson, __vaviews.imglst_private, __vaviews.vmiinstanceid, __vaviews.vmiinstance_guid, __vaviews.vmiinstance_version, (good_vmiinstanceid(va_provider_images.*)), (vmiflavor_hypervisor_xml.hypervisor::text), oses.id, archs.id, __vaviews.osversion, __vaviews.format, __vaviews.uri, __vaviews.size, __vaviews.appid, __vaviews.appcname, __vaviews.appname, applications.deleted, applications.moderated) siteimages
   GROUP BY siteimages.va_provider_id;
 ALTER MATERIALIZED VIEW site_service_images_xml OWNER TO appdb;
+CREATE UNIQUE INDEX "idx_site_service_images_xml_id" ON site_service_images_xml USING btree (va_provider_id);
 
-CREATE OR REPLACE FUNCTION refresh_va_providers() RETURNS VOID AS
-$$ 
-DECLARE deltime TEXT;
+ALTER TABLE gocdb.sites ALTER COLUMN shortname DROP NOT NULL;
+
+DROP TABLE IF EXISTS sitej CASCADE;
+CREATE TABLE sitej (
+	pkey TEXT NOT NULL PRIMARY KEY,
+	j JSONB NOT NULL,
+	h TEXT NOT NULL,
+	lastseen TIMESTAMP DEFAULT NOW()
+);
+ALTER TABLE sitej OWNER TO appdb;
+CREATE INDEX idx_sitej_info ON sitej USING gin (((j ->> 'info')::jsonb));
+CREATE INDEX idx_sitej_lastseen ON sitej USING btree(lastseen);
+
+CREATE OR REPLACE FUNCTION trfn_sitej_upsert() RETURNS TRIGGER AS
+$$
 BEGIN
-	deltime := '1 minute';
-	ALTER TABLE gocdb.va_providers
-		DISABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;
+	IF EXISTS (SELECT 1 FROM sitej WHERE pkey = NEW.pkey) THEN
 		
-	-- TRUNCATE TABLE gocdb.va_providers;
+		IF NEW.h = (SELECT h FROM sitej WHERE pkey = NEW.pkey) THEN
+			-- RAISE NOTICE 'existing unmodded entry, updating lastseen';
+			UPDATE sitej
+				SET lastseen = NOW()
+				WHERE pkey = NEW.pkey;
+			RETURN NULL;
+		ELSE
+			-- RAISE NOTICE 'existing modded entry, updating data and lastseen';
+			UPDATE sitej 
+				SET j = NEW.j, h = NEW.h, lastseen = NOW()
+				WHERE pkey = NEW.pkey;
+			RETURN NULL;
+		END IF;
+	ELSE
+		-- RAISE NOTICE 'new entry';
+		NEW.lastseen = NOW();
+		RETURN NEW;
+	END IF;
+END;
+$$
+LANGUAGE plpgsql;
+ALTER FUNCTION trfn_sitej_upsert() OWNER TO appdb;
+
+DROP TRIGGER IF EXISTS rtr_sitej_10_upsert ON sitej;
+CREATE TRIGGER rtr_sitej_10_upsert BEFORE INSERT ON sitej
+FOR EACH ROW EXECUTE PROCEDURE trfn_sitej_upsert();
+
+CREATE OR REPLACE VIEW __va_providers AS
+ SELECT va_providers.pkey AS id,
+    va_providers.sitename,
+    va_providers.url,
+    va_providers.gocdb_url,
+    va_providers.hostname,
+    va_providers.host_dn,
+    va_providers.host_ip,
+    oses.id AS host_os_id,
+    archs.id AS host_arch_id,
+    va_providers.beta,
+    va_providers.in_production,
+    va_providers.node_monitored,
+    countries.id AS country_id,
+    va_providers.roc_name AS ngi,
+    uuid_generate_v5(uuid_namespace('ISO OID'::text), va_providers.pkey) AS guid,
+    va_providers.serviceid,
+    va_providers.service_downtime,
+    va_providers.service_status,
+    va_providers.service_status_date
+   FROM gocdb.va_providers
+     LEFT JOIN oses ON LOWER(oses.name) = LOWER(va_providers.host_os)
+     LEFT JOIN archs ON LOWER(archs.name) = LOWER(va_providers.host_arch) OR (LOWER(va_providers.host_arch) = ANY(LOWER(archs.aliases::text)::text[]))
+     LEFT JOIN countries ON countries.isocode = va_providers.country_code;
+
+CREATE OR REPLACE FUNCTION trfn_gocdb_sites_upsert() RETURNS TRIGGER AS
+$$
+BEGIN
+	-- RAISE NOTICE 'processing pkey: %;', NEW.pkey;
+	IF EXISTS (SELECT 1 FROM gocdb.sites WHERE pkey = NEW.pkey) THEN
+		-- RAISE NOTICE 'existing pkey: %;', NEW.pkey;
+		UPDATE gocdb.sites SET 
+		  name = NEW.name,
+		  shortname = NEW.shortname,
+		  officialname = NEW.officialname,
+		  description = NEW.description,
+		  portalurl = NEW.portalurl,
+		  homeurl = NEW.homeurl,
+		  contactemail = NEW.contactemail,
+		  contacttel = NEW.contacttel,
+		  alarmemail = NEW.alarmemail,
+		  csirtemail = NEW.csirtemail,
+		  giisurl = NEW.giisurl,
+		  countrycode = NEW.countrycode,
+		  country = NEW.country,
+		  tier = NEW.tier,
+		  subgrid = NEW.subgrid,
+		  roc = NEW.roc,
+		  prodinfrastructure = NEW.prodinfrastructure,
+		  certstatus = NEW.certstatus,
+		  timezone = NEW.timezone,
+		  latitude = NEW.latitude,
+		  longitude = NEW.longitude,
+		  domainname = NEW.domainname,
+		  siteip = NEW.siteip,
+		  guid = uuid_generate_v5(uuid_namespace('ISO OID'::text), 'gocdb:sites:' || NEW.name),
+		  updatedon = NOW(),
+		  deleted = COALESCE(NEW.deleted, false),
+		  deletedon = COALESCE(NEW.deletedon, NULL),
+		  deletedby = COALESCE(NEW.deletedby, NULL)
+		WHERE pkey = NEW.pkey;
+		RETURN NULL;
+	ELSE		
+		-- RAISE NOTICE 'new pkey: %;', NEW.pkey;
+		RETURN NEW;
+	END IF;
+END;
+$$
+LANGUAGE plpgsql;
+ALTER FUNCTION trfn_gocdb_sites_upsert() OWNER TO appdb;
+
+DROP TRIGGER IF EXISTS rtr_gocdb_sites_10_upsert ON gocdb.sites;
+CREATE TRIGGER rtr_gocdb_sites_10_upsert BEFORE INSERT ON gocdb.sites
+FOR EACH ROW EXECUTE PROCEDURE trfn_gocdb_sites_upsert();
+
+CREATE OR REPLACE FUNCTION refresh_sites(va_sync_scopes TEXT DEFAULT 'FedCloud') RETURNS VOID AS
+$$ 
+-- DECLARE deltime TEXT;
+DECLARE scopes TEXT[];
+BEGIN
+	scopes := ('{' || COALESCE(va_sync_scopes, '') || '}')::text[];
+--	deltime := '1 minute';
+
+	TRUNCATE TABLE gocdb.site_contacts;  -- OBSOLETED
+
+	-- mark sites that weren't seen during the last json sync from the infosys service as deleted (key missing, or old timestamp)
+	UPDATE gocdb.sites
+	SET 
+		deleted = TRUE, 
+		deletedon = NOW(),
+		deletedby = 'gocdb'
+	WHERE pkey IN (
+		SELECT pkey 
+			FROM sitej
+			-- WHERE ((NOW() - lastseen)::INTERVAL > deltime::INTERVAL)
+			WHERE lastseen < (SELECT MAX(lastseen) FROM sitej)
+	) OR pkey NOT IN (SELECT pkey FROM sitej);
+	
+	-- upsert json data into sites table
+	INSERT INTO gocdb.sites
+		(pkey, name, shortname, officialname, description, portalurl, homeurl, contactemail, contacttel, alarmemail, csirtemail, giisurl,
+		countrycode, country, tier, subgrid, roc, prodinfrastructure, certstatus, timezone, latitude, longitude, domainname, siteip,
+		deleted, deletedon, deletedby)
+	SELECT
+		g.pkey,
+		((g.j->>'info')::jsonb->>'site_name')::text AS name,
+		((g.j->>'info')::jsonb->>'shortname')::text AS shortname,
+		((g.j->>'info')::jsonb->>'officialname')::text AS officialname,
+		((g.j->>'info')::jsonb->>'description')::text AS description,
+		((g.j->>'info')::jsonb->>'gocdb_portal_url')::text AS portalurl,
+		((g.j->>'info')::jsonb->>'homeurl')::text AS homeurl,
+		NULL::text AS contactemail,
+		NULL::text AS contacttel,
+		NULL::text AS alarmemail,
+		NULL::text AS csirtemail,		
+		((g.j->>'info')::jsonb->>'giisurl')::text AS giisurl,
+		((g.j->>'info')::jsonb->>'countrycode')::text AS countrycode,
+		((g.j->>'info')::jsonb->>'country')::text AS country,
+		((g.j->>'info')::jsonb->>'tier')::text AS tier,
+		((g.j->>'info')::jsonb->>'subgrid')::text AS subgrid,
+		((g.j->>'info')::jsonb->>'roc')::text AS roc,
+		((g.j->>'info')::jsonb->>'prodinfrastructure')::text AS prodinfrastructure,
+		((g.j->>'info')::jsonb->>'certstatus')::text AS certstatus,
+		((g.j->>'info')::jsonb->>'timezone')::text AS timezone,
+		((g.j->>'info')::jsonb->>'latitude')::text AS latitude,
+		((g.j->>'info')::jsonb->>'longtitude')::text AS longtitude,
+		((g.j->>'info')::jsonb->>'domainname')::text AS domainname,
+		NULL::text AS siteip,
+		FALSE, NULL, NULL
+	FROM sitej AS g
+	-- WHERE (NOW() - g.lastseen)::INTERVAL <= deltime::INTERVAL;
+	WHERE g.lastseen = (SELECT MAX(lastseen) FROM sitej);
+
+	-- ******************
+	-- VA PROVIDERS
+	-- ******************
+
+	-- ALTER TABLE gocdb.va_providers
+		-- DISABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;		
+
+	-- remove entries that either
+	-- 1) weren't seen during the last json sync from the infosys service (key missing, or old timestamp)
+	-- 2) don't have at least one scope that matches the VA scopes given
 	DELETE FROM gocdb.va_providers 
 	WHERE pkey IN (
 		SELECT pkey 
 			FROM vapj
-			WHERE ((NOW() - lastseen)::INTERVAL > deltime::INTERVAL)
-	) OR pkey NOT IN (SELECT pkey FROM vapj);
+			-- WHERE ((NOW() - lastseen)::INTERVAL > deltime::INTERVAL)
+			WHERE lastseen < (SELECT MAX(lastseen) FROM vapj)
+	) OR (
+		pkey NOT IN (SELECT pkey FROM vapj)
+	) OR ( NOT (
+		SELECT array_agg(s) && scopes
+		FROM (SELECT jsonb_array_elements_text(((g.j->>'info')::jsonb->>'scopes')::jsonb)::text AS s FROM vapj AS g WHERE g.pkey = va_providers.pkey) AS ts
+	));
 	
+	-- make sure any OS declared by the VA exists in our OSes table
+	INSERT INTO oses (name)
+		SELECT DISTINCT
+			TRIM(((g.j->>'info')::jsonb->>'host_os')::text)
+		FROM 
+			vapj AS g
+		WHERE 	
+			(((g.j->>'info')::jsonb->>'host_os')::text IS DISTINCT FROM NULL) AND
+			(TRIM(((g.j->>'info')::jsonb->>'host_os')::text) <> '') AND
+			(LOWER(TRIM(((g.j->>'info')::jsonb->>'host_os')::text)) NOT IN (
+				SELECT LOWER(name) FROM oses
+			));
+
 	INSERT INTO gocdb.va_providers
-	SELECT
+	SELECT 
 		g.pkey,
 		((g.j->>'info')::jsonb->>'hostname')::text AS hostname,
 		((g.j->>'info')::jsonb->>'goc_portal_url')::text AS gocdb_url,
@@ -351,35 +586,227 @@ BEGIN
 		((g.j->>'info')::jsonb->>'roc_name')::text AS roc_name,
 		((g.j->>'info')::jsonb->>'url')::text AS url,
 		((t.j->>'info')::jsonb->>'GLUE2ComputingEndpointComputingServiceForeignKey')::text AS serviceid
-	FROM vapj AS g
+	FROM 
+		vapj AS g
 	LEFT OUTER JOIN tvapj AS t ON t.pkey = g.pkey
-	WHERE (NOW() - g.lastseen)::INTERVAL <= deltime::INTERVAL;
+	WHERE 
+		-- ((NOW() - g.lastseen)::INTERVAL <= deltime::INTERVAL) AND
+		(
+			g.lastseen = (SELECT MAX(lastseen) FROM vapj)
+		) AND (
+			SELECT array_agg(s) && scopes
+			FROM (SELECT jsonb_array_elements_text(((g.j->>'info')::jsonb->>'scopes')::jsonb)::text AS s) AS ts
+		) 
+	;
 	
-	REFRESH MATERIALIZED VIEW va_providers;
-	REFRESH MATERIALIZED VIEW va_provider_endpoints;
-	REFRESH MATERIALIZED VIEW va_provider_images;
-	REFRESH MATERIALIZED VIEW va_provider_templates;
-
-	ALTER TABLE gocdb.va_providers
-		ENABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;
+	-- refresh all related materialized views
+	REFRESH MATERIALIZED VIEW CONCURRENTLY sites;
+	REFRESH MATERIALIZED VIEW CONCURRENTLY va_providers;
+	REFRESH MATERIALIZED VIEW CONCURRENTLY va_provider_endpoints;
+	REFRESH MATERIALIZED VIEW CONCURRENTLY va_provider_images;
+	REFRESH MATERIALIZED VIEW CONCURRENTLY va_provider_templates;
 
 	REFRESH MATERIALIZED VIEW CONCURRENTLY _actor_group_members;
         REFRESH MATERIALIZED VIEW CONCURRENTLY _actor_group_members2;
         REFRESH MATERIALIZED VIEW CONCURRENTLY permissions;
 
-	--
-	-- These materialized views also depend on va providers, but are slow to refresh
-	-- Might want to only refresh them when sync'ing sites instead
-	--
-	REFRESH MATERIALIZED VIEW site_services_xml;
-	REFRESH MATERIALIZED VIEW site_service_images_xml;
-
+	REFRESH MATERIALIZED VIEW CONCURRENTLY site_services_xml;
+	REFRESH MATERIALIZED VIEW CONCURRENTLY site_service_images_xml;
+	
+	-- ALTER TABLE gocdb.va_providers
+		-- ENABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;
 END;
-$$
+$$ 
 LANGUAGE plpgsql VOLATILE;
-ALTER FUNCTION refresh_va_providers() OWNER TO appdb;
+ALTER FUNCTION refresh_sites(text) OWNER TO appdb;
 
-SELECT refresh_va_providers();
+CREATE OR REPLACE FUNCTION public.count_site_matches(
+    itemname text,
+    cachetable text,
+    private boolean DEFAULT false)
+  RETURNS SETOF record AS
+$BODY$
+DECLARE q TEXT;
+DECLARE allitems INT;
+BEGIN
+	IF itemname = 'country' THEN
+		q := 'SELECT countries.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, countries.id AS count_id FROM ' || cachetable || ' AS sites LEFT JOIN countries ON countries.id = sites.countryid';
+	ELSIF itemname = 'discipline' THEN
+		q := 'SELECT disciplines.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, disciplines.id AS count_id FROM ' || cachetable || ' AS sites LEFT JOIN va_providers ON va_providers.sitename = sites.name
+		LEFT JOIN va_provider_images AS va_provider_images ON va_provider_images.va_provider_id = va_providers.id
+		LEFT JOIN vaviews ON vaviews.vmiinstanceid = va_provider_images.vmiinstanceid
+		LEFT JOIN applications ON applications.id = vaviews.appid
+		LEFT JOIN appdisciplines ON appdisciplines.appid = applications.id
+		LEFT JOIN disciplines ON disciplines.id = appdisciplines.disciplineid';
+		-- q := 'SELECT disciplines.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, disciplines.id AS count_id FROM ' || cachetable || ' AS sites' || CASE WHEN NOT private THEN ' LEFT JOIN app_vos ON app_vos.appid = applications.id LEFT JOIN vos ON vos.id = app_vos.void AND vos.deleted IS FALSE' ELSE '' END || ' LEFT JOIN appdisciplines ON appdisciplines.appid = applications.id LEFT JOIN disciplines ON disciplines.id = appdisciplines.disciplineid' || CASE WHEN NOT private THEN ' OR disciplines.id = vos.domainid' ELSE '' END;
+	ELSIF itemname = 'category' THEN
+		q := 'SELECT categories.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, categories.id AS count_id
+		FROM ' || cachetable || ' AS sites LEFT JOIN va_providers ON va_providers.sitename = sites.name LEFT JOIN va_provider_images AS va_provider_images ON va_provider_images.va_provider_id = va_providers.id
+		LEFT JOIN vaviews ON vaviews.vmiinstanceid = va_provider_images.vmiinstanceid LEFT JOIN applications ON applications.id = vaviews.appid LEFT JOIN categories ON categories.id = ANY(applications.categoryid)';
+		--q := 'SELECT categories.name::TEXT AS count_text, COUNT(DISTINCT applications.id) AS count, categories.id AS count_id FROM ' || cachetable || ' AS applications LEFT JOIN categories ON categories.id = ANY(applications.categoryid)';
+	ELSIF itemname = 'arch' THEN
+		q := 'SELECT archs.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, archs.id AS count_id FROM ' || cachetable || ' AS sites LEFT JOIN va_providers ON va_providers.sitename = sites.name
+		LEFT JOIN va_provider_images AS va_provider_images ON va_provider_images.va_provider_id = va_providers.id
+		LEFT JOIN vaviews ON vaviews.vmiinstanceid = va_provider_images.vmiinstanceid
+		LEFT JOIN applications ON applications.id = vaviews.appid
+		LEFT JOIN vapplications ON vapplications.appid = applications.id
+		LEFT JOIN vapp_versions ON vapp_versions.vappid = vapplications.id AND published AND enabled AND NOT archived AND status = ''verified''
+		LEFT JOIN vmis ON vmis.vappid = vapplications.id
+		LEFT JOIN vmiflavours ON vmiflavours.vmiid = vmis.id
+		LEFT JOIN archs ON archs.id = vmiflavours.archid';
+	ELSIF itemname = 'os' THEN
+		q := 'SELECT oses.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, oses.id AS count_id FROM  ' || cachetable || ' AS sites
+		LEFT JOIN va_providers ON va_providers.sitename = sites.name
+		LEFT JOIN va_provider_images AS va_provider_images ON va_provider_images.va_provider_id = va_providers.id
+		LEFT JOIN vaviews ON vaviews.vmiinstanceid = va_provider_images.vmiinstanceid
+		LEFT JOIN applications ON applications.id = vaviews.appid
+		LEFT JOIN vapplications ON vapplications.appid = applications.id
+		LEFT JOIN vapp_versions ON vapp_versions.vappid = vapplications.id AND published AND enabled AND NOT archived AND status = ''verified''
+		LEFT JOIN vmis ON vmis.vappid = vapplications.id
+		LEFT JOIN vmiflavours ON vmiflavours.vmiid = vmis.id
+		LEFT JOIN oses ON oses.id = vmiflavours.osid';
+	ELSIF itemname = 'osfamily' THEN
+		q := 'SELECT os_families.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, os_families.id AS count_id FROM ' || cachetable || ' AS sites
+		LEFT JOIN va_providers ON va_providers.sitename = sites.name
+		LEFT JOIN va_provider_images AS va_provider_images ON va_provider_images.va_provider_id = va_providers.id
+		LEFT JOIN vaviews ON vaviews.vmiinstanceid = va_provider_images.vmiinstanceid
+		LEFT JOIN applications ON applications.id = vaviews.appid
+		LEFT JOIN vapplications ON vapplications.appid = applications.id
+		LEFT JOIN vapp_versions ON vapp_versions.vappid = vapplications.id AND published AND enabled AND NOT archived AND status = ''verified''
+		LEFT JOIN vmis ON vmis.vappid = vapplications.id
+		LEFT JOIN vmiflavours ON vmiflavours.vmiid = vmis.id
+		LEFT JOIN oses ON oses.id = vmiflavours.osid
+		LEFT JOIN os_families ON os_families.id = oses.os_family_id';
+	ELSIF itemname = 'hypervisor' THEN
+		q :='SELECT hypervisors.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, hypervisors.id::int AS count_id FROM ' || cachetable || ' AS sites
+		LEFT JOIN va_providers ON va_providers.sitename = sites.name
+		LEFT JOIN va_provider_images AS va_provider_images ON va_provider_images.va_provider_id = va_providers.id
+		LEFT JOIN vaviews ON vaviews.vmiinstanceid = va_provider_images.vmiinstanceid
+		LEFT JOIN applications ON applications.id = vaviews.appid
+		LEFT JOIN vapplications ON vapplications.appid = applications.id
+		LEFT JOIN vapp_versions ON vapp_versions.vappid = vapplications.id AND published AND enabled AND NOT archived AND status = ''verified''
+		LEFT JOIN vmis ON vmis.vappid = vapplications.id
+		LEFT JOIN vmiflavours ON vmiflavours.vmiid = vmis.id
+		LEFT JOIN hypervisors ON hypervisors.value = ANY(vmiflavours.hypervisors)';
+	ELSIF itemname = 'vo' THEN
+		q := 'SELECT vos.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, vos.id AS count_id FROM ' || cachetable || ' AS sites
+		LEFT JOIN va_providers ON va_providers.sitename = sites.name
+		LEFT JOIN va_provider_images AS va_provider_images ON va_provider_images.va_provider_id = va_providers.id AND va_provider_images.vowide_vmiinstanceid IS NOT NULL
+		LEFT JOIN vowide_image_list_images ON vowide_image_list_images.ID = va_provider_images.vowide_vmiinstanceid and vowide_image_list_images.state = ''up-to-date''::e_vowide_image_state
+		LEFT JOIN vowide_image_lists ON vowide_image_lists.id = vowide_image_list_images.vowide_image_list_id AND vowide_image_list_images.state <> ''draft''::e_vowide_image_state
+		LEFT JOIN vos ON vos.id = vowide_image_lists.void AND vos.deleted IS FALSE';
+	ELSIF itemname = 'middleware' THEN
+		q := 'SELECT middlewares.name::TEXT AS count_text, COUNT(DISTINCT sites.id) AS count, middlewares.id AS count_id FROM ' || cachetable || ' AS sites
+		LEFT JOIN va_providers ON va_providers.sitename = sites.name
+		LEFT JOIN va_provider_images AS va_provider_images ON va_provider_images.va_provider_id = va_providers.id
+		LEFT JOIN vaviews ON vaviews.vmiinstanceid = va_provider_images.vmiinstanceid
+		LEFT JOIN applications ON applications.id = vaviews.appid
+		LEFT JOIN app_middlewares ON app_middlewares.appid = applications.id
+		LEFT JOIN middlewares ON middlewares.id = app_middlewares.middlewareid';
+	ELSIF itemname = 'supports' THEN
+		q := 'SELECT CASE WHEN va_providers.sitename IS NULL THEN ''none''
+		ELSE ''occi'' END AS count_text, COUNT(DISTINCT sites.id) AS count,
+		CASE WHEN va_providers.sitename IS NULL THEN 0 ELSE 1 END AS count_id
+		FROM ' || cachetable || ' AS sites
+		LEFT JOIN va_providers ON va_providers.sitename = sites.name and va_providers.in_production = true';
+	ELSIF itemname = 'hasinstances' THEN
+		q := 'SELECT CASE WHEN va_provider_images.vmiinstanceid IS NULL THEN ''none''
+		ELSE ''virtual images'' END AS count_text, COUNT(DISTINCT sites.id) AS count,
+		CASE WHEN va_provider_images.vmiinstanceid IS NULL THEN 0 ELSE 1 END AS count_id
+		FROM ' || cachetable || ' AS sites
+		LEFT JOIN va_providers ON va_providers.sitename = sites.name and va_providers.in_production = true
+		LEFT JOIN va_provider_images AS va_provider_images ON va_provider_images.va_provider_id = va_providers.id
+		LEFT JOIN vaviews ON vaviews.vmiinstanceid = va_provider_images.vmiinstanceid';
+	ELSE
+		RAISE NOTICE 'Unknown site property requested for logistics counting: %', itemname;
+		RETURN;
+	END IF;
+	RETURN QUERY EXECUTE 'SELECT count_text, count, count_id::text FROM (' || q || ' GROUP BY count_text, count_id) AS t WHERE NOT count_text IS NULL';
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100
+  ROWS 1000;
+ALTER FUNCTION public.count_site_matches(text, text, boolean)
+  OWNER TO appdb;
+COMMENT ON FUNCTION public.count_site_matches(text, text, boolean) IS 'not to be called directly; used by site_logistics function';
+
+TRUNCATE TABLE gocdb.sites CASCADE;
+
+SELECT refresh_sites();
+
+CREATE OR REPLACE FUNCTION process_site_argo_status(dat jsonb[]) RETURNS VOID
+AS
+$$
+DECLARE j jsonb;
+DECLARE statust TIMESTAMP;
+DECLARE statusv TEXT;
+DECLARE epkey TEXT;
+BEGIN
+	FOREACH j IN ARRAY dat LOOP  
+    	statust := (j->>'info')::jsonb->>'timestamp';
+        statusv := (j->>'info')::jsonb->>'value';
+        epkey := (j->>'info')::jsonb->>'endpoint_pkey';
+        -- RAISE NOTICE 'status: %, ts: %, pkey: %', statusv, statust, epkey;
+        UPDATE gocdb.va_providers 
+        	SET service_status = statusv, service_status_date = statust 
+        	WHERE (pkey = epkey) AND ((service_status_date < statust) OR (service_status_date IS NULL)) AND (LOWER(TRIM(COALESCE(statusv,''))) NOT IN ('', 'missing'));
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql VOLATILE;
+ALTER FUNCTION process_site_argo_status(jsonb[]) OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION process_site_downtimes(dat jsonb[]) RETURNS VOID
+AS
+$$
+DECLARE j jsonb;
+DECLARE dstart TIMESTAMP;
+DECLARE dend TIMESTAMP;
+DECLARE nowstart TIMESTAMP;
+DECLARE nowend TIMESTAMP;
+DECLARE epkey TEXT;
+DECLARE dkey TEXT;
+DECLARE active_dts TEXT[];
+BEGIN
+	active_dts := '{}'::TEXT[];
+	UPDATE gocdb.va_providers SET service_downtime = 0::bit(2);
+	
+	FOREACH j IN ARRAY dat LOOP
+		dkey := (j->>'info')::jsonb->>'downtime_pkey';
+		dstart := (j->>'info')::jsonb->>'start_time';
+		dend := (j->>'info')::jsonb->>'end_time';
+		nowstart := (SELECT NOW() AT TIME ZONE 'UTC');
+		nowend := (SELECT (NOW() AT TIME ZONE 'UTC') + '1 day'::INTERVAL);
+		epkey := (j->>'info')::jsonb->>'endpoint_pkey';
+		IF 
+			(nowstart >= dstart) AND (nowstart <= dend)
+		THEN
+			-- Active downtime
+			UPDATE gocdb.va_providers SET service_downtime = service_downtime | 2::bit(2) WHERE pkey = epkey;
+			active_dts := array_append(active_dts, dkey);
+		ELSIF
+			((dend >= nowstart) AND (dend <= nowend)) OR
+			((dstart >= nowstart) AND (dstart <= nowend)) OR
+			((dstart <= nowstart) AND (dend >= nowend))
+		THEN
+			IF NOT (dkey = ANY(active_dts)) THEN -- this shouldn't happen if incoming data are sound, but better check just in case
+				-- Down sometime between now and 24h from now
+				UPDATE gocdb.va_providers SET service_downtime = service_downtime | 1::bit(2) WHERE pkey = epkey;
+			END IF;
+		ELSE
+			RAISE NOTICE 'Downtime % is either in the past, or scheduled for more than 24 hours from now. Ignored', dkey;
+		END IF;
+	END LOOP;
+END;
+$$ LANGUAGE plpgsql VOLATILE;
+ALTER FUNCTION process_site_downtimes(jsonb[]) OWNER TO appdb;
+
+DROP TRIGGER IF EXISTS tr_gocdb_sites_99_create_uuid ON gocdb.sites;
+CREATE TRIGGER tr_gocdb_sites_01_create_uuid
+    BEFORE INSERT
+    ON gocdb.sites
+    FOR EACH ROW
+    EXECUTE PROCEDURE gocdb.trfn_gocdb_sites_create_uuid();
 
 INSERT INTO version (major,minor,revision,notes)
        SELECT 8, 16, 0, E'Refactor va providers, based on new JSON information system data'
