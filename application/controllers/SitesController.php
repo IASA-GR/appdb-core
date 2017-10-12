@@ -231,7 +231,7 @@ class SitesController extends Zend_Controller_Action{
 			foreach ($docs as $doc) {
 				$id = $doc->_id;
 				db()->query('INSERT INTO vapj (pkey,j,h) VALUES (?, ?, ?)', array(
-					$doc->info->endpoint_pkey,
+					$doc->info->SiteEndpointPKey,
 					json_encode($doc),
 					$doc->meta->hash
 				));
@@ -242,7 +242,7 @@ class SitesController extends Zend_Controller_Action{
 					$release_sp_vap = true;
 					$tdoc = $client->getDoc($tid);
 					db()->query('INSERT INTO tvapj (pkey,j,h) VALUES (?, ?, ?)', array(
-						$tdoc->info->endpoint_pkey,
+						$tdoc->info->SiteEndpointPKey,
 						json_encode($tdoc),
 						$tdoc->meta->hash
 				)); 
@@ -269,7 +269,7 @@ class SitesController extends Zend_Controller_Action{
 			$docs = $client->limit(1000)->find(['meta.collection'=>['$eq'=>'egi.goc.sites']]);
 			foreach ($docs as $doc) {				
 				db()->query('INSERT INTO sitej (pkey,j,h) VALUES (?, ?, ?)', array(
-					$doc->info->site_pkey,
+					$doc->info->SitePKey,
 					json_encode($doc),
 					$doc->meta->hash
 				));

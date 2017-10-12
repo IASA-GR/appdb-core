@@ -186,7 +186,7 @@ FROM vapj AS g
 LEFT OUTER JOIN tvapj AS t ON t.pkey = g.pkey
 WHERE 
 	(COALESCE(TRIM(((t.j->>'info')::jsonb->>'GLUE2ComputingEndpointComputingServiceForeignKey')::text), '') <> '') AND
-	(COALESCE(((g.j->>'info')::jsonb->>'in_production')::text, 'FALSE')::boolean IS DISTINCT FROM FALSE);
+	(COALESCE(((g.j->>'info')::jsonb->>'SiteEndpointInProduction')::text, 'FALSE')::boolean IS DISTINCT FROM FALSE);
 ALTER MATERIALIZED VIEW va_provider_templates OWNER TO appdb;
 CREATE UNIQUE INDEX "idx_va_provider_templates_id" ON va_provider_templates USING btree (id);
 CREATE INDEX "idx_va_provider_templates_va_provider_id_textops" ON va_provider_templates USING btree (va_provider_id text_pattern_ops);
@@ -244,16 +244,16 @@ FROM (
 		SELECT 
 		  nextval('va_provider_images_id_seq'::regclass) AS id,
 		  g.pkey AS va_provider_id,
-		  (jsonb_array_elements(((t.j->>'info')::jsonb->>'images')::jsonb)->'vmi_instance_id')::text AS vmiinstanceid,
-		  (jsonb_array_elements(((t.j->>'info')::jsonb->>'images')::jsonb)->>'content_type')::text AS content_type,
+		  (jsonb_array_elements(((t.j->>'info')::jsonb->>'images')::jsonb)->'ImageVmiInstanceId')::text AS vmiinstanceid,
+		  (jsonb_array_elements(((t.j->>'info')::jsonb->>'images')::jsonb)->>'ImageContentType')::text AS content_type,
 		  (jsonb_array_elements(((t.j->>'info')::jsonb->>'images')::jsonb)->>'GLUE2EntityName')::text AS va_provider_image_id,
 		  (jsonb_array_elements(((t.j->>'info')::jsonb->>'images')::jsonb)->>'GLUE2ApplicationEnvironmentRepository')::text AS mp_uri,
-		  (jsonb_array_elements(((t.j->>'info')::jsonb->>'images')::jsonb)->'vowide_vmi_instance_id')::text AS vowide_vmiinstanceid
+		  (jsonb_array_elements(((t.j->>'info')::jsonb->>'images')::jsonb)->'ImageVoVmiInstanceId')::text AS vowide_vmiinstanceid
 		FROM vapj AS g
 		LEFT OUTER JOIN tvapj AS t ON g.pkey = t.pkey
 		WHERE 
 			(COALESCE(TRIM(((t.j->>'info')::jsonb->>'GLUE2ComputingEndpointComputingServiceForeignKey')::text), '') <> '') AND
-			(COALESCE(((g.j->>'info')::jsonb->>'in_production')::text, 'FALSE')::boolean IS DISTINCT FROM FALSE)
+			(COALESCE(((g.j->>'info')::jsonb->>'SiteEndpointInProduction')::text, 'FALSE')::boolean IS DISTINCT FROM FALSE)
 	) AS x
 ) AS xx;
 ALTER MATERIALIZED VIEW va_provider_images OWNER TO appdb;
@@ -503,28 +503,28 @@ BEGIN
 		deleted, deletedon, deletedby)
 	SELECT
 		g.pkey,
-		((g.j->>'info')::jsonb->>'site_name')::text AS name,
-		((g.j->>'info')::jsonb->>'shortname')::text AS shortname,
-		((g.j->>'info')::jsonb->>'officialname')::text AS officialname,
-		((g.j->>'info')::jsonb->>'description')::text AS description,
-		((g.j->>'info')::jsonb->>'gocdb_portal_url')::text AS portalurl,
-		((g.j->>'info')::jsonb->>'homeurl')::text AS homeurl,
+		((g.j->>'info')::jsonb->>'SiteName')::text AS name,
+		((g.j->>'info')::jsonb->>'SiteShortName')::text AS shortname,
+		((g.j->>'info')::jsonb->>'SiteOfficialName')::text AS officialname,
+		((g.j->>'info')::jsonb->>'SiteDescription')::text AS description,
+		((g.j->>'info')::jsonb->>'SiteGocdbPortalUrl')::text AS portalurl,
+		((g.j->>'info')::jsonb->>'SiteHomeUrl')::text AS homeurl,
 		NULL::text AS contactemail,
 		NULL::text AS contacttel,
 		NULL::text AS alarmemail,
 		NULL::text AS csirtemail,		
-		((g.j->>'info')::jsonb->>'giisurl')::text AS giisurl,
-		((g.j->>'info')::jsonb->>'countrycode')::text AS countrycode,
-		((g.j->>'info')::jsonb->>'country')::text AS country,
-		((g.j->>'info')::jsonb->>'tier')::text AS tier,
-		((g.j->>'info')::jsonb->>'subgrid')::text AS subgrid,
-		((g.j->>'info')::jsonb->>'roc')::text AS roc,
-		((g.j->>'info')::jsonb->>'prodinfrastructure')::text AS prodinfrastructure,
-		((g.j->>'info')::jsonb->>'certstatus')::text AS certstatus,
-		((g.j->>'info')::jsonb->>'timezone')::text AS timezone,
-		((g.j->>'info')::jsonb->>'latitude')::text AS latitude,
-		((g.j->>'info')::jsonb->>'longtitude')::text AS longtitude,
-		((g.j->>'info')::jsonb->>'domainname')::text AS domainname,
+		((g.j->>'info')::jsonb->>'SiteGiisUrl')::text AS giisurl,
+		((g.j->>'info')::jsonb->>'SiteCountryCode')::text AS countrycode,
+		((g.j->>'info')::jsonb->>'SiteCountry')::text AS country,
+		((g.j->>'info')::jsonb->>'SiteTier')::text AS tier,
+		((g.j->>'info')::jsonb->>'SiteSubgrid')::text AS subgrid,
+		((g.j->>'info')::jsonb->>'SiteRoc')::text AS roc,
+		((g.j->>'info')::jsonb->>'SiteProdInfrastructure')::text AS prodinfrastructure,
+		((g.j->>'info')::jsonb->>'SiteCertStatus')::text AS certstatus,
+		((g.j->>'info')::jsonb->>'SiteTimezone')::text AS timezone,
+		((g.j->>'info')::jsonb->>'SiteLatitude')::text AS latitude,
+		((g.j->>'info')::jsonb->>'SiteLongitude')::text AS longtitude,
+		((g.j->>'info')::jsonb->>'SiteDomainname')::text AS domainname,
 		NULL::text AS siteip,
 		FALSE, NULL, NULL
 	FROM sitej AS g
@@ -551,40 +551,40 @@ BEGIN
 		pkey NOT IN (SELECT pkey FROM vapj)
 	) OR ( NOT (
 		SELECT array_agg(s) && scopes
-		FROM (SELECT jsonb_array_elements_text(((g.j->>'info')::jsonb->>'scopes')::jsonb)::text AS s FROM vapj AS g WHERE g.pkey = va_providers.pkey) AS ts
+		FROM (SELECT jsonb_array_elements_text(((g.j->>'info')::jsonb->>'SiteEndpointScopes')::jsonb)::text AS s FROM vapj AS g WHERE g.pkey = va_providers.pkey) AS ts
 	));
 	
 	-- make sure any OS declared by the VA exists in our OSes table
 	INSERT INTO oses (name)
 		SELECT DISTINCT
-			TRIM(((g.j->>'info')::jsonb->>'host_os')::text)
+			TRIM(((g.j->>'info')::jsonb->>'SiteEndpointHostOS')::text)
 		FROM 
 			vapj AS g
 		WHERE 	
-			(((g.j->>'info')::jsonb->>'host_os')::text IS DISTINCT FROM NULL) AND
-			(TRIM(((g.j->>'info')::jsonb->>'host_os')::text) <> '') AND
-			(LOWER(TRIM(((g.j->>'info')::jsonb->>'host_os')::text)) NOT IN (
+			(((g.j->>'info')::jsonb->>'SiteEndpointHostOS')::text IS DISTINCT FROM NULL) AND
+			(TRIM(((g.j->>'info')::jsonb->>'SiteEndpointHostOS')::text) <> '') AND
+			(LOWER(TRIM(((g.j->>'info')::jsonb->>'SiteEndpointHostOS')::text)) NOT IN (
 				SELECT LOWER(name) FROM oses
 			));
 
 	INSERT INTO gocdb.va_providers
 	SELECT 
 		g.pkey,
-		((g.j->>'info')::jsonb->>'hostname')::text AS hostname,
-		((g.j->>'info')::jsonb->>'goc_portal_url')::text AS gocdb_url,
-		((g.j->>'info')::jsonb->>'hostdn')::text AS host_dn,
-		((g.j->>'info')::jsonb->>'host_os')::text AS host_os,
-		((g.j->>'info')::jsonb->>'host_arch')::text AS host_arch,
-		((g.j->>'info')::jsonb->>'beta')::text::boolean AS beta,
-		((g.j->>'info')::jsonb->>'service_type')::text AS service_type,
-		((g.j->>'info')::jsonb->>'host_ip')::text AS host_ip,
-		((g.j->>'info')::jsonb->>'in_production')::text::boolean AS in_production,
-		((g.j->>'info')::jsonb->>'node_monitored')::text::boolean AS node_monitored,
-		((g.j->>'info')::jsonb->>'site_name')::text AS sitename,
-		((g.j->>'info')::jsonb->>'country_name')::text AS country_name,
-		((g.j->>'info')::jsonb->>'country_code')::text AS country_code,
-		((g.j->>'info')::jsonb->>'roc_name')::text AS roc_name,
-		((g.j->>'info')::jsonb->>'url')::text AS url,
+		((g.j->>'info')::jsonb->>'SiteEndpointHostname')::text AS hostname,
+		((g.j->>'info')::jsonb->>'SiteEndpointGocPortalUrl')::text AS gocdb_url,
+		((g.j->>'info')::jsonb->>'SiteEndpointHostDN')::text AS host_dn,
+		((g.j->>'info')::jsonb->>'SiteEndpointHostOS')::text AS host_os,
+		((g.j->>'info')::jsonb->>'SiteEndpointHostArch')::text AS host_arch,
+		((g.j->>'info')::jsonb->>'SiteEndpointBeta')::text::boolean AS beta,
+		((g.j->>'info')::jsonb->>'SiteEndpointServiceType')::text AS service_type,
+		((g.j->>'info')::jsonb->>'SiteEndpointHostIP')::text AS host_ip,
+		((g.j->>'info')::jsonb->>'SiteEndpointInProduction')::text::boolean AS in_production,
+		((g.j->>'info')::jsonb->>'SiteEndpointNodeMonitored')::text::boolean AS node_monitored,
+		((g.j->>'info')::jsonb->>'SiteName')::text AS sitename,
+		((g.j->>'info')::jsonb->>'SiteEndpointCountryName')::text AS country_name,
+		((g.j->>'info')::jsonb->>'SiteEndpointCountryCode')::text AS country_code,
+		((g.j->>'info')::jsonb->>'SiteEndpointRocName')::text AS roc_name,
+		((g.j->>'info')::jsonb->>'SiteEndpointUrl')::text AS url,
 		((t.j->>'info')::jsonb->>'GLUE2ComputingEndpointComputingServiceForeignKey')::text AS serviceid
 	FROM 
 		vapj AS g
@@ -595,7 +595,7 @@ BEGIN
 			g.lastseen = (SELECT MAX(lastseen) FROM vapj)
 		) AND (
 			SELECT array_agg(s) && scopes
-			FROM (SELECT jsonb_array_elements_text(((g.j->>'info')::jsonb->>'scopes')::jsonb)::text AS s) AS ts
+			FROM (SELECT jsonb_array_elements_text(((g.j->>'info')::jsonb->>'SiteEndpointScopes')::jsonb)::text AS s) AS ts
 		) 
 	;
 	
@@ -739,18 +739,23 @@ CREATE OR REPLACE FUNCTION process_site_argo_status(dat jsonb[]) RETURNS VOID
 AS
 $$
 DECLARE j jsonb;
-DECLARE statust TIMESTAMP;
+DECLARE statust TIMESTAMP WITHOUT TIME ZONE;
 DECLARE statusv TEXT;
 DECLARE epkey TEXT;
 BEGIN
 	FOREACH j IN ARRAY dat LOOP  
-    	statust := (j->>'info')::jsonb->>'timestamp';
-        statusv := (j->>'info')::jsonb->>'value';
-        epkey := (j->>'info')::jsonb->>'endpoint_pkey';
+    	statust := ((j->>'info')::jsonb->>'StatusTimestamp')::TIMESTAMP;
+        statusv := (j->>'info')::jsonb->>'StatusValue';
+        epkey := (j->>'info')::jsonb->>'SiteEndpointPKey';
         -- RAISE NOTICE 'status: %, ts: %, pkey: %', statusv, statust, epkey;
         UPDATE gocdb.va_providers 
         	SET service_status = statusv, service_status_date = statust 
-        	WHERE (pkey = epkey) AND ((service_status_date < statust) OR (service_status_date IS NULL)) AND (LOWER(TRIM(COALESCE(statusv,''))) NOT IN ('', 'missing'));
+        	WHERE 
+            	(pkey = epkey) 
+            AND 
+            	((service_status_date < statust) OR (service_status_date IS NULL)) 
+            AND 
+            	(LOWER(TRIM(COALESCE(statusv,''))) NOT IN ('', 'missing'));
     END LOOP;
 END;
 $$ LANGUAGE plpgsql VOLATILE;
@@ -760,10 +765,10 @@ CREATE OR REPLACE FUNCTION process_site_downtimes(dat jsonb[]) RETURNS VOID
 AS
 $$
 DECLARE j jsonb;
-DECLARE dstart TIMESTAMP;
-DECLARE dend TIMESTAMP;
-DECLARE nowstart TIMESTAMP;
-DECLARE nowend TIMESTAMP;
+DECLARE dstart TIMESTAMP WITHOUT TIME ZONE;
+DECLARE dend TIMESTAMP WITHOUT TIME ZONE;
+DECLARE nowstart TIMESTAMP WITHOUT TIME ZONE;
+DECLARE nowend TIMESTAMP WITHOUT TIME ZONE;
 DECLARE epkey TEXT;
 DECLARE dkey TEXT;
 DECLARE active_dts TEXT[];
@@ -772,12 +777,12 @@ BEGIN
 	UPDATE gocdb.va_providers SET service_downtime = 0::bit(2);
 	
 	FOREACH j IN ARRAY dat LOOP
-		dkey := (j->>'info')::jsonb->>'downtime_pkey';
-		dstart := (j->>'info')::jsonb->>'start_time';
-		dend := (j->>'info')::jsonb->>'end_time';
+		dkey := (j->>'info')::jsonb->>'DowntimePKey';
+		dstart := ((j->>'info')::jsonb->>'DowntimeFormatedStartDate')::TIMESTAMP;
+		dend := ((j->>'info')::jsonb->>'DowntimeFormatedEndDate')::TIMESTAMP;
 		nowstart := (SELECT NOW() AT TIME ZONE 'UTC');
 		nowend := (SELECT (NOW() AT TIME ZONE 'UTC') + '1 day'::INTERVAL);
-		epkey := (j->>'info')::jsonb->>'endpoint_pkey';
+		epkey := (j->>'info')::jsonb->>'SiteEndpointPKey';
 		IF 
 			(nowstart >= dstart) AND (nowstart <= dend)
 		THEN
@@ -802,6 +807,7 @@ $$ LANGUAGE plpgsql VOLATILE;
 ALTER FUNCTION process_site_downtimes(jsonb[]) OWNER TO appdb;
 
 DROP TRIGGER IF EXISTS tr_gocdb_sites_99_create_uuid ON gocdb.sites;
+DROP TRIGGER IF EXISTS tr_gocdb_sites_01_create_uuid ON gocdb.sites;
 CREATE TRIGGER tr_gocdb_sites_01_create_uuid
     BEFORE INSERT
     ON gocdb.sites
