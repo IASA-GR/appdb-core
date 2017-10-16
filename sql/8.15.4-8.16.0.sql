@@ -237,7 +237,7 @@ FROM (
 		ELSE 
 			vmiinstanceid
 		END AS vmiinstanceid,
-		CASE LOWER(content_type) WHEN 'vm' THEN 'va' ELSE LOWER(content_type) END AS content_type,
+		CASE LOWER(content_type) WHEN 'va' THEN 'vm' ELSE LOWER(content_type) END AS content_type,    	
 		va_provider_image_id, mp_uri, 
 		CASE WHEN LOWER(vowide_vmiinstanceid) = 'null' THEN NULL::int ELSE vowide_vmiinstanceid::int END AS vowide_vmiinstanceid	
 	FROM (
@@ -742,20 +742,26 @@ DECLARE j jsonb;
 DECLARE statust TIMESTAMP WITHOUT TIME ZONE;
 DECLARE statusv TEXT;
 DECLARE epkey TEXT;
+DECLARE srvgrp TEXT;
 BEGIN
 	FOREACH j IN ARRAY dat LOOP  
     	statust := ((j->>'info')::jsonb->>'StatusTimestamp')::TIMESTAMP;
         statusv := (j->>'info')::jsonb->>'StatusValue';
         epkey := (j->>'info')::jsonb->>'SiteEndpointPKey';
-        -- RAISE NOTICE 'status: %, ts: %, pkey: %', statusv, statust, epkey;
-        UPDATE gocdb.va_providers 
-        	SET service_status = statusv, service_status_date = statust 
-        	WHERE 
-            	(pkey = epkey) 
-            AND 
-            	((service_status_date < statust) OR (service_status_date IS NULL)) 
-            AND 
-            	(LOWER(TRIM(COALESCE(statusv,''))) NOT IN ('', 'missing'));
+        srvgrp := (j->>'info')::jsonb->>'StatusEndpointGroup';
+        IF srvgrp = 'eu.egi.cloud.vm-management.occi' THEN
+        	-- RAISE NOTICE 'processing status: %, ts: %, pkey: % for srvgrp %', statusv, statust, epkey, srvgrp;
+            UPDATE gocdb.va_providers 
+                SET service_status = statusv, service_status_date = statust 
+                WHERE 
+                    (pkey = epkey) 
+                AND 
+                    ((service_status_date <= statust) OR (service_status_date IS NULL)) 
+                AND 
+                    (LOWER(TRIM(COALESCE(statusv,''))) NOT IN ('', 'missing'));
+         -- ELSE 
+         	-- RAISE NOTICE 'ignoring status: %, ts: %, pkey: % for srvgrp %', statusv, statust, epkey, srvgrp;
+         END IF;
     END LOOP;
 END;
 $$ LANGUAGE plpgsql VOLATILE;
