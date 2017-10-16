@@ -151,7 +151,7 @@ class SitesController extends Zend_Controller_Action{
 		error_log('VA providers RESTful API XML cache DONE');		
 		// 2nd call returns the cached response
 		$result = curl_exec($ch);
-		$result_tmp = gzdecode($result);
+		$result_tmp = @gzdecode($result);
 		if ($result_tmp !== false) {
 			$result = $result_tmp;
 		}
@@ -315,6 +315,7 @@ class SitesController extends Zend_Controller_Action{
 				$statinfo[] = json_encode($doc);
 			}
 			try {
+//				echo "SELECT process_site_argo_status('" . php_to_pg_array($statinfo) . "'::jsonb[])\n"; 
 				db()->query("SELECT process_site_argo_status(?::jsonb[])", array(php_to_pg_array($statinfo))); 
 			} catch (Exception $e) {
 					db()->query("ROLLBACK TO SAVEPOINT $sp_vap");
