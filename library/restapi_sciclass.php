@@ -45,11 +45,11 @@ class RestSciClassList extends RestROResourceList {
 			foreach ($res as $r) {
 				$x[] = $r->x;
 			}
-			if ( $this->getParam("format") === "json" ) {
-				return new JSONRestResponse(new XMLFragmentRestResponse($x, $this), $this);
-			} else {
+//			if ( $this->getParam("format") === "json" ) {
+//				return new JSONRestResponse(new XMLFragmentRestResponse($x, $this), $this);
+//			} else {
 				return new XMLFragmentRestResponse($x, $this);
-			}
+//			}
 		} else return false;
 	}
 }

@@ -2312,11 +2312,11 @@ abstract class RestResourceItem extends RestResource {
 				}
 				$this->_model->refresh("xml", true);
 				if ( count($this->_model->items) > 0 ) {
-					if ( $this->getParam("format") === "json" ) {
-						return new JSONRestResponse(new XMLFragmentRestResponse($this->_model->items, $this), $this);
-					} else {
+//					if ( $this->getParam("format") === "json" ) {
+//						return new JSONRestResponse(new XMLFragmentRestResponse($this->_model->items, $this), $this);
+//					} else {
 						return new XMLFragmentRestResponse($this->_model->items, $this);
-					}
+//					}
 				} else {
 					$this->setError(RestErrorEnum::RE_ITEM_NOT_FOUND);
 					return false;
