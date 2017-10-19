@@ -286,7 +286,42 @@ class RestAPIHelper implements iRestAPIHelper {
         $response[] = RestAPIHelper::responseTail();
         if ( ! is_array($originalResponse) ) $response = implode("\n", $response);
         return new XMLRestResponse($response, $parent);
-    }
+	}
+
+	static public function transformXMLtoJSON($x) {
+		$json = $x;
+		$xslt_path1 = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'xml2js_preprocess.xsl';
+		$xslt_path2 = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'xml2js.xsl';
+		if( file_exists($xslt_path1) && file_exists($xslt_path2) ) {
+			try{
+				//convert all attributes to elements
+				$xsl = new DOMDocument();
+				$xsl->load($xslt_path1);
+				$xml = new DOMDocument();
+				$xml->loadXML($x, LIBXML_NSCLEAN | LIBXML_COMPACT);
+				$proc = new XSLTProcessor();
+				$proc->registerPHPFunctions();
+				$proc->importStylesheet($xsl);
+				$json = $proc->transformToXml( $xml );
+				
+				//convert all attributes to json
+				$xsl = new DOMDocument();
+				$xsl->load($xslt_path2);
+				$xml = new DOMDocument();
+				$xml->loadXML($json, LIBXML_NSCLEAN | LIBXML_COMPACT);
+				$proc = new XSLTProcessor();
+				$proc->registerPHPFunctions();
+				$proc->importStylesheet($xsl);
+				$json = $proc->transformToXml( $xml );
+				header('Content-type: application/json');
+			}catch( Exception $e) {
+				error_log('[Api::transformXmlToJson]: ' . $e->getMessage());
+				return $x;
+			}
+		}
+		
+		return $json;
+	}
 }
 
 /**
@@ -1787,8 +1822,9 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
 	 * @return string
 	 * @access public
 	 */	
-	public function cachefile() {
-		return RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '/query_' . get_class($this) . '_' . $this->cachekey() . '.xml';
+	public function cachefile() {		
+		$ext = ".xml";
+		return RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '/query_' . get_class($this) . '_' . $this->cachekey() . $ext;
 	}
 
     /**
@@ -1817,10 +1853,10 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
 				}
 				if ($maxcachelife > $this->getCacheLife()) { // unlink cache file and perform proper query
 					@unlink($cachefile);
-		            $this->_model = $this->getModel();
-			        return new XMLFragmentRestResponse("", $this);
+					$this->_model = $this->getModel();
+				    return new XMLFragmentRestResponse("", $this);
 				} else { // serve existing cache
-					//debug_log("serving cached data");
+					debug_log("serving cached data");
 					// TODO: remove this code block, and add cache hooks to the RestResource interface which will properly implement
 					// needed actions in subclasses
 					if ((get_class($this) == "RestAppItem") || (get_class($this) == "RestPplItem") || (get_class($this) == "RestBroker")) {
@@ -1848,7 +1884,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
 				}
 			} else {
 	            $this->_model = $this->getModel();
-		        return new XMLFragmentRestResponse("", $this);
+				return new XMLFragmentRestResponse("", $this);
 			};
         } else return $this->accessDenied();
     }
