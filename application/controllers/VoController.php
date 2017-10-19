@@ -50,16 +50,22 @@ class VoController extends Zend_Controller_Action
 			$h[] = "$k: $v";
 		}
 		$h['Connection']='Keep-Alive';
-		$h['Keep-Alive']='300';
+		$h['Keep-Alive']='300';		
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $h);
 		// remove existing cachefiles before making API call, or else this will not work
 		foreach ( glob(RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) .'/query_RestVAProvidersList_*.xml') as $cachefile ) {
 			@unlink($cachefile);
 		}
 		error_log('VA providers RESTful API XML cache STARTED');
+		// 1st call creates the cache
 		$result = curl_exec($ch);
-		error_log('VA providers RESTful API XML cache DONE');
+		error_log('VA providers RESTful API XML cache DONE');		
+		// 2nd call returns the cached response
 		$result = curl_exec($ch);
+		$result_tmp = @gzdecode($result);
+		if ($result_tmp !== false) {
+			$result = $result_tmp;
+		}
 		$ck = "";
 		try {
 			$xmlresult = new SimpleXMLElement($result);
