@@ -18388,8 +18388,8 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 		var osfamilytext = ($.trim(d.os_family) === "" ? "-" : $.trim(d.os_family));
 	
 		var disk = $("<div class='template-cell disk'></div>");
-                var disktext = $("<span></span>").text($.trim(d.disk_size));
-                var diskSize = parseInt($.trim(d.disk_size) || "-1");
+                var disktext = $("<span></span>").text($.trim(d.disc_size));
+                var diskSize = parseInt($.trim(d.disc_size) || "-1");
                 if (isNaN(diskSize) === false) {
                   switch(diskSize) {
                     case -1:
@@ -18430,7 +18430,7 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 		var d = data.templates || [];
 		var ul = $("<ul class='cancollapse'></ul>");
 		var liheader = $("<li class='va-template va-template-header'></li>");
-		this.renderTemplate(liheader, {main_memory_size: "Memory", disk_size: "Disk", logical_cpus: "Logical", physical_cpus: "/Physical CPUs", connectivity_in: "Connectivity In", connectivity_out: "/Out", os_family: "OS Family", noaction: "true"}, data);
+		this.renderTemplate(liheader, {main_memory_size: "Memory", disc_size: "Disk", logical_cpus: "Logical", physical_cpus: "/Physical CPUs", connectivity_in: "Connectivity In", connectivity_out: "/Out", os_family: "OS Family", noaction: "true"}, data);
 		$(ul).append(liheader);
 		if (d.length > 0) {
 			$.each(d, (function(self, container) {
@@ -18900,8 +18900,8 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 		var osfamilytext = ($.trim(d.os_family) === "" ? "-" : $.trim(d.os_family));
 		
 		var disk = $("<div class='template-cell disk'></div>");
-		var disktext = $("<span></span>").text($.trim(d.disk_size));
-		var diskSize = parseInt($.trim(d.disk_size) || "-1");
+		var disktext = $("<span></span>").text($.trim(d.disc_size));
+		var diskSize = parseInt($.trim(d.disc_size) || "-1");
 		if (isNaN(diskSize) === false) {
 		  switch(diskSize) {
 		    case -1:
@@ -18943,7 +18943,7 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 		var d = this.options.instanceData.template || [];
 		var ul = $("<ul class='cancollapse'></ul>");
 		var liheader = $("<li class='va-template va-template-header'></li>");
-		this.renderTemplate(liheader, {main_memory_size: "Memory", disk_size: "Disk", logical_cpus: "Logical", physical_cpus: "/Physical CPUs", connectivity_in: "Connectivity In", connectivity_out: "/Out", os_family: "OS Family", noaction: "true"}, data);
+		this.renderTemplate(liheader, {main_memory_size: "Memory", disc_size: "Disk", logical_cpus: "Logical", physical_cpus: "/Physical CPUs", connectivity_in: "Connectivity In", connectivity_out: "/Out", os_family: "OS Family", noaction: "true"}, data);
 		$(ul).append(liheader);
 		if (d.length > 0) {
 			$.each(d, (function(self, container) {
