@@ -90,16 +90,46 @@ class VoController extends Zend_Controller_Action
 				$errors = error_get_last();
 				error_log("[makeVAprovidersCache] Could not copy VA providers cache file into assets. Reason: " . $errors['message']);
 			} else {
-				$f_hashfile = @fopen($hashfile, "w");
-				if ($f_hasfile !== false) {
-					fwrite($f_hashfile, $hash);
-					fclose($f_hashfile);
-				} else {
-					$errors = error_get_last();
-					error_log("[makeVAprovidersCache] Could not open+write VA providers cache data hash file. Reason: " . $errors['message']);
-				}
 				debug_log("Copied VA providers cache file into assets");
-				debug_log("Data md5 is $hash");
+				// XML cache file has been copied to assets. Create a JSON copy as well.
+				$copyfile2 = str_replace(".xml", ".json", $copyfile);
+				$jsondata = RestAPIHelper::transformXMLtoJSON(file_get_contents($copyfile));
+				$f_jsonop = true;
+				$f_jsonfile = @fopen($copyfile2, "w");
+				if ($f_jsonfile !== false) {
+					if (@fwrite($f_jsonfile, "" . $jsondata) === false) {
+						$errors = error_get_last();
+						error_log("[makeVAprovidersCache] Could not write to VA providers cache file JSON copy in assets. Reason: " . $errors['message']);
+						$f_jsonop = false;
+					}
+					@fclose($f_jsonfile);
+				} else {
+						$errors = error_get_last();
+						error_log("[makeVAprovidersCache] Could not open VA providers cache file JSON copy for writing in assets. Reason: " . $errors['message']);
+						$f_jsonop = false;
+				}
+				if ($f_jsonop) {
+					debug_log("Created VA providers cache file JSON copy in assets");
+				}
+				// Keep a hashfile of the cache
+				$f_hashop = true;
+ 				$f_hashfile = @fopen($hashfile, "w");
+ 				if ($f_hashfile !== false) {
+					if (@fwrite($f_hashfile, $hash) === false) {
+						$errors = error_get_last();
+						error_log("[makeVAprovidersCache] Could not write to VA providers cache data hash file. Reason: " . $errors['message']);
+						$f_hashop = false;
+					}
+					@fclose($f_hashfile);
+ 				} else {
+ 					$errors = error_get_last();
+					error_log("[makeVAprovidersCache] Could not open VA providers cache data hash file for writing. Reason: " . $errors['message']);
+					$f_hashop = false;
+ 				}
+ 				debug_log("Data md5 is $hash");
+				if ($f_hashop) {
+					debug_log("Copied VA providers cache hash file into assets");
+				}
 			}
 		} else {
 			error_log("[makeVAprovidersCache] No VA providers cache file to copy into assets");
