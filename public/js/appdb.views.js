@@ -12703,13 +12703,13 @@ appdb.views.ManagedFilterEntry = appdb.ExtendClass(appdb.View, "appdb.views.Mana
 		},
 		"storetype": function(text) {
 			if ($.inArray($.trim(text).toLowerCase(), ["2", "virtual appliances"]) > -1) {
-				return "Cloud Mp";
+				return "Cloud Marketplace";
 			}
-			return "Software Mp";
+			return "Software Marketplace";
 		},
 		"supports": function(text) {
 			if ($.inArray($.trim(text).toLowerCase(), ["1", "occi"]) > -1) {
-				return "Cloud Mp";
+				return "Cloud Marketplace";
 			}
 			return "None";
 		},
