@@ -23,49 +23,53 @@ Author: wvkarag@lovecraft.priv.iasa.gr
 
 START TRANSACTION;
 
+CREATE SCHEMA egiis;
+
+ALTER SCHEMA egiis OWNER TO appdb;
+
 DROP TRIGGER IF EXISTS tr_gocdb_va_providers_99_refresh_permissions ON gocdb.va_providers;
 
 DROP FUNCTION IF EXISTS group_hash(va_provider_templates);
--- DROP TABLE IF EXISTS va_provider_templates;
+  DROP TABLE IF EXISTS va_provider_templates;
 DROP SEQUENCE IF EXISTS va_provider_templates_id_seq CASCADE;
 CREATE SEQUENCE va_provider_templates_id_seq;
 ALTER SEQUENCE va_provider_templates_id_seq OWNER TO appdb;
 DROP MATERIALIZED VIEW site_services_xml;
 DROP MATERIALIZED VIEW site_service_images_xml;
 DROP FUNCTION IF EXISTS good_vmiinstanceid(va_provider_images);
--- DROP TABLE IF EXISTS va_provider_images;
+  DROP TABLE IF EXISTS va_provider_images;
 DROP SEQUENCE IF EXISTS va_provider_images_id_seq CASCADE;
 CREATE SEQUENCE va_provider_images_id_seq;
 ALTER SEQUENCE va_provider_images_id_seq OWNER TO appdb;
--- DROP TABLE IF EXISTS va_provider_endpoints;
+  DROP TABLE IF EXISTS va_provider_endpoints;
 DROP SEQUENCE IF EXISTS va_provider_endpoints_id_seq CASCADE;
 CREATE SEQUENCE va_provider_endpoints_id_seq;
 ALTER SEQUENCE va_provider_endpoints_id_seq OWNER TO appdb;
 
-DROP TABLE IF EXISTS vapj CASCADE;
-CREATE TABLE vapj (
+DROP TABLE IF EXISTS egiis.vapj CASCADE;
+CREATE TABLE egiis.vapj (
 	pkey TEXT NOT NULL PRIMARY KEY,
 	j JSONB NOT NULL,
 	h TEXT NOT NULL,
 	lastseen TIMESTAMP DEFAULT NOW()
 );
-ALTER TABLE vapj OWNER TO appdb;
-CREATE INDEX idx_vapj_info ON vapj USING gin (((j ->> 'info')::jsonb));
-CREATE INDEX idx_vapj_lastseen ON vapj USING btree(lastseen);
+ALTER TABLE egiis.vapj OWNER TO appdb;
+CREATE INDEX idx_vapj_info ON egiis.vapj USING gin (((j ->> 'info')::jsonb));
+CREATE INDEX idx_vapj_lastseen ON egiis.vapj USING btree(lastseen);
 
 CREATE OR REPLACE FUNCTION trfn_vapj_upsert() RETURNS TRIGGER AS
 $$
 BEGIN
-	IF EXISTS (SELECT * FROM vapj WHERE TRIM(pkey) = TRIM(NEW.pkey)) THEN		
-		IF NEW.h = (SELECT h FROM vapj WHERE pkey = NEW.pkey) THEN
+	IF EXISTS (SELECT * FROM egiis.vapj WHERE TRIM(pkey) = TRIM(NEW.pkey)) THEN		
+		IF NEW.h = (SELECT h FROM egiis.vapj WHERE pkey = NEW.pkey) THEN
 			-- RAISE NOTICE 'existing unmodded entry, updating lastseen for %', pkey;
-			UPDATE vapj
+			UPDATE egiis.vapj
 				SET lastseen = NOW()
 				WHERE pkey = NEW.pkey;
 			RETURN NULL;
 		ELSE
 			-- RAISE NOTICE 'existing modded entry, updating data and lastseen for %', pkey;
-			UPDATE vapj 
+			UPDATE egiis.vapj 
 				SET j = NEW.j, h = NEW.h, lastseen = NOW()
 				WHERE pkey = NEW.pkey;
 			RETURN NULL;
@@ -80,29 +84,29 @@ $$
 LANGUAGE plpgsql;
 ALTER FUNCTION trfn_vapj_upsert() OWNER TO appdb;
 
-DROP TRIGGER IF EXISTS rtr_vapj_10_upsert ON vapj;
-CREATE TRIGGER rtr_vapj_10_upsert BEFORE INSERT ON vapj
+DROP TRIGGER IF EXISTS rtr_vapj_10_upsert ON egiis.vapj;
+CREATE TRIGGER rtr_vapj_10_upsert BEFORE INSERT ON egiis.vapj
 FOR EACH ROW EXECUTE PROCEDURE trfn_vapj_upsert();
 
-DROP TABLE IF EXISTS tvapj CASCADE;
-CREATE TABLE tvapj (
+DROP TABLE IF EXISTS egiis.tvapj CASCADE;
+CREATE TABLE egiis.tvapj (
 	pkey TEXT NOT NULL PRIMARY KEY,
 	j JSONB NOT NULL,
 	h TEXT NOT NULL,
 	lastseen TIMESTAMP DEFAULT NOW()
 );
-ALTER TABLE tvapj OWNER TO appdb;
-CREATE INDEX idx_tvapj_info ON tvapj USING gin (((j ->> 'info')::jsonb));
-CREATE INDEX idx_tvapj_lastseen ON tvapj USING btree(lastseen);
+ALTER TABLE egiis.tvapj OWNER TO appdb;
+CREATE INDEX idx_egiis_tvapj_info ON egiis.tvapj USING gin (((j ->> 'info')::jsonb));
+CREATE INDEX idx_egiis_tvapj_lastseen ON egiis.tvapj USING btree(lastseen);
 
-CREATE OR REPLACE FUNCTION trfn_tvapj_upsert() RETURNS TRIGGER AS
+CREATE OR REPLACE FUNCTION trfn_egiis_tvapj_upsert() RETURNS TRIGGER AS
 $$
 BEGIN
-	IF EXISTS (SELECT 1 FROM tvapj WHERE pkey = NEW.pkey) THEN
-		IF NEW.h = (SELECT h FROM tvapj WHERE pkey = NEW.pkey) THEN
+	IF EXISTS (SELECT 1 FROM egiis.tvapj WHERE pkey = NEW.pkey) THEN
+		IF NEW.h = (SELECT h FROM egiis.tvapj WHERE pkey = NEW.pkey) THEN
 			RETURN NULL;
 		ELSE
-			UPDATE tvapj 
+			UPDATE egiis.tvapj 
 				SET j = NEW.j, h = NEW.h, lastseen = NOW()
 				WHERE pkey = NEW.pkey;
 			RETURN NULL;
@@ -114,11 +118,11 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
-ALTER FUNCTION trfn_tvapj_upsert() OWNER TO appdb;
+ALTER FUNCTION trfn_egiis_tvapj_upsert() OWNER TO appdb;
 
-DROP TRIGGER IF EXISTS rtr_tvapj_10_upsert ON tvapj;
-CREATE TRIGGER rtr_tvapj_10_upsert BEFORE INSERT ON tvapj
-FOR EACH ROW EXECUTE PROCEDURE trfn_tvapj_upsert();
+DROP TRIGGER IF EXISTS rtr_egiis_tvapj_10_upsert ON egiis.tvapj;
+CREATE TRIGGER rtr_egiis_tvapj_10_upsert BEFORE INSERT ON egiis.tvapj
+FOR EACH ROW EXECUTE PROCEDURE trfn_egiis_tvapj_upsert();
 
 CREATE OR REPLACE FUNCTION trfn_gocdb_va_providers_upsert() RETURNS TRIGGER AS
 $$
@@ -182,8 +186,8 @@ SELECT
 		((SELECT jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ExecutionEnvironmentDiskSize')::text) || ' GiB'
   END AS disc_size*/
   (jsonb_array_elements(((t.j->>'info')::jsonb->>'templates')::jsonb)->>'GLUE2ExecutionEnvironmentDiskSize')::text AS disc_size
-FROM vapj AS g
-LEFT OUTER JOIN tvapj AS t ON t.pkey = g.pkey
+FROM egiis.vapj AS g
+LEFT OUTER JOIN egiis.tvapj AS t ON t.pkey = g.pkey
 WHERE 
 	(COALESCE(TRIM(((t.j->>'info')::jsonb->>'GLUE2ComputingEndpointComputingServiceForeignKey')::text), '') <> '') AND
 	(COALESCE(((g.j->>'info')::jsonb->>'SiteEndpointInProduction')::text, 'FALSE')::boolean IS DISTINCT FROM FALSE);
@@ -199,8 +203,8 @@ SELECT
   t.pkey AS va_provider_id,
   ((t.j->>'info')::jsonb->>'GLUE2EndpointURL')::text AS endpoint_url,
   ((t.j->>'info')::jsonb->>'GLUE2EndpointImplementor')::text AS deployment_type
-FROM vapj AS g
-LEFT OUTER JOIN tvapj AS t ON g.pkey = t.pkey
+FROM egiis.vapj AS g
+LEFT OUTER JOIN egiis.tvapj AS t ON g.pkey = t.pkey
 WHERE ((t.j->>'info')::jsonb->>'GLUE2EndpointInterfaceName')::text = 'OCCI';
 ALTER MATERIALIZED VIEW va_provider_endpoints OWNER TO appdb;
 CREATE UNIQUE INDEX "idx_va_provider_endpoints_id" ON va_provider_endpoints USING btree (id);
@@ -249,8 +253,8 @@ FROM (
 		  (jsonb_array_elements(((t.j->>'info')::jsonb->>'images')::jsonb)->>'GLUE2EntityName')::text AS va_provider_image_id,
 		  (jsonb_array_elements(((t.j->>'info')::jsonb->>'images')::jsonb)->>'GLUE2ApplicationEnvironmentRepository')::text AS mp_uri,
 		  (jsonb_array_elements(((t.j->>'info')::jsonb->>'images')::jsonb)->'ImageVoVmiInstanceId')::text AS vowide_vmiinstanceid
-		FROM vapj AS g
-		LEFT OUTER JOIN tvapj AS t ON g.pkey = t.pkey
+		FROM egiis.vapj AS g
+		LEFT OUTER JOIN egiis.tvapj AS t ON g.pkey = t.pkey
 		WHERE 
 			(COALESCE(TRIM(((t.j->>'info')::jsonb->>'GLUE2ComputingEndpointComputingServiceForeignKey')::text), '') <> '') AND
 			(COALESCE(((g.j->>'info')::jsonb->>'SiteEndpointInProduction')::text, 'FALSE')::boolean IS DISTINCT FROM FALSE)
@@ -355,31 +359,31 @@ CREATE UNIQUE INDEX "idx_site_service_images_xml_id" ON site_service_images_xml 
 
 ALTER TABLE gocdb.sites ALTER COLUMN shortname DROP NOT NULL;
 
-DROP TABLE IF EXISTS sitej CASCADE;
-CREATE TABLE sitej (
+DROP TABLE IF EXISTS egiis.sitej CASCADE;
+CREATE TABLE egiis.sitej (
 	pkey TEXT NOT NULL PRIMARY KEY,
 	j JSONB NOT NULL,
 	h TEXT NOT NULL,
 	lastseen TIMESTAMP DEFAULT NOW()
 );
-ALTER TABLE sitej OWNER TO appdb;
-CREATE INDEX idx_sitej_info ON sitej USING gin (((j ->> 'info')::jsonb));
-CREATE INDEX idx_sitej_lastseen ON sitej USING btree(lastseen);
+ALTER TABLE egiis.sitej OWNER TO appdb;
+CREATE INDEX idx_egiis_sitej_info ON egiis.sitej USING gin (((j ->> 'info')::jsonb));
+CREATE INDEX idx_egiis_sitej_lastseen ON egiis.sitej USING btree(lastseen);
 
-CREATE OR REPLACE FUNCTION trfn_sitej_upsert() RETURNS TRIGGER AS
+CREATE OR REPLACE FUNCTION trfn_egiis_sitej_upsert() RETURNS TRIGGER AS
 $$
 BEGIN
-	IF EXISTS (SELECT 1 FROM sitej WHERE pkey = NEW.pkey) THEN
+	IF EXISTS (SELECT 1 FROM egiis.sitej WHERE pkey = NEW.pkey) THEN
 		
-		IF NEW.h = (SELECT h FROM sitej WHERE pkey = NEW.pkey) THEN
+		IF NEW.h = (SELECT h FROM egiis.sitej WHERE pkey = NEW.pkey) THEN
 			-- RAISE NOTICE 'existing unmodded entry, updating lastseen';
-			UPDATE sitej
+			UPDATE egiis.sitej
 				SET lastseen = NOW()
 				WHERE pkey = NEW.pkey;
 			RETURN NULL;
 		ELSE
 			-- RAISE NOTICE 'existing modded entry, updating data and lastseen';
-			UPDATE sitej 
+			UPDATE egiis.sitej 
 				SET j = NEW.j, h = NEW.h, lastseen = NOW()
 				WHERE pkey = NEW.pkey;
 			RETURN NULL;
@@ -392,11 +396,11 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
-ALTER FUNCTION trfn_sitej_upsert() OWNER TO appdb;
+ALTER FUNCTION trfn_egiis_sitej_upsert() OWNER TO appdb;
 
-DROP TRIGGER IF EXISTS rtr_sitej_10_upsert ON sitej;
-CREATE TRIGGER rtr_sitej_10_upsert BEFORE INSERT ON sitej
-FOR EACH ROW EXECUTE PROCEDURE trfn_sitej_upsert();
+DROP TRIGGER IF EXISTS rtr_egiis_sitej_10_upsert ON egiis.sitej;
+CREATE TRIGGER rtr_egiis_sitej_10_upsert BEFORE INSERT ON egiis.sitej
+FOR EACH ROW EXECUTE PROCEDURE trfn_egiis_sitej_upsert();
 
 CREATE OR REPLACE VIEW __va_providers AS
  SELECT va_providers.pkey AS id,
@@ -422,6 +426,49 @@ CREATE OR REPLACE VIEW __va_providers AS
      LEFT JOIN oses ON LOWER(oses.name) = LOWER(va_providers.host_os)
      LEFT JOIN archs ON LOWER(archs.name) = LOWER(va_providers.host_arch) OR (LOWER(va_providers.host_arch) = ANY(LOWER(archs.aliases::text)::text[]))
      LEFT JOIN countries ON countries.isocode = va_providers.country_code;
+     
+CREATE OR REPLACE VIEW __sites AS
+ SELECT sites.pkey AS id,
+    sites.name,
+    sites.shortname,
+    sites.officialname,
+    sites.description,
+    sites.portalurl,
+    sites.homeurl,
+    sites.contactemail,
+    sites.contacttel,
+    sites.alarmemail,
+    sites.csirtemail,
+    sites.giisurl,
+    countries.id AS countryid,
+    sites.countrycode,
+    sites.country AS countryname,
+    regions.id AS regionid,
+    regions.name AS regionname,
+    sites.tier,
+    sites.subgrid,
+    sites.roc,
+    sites.prodinfrastructure AS productioninfrastructure,
+    sites.certstatus AS certificationstatus,
+    sites.timezone,
+    sites.latitude,
+    sites.longitude,
+    sites.domainname,
+    sites.siteip AS ip,
+    uuid_generate_v5(uuid_namespace('ISO OID'::text), 'gocdb:sites:' || sites.name) AS guid,
+    'gocdb'::text AS datasource,
+    sites.createdon,
+    'gocdb'::text AS createdby,
+    sites.updatedon,
+    'gocdb'::text AS updatedby,
+    sites.deleted,
+    sites.deletedon,
+    sites.deletedby
+   FROM gocdb.sites
+     LEFT JOIN countries ON countries.isocode = sites.countrycode
+     LEFT JOIN regions ON regions.id = countries.regionid
+  WHERE sites.prodinfrastructure = 'Production'::text AND sites.certstatus = 'Certified'::text;
+ALTER VIEW __sites OWNER TO appdb;    
 
 CREATE OR REPLACE FUNCTION trfn_gocdb_sites_upsert() RETURNS TRIGGER AS
 $$
@@ -453,7 +500,7 @@ BEGIN
 		  longitude = NEW.longitude,
 		  domainname = NEW.domainname,
 		  siteip = NEW.siteip,
-		  guid = uuid_generate_v5(uuid_namespace('ISO OID'::text), 'gocdb:sites:' || NEW.name),
+		  -- guid = uuid_generate_v5(uuid_namespace('ISO OID'::text), 'gocdb:sites:' || NEW.name),
 		  updatedon = NOW(),
 		  deleted = COALESCE(NEW.deleted, false),
 		  deletedon = COALESCE(NEW.deletedon, NULL),
@@ -468,6 +515,8 @@ END;
 $$
 LANGUAGE plpgsql;
 ALTER FUNCTION trfn_gocdb_sites_upsert() OWNER TO appdb;
+
+ALTER TABLE gocdb.sites DROP COLUMN IF EXISTS guid;
 
 DROP TRIGGER IF EXISTS rtr_gocdb_sites_10_upsert ON gocdb.sites;
 CREATE TRIGGER rtr_gocdb_sites_10_upsert BEFORE INSERT ON gocdb.sites
@@ -491,10 +540,10 @@ BEGIN
 		deletedby = 'gocdb'
 	WHERE pkey IN (
 		SELECT pkey 
-			FROM sitej
+			FROM egiis.sitej
 			-- WHERE ((NOW() - lastseen)::INTERVAL > deltime::INTERVAL)
-			WHERE lastseen < (SELECT MAX(lastseen) FROM sitej)
-	) OR pkey NOT IN (SELECT pkey FROM sitej);
+			WHERE lastseen < (SELECT MAX(lastseen) FROM egiis.sitej)
+	) OR pkey NOT IN (SELECT pkey FROM egiis.sitej);
 	
 	-- upsert json data into sites table
 	INSERT INTO gocdb.sites
@@ -527,9 +576,9 @@ BEGIN
 		((g.j->>'info')::jsonb->>'SiteDomainname')::text AS domainname,
 		NULL::text AS siteip,
 		FALSE, NULL, NULL
-	FROM sitej AS g
+	FROM egiis.sitej AS g
 	-- WHERE (NOW() - g.lastseen)::INTERVAL <= deltime::INTERVAL;
-	WHERE g.lastseen = (SELECT MAX(lastseen) FROM sitej);
+	WHERE g.lastseen = (SELECT MAX(lastseen) FROM egiis.sitej);
 
 	-- ******************
 	-- VA PROVIDERS
@@ -544,14 +593,14 @@ BEGIN
 	DELETE FROM gocdb.va_providers 
 	WHERE pkey IN (
 		SELECT pkey 
-			FROM vapj
+			FROM egiis.vapj
 			-- WHERE ((NOW() - lastseen)::INTERVAL > deltime::INTERVAL)
-			WHERE lastseen < (SELECT MAX(lastseen) FROM vapj)
+			WHERE lastseen < (SELECT MAX(lastseen) FROM egiis.vapj)
 	) OR (
-		pkey NOT IN (SELECT pkey FROM vapj)
+		pkey NOT IN (SELECT pkey FROM egiis.vapj)
 	) OR ( NOT (
 		SELECT array_agg(s) && scopes
-		FROM (SELECT jsonb_array_elements_text(((g.j->>'info')::jsonb->>'SiteEndpointScopes')::jsonb)::text AS s FROM vapj AS g WHERE g.pkey = va_providers.pkey) AS ts
+		FROM (SELECT jsonb_array_elements_text(((g.j->>'info')::jsonb->>'SiteEndpointScopes')::jsonb)::text AS s FROM egiis.vapj AS g WHERE g.pkey = va_providers.pkey) AS ts
 	));
 	
 	-- make sure any OS declared by the VA exists in our OSes table
@@ -559,7 +608,7 @@ BEGIN
 		SELECT DISTINCT
 			TRIM(((g.j->>'info')::jsonb->>'SiteEndpointHostOS')::text)
 		FROM 
-			vapj AS g
+			egiis.vapj AS g
 		WHERE 	
 			(((g.j->>'info')::jsonb->>'SiteEndpointHostOS')::text IS DISTINCT FROM NULL) AND
 			(TRIM(((g.j->>'info')::jsonb->>'SiteEndpointHostOS')::text) <> '') AND
@@ -587,12 +636,12 @@ BEGIN
 		((g.j->>'info')::jsonb->>'SiteEndpointUrl')::text AS url,
 		((t.j->>'info')::jsonb->>'GLUE2ComputingEndpointComputingServiceForeignKey')::text AS serviceid
 	FROM 
-		vapj AS g
-	LEFT OUTER JOIN tvapj AS t ON t.pkey = g.pkey
+		egiis.vapj AS g
+	LEFT OUTER JOIN egiis.tvapj AS t ON t.pkey = g.pkey
 	WHERE 
 		-- ((NOW() - g.lastseen)::INTERVAL <= deltime::INTERVAL) AND
 		(
-			g.lastseen = (SELECT MAX(lastseen) FROM vapj)
+			g.lastseen = (SELECT MAX(lastseen) FROM egiis.vapj)
 		) AND (
 			SELECT array_agg(s) && scopes
 			FROM (SELECT jsonb_array_elements_text(((g.j->>'info')::jsonb->>'SiteEndpointScopes')::jsonb)::text AS s) AS ts
@@ -813,12 +862,7 @@ $$ LANGUAGE plpgsql VOLATILE;
 ALTER FUNCTION process_site_downtimes(jsonb[]) OWNER TO appdb;
 
 DROP TRIGGER IF EXISTS tr_gocdb_sites_99_create_uuid ON gocdb.sites;
-DROP TRIGGER IF EXISTS tr_gocdb_sites_01_create_uuid ON gocdb.sites;
-CREATE TRIGGER tr_gocdb_sites_01_create_uuid
-    BEFORE INSERT
-    ON gocdb.sites
-    FOR EACH ROW
-    EXECUTE PROCEDURE gocdb.trfn_gocdb_sites_create_uuid();
+DROP FUNCTION IF EXISTS gocdb.trfn_gocdb_sites_create_uuid;
 
 -- Function: public.va_provider_to_xml_ext(text)
 
@@ -997,7 +1041,7 @@ $BODY$
   ROWS 1000;
 ALTER FUNCTION public.va_provider_to_xml_ext(text)
   OWNER TO appdb;
-	
+
 INSERT INTO version (major,minor,revision,notes)
        SELECT 8, 16, 0, E'Refactor va providers, based on new JSON information system data. Add base_mp_uri and strict_base_mp_uri to va_providers_to_xml_ext function'
        WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=16 AND revision=0);
