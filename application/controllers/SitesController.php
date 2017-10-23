@@ -359,7 +359,17 @@ class SitesController extends Zend_Controller_Action{
 
 			db()->query("SELECT refresh_sites(?)", array($this->vaSyncScopes)); 
 			db()->commit();
-			
+			// clean potantially related filter cache
+			db()->query("DELETE FROM cache.filtercache WHERE m_from LIKE '%FROM sites%'");
+			db()->query("DELETE FROM cache.filtercache WHERE m_from LIKE '%FROM va_provider%'");
+			// give the commit some time to settle before creating VA provider cache and notifying the dashboard
+			sleep(2);
+			// create VA providers cache
+			$this->makeVAprovidersCache();
+			// notify dashboard			
+ 			if ( strtolower($_SERVER["SERVER_NAME"]) == "appdb.egi.eu" ) {
+ 				web_get_contents("https://dashboard.appdb.egi.eu/services/appdb/sync/cloud");
+ 			}
 			$this->makeVAprovidersCache();
 		} catch(Exceptions\CouchNotFoundException $e) {
 			$success = false;
