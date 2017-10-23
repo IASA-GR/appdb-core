@@ -305,6 +305,13 @@ class SitesController extends Zend_Controller_Action{
 				));
 			}
 			db()->query("RELEASE SAVEPOINT $sp_vap");
+			
+			db()->query("SELECT refresh_sites(?)", array($this->vaSyncScopes)); 
+			db()->commit();
+			$inTransaction = false;
+
+			db()->beginTransaction();
+			$inTransaction = true;			
 
 			/* Downtimes START */
 			$sp_vap = "sync_egi_site_done" . (microtime(true) * 10000);
@@ -345,7 +352,7 @@ class SitesController extends Zend_Controller_Action{
 				$statinfo[] = json_encode($doc);
 			}
 			try {
-//				echo "SELECT process_site_argo_status('" . php_to_pg_array($statinfo) . "'::jsonb[])\n"; 
+//				error_log("SELECT process_site_argo_status('" . php_to_pg_array($statinfo) . "'::jsonb[])\n");
 				db()->query("SELECT process_site_argo_status(?::jsonb[])", array(php_to_pg_array($statinfo))); 
 			} catch (Exception $e) {
 					db()->query("ROLLBACK TO SAVEPOINT $sp_vap");
@@ -357,20 +364,11 @@ class SitesController extends Zend_Controller_Action{
 			}
 			/* ARGO status END */
 
-			db()->query("SELECT refresh_sites(?)", array($this->vaSyncScopes)); 
+			// refresh VA providers to reflect ARGO status and downtime info
+			db()->query("REFRESH MATERIALIZED VIEW CONCURRENTLY va_providers"); 
 			db()->commit();
-			// clean potantially related filter cache
-			db()->query("DELETE FROM cache.filtercache WHERE m_from LIKE '%FROM sites%'");
-			db()->query("DELETE FROM cache.filtercache WHERE m_from LIKE '%FROM va_provider%'");
-			// give the commit some time to settle before creating VA provider cache and notifying the dashboard
-			sleep(2);
-			// create VA providers cache
-			$this->makeVAprovidersCache();
-			// notify dashboard			
- 			if ( strtolower($_SERVER["SERVER_NAME"]) == "appdb.egi.eu" ) {
- 				web_get_contents("https://dashboard.appdb.egi.eu/services/appdb/sync/cloud");
- 			}
-			$this->makeVAprovidersCache();
+			$inTransaction = false;
+
 		} catch(Exceptions\CouchNotFoundException $e) {
 			$success = false;
 			$error_message = $e->getMessage();
@@ -390,6 +388,26 @@ class SitesController extends Zend_Controller_Action{
 				db()->rollBack();
 			}
 		}
+
+		try {
+			// clean potantially related filter cache
+			db()->query("DELETE FROM cache.filtercache WHERE m_from LIKE '%FROM sites%'");
+			db()->query("DELETE FROM cache.filtercache WHERE m_from LIKE '%FROM va_provider%'");
+		} catch(Exception $e) {
+			$error_message = $e->getMessage();
+			error_log("[syncvaprovidersAction] Error while cleaning filter cache. Reason: " . $e->getMessage());
+		}
+
+		// give the commit some time to settle before creating VA provider cache and notifying the dashboard
+		sleep(2);
+		// create VA providers cache
+		$this->makeVAprovidersCache();
+		// notify dashboard			
+ 		if ( strtolower($_SERVER["SERVER_NAME"]) == "appdb.egi.eu" ) {
+ 			web_get_contents("https://dashboard.appdb.egi.eu/services/appdb/sync/cloud");
+ 		}
+		
+		// echo response
 		header('Content-type: text/xml');
 		echo '<' . '?xml version="1.0" encoding="UTF-8"?'.'>'."\n";
 		if ($success) {
@@ -399,7 +417,7 @@ class SitesController extends Zend_Controller_Action{
 			echo " time='" . $dt . "'";
 			echo " />";
 		} else {
-			ExternalDataNotification::sendNotification('Sites::syncSites', $error_message, ExternalDataNotification::MESSAGE_TYPE_ERROR);
+//			ExternalDataNotification::sendNotification('Sites::syncSites', $error_message, ExternalDataNotification::MESSAGE_TYPE_ERROR);
 			echo "<result success='false' error='" . htmlspecialchars($error_message, ENT_QUOTES). "' />";
 			$this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 500 Internal Server Error");
