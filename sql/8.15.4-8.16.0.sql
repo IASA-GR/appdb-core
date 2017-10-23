@@ -23,7 +23,7 @@ Author: wvkarag@lovecraft.priv.iasa.gr
 
 START TRANSACTION;
 
-CREATE SCHEMA egiis;
+CREATE SCHEMA IF NOT EXISTS egiis;
 
 ALTER SCHEMA egiis OWNER TO appdb;
 
@@ -189,6 +189,7 @@ SELECT
 FROM egiis.vapj AS g
 LEFT OUTER JOIN egiis.tvapj AS t ON t.pkey = g.pkey
 WHERE 
+    ((t.j->>'info')::jsonb->>'GLUE2EndpointInterfaceName')::text = 'OCCI' AND
 	(COALESCE(TRIM(((t.j->>'info')::jsonb->>'GLUE2ComputingEndpointComputingServiceForeignKey')::text), '') <> '') AND
 	(COALESCE(((g.j->>'info')::jsonb->>'SiteEndpointInProduction')::text, 'FALSE')::boolean IS DISTINCT FROM FALSE);
 ALTER MATERIALIZED VIEW va_provider_templates OWNER TO appdb;
@@ -226,7 +227,7 @@ SELECT
 FROM (
 	SELECT 
 		id, va_provider_id,
-		CASE WHEN LOWER(vmiinstanceid) = 'null' THEN
+--		CASE WHEN LOWER(vmiinstanceid) = 'null' THEN
 			CASE LOWER(content_type)
 				WHEN 'vo' THEN
 					(
@@ -236,11 +237,12 @@ FROM (
 						WHERE vowide_image_list_images.id::text = ((SELECT REGEXP_SPLIT_TO_ARRAY(REPLACE((REGEXP_MATCHES(mp_uri, ':[0-9]+[:/]*[0-9]*', '')::text[])[1], '/', ''), ':', '')::text[]))[2]
 					)::text
 				ELSE
-					((SELECT REGEXP_SPLIT_TO_ARRAY(REPLACE((REGEXP_MATCHES(mp_uri, ':[0-9]+[:/]*[0-9]*', '')::text[])[1], '/', ''), ':', '')::text[]))[2]	
+					((SELECT REGEXP_SPLIT_TO_ARRAY(REPLACE((REGEXP_MATCHES(mp_uri, ':[0-9]+[:/]*[0-9]*', '')::text[])[1], '/', ''), ':', '')::text[]))[2]
 			END
-		ELSE 
-			vmiinstanceid
-		END AS vmiinstanceid,
+--		ELSE 
+--			vmiinstanceid
+--		END 
+        AS vmiinstanceid,
 		CASE LOWER(content_type) WHEN 'va' THEN 'vm' ELSE LOWER(content_type) END AS content_type,    	
 		va_provider_image_id, mp_uri, 
 		CASE WHEN LOWER(vowide_vmiinstanceid) = 'null' THEN NULL::int ELSE vowide_vmiinstanceid::int END AS vowide_vmiinstanceid	
@@ -255,7 +257,8 @@ FROM (
 		  (jsonb_array_elements(((t.j->>'info')::jsonb->>'images')::jsonb)->'ImageVoVmiInstanceId')::text AS vowide_vmiinstanceid
 		FROM egiis.vapj AS g
 		LEFT OUTER JOIN egiis.tvapj AS t ON g.pkey = t.pkey
-		WHERE 
+		WHERE
+            ((t.j->>'info')::jsonb->>'GLUE2EndpointInterfaceName')::text = 'OCCI' AND
 			(COALESCE(TRIM(((t.j->>'info')::jsonb->>'GLUE2ComputingEndpointComputingServiceForeignKey')::text), '') <> '') AND
 			(COALESCE(((g.j->>'info')::jsonb->>'SiteEndpointInProduction')::text, 'FALSE')::boolean IS DISTINCT FROM FALSE)
 	) AS x
@@ -402,31 +405,6 @@ DROP TRIGGER IF EXISTS rtr_egiis_sitej_10_upsert ON egiis.sitej;
 CREATE TRIGGER rtr_egiis_sitej_10_upsert BEFORE INSERT ON egiis.sitej
 FOR EACH ROW EXECUTE PROCEDURE trfn_egiis_sitej_upsert();
 
-CREATE OR REPLACE VIEW __va_providers AS
- SELECT va_providers.pkey AS id,
-    va_providers.sitename,
-    va_providers.url,
-    va_providers.gocdb_url,
-    va_providers.hostname,
-    va_providers.host_dn,
-    va_providers.host_ip,
-    oses.id AS host_os_id,
-    archs.id AS host_arch_id,
-    va_providers.beta,
-    va_providers.in_production,
-    va_providers.node_monitored,
-    countries.id AS country_id,
-    va_providers.roc_name AS ngi,
-    uuid_generate_v5(uuid_namespace('ISO OID'::text), va_providers.pkey) AS guid,
-    va_providers.serviceid,
-    va_providers.service_downtime,
-    va_providers.service_status,
-    va_providers.service_status_date
-   FROM gocdb.va_providers
-     LEFT JOIN oses ON LOWER(oses.name) = LOWER(va_providers.host_os)
-     LEFT JOIN archs ON LOWER(archs.name) = LOWER(va_providers.host_arch) OR (LOWER(va_providers.host_arch) = ANY(LOWER(archs.aliases::text)::text[]))
-     LEFT JOIN countries ON countries.isocode = va_providers.country_code;
-     
 CREATE OR REPLACE VIEW __sites AS
  SELECT sites.pkey AS id,
     sites.name,
@@ -467,8 +445,35 @@ CREATE OR REPLACE VIEW __sites AS
    FROM gocdb.sites
      LEFT JOIN countries ON countries.isocode = sites.countrycode
      LEFT JOIN regions ON regions.id = countries.regionid
-  WHERE sites.prodinfrastructure = 'Production'::text AND sites.certstatus = 'Certified'::text;
+  WHERE sites.certstatus NOT IN ('Closed', 'Suspended');
 ALTER VIEW __sites OWNER TO appdb;    
+
+CREATE OR REPLACE VIEW __va_providers AS
+ SELECT va_providers.pkey AS id,
+    va_providers.sitename,
+    va_providers.url,
+    va_providers.gocdb_url,
+    va_providers.hostname,
+    va_providers.host_dn,
+    va_providers.host_ip,
+    oses.id AS host_os_id,
+    archs.id AS host_arch_id,
+    va_providers.beta,
+    va_providers.in_production,
+    va_providers.node_monitored,
+    countries.id AS country_id,
+    va_providers.roc_name AS ngi,
+    uuid_generate_v5(uuid_namespace('ISO OID'::text), va_providers.pkey) AS guid,
+    va_providers.serviceid,
+    va_providers.service_downtime,
+    va_providers.service_status,
+    va_providers.service_status_date
+   FROM gocdb.va_providers
+     LEFT JOIN oses ON LOWER(oses.name) = LOWER(va_providers.host_os)
+     LEFT JOIN archs ON LOWER(archs.name) = LOWER(va_providers.host_arch) OR (LOWER(va_providers.host_arch) = ANY(LOWER(archs.aliases::text)::text[]))
+     LEFT JOIN countries ON countries.isocode = va_providers.country_code
+     INNER JOIN gocdb.sites ON LOWER(gocdb.sites.name) = LOWER(gocdb.va_providers.sitename)
+   WHERE gocdb.sites.certstatus NOT IN ('Closed', 'Suspended');
 
 CREATE OR REPLACE FUNCTION trfn_gocdb_sites_upsert() RETURNS TRIGGER AS
 $$
@@ -862,7 +867,7 @@ $$ LANGUAGE plpgsql VOLATILE;
 ALTER FUNCTION process_site_downtimes(jsonb[]) OWNER TO appdb;
 
 DROP TRIGGER IF EXISTS tr_gocdb_sites_99_create_uuid ON gocdb.sites;
-DROP FUNCTION IF EXISTS gocdb.trfn_gocdb_sites_create_uuid;
+DROP FUNCTION IF EXISTS gocdb.trfn_gocdb_sites_create_uuid();
 
 -- Function: public.va_provider_to_xml_ext(text)
 
@@ -963,8 +968,7 @@ SELECT
 					xmlattributes(
 						content_type,
 						mp_uri,
-						'https://' || COALESCE((SELECT data FROM config WHERE var = 'ui-host'), 'appdb.egi.eu') || '/store/vm/image/' || vmiinstances.guid::text || ':' || va_provider_images.vmiinstanceid::text AS  base_mp_uri,
-						'https://' || COALESCE((SELECT data FROM config WHERE var = 'ui-host'), 'appdb.egi.eu') || '/store/vm/image/' || vmiinstances.guid::text || ':' || va_provider_images.good_vmiinstanceid::text AS  strict_base_mp_uri,
+						'https://appdb.egi.eu/store/vm/image/' || vmiinstances.guid::text || ':' || va_provider_images.vmiinstanceid::text AS base_mp_uri,
 						vmiinstances.version AS "vmiversion",
 						va_provider_image_id,
 						va_provider_images.vmiinstanceid,
@@ -1045,5 +1049,5 @@ ALTER FUNCTION public.va_provider_to_xml_ext(text)
 INSERT INTO version (major,minor,revision,notes)
        SELECT 8, 16, 0, E'Refactor va providers, based on new JSON information system data. Add base_mp_uri and strict_base_mp_uri to va_providers_to_xml_ext function'
        WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=16 AND revision=0);
-
+       
 COMMIT;
