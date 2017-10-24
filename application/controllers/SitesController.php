@@ -256,6 +256,14 @@ class SitesController extends Zend_Controller_Action{
 		$success = true;
 		try{
 			db()->beginTransaction();
+
+			// keep a snaphot of current data, in order to compare post-syncing
+			db()->exec("DROP TABLE IF EXISTS egiis.vapj2; CREATE TABLE egiis.vapj2 AS SELECT * FROM egiis.vapj;");
+			db()->exec("DROP TABLE IF EXISTS egiis.tvapj2; CREATE TABLE egiis.tvapj2 AS SELECT * FROM egiis.tvapj;");
+			db()->exec("DROP TABLE IF EXISTS egiis.sitej2; CREATE TABLE egiis.sitej2 AS SELECT * FROM egiis.sitej;");
+			db()->exec("DROP TABLE IF EXISTS egiis.downtimes2; CREATE TABLE egiis.downtimes2 AS SELECT * FROM egiis.downtimes;");
+			db()->exec("DROP TABLE IF EXISTS egiis.argo2; CREATE TABLE egiis.argo2 AS SELECT * FROM egiis.argo;");
+
 			$inTransaction = true;			
 			$docs = $client->limit(1000)->find(['meta.collection'=>['$eq'=>'egi.goc.vaproviders']]);
 			foreach ($docs as $doc) {
@@ -275,7 +283,7 @@ class SitesController extends Zend_Controller_Action{
 						$tdoc->info->SiteEndpointPKey,
 						json_encode($tdoc),
 						$tdoc->meta->hash
-				)); 
+					)); 
 				} catch(Exceptions\CouchNotFoundException $e){
 					if($e->getCode() == 404) {
 						error_log("[syncvaprovidersAction] Sync operation exception while querying $tid due to CouchDB error. Reason: TopBDII document not found. Operation will continue." );
@@ -360,12 +368,24 @@ class SitesController extends Zend_Controller_Action{
 			}
 			/* ARGO status END */
 
-			db()->query("SELECT refresh_sites(?)", array($this->vaSyncScopes)); 
-			//// refresh VA providers to reflect ARGO status and downtime info
-			//db()->query("REFRESH MATERIALIZED VIEW CONCURRENTLY va_providers"); 
+			db()->setFetchMode(Zend_Db::FETCH_NUM);
+			$res = db()->query("SELECT refresh_sites(?)", array($this->vaSyncScopes))->fetchAll(); 
+			if (count($res) >0) {
+				$res = $res[0];
+				if (count($res) >0) {
+					$res = $res[0];
+				} else {
+					$res = null;
+				}
+			} else {
+				$res = null;
+			};
+			if ($res === false) {
+				error_log("[syncvaprovidersAction] Sync operation complete, no data changed");
+			}
+
 			db()->commit();
 			$inTransaction = false;
-
 		} catch(Exceptions\CouchNotFoundException $e) {
 			$success = false;
 			$error_message = $e->getMessage();
@@ -386,24 +406,26 @@ class SitesController extends Zend_Controller_Action{
 			}
 		}
 
-		try {
-			// clean potantially related filter cache
-			db()->query("DELETE FROM cache.filtercache WHERE m_from LIKE '%FROM sites%'");
-			db()->query("DELETE FROM cache.filtercache WHERE m_from LIKE '%FROM va_provider%'");
-		} catch(Exception $e) {
-			$error_message = $e->getMessage();
-			error_log("[syncvaprovidersAction] Error while cleaning filter cache. Reason: " . $e->getMessage());
-		}
+		if ($res !== false) {
+			try {
+				// clean potantially related filter cache
+				db()->query("DELETE FROM cache.filtercache WHERE m_from LIKE '%FROM sites%'");
+				db()->query("DELETE FROM cache.filtercache WHERE m_from LIKE '%FROM va_provider%'");
+			} catch(Exception $e) {
+				$error_message = $e->getMessage();
+				error_log("[syncvaprovidersAction] Error while cleaning filter cache. Reason: " . $e->getMessage());
+			}
 
-		// give the commit some time to settle before creating VA provider cache and notifying the dashboard
-		sleep(2);
-		// create VA providers cache
-		$this->makeVAprovidersCache();
-		// notify dashboard			
- 		if ( strtolower($_SERVER["SERVER_NAME"]) == "appdb.egi.eu" ) {
- 			web_get_contents("https://dashboard.appdb.egi.eu/services/appdb/sync/cloud");
- 		}
-		
+			// give the commit some time to settle before creating VA provider cache and notifying the dashboard
+			sleep(2);
+			// create VA providers cache
+			$this->makeVAprovidersCache();
+			// notify dashboard			
+			if ( strtolower($_SERVER["SERVER_NAME"]) == "appdb.egi.eu" ) {
+				web_get_contents("https://dashboard.appdb.egi.eu/services/appdb/sync/cloud");
+			}
+		}
+	
 		// echo response
 		header('Content-type: text/xml');
 		echo '<' . '?xml version="1.0" encoding="UTF-8"?'.'>'."\n";
@@ -412,6 +434,7 @@ class SitesController extends Zend_Controller_Action{
 			$endTime = microtime(true);
 			$dt = ($endTime - $startTime);
 			echo " time='" . $dt . "'";
+			echo " changed='" . json_encode($res) . "'";	// json_encode(false) returns "false" ;)
 			echo " />";
 		} else {
 //			ExternalDataNotification::sendNotification('Sites::syncSites', $error_message, ExternalDataNotification::MESSAGE_TYPE_ERROR);
