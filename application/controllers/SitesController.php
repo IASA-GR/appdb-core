@@ -305,13 +305,6 @@ class SitesController extends Zend_Controller_Action{
 				));
 			}
 			db()->query("RELEASE SAVEPOINT $sp_vap");
-			
-			db()->query("SELECT refresh_sites(?)", array($this->vaSyncScopes)); 
-			db()->commit();
-			$inTransaction = false;
-
-			db()->beginTransaction();
-			$inTransaction = true;			
 
 			/* Downtimes START */
 			$sp_vap = "sync_egi_site_done" . (microtime(true) * 10000);
@@ -321,51 +314,55 @@ class SitesController extends Zend_Controller_Action{
 				$docs = $client->limit(1000)->find(['meta.collection'=>['$eq'=>'egi.goc.vadowntimes']]);
 			} catch (Exception $e) {
 				error_log("[syncvaprovidersAction] Cannot fetch site downtimes info. Reason: " . $e->getMessage());
+				$docs = array();
 			}
-			$dtinfo = array();
 			foreach ($docs as $doc) {				
-				$dtinfo[] = json_encode($doc);
-			}
-			try {
-				db()->query("SELECT process_site_downtimes(?::jsonb[])", array(php_to_pg_array($dtinfo))); 
-			} catch (Exception $e) {
+				try {
+					if ($doc->info->SiteEndpointPKey != "") {
+						$sp_vap = "sync_egi_site_done" . (microtime(true) * 10000);
+						db()->query("SAVEPOINT $sp_vap");
+						db()->query("INSERT INTO egiis.downtimes(pkey, j, h) VALUES (?, ?, ?)", array(
+							$doc->info->DowntimePKey,
+							json_encode($doc),
+							$doc->meta->hash
+						)); 
+						db()->query("RELEASE SAVEPOINT $sp_vap");
+					}
+				} catch (Exception $e) {
 					db()->query("ROLLBACK TO SAVEPOINT $sp_vap");
-					$release_sp_vap = false;
-					error_log("[syncvaprovidersAction] DB error while processing site downtime info. Operation will continue. Message: " . $e->getMessage());
-			}
-			if ($release_sp_vap) {
-				db()->query("RELEASE SAVEPOINT $sp_vap");
+					error_log("[syncvaprovidersAction] DB error while processing site downtime info for endpoint \`" . $doc->info->SiteEndpointPKey . "'. Operation will continue. Message: " . $e->getMessage());
+				}
 			}
 			/* Downtimes END */
 
 			/* ARGO status START */
-			$sp_vap = "sync_egi_downtime_done" . (microtime(true) * 10000);
-			db()->query("SAVEPOINT $sp_vap");
-			$release_sp_vap = true;
 			try {
 				$docs = $client->limit(1000)->find(['meta.collection'=>['$eq'=>'egi.argo.vaproviders']]);
 			} catch (Exception $e) {
 				error_log("[syncvaprovidersAction] Cannot fetch site ARGO status info. Reason: " . $e->getMessage());
 			}
-			$statinfo = array();
 			foreach ($docs as $doc) {				
-				$statinfo[] = json_encode($doc);
-			}
-			try {
-//				error_log("SELECT process_site_argo_status('" . php_to_pg_array($statinfo) . "'::jsonb[])\n");
-				db()->query("SELECT process_site_argo_status(?::jsonb[])", array(php_to_pg_array($statinfo))); 
-			} catch (Exception $e) {
+				try {
+	//				db()->query("SELECT process_site_argo_status(?::jsonb[])", array(php_to_pg_array($statinfo))); 
+					$sp_vap = "sync_egi_downtime_done" . (microtime(true) * 10000);
+					db()->query("SAVEPOINT $sp_vap");
+					db()->query("INSERT INTO egiis.argo(pkey, egroup, j, h) VALUES (?, ?, ?, ?)", array(
+						$doc->info->SiteEndpointPKey,
+						$doc->info->StatusEndpointGroup,
+						json_encode($doc),
+						$doc->meta->hash
+					)); 
+					db()->query("RELEASE SAVEPOINT $sp_vap");
+				} catch (Exception $e) {
 					db()->query("ROLLBACK TO SAVEPOINT $sp_vap");
-					$release_sp_vap = false;
 					error_log("[syncvaprovidersAction] DB error while processing site ARGO status. Operation will continue. Message: " . $e->getMessage());
-			}
-			if ($release_sp_vap) {
-				db()->query("RELEASE SAVEPOINT $sp_vap");
+				}
 			}
 			/* ARGO status END */
 
-			// refresh VA providers to reflect ARGO status and downtime info
-			db()->query("REFRESH MATERIALIZED VIEW CONCURRENTLY va_providers"); 
+			db()->query("SELECT refresh_sites(?)", array($this->vaSyncScopes)); 
+			//// refresh VA providers to reflect ARGO status and downtime info
+			//db()->query("REFRESH MATERIALIZED VIEW CONCURRENTLY va_providers"); 
 			db()->commit();
 			$inTransaction = false;
 
