@@ -46,6 +46,92 @@ DROP SEQUENCE IF EXISTS va_provider_endpoints_id_seq CASCADE;
 CREATE SEQUENCE va_provider_endpoints_id_seq;
 ALTER SEQUENCE va_provider_endpoints_id_seq OWNER TO appdb;
 
+DROP TABLE IF EXISTS egiis.argo CASCADE;
+CREATE TABLE egiis.argo(
+    pkey TEXT NOT NULL,
+    egroup TEXT NOT NULL,
+    j JSONB NOT NULL,
+    h TEXT NOT NULL,
+    lastseen TIMESTAMP DEFAULT NOW(),
+    CONSTRAINT pk_egiis_argo PRIMARY KEY (pkey, egroup)
+);
+ALTER TABLE egiis.argo OWNER TO appdb;
+CREATE INDEX idx_argo_info ON egiis.argo USING gin (((j ->> 'info')::jsonb));
+CREATE INDEX idx_argo_lastseen ON egiis.argo USING btree(lastseen);
+
+CREATE OR REPLACE FUNCTION trfn_argo_upsert() RETURNS TRIGGER AS
+$$
+BEGIN
+	IF EXISTS (SELECT 1 FROM egiis.argo WHERE (pkey = NEW.pkey) AND (egroup = NEW.egroup)) THEN		
+		IF NEW.h = (SELECT h FROM egiis.argo WHERE (pkey = NEW.pkey) AND (egroup = NEW.egroup)) THEN
+			-- RAISE NOTICE 'existing unmodded entry, updating lastseen for %', pkey;
+			UPDATE egiis.argo
+				SET lastseen = NOW()
+				WHERE (pkey = NEW.pkey) AND (egroup = NEW.egroup);
+			RETURN NULL;
+		ELSE
+			-- RAISE NOTICE 'existing modded entry, updating data and lastseen for %', pkey;
+			UPDATE egiis.argo 
+				SET j = NEW.j, h = NEW.h, lastseen = NOW()
+				WHERE (pkey = NEW.pkey) AND (egroup = NEW.egroup);
+			RETURN NULL;
+		END IF;
+	ELSE
+		-- RAISE NOTICE 'new entry';
+		NEW.lastseen = NOW();
+		RETURN NEW;
+	END IF;
+END;
+$$
+LANGUAGE plpgsql;
+ALTER FUNCTION trfn_argo_upsert() OWNER TO appdb;
+
+DROP TRIGGER IF EXISTS rtr_argo_10_upsert ON egiis.argo;
+CREATE TRIGGER rtr_argo_10_upsert BEFORE INSERT ON egiis.argo
+FOR EACH ROW EXECUTE PROCEDURE trfn_argo_upsert();
+
+DROP TABLE IF EXISTS egiis.downtimes CASCADE;
+CREATE TABLE egiis.downtimes(
+    pkey TEXT NOT NULL PRIMARY KEY,
+    j JSONB NOT NULL,
+    h TEXT NOT NULL,
+	lastseen TIMESTAMP DEFAULT NOW()
+);
+ALTER TABLE egiis.downtimes OWNER TO appdb;
+CREATE INDEX idx_downtimes_info ON egiis.downtimes USING gin (((j ->> 'info')::jsonb));
+CREATE INDEX idx_downtimes_lastseen ON egiis.downtimes USING btree(lastseen);
+
+CREATE OR REPLACE FUNCTION trfn_downtimes_upsert() RETURNS TRIGGER AS
+$$
+BEGIN
+	IF EXISTS (SELECT 1 FROM egiis.downtimes WHERE pkey = NEW.pkey) THEN		
+		IF NEW.h = (SELECT h FROM egiis.downtimes WHERE pkey = NEW.pkey) THEN
+			-- RAISE NOTICE 'existing unmodded entry, updating lastseen for %', pkey;
+			UPDATE egiis.downtimes
+				SET lastseen = NOW()
+				WHERE pkey = NEW.pkey;
+			RETURN NULL;
+		ELSE
+			-- RAISE NOTICE 'existing modded entry, updating data and lastseen for %', pkey;
+			UPDATE egiis.downtimes 
+				SET j = NEW.j, h = NEW.h, lastseen = NOW()
+				WHERE pkey = NEW.pkey;
+			RETURN NULL;
+		END IF;
+	ELSE
+		-- RAISE NOTICE 'new entry';
+		NEW.lastseen = NOW();
+		RETURN NEW;
+	END IF;
+END;
+$$
+LANGUAGE plpgsql;
+ALTER FUNCTION trfn_downtimes_upsert() OWNER TO appdb;
+
+DROP TRIGGER IF EXISTS rtr_downtimes_10_upsert ON egiis.downtimes;
+CREATE TRIGGER rtr_downtimes_10_upsert BEFORE INSERT ON egiis.downtimes
+FOR EACH ROW EXECUTE PROCEDURE trfn_downtimes_upsert();
+
 DROP TABLE IF EXISTS egiis.vapj CASCADE;
 CREATE TABLE egiis.vapj (
 	pkey TEXT NOT NULL PRIMARY KEY,
@@ -60,7 +146,7 @@ CREATE INDEX idx_vapj_lastseen ON egiis.vapj USING btree(lastseen);
 CREATE OR REPLACE FUNCTION trfn_vapj_upsert() RETURNS TRIGGER AS
 $$
 BEGIN
-	IF EXISTS (SELECT * FROM egiis.vapj WHERE TRIM(pkey) = TRIM(NEW.pkey)) THEN		
+	IF EXISTS (SELECT 1 FROM egiis.vapj WHERE pkey = NEW.pkey) THEN		
 		IF NEW.h = (SELECT h FROM egiis.vapj WHERE pkey = NEW.pkey) THEN
 			-- RAISE NOTICE 'existing unmodded entry, updating lastseen for %', pkey;
 			UPDATE egiis.vapj
@@ -527,153 +613,6 @@ DROP TRIGGER IF EXISTS rtr_gocdb_sites_10_upsert ON gocdb.sites;
 CREATE TRIGGER rtr_gocdb_sites_10_upsert BEFORE INSERT ON gocdb.sites
 FOR EACH ROW EXECUTE PROCEDURE trfn_gocdb_sites_upsert();
 
-CREATE OR REPLACE FUNCTION refresh_sites(va_sync_scopes TEXT DEFAULT 'FedCloud') RETURNS VOID AS
-$$ 
--- DECLARE deltime TEXT;
-DECLARE scopes TEXT[];
-BEGIN
-	scopes := ('{' || COALESCE(va_sync_scopes, '') || '}')::text[];
---	deltime := '1 minute';
-
-	TRUNCATE TABLE gocdb.site_contacts;  -- OBSOLETED
-
-	-- mark sites that weren't seen during the last json sync from the infosys service as deleted (key missing, or old timestamp)
-	UPDATE gocdb.sites
-	SET 
-		deleted = TRUE, 
-		deletedon = NOW(),
-		deletedby = 'gocdb'
-	WHERE pkey IN (
-		SELECT pkey 
-			FROM egiis.sitej
-			-- WHERE ((NOW() - lastseen)::INTERVAL > deltime::INTERVAL)
-			WHERE lastseen < (SELECT MAX(lastseen) FROM egiis.sitej)
-	) OR pkey NOT IN (SELECT pkey FROM egiis.sitej);
-	
-	-- upsert json data into sites table
-	INSERT INTO gocdb.sites
-		(pkey, name, shortname, officialname, description, portalurl, homeurl, contactemail, contacttel, alarmemail, csirtemail, giisurl,
-		countrycode, country, tier, subgrid, roc, prodinfrastructure, certstatus, timezone, latitude, longitude, domainname, siteip,
-		deleted, deletedon, deletedby)
-	SELECT
-		g.pkey,
-		((g.j->>'info')::jsonb->>'SiteName')::text AS name,
-		((g.j->>'info')::jsonb->>'SiteShortName')::text AS shortname,
-		((g.j->>'info')::jsonb->>'SiteOfficialName')::text AS officialname,
-		((g.j->>'info')::jsonb->>'SiteDescription')::text AS description,
-		((g.j->>'info')::jsonb->>'SiteGocdbPortalUrl')::text AS portalurl,
-		((g.j->>'info')::jsonb->>'SiteHomeUrl')::text AS homeurl,
-		NULL::text AS contactemail,
-		NULL::text AS contacttel,
-		NULL::text AS alarmemail,
-		NULL::text AS csirtemail,		
-		((g.j->>'info')::jsonb->>'SiteGiisUrl')::text AS giisurl,
-		((g.j->>'info')::jsonb->>'SiteCountryCode')::text AS countrycode,
-		((g.j->>'info')::jsonb->>'SiteCountry')::text AS country,
-		((g.j->>'info')::jsonb->>'SiteTier')::text AS tier,
-		((g.j->>'info')::jsonb->>'SiteSubgrid')::text AS subgrid,
-		((g.j->>'info')::jsonb->>'SiteRoc')::text AS roc,
-		((g.j->>'info')::jsonb->>'SiteProdInfrastructure')::text AS prodinfrastructure,
-		((g.j->>'info')::jsonb->>'SiteCertStatus')::text AS certstatus,
-		((g.j->>'info')::jsonb->>'SiteTimezone')::text AS timezone,
-		((g.j->>'info')::jsonb->>'SiteLatitude')::text AS latitude,
-		((g.j->>'info')::jsonb->>'SiteLongitude')::text AS longtitude,
-		((g.j->>'info')::jsonb->>'SiteDomainname')::text AS domainname,
-		NULL::text AS siteip,
-		FALSE, NULL, NULL
-	FROM egiis.sitej AS g
-	-- WHERE (NOW() - g.lastseen)::INTERVAL <= deltime::INTERVAL;
-	WHERE g.lastseen = (SELECT MAX(lastseen) FROM egiis.sitej);
-
-	-- ******************
-	-- VA PROVIDERS
-	-- ******************
-
-	-- ALTER TABLE gocdb.va_providers
-		-- DISABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;		
-
-	-- remove entries that either
-	-- 1) weren't seen during the last json sync from the infosys service (key missing, or old timestamp)
-	-- 2) don't have at least one scope that matches the VA scopes given
-	DELETE FROM gocdb.va_providers 
-	WHERE pkey IN (
-		SELECT pkey 
-			FROM egiis.vapj
-			-- WHERE ((NOW() - lastseen)::INTERVAL > deltime::INTERVAL)
-			WHERE lastseen < (SELECT MAX(lastseen) FROM egiis.vapj)
-	) OR (
-		pkey NOT IN (SELECT pkey FROM egiis.vapj)
-	) OR ( NOT (
-		SELECT array_agg(s) && scopes
-		FROM (SELECT jsonb_array_elements_text(((g.j->>'info')::jsonb->>'SiteEndpointScopes')::jsonb)::text AS s FROM egiis.vapj AS g WHERE g.pkey = va_providers.pkey) AS ts
-	));
-	
-	-- make sure any OS declared by the VA exists in our OSes table
-	INSERT INTO oses (name)
-		SELECT DISTINCT
-			TRIM(((g.j->>'info')::jsonb->>'SiteEndpointHostOS')::text)
-		FROM 
-			egiis.vapj AS g
-		WHERE 	
-			(((g.j->>'info')::jsonb->>'SiteEndpointHostOS')::text IS DISTINCT FROM NULL) AND
-			(TRIM(((g.j->>'info')::jsonb->>'SiteEndpointHostOS')::text) <> '') AND
-			(LOWER(TRIM(((g.j->>'info')::jsonb->>'SiteEndpointHostOS')::text)) NOT IN (
-				SELECT LOWER(name) FROM oses
-			));
-
-	INSERT INTO gocdb.va_providers
-	SELECT 
-		g.pkey,
-		((g.j->>'info')::jsonb->>'SiteEndpointHostname')::text AS hostname,
-		((g.j->>'info')::jsonb->>'SiteEndpointGocPortalUrl')::text AS gocdb_url,
-		((g.j->>'info')::jsonb->>'SiteEndpointHostDN')::text AS host_dn,
-		((g.j->>'info')::jsonb->>'SiteEndpointHostOS')::text AS host_os,
-		((g.j->>'info')::jsonb->>'SiteEndpointHostArch')::text AS host_arch,
-		((g.j->>'info')::jsonb->>'SiteEndpointBeta')::text::boolean AS beta,
-		((g.j->>'info')::jsonb->>'SiteEndpointServiceType')::text AS service_type,
-		((g.j->>'info')::jsonb->>'SiteEndpointHostIP')::text AS host_ip,
-		((g.j->>'info')::jsonb->>'SiteEndpointInProduction')::text::boolean AS in_production,
-		((g.j->>'info')::jsonb->>'SiteEndpointNodeMonitored')::text::boolean AS node_monitored,
-		((g.j->>'info')::jsonb->>'SiteName')::text AS sitename,
-		((g.j->>'info')::jsonb->>'SiteEndpointCountryName')::text AS country_name,
-		((g.j->>'info')::jsonb->>'SiteEndpointCountryCode')::text AS country_code,
-		((g.j->>'info')::jsonb->>'SiteEndpointRocName')::text AS roc_name,
-		((g.j->>'info')::jsonb->>'SiteEndpointUrl')::text AS url,
-		((t.j->>'info')::jsonb->>'GLUE2ComputingEndpointComputingServiceForeignKey')::text AS serviceid
-	FROM 
-		egiis.vapj AS g
-	LEFT OUTER JOIN egiis.tvapj AS t ON t.pkey = g.pkey
-	WHERE 
-		-- ((NOW() - g.lastseen)::INTERVAL <= deltime::INTERVAL) AND
-		(
-			g.lastseen = (SELECT MAX(lastseen) FROM egiis.vapj)
-		) AND (
-			SELECT array_agg(s) && scopes
-			FROM (SELECT jsonb_array_elements_text(((g.j->>'info')::jsonb->>'SiteEndpointScopes')::jsonb)::text AS s) AS ts
-		) 
-	;
-	
-	-- refresh all related materialized views
-	REFRESH MATERIALIZED VIEW CONCURRENTLY sites;
-	REFRESH MATERIALIZED VIEW CONCURRENTLY va_providers;
-	REFRESH MATERIALIZED VIEW CONCURRENTLY va_provider_endpoints;
-	REFRESH MATERIALIZED VIEW CONCURRENTLY va_provider_images;
-	REFRESH MATERIALIZED VIEW CONCURRENTLY va_provider_templates;
-
-	REFRESH MATERIALIZED VIEW CONCURRENTLY _actor_group_members;
-        REFRESH MATERIALIZED VIEW CONCURRENTLY _actor_group_members2;
-        REFRESH MATERIALIZED VIEW CONCURRENTLY permissions;
-
-	REFRESH MATERIALIZED VIEW CONCURRENTLY site_services_xml;
-	REFRESH MATERIALIZED VIEW CONCURRENTLY site_service_images_xml;
-	
-	-- ALTER TABLE gocdb.va_providers
-		-- ENABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;
-END;
-$$ 
-LANGUAGE plpgsql VOLATILE;
-ALTER FUNCTION refresh_sites(text) OWNER TO appdb;
-
 CREATE OR REPLACE FUNCTION public.count_site_matches(
     itemname text,
     cachetable text,
@@ -785,10 +724,6 @@ ALTER FUNCTION public.count_site_matches(text, text, boolean)
   OWNER TO appdb;
 COMMENT ON FUNCTION public.count_site_matches(text, text, boolean) IS 'not to be called directly; used by site_logistics function';
 
-TRUNCATE TABLE gocdb.sites CASCADE;
-
-SELECT refresh_sites();
-
 CREATE OR REPLACE FUNCTION process_site_argo_status(dat jsonb[]) RETURNS VOID
 AS
 $$
@@ -797,7 +732,7 @@ DECLARE statust TIMESTAMP WITHOUT TIME ZONE;
 DECLARE statusv TEXT;
 DECLARE epkey TEXT;
 DECLARE srvgrp TEXT;
-BEGIN
+BEGIN   
 	FOREACH j IN ARRAY dat LOOP  
     	statust := ((j->>'info')::jsonb->>'StatusTimestamp')::TIMESTAMP;
         statusv := (j->>'info')::jsonb->>'StatusValue';
@@ -818,8 +753,14 @@ BEGIN
          END IF;
     END LOOP;
 END;
-$$ LANGUAGE plpgsql VOLATILE;
+$$ LANGUAGE plpgsql VOLATILE RETURNS NULL ON NULL INPUT;
 ALTER FUNCTION process_site_argo_status(jsonb[]) OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION process_site_argo_status() RETURNS VOID AS
+$$
+	SELECT process_site_argo_status(array_agg(j)) FROM egiis.argo WHERE lastseen = (SELECT MAX(lastseen) FROM egiis.argo);
+$$ LANGUAGE SQL VOLATILE;
+ALTER FUNCTION process_site_argo_status() OWNER TO appdb;
 
 CREATE OR REPLACE FUNCTION process_site_downtimes(dat jsonb[]) RETURNS VOID
 AS
@@ -863,8 +804,14 @@ BEGIN
 		END IF;
 	END LOOP;
 END;
-$$ LANGUAGE plpgsql VOLATILE;
+$$ LANGUAGE plpgsql VOLATILE RETURNS NULL ON NULL INPUT;
 ALTER FUNCTION process_site_downtimes(jsonb[]) OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION process_site_downtimes() RETURNS VOID AS
+$$
+	SELECT process_site_downtimes(array_agg(j)) FROM egiis.downtimes WHERE lastseen = (SELECT MAX(lastseen) FROM egiis.downtimes);
+$$ LANGUAGE SQL VOLATILE;
+ALTER FUNCTION process_site_downtimes() OWNER TO appdb;
 
 DROP TRIGGER IF EXISTS tr_gocdb_sites_99_create_uuid ON gocdb.sites;
 DROP FUNCTION IF EXISTS gocdb.trfn_gocdb_sites_create_uuid();
@@ -1045,6 +992,159 @@ $BODY$
   ROWS 1000;
 ALTER FUNCTION public.va_provider_to_xml_ext(text)
   OWNER TO appdb;
+    
+CREATE OR REPLACE FUNCTION refresh_sites(va_sync_scopes TEXT DEFAULT 'FedCloud') RETURNS VOID AS
+$$ 
+-- DECLARE deltime TEXT;
+DECLARE scopes TEXT[];
+BEGIN
+	scopes := ('{' || COALESCE(va_sync_scopes, '') || '}')::text[];
+--	deltime := '1 minute';
+
+	TRUNCATE TABLE gocdb.site_contacts;  -- OBSOLETED
+
+	-- mark sites that weren't seen during the last json sync from the infosys service as deleted (key missing, or old timestamp)
+	UPDATE gocdb.sites
+	SET 
+		deleted = TRUE, 
+		deletedon = NOW(),
+		deletedby = 'gocdb'
+	WHERE pkey IN (
+		SELECT pkey 
+			FROM egiis.sitej
+			-- WHERE ((NOW() - lastseen)::INTERVAL > deltime::INTERVAL)
+			WHERE lastseen < (SELECT MAX(lastseen) FROM egiis.sitej)
+	) OR pkey NOT IN (SELECT pkey FROM egiis.sitej);
+	
+	-- upsert json data into sites table
+	INSERT INTO gocdb.sites
+		(pkey, name, shortname, officialname, description, portalurl, homeurl, contactemail, contacttel, alarmemail, csirtemail, giisurl,
+		countrycode, country, tier, subgrid, roc, prodinfrastructure, certstatus, timezone, latitude, longitude, domainname, siteip,
+		deleted, deletedon, deletedby)
+	SELECT
+		g.pkey,
+		((g.j->>'info')::jsonb->>'SiteName')::text AS name,
+		((g.j->>'info')::jsonb->>'SiteShortName')::text AS shortname,
+		((g.j->>'info')::jsonb->>'SiteOfficialName')::text AS officialname,
+		((g.j->>'info')::jsonb->>'SiteDescription')::text AS description,
+		((g.j->>'info')::jsonb->>'SiteGocdbPortalUrl')::text AS portalurl,
+		((g.j->>'info')::jsonb->>'SiteHomeUrl')::text AS homeurl,
+		NULL::text AS contactemail,
+		NULL::text AS contacttel,
+		NULL::text AS alarmemail,
+		NULL::text AS csirtemail,		
+		((g.j->>'info')::jsonb->>'SiteGiisUrl')::text AS giisurl,
+		((g.j->>'info')::jsonb->>'SiteCountryCode')::text AS countrycode,
+		((g.j->>'info')::jsonb->>'SiteCountry')::text AS country,
+		((g.j->>'info')::jsonb->>'SiteTier')::text AS tier,
+		((g.j->>'info')::jsonb->>'SiteSubgrid')::text AS subgrid,
+		((g.j->>'info')::jsonb->>'SiteRoc')::text AS roc,
+		((g.j->>'info')::jsonb->>'SiteProdInfrastructure')::text AS prodinfrastructure,
+		((g.j->>'info')::jsonb->>'SiteCertStatus')::text AS certstatus,
+		((g.j->>'info')::jsonb->>'SiteTimezone')::text AS timezone,
+		((g.j->>'info')::jsonb->>'SiteLatitude')::text AS latitude,
+		((g.j->>'info')::jsonb->>'SiteLongitude')::text AS longtitude,
+		((g.j->>'info')::jsonb->>'SiteDomainname')::text AS domainname,
+		NULL::text AS siteip,
+		FALSE, NULL, NULL
+	FROM egiis.sitej AS g
+	-- WHERE (NOW() - g.lastseen)::INTERVAL <= deltime::INTERVAL;
+	WHERE g.lastseen = (SELECT MAX(lastseen) FROM egiis.sitej);
+
+	-- ******************
+	-- VA PROVIDERS
+	-- ******************
+
+	-- ALTER TABLE gocdb.va_providers
+		-- DISABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;		
+
+	-- remove entries that either
+	-- 1) weren't seen during the last json sync from the infosys service (key missing, or old timestamp)
+	-- 2) don't have at least one scope that matches the VA scopes given
+	DELETE FROM gocdb.va_providers 
+	WHERE pkey IN (
+		SELECT pkey 
+			FROM egiis.vapj
+			-- WHERE ((NOW() - lastseen)::INTERVAL > deltime::INTERVAL)
+			WHERE lastseen < (SELECT MAX(lastseen) FROM egiis.vapj)
+	) OR (
+		pkey NOT IN (SELECT pkey FROM egiis.vapj)
+	) OR ( NOT (
+		SELECT array_agg(s) && scopes
+		FROM (SELECT jsonb_array_elements_text(((g.j->>'info')::jsonb->>'SiteEndpointScopes')::jsonb)::text AS s FROM egiis.vapj AS g WHERE g.pkey = va_providers.pkey) AS ts
+	));
+	
+	-- make sure any OS declared by the VA exists in our OSes table
+	INSERT INTO oses (name)
+		SELECT DISTINCT
+			TRIM(((g.j->>'info')::jsonb->>'SiteEndpointHostOS')::text)
+		FROM 
+			egiis.vapj AS g
+		WHERE 	
+			(((g.j->>'info')::jsonb->>'SiteEndpointHostOS')::text IS DISTINCT FROM NULL) AND
+			(TRIM(((g.j->>'info')::jsonb->>'SiteEndpointHostOS')::text) <> '') AND
+			(LOWER(TRIM(((g.j->>'info')::jsonb->>'SiteEndpointHostOS')::text)) NOT IN (
+				SELECT LOWER(name) FROM oses
+			));
+
+	INSERT INTO gocdb.va_providers
+	SELECT 
+		g.pkey,
+		((g.j->>'info')::jsonb->>'SiteEndpointHostname')::text AS hostname,
+		((g.j->>'info')::jsonb->>'SiteEndpointGocPortalUrl')::text AS gocdb_url,
+		((g.j->>'info')::jsonb->>'SiteEndpointHostDN')::text AS host_dn,
+		((g.j->>'info')::jsonb->>'SiteEndpointHostOS')::text AS host_os,
+		((g.j->>'info')::jsonb->>'SiteEndpointHostArch')::text AS host_arch,
+		((g.j->>'info')::jsonb->>'SiteEndpointBeta')::text::boolean AS beta,
+		((g.j->>'info')::jsonb->>'SiteEndpointServiceType')::text AS service_type,
+		((g.j->>'info')::jsonb->>'SiteEndpointHostIP')::text AS host_ip,
+		((g.j->>'info')::jsonb->>'SiteEndpointInProduction')::text::boolean AS in_production,
+		((g.j->>'info')::jsonb->>'SiteEndpointNodeMonitored')::text::boolean AS node_monitored,
+		((g.j->>'info')::jsonb->>'SiteName')::text AS sitename,
+		((g.j->>'info')::jsonb->>'SiteEndpointCountryName')::text AS country_name,
+		((g.j->>'info')::jsonb->>'SiteEndpointCountryCode')::text AS country_code,
+		((g.j->>'info')::jsonb->>'SiteEndpointRocName')::text AS roc_name,
+		((g.j->>'info')::jsonb->>'SiteEndpointUrl')::text AS url,
+		((t.j->>'info')::jsonb->>'GLUE2ComputingEndpointComputingServiceForeignKey')::text AS serviceid
+	FROM 
+		egiis.vapj AS g
+	LEFT OUTER JOIN egiis.tvapj AS t ON t.pkey = g.pkey
+	WHERE 
+		-- ((NOW() - g.lastseen)::INTERVAL <= deltime::INTERVAL) AND
+		(
+			g.lastseen = (SELECT MAX(lastseen) FROM egiis.vapj)
+		) AND (
+			SELECT array_agg(s) && scopes
+			FROM (SELECT jsonb_array_elements_text(((g.j->>'info')::jsonb->>'SiteEndpointScopes')::jsonb)::text AS s) AS ts
+		) 
+	;
+    
+    PERFORM process_site_argo_status();
+    PERFORM process_site_downtimes();
+	
+	-- refresh all related materialized views
+	REFRESH MATERIALIZED VIEW CONCURRENTLY sites;
+	REFRESH MATERIALIZED VIEW CONCURRENTLY va_providers;
+	REFRESH MATERIALIZED VIEW CONCURRENTLY va_provider_endpoints;
+	REFRESH MATERIALIZED VIEW CONCURRENTLY va_provider_images;
+	REFRESH MATERIALIZED VIEW CONCURRENTLY va_provider_templates;
+
+	REFRESH MATERIALIZED VIEW CONCURRENTLY _actor_group_members;
+        REFRESH MATERIALIZED VIEW CONCURRENTLY _actor_group_members2;
+        REFRESH MATERIALIZED VIEW CONCURRENTLY permissions;
+
+	REFRESH MATERIALIZED VIEW CONCURRENTLY site_services_xml;
+	REFRESH MATERIALIZED VIEW CONCURRENTLY site_service_images_xml;
+	
+	-- ALTER TABLE gocdb.va_providers
+		-- ENABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;
+END;
+$$ 
+LANGUAGE plpgsql VOLATILE;
+ALTER FUNCTION refresh_sites(text) OWNER TO appdb;
+
+TRUNCATE TABLE gocdb.sites CASCADE;
+SELECT refresh_sites();
 
 INSERT INTO version (major,minor,revision,notes)
        SELECT 8, 16, 0, E'Refactor va providers, based on new JSON information system data. Add base_mp_uri and strict_base_mp_uri to va_providers_to_xml_ext function'
