@@ -254,8 +254,10 @@ class SitesController extends Zend_Controller_Action{
 		$release_sp_vap = false;
 		$startTime = microtime(true);
 		$success = true;
+		$res = null;
 		try{
 			db()->beginTransaction();
+			$inTransaction = true;			
 
 			// keep a snaphot of current data, in order to compare post-syncing
 			db()->exec("DROP TABLE IF EXISTS egiis.vapj2; CREATE TABLE egiis.vapj2 AS SELECT * FROM egiis.vapj;");
@@ -264,8 +266,8 @@ class SitesController extends Zend_Controller_Action{
 			db()->exec("DROP TABLE IF EXISTS egiis.downtimes2; CREATE TABLE egiis.downtimes2 AS SELECT * FROM egiis.downtimes;");
 			db()->exec("DROP TABLE IF EXISTS egiis.argo2; CREATE TABLE egiis.argo2 AS SELECT * FROM egiis.argo;");
 
-			$inTransaction = true;			
 			$docs = $client->limit(1000)->find(['meta.collection'=>['$eq'=>'egi.goc.vaproviders']]);
+			$topids = array();
 			foreach ($docs as $doc) {
 				$id = $doc->_id;
 				db()->query('INSERT INTO egiis.vapj (pkey,j,h) VALUES (?, ?, ?)', array(
@@ -274,6 +276,7 @@ class SitesController extends Zend_Controller_Action{
 					$doc->meta->hash
 				));
 				$tid = str_replace('egi.goc.vaproviders.', 'egi.top.vaproviders.', $id) . '.glue' . $glueVer;
+				$topids[] = $tid;
 				try {
 					$sp_vap = "sync_egi_vap_tvapj" . (microtime(true) * 10000);
 					db()->query("SAVEPOINT $sp_vap");
@@ -303,6 +306,7 @@ class SitesController extends Zend_Controller_Action{
 			}
 			$sp_vap = "sync_egi_vap_done" . (microtime(true) * 10000);
 			db()->query("SAVEPOINT $sp_vap");			
+
 			/*** SITES ***/
 			$docs = $client->limit(1000)->find(['meta.collection'=>['$eq'=>'egi.goc.sites']]);
 			foreach ($docs as $doc) {				
@@ -380,7 +384,7 @@ class SitesController extends Zend_Controller_Action{
 			} else {
 				$res = null;
 			};
-			if ($res === false) {
+			if ($res == 0) {
 				error_log("[syncvaprovidersAction] Sync operation complete, no data changed");
 			}
 
@@ -396,6 +400,7 @@ class SitesController extends Zend_Controller_Action{
 			}
 			if ($inTransaction) {
 				db()->rollBack();
+				$inTransaction = false;
 			}
 		} catch(Exception $e){
 			$success = false;
@@ -403,10 +408,12 @@ class SitesController extends Zend_Controller_Action{
 			error_log("[syncvaprovidersAction] Sync operation failed. Reason: " . $e->getMessage() . ". Operation aborted.");
 			if ($inTransaction) {
 				db()->rollBack();
+				$inTransaction = false;
 			}
 		}
 
-		if ($res !== false) {
+		if (($res != 0) && $success) {
+			error_log("[syncvaprovidersAction] Sync operation compete, data change code: $res");
 			try {
 				// clean potantially related filter cache
 				db()->query("DELETE FROM cache.filtercache WHERE m_from LIKE '%FROM sites%'");
@@ -434,7 +441,8 @@ class SitesController extends Zend_Controller_Action{
 			$endTime = microtime(true);
 			$dt = ($endTime - $startTime);
 			echo " time='" . $dt . "'";
-			echo " changed='" . json_encode($res) . "'";	// json_encode(false) returns "false" ;)
+			echo " changed='" . ($res == 0 ? "false" : "true") . "'";
+			echo " changecode='" . $res . "'";	
 			echo " />";
 		} else {
 //			ExternalDataNotification::sendNotification('Sites::syncSites', $error_message, ExternalDataNotification::MESSAGE_TYPE_ERROR);
