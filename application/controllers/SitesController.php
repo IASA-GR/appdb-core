@@ -433,20 +433,24 @@ class SitesController extends Zend_Controller_Action{
 			}
 		}
 	
+		$endTime = microtime(true);
+		error_log("[syncvaprovidersAction] Sync operation took " . number_format($endTime - $startTime, 2) . "s");
 		// echo response
 		header('Content-type: text/xml');
 		echo '<' . '?xml version="1.0" encoding="UTF-8"?'.'>'."\n";
 		if ($success) {
 			echo "<result success='true'";
-			$endTime = microtime(true);
 			$dt = ($endTime - $startTime);
-			echo " time='" . $dt . "'";
+			echo " time='" . number_format($dt, 2) . "'";
 			echo " changed='" . ($res == 0 ? "false" : "true") . "'";
 			echo " changecode='" . $res . "'";	
 			echo " />";
 		} else {
 //			ExternalDataNotification::sendNotification('Sites::syncSites', $error_message, ExternalDataNotification::MESSAGE_TYPE_ERROR);
-			echo "<result success='false' error='" . htmlspecialchars($error_message, ENT_QUOTES). "' />";
+			echo "<result success='false'";
+			$dt = ($endTime - $startTime);
+			echo " time='" . number_format($dt, 2) . "'";
+			echo " error='" . htmlspecialchars($error_message, ENT_QUOTES). "' />";
 			$this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 500 Internal Server Error");
 			$this->getResponse()->setHeader("Status","500 Internal Server Error");
