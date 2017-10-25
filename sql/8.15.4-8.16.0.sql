@@ -190,7 +190,10 @@ $$
 BEGIN
 	IF EXISTS (SELECT 1 FROM egiis.tvapj WHERE pkey = NEW.pkey) THEN
 		IF NEW.h = (SELECT h FROM egiis.tvapj WHERE pkey = NEW.pkey) THEN
-			RETURN NULL;
+			UPDATE egiis.tvapj
+                SET lastseen = NOW()
+                WHERE pkey = NEW.pkey;
+            RETURN NULL;
 		ELSE
 			UPDATE egiis.tvapj 
 				SET j = NEW.j, h = NEW.h, lastseen = NOW()
@@ -1103,8 +1106,8 @@ WHERE t1.h <> t2.h
 );
 $$ LANGUAGE sql;
 ALTER FUNCTION egiis.argo_changed() OWNER TO appdb;  
-    
-CREATE OR REPLACE FUNCTION refresh_sites(va_sync_scopes TEXT DEFAULT 'FedCloud') RETURNS BOOL AS
+
+CREATE OR REPLACE FUNCTION refresh_sites(va_sync_scopes TEXT DEFAULT 'FedCloud', forced BOOL DEFAULT FALSE) RETURNS INT AS
 $$ 
 -- DECLARE deltime TEXT;
 DECLARE scopes TEXT[];
@@ -1114,12 +1117,19 @@ DECLARE doDT BOOL;
 DECLARE doArgo BOOL;
 BEGIN
 	-- check if imported data has changed
-    doSites := egiis.sitej_changed();
-    doVap := egiis.vapj_changed() OR egiis.tvapj_changed();
-    doDT := egiis.downtimes_changed();
-    doArgo := egiis.argo_changed();
-    IF NOT (doSites OR doVap OR doDT OR doArgo) THEN
-    	RETURN FALSE;
+    IF NOT forced THEN
+        doSites := egiis.sitej_changed();
+        doVap := egiis.vapj_changed() OR egiis.tvapj_changed();
+        doDT := egiis.downtimes_changed();
+        doArgo := egiis.argo_changed();
+        IF NOT (doSites OR doVap OR doDT OR doArgo) THEN
+            RETURN 0;
+        END IF;
+    ELSE
+    	doSites := TRUE;
+        doVap := TRUE;
+        doDT := TRUE;
+        doArgo := TRUE;
     END IF;
     
 	scopes := ('{' || COALESCE(va_sync_scopes, '') || '}')::text[];
@@ -1264,24 +1274,24 @@ BEGIN
 		REFRESH MATERIALIZED VIEW CONCURRENTLY va_provider_images;
 		REFRESH MATERIALIZED VIEW CONCURRENTLY va_provider_templates;
 	END IF;
-    IF doSite OR doVap THEN
+    IF doSites OR doVap THEN
 		REFRESH MATERIALIZED VIEW CONCURRENTLY _actor_group_members;
     	REFRESH MATERIALIZED VIEW CONCURRENTLY _actor_group_members2;
     	REFRESH MATERIALIZED VIEW CONCURRENTLY permissions;
     END IF;
 
-	IF doSite OR doVap THEN
+	IF doSites OR doVap THEN
 		REFRESH MATERIALIZED VIEW CONCURRENTLY site_services_xml;
 		REFRESH MATERIALIZED VIEW CONCURRENTLY site_service_images_xml;
     END IF;
 	
 	-- ALTER TABLE gocdb.va_providers
 		-- ENABLE TRIGGER tr_gocdb_va_providers_99_refresh_permissions;
-    RETURN TRUE;
+    RETURN (doSites::int<<0) | (doVap::int<<1) | (doDT::int<<2) | (doArgo::int<<3);
 END;
 $$ 
 LANGUAGE plpgsql VOLATILE;
-ALTER FUNCTION refresh_sites(text) OWNER TO appdb;
+ALTER FUNCTION refresh_sites(text, bool) OWNER TO appdb;
 
 TRUNCATE TABLE gocdb.sites CASCADE;
 SELECT refresh_sites();
