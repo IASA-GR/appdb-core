@@ -316,6 +316,9 @@ if( $browserSupported == false ){
 	</div>
 </div>
 <div class="mainnavpanel">
+        <?php if (ApplicationConfiguration::isProductionInstance() === false ) { ?>
+	<div class="developmentinstance"><span>Development Instance</span><a href="http://appdb.egi.eu" title='Click here to go to production instance' >[go to production]</a></div>
+	<?php } ?>
 	<div class="mainnavcontents">
 		<div class="selectedcontent">
 			<ul>
@@ -333,10 +336,11 @@ if( $browserSupported == false ){
 				<li class="contenttypelink researchers"><button class='btn btn-content' data-contenttype="researchers"><!--<img src='/images/person.png' alt='' />--><span style="height:25px;">People</span></button></li>
 			</ul>
 		</div>
-		<?php if (ApplicationConfiguration::isProductionInstance() === false ) { ?>
-		<div class="developmentinstance"><span>Development Instance</span><a href="http://appdb.egi.eu" title='Click here to go to production instance' >[go to production]</a></div>
-		<?php } ?>
 	</div>
+        <div class="vmopsdashboardlink">
+            <a href="//dashboard.appdb.egi.eu/vmops" title='Click here to go to the VMOps dashboard' target="_blank">go to the <strong>VMOps dashboard</strong></a>
+            <div class="popupmessage">Click to visit the AppDB VMOps Dashboard for deploying and managing Virtual Machines to the EGI Cloud infrastructure.<a href="<?php echo $wiki; ?>main:faq:what_is_the_vmops_dashboard" target="_blank" title="Learn more about the AppDB VMOps dashboard" class="readmore">read more</a></div>
+        </div>
 </div>
 <div id="maincontent" align="center" style="display:block;">
 	<div class="logo" style="min-height:120px;height:auto;">
@@ -349,8 +353,8 @@ if( $browserSupported == false ){
 				<div id="navigationmenu" class="navigation invisible" >
 					<div class="header">
 						<div class="admin" title="Administrative">Administrative</div>
-						<div class="softwaremp" title="Software Marketplace">Software Mp</div>
-						<div class="cloudmp" title="Cloud Marketplace">Cloud Mp</div>
+						<div class="softwaremp" title="Software Marketplace">Software Marketplace</div>
+						<div class="cloudmp" title="Cloud Marketplace">Cloud Marketplace</div>
 						<div class="researchers" title="People registry">People</div>
 						<?php if( Supports::datasets() ) { ?>
 						<div class="datasets" title="Dataset registry">Datasets</div>
@@ -363,7 +367,7 @@ if( $browserSupported == false ){
 									<a id="homeSoftwareMp" href="/browse/software" title="Browse registered software" onclick="appdb.views.Main.showSoftwareMarketplace();">
 										<div class="homenavlink softwaremp">
 											<img src="/images/softwaremp.png" alt=""/>
-											<span>Software Mp</span>
+											<span>Software</span>
 										</div>
 									</a>
 								</li>
@@ -371,7 +375,7 @@ if( $browserSupported == false ){
 									<a id="homeVapplianceMp" href="/browse/cloud" title="Browse registered virtual appliances" onclick="appdb.views.Main.showCloudMarketplace();">
 										<div class="homenavlink cloudmp">
 											<img src="/images/cloudmp.png" alt=""/>
-											<span>Cloud Mp</span>
+											<span>Cloud</span>
 										</div>
 									</a>
 								</li>
