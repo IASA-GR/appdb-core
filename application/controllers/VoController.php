@@ -27,7 +27,7 @@ class VoController extends Zend_Controller_Action
 		# truncate data hash file (i.e. sync operation in progress)
 		$f_hashfile = @fopen($hashfile, "w");
 		if ($f_hashfile !== false) { 
-			fwrite("", $hash);
+			fwrite($f_hashfile, "");
 			fclose($f_hashfile);
 		} else {
 			$errors = error_get_last();
@@ -1554,12 +1554,14 @@ class VoController extends Zend_Controller_Action
 							error_log("Number of template results returned by top-BDII is zero for " . $site["name"]);
 						}
 						for ($i = 0; $i < $result["count"]; $i++) {
-							if (trim($result[$i]["glue2entityotherinfo"][0]) != "") {
-								$pregm = array();
-								preg_match('/\bdisk=([0-9]+)\b/', trim($result[$i]["glue2entityotherinfo"][0]), $pregm);
-								if (count($pregm)>=2) {
-									if (is_numeric($pregm[1])) {
-										$disc_size = intval($pregm[1]);
+							if (array_key_exists("glue2entityotherinfo", $result[$i])) {
+								if (trim($result[$i]["glue2entityotherinfo"][0]) != "") {
+									$pregm = array();
+									preg_match('/\bdisk=([0-9]+)\b/', trim($result[$i]["glue2entityotherinfo"][0]), $pregm);
+									if (count($pregm)>=2) {
+										if (is_numeric($pregm[1])) {
+											$disc_size = intval($pregm[1]);
+										}
 									}
 								}
 							}
