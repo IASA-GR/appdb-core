@@ -1532,6 +1532,7 @@ class VoController extends Zend_Controller_Action
 				'GLUE2ResourceID',
 				'GLUE2ExecutionEnvironmentPhysicalCPUs',
 				'GLUE2ExecutionEnvironmentComputingManagerForeignKey',
+				'GLUE2EntityOtherInfo',
 			);
 
 			$prod_sites = $this->getVAProvidersArray();
@@ -1546,13 +1547,22 @@ class VoController extends Zend_Controller_Action
 						continue; // if there is no service id, no templates should be queried
 					}
 					$result = $this->getTopBDIIData($basedn, $filter, $attrs);
-					$disc_size = null; // FIXME: set proper value from GLUE schema when implemented
+					$disc_size = null;
 					if (isset($result["count"])) {
 						if ($result["count"] <= 0) {
 							//throw new Exception("Number of results returned by top-BDII is zero. Aborting operation.");
 							error_log("Number of template results returned by top-BDII is zero for " . $site["name"]);
 						}
 						for ($i = 0; $i < $result["count"]; $i++) {
+							if (trim($result[$i]["glue2entityotherinfo"][0]) != "") {
+								$pregm = array();
+								preg_match('/\bdisk=([0-9]+)\b/', trim($result[$i]["glue2entityotherinfo"][0]), $pregm);
+								if (count($pregm)>=2) {
+									if (is_numeric($pregm[1])) {
+										$disc_size = intval($pregm[1]);
+									}
+								}
+							}
 							$sp_vap_tmpl = "sync_va_provider_templates" . (microtime(true) * 10000);
 							db()->query("SAVEPOINT $sp_vap_tmpl");
 							$release_vap_tmpl = true;
@@ -1640,7 +1650,9 @@ class VoController extends Zend_Controller_Action
 			try {
 				db()->beginTransaction();
 				db()->query("TRUNCATE TABLE va_provider_endpoints");
+				$k=1;
 				foreach($prod_sites as $site) {
+					
 					$basedn='GLUE2GroupID=cloud,GLUE2DomainID='.$site["name"].',GLUE2GroupID=grid,o=glue';
 					$filter = '(&(objectClass=GLUE2Endpoint)(|(GLUE2EndpointInterfaceName=OCCI)))';
 					if ($site["url"] != '') {
@@ -1662,6 +1674,7 @@ class VoController extends Zend_Controller_Action
 									$result[$i]["glue2endpointurl"][0],
 									$result[$i]["glue2endpointimplementor"][0]
 								));
+								error_log($k.". Endpoint processed SITE: ".$site["name"]." ID:".$site["id"]." VALUE: ".$result[$i]["glue2endpointurl"][0]);
 								if(trim($result[$i]["glue2computingendpointcomputingserviceforeignkey"][0]) != ""){
 									db()->query("UPDATE gocdb.va_providers SET serviceid='".trim($result[$i]["glue2computingendpointcomputingserviceforeignkey"][0])."' WHERE gocdb.va_providers.pkey='".$site["id"]."'");
 								}
@@ -1675,6 +1688,7 @@ class VoController extends Zend_Controller_Action
 							}
 						}
 					}
+				$k++;
 				}
 				db()->query("REFRESH MATERIALIZED VIEW CONCURRENTLY va_providers;");
 				db()->query("SELECT request_permissions_refresh();");
