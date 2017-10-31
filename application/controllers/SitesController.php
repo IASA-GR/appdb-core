@@ -373,10 +373,22 @@ class SitesController extends Zend_Controller_Action{
 			/* ARGO status END */
 
 			db()->setFetchMode(Zend_Db::FETCH_NUM);
+			$nres = db()->query("SELECT egiis.sitej_changes()")->fetchAll();
+			if (count($nres) > 0) {
+				$nres = $nres[0];
+				if (count($nres) > 0) {
+					$nres = $nres[0];
+					$nres = pg_to_php_array($nres);
+				} else {
+					$nres = null;
+				} 
+			} else {
+				$nres = 0;
+			}
 			$res = db()->query("SELECT refresh_sites(?)", array($this->vaSyncScopes))->fetchAll(); 
-			if (count($res) >0) {
+			if (count($res) > 0) {
 				$res = $res[0];
-				if (count($res) >0) {
+				if (count($res) > 0) {
 					$res = $res[0];
 				} else {
 					$res = null;
@@ -443,7 +455,17 @@ class SitesController extends Zend_Controller_Action{
 			$dt = ($endTime - $startTime);
 			echo " time='" . number_format($dt, 2) . "'";
 			echo " changed='" . ($res == 0 ? "false" : "true") . "'";
-			echo " changecode='" . $res . "'";	
+			echo " changecode='" . $res . "'";
+			// print number of ins, upd, del for sites, only if the sites_changed bit is set
+			if ($res & 1) {
+				if (is_array($nres)) {
+					if (count($nres) == 3) {
+						echo " inserted='" . $nres[0] . "' updated='" . $nres[1] . "' deleted='" . $nres[2] . "'";	
+					}
+				}
+			} else {
+				echo " inserted='0' updated='0' deleted='0'";
+			}
 			echo " />";
 		} else {
 //			ExternalDataNotification::sendNotification('Sites::syncSites', $error_message, ExternalDataNotification::MESSAGE_TYPE_ERROR);
