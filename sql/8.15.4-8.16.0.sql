@@ -1046,6 +1046,10 @@ ALTER FUNCTION egiis.tvapj_changed() OWNER TO appdb;
 
 CREATE OR REPLACE FUNCTION egiis.sitej_changed() RETURNS BOOL AS
 $$
+	SELECT SUM(x) > 0 FROM UNNEST(egiis.sitej_changes()) AS x
+$$ LANGUAGE sql STABLE;
+/*CREATE OR REPLACE FUNCTION egiis.sitej_changed() RETURNS BOOL AS
+$$
 SELECT EXISTS (
 SELECT t1.pkey 
 FROM egiis.sitej AS t1
@@ -1062,7 +1066,7 @@ FROM egiis.sitej AS t1
 INNER JOIN egiis.sitej2 AS t2 ON t1.pkey = t2.pkey
 WHERE t1.h <> t2.h
 );
-$$ LANGUAGE sql STABLE;
+$$ LANGUAGE sql STABLE;*/
 ALTER FUNCTION egiis.sitej_changed() OWNER TO appdb;
 
 CREATE OR REPLACE FUNCTION egiis.sitej_changes() RETURNS INT[3] AS
