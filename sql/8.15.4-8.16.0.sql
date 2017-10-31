@@ -1046,7 +1046,7 @@ ALTER FUNCTION egiis.tvapj_changed() OWNER TO appdb;
 
 CREATE OR REPLACE FUNCTION egiis.sitej_changed() RETURNS BOOL AS
 $$
-	SELECT SUM(x) > 0 FROM UNNEST(egiis.sitej_changes()) AS x
+	SELECT SUM(x) > 0 AS "exists" FROM UNNEST(egiis.sitej_changes()) AS x
 $$ LANGUAGE sql STABLE;
 /*CREATE OR REPLACE FUNCTION egiis.sitej_changed() RETURNS BOOL AS
 $$
