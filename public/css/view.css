@@ -18569,7 +18569,7 @@ ul.itemlist > li.itemcontainer > div.item a.itemlink span.itemlongtext{
         background-color: white;
         border: 1px solid #bbb;
         border-bottom: none;
-        z-index: 2100;
+        z-index: 900;
         border-radius: 4px 4px 0px 0px;
 }
 .vmopsdashboardlink > a:hover {
@@ -18583,7 +18583,7 @@ ul.itemlist > li.itemcontainer > div.item a.itemlink span.itemlongtext{
         font-size: 12px;
         background-color: white;
         color: #444;
-        z-index: 1000;
+        z-index: 800;
         min-width: 355px;
         padding: 15px 10px 0px 10px;
         margin-top: 3px;
