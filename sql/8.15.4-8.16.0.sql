@@ -1020,7 +1020,7 @@ FROM egiis.vapj AS t1
 INNER JOIN egiis.vapj2 AS t2 ON t1.pkey = t2.pkey
 WHERE t1.h <> t2.h
 );
-$$ LANGUAGE sql;
+$$ LANGUAGE sql STABLE;
 ALTER FUNCTION egiis.vapj_changed() OWNER TO appdb;
 
 CREATE OR REPLACE FUNCTION egiis.tvapj_changed() RETURNS BOOL AS
@@ -1041,10 +1041,14 @@ FROM egiis.tvapj AS t1
 INNER JOIN egiis.tvapj2 AS t2 ON t1.pkey = t2.pkey
 WHERE t1.h <> t2.h
 );
-$$ LANGUAGE sql;
+$$ LANGUAGE sql STABLE;
 ALTER FUNCTION egiis.tvapj_changed() OWNER TO appdb;
 
 CREATE OR REPLACE FUNCTION egiis.sitej_changed() RETURNS BOOL AS
+$$
+	SELECT SUM(x) > 0 AS "exists" FROM UNNEST(egiis.sitej_changes()) AS x
+$$ LANGUAGE sql STABLE;
+/*CREATE OR REPLACE FUNCTION egiis.sitej_changed() RETURNS BOOL AS
 $$
 SELECT EXISTS (
 SELECT t1.pkey 
@@ -1062,8 +1066,35 @@ FROM egiis.sitej AS t1
 INNER JOIN egiis.sitej2 AS t2 ON t1.pkey = t2.pkey
 WHERE t1.h <> t2.h
 );
-$$ LANGUAGE sql;
+$$ LANGUAGE sql STABLE;*/
 ALTER FUNCTION egiis.sitej_changed() OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION egiis.sitej_changes() RETURNS INT[3] AS
+$$
+DECLARE ret int[3];
+BEGIN
+	ret[1] := (SELECT COUNT(DISTINCT pkey) FROM (
+		SELECT t1.pkey 
+		FROM egiis.sitej AS t1
+		WHERE 
+			(t1.pkey NOT IN (SELECT pkey FROM egiis.sitej2 WHERE lastseen = (SELECT MAX(lastseen) FROM egiis.sitej2)))
+	) AS tins);
+	ret[2] := (SELECT COUNT(DISTINCT pkey) FROM (
+		SELECT t1.pkey 
+		FROM egiis.sitej AS t1
+		INNER JOIN egiis.sitej2 AS t2 ON t1.pkey = t2.pkey
+		WHERE t1.h <> t2.h
+	) AS tupd);
+	ret[3] := (SELECT COUNT(DISTINCT pkey) FROM (
+		SELECT t2.pkey 
+		FROM egiis.sitej2 AS t2
+		WHERE
+			(t2.pkey NOT IN (SELECT pkey FROM egiis.sitej WHERE lastseen = (SELECT MAX(lastseen) FROM egiis.sitej)))
+	) AS tdel);
+	RETURN ret;
+END;
+$$ LANGUAGE plpgsql STABLE;
+ALTER FUNCTION egiis.sitej_changes() OWNER TO appdb;
 
 CREATE OR REPLACE FUNCTION egiis.downtimes_changed() RETURNS BOOL AS
 $$
@@ -1083,7 +1114,7 @@ FROM egiis.downtimes AS t1
 INNER JOIN egiis.downtimes2 AS t2 ON t1.pkey = t2.pkey
 WHERE t1.h <> t2.h
 );
-$$ LANGUAGE sql;
+$$ LANGUAGE sql STABLE;
 ALTER FUNCTION egiis.downtimes_changed() OWNER TO appdb;
 
 CREATE OR REPLACE FUNCTION egiis.argo_changed() RETURNS BOOL AS
@@ -1104,7 +1135,7 @@ FROM egiis.argo AS t1
 INNER JOIN egiis.argo2 AS t2 ON t1.pkey = t2.pkey AND t1.egroup = t2.egroup
 WHERE t1.h <> t2.h
 );
-$$ LANGUAGE sql;
+$$ LANGUAGE sql STABLE;
 ALTER FUNCTION egiis.argo_changed() OWNER TO appdb;  
 
 CREATE OR REPLACE FUNCTION refresh_sites(va_sync_scopes TEXT DEFAULT 'FedCloud', forced BOOL DEFAULT FALSE) RETURNS INT AS
@@ -1298,6 +1329,6 @@ SELECT refresh_sites();
 
 INSERT INTO version (major,minor,revision,notes)
        SELECT 8, 16, 0, E'Refactor va providers, based on new JSON information system data. Add base_mp_uri and strict_base_mp_uri to va_providers_to_xml_ext function'
-       WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=16 AND revision=0);
-       
+       WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=16 AND revision=0);      
+
 COMMIT;
