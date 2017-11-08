@@ -1044,31 +1044,6 @@ WHERE t1.h <> t2.h
 $$ LANGUAGE sql STABLE;
 ALTER FUNCTION egiis.tvapj_changed() OWNER TO appdb;
 
-CREATE OR REPLACE FUNCTION egiis.sitej_changed() RETURNS BOOL AS
-$$
-	SELECT SUM(x) > 0 AS "exists" FROM UNNEST(egiis.sitej_changes()) AS x
-$$ LANGUAGE sql STABLE;
-/*CREATE OR REPLACE FUNCTION egiis.sitej_changed() RETURNS BOOL AS
-$$
-SELECT EXISTS (
-SELECT t1.pkey 
-FROM egiis.sitej AS t1
-WHERE 
-        (t1.pkey NOT IN (SELECT pkey FROM egiis.sitej2 WHERE lastseen = (SELECT MAX(lastseen) FROM egiis.sitej2)))
-UNION ALL
-SELECT t2.pkey 
-FROM egiis.sitej2 AS t2
-WHERE
-        (t2.pkey NOT IN (SELECT pkey FROM egiis.sitej WHERE lastseen = (SELECT MAX(lastseen) FROM egiis.sitej)))
-UNION ALL
-SELECT t1.pkey 
-FROM egiis.sitej AS t1
-INNER JOIN egiis.sitej2 AS t2 ON t1.pkey = t2.pkey
-WHERE t1.h <> t2.h
-);
-$$ LANGUAGE sql STABLE;*/
-ALTER FUNCTION egiis.sitej_changed() OWNER TO appdb;
-
 CREATE OR REPLACE FUNCTION egiis.sitej_changes() RETURNS INT[3] AS
 $$
 DECLARE ret int[3];
@@ -1095,6 +1070,31 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql STABLE;
 ALTER FUNCTION egiis.sitej_changes() OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION egiis.sitej_changed() RETURNS BOOL AS
+$$
+	SELECT SUM(x) > 0 AS "exists" FROM UNNEST(egiis.sitej_changes()) AS x
+$$ LANGUAGE sql STABLE;
+/*CREATE OR REPLACE FUNCTION egiis.sitej_changed() RETURNS BOOL AS
+$$
+SELECT EXISTS (
+SELECT t1.pkey 
+FROM egiis.sitej AS t1
+WHERE 
+        (t1.pkey NOT IN (SELECT pkey FROM egiis.sitej2 WHERE lastseen = (SELECT MAX(lastseen) FROM egiis.sitej2)))
+UNION ALL
+SELECT t2.pkey 
+FROM egiis.sitej2 AS t2
+WHERE
+        (t2.pkey NOT IN (SELECT pkey FROM egiis.sitej WHERE lastseen = (SELECT MAX(lastseen) FROM egiis.sitej)))
+UNION ALL
+SELECT t1.pkey 
+FROM egiis.sitej AS t1
+INNER JOIN egiis.sitej2 AS t2 ON t1.pkey = t2.pkey
+WHERE t1.h <> t2.h
+);
+$$ LANGUAGE sql STABLE;*/
+ALTER FUNCTION egiis.sitej_changed() OWNER TO appdb;
 
 CREATE OR REPLACE FUNCTION egiis.downtimes_changed() RETURNS BOOL AS
 $$
