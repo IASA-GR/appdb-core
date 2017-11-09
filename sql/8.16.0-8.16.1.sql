@@ -21,6 +21,8 @@ New version: 8.16.1
 Author: wvkarag@lovecraft.priv.iasa.gr
 */
 
+START TRANSACTION;
+
 CREATE OR REPLACE FUNCTION vacreators_to_xml() RETURNS SETOF XML AS
 $$
 WITH conf AS (
@@ -137,3 +139,5 @@ ALTER FUNCTION vacreators_to_xml() OWNER TO appdb;
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 16, 1, E'Add vacreators_to_xml() function'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=16 AND revision=1);
+
+COMMIT;
