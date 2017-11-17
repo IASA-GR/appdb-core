@@ -1166,7 +1166,7 @@ class AppsController extends Zend_Controller_Action
 	 $res = "<response>";
 	 $i = 0;
 	 foreach($items as $item){
-	  $res .= "<title index='".($i++)."'>" . htmlentities($item) . "</title>";
+	  $res .= "<title index='".($i++)."'>" . htmlspecialchars($item, ENT_XML1, 'UTF-8') . "</title>";
 	 }
 	 $res .= "</response>";
 	 echo $res;
