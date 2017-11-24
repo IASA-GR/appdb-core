@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-require_once(APPLICATION_PATH . "/../library/argo.php");
+//require_once(APPLICATION_PATH . "/../library/argo.php");
 
 class GocdbController extends Zend_Controller_Action
 {
-	private $vaSyncScopes;
+//	private $vaSyncScopes;
 
 	public function init()
 	{
@@ -27,17 +27,17 @@ class GocdbController extends Zend_Controller_Action
 	    $this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
 		$this->session = new Zend_Session_Namespace('default');
-
-		$this->vaSyncScopes = Zend_Registry::get("app");
-		$this->vaSyncScopes = $this->vaSyncScopes['va_sync_scopes'];
-
-		if (trim($this->vaSyncScopes) == "") {
-			$this->vaSyncScopes = 'FedCloud';
-		} else {
-			if (strpos($this->vaSyncScopes, ",") !== false) {
-				$this->vaSyncScopes = explode(",", $this->vaSyncScopes);
-			}
-		}
+// OBSOLETE
+//		$this->vaSyncScopes = Zend_Registry::get("app");
+//		$this->vaSyncScopes = $this->vaSyncScopes['va_sync_scopes'];
+//
+//		if (trim($this->vaSyncScopes) == "") {
+//			$this->vaSyncScopes = 'FedCloud';
+//		} else {
+//			if (strpos($this->vaSyncScopes, ",") !== false) {
+//				$this->vaSyncScopes = explode(",", $this->vaSyncScopes);
+//			}
+//		}
 
 	}
 
