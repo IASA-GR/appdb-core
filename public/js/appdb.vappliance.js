@@ -73,6 +73,47 @@ appdb.vappliance.utils.normalization.viewram = function(v, prop) {
     }
     return res;
 };
+appdb.vappliance.utils.getInfiniteDate = function(){
+	return "2500-01-01";
+};
+appdb.vappliance.utils.getDateAfterMonths = function(months) {
+	var d = new Date();
+	d = new Date(d.setMonth(d.getMonth() + months));
+	return d.toISOString().split('T')[0];
+};
+appdb.vappliance.utils.getExpirationPresets = function(currentDate) {
+    currentDate = currentDate ? $.trim(currentDate).split('T')[0] : null;
+    var months = [3, 6, 9, 12];
+    var presets = [];
+    var found = false;
+
+    $.each(months, function(index, val) {
+	    var id = appdb.vappliance.utils.getDateAfterMonths(val);
+	    var item = {
+		    id: id,
+		    val: function() {
+			    return id;
+		    },
+		    displayValue: function() {
+			    return ''  + val + ' months (' + id + ')';
+		    },
+		    selected: (!found && id === currentDate)
+	    };
+	    found = found || item.selected || false;
+	    presets.push(item);
+    });
+
+    if (!found && currentDate && $.trim(currentDate).indexOf(appdb.vappliance.utils.getInfiniteDate()) === -1) {
+	    presets = [{
+		    id: currentDate,
+		    val: function() { return currentDate; },
+		    displayValue: function() { return "<span>Use previous (" + currentDate + ")</span>"; },
+		    selected: false
+	    }].concat(presets);
+    }
+
+    return presets;
+};
 appdb.vappliance.model.VirtualAppliance = appdb.model.VirtualAppliance;
 appdb.vappliance.FindData = appdb.FindData;
 appdb.vappliance.validators = {};
@@ -4248,6 +4289,131 @@ appdb.vappliance.ui.views.DataValueHandlerIntegritycheck = appdb.ExtendClass(app
 		$(this.editor.domNode).after(descr);
 		this.onValueChange(isChecked);
 	};
+});
+appdb.vappliance.ui.views.DataValueHandlerPresetdate = appdb.ExtendClass(appdb.vappliance.ui.views.DataValueHandler, "appdb.vappliance.ui.views.DataValueHandlerPresetdate", function(o){
+    this.initConstraints = function(){
+	    this.options.constraints = {
+		    isRequired: true
+	    };
+    };
+    this.onValueChange = function(v){
+	    v = v || this.editor.get("value");
+	    this.options.dataCurrentValue = v;
+	    this.onValidate();
+    };
+    this.getInfiniteDate = function(){
+	    return "2500-01-01";
+    };
+    this.renderValidationMessage = function(err){
+	    if( !err.message ){
+		    err.message = "Invalid Value";
+	    }
+	    $(this.dom).children(".validationmessage").addClass("tooltip");
+	    $(this.dom).children(".validationmessage").append("<div class='arrow'></div>");
+	    $(this.dom).children(".validationmessage").children(".validationerrormessage").append("<span>" + err.message + "</span>");
+	    $(this.dom).children(".validationmessage").removeClass("hidden");
+    };
+    this.renderValidationError = function(err){
+	    if( this.options.tooltip  ){
+		    this.options.tooltip.destroyRecursive(false);
+		    this.options.tooltip = null;
+	    }
+	    $(this.dom).children(".validationmessage").remove();
+	    if( err ){
+		    var vm = $("<a class='validationmessage' title='' href='#'><img src='/images/vappliance/warning.png' alt='' /><div class='validationerrormessage hidden'><span>" + err.message + "</span></div></a>");
+		    $(this.dom).append(vm);
+
+	    }
+    };
+    this.renderViewer = function(){
+	var displayValue = "" + this.options.dataCurrentValue;
+	if( $.isPlainObject(this.options.dataCurrentValue) && this.options.dataCurrentValue.val){
+		displayValue = this.options.dataCurrentValue.val();
+	}
+	displayValue = displayValue.split(".");
+	displayValue = displayValue[0];
+	if( $.trim(displayValue) === "" || $.trim(displayValue).indexOf(appdb.vappliance.utils.getInfiniteDate()) > -1 ){
+		displayValue = "<span class='infinite'>Infinite</span>";
+	}
+	$(this.dom).append(displayValue.split('T')[0]);
+    };
+    this.renderEditor = function(dom){
+	    var selid = ( ( $.isPlainObject(this.options.dataCurrentValue) && this.options.dataCurrentValue.id )?this.options.dataCurrentValue.id: this.options.dataCurrentValue) || null;
+
+	    if (!this.options.dataSource || ($.isArray(this.options.dataSource) && this.options.dataSource.length === 0)) {
+		this.options.dataSource = appdb.vappliance.utils.getExpirationPresets(selid)
+	    }
+
+	    if( $(this.editor).length > 0 ){
+		    $(this.editor).remove();
+	    }
+
+	    var html = "<select class='dijitTextBox groupedselect'>";
+
+	    html += "<option value='-1' " + ( ( selid===-1 )?"selected":"" ) + "></option>";
+
+	    $.each(this.options.dataSource, function(i, e){
+		var val = e.val();
+		var displayVal = ((e.displayValue) ? e.displayValue() : val);
+		var selected = ((e.selected) ? " selected": "");
+		html += "<option value='" + val + "'" + selected + ">" + displayVal + "</option>";
+	    });
+
+	    html += "</select>";
+
+	    this.editor = $(html);
+	    this.editor.destroyRecursive = (function(self){
+		    return function(){
+			    $(this).empty();
+			    $(this).remove();
+		    };
+	    })(this.editor);
+	    $(dom).empty().append(this.editor);
+
+	    $(this.editor).focusin( (function(self){
+		    return function(){
+			    self.parent.setFocus(true);
+		    };
+	    })(this) ).focusout(  (function(self){
+		    return function(){
+			    self.parent.setFocus(false);
+		    };
+	    })(this) ).unbind("change").bind("change", (function(self){
+		    return function(v){
+			    var res = $(this).val();
+			    if( self.options.dataSource ){
+				    $.each(self.options.dataSource, function(i,e){
+					    if( e.id === res ){
+						    res = e;
+					    }
+				    });
+			    }
+			    self.options.dataCurrentValue = res;
+			    self.onValidate();
+			    self.parent.setFocus(true);
+		    };
+	    })(this) );
+	    this.editor.get = (function(self){
+		    return function(name){
+			    name = $.trim(name).toLowerCase();
+			    switch(name){
+				    case "displayedvalue":
+					    return $(self.editor).find(":selected").text();
+				    default:
+					    return undefined;
+			    }
+		    };
+	    })(this);
+	    if ($.isArray(this.options.dataSource) && this.options.dataSource.length > 0) {
+		this.setFocus(true);
+		this.options.dataCurrentValue = {id: '', val: function() { return ''; }, displayValue: function() {return ''; }};
+		this.setFocus(false);
+	    }
+	    setTimeout(this.onValidate.bind(this), 1);
+    };
+    this.postRenderEditor = function(){
+	    this.onValidate();
+    };
 });
 appdb.vappliance.ui.views.DataValueHandlerDatetime = appdb.ExtendClass(appdb.vappliance.ui.views.DataValueHandler,"appdb.vappliance.ui.views.DataValueHandlerDatetime", function(o){
 	this.getInfiniteDate = function(){
