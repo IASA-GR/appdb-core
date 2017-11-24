@@ -439,7 +439,10 @@ class SitesController extends Zend_Controller_Action{
 			sleep(2);
 			// create VA providers cache
 			$this->makeVAprovidersCache();
-			// notify dashboard			
+		}
+
+		if ($success) {
+			// notify dashboard
 			if ( strtolower($_SERVER["SERVER_NAME"]) == "appdb.egi.eu" ) {
 				web_get_contents("https://dashboard.appdb.egi.eu/services/appdb/sync/cloud");
 			}
