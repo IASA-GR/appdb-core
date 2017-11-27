@@ -21,10 +21,10 @@ class ResController extends Zend_Controller_Action
 	public function init() {
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
-		$this->headers = apache_request_headers();
 	}
 
 	public function jsAction() {
+		$headers = apache_request_headers();
 		$f = $this->_getParam('f');
 		if ( $f != '' ) {
 			if ( substr($f, -4) === '.php' ) {
@@ -50,6 +50,7 @@ class ResController extends Zend_Controller_Action
 	}
 
 	public function cssAction() {
+		$headers = apache_request_headers();
 		$f = $this->_getParam('f');
 		if ( $f != '' ) {
 			if ( substr($f, -4) === '.php' ) {
@@ -75,6 +76,7 @@ class ResController extends Zend_Controller_Action
 	}
 
 	public function zipAction() {
+
 		$f = $this->_getParam('f');
 		if ( $f != '' ) {
 			if ( substr($f, -4) === '.php' ) {
