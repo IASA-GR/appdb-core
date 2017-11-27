@@ -2504,14 +2504,14 @@ appdb.components.Site = appdb.ExtendClass(appdb.Component, "appdb.components.Sit
 			}
 			$(ul).append(li);
 		});
-		$(this.dom).find("#contactinfo").empty().append(ul);*/
+		$(this.dom).find("#sitecontactinfo").empty().append(ul);*/
 		d.url = d.url || [];
 		d.url = $.isArray(d.url)?d.url:[d.url];
 		var gocportalurl = '';
 		$.each(d.url, function(index, value) {console.log(value.val());
 			gocportalurl = gocportalurl || ((value.type==='portal' && value.val) ? value.val() : gocportalurl);
 		});
-		$(this.dom).find('#contactinfo a.gocdbportallink').attr('href', gocportalurl);
+		$(this.dom).find('#sitecontactinfo a.gocdbportallink').attr('href', gocportalurl);
 	};
 	this.renderSiteGroup = function(d){
 		this.renderContacts(d);
