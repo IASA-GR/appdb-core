@@ -33,6 +33,8 @@ ALTER TABLE vapp_versions ENABLE TRIGGER USER;
 
 REFRESH MATERIALIZED VIEW vaviews;
 
+ALTER TABLE vapp_versions ADD CONSTRAINT chk_expireson CHECK ((expireson - NOW()) <= '365 days'::INTERVAL);
+
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 16, 3, E'Limit vapp_version.expireson to a maximum of 1y from now'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=16 AND revision=3);
