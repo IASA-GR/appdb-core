@@ -3435,7 +3435,38 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		return true;
 	}
-	
+        /**
+         * Returns a VA Version expiration date as long as it is in less than a year.
+         * Otherwise it returns the date 1 year from now
+         *
+         * @param string $expireson
+         * @return string
+         */
+	private function getValidVAVersionExpirationDate($expireson) {
+                $expireson = trim($expireson);
+                $expireson = explode('T', $expireson);
+                $expireson = trim($expireson[0]);
+
+                if (!$expireson) {
+                        return date('Y-m-d', strtotime('+1 years'));
+                }
+
+                $expiresontime = date_parse_from_format('Y-m-d', $expireson);
+
+                if ($expiresontime['warning_count'] > 0 || $expiresontime['error_count'] > 0) {
+                        return date('Y-m-d', strtotime('+1 years'));
+                }
+
+                $expiresontimeval = intval($expiresontime['year'] . '' . $expiresontime['month'] . '' . $expiresontime['day']);
+                $yearfromnow = date_parse(date('Y-m-d', strtotime('+1 years')));
+                $yearfromnow = intval($yearfromnow['year'] . '' . $yearfromnow['month'] . '' . $yearfromnow['day']);
+
+                if ($expiresontimeval > $yearfromnow) {
+                        return date('Y-m-d', strtotime('+1 years'));
+                }
+
+                return $expiresontime['year'] . "-" . $expiresontime['month'] . "-" . $expiresontime['day'];
+        }
 	private function canIncludeImageInstance($instance,$parent){
 		$m = null;
 		$insts = new Default_Model_VMIinstances();
@@ -5011,6 +5042,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		if( strlen( trim(strval($xml->attributes()->expireson)) ) > 0 ){
 			$m->expireson = strval($xml->attributes()->expireson);
+                        $m->expireson = $this->getValidVAVersionExpirationDate($m->expireson);
 		}
 		//In case of a new vaversion check if user has given an identifier
 		if( !$m->guid ){
