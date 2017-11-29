@@ -76,43 +76,150 @@ appdb.vappliance.utils.normalization.viewram = function(v, prop) {
 appdb.vappliance.utils.getInfiniteDate = function(){
 	return "2500-01-01";
 };
+appdb.vappliance.utils.getDateDiff = function(dt1, dt2) {
+	dt1 = (dt1) ? new Date(dt1) : new Date();
+	dt2 = (dt2) ? new Date(dt2) : new Date();
+	/*
+	* setup 'empty' return object
+	*/
+	var ret = {days:0, months:0, years:0};
+
+	/*
+	 * If the dates are equal, return the 'empty' object
+	 */
+	if (dt1 == dt2) return ret;
+
+	/*
+	 * ensure dt2 > dt1
+	 */
+	if (dt1 > dt2)
+	{
+		var dtmp = dt2;
+		dt2 = dt1;
+		dt1 = dtmp;
+	}
+
+	/*
+	 * First get the number of full years
+	 */
+
+	var year1 = dt1.getFullYear();
+	var year2 = dt2.getFullYear();
+
+	var month1 = dt1.getMonth();
+	var month2 = dt2.getMonth();
+
+	var day1 = dt1.getDate();
+	var day2 = dt2.getDate();
+
+	/*
+	 * Set initial values bearing in mind the months or days may be negative
+	 */
+
+	ret['years'] = year2 - year1;
+	ret['months'] = month2 - month1;
+	ret['days'] = day2 - day1;
+
+	/*
+	 * Now we deal with the negatives
+	 */
+
+	/*
+	 * First if the day difference is negative
+	 * eg dt2 = 13 oct, dt1 = 25 sept
+	 */
+	if (ret['days'] < 0)
+	{
+		/*
+		 * Use temporary dates to get the number of days remaining in the month
+		 */
+		var dtmp1 = new Date(dt1.getFullYear(), dt1.getMonth() + 1, 1, 0, 0, -1);
+
+		var numDays = dtmp1.getDate();
+
+		ret['months'] -= 1;
+		ret['days'] += numDays;
+
+	}
+
+	/*
+	 * Now if the month difference is negative
+	 */
+	if (ret['months'] < 0)
+	{
+		ret['months'] += 12;
+		ret['years'] -= 1;
+	}
+
+	return ret;
+};
+appdb.vappliance.utils.getLexicalDateDiff = function (dt1, dt2) {
+	var diff = appdb.vappliance.utils.getDateDiff(dt1, dt2);
+	var months = diff["months"] || 0;
+	var days = diff["days"] || 0;
+	var years = diff["years"] || 0;
+	var message = "";
+	if (months > 0) {
+		message += months+ ' month' + ((months > 1) ? "s" : "");
+		if (days > 0) {
+			message += " and ";
+		}
+	}
+
+	if (days > 0) {
+		 message += days + " day" + ((days > 1) ? "s" : "");
+	}
+
+	if (days === 0 && months === 0) {
+	     if (years === 0) {
+		     message = 'today';
+	     } else {
+		     message = '12 months';
+	     }
+	} else if (years > 0) {
+	    message = years + ' year' + ((years > 1) ? 's' : '');
+	}
+
+	return message;
+};
 appdb.vappliance.utils.getDateAfterMonths = function(months) {
 	var d = new Date();
 	d = new Date(d.setMonth(d.getMonth() + months));
 	return d.toISOString().split('T')[0];
 };
 appdb.vappliance.utils.getExpirationPresets = function(currentDate) {
-    currentDate = currentDate ? $.trim(currentDate).split('T')[0] : null;
-    var months = [3, 6, 9, 12];
-    var presets = [];
-    var found = false;
+	currentDate = currentDate ? $.trim(currentDate).split('T')[0] : null;
+	var months = [3, 6, 9, 12];
+	var presets = [];
+	var found = false;
 
-    $.each(months, function(index, val) {
-	    var id = appdb.vappliance.utils.getDateAfterMonths(val);
-	    var item = {
-		    id: id,
-		    val: function() {
-			    return id;
-		    },
-		    displayValue: function() {
-			    return ''  + val + ' months (' + id + ')';
-		    },
-		    selected: (!found && id === currentDate)
-	    };
-	    found = found || item.selected || false;
-	    presets.push(item);
-    });
+	$.each(months, function(index, val) {
+		var id = appdb.vappliance.utils.getDateAfterMonths(val);
+		var item = {
+			id: id,
+			val: function() {
+				return id;
+			},
+			displayValue: function() {
+				return ''  + val + ' months from now (' + id + ')';
+			},
+			selected: (!found && id === currentDate)
+		};
+		found = found || item.selected || false;
+		presets.push(item);
+	});
 
-    if (!found && currentDate && $.trim(currentDate).indexOf(appdb.vappliance.utils.getInfiniteDate()) === -1) {
-	    presets = [{
-		    id: currentDate,
-		    val: function() { return currentDate; },
-		    displayValue: function() { return "<span>Use previous (" + currentDate + ")</span>"; },
-		    selected: false
-	    }].concat(presets);
-    }
+	if (!found && currentDate && $.trim(currentDate).indexOf(appdb.vappliance.utils.getInfiniteDate()) === -1) {
+		var dateDiff = appdb.vappliance.utils.getLexicalDateDiff(currentDate);
+		presets = [{
+			id: currentDate,
+			val: function() { return currentDate; },
+			displayValue: function() { return "<span>" + dateDiff + " (" + currentDate + ")</span>"; },
+			selected: true
+		}].concat(presets);
+	}
 
-    return presets;
+	return presets;
 };
 appdb.vappliance.model.VirtualAppliance = appdb.model.VirtualAppliance;
 appdb.vappliance.FindData = appdb.FindData;
@@ -4299,7 +4406,14 @@ appdb.vappliance.ui.views.DataValueHandlerPresetdate = appdb.ExtendClass(appdb.v
     this.onValueChange = function(v){
 	    v = v || this.editor.get("value");
 	    this.options.dataCurrentValue = v;
-	    this.onValidate();
+	    this.onValidate(v.id);
+    };
+    this.getValue = function(){
+	    var val = this.options.dataCurrentValue;
+	    if (val && val.id) {
+		return val.id;
+	    }
+	    return val;
     };
     this.getInfiniteDate = function(){
 	    return "2500-01-01";
@@ -4326,16 +4440,39 @@ appdb.vappliance.ui.views.DataValueHandlerPresetdate = appdb.ExtendClass(appdb.v
 	    }
     };
     this.renderViewer = function(){
-	var displayValue = "" + this.options.dataCurrentValue;
-	if( $.isPlainObject(this.options.dataCurrentValue) && this.options.dataCurrentValue.val){
-		displayValue = this.options.dataCurrentValue.val();
-	}
-	displayValue = displayValue.split(".");
-	displayValue = displayValue[0];
-	if( $.trim(displayValue) === "" || $.trim(displayValue).indexOf(appdb.vappliance.utils.getInfiniteDate()) > -1 ){
-		displayValue = "<span class='infinite'>Infinite</span>";
-	}
-	$(this.dom).append(displayValue.split('T')[0]);
+	    var displayValue = "" + this.options.dataCurrentValue;
+	    var futureDate = new Date('2499-01-01');
+	    var hasExpired = false;
+	    if( $.isPlainObject(this.options.dataCurrentValue) && this.options.dataCurrentValue.val){
+		    displayValue = this.options.dataCurrentValue.val();
+	    }
+	    displayValue = displayValue.split(".");
+	    displayValue = displayValue[0];
+	    var valueDate = new Date(displayValue);
+	    if( $.trim(displayValue) === "" || $.trim(displayValue).indexOf(appdb.vappliance.utils.getInfiniteDate()) > -1 ){
+		    displayValue = "<span class='infinite'>Infinite</span>";
+	    } else if (valueDate >= futureDate) {
+		    displayValue = "" + displayValue.split('T')[0] ;
+	    } else {
+		    var valDate = new Date(displayValue.split('T')[0]);
+		    var nowDate = (new Date()).toISOString();
+		    nowDate = new Date(nowDate.split('T')[0]);
+		    if (valDate > nowDate) {
+			    displayValue = "" + appdb.vappliance.utils.getLexicalDateDiff(valDate, nowDate) + " from now (" + displayValue.split('T')[0] + ")";
+		    } else if (valDate === nowDate) {
+			    displayValue = " today (" + displayValue.split('T')[0] + ")";
+			    hasExpired = true;
+		    } else {
+			    displayValue = " has expired (" + displayValue.split('T')[0] + ")";
+			    hasExpired = true;
+		    }
+	    }
+	    $(this.dom).append(displayValue);
+	    if (hasExpired) {
+		    $(this.dom).addClass('has-expired');
+	    } else {
+		    $(this.dom).removeClass('has-expired');
+	    }
     };
     this.renderEditor = function(dom){
 	    var selid = ( ( $.isPlainObject(this.options.dataCurrentValue) && this.options.dataCurrentValue.id )?this.options.dataCurrentValue.id: this.options.dataCurrentValue) || null;
@@ -4350,7 +4487,7 @@ appdb.vappliance.ui.views.DataValueHandlerPresetdate = appdb.ExtendClass(appdb.v
 
 	    var html = "<select class='dijitTextBox groupedselect'>";
 
-	    html += "<option value='-1' " + ( ( selid===-1 )?"selected":"" ) + "></option>";
+	    html += "<option value='' " + ( ( selid===-1 )?"selected":"" ) + "></option>";
 
 	    $.each(this.options.dataSource, function(i, e){
 		var val = e.val();
@@ -4399,15 +4536,17 @@ appdb.vappliance.ui.views.DataValueHandlerPresetdate = appdb.ExtendClass(appdb.v
 			    switch(name){
 				    case "displayedvalue":
 					    return $(self.editor).find(":selected").text();
+				    case "value":
+					    return $(self.editor).find(":selected").value();
 				    default:
 					    return undefined;
 			    }
 		    };
 	    })(this);
-	    if ($.isArray(this.options.dataSource) && this.options.dataSource.length > 0) {
-		this.setFocus(true);
-		this.options.dataCurrentValue = {id: '', val: function() { return ''; }, displayValue: function() {return ''; }};
-		this.setFocus(false);
+	    if ($.isArray(this.options.dataSource) && this.options.dataSource.length === 0) {
+		    this.setFocus(true);
+		    this.options.dataCurrentValue = {id: '', val: function() { return ''; }, displayValue: function() {return ''; }};
+		    this.setFocus(false);
 	    }
 	    setTimeout(this.onValidate.bind(this), 1);
     };
@@ -5592,7 +5731,13 @@ appdb.vappliance.ui.views.VApplianceVersion = appdb.ExtendClass(appdb.vappliance
 			image: ( (!list)?[]:list.getData() )
 		};
 		if( $.trim(res.expireson) === "" ){
-			res.expireson = "2500-01-01";
+			res.expireson = appdb.vappliance.utils.getDateAfterMonths(12)//"2500-01-01";
+		} else {
+		    var in12motnhs = new Date(appdb.vappliance.utils.getDateAfterMonths(12));
+			var expiresOnDate = new Date(res.expireson);
+			if (expiresOnDate > in12motnhs) {
+				res.expireson = appdb.vappliance.utils.getDateAfterMonths(12);
+			}
 		}
 		return res;
 	};
@@ -5637,12 +5782,38 @@ appdb.vappliance.ui.views.VApplianceVersion = appdb.ExtendClass(appdb.vappliance
 			return function(i,e){
 				var name = $.trim($(this).data("name")).toLowerCase();
 				var val = latest[name];
+				var hasExpired = false;
 				if( val ){
 					if( $.inArray(name, ["expireson","createdon"]) > -1 ){
 						val = val.split("T")[0];
 					}
-					if( val === "2500-01-01" ){
-						val = "Infinite";
+					if (name === "expireson") {
+					    if( val === "2500-01-01" ){
+						    val = " will never expire (Infinite)";
+					    } else {
+						var valDate = new Date(val);
+						var nowDate = (new Date()).toISOString();
+						nowDate = new Date(nowDate.split('T')[0]);
+						if (valDate > nowDate) {
+						    if (valDate > (new Date('2100-01-01'))) {
+							    val = " will expire on " + val;
+						    } else {
+							    val = " will expire in " + appdb.vappliance.utils.getLexicalDateDiff(valDate, nowDate) + "(" + val + ")";
+						    }
+						} else if (valDate === nowDate) {
+						    val = " expires today (" + val + ")";
+						    hasExpired = true;
+						} else {
+						    val = " has expired (" + val + ")";
+						    hasExpired = true;
+						}
+					    }
+
+					    if (hasExpired) {
+						$(this).find(".value").closest('[data-name="expireson"]').addClass('has-expired');
+					    } else {
+						$(this).find(".value").closest('[data-name="expireson"]').removeClass('has-expired');
+					    }
 					}
 					$(this).find(".value").text(val);
 					$(this).removeClass("hidden");
