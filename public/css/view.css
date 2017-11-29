@@ -12048,7 +12048,7 @@ vappliance.singlevmipolicy .property > .loader, .vappliance .vappliance-version 
 }
 .vappliance .vappliance-version > .content > .verticalpanel.info{
 	display: inline-block;
-	min-width: 275px;
+	min-width: 350px;
 	vertical-align: top;
 	border-right:1px dashed #E0E0E0;
 }
@@ -12072,7 +12072,7 @@ vappliance.singlevmipolicy .property > .loader, .vappliance .vappliance-version 
 }*/
 .vappliance .vappliance-version > .content > .verticalpanel.description{
 	display: inline-block;
-	width: 670px;
+	min-width: 600px;
 	vertical-align: top;
 	padding: 0px 8px;
 }
@@ -13186,14 +13186,14 @@ vappliance.singlevmipolicy .property > .loader, .vappliance .vappliance-version 
 
 .vappliance .property.vaversion-title
 {
-	max-width: 600px;
+	max-width: 490px;
 	vertical-align: top;
 }
 .vappliance .property.vaversion-title.longtext > .value{
-	width: 555px;
+	width: 480px;
 	margin-left: 15px !important;
-	min-width: 555px;
-	max-width: 555px;
+	min-width: 480px;
+	max-width: 480px;
 }
 .vappliance.canedit.editmode .property.vaversion-title.longtext > .value{
 	margin-left: 0px !important;
@@ -13947,6 +13947,35 @@ vappliance.singlevmipolicy .property > .loader, .vappliance .vappliance-version 
 .vappliance.editmode .property > .value.invalid .dijitReset.dijitValidationContainer{
 	display: none;
 }
+.vappliance.editmode .property.vaversion-version,
+.vappliance.editmode .property.vaversion-expireson {
+        padding-bottom: 5px;
+}
+.vappliance.editmode .property.vaversion-version > .header,
+.vappliance.editmode .property.vaversion-expireson > .header {
+        width: 75px;
+}
+.vappliance.editmode .property.vaversion-version > .value,
+.vappliance.editmode .property.vaversion-expireson > .value,
+.vappliance.editmode .property.vaversion-version > .value  .dijitTextBox,
+.vappliance.editmode .property.vaversion-expireson > .value .dijitTextBox{
+        width: 230px;
+        min-width: 230px;
+        max-width: 230px;
+        height: 20px;
+}
+.vappliance .property.vaversion-expireson > .value {
+        padding-left: 10px;
+        padding-top: 1px;
+}
+.vappliance.editmode .property.vaversion-expireson > .value {
+        padding-left: 0;
+        padding-top: 0;
+}
+.vappliance .property.vaversion-expireson > .value.has-expired {
+        color: #D9534F;
+        font-weight: bold;
+}
 .vappliance .toolbar .actions .action.editbutton.disabled,
 .vappliance .toolbar .actions .action.editbutton.disabled:hover{
 	background: none;
@@ -13965,6 +13994,7 @@ vappliance.singlevmipolicy .property > .loader, .vappliance .vappliance-version 
 }
 .vappliance.viewmode .property.vaversion-createdon,
 .vappliance.viewmode .property.vaversion-expireson{
+        width: 330px;
 	background: none repeat scroll 0 0 #f5f5f5;
 	border: 1px solid #dddddd;
 	border-radius: 5px;
@@ -14435,6 +14465,12 @@ vappliance.singlevmipolicy .property > .loader, .vappliance .vappliance-version 
 	position: absolute;
 	width: auto;
 	right: 30px;
+}
+.vappliancecontainer .workingversion > .vappliance-version .vaversion-vmi .vaversion-vmiversion .property.vmiversion-integrity {
+        display: none;
+}
+.vappliancecontainer.isprivate .workingversion > .vappliance-version .vaversion-vmi .vaversion-vmiversion .property.vmiversion-integrity {
+        display: block;
 }
 .vappliance.workingversion .vaversion-vmiversion.integritysuccess > .integritycheck,
 .vappliance.workingversion .vaversion-vmiversion.integrityerror.autointegrity > .integritycheck,
@@ -15826,7 +15862,10 @@ color: #555;
 	font-weight: bold;
 	color: #aaa;
 }
-
+.vappliance .showonedit.previousversionproperty.has-expired,
+.vappliance .showonedit.previousversionproperty.has-expired > .value {
+        color: #D9534F;
+}
 .vappliance .property > .value > .fullvalue{
 	display: none;
 	position: absolute;
