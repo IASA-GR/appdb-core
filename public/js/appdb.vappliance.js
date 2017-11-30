@@ -76,18 +76,17 @@ appdb.vappliance.utils.normalization.viewram = function(v, prop) {
 appdb.vappliance.utils.getInfiniteDate = function(){
 	return "2500-01-01";
 };
-appdb.vappliance.utils.getDateDiff = function(dt1, dt2) {
+appdb.vappliance.utils.getDateDiff = function(dt1, dt2, humanize) {
+	humanize = (typeof humanize === 'boolean') ? humanize : false;
 	dt1 = (dt1) ? new Date(dt1) : new Date();
 	dt2 = (dt2) ? new Date(dt2) : new Date();
-	/*
-	* setup 'empty' return object
-	*/
-	var ret = {days:0, months:0, years:0};
+	dt1 = new Date((dt1.toISOString().split('T')[0]) + ' 23:59');
+	dt2 = new Date((dt2.toISOString().split('T')[0]) + ' 23:59');
 
 	/*
 	 * If the dates are equal, return the 'empty' object
 	 */
-	if (dt1 == dt2) return ret;
+	if (dt1 == dt2) return (humanize) ? 'today' : {years: 0, months: 0, days: 0};
 
 	/*
 	 * ensure dt2 > dt1
@@ -99,62 +98,26 @@ appdb.vappliance.utils.getDateDiff = function(dt1, dt2) {
 		dt1 = dtmp;
 	}
 
-	/*
-	 * First get the number of full years
-	 */
+	dt1 = (dt1.toISOString().split('T')[0]) + ' 23:59:59';
+	dt2 = (dt2.toISOString().split('T')[0]) + ' 23:59:59';
 
-	var year1 = dt1.getFullYear();
-	var year2 = dt2.getFullYear();
+	var mdt1 = moment(dt1, 'YYYY-MM-DD HH:mm:ss');
+	var mdt2 = moment(dt2, 'YYYY-MM-DD HH:mm:ss').add(1, 'day');
+	var diff = moment.duration(mdt2.diff(mdt1));
 
-	var month1 = dt1.getMonth();
-	var month2 = dt2.getMonth();
-
-	var day1 = dt1.getDate();
-	var day2 = dt2.getDate();
-
-	/*
-	 * Set initial values bearing in mind the months or days may be negative
-	 */
-
-	ret['years'] = year2 - year1;
-	ret['months'] = month2 - month1;
-	ret['days'] = day2 - day1;
-
-	/*
-	 * Now we deal with the negatives
-	 */
-
-	/*
-	 * First if the day difference is negative
-	 * eg dt2 = 13 oct, dt1 = 25 sept
-	 */
-	if (ret['days'] < 0)
-	{
-		/*
-		 * Use temporary dates to get the number of days remaining in the month
-		 */
-		var dtmp1 = new Date(dt1.getFullYear(), dt1.getMonth() + 1, 1, 0, 0, -1);
-
-		var numDays = dtmp1.getDate();
-
-		ret['months'] -= 1;
-		ret['days'] += numDays;
-
+	if (humanize) {
+	    return diff.humanize();
 	}
 
-	/*
-	 * Now if the month difference is negative
-	 */
-	if (ret['months'] < 0)
-	{
-		ret['months'] += 12;
-		ret['years'] -= 1;
-	}
+	var ret = {
+		years: diff.years(),
+		months: diff.months(),
+		days: diff.days()
+	};
 
-	return ret;
 };
-appdb.vappliance.utils.getLexicalDateDiff = function (dt1, dt2) {
-	var diff = appdb.vappliance.utils.getDateDiff(dt1, dt2);
+appdb.vappliance.utils.getLexicalDateFromDiff = function(diffObject) {
+	var diff = diffObject || {};
 	var months = diff["months"] || 0;
 	var days = diff["days"] || 0;
 	var years = diff["years"] || 0;
@@ -182,9 +145,12 @@ appdb.vappliance.utils.getLexicalDateDiff = function (dt1, dt2) {
 
 	return message;
 };
+appdb.vappliance.utils.getLexicalDateDiff = function (dt1, dt2) {
+	return appdb.vappliance.utils.getDateDiff(dt1, dt2, true);
+};
 appdb.vappliance.utils.getDateAfterMonths = function(months) {
-	var d = new Date();
-	d = new Date(d.setMonth(d.getMonth() + months));
+	var futureMonth = moment(new Date()).add(months, 'M');
+	var d = futureMonth.toDate();
 	return d.toISOString().split('T')[0];
 };
 appdb.vappliance.utils.getExpirationPresets = function(currentDate) {
@@ -4458,7 +4424,7 @@ appdb.vappliance.ui.views.DataValueHandlerPresetdate = appdb.ExtendClass(appdb.v
 		    var nowDate = (new Date()).toISOString();
 		    nowDate = new Date(nowDate.split('T')[0]);
 		    if (valDate > nowDate) {
-			    displayValue = "" + appdb.vappliance.utils.getLexicalDateDiff(valDate, nowDate) + " from now (" + displayValue.split('T')[0] + ")";
+			   displayValue = "" + appdb.vappliance.utils.getLexicalDateDiff(valDate, nowDate) + " from now (" + displayValue.split('T')[0] + ")";
 		    } else if (valDate === nowDate) {
 			    displayValue = " today (" + displayValue.split('T')[0] + ")";
 			    hasExpired = true;
@@ -5798,7 +5764,7 @@ appdb.vappliance.ui.views.VApplianceVersion = appdb.ExtendClass(appdb.vappliance
 						    if (valDate > (new Date('2100-01-01'))) {
 							    val = " will expire on " + val;
 						    } else {
-							    val = " will expire in " + appdb.vappliance.utils.getLexicalDateDiff(valDate, nowDate) + "(" + val + ")";
+							    val = " will expire in " + appdb.vappliance.utils.getLexicalDateDiff(valDate, nowDate) + " (" + val + ")";
 						    }
 						} else if (valDate === nowDate) {
 						    val = " expires today (" + val + ")";
