@@ -35,6 +35,7 @@ REQUIREMENTS
 	- tinymce folder (v.3.4.9)
 	- shortcut.js
 	- d3 (v3 and v4)
+        - moment.js (v2.19.2) from http://momentjs.com/downloads/moment.min.js
 	- dijit (../zend/externals/dojo/release/dojo/dijit/)
 	- dojo (../zend/externals/dojo/release/dojo/dojo/)
 	- dojox (../zend/externals/dojo/release/dojo/dijit/)
