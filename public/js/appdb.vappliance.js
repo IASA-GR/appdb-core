@@ -176,11 +176,11 @@ appdb.vappliance.utils.getExpirationPresets = function(currentDate) {
 	});
 
 	if (!found && currentDate && $.trim(currentDate).indexOf(appdb.vappliance.utils.getInfiniteDate()) === -1) {
-		var dateDiff = appdb.vappliance.utils.getLexicalDateDiff(currentDate);
+		//var dateDiff = appdb.vappliance.utils.getLexicalDateDiff(currentDate);
 		presets = [{
 			id: currentDate,
 			val: function() { return currentDate; },
-			displayValue: function() { return "<span>" + dateDiff + " (" + currentDate + ")</span>"; },
+			displayValue: function() { return "<span>Keep previous set (" + currentDate + ")</span>"; },
 			selected: true
 		}].concat(presets);
 	}
