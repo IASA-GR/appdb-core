@@ -4137,6 +4137,22 @@ appdb.vappliance.ui.views.DataValueHandlerUrl = appdb.ExtendClass(appdb.vapplian
 		}
 		this.onValueChange();
 	};
+	this.isPrivateVersion = function() {
+		return $(this.parent.parent.dom).closest('.workingversion').closest('.vappliancecontainer').hasClass('isprivate');
+	};
+	this.setIntegrityCheck = function(v) {
+		var obj = dijit.byNode($(this.parent.parent.dom).find(".vmiversion-integrity > .value > .dijit")[0]);
+		if ( !obj ) {
+			return "";
+		}
+		if (this.isPrivateVersion() === false) {
+			if (v === false && this.options.integritySelected === false) {
+			    obj.set("checked", false);
+			} else {
+			    obj.set('checked', true);
+			}
+		}
+	}
 	this.checksumValue = function(v){
 		var obj = dijit.byNode($(this.parent.parent.dom).find(".vmiversion-checksum512 > .value > .dijit")[0]);
 		if( !obj ){
@@ -4197,12 +4213,17 @@ appdb.vappliance.ui.views.DataValueHandlerUrl = appdb.ExtendClass(appdb.vapplian
 		} else {
 			$(dom).addClass('hidden');
 		}
-		
 	};
+	this.isIntegrityCheckSelected = function() {
+	    var obj = dijit.byNode($(this.parent.parent.dom).find(".vmiversion-integrity > .value > .dijit")[0]);
+	    if (!obj) return false;
+	    return obj.get('checked') || false;
+	}
 	this.initChecksumChecker = function(){
 		this.options.checksum = this.checksumValue();
 		this.options.filesize = this.sizeValue();
 		this.options.ovfurl = this.ovfurl();
+		this.options.integritySelected = this.isIntegrityCheckSelected();
 	};
 	this.locationChanged = function(changed){
 		changed = (typeof changed === "boolean")?changed:true;
@@ -4217,11 +4238,13 @@ appdb.vappliance.ui.views.DataValueHandlerUrl = appdb.ExtendClass(appdb.vapplian
 			this.checksumValue("");	
 			this.sizeValue("");
 			this.ovfurl("");
+			this.setIntegrityCheck(true);
 			this.locationChanged(true);
 		}else{
 			this.checksumValue(this.options.checksum);
 			this.sizeValue(this.options.filesize);
 			this.ovfurl(this.options.ovfurl);
+			this.setIntegrityCheck(false);
 			this.locationChanged(false);
 		}
 	};
