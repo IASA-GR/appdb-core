@@ -9,6 +9,14 @@ http://framework.zend.com
 License: New BSD License
 Copyright (c) 2005-2015, Zend Technologies USA, Inc.
 
+PHP-on-Couch
+https://github.com/PHP-on-Couch/PHP-on-Couch
+License: LGPL v3 License
+
+PHP dotenv
+https://github.com/vlucas/phpdotenv
+License: BSD 3-clause "New" or "Revised" License
+Copyright (c) 2013, Vance Lucas
 
 ------------------------------------------------
 Attribution for JavaScript Libraries and Plugins
@@ -82,7 +90,7 @@ License: MIT License
 Copyright (c) 2009 Jörn Zaefferer
 
 TinyMCE provided by https://www.tinymce.com/
-License: LGPL v2 License,
+License: LGPL v2 License
 https://github.com/tinymce
 
 Browser Detection Javascript, provided by Stephen Chapman
@@ -108,9 +116,9 @@ License: GPLv2 license
 Copyright 2013, Moxiecode Systems AB
 
 d3 javascript library provided by Michael Bostock
-http://d3js.org
-License: https://github.com/mbostock/d3/blob/master/LICENSE
-Copyright (c) 2010-2015, Michael Bostock
+https://github.com/d3/d3
+License: BSD 3-clause "New" or "Revised" License
+Copyright 2010-2017 Mike Bostock
 
 PIE CSS provided by Jason Johnston
 http://css3pie.com
