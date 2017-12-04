@@ -66,6 +66,7 @@
 				<xsl:attribute name="archived"><xsl:value-of select="./vappliance/archivedon"/></xsl:attribute>
 				<xsl:attribute name="createdon"><xsl:value-of select="./vappliance/createdon"/></xsl:attribute>
 				<xsl:attribute name="expireson"><xsl:value-of select="./vappliance/expireson"/></xsl:attribute>
+				<xsl:attribute name="expiresin"><xsl:value-of select="./vappliance/expiresin"/></xsl:attribute>
 			</xsl:element>
 			<xsl:element name="virtualization:identifier"><xsl:value-of select="./identifier"/></xsl:element>
 			<xsl:if test='./baseidentifier'>

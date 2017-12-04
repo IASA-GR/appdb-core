@@ -5040,9 +5040,19 @@ class RestAppVAXMLParser extends RestXMLParser {
 		if( strlen( trim(strval($xml->attributes()->createdon)) ) > 0 ){
 			$m->createdon = strval($xml->attributes()->createdon);
 		}
-		if( strlen( trim(strval($xml->attributes()->expireson)) ) > 0 ){
+
+		// check for expireson attribute. If it does not exist, fall back to expiresin (i.e. give priority to expireon)
+		// if neither expireson nor expiresin exist, impose a default of 1y
+		if(strlen(trim(strval($xml->attributes()->expireson))) > 0) {
 			$m->expireson = strval($xml->attributes()->expireson);
-                        $m->expireson = $this->getValidVAVersionExpirationDate($m->expireson);
+			$m->expireson = $this->getValidVAVersionExpirationDate($m->expireson);
+		} elseif (strlen(trim(strval($xml->attributes()->expiresin))) > 0) {
+			$expiresin = trim(strval($xml->attributes()->expiresin));
+			$m->expireson = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s", strtotime(date('Y-m-d H:i:s'))) . " + $expiresin"));
+			$m->expireson = $this->getValidVAVersionExpirationDate($m->expireson);
+		} else {
+			$m->expireson = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s", strtotime(date('Y-m-d H:i:s'))) . " + 1 year"));
+			$m->expireson = $this->getValidVAVersionExpirationDate($m->expireson);
 		}
 		//In case of a new vaversion check if user has given an identifier
 		if( !$m->guid ){

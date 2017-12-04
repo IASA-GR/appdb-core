@@ -229,7 +229,8 @@
 		<xs:attribute name="archived" type="xs:boolean" use="required" />
 		<xs:attribute name="archivedon" type="xs:dateTime" use="optional" />
 		<xs:attribute name="status" type="xs:string" use="required" />
-		<xs:attribute name="expireson" type="xs:dateTime" use="required" />
+		<xs:attribute name="expireson" type="xs:dateTime" use="optional" />
+		<xs:attribute name="expiresin" type="xs:string" use="optional" />
 	</xs:complexType>
 
 	<xs:complexType name="applianceType" mixed="true">
