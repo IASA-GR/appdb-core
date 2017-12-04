@@ -215,12 +215,10 @@ CREATE OR REPLACE VIEW vapp_to_xml AS
   GROUP BY tpublishedby.institution, tpublishedby.positiontypeid, tpublishedby.lastname, tpublishedby.cname, tpublishedby.firstname, tenabledby.institution, tenabledby.positiontypeid, tenabledby.lastname, tenabledby.cname, tenabledby.firstname, applications.id, vapplications.id, vapp_versions.published, vapp_versions.publishedby, vapp_versions.publishedon, vapp_versions.enabledby, vapp_versions.enabledon, vapp_versions.version, applications.guid, vapplications.name, vapp_versions.id, vapp_versions.createdon, vapp_versions.expireson, vapp_versions.expiresin, vapp_versions.status, vapp_versions.enabled, vapp_versions.archived
   ORDER BY vapp_versions.published, vapp_versions.archived, vapp_versions.archivedon DESC;
 
-UPDATE vapp_versions SET expireson = NOW() + '1 year'::INTERVAL WHERE (expireson > NOW()) AND (expireson - NOW() > '365 days'::INTERVAL);
 ALTER TABLE vapp_versions ALTER COLUMN expireson SET NOT NULL;
-ALTER TABLE public.vapp_versions ADD CONSTRAINT chk_expireson CHECK ((expireson::timestamp with time zone - now()) <= '365 days'::INTERVAL);
 
 INSERT INTO version (major,minor,revision,notes) 
-	SELECT 8, 16, 4, E'Add computed column expiresin to vapp_versions. Limit vapp_versions expiration to 1y max.'
+	SELECT 8, 16, 4, E'Add computed column expiresin to vapp_versions. Set NOT NULL on expireson column.'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=16 AND revision=4);
 
 COMMIT;
