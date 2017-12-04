@@ -314,7 +314,7 @@ class textPNG {
     
     function draw() 
     {
-        putenv('GDFONTPATH='.APPLICATION_PATH.'/../library/fonts');
+        putenv('GDFONTPATH='.APPLICATION_PATH.'/../library/fonts/');
         $width = 0;
         $height = 0;
         $offset_x = 0;
