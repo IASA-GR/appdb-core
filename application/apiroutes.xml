@@ -140,14 +140,14 @@
 <route type="rest" name="apphistoryitem" url="/:version/applications/:id/history/:hid">
 	<format xslt="history">xml</format>
     <param name="id" fmt="(\d+|s:.+)"/>
-    <param name="hid" fmt="\s+"/>
+    <param name="hid" fmt=".+"/>
 	<resource>RestAppHistoryItem</resource>
 	<comment>The historical state of a software entry specified by parameter :hid</comment>
 </route>
 <route type="rest" name="apphistoryrbitem" url="/:version/applications/:id/history/:hid/rollback">
 	<format xslt="history">xml</format>
     <param name="id" fmt="(\d+|s:.+)"/>
-    <param name="hid" fmt="\s+"/>
+    <param name="hid" fmt=".+"/>
 	<resource>RestAppHistoryRBItem</resource>
 	<comment>Rolls-back a software entry to the state it was in as described by the parameter :hid</comment>
 </route>

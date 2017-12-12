@@ -2340,7 +2340,7 @@ class RestAppHistoryList extends RestROResourceList {
                             $value = $value[0];
                             $value = base64_decode($value);
                             $value = bzdecompress($value);
-                            $oldvalue = '<history:oldvalue xmlns:history="http://appdb.egi.eu/api/'.$this->getParam('version').'/history">'.
+                            $oldvalue = '<history:oldvalue xmlns:history="' . RestAPIHelper::XMLNS_HISTORY() . '">'.
                                 $value.'</history:oldvalue>';
                         }
                         $value = $x->xpath('newvalue');
@@ -2348,14 +2348,14 @@ class RestAppHistoryList extends RestROResourceList {
                             $value = $value[0];
                             $value = base64_decode($value);
                             $value = bzdecompress($value);
-                            $newvalue = '<history:newvalue xmlns:history="http://appdb.egi.eu/api/'.$this->getParam('version').'/history">'.
+                            $newvalue = '<history:newvalue xmlns:history="' . RestAPIHelper::XMLNS_HISTORY() . '">'.
                                 $value.'</history:newvalue>';
                         }
                         if ( $oldvalue != '' && $newvalue != '' ) { 
                             if ( $this->_listMode === RestListModeEnum::RL_NORMAL ) {
-                                $list[] = '<history:history xmlns:history="http://appdb.egi.eu/api/'.$this->getParam('version').'/history"'.' id="'.$counter.'" event="'.$event. '"' . ($disposition != '' ? ' disposition="' . $disposition . '"' : '') . ' userid="'.$userid.'" usercname="'.$userCname.'" username="'.$username.'" usercontact="'.$usercontact.'" apiver="'.$apiver.'" timestamp="'.$timestamp.'">'.$oldvalue.$newvalue.'</history:history>';
+                                $list[] = '<history:history xmlns:history="' . RestAPIHelper::XMLNS_HISTORY() . '"'.' id="'.$counter.'" event="'.$event. '"' . ($disposition != '' ? ' disposition="' . $disposition . '"' : '') . ' userid="'.$userid.'" usercname="'.$userCname.'" username="'.$username.'" usercontact="'.$usercontact.'" apiver="'.$apiver.'" timestamp="'.$timestamp.'">'.$oldvalue.$newvalue.'</history:history>';
                             } elseif ( $this->_listMode === RestListModeEnum::RL_LISTING ) {
-                                $list[] = '<history:history xmlns:history="http://appdb.egi.eu/api/'.$this->getParam('version').'/history"'.' id="'.$counter.'" event="'.$event.'" userid="'.$userid.'" usercname="'.$userCname.'" username="'.$username.'" usercontact="'.$usercontact.'" apiver="'.$apiver.'" timestamp="'.$timestamp.'"/>';
+                                $list[] = '<history:history xmlns:history="' . RestAPIHelper::XMLNS_HISTORY() . '"'.' id="'.$counter.'" event="'.$event.'" userid="'.$userid.'" usercname="'.$userCname.'" username="'.$username.'" usercontact="'.$usercontact.'" apiver="'.$apiver.'" timestamp="'.$timestamp.'"/>';
                             }
                         }
                     }
