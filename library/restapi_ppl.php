@@ -242,7 +242,7 @@ class RestPplList extends RestResourceList {
    		$ret = array();
 		$this->_model->refresh();
 		for ($i=0; $i < count($this->_model->items); $i++) {
-			$ret[] = '<person:person xmlns:person="http://appdb.egi.eu/api/'.$this->getParam('version').'/person" id="'.$this->_model->items[$i]->id.'" >'.$this->_model->items[$i]->name.'</person:person>';
+			$ret[] = '<person:person xmlns:person="' . RestAPIHelper::XMLNS_PERSON() . '" id="'.$this->_model->items[$i]->id.'" >'.$this->_model->items[$i]->name.'</person:person>';
 		}
 		return new XMLFragmentRestResponse($ret, $this);
     }

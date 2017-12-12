@@ -812,7 +812,7 @@ class RestAppXMLParser extends RestXMLParser {
 							// TODO: formalize the appdb:appdb head in a constant
 							// and search for other places in the API lib where this should
 							// be done as well
-							$tagval = '<appdb:appdb xmlns:appdb="http://appdb.egi.eu/api/'.$this->_parent->getParam('version').'/appdb" xmlns:application="http://appdb.egi.eu/api/'.$this->_parent->getParam('version').'/application">'.$tagval.'</appdb:appdb>';
+							$tagval = '<appdb:appdb xmlns:appdb="' . RestAPIHelper::XMLNS_APPDB() . '" xmlns:application="' . RestAPIHelper::XMLNS_APPLICATION() . '">'.$tagval.'</appdb:appdb>';
 	                        $taglist = new RestAppTagList(array_merge($this->_parent->getParams(), array('id' => $app->id, 'data' => $tagval)));
 							$tagres = RestAPIHelper::wrapResponse(strval($taglist->get()));
 							$tagxml = new SimpleXMLElement(strval($tagres));
@@ -836,7 +836,7 @@ class RestAppXMLParser extends RestXMLParser {
                     //remove non-existent
                     $taglist = new RestAppTagList(array('id' => $app->id));
 					$tagsxml = strval($taglist->get());
-					$tagsxml = '<appdb:appdb xmlns:appdb="http://appdb.egi.eu/api/'.$this->_parent->getParam('version').'/appdb" xmlns:application="http://appdb.egi.eu/api/'.$this->_parent->getParam('version').'/application">'.$tagsxml.'</appdb:appdb>';
+					$tagsxml = '<appdb:appdb xmlns:appdb="' . RestAPIHelper::XMLSNS_APPDB() . '" xmlns:application="' . RestAPIHelper::XMLNS_APPLICATION() . '">'.$tagsxml.'</appdb:appdb>';
                     $xml2 = new SimpleXMLElement($tagsxml);
                     foreach($xml2->xpath('//application:tag[not(@system="true")]') as $tag) {
                         if (! in_array(strval($tag), $newtags) ) {
@@ -1126,7 +1126,7 @@ class RestAppList extends RestResourceList {
 		return new XMLFragmentRestResponse($_this->_model->items, $_this);
 //		$_this->_model->refresh();
 //		for ($i=0; $i < count($_this->_model->items); $i++) {
-//			$ret[] = '<application:application xmlns:application="http://appdb.egi.eu/api/'.$_this->getParam('version').'/application" id="'.$_this->_model->items[$i]->id.'" >'.$_this->_model->items[$i]->name.'</application:application>';
+//			$ret[] = '<application:application xmlns:application="' . RestAPIHelper::XMLNS_APPLICATION() . '" id="'.$_this->_model->items[$i]->id.'" >'.$_this->_model->items[$i]->name.'</application:application>';
 //		}
 //		return new XMLFragmentRestResponse($ret, $_this);
     }
@@ -2209,7 +2209,7 @@ class RestAppRatingList extends RestROResourceList {
         $ret = array();
 		$this->_model->refresh();
 		for ($i=0; $i < count($this->_model->items); $i++) {
-            $ret[] = '<application:rating xmlns:application="http://appdb.egi.eu/api/'.$this->getParam('version').'/application" id="'.$this->_model->items[$i]->id.'" >'.$this->_model->items[$i]->rating.'</application:rating>';
+            $ret[] = '<application:rating xmlns:application="' . RestAPIHelper::XMLNS_APPLICATION() . '" id="'.$this->_model->items[$i]->id.'" >'.$this->_model->items[$i]->rating.'</application:rating>';
         }
 		return new XMLFragmentRestResponse($ret, $this);
     }
@@ -2559,7 +2559,7 @@ class RestAppTagList extends RestResourceList {
                 $res->refresh();
                 $xml = array();
                 foreach ($res->items as $item) {
-                    $xml[] = '<application:tag xmlns:application="http://appdb.egi.eu/api/'.$this->getParam('version').'/application" id="'.$item->id.'" system="'.(is_null($item->researcherID) ? 'true' : 'false').'" '.(is_null($item->researcherID) ? '' : 'ownerid="'.$item->researcherID.'"').'>'.$item->tag.'</application:tag>'."\n";
+                    $xml[] = '<application:tag xmlns:application="' . RestAPIHelper::XMLNS_APPLICATION() . '" id="'.$item->id.'" system="'.(is_null($item->researcherID) ? 'true' : 'false').'" '.(is_null($item->researcherID) ? '' : 'ownerid="'.$item->researcherID.'"').'>'.$item->tag.'</application:tag>'."\n";
                 }
 				$this->_total = count($res->items);
                 return new XMLFragmentRestResponse($xml, $this);
@@ -2671,7 +2671,7 @@ class RestAppTagItem extends RestResourceItem {
         if ( parent::get() !== false ) {
             if ( ! is_null($this->_res) ) {
                 $item = $this->_res;
-                $xml = '<application:tag xmlns:application="http://appdb.egi.eu/api/'.$this->getParam('version').'/application" id="'.$item->id.'" system="'.(is_null($item->researcherID) ? 'true' : 'false').'" '.(is_null($item->researcherID) ? '' : 'ownerid="'.$item->researcherID.'"').'>'.$item->tag.'</application:tag>'."\n";
+                $xml = '<application:tag xmlns:application="' . RestAPIHelper::XMLNS_APPLICATION() . '" id="'.$item->id.'" system="'.(is_null($item->researcherID) ? 'true' : 'false').'" '.(is_null($item->researcherID) ? '' : 'ownerid="'.$item->researcherID.'"').'>'.$item->tag.'</application:tag>'."\n";
                 return new XMLFragmentRestResponse($xml, $this);
             } else {
                 $this->setError(RestErrorEnum::RE_ITEM_NOT_FOUND);

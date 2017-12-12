@@ -86,7 +86,7 @@ class RestVOList extends RestROResourceList {
    		$ret = array();
 		$this->_model->refresh();
 		for ($i=0; $i < count($this->_model->items); $i++) {
-			$ret[] = '<vo:vo xmlns:vo="http://appdb.egi.eu/api/'.$this->getParam('version').'/vo" id="'.$this->_model->items[$i]->id.'" >'.$this->_model->items[$i]->name.'</vo:vo>';
+			$ret[] = '<vo:vo xmlns:vo="' . RestAPIHelper::XMLNS_VO() . '" id="'.$this->_model->items[$i]->id.'" >'.$this->_model->items[$i]->name.'</vo:vo>';
 		}
 		return new XMLFragmentRestResponse($ret, $this);
     }

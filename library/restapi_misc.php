@@ -641,13 +641,13 @@ class RestRegionalList extends RestROResourceList {
         $res2->refresh();
         $res3->refresh();
 		for ($i=0; $i < count($res1->items); $i++) {
-			$ret[] = '<regional:country xmlns:regional="http://appdb.egi.eu/api/'.$this->getParam('version').'/regional" id="'.$res1->items[$i]->id.'" >'.htmlentities($res1->items[$i]->name, ENT_XML1).'</regional:country>';
+			$ret[] = '<regional:country xmlns:regional="' . RestAPIHelper::XMLNS_REGIONAL() . '" id="'.$res1->items[$i]->id.'" >'.htmlentities($res1->items[$i]->name, ENT_XML1).'</regional:country>';
 		}
 		for ($i=0; $i < count($res2->items); $i++) {
-			$ret[] = '<regional:region xmlns:regional="http://appdb.egi.eu/api/'.$this->getParam('version').'/regional" id="'.$res2->items[$i]->id.'" >'.htmlentities($res2->items[$i]->name, ENT_XML1).'</regional:region>';
+			$ret[] = '<regional:region xmlns:regional="' . RestAPIHelper::XMLNS_REGIONAL() . '" id="'.$res2->items[$i]->id.'" >'.htmlentities($res2->items[$i]->name, ENT_XML1).'</regional:region>';
 		}
 		for ($i=0; $i < count($res3->items); $i++) {
-			$ret[] = '<regional:provider xmlns:regional="http://appdb.egi.eu/api/'.$this->getParam('version').'/regional" id="'.$res3->items[$i]->id.'" >'.htmlentities($res3->items[$i]->name, ENT_XML1).'</regional:provider>';
+			$ret[] = '<regional:provider xmlns:regional="' . RestAPIHelper::XMLNS_REGIONAL() . '" id="'.$res3->items[$i]->id.'" >'.htmlentities($res3->items[$i]->name, ENT_XML1).'</regional:provider>';
         }
 		return new XMLFragmentRestResponse($ret, $this);
     }
@@ -691,7 +691,7 @@ class RestDisseminationList extends RestResourceList {
    		$ret = array();
 		$this->_model->refresh();
 		for ($i=0; $i < count($this->_model->items); $i++) {
-			$ret[] = '<dissemination:dissemination xmlns:dissemination="http://appdb.egi.eu/api/'.$this->getParam('version').'/dissemination" id="'.$this->_model->items[$i]->id.'" >'.htmlentities($this->_model->items[$i]->subject).'</dissemination:dissemination>';
+			$ret[] = '<dissemination:dissemination xmlns:dissemination="' . RestAPIHelper::XMLNS_DISSEMINATION() . '" id="'.$this->_model->items[$i]->id.'" >'.htmlentities($this->_model->items[$i]->subject).'</dissemination:dissemination>';
 		}
 		return new XMLFragmentRestResponse($ret, $this);
     }

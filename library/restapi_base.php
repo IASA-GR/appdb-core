@@ -1932,7 +1932,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
         $this->_method = RestMethodEnum::RM_OPTIONS;
         $options = array();
         foreach($this->_options() as $option) {
-            $options[] = '<appdb:option xmlns:appdb="http://appdb.egi.eu/api/'.$this->getParam('version').'/appdb">'.RestMethodEnum::toString($option).'</appdb:option>';
+            $options[] = '<appdb:option xmlns:appdb="' . RestAPIHelper::XMLNS_APPDB() . '">'.RestMethodEnum::toString($option).'</appdb:option>';
         }
         return new XMLFragmentRestResponse($options, $this);
     }
