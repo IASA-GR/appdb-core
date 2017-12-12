@@ -312,6 +312,7 @@ class ApiController extends Zend_Controller_Action
 			return;
 		}	
 		$s_method = strtolower(RestMethodEnum::toString($method));
+		$res->startLogging(APPLICATION_PATH .'/appdbapilog.xml');
 		$_res = $res->$s_method();
 		if ( $_res !== false ) {
 			if ( $_res->isFragment() ) {
