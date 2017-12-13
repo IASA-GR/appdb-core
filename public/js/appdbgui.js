@@ -2012,6 +2012,18 @@
         }).call();
 	}
 
+	function appHistoryBack(appid, histid, histtype) {
+		if ( typeof histid !== 'undefined' ) {
+			appdb.views.Main.showApplication({id: appid, histid: histid, histtype: histtype});
+		}
+	}
+
+	function appHistoryFwd(appid, histid, histtype) {
+		if ( typeof histid !== 'undefined' ) {
+			appdb.views.Main.showApplication({id: appid, histid: histid, histtype: histtype});
+		}
+	}
+
 	function appHistoryRollback(appid, histid, histtype) {
 		var dlg = $('<div title="Rollback s/w state"><p><table><tr><td><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span></td><td>This action will revert the software\'s current state, affecting only data in the <i>information</i> and <i>publication</i> panes. Other metadata such as releases, comments, etc. will not be affected.<br/><br/>Are you sure you want to proceed?</td></tr></table></p></div>').dialog({
 			dialogClass: 'alert',
@@ -2185,8 +2197,21 @@
 		var recordFound = true;
 		if ( typeof histid !== 'undefined' ) {
 			$("div.app-subtitle").hide();
+			console.log(d);
 			if ( histtype == 0 ) {
-				$(e).find("span.app-hist-timestamp").html('state before '+d.history.event+' on '+appdb.utils.formatDate(d.history.timestamp));
+				var spanPrev;
+				var spanNext;
+				if ( typeof d.history.previd !== 'undefined') {
+					spanPrev = '<span title="previous entry" onclick="appHistoryBack(' + id + ', \'' + d.history.previd + '\', ' + histtype +')" style="margin-left: 10px; margin-right: 5px; font-size: 14pt; cursor: pointer">❰</span>';
+				} else {
+					spanPrev = '<span title="previous entry" style="color: grey; margin-left: 10px; margin-right: 5px; font-size: 14pt; cursor: default">❰</span>';
+				}
+				if ( typeof d.history.nextid !== 'undefined') {
+					spanNext = '<span title="next entry" onclick="appHistoryFwd(' + id + ', \'' + d.history.nextid + '\', ' + histtype +')" style="margin-left: 5px; margin-right: 10px; font-size: 14pt; cursor: pointer">❱</span>';
+				} else {
+					spanNext = '<span title="next entry" style="color: grey; margin-left: 5px; margin-right: 10px; font-size: 14pt; cursor: default">❱</span>';
+				}
+				$(e).find("span.app-hist-timestamp").html(spanPrev + spanNext + 'state before '+d.history.event+' on '+appdb.utils.formatDate(d.history.timestamp));
 				otherstate = d.history.newvalue;
 				if ( d.history.oldvalue ) d = d.history.oldvalue;
 			} else {
