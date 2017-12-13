@@ -1964,7 +1964,35 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
     /**
      * realization of logAction() from iRestAPILogger.
      */
-    public function logAction($event, $target, $id, $old, $new, $disposition = null) {
+	public function logAction($event, $target, $id, $old, $new, $disposition = null) {
+		$this->logActionDB($event, $target, $id, $old, $new, $disposition);
+		if ($this->_logfile != '') {
+			$this->logActionFile($event, $target, $id, $old, $new, $disposition);
+		}
+	}
+
+	public function logActionDB($event, $target, $id, $old, $new, $disposition = null) {
+		if ( strval($old) != strval($new) ) {
+			$now = new DateTime();
+			$userid = $this->_userid != "" ? $this->_userid : null;
+			$username = $this->_userid != "" ? $this->getUser()->name : null;
+			$usercontact = $this->_userid != "" ? (is_null($this->getUser()->primaryContact) ? null : $this->getUser()->primaryContact) : null;
+			db()->query("INSERT INTO apilog.actions (target, targetid, event, userid, username, usercontact, disposition, apiver, oldval, newval) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", array(
+				$target,
+				$id,
+				$event,
+				$userid,
+				$username,
+				$usercontact,
+				$disposition,
+				RestAPIHelper::getVersion(),
+				($old == '' ? null : $old),
+				($new == '' ? null : $new)
+			))->fetchAll();
+		}
+	}
+
+    public function logActionFile($event, $target, $id, $old, $new, $disposition = null) {
         if ( $this->_logfile != '' ) {
 			if ( strval($old) != strval($new) ) {
                 $now = new DateTime();

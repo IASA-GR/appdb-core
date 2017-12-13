@@ -2263,10 +2263,74 @@ class RestAppHistoryList extends RestROResourceList {
         return $this->get();
     }
 
-     /**
+	/**
      * @overrides get() from RestResource
      */
-    public function get() {
+	public function get() {
+		return $this->getFromDB();
+	}
+
+
+    public function getFromDB() {
+		if ( parent::get() !== false ) {
+			try {
+				$oldvalue = '';
+				$newvalue = '';
+				$list = array();
+				if ( is_numeric($this->getParam('id')) ) {
+					$id = $this->getParam('id');
+				} elseif ( substr($this->getParam('id'),0,2) === "s:" ) {
+					db()->setFetchMode(Zend_Db::FETCH_BOTH);
+					$id = db()->query("(SELECT id FROM applications WHERE cname ILIKE '" . pg_escape_string(substr($this->getParam('id'), 2)) . "
+	' FETCH FIRST 1 ROWS ONLY)")->fetchAll();
+					try {
+						$id = $id[0][0];
+						$this->_pars["id"] = $id;
+					} catch (Exception $e) {
+						debug_log('could not find ID for application with cname `' . pg_escape_string(substr($this->getParam('id'), 2)) . "'");
+					}
+				}					
+				db()->setFetchMode(Zend_Db::FETCH_OBJ);
+				$rs = db()->query("SELECT (applications.history).* FROM applications WHERE applications.id = $id")->fetchAll();
+				foreach ($rs as $r) {
+					$event = $r->event;
+					$userid = $r->userid;
+					$username = $r->username;
+					$usercontact = $r->usercontact;
+					$apiver = $r->apiver;
+					$timestamp = $r->tstamp;
+					$disposition = "";
+					if ( $timestamp != '' ) {
+						$timestamp = str_replace(' ','T', $timestamp);
+	//					$timestamp = substr($timestamp,0,4)."-".substr($timestamp,6,2)."-".substr($timestamp,4,2).substr($timestamp,8);
+					}
+					if ( $userid !== '' ) {
+						$ppl = new Default_Model_Researchers();
+						// retreive the user's CName even if the record has been marked as deleted
+						$ppl->viewModerated = true; 
+						$ppl->filter->id->numequals($userid);
+						if (count($ppl->items) > 0) {
+							$userCname = $ppl->items[0]->cname;
+						} else {
+							$userCname = '';
+						}
+					}
+	//				$oldvalue = str_replace('\012','',str_replace('\011','',$r->oldval));
+	//				$newvalue = str_replace('\012','',str_replace('\011','',$r->newval));
+					$oldvalue = '<history:oldvalue xmlns:history="' . RestAPIHelper::XMLNS_HISTORY() . '">' . $r->oldval . '</history:oldvalue>';
+					$newvalue = '<history:newvalue xmlns:history="' . RestAPIHelper::XMLNS_HISTORY() . '">' . $r->newval . '</history:newvalue>';
+					$list[] = '<history:history xmlns:history="' . RestAPIHelper::XMLNS_HISTORY() . '"'.' id="'. $r->id .'" event="'.$event. '"' . ($disposition != '' ? ' disposition="' . $disposition . '"' : '') . ' userid="'.$userid.'" usercname="'.$userCname.'" username="'.$username.'" usercontact="'.$usercontact.'" apiver="'.$apiver.'" timestamp="'.$timestamp.'">'.$oldvalue.$newvalue.'</history:history>';
+				}
+				$this->_total = count($list);
+				return new XMLFragmentRestResponse($list, $this);
+			} catch (Exception $e) {
+				$this->setError(RestErrorEnum::RE_BACKEND_ERROR, $e->getMessage());
+				return false;
+			}
+		}
+	}
+
+    public function getFromFile() {
         if ( parent::get() !== false ) {
             if ( $this->_logfile != '' ) {
                 try {
@@ -2283,7 +2347,7 @@ class RestAppHistoryList extends RestROResourceList {
                             $id = $id[0][0];
                             $this->_pars["id"] = $id;
                         } catch (Exception $e) {
-                            debug_log('could not find if for application with cname `' . pg_escape_string(substr($this->getParam('id'), 2)) . "'");
+                            debug_log('could not find ID for application with cname `' . pg_escape_string(substr($this->getParam('id'), 2)) . "'");
                         }
                     }					
 					$log = '';
@@ -2368,7 +2432,7 @@ class RestAppHistoryList extends RestROResourceList {
 				return new XMLFragmentRestResponse($list, $this);
             } else return new XMLFragmentRestResponse("", $this);
         } else return false;
-    }
+	}
 }
 
 /**
