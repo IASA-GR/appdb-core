@@ -836,7 +836,7 @@ class RestAppXMLParser extends RestXMLParser {
                     //remove non-existent
                     $taglist = new RestAppTagList(array('id' => $app->id));
 					$tagsxml = strval($taglist->get());
-					$tagsxml = '<appdb:appdb xmlns:appdb="' . RestAPIHelper::XMLSNS_APPDB() . '" xmlns:application="' . RestAPIHelper::XMLNS_APPLICATION() . '">'.$tagsxml.'</appdb:appdb>';
+					$tagsxml = '<appdb:appdb xmlns:appdb="' . RestAPIHelper::XMLNS_APPDB() . '" xmlns:application="' . RestAPIHelper::XMLNS_APPLICATION() . '">'.$tagsxml.'</appdb:appdb>';
                     $xml2 = new SimpleXMLElement($tagsxml);
                     foreach($xml2->xpath('//application:tag[not(@system="true")]') as $tag) {
                         if (! in_array(strval($tag), $newtags) ) {
