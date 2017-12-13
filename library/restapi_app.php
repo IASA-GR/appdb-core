@@ -2291,7 +2291,7 @@ class RestAppHistoryList extends RestROResourceList {
 					}
 				}					
 				db()->setFetchMode(Zend_Db::FETCH_OBJ);
-				$rs = db()->query("SELECT (applications.history).* FROM applications WHERE applications.id = $id")->fetchAll();
+				$rs = db()->query("SELECT (applications.history).*, (applications.history).nextid, (applications.history).previd FROM applications WHERE applications.id = $id ORDER BY (applications.history).tstamp DESC")->fetchAll();
 				foreach ($rs as $r) {
 					$event = $r->event;
 					$userid = $r->userid;
@@ -2319,7 +2319,7 @@ class RestAppHistoryList extends RestROResourceList {
 	//				$newvalue = str_replace('\012','',str_replace('\011','',$r->newval));
 					$oldvalue = '<history:oldvalue xmlns:history="' . RestAPIHelper::XMLNS_HISTORY() . '">' . $r->oldval . '</history:oldvalue>';
 					$newvalue = '<history:newvalue xmlns:history="' . RestAPIHelper::XMLNS_HISTORY() . '">' . $r->newval . '</history:newvalue>';
-					$list[] = '<history:history xmlns:history="' . RestAPIHelper::XMLNS_HISTORY() . '"'.' id="'. $r->id .'" event="'.$event. '"' . ($disposition != '' ? ' disposition="' . $disposition . '"' : '') . ' userid="'.$userid.'" usercname="'.$userCname.'" username="'.$username.'" usercontact="'.$usercontact.'" apiver="'.$apiver.'" timestamp="'.$timestamp.'">'.$oldvalue.$newvalue.'</history:history>';
+					$list[] = '<history:history xmlns:history="' . RestAPIHelper::XMLNS_HISTORY() . '"'.' id="'. $r->id .'" ' . ($r->previd != '' ? 'previd="' . $r->previd .'" ' : '') . ($r->nextid != '' ? 'nextid="' . $r->nextid .'" ' : '') . 'event="'.$event. '"' . ($disposition != '' ? ' disposition="' . $disposition . '"' : '') . ' userid="'.$userid.'" usercname="'.$userCname.'" username="'.$username.'" usercontact="'.$usercontact.'" apiver="'.$apiver.'" timestamp="'.$timestamp.'">'.$oldvalue.$newvalue.'</history:history>';
 				}
 				$this->_total = count($list);
 				return new XMLFragmentRestResponse($list, $this);
