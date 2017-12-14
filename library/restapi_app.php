@@ -2299,7 +2299,7 @@ class RestAppHistoryList extends RestROResourceList {
 					$usercontact = $r->usercontact;
 					$apiver = $r->apiver;
 					$timestamp = $r->tstamp;
-					$disposition = "";
+					$disposition = $r->disposition;
 					if ( $timestamp != '' ) {
 						$timestamp = str_replace(' ','T', $timestamp);
 	//					$timestamp = substr($timestamp,0,4)."-".substr($timestamp,6,2)."-".substr($timestamp,4,2).substr($timestamp,8);
