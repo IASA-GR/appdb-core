@@ -2281,8 +2281,7 @@ class RestAppHistoryList extends RestROResourceList {
 					$id = $this->getParam('id');
 				} elseif ( substr($this->getParam('id'),0,2) === "s:" ) {
 					db()->setFetchMode(Zend_Db::FETCH_BOTH);
-					$id = db()->query("(SELECT id FROM applications WHERE cname ILIKE '" . pg_escape_string(substr($this->getParam('id'), 2)) . "
-	' FETCH FIRST 1 ROWS ONLY)")->fetchAll();
+					$id = db()->query("SELECT id FROM applications WHERE cname ILIKE '" . pg_escape_string(substr($this->getParam('id'), 2)) . "' FETCH FIRST 1 ROWS ONLY")->fetchAll();
 					try {
 						$id = $id[0][0];
 						$this->_pars["id"] = $id;
