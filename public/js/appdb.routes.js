@@ -1002,6 +1002,56 @@ appdb.routing.resources.Software = new appdb.routing.Resource({
 		}
 		return false;
 	},
+	history: function(d, force){
+		var sname = (d.parameters && typeof d.parameters.name === "string")?d.parameters.name:"", ext = {isCanonical: true};
+		var m = appdb.routing.currentMatch, isLoaded = m.route && m.route.resource && (m.route.resource == this) && m.parameters.name.toLowerCase() === appdb.pages.Application.currentCName().toLowerCase();
+		var histid = (d.parameters && typeof d.parameters.histid === "string") ? d.parameters.histid: "";
+		cname = sname;
+		if( !isLoaded ) appdb.pages.reset();
+		if( $.trim(cname) !== "" ){
+			appdb.pages.Application.currentRouteData(d);
+			if( !force && appdb.pages.Application.currentId() && appdb.pages.Application.currentCName().toLowerCase() === cname.toLowerCase() ){
+				d.parameters.section = d.parameters.section || "information";
+				appdb.pages.Application.selectSection( d.parameters.section );
+				if( !d.parameters.series ){
+					appdb.Navigator.setTitle("Software " + cname + " " + d.parameters.section);
+				}
+			} else {
+				var content = (d && d.parameters && $.trim(d.parameters.content) )?$.trim(d.parameters.content).toLowerCase():"software";
+				var o = {id: encodeURIComponent("s:" + cname), name: cname, histid: histid, histtype: 0, entityType: 'software'};
+				var e = {isCanonical: true, content: content };
+				var conf = appdb.utils.entity.getConfig(content, o, e);
+				appdb.views.Main.showApplication(o,e);
+				appdb.Navigator.setTitle(conf.name() + " " + cname);
+			}
+		}
+		return false;
+	}, 
+	vahistory: function(d, force){
+		var sname = (d.parameters && typeof d.parameters.name === "string")?d.parameters.name:"", ext = {isCanonical: true};
+		var m = appdb.routing.currentMatch, isLoaded = m.route && m.route.resource && (m.route.resource == this) && m.parameters.name.toLowerCase() === appdb.pages.Application.currentCName().toLowerCase();
+		var histid = (d.parameters && typeof d.parameters.histid === "string") ? d.parameters.histid: "";
+		cname = sname;
+		if( !isLoaded ) appdb.pages.reset();
+		if( $.trim(cname) !== "" ){
+			appdb.pages.Application.currentRouteData(d);
+			if( !force && appdb.pages.Application.currentId() && appdb.pages.Application.currentCName().toLowerCase() === cname.toLowerCase() ){
+				d.parameters.section = d.parameters.section || "information";
+				appdb.pages.Application.selectSection( d.parameters.section );
+				if( !d.parameters.series ){
+					appdb.Navigator.setTitle("Software " + cname + " " + d.parameters.section);
+				}
+			} else {
+				var content = (d && d.parameters && $.trim(d.parameters.content) )?$.trim(d.parameters.content).toLowerCase():"vappliance";
+				var o = {id: encodeURIComponent("s:" + cname), name: cname, histid: histid, histtype: 0, entityType: 'vappliance'};
+				var e = {isCanonical: true, content: content };
+				var conf = appdb.utils.entity.getConfig(content, o, e);
+				appdb.views.Main.showApplication(o,e);
+				appdb.Navigator.setTitle(conf.name() + " " + cname);
+			}
+		}
+		return false;
+	}, 
 	vadetails: function(d, force){
 		d.parameters = d.parameters || {};
 		d.parameters.section = $.trim(d.parameters.section);
@@ -1526,6 +1576,14 @@ appdb.routing.addRoutes([{
 	parameters: {
 		section: "vaversion"
 	}
+},{
+	path: "store/software/:name/history/:histid",
+	resource: "Software",
+	action: "history"
+},{
+	path: "store/vappliance/:name/history/:histid",
+	resource: "Software",
+	action: "history"
 },{
 	path: "store/software/:name/<section:information|publications|releases|comments|permissions>/:series/:release/<releasesection:details|files|repositories>",
 	resource: "Software",

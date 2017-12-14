@@ -2191,16 +2191,19 @@
 		var otherstate = null;
 		// check wether we want to display historic state instead of current state
 		if ( typeof histid !== 'undefined' ) {
-			$("div.app-subtitle").hide();
 			var spanPrev;
 			var spanNext;
+			var ID = id;
+			if (isNaN(ID)) {
+				ID = "'" + ID + "'";
+			}
 			if ( d.history.previd ) { 
-				spanPrev = '<span title="previous entry" onclick="appHistoryWalk(' + id + ', appdb.pages.application.currentCName() + \'/history/' + d.history.previd + '\', \'' + d.history.previd + '\', ' + histtype + ')" style="margin-left: 10px; margin-right: 5px; font-size: 14pt; cursor: pointer">❰</span>';
+				spanPrev = '<span title="previous entry" onclick="appHistoryWalk(' + ID + ', appdb.pages.application.currentCName() + \'/history/' + d.history.previd + '\', \'' + d.history.previd + '\', ' + histtype + ')" style="margin-left: 10px; margin-right: 5px; font-size: 14pt; cursor: pointer">❰</span>';
 			} else {
 				spanPrev = '<span title="previous entry" style="color: lightgrey; margin-left: 10px; margin-right: 5px; font-size: 14pt; cursor: default">❰</span>';
 			}
 			if ( d.history.nextid ) { 
-				spanNext = '<span title="next entry" onclick="appHistoryWalk(' + id + ', appdb.pages.application.currentCName() + \'/history/' + d.history.nextid + '\', \'' + d.history.nextid + '\', ' + histtype +')" style="margin-left: 5px; margin-right: 10px; font-size: 14pt; cursor: pointer">❱</span>';
+				spanNext = '<span title="next entry" onclick="appHistoryWalk(' + ID + ', appdb.pages.application.currentCName() + \'/history/' + d.history.nextid + '\', \'' + d.history.nextid + '\', ' + histtype +')" style="margin-left: 5px; margin-right: 10px; font-size: 14pt; cursor: pointer">❱</span>';
 			} else {
 				spanNext = '<span title="next entry" style="color: lightgrey; margin-left: 5px; margin-right: 10px; font-size: 14pt; cursor: default">❱</span>';
 			}
