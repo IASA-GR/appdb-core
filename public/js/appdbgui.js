@@ -1985,7 +1985,7 @@
                         if ( h[i].userid ) by = ' by <a target="_blank" href="/store/person/'+h[i].username+'" onclick="appdb.views.Main.showPerson({id: '+h[i].userid+', cname:\''+h[i].usercname+'\'},{mainTitle: \''+h[i].username+'\'});">' + h[i].username + (h[i].usercontact != '' ? ' ('+h[i].usercontact+')' : '') + '</a>'; else by = h[i].username + (h[i].usercontact != '' ? ' ('+h[i].usercontact+')' : '');
 						evt = h[i].event;
 						if ( evt == "update" && h[i].disposition === "rollback" ) evt = "rollback";
-						s = s + '<li><a href="#" onclick="appdb.views.Main.showApplication({id: '+id+', histid: \''+h[i].id+'\', histtype: 0});">'+appdb.utils.formatDate(h[i].timestamp) + "</a>: "+ evt + by + 
+						s = s + '<li><a href="#" onclick="appdb.views.Main.showApplication({id: '+id+', cname: appdb.pages.application.currentCName() + \'/history/' + h[i].id + '\', histid: \''+h[i].id+'\', histtype: 0});">'+appdb.utils.formatDate(h[i].timestamp) + "</a>: "+ evt + by + 
 						'</li>';
                     }
 					s = '<div><h3><a style="font-size: 110%; margin-left: -24px;" href="#" onclick="appdb.views.Main.showApplication({id: '+id+', cname: appdb.pages.application.currentCName(), name: appdb.pages.application.currentName()});">View current state</a></h3></div>' + s;
@@ -2012,15 +2012,9 @@
         }).call();
 	}
 
-	function appHistoryBack(appid, histid, histtype) {
+	function appHistoryWalk(appid, cname, histid, histtype) {
 		if ( typeof histid !== 'undefined' ) {
-			appdb.views.Main.showApplication({id: appid, histid: histid, histtype: histtype});
-		}
-	}
-
-	function appHistoryFwd(appid, histid, histtype) {
-		if ( typeof histid !== 'undefined' ) {
-			appdb.views.Main.showApplication({id: appid, histid: histid, histtype: histtype});
+			appdb.views.Main.showApplication({id: appid, cname: cname, histid: histid, histtype: histtype});
 		}
 	}
 
@@ -2193,29 +2187,28 @@
 	}
 	function populateAppDataDetails(d,e,id, histid, histtype){
 		showAjaxLoading();
-		var otherstate = null;
 		var recordFound = true;
+		var otherstate = null;
+		// check wether we want to display historic state instead of current state
 		if ( typeof histid !== 'undefined' ) {
 			$("div.app-subtitle").hide();
-			console.log(d);
+			var spanPrev;
+			var spanNext;
+			if ( d.history.previd ) { 
+				spanPrev = '<span title="previous entry" onclick="appHistoryWalk(' + id + ', appdb.pages.application.currentCName() + \'/history/' + d.history.previd + '\', \'' + d.history.previd + '\', ' + histtype + ')" style="margin-left: 10px; margin-right: 5px; font-size: 14pt; cursor: pointer">❰</span>';
+			} else {
+				spanPrev = '<span title="previous entry" style="color: lightgrey; margin-left: 10px; margin-right: 5px; font-size: 14pt; cursor: default">❰</span>';
+			}
+			if ( d.history.nextid ) { 
+				spanNext = '<span title="next entry" onclick="appHistoryWalk(' + id + ', appdb.pages.application.currentCName() + \'/history/' + d.history.nextid + '\', \'' + d.history.nextid + '\', ' + histtype +')" style="margin-left: 5px; margin-right: 10px; font-size: 14pt; cursor: pointer">❱</span>';
+			} else {
+				spanNext = '<span title="next entry" style="color: lightgrey; margin-left: 5px; margin-right: 10px; font-size: 14pt; cursor: default">❱</span>';
+			}
+			$(e).find("span.app-hist-timestamp").html(spanPrev + spanNext + 'state before ' + (d.history.disposition === 'rollback' ? d.history.disposition : d.history.event) + ' on ' + appdb.utils.formatDate(d.history.timestamp));
 			if ( histtype == 0 ) {
-				var spanPrev;
-				var spanNext;
-				if ( d && d.history && d.history.previd ) { 
-					spanPrev = '<span title="previous entry" onclick="appHistoryBack(' + id + ', \'' + d.history.previd + '\', ' + histtype +')" style="margin-left: 10px; margin-right: 5px; font-size: 14pt; cursor: pointer">❰</span>';
-				} else {
-					spanPrev = '<span title="previous entry" style="color: lightgrey; margin-left: 10px; margin-right: 5px; font-size: 14pt; cursor: default">❰</span>';
-				}
-				if ( d && d.history && d.history.nextid ) { 
-					spanNext = '<span title="next entry" onclick="appHistoryFwd(' + id + ', \'' + d.history.nextid + '\', ' + histtype +')" style="margin-left: 5px; margin-right: 10px; font-size: 14pt; cursor: pointer">❱</span>';
-				} else {
-					spanNext = '<span title="next entry" style="color: lightgrey; margin-left: 5px; margin-right: 10px; font-size: 14pt; cursor: default">❱</span>';
-				}
-				$(e).find("span.app-hist-timestamp").html(spanPrev + spanNext + 'state before '+d.history.event+' on '+appdb.utils.formatDate(d.history.timestamp));
 				otherstate = d.history.newvalue;
 				if ( d.history.oldvalue ) d = d.history.oldvalue;
 			} else {
-				$(e).find("span.app-hist-timestamp").html('state after '+d.history.event+' on '+appdb.utils.formatDate(d.history.timestamp));
 				otherstate = d.history.oldvalue;
 				if ( d.history.newvalue ) d = d.history.newvalue;
 			}
