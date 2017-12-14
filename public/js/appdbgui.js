@@ -2842,6 +2842,9 @@
 		} else {	// register new application
 			populateAppRegistrationDetails(e);
 		}
+		if (! userID) {
+			$(".app-rollback").empty();
+		}
 	}
 
 	function hideRatingTab() {
