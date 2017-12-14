@@ -71,15 +71,6 @@ ORDER BY tstamp DESC
 LIMIT 1
 $$ LANGUAGE SQL STABLE;
 
-DROP FUNCTION IF EXISTS historynextid(applications, uuid);
-CREATE FUNCTION historynextid(applications, uuid) RETURNS UUID AS
-$$
-SELECT id FROM apilog.actions
-WHERE target = 'application' AND targetid = $1.id::TEXT AND tstamp > (SELECT tstamp FROM apilog.actions WHERE id = $2)
-ORDER BY tstamp ASC
-LIMIT 1
-$$ LANGUAGE SQL STABLE;
-
 DROP FUNCTION IF EXISTS history(applications);
 CREATE OR REPLACE FUNCTION history(applications) RETURNS SETOF apilog.t_apphistory AS
 $$
