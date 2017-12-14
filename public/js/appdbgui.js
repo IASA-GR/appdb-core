@@ -2201,15 +2201,15 @@
 			if ( histtype == 0 ) {
 				var spanPrev;
 				var spanNext;
-				if ( typeof d.history.previd !== 'undefined') {
+				if ( d && d.history && d.history.previd ) { 
 					spanPrev = '<span title="previous entry" onclick="appHistoryBack(' + id + ', \'' + d.history.previd + '\', ' + histtype +')" style="margin-left: 10px; margin-right: 5px; font-size: 14pt; cursor: pointer">❰</span>';
 				} else {
-					spanPrev = '<span title="previous entry" style="color: grey; margin-left: 10px; margin-right: 5px; font-size: 14pt; cursor: default">❰</span>';
+					spanPrev = '<span title="previous entry" style="color: lightgrey; margin-left: 10px; margin-right: 5px; font-size: 14pt; cursor: default">❰</span>';
 				}
-				if ( typeof d.history.nextid !== 'undefined') {
+				if ( d && d.history && d.history.nextid ) { 
 					spanNext = '<span title="next entry" onclick="appHistoryFwd(' + id + ', \'' + d.history.nextid + '\', ' + histtype +')" style="margin-left: 5px; margin-right: 10px; font-size: 14pt; cursor: pointer">❱</span>';
 				} else {
-					spanNext = '<span title="next entry" style="color: grey; margin-left: 5px; margin-right: 10px; font-size: 14pt; cursor: default">❱</span>';
+					spanNext = '<span title="next entry" style="color: lightgrey; margin-left: 5px; margin-right: 10px; font-size: 14pt; cursor: default">❱</span>';
 				}
 				$(e).find("span.app-hist-timestamp").html(spanPrev + spanNext + 'state before '+d.history.event+' on '+appdb.utils.formatDate(d.history.timestamp));
 				otherstate = d.history.newvalue;
