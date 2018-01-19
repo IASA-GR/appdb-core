@@ -5162,6 +5162,7 @@ appdb.pages.connectprofile = (function(){
 		});
 		model.get({flt: flt.join(" ")});
 	};
+
 	page.renderSearchedProfiles = function(filter){
 		filter = $.trim(filter);
 		filter = filter.replace(/\ {2,}/g," "); //reduce whitespace to single whitespace
