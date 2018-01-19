@@ -5211,6 +5211,7 @@ appdb.pages.connectprofile = (function(){
 		},caller: page } );
 		pager.current();
 	};
+
 	page.initActions = function(){
 		$(".connectprofile > .header > .actions > .action").unbind("click").bind("click", (function(p){
 			return function(ev){
