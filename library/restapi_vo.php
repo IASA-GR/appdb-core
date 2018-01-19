@@ -40,7 +40,7 @@ class RestVoReport extends RestROAuthResourceList {
  }
 
     /**
-     * @overrides get from RestResource
+     * overrides RestResource::get
      */
 	public function get() {
 		if (parent::get() !== false) {
@@ -76,7 +76,7 @@ class RestVOList extends RestROResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "vo";
@@ -92,7 +92,7 @@ class RestVOList extends RestROResourceList {
     }
 
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		$res = new Default_Model_VOs();
@@ -112,14 +112,14 @@ class RestVOItem extends RestROResourceItem {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "vo";
     }
     
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		$res = new Default_Model_VOs();
@@ -197,7 +197,7 @@ class RestVOFilterNormalization extends RestROResourceItem {
     }
     
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if (  parent::get() !== false ) {
@@ -220,7 +220,7 @@ class RestVOFilterReflection extends RestROResourceItem {
     }
     
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if ( parent::get() !== false ) {
@@ -351,7 +351,7 @@ class RestVOLogistics extends RestROResourceItem {
 	}
 
    /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get($extraFilter = null) {
 		if ( parent::get() !== false ) {

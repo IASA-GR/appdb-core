@@ -24,7 +24,7 @@ class RestSiteList extends RestROResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "site";
@@ -35,7 +35,7 @@ class RestSiteList extends RestROResourceList {
     }
 
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		$res = new Default_Model_Sites();
@@ -57,14 +57,14 @@ class RestSiteItem extends RestROResourceItem {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "site";
 	}
 
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if ( parent::get() !== false ) {
@@ -98,7 +98,7 @@ class RestSiteFilterReflection extends RestROResourceItem {
     }
     
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if ( parent::get() !== false ) {
@@ -123,7 +123,7 @@ class RestSiteFilterNormalization extends RestROResourceItem {
     }
     
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if (  parent::get() !== false ) {
@@ -147,7 +147,7 @@ class RestSiteLogistics extends RestROResourceItem {
 	}
 
    /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get($extraFilter = null) {
 		if ( parent::get() !== false ) {

@@ -40,7 +40,7 @@ class RestAppReport extends RestROAuthResourceList {
  }
 
     /**
-     * @overrides get from RestResource
+     * overrides RestResource::get
      */
 	public function get() {
 		if (parent::get() !== false) {
@@ -84,9 +84,9 @@ class RestAppXMLParser extends RestXMLParser {
      * eliminate duplicate entries for properties with 0..* cardinality, so 
      * that they may not be inserted twice in the database
      *
-     * @data string[] array of application property data
+     * @param string $data[] array of application property data
      *
-     * @access protected
+     *
      */
     protected function noDupes($data) {
         $r = array();
@@ -116,11 +116,11 @@ class RestAppXMLParser extends RestXMLParser {
      * synchronize extra contact information about application contacts in the 
      * backend
      *
-     * @appid integer the application id
-     * @data string[] array of JSON data describing the extra contact 
+     * @param integer $appid the application id
+     * @param string $data[] array of JSON data describing the extra contact 
      * information
      *
-     * @access private
+     *
      */
 	private function syncAppContactItems($appid, $data) {
 		$collection = new Default_Model_AppContactItems();
@@ -232,20 +232,20 @@ class RestAppXMLParser extends RestXMLParser {
 //     * synchronize data collections such as middlwares, disciplines, etc., about an 
 //     * application in the backend
 //     *
-//     * @masterName string the name of the attribute that represents the 
+//     * @param string $masterName the name of the attribute that represents the 
 //     * application id
-//     * @masterID integer the application id
-//     * @slaveName string the name of the attribute that represents the 
+//     * @param integer $masterID the application id
+//     * @param string $slaveName the name of the attribute that represents the 
 //     * collection item (slave) id
-//     * @collectionName string the classname of the class that represents the 
+//     * @param string $collectionName the classname of the class that represents the 
 //     * collection of items related to the application
-//     * @collectionItemName string the classname of the class that represents idividual 
+//     * @param string $collectionItemName the classname of the class that represents idividual 
 //     * items in such a collection
-//     * @data string[] array of actual collection data
-//     * @dataSlaveName string the array key used to retrieve relevant data from 
+//     * @param string $data[] array of actual collection data
+//     * @param string $dataSlaveName the array key used to retrieve relevant data from 
 //     * the array above. If empty, it is considered to be equal to @slaveName
 //     *
-//     * @access private
+//     *
 //     */
 //    private function syncDBCollection($masterName, $masterID, $slaveName, $collectionName, $collectionItemName, &$data, $dataSlaveName = "") {
 //        if ( is_null($data) ) return;
@@ -388,13 +388,13 @@ class RestAppXMLParser extends RestXMLParser {
 //     * otherwise, return an array of new element so that they may be synced 
 //     * with the existing ones (i.e. add/remove accordingly)
 //     *
-//     * @xml SimpleXMLElement the resource's XML representation root element
-//     * @path string XPath to the elements that belong to the collection in 
+//     * @param SimpleXMLElement $xml the resource's XML representation root element
+//     * @param string $path XPath to the elements that belong to the collection in 
 //     * question
-//     * @key string the key that will be used to put data in the array
+//     * @param string $key the key that will be used to put data in the array
 //     *
 //     * @return string[]
-//     * @access private
+//     *
 //     */
 //    private function buildCollection($xml, $path, $key) {
 //        $xmli = @$xml->xpath($path);
@@ -444,14 +444,14 @@ class RestAppXMLParser extends RestXMLParser {
      * helper function to get a publications property from XML. Useful due to 
      * PHP's syntax limitations
      *
-     * @xml SimpleXMLElement the XML root element of the publication 
+     * @param SimpleXMLElement $xml the XML root element of the publication 
      * representation
-     * @prop string the element name of the property in question
-     * @arr string[] reference to the array that will be populated with the 
+     * @param string $prop the element name of the property in question
+     * @param string $arr[] reference to the array that will be populated with the 
      * property
      *
      * @return string[]
-     * @access private
+     *
      */
 	private function pubprop($xml,$prop,&$arr) {
 		$tmp = $this->el($xml, "publication:".$prop);
@@ -461,13 +461,13 @@ class RestAppXMLParser extends RestXMLParser {
     /**
      * populate a Default_Model_AppDocument with data from array
      *
-     * @existing Default_Model_AppDocument reference to the model where the 
+     * @param Default_Model_AppDocument $existing reference to the model where the 
      * array data shall be put
-     * @docdatum string[] reference to the array that holds the publication 
+     * @param string $docdatum[] reference to the array that holds the publication 
      * data
      *
      * @return Default_Model_AppDocument
-     * @access private
+     *
      */
     private function &populateAppDoc(&$existing,&$docdatum) {
 		if ( array_key_exists("url", $docdatum) ) $existing->url = $docdatum['url'];
@@ -534,10 +534,10 @@ class RestAppXMLParser extends RestXMLParser {
      * metadata and publication have dedicated functions, yet the XML -> array 
      * -> Model logic still stands
      *
-     * @xml SimpleXMLElement the root element of the application XML representation
+     * @param SimpleXMLElement $xml the root element of the application XML representation
      * 
      * @return Default_Model_Application
-     * @access public
+     *
      */
     public function parse($xml) {
 		global $application;
@@ -1139,7 +1139,7 @@ class RestAppList extends RestResourceList {
 
     /**
      * internal reference to XML parser, set during initialization
-     * @access private
+     *
      */
 	private $_parser;
 
@@ -1147,21 +1147,21 @@ class RestAppList extends RestResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "application";
     }
 
     /**
-     * @overrides init() from RestResourceList
+     * overrides RestResourceList::init()
      */
 	protected function init() {
 		$this->_parser = new RestAppXMLParser($this);
 	}
 
     /**
-     * @overrides getModel from RestResource
+     * overrides RestResource::getModel
      */
     protected function getModel() {
 		// must call iserIsAdmin before instanciating a Default_Model_Applications, so that
@@ -1179,10 +1179,10 @@ class RestAppList extends RestResourceList {
     /**
      * handles PUT and POST HTTP methods to REST requests
      *
-     * @method integer the method enumeration according to RestMethodEnum
+     * @param integer $method the method enumeration according to RestMethodEnum
      *
      * @return iRestResponse
-     * @access private
+     *
      */
     private function putpost($method, $disposition = null) {
         $oldret = null;
@@ -1228,7 +1228,7 @@ class RestAppList extends RestResourceList {
 	}
 
     /**
-     * @overrides put() from RestResource
+     * overrides RestResource::put()
      */
 	public function put() {
 		if (  parent::put() !== false ) {
@@ -1237,7 +1237,7 @@ class RestAppList extends RestResourceList {
 	}
 
     /**
-     * @overrides post() from RestResource
+     * overrides RestResource::post()
      */
 	public function post($disposition = null) {
 		if ( parent::post() !== false ) {
@@ -1322,7 +1322,7 @@ class RestAppFollowedList extends RestResourceList {
     }
 
     /**
-     * @overrides init from RestResource
+     * overrides RestResource::init
      */
 	protected function init() {
 		$this->_cacheable = false;
@@ -1330,7 +1330,7 @@ class RestAppFollowedList extends RestResourceList {
 	}
 
     /**
-     * @overrides getModel from RestResource
+     * overrides RestResource::getModel
      */
 	protected function getModel() {
 		$res = new Default_Model_Applications();
@@ -1361,7 +1361,7 @@ class RestAppFollowedList extends RestResourceList {
 	}
 
     /**
-     * @overrides put() from RestResource
+     * overrides RestResource::put()
      */
 	public function put() {
 		if ( parent::put() !== false ) {
@@ -1442,7 +1442,7 @@ class RestAppFollowedItem extends RestResourceItem {
 	}
 
     /**
-     * @overrides delete from RestResource
+     * overrides RestResource::delete
      */
 	public function delete() {
 		if ( parent::delete() !== false ) {
@@ -1505,14 +1505,14 @@ class RestAppBookmarkList extends RestResourceList {
     }
 
     /**
-     * @overrides init from RestResource
+     * overrides RestResource::init
      */
 	protected function init() {
 		$this->_parser = new RestAppXMLParser($this);
 	}
 
     /**
-     * @overrides getModel from RestResource
+     * overrides RestResource::getModel
      */
 	protected function getModel() {
 		$res = new Default_Model_Applications();
@@ -1524,7 +1524,7 @@ class RestAppBookmarkList extends RestResourceList {
 	}
 
     /**
-     * @overrides put() from RestResource
+     * overrides RestResource::put()
      */
 	public function put() {
 		if ( parent::put() !== false ) {
@@ -1598,7 +1598,7 @@ class RestAppBookmarkItem extends RestResourceItem {
 	}
 
     /**
-     * @overrides delete from RestResource
+     * overrides RestResource::delete
      */
 	public function delete() {
 		if ( parent::delete() !== false ) {
@@ -1652,7 +1652,7 @@ class RestEdtAppList extends RestROAuthResourceList {
     }
 
     /**
-     * @overrides getModel from RestResource
+     * overrides RestResource::getModel
      */
 	protected function getModel() {
 		$res = new Default_Model_Applications();
@@ -1687,7 +1687,7 @@ class RestOwnAppList extends RestROAuthResourceList {
     }
 
     /**
-     * @overrides getModel from RestResource
+     * overrides RestResource::getModel
      */
 	protected function getModel() {
 		$res = new Default_Model_Applications();
@@ -1723,7 +1723,7 @@ class RestAscAppList extends RestROAuthResourceList {
     }
 
     /**
-     * @overrides getModel from RestResource
+     * overrides RestResource::getModel
      */
 	protected function getModel() {
 		$res = new Default_Model_Applications();
@@ -1775,7 +1775,7 @@ class RestModAppList extends RestROAdminResourceList {
     }
 
     /**
-     * @overrides getModel from RestResource
+     * overrides RestResource::getModel
      */
 	protected function getModel() {
 		$res = new Default_Model_Applications();
@@ -1787,7 +1787,7 @@ class RestModAppList extends RestROAdminResourceList {
     }
 
     /**
-     * @overrides authorize from RestResourceList
+     * overrides RestResourceList::authorize
      */
     public function put() {
         if ( parent::put() !== false ) {
@@ -1830,7 +1830,7 @@ class RestModAppList extends RestROAdminResourceList {
     }
 
     /**
-     * @overrides authorize from RestROAdminResourceList
+     * overrides RestROAdminResourceList::authorize
      */
     public function authorize($method) {
         if ( $method === RestMethodEnum::RM_PUT ) {
@@ -1860,7 +1860,7 @@ class RestModAppItem extends RestROAdminResourceItem {
     }
 
     /**
-     * @overrides authorize from RestROAdminResourceItem
+     * overrides RestROAdminResourceItem::authorize
      */
     public function authorize($method) {
         if ( $method === RestMethodEnum::RM_DELETE ) {
@@ -1874,7 +1874,7 @@ class RestModAppItem extends RestROAdminResourceItem {
     }
 	
 	/**
-	 * @overrides delete from RestROAdminResourceItem
+	 * overrides RestROAdminResourceItem::delete
 	 */
 	public function delete(){
 		if( parent::delete() !== false ) {
@@ -1912,7 +1912,7 @@ class RestDelAppList extends RestROAdminResourceList {
     }
 
     /**
-     * @overrides getModel from RestResource
+     * overrides RestResource::getModel
      */
 	protected function getModel() {
 		$res = new Default_Model_Applications();
@@ -1942,7 +1942,7 @@ class RestRelAppList extends RestROResourceList {
     }
 
     /**
-     * @overrides getModel from RestResource
+     * overrides RestResource::getModel
      */
 	protected function getModel() {
 		$id = normalizeAppID($this);
@@ -1971,17 +1971,17 @@ class RestAppItem extends RestResourceItem {
 
     /**
      * reference to model representing the requested resource item
-     * @access private
+     *
      */
     private $_res;
     /**
      * reference to parent collection of the model representing the requested resource item
-     * @access private
+     *
      */
     private $_resParent;
     /**
      * reference to XML parser
-     * @access private
+     *
      */
 	private $_parser;
 	private $_logged;
@@ -1994,7 +1994,7 @@ class RestAppItem extends RestResourceItem {
     }
 
     /**
-     * @overrides init() from RestResource
+     * overrides RestResource::init()
      */
 	protected function init() {
 		$this->_logged = false;
@@ -2031,7 +2031,7 @@ class RestAppItem extends RestResourceItem {
 	}
     
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
     protected function getModel() {
 		if ( ($this->getMethod() == RestMethodEnum::RM_GET) && (! $this->_logged) ) {
@@ -2052,7 +2052,7 @@ class RestAppItem extends RestResourceItem {
     }
 
     /**
-     * @overrides delete() from RestResource
+     * overrides RestResource::delete()
      */
 	public function delete() {
 		if ( parent::delete() !== false ) {
@@ -2118,7 +2118,7 @@ class RestAppFilterNormalization extends RestROResourceItem {
     }
     
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if (  parent::get() !== false ) {
@@ -2141,7 +2141,7 @@ class RestAppFilterReflection extends RestROResourceItem {
     }
     
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if ( parent::get() !== false ) {
@@ -2166,7 +2166,7 @@ class RestAppRatingReport extends RestROResourceItem {
     }
 
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if ( parent::get() !== false ) {
@@ -2215,7 +2215,7 @@ class RestAppRatingList extends RestROResourceList {
     }
     
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
     protected function getModel() {
 		$res = new Default_Model_AppRatings();
@@ -2238,7 +2238,7 @@ class RestAppRatingItem extends RestROResourceItem{
     }
     
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
     protected function getModel() {
 		$res = new Default_Model_AppRatings();
@@ -2264,7 +2264,7 @@ class RestAppHistoryList extends RestROResourceList {
     }
 
 	/**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		return $this->getFromDB();
@@ -2447,7 +2447,7 @@ class RestAppHistoryItem extends RestROResourceItem {
     }
    
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
     public function get() {
         if ( parent::get() !== false ) {
@@ -2500,7 +2500,7 @@ class RestAppHistoryRBItem extends RestROAuthResourceItem {
     }
    
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if ( parent::get() !== false ) {
@@ -2611,7 +2611,7 @@ class RestAppTagList extends RestResourceList {
     }
 
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
     public function get() {
         if ( parent::get() !== false ) {
@@ -2728,7 +2728,7 @@ class RestAppTagItem extends RestResourceItem {
     }
    
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
     public function get() {
         if ( parent::get() !== false ) {
@@ -2931,7 +2931,7 @@ class RestAppPubList extends RestResourceList {
 	}
    
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
     protected function getModel() {
 		$res = new Default_Model_AppDocuments();
@@ -3004,7 +3004,7 @@ class RestAppPubItem extends RestResourceItem {
     }
 
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
     protected function getModel() {
 		if ( $this->_res !== null ) {
@@ -3063,7 +3063,7 @@ class RestAppLogistics extends RestROResourceItem {
     }
     
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get($extraFilter = null) {
 		if ( parent::get() !== false ) {
@@ -3155,7 +3155,7 @@ class RestAppLogistics extends RestROResourceItem {
 
 class RestOwnAppLogistics extends RestAppLogistics {
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if ( trim($this->getParam("flt")) != "" ) {
@@ -3180,7 +3180,7 @@ class RestOwnAppLogistics extends RestAppLogistics {
 
 class RestEdtAppLogistics extends RestAppLogistics {
    	/**
-     * @overrides get() from RestAppLogistics
+     * overrides RestAppLogistics::get()
      */
 	public function get() {
 		$f = new Default_Model_PermissionsFilter();
@@ -3201,7 +3201,7 @@ return parent::get($f);
 
 class RestAscAppLogistics extends RestAppLogistics {
 	/**
-     * @overrides get() from RestAppLogistics
+     * overrides RestAppLogistics::get()
      */
 	public function get() {
 		$f = new Default_Model_ResearchersFilter();
@@ -3222,7 +3222,7 @@ class RestAscAppLogistics extends RestAppLogistics {
 
 class RestAppBookmarkLogistics extends RestAppLogistics {
 	/**
-     * @overrides get() from RestAppLogistics
+     * overrides RestAppLogistics::get()
      */
 	public function get() {
 		$f = new Default_Model_AppBookmarksFilter();
@@ -3243,7 +3243,7 @@ class RestAppBookmarkLogistics extends RestAppLogistics {
 
 class RestAppFollowedLogistics extends RestAppLogistics {
 	/**
-     * @overrides get() from RestAppLogistics
+     * overrides RestAppLogistics::get()
      */
 	public function get() {
 		$ids = array();
@@ -3277,7 +3277,7 @@ class RestAppFollowedLogistics extends RestAppLogistics {
 
 class RestRelAppLogistics extends RestAppLogistics {
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if ( trim($this->getParam("flt")) != "" ) {
@@ -3502,7 +3502,7 @@ class RestAppVAXMLParser extends RestXMLParser {
          * Returns a VA Version expiration date as long as it is in less than a year.
          * Otherwise it returns the date 1 year from now
          *
-         * @param string $expireson
+         * @param string $param $expireson
          * @return string
          */
 	private function getValidVAVersionExpirationDate($expireson) {
@@ -5368,7 +5368,7 @@ class RestAppVAList extends RestResourceList {
 
     /**
      * internal reference to XML parser, set during initialization
-     * @access private
+     *
      */
 	private $_parser;
 	const VALIST_VERSION_LIMIT = 102;
@@ -5387,7 +5387,7 @@ class RestAppVAList extends RestResourceList {
 	}
 
 	/**
-     * @overrides init() from RestResourceList
+     * overrides RestResourceList::init()
      */
 	protected function init() {
 		$this->_parser = new RestAppVAXMLParser($this);
@@ -5603,13 +5603,13 @@ class RestAppVAItem extends RestResourceItem {
 
     /**
      * reference to model representing the requested resource item
-     * @access private
+     *
      */
     private $_res;
 
 	/**
      * reference to parent collection of the model representing the requested resource item
-     * @access private
+     *
      */
 	private $_resParent;
 
@@ -5716,7 +5716,7 @@ class RestAppVAItem extends RestResourceItem {
 		return $canAccess;
 	}
     /**
-     * @overrides delete() from RestResource
+     * overrides RestResource::delete()
      */
 	public function delete() {
 		// We do not want to allow removing the vappliance (and all it's versions) at once.
@@ -6335,13 +6335,13 @@ class RestAppVAVersionItem extends RestAppVAItem {
 
     /**
      * reference to model representing the requested resource item
-     * @access private
+     *
      */
     private $_res;
 
 	/**
      * reference to parent collection of the model representing the requested resource item
-     * @access private
+     *
      */
 	private $_resParent;
 
@@ -6389,7 +6389,7 @@ class RestAppVAVersionItem extends RestAppVAItem {
 	}
 
     /**
-     * @overrides delete() from RestResource
+     * overrides RestResource::delete()
      */
 	public function delete() {
 		if (! is_null($this->_res)) {
@@ -6533,13 +6533,13 @@ class RestAppVAVersionIntegrityItem extends RestResourceItem {
 
     /**
      * reference to model representing the requested resource item
-     * @access private
+     *
      */
     private $_res;
 
 	/**
      * reference to parent collection of the model representing the requested resource item
-     * @access private
+     *
      */
 	private $_resParent;
 
@@ -6590,7 +6590,7 @@ class RestAppVAVersionIntegrityItem extends RestResourceItem {
 	}
 
     /**
-     * @overrides delete() from RestResource
+     * overrides RestResource::delete()
      */
 	public function delete() {
 		if (parent::delete() !== false) {
@@ -6672,7 +6672,7 @@ class RestVAImageList extends RestROResourceList {
     }
 
     /**
-     * @overrides get from RestResource
+     * overrides RestResource::get
      */
 	public function get() {
 		if (parent::get() !== false) {
@@ -6709,7 +6709,7 @@ class RestSWAppImageList extends RestROResourceList {
     }
 
     /**
-     * @overrides get from RestResource
+     * overrides RestResource::get
      */
 	public function get() {
 		if (parent::get() !== false) {
@@ -6743,7 +6743,7 @@ class RestVAppSWAppList extends RestROResourceList{
     }
 
     /**
-     * @overrides get from RestResource
+     * overrides RestResource::get
      */
 	public function get() {
 		if (parent::get() !== false) {

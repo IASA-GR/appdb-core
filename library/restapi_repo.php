@@ -312,10 +312,10 @@ class RestProductReleasePropertyItem extends RestResourceItem{
 	 /**
      * handles PUT and POST HTTP methods to REST requests
      *
-     * @method integer the method enumeration according to RestMethodEnum
+     * @param integer $method the method enumeration according to RestMethodEnum
      *
      * @return iRestResponse
-     * @access private
+     *
      */
 	private function putpost($method) {
 		
@@ -353,7 +353,7 @@ class RestProductReleasePropertyItem extends RestResourceItem{
 	}
 
     /**
-     * @overrides put() from RestResource
+     * overrides RestResource::put()
      */
 	public function put() {
 		if (  parent::put() !== false ) {
@@ -362,7 +362,7 @@ class RestProductReleasePropertyItem extends RestResourceItem{
 	}
 
     /**
-     * @overrides post() from RestResource
+     * overrides RestResource::post()
      */
 	public function post() {
 		if ( parent::post() !== false ) {
@@ -663,10 +663,10 @@ class RestRepositoryAreaPropertyItem extends RestResourceItem{
 	 /**
      * handles PUT and POST HTTP methods to REST requests
      *
-     * @method integer the method enumeration according to RestMethodEnum
+     * @param integer $method the method enumeration according to RestMethodEnum
      *
      * @return iRestResponse
-     * @access private
+     *
      */
 	private function putpost($method) {
 		
@@ -704,7 +704,7 @@ class RestRepositoryAreaPropertyItem extends RestResourceItem{
 	}
 
     /**
-     * @overrides put() from RestResource
+     * overrides RestResource::put()
      */
 	public function put() {
 		if (  parent::put() !== false ) {
@@ -713,7 +713,7 @@ class RestRepositoryAreaPropertyItem extends RestResourceItem{
 	}
 
     /**
-     * @overrides post() from RestResource
+     * overrides RestResource::post()
      */
 	public function post() {
 		if ( parent::post() !== false ) {

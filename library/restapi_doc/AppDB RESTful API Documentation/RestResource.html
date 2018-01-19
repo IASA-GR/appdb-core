@@ -1,0 +1,2462 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos -->
+			<title>Docs For Class RestResource</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+			<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'/>
+		</head>
+		<body>
+			<div class="page-body">			
+
+
+<h2 class="class-name">Class RestResource</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+							<a href="#sec-descendents">Descendents</a>
+			|											<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+					</div>
+	<div class="info-box-body">
+                <p class="implements">
+            Implements interfaces:
+            <ul>
+                <li><a href="../AppDB RESTful API Documentation/iRestResource.html">iRestResource</a></li><li><a href="../AppDB RESTful API Documentation/iRestAuthModule.html">iRestAuthModule</a></li><li><a href="../AppDB RESTful API Documentation/iRestAPILogger.html">iRestAPILogger</a></li>            </ul>
+        </p>
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">class RestResource</p>
+<p class="description"><p>base class for all REST resource classes</p></p>
+	<ul class="tags">
+				<li><span class="field">abstract:</span> </li>
+			</ul>
+
+		<p class="notes">
+			Located in <a class="field" href="_restapi_base.php.html">/restapi_base.php</a> (line <span class="field">1341</span>)
+		</p>
+		
+				
+		<pre></pre>
+	
+			</div>
+</div>
+
+	<a name="sec-descendents"></a>
+	<div class="info-box">
+		<div class="info-box-title">Direct descendents</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+			<span class="disabled">Descendents</span>
+			|												<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+								|															<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+								</div>
+		<div class="info-box-body">
+			<table cellpadding="2" cellspacing="0" class="class-table">
+				<tr>
+					<th class="class-table-header">Class</th>
+					<th class="class-table-header">Description</th>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em"><a href="../AppDB RESTful API Documentation/RestResourceList.html">RestResourceList</a></td>
+					<td>
+											class RestResourceList
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em"><a href="../AppDB RESTful API Documentation/RestResourceItem.html">RestResourceItem</a></td>
+					<td>
+											class RestResourceItem
+										</td>
+				</tr>
+							</table>
+		</div>
+	</div>
+
+
+	<a name="sec-var-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variable Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+						<span class="disabled">Vars</span> (<a href="#sec-vars">details</a>)
+							| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+								</div>
+		<div class="info-box-body">
+			<div class="var-summary">
+																																																																																																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_cacheable" title="details" class="var-name">$_cacheable</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_cacheLife" title="details" class="var-name">$_cacheLife</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_error" title="details" class="var-name">$_error</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_extError" title="details" class="var-name">$_extError</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_logfile" title="details" class="var-name">$_logfile</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_model" title="details" class="var-name">$_model</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_pars" title="details" class="var-name">$_pars</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_requestTime" title="details" class="var-name">$_requestTime</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_userGroups" title="details" class="var-name">$_userGroups</a>
+				</div>
+																<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_userid" title="details" class="var-name">$_userid</a>
+				</div>
+											</div>
+		</div>
+	</div>
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+																		<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																																																																																																																																																				<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#ldapErrorFunc" title="details" class="method-name">ldapErrorFunc</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$ds</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$err</span>)
+									</div>
+																																																																																																																
+												<div class="method-definition">
+											<span class="method-result">RestResource</span>
+										<a href="#__construct" title="details" class="method-name">__construct</a>
+											([<span class="var-type"></span>&nbsp;<span class="var-name">$pars</span> = <span class="var-default">null</span>], <span class="var-type">string</span>&nbsp;<span class="var-name">$pars[]</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#authenticate" title="details" class="method-name">authenticate</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#cachefile" title="details" class="method-name">cachefile</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#cachekey" title="details" class="method-name">cachekey</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#canSync" title="details" class="method-name">canSync</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$target</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#delete" title="details" class="method-name">delete</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#get" title="details" class="method-name">get</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#getCacheLife" title="details" class="method-name">getCacheLife</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string</span>
+										<a href="#getData" title="details" class="method-name">getData</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#getError" title="details" class="method-name">getError</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#getExtError" title="details" class="method-name">getExtError</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">integer</span>
+										<a href="#getMethod" title="details" class="method-name">getMethod</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">iDefault_Model_ItemCollection</span>
+										<a href="#getModel" title="details" class="method-name">getModel</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#getParam" title="details" class="method-name">getParam</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$v</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">string[]</span>
+										<a href="#getParams" title="details" class="method-name">getParams</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#getRequestTime" title="details" class="method-name">getRequestTime</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#getUser" title="details" class="method-name">getUser</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#init" title="details" class="method-name">init</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#isCacheable" title="details" class="method-name">isCacheable</a>
+										()
+									</div>
+																								<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#logAction" title="details" class="method-name">logAction</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$event</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$target</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$id</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$old</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$new</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$disposition</span> = <span class="var-default">null</span>])
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#logActionDB" title="details" class="method-name">logActionDB</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$event</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$target</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$id</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$old</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$new</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$disposition</span> = <span class="var-default">null</span>])
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#logActionFile" title="details" class="method-name">logActionFile</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$event</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$target</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$id</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$old</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$new</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$disposition</span> = <span class="var-default">null</span>])
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#options" title="details" class="method-name">options</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#post" title="details" class="method-name">post</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#put" title="details" class="method-name">put</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#setError" title="details" class="method-name">setError</a>
+											(<span class="var-type"><a href="../AppDB RESTful API Documentation/RestErrorEnum.html">RestErrorEnum</a></span>&nbsp;<span class="var-name">$e</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$ext</span> = <span class="var-default">null</span>], [<span class="var-type">bool</span>&nbsp;<span class="var-name">$enc</span> = <span class="var-default">true</span>])
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#startLogging" title="details" class="method-name">startLogging</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$logfile</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#stopLogging" title="details" class="method-name">stopLogging</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#unknown" title="details" class="method-name">unknown</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#userIsAdmin" title="details" class="method-name">userIsAdmin</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#_options" title="details" class="method-name">_options</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#__get" title="details" class="method-name">__get</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$name</span>)
+									</div>
+								</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="var$_cacheable" id="$_cacheable"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_cacheable</span>
+						(line <span class="line-number">1355</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">UNIX epoch whence the GET/PUT/POST method was called</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_cacheLife" id="$_cacheLife"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_cacheLife</span>
+						(line <span class="line-number">1351</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">cache validity time, in seconds</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_error" id="$_error"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_error</span>
+						(line <span class="line-number">1369</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">REST request error state</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_extError" id="$_extError"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_extError</span>
+						(line <span class="line-number">1374</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">extended information about the error state (e.g. debug info, backend</p>
+<p class="description"><p>error description, etc)</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_logfile" id="$_logfile"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_logfile</span>
+						(line <span class="line-number">1360</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">internal reference to logfile for iRestAPILogger</p>
+<p class="description"><p>time</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_model" id="$_model"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_model</span>
+						(line <span class="line-number">1379</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">internal reference to the model used to fetch resources for GET HTTP requests,</p>
+<p class="description"><p>if any. Set by getModel()</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_pars" id="$_pars"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_pars</span>
+						(line <span class="line-number">1365</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">internal reference to request parameters array, given at construction</p>
+<p class="description"><p>time</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_requestTime" id="$_requestTime"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_requestTime</span>
+						(line <span class="line-number">1347</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">UNIX epoch whence the request was initiated</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_userGroups" id="$_userGroups"><!-- --></A>
+<div class="evenrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_userGroups</span>
+						(line <span class="line-number">1387</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">the actor groups of the authenticated user, if any</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+<a name="var$_userid" id="$_userid"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_userid</span>
+						(line <span class="line-number">1383</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">the id of the authenitcated user, if any</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+
+
+						
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+																	<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="methodldapErrorFunc" id="ldapErrorFunc"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method ldapErrorFunc</span> (line <span class="line-number">1547</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			ldapErrorFunc
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$ds</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$err</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$ds</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$err</span>			</li>
+				</ul>
+		
+			
+	</div>
+
+<a name="method__construct" id="__construct"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number">1657</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">constructor</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">RestResource</span>
+		<span class="method-name">
+			__construct
+		</span>
+					([<span class="var-type"></span>&nbsp;<span class="var-name">$pars</span> = <span class="var-default">null</span>], <span class="var-type">string</span>&nbsp;<span class="var-name">$pars[]</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$pars[]</span><span class="var-description">: parameters for the REST request (e.g. HTTP query string,  etc)</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$pars</span>			</li>
+				</ul>
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestResourceList.html#method__construct">RestResourceList::__construct()</a>
+								: constructor. _pageLength and _pageOffset attributes are initialized here from  the request parameters. Their value may change after an HTTP request, to  reflect the result.
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestResourceItem.html#method__construct">RestResourceItem::__construct()</a>
+								: constructor.
+							</li>
+				</ul>
+	</div>
+<a name="methodauthenticate" id="authenticate"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">authenticate</span> (line <span class="line-number">1554</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of authenticate() from iRestAuthModule</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			authenticate
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestAuthModule.html#methodauthenticate">iRestAuthModule::authenticate()</a></dt>
+						<dd>authenticate user according to given credentials, if any</dd>
+					</dl>
+			
+	</div>
+<a name="methodcachefile" id="cachefile"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">cachefile</span> (line <span class="line-number">1825</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">returns the name of the request's cache file. File existence is based on isCachable attribute</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			cachefile
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodcachekey" id="cachekey"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">cachekey</span> (line <span class="line-number">1815</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">returns a &quot;key&quot; which identifies a request cache file, based on the request's parameters</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			cachekey
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodcanSync" id="canSync"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">canSync</span> (line <span class="line-number">1396</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of canSync($target) from iRestAuthModule</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			canSync
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$target</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$target</span>			</li>
+				</ul>
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestAuthModule.html#methodcanSync">iRestAuthModule::canSync()</a></dt>
+						<dd>return true when the authenticated user has permission to sync a target</dd>
+					</dl>
+			
+	</div>
+<a name="methoddelete" id="delete"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">delete</span> (line <span class="line-number">1918</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of delete() from iRestResource. Checks for authorization and calls accessDenied() and returns FALSE if  it fails.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			delete
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestResource.html#methoddelete">iRestResource::delete()</a></dt>
+						<dd>function to implement a DELETE REST request</dd>
+					</dl>
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppContextScriptList.html#methoddelete">RestAppContextScriptList::delete()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppFollowedItem.html#methoddelete">RestAppFollowedItem::delete()</a>
+								: overrides RestResource::delete
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppBookmarkItem.html#methoddelete">RestAppBookmarkItem::delete()</a>
+								: overrides RestResource::delete
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppItem.html#methoddelete">RestAppItem::delete()</a>
+								: overrides RestResource::delete()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppTagItem.html#methoddelete">RestAppTagItem::delete()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppPubItem.html#methoddelete">RestAppPubItem::delete()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppVAItem.html#methoddelete">RestAppVAItem::delete()</a>
+								: overrides RestResource::delete()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppVAVersionItem.html#methoddelete">RestAppVAVersionItem::delete()</a>
+								: overrides RestResource::delete()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppContextScriptItem.html#methoddelete">RestAppContextScriptItem::delete()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppVAVersionIntegrityItem.html#methoddelete">RestAppVAVersionIntegrityItem::delete()</a>
+								: overrides RestResource::delete()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestModAppItem.html#methoddelete">RestModAppItem::delete()</a>
+								: overrides RestROAdminResourceItem::delete
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetItem.html#methoddelete">RestDatasetItem::delete()</a>
+								: overrides RestResource::delete()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetVersionItem.html#methoddelete">RestDatasetVersionItem::delete()</a>
+								: overrides RestResource::delete()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetLocationItem.html#methoddelete">RestDatasetLocationItem::delete()</a>
+								: overrides RestResource::delete()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestPplItem.html#methoddelete">RestPplItem::delete()</a>
+								: overrides RestResource::delete()
+							</li>
+				</ul>
+	</div>
+<a name="methodget" id="get"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">get</span> (line <span class="line-number">1834</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of get() from iRestResource. If authorization succeeds, then  sets the GET model. Calls accessDenied() and returns FALSE otherwise.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			get
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestResource.html#methodget">iRestResource::get()</a></dt>
+						<dd>function to implement a GET REST request</dd>
+					</dl>
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestResourceList.html#methodget">RestResourceList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppTagList.html#methodget">RestAppTagList::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppVAList.html#methodget">RestAppVAList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppContext.html#methodget">RestAppContext::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppContextScriptList.html#methodget">RestAppContextScriptList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppHistoryList.html#methodget">RestAppHistoryList::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVAImageList.html#methodget">RestVAImageList::get()</a>
+								: overrides RestResource::get
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestSWAppImageList.html#methodget">RestSWAppImageList::get()</a>
+								: overrides RestResource::get
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVAppSWAppList.html#methodget">RestVAppSWAppList::get()</a>
+								: overrides RestResource::get
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppReport.html#methodget">RestAppReport::get()</a>
+								: overrides RestResource::get
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppPrivList.html#methodget">RestAppPrivList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestPplPrivList.html#methodget">RestPplPrivList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVoReport.html#methodget">RestVoReport::get()</a>
+								: overrides RestResource::get
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestSchemaList.html#methodget">RestSchemaList::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestCategoryAppStatsList.html#methodget">RestCategoryAppStatsList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDisciplineVOStatsList.html#methodget">RestDisciplineVOStatsList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDisciplineAppStatsList.html#methodget">RestDisciplineAppStatsList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestRegionalList.html#methodget">RestRegionalList::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppDBResourceList.html#methodget">RestAppDBResourceList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestOSList.html#methodget">RestOSList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestRelationTypeList.html#methodget">RestRelationTypeList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestContextScriptFormatList.html#methodget">RestContextScriptFormatList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestStoreStatsList.html#methodget">RestStoreStatsList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestProductReleaseList.html#methodget">RestProductReleaseList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestTargetList.html#methodget">RestTargetList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestRepoConfigList.html#methodget">RestRepoConfigList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestRepositoryAreaList.html#methodget">RestRepositoryAreaList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestSciClassList.html#methodget">RestSciClassList::get()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestPplVOList.html#methodget">RestPplVOList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVOAppStatsList.html#methodget">RestVOAppStatsList::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestBroker.html#methodget">RestBroker::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestResourceItem.html#methodget">RestResourceItem::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppTagItem.html#methodget">RestAppTagItem::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppVAItem.html#methodget">RestAppVAItem::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppVAVersionItem.html#methodget">RestAppVAVersionItem::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppContextScriptItem.html#methodget">RestAppContextScriptItem::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppVAVersionIntegrityItem.html#methodget">RestAppVAVersionIntegrityItem::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppFilterNormalization.html#methodget">RestAppFilterNormalization::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppFilterReflection.html#methodget">RestAppFilterReflection::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppRatingReport.html#methodget">RestAppRatingReport::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppHistoryItem.html#methodget">RestAppHistoryItem::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppLogistics.html#methodget">RestAppLogistics::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestOwnAppLogistics.html#methodget">RestOwnAppLogistics::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestEdtAppLogistics.html#methodget">RestEdtAppLogistics::get()</a>
+								: overrides RestAppLogistics::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAscAppLogistics.html#methodget">RestAscAppLogistics::get()</a>
+								: overrides RestAppLogistics::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppBookmarkLogistics.html#methodget">RestAppBookmarkLogistics::get()</a>
+								: overrides RestAppLogistics::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppFollowedLogistics.html#methodget">RestAppFollowedLogistics::get()</a>
+								: overrides RestAppLogistics::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestRelAppLogistics.html#methodget">RestRelAppLogistics::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppHistoryRBItem.html#methodget">RestAppHistoryRBItem::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestProfile.html#methodget">RestProfile::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestSchemaItem.html#methodget">RestSchemaItem::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestCategoryItem.html#methodget">RestCategoryItem::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDisciplineItem.html#methodget">RestDisciplineItem::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDisseminationFilterNormalization.html#methodget">RestDisseminationFilterNormalization::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDisseminationFilterReflection.html#methodget">RestDisseminationFilterReflection::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAccessGroupItem.html#methodget">RestAccessGroupItem::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestPplFilterNormalization.html#methodget">RestPplFilterNormalization::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestPplFilterReflection.html#methodget">RestPplFilterReflection::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestPplLogistics.html#methodget">RestPplLogistics::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestProductReleaseItem.html#methodget">RestProductReleaseItem::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestTargetItem.html#methodget">RestTargetItem::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestRepoConfigItem.html#methodget">RestRepoConfigItem::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestRepositoryAreaItem.html#methodget">RestRepositoryAreaItem::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestSciClassItem.html#methodget">RestSciClassItem::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestSiteItem.html#methodget">RestSiteItem::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestSiteFilterReflection.html#methodget">RestSiteFilterReflection::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestSiteFilterNormalization.html#methodget">RestSiteFilterNormalization::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestSiteLogistics.html#methodget">RestSiteLogistics::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVOFilterNormalization.html#methodget">RestVOFilterNormalization::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVOFilterReflection.html#methodget">RestVOFilterReflection::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVOLogistics.html#methodget">RestVOLogistics::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDisseminationItem.html#methodget">RestDisseminationItem::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestProductReleasePropertyItem.html#methodget">RestProductReleasePropertyItem::get()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestRepositoryAreaPropertyItem.html#methodget">RestRepositoryAreaPropertyItem::get()</a>
+							</li>
+				</ul>
+	</div>
+<a name="methodgetCacheLife" id="getCacheLife"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getCacheLife</span> (line <span class="line-number">1701</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			getCacheLife
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestResource.html#methodgetCacheLife">iRestResource::getCacheLife()</a></dt>
+						<dd>function to indicate resource's caching validity time (in seconds)</dd>
+					</dl>
+			
+	</div>
+<a name="methodgetData" id="getData"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getData</span> (line <span class="line-number">1448</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">returns the representation of the data sent to the server during a REST  request (e.g. PUTed, or POSTed as 'data=')</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">string</span>
+		<span class="method-name">
+			getData
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetError" id="getError"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getError</span> (line <span class="line-number">1728</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getter function for the internal _error attribute</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			getError
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestResource.html#methodgetError">iRestResource::getError()</a></dt>
+						<dd>getter function for internal error state that might have occured during  REST request execution</dd>
+					</dl>
+			
+	</div>
+<a name="methodgetExtError" id="getExtError"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getExtError</span> (line <span class="line-number">1737</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getter function for the internal _extError attribute</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			getExtError
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetMethod" id="getMethod"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getMethod</span> (line <span class="line-number">1475</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">returns the HTTP method for the REST request this object has created for,  according the RestMethodEnum</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">integer</span>
+		<span class="method-name">
+			getMethod
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetModel" id="getModel"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getModel</span> (line <span class="line-number">1645</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">returns the model that may be used to fetch GET request resources.</p>
+<p class="description"><p>Either this or the get() function must be overriden in derived classes  for meaningful GET operations</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">iDefault_Model_ItemCollection</span>
+		<span class="method-name">
+			getModel
+		</span>
+				()
+			</div>
+	
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppList.html#methodgetModel">RestAppList::getModel()</a>
+								: overrides RestResource::getModel
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppFollowedList.html#methodgetModel">RestAppFollowedList::getModel()</a>
+								: overrides RestResource::getModel
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppBookmarkList.html#methodgetModel">RestAppBookmarkList::getModel()</a>
+								: overrides RestResource::getModel
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppPubList.html#methodgetModel">RestAppPubList::getModel()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestRelAppList.html#methodgetModel">RestRelAppList::getModel()</a>
+								: overrides RestResource::getModel
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppRatingList.html#methodgetModel">RestAppRatingList::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestEdtAppList.html#methodgetModel">RestEdtAppList::getModel()</a>
+								: overrides RestResource::getModel
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestOwnAppList.html#methodgetModel">RestOwnAppList::getModel()</a>
+								: overrides RestResource::getModel
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAscAppList.html#methodgetModel">RestAscAppList::getModel()</a>
+								: overrides RestResource::getModel
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestModAppList.html#methodgetModel">RestModAppList::getModel()</a>
+								: overrides RestResource::getModel
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDelAppList.html#methodgetModel">RestDelAppList::getModel()</a>
+								: overrides RestResource::getModel
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDelPplList.html#methodgetModel">RestDelPplList::getModel()</a>
+								: overrides RestResource::getModel
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDSExchangeFormatList.html#methodgetModel">RestDSExchangeFormatList::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDSConnectionTypeList.html#methodgetModel">RestDSConnectionTypeList::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestMWList.html#methodgetModel">RestMWList::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestStatusList.html#methodgetModel">RestStatusList::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestRoleList.html#methodgetModel">RestRoleList::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestContactTypeList.html#methodgetModel">RestContactTypeList::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestCategoryList.html#methodgetModel">RestCategoryList::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDisciplineList.html#methodgetModel">RestDisciplineList::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestTagList.html#methodgetModel">RestTagList::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestLangList.html#methodgetModel">RestLangList::getModel()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestLicenseList.html#methodgetModel">RestLicenseList::getModel()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestArchList.html#methodgetModel">RestArchList::getModel()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestHVList.html#methodgetModel">RestHVList::getModel()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVMIFmtList.html#methodgetModel">RestVMIFmtList::getModel()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVAProvidersList.html#methodgetModel">RestVAProvidersList::getModel()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAccessGroupList.html#methodgetModel">RestAccessGroupList::getModel()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestContextScriptFormatList.html#methodgetModel">RestContextScriptFormatList::getModel()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestSiteList.html#methodgetModel">RestSiteList::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVOList.html#methodgetModel">RestVOList::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVOMemberList.html#methodgetModel">RestVOMemberList::getModel()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVOContactList.html#methodgetModel">RestVOContactList::getModel()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetList.html#methodgetModel">RestDatasetList::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetVersionList.html#methodgetModel">RestDatasetVersionList::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetLocationList.html#methodgetModel">RestDatasetLocationList::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDisseminationList.html#methodgetModel">RestDisseminationList::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestPplList.html#methodgetModel">RestPplList::getModel()</a>
+								: overrides RestResource::getModel
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppItem.html#methodgetModel">RestAppItem::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppPubItem.html#methodgetModel">RestAppPubItem::getModel()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppRatingItem.html#methodgetModel">RestAppRatingItem::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetItem.html#methodgetModel">RestDatasetItem::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetVersionItem.html#methodgetModel">RestDatasetVersionItem::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetLocationItem.html#methodgetModel">RestDatasetLocationItem::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVAProviderItem.html#methodgetModel">RestVAProviderItem::getModel()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVOItem.html#methodgetModel">RestVOItem::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestPplItem.html#methodgetModel">RestPplItem::getModel()</a>
+								: overrides RestResource::getModel()
+							</li>
+				</ul>
+	</div>
+<a name="methodgetParam" id="getParam"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getParam</span> (line <span class="line-number">1792</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of getParam() from iRestResource</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			getParam
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$v</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$v</span>			</li>
+				</ul>
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestResource.html#methodgetParam">iRestResource::getParam()</a></dt>
+						<dd>getter function for internal array of named parameters, set at  construction time</dd>
+					</dl>
+			
+	</div>
+<a name="methodgetParams" id="getParams"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getParams</span> (line <span class="line-number">1805</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">returns a reference to the internal array of request parameters</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">string[]</span>
+		<span class="method-name">
+			getParams
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetRequestTime" id="getRequestTime"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getRequestTime</span> (line <span class="line-number">1682</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			getRequestTime
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestResource.html#methodgetRequestTime">iRestResource::getRequestTime()</a></dt>
+						<dd>function to return the UNIX epoch whence the request was made</dd>
+					</dl>
+			
+	</div>
+<a name="methodgetUser" id="getUser"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getUser</span> (line <span class="line-number">1427</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of getUser() from iRestAuthModule</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			getUser
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestAuthModule.html#methodgetUser">iRestAuthModule::getUser()</a></dt>
+						<dd>return a reference to the authenticated user, or NULL if none</dd>
+					</dl>
+			
+	</div>
+<a name="methodinit" id="init"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">init</span> (line <span class="line-number">1693</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			init
+		</span>
+				()
+			</div>
+	
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppList.html#methodinit">RestAppList::init()</a>
+								: overrides RestResourceList::init()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppFollowedList.html#methodinit">RestAppFollowedList::init()</a>
+								: overrides RestResource::init
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppBookmarkList.html#methodinit">RestAppBookmarkList::init()</a>
+								: overrides RestResource::init
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppTagList.html#methodinit">RestAppTagList::init()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppPubList.html#methodinit">RestAppPubList::init()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppVAList.html#methodinit">RestAppVAList::init()</a>
+								: overrides RestResourceList::init()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppContext.html#methodinit">RestAppContext::init()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppContextScriptList.html#methodinit">RestAppContextScriptList::init()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestModAppList.html#methodinit">RestModAppList::init()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVAProvidersList.html#methodinit">RestVAProvidersList::init()</a>
+								: overrides RestResource::init()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVOContactList.html#methodinit">RestVOContactList::init()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVOManagerList.html#methodinit">RestVOManagerList::init()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVODeputyList.html#methodinit">RestVODeputyList::init()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVOExpertList.html#methodinit">RestVOExpertList::init()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVOShifterList.html#methodinit">RestVOShifterList::init()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetList.html#methodinit">RestDatasetList::init()</a>
+								: overrides RestResourceList::init()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetVersionList.html#methodinit">RestDatasetVersionList::init()</a>
+								: overrides RestResourceList::init()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetLocationList.html#methodinit">RestDatasetLocationList::init()</a>
+								: overrides RestResourceList::init()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestPplList.html#methodinit">RestPplList::init()</a>
+								: overrides RestResourceList::init()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppItem.html#methodinit">RestAppItem::init()</a>
+								: overrides RestResource::init()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppTagItem.html#methodinit">RestAppTagItem::init()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppPubItem.html#methodinit">RestAppPubItem::init()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppVAItem.html#methodinit">RestAppVAItem::init()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppVAVersionItem.html#methodinit">RestAppVAVersionItem::init()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppContextScriptItem.html#methodinit">RestAppContextScriptItem::init()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppVAVersionIntegrityItem.html#methodinit">RestAppVAVersionIntegrityItem::init()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestVAProviderItem.html#methodinit">RestVAProviderItem::init()</a>
+								: overrides RestResource::init()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestPplItem.html#methodinit">RestPplItem::init()</a>
+								: overrides RestResource::init()
+							</li>
+				</ul>
+	</div>
+<a name="methodisCacheable" id="isCacheable"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">isCacheable</span> (line <span class="line-number">1697</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			isCacheable
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestResource.html#methodisCacheable">iRestResource::isCacheable()</a></dt>
+						<dd>function to indicate resource's caching intention (do not cache response if false)</dd>
+					</dl>
+			
+	</div>
+<a name="methodlogAction" id="logAction"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">logAction</span> (line <span class="line-number">1967</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of logAction() from iRestAPILogger.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			logAction
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$event</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$target</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$id</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$old</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$new</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$disposition</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$event</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$target</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$id</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$old</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$new</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$disposition</span>			</li>
+				</ul>
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestAPILogger.html#methodlogAction">iRestAPILogger::logAction()</a></dt>
+						<dd>Function to be called when an action that modifies data occurs, if  logging has been requested. If @old and @new are the same, then no  logging occurs.</dd>
+					</dl>
+			
+	</div>
+<a name="methodlogActionDB" id="logActionDB"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">logActionDB</span> (line <span class="line-number">1974</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			logActionDB
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$event</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$target</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$id</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$old</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$new</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$disposition</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$event</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$target</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$id</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$old</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$new</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$disposition</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodlogActionFile" id="logActionFile"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">logActionFile</span> (line <span class="line-number">1995</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			logActionFile
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$event</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$target</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$id</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$old</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$new</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$disposition</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$event</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$target</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$id</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$old</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$new</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$disposition</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodoptions" id="options"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">options</span> (line <span class="line-number">1931</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of options() from iRestResource. Checks for authorization and calls accessDenied() and returns FALSE if  it fails.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			options
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestResource.html#methodoptions">iRestResource::options()</a></dt>
+						<dd>function to implement an OPTIONS REST request</dd>
+					</dl>
+			
+	</div>
+<a name="methodpost" id="post"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">post</span> (line <span class="line-number">1896</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of post() from iRestResource. Checks for authorization and calls accessDenied() and returns FALSE if  it fails.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			post
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestResource.html#methodpost">iRestResource::post()</a></dt>
+						<dd>function to implement a POST REST request</dd>
+					</dl>
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppList.html#methodpost">RestAppList::post()</a>
+								: overrides RestResource::post()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppPubList.html#methodpost">RestAppPubList::post()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppVAList.html#methodpost">RestAppVAList::post()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppContext.html#methodpost">RestAppContext::post()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppContextScriptList.html#methodpost">RestAppContextScriptList::post()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetList.html#methodpost">RestDatasetList::post()</a>
+								: overrides RestResource::post()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetVersionList.html#methodpost">RestDatasetVersionList::post()</a>
+								: overrides RestResource::post()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetLocationList.html#methodpost">RestDatasetLocationList::post()</a>
+								: overrides RestResource::post()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestBroker.html#methodpost">RestBroker::post()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestPplList.html#methodpost">RestPplList::post()</a>
+								: overrides RestResource::post()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppContextScriptItem.html#methodpost">RestAppContextScriptItem::post()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestProductReleasePropertyItem.html#methodpost">RestProductReleasePropertyItem::post()</a>
+								: overrides RestResource::post()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestRepositoryAreaPropertyItem.html#methodpost">RestRepositoryAreaPropertyItem::post()</a>
+								: overrides RestResource::post()
+							</li>
+				</ul>
+	</div>
+<a name="methodput" id="put"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">put</span> (line <span class="line-number">1907</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of put() from iRestResource. Checks for authorization and calls accessDenied() and returns FALSE if  it fails.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			put
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestResource.html#methodput">iRestResource::put()</a></dt>
+						<dd>function to implement a PUT REST request</dd>
+					</dl>
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppList.html#methodput">RestAppList::put()</a>
+								: overrides RestResource::put()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppFollowedList.html#methodput">RestAppFollowedList::put()</a>
+								: overrides RestResource::put()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppBookmarkList.html#methodput">RestAppBookmarkList::put()</a>
+								: overrides RestResource::put()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppTagList.html#methodput">RestAppTagList::put()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppPubList.html#methodput">RestAppPubList::put()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppVAList.html#methodput">RestAppVAList::put()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppContextScriptList.html#methodput">RestAppContextScriptList::put()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestModAppList.html#methodput">RestModAppList::put()</a>
+								: overrides RestResourceList::authorize
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetList.html#methodput">RestDatasetList::put()</a>
+								: overrides RestResource::put()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetVersionList.html#methodput">RestDatasetVersionList::put()</a>
+								: overrides RestResource::put()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetLocationList.html#methodput">RestDatasetLocationList::put()</a>
+								: overrides RestResource::put()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestBroker.html#methodput">RestBroker::put()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestPplList.html#methodput">RestPplList::put()</a>
+								: overrides RestResource::put()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestProductReleasePropertyItem.html#methodput">RestProductReleasePropertyItem::put()</a>
+								: overrides RestResource::put()
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestRepositoryAreaPropertyItem.html#methodput">RestRepositoryAreaPropertyItem::put()</a>
+								: overrides RestResource::put()
+							</li>
+				</ul>
+	</div>
+<a name="methodsetError" id="setError"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">setError</span> (line <span class="line-number">1753</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">sets the error state, along with optional extended error info, which may  be encrypted. The appropriate HTTP headers are also set, according to  the error state specified.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			setError
+		</span>
+					(<span class="var-type"><a href="../AppDB RESTful API Documentation/RestErrorEnum.html">RestErrorEnum</a></span>&nbsp;<span class="var-name">$e</span>, [<span class="var-type">string</span>&nbsp;<span class="var-name">$ext</span> = <span class="var-default">null</span>], [<span class="var-type">bool</span>&nbsp;<span class="var-name">$enc</span> = <span class="var-default">true</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../AppDB RESTful API Documentation/RestErrorEnum.html">RestErrorEnum</a></span>
+				<span class="var-name">$e</span><span class="var-description">: the error state</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$ext</span><span class="var-description">: optional extended error information</span>			</li>
+					<li>
+				<span class="var-type">bool</span>
+				<span class="var-name">$enc</span><span class="var-description">: whether the extended error information should be encrypted or  not (i.e. sensitive debug data, or not)</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodstartLogging" id="startLogging"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">startLogging</span> (line <span class="line-number">1953</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of startLogging() from iRestAPILogger.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			startLogging
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$logfile</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$logfile</span>			</li>
+				</ul>
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestAPILogger.html#methodstartLogging">iRestAPILogger::startLogging()</a></dt>
+						<dd>indicate the intention to log API calls which make changes to the  database</dd>
+					</dl>
+			
+	</div>
+<a name="methodstopLogging" id="stopLogging"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">stopLogging</span> (line <span class="line-number">1960</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of stopLogging() from iRestAPILogger.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			stopLogging
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestAPILogger.html#methodstopLogging">iRestAPILogger::stopLogging()</a></dt>
+						<dd>indicate that logging is no longer wanted</dd>
+					</dl>
+			
+	</div>
+<a name="methodunknown" id="unknown"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">unknown</span> (line <span class="line-number">1944</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of unknown() from iRestResource. Checks for authorization and calls accessDenied() and returns FALSE if  it fails.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			unknown
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestResource.html#methodunknown">iRestResource::unknown()</a></dt>
+						<dd>function to call if passed with an unknown HTTP request</dd>
+					</dl>
+			
+	</div>
+<a name="methoduserIsAdmin" id="userIsAdmin"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">userIsAdmin</span> (line <span class="line-number">1411</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of userIsAdmin() from iRestAuthModule</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			userIsAdmin
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestAuthModule.html#methoduserIsAdmin">iRestAuthModule::userIsAdmin()</a></dt>
+						<dd>check whether the authenticated user has an administrative role</dd>
+					</dl>
+			
+	</div>
+<a name="method_options" id="_options"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">_options</span> (line <span class="line-number">1925</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">abstract:</span> </li>
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_options
+		</span>
+				()
+			</div>
+	
+		
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppList.html#method_options">RestAppList::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppFollowedList.html#method_options">RestAppFollowedList::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppBookmarkList.html#method_options">RestAppBookmarkList::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppTagList.html#method_options">RestAppTagList::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppPubList.html#method_options">RestAppPubList::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppVAList.html#method_options">RestAppVAList::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppContext.html#method_options">RestAppContext::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppContextScriptList.html#method_options">RestAppContextScriptList::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestROResourceList.html#method_options">RestROResourceList::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestROAuthResourceList.html#method_options">RestROAuthResourceList::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestROAdminResourceList.html#method_options">RestROAdminResourceList::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestModAppList.html#method_options">RestModAppList::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetList.html#method_options">RestDatasetList::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetVersionList.html#method_options">RestDatasetVersionList::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDatasetLocationList.html#method_options">RestDatasetLocationList::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDisseminationList.html#method_options">RestDisseminationList::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestBroker.html#method_options">RestBroker::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestPplList.html#method_options">RestPplList::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppFollowedItem.html#method_options">RestAppFollowedItem::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppBookmarkItem.html#method_options">RestAppBookmarkItem::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppItem.html#method_options">RestAppItem::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppTagItem.html#method_options">RestAppTagItem::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppPubItem.html#method_options">RestAppPubItem::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppVAItem.html#method_options">RestAppVAItem::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppVAVersionItem.html#method_options">RestAppVAVersionItem::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppContextScriptItem.html#method_options">RestAppContextScriptItem::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestAppVAVersionIntegrityItem.html#method_options">RestAppVAVersionIntegrityItem::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestROResourceItem.html#method_options">RestROResourceItem::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestROAuthResourceItem.html#method_options">RestROAuthResourceItem::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestROAdminResourceItem.html#method_options">RestROAdminResourceItem::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestModAppItem.html#method_options">RestModAppItem::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestDisseminationItem.html#method_options">RestDisseminationItem::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestPplItem.html#method_options">RestPplItem::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestProductReleasePropertyItem.html#method_options">RestProductReleasePropertyItem::_options()</a>
+							</li>
+					<li>
+				<a href="../AppDB RESTful API Documentation/RestRepositoryAreaPropertyItem.html#method_options">RestRepositoryAreaPropertyItem::_options()</a>
+							</li>
+				</ul>
+	</div>
+<a name="method__get" id="__get"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">__get</span> (line <span class="line-number">1714</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">PHP magic property getter function</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			__get
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$name</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$name</span>			</li>
+				</ul>
+		
+			
+	</div>
+
+						
+		</div>
+	</div>
+
+
+	<p class="notes" id="credit">
+		Documentation generated on Fri, 19 Jan 2018 16:28:58 +0000 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.4</a>
+	</p>
+	</div></body>
+</html>
+

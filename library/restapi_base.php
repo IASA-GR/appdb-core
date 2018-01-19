@@ -60,13 +60,13 @@ interface iRestAPILogger {
      * in the @old and @new parameters are bzip2 compressed and stored as base64 
      * encoded node values
      *
-     * @event string one of "insert", "update", "delete"
-     * @target string the name of the resource that gets acted upon (e.g. 
+     * @param string $event one of "insert", "update", "delete"
+     * @param string $target the name of the resource that gets acted upon (e.g. 
      * "application", "person", etc., as specified by the datatype attribute of 
      * iRestResource
-     * @id integer the id of the resource that gets modified
-     * @old string the representation of the resource before the modification
-     * @new string the representation of the resource after the modification
+     * @param integer $id the id of the resource that gets modified
+     * @param string $old the representation of the resource before the modification
+     * @param string $new the representation of the resource after the modification
      *
      * @return void
      */
@@ -359,7 +359,7 @@ abstract class RestResponse implements iRestResponse {
     /*** Attributes ***/
     /**
      * holds the response data which is set at construction time
-     * @access protected
+     *
      */
     protected $data;
     protected $_parent;
@@ -367,10 +367,10 @@ abstract class RestResponse implements iRestResponse {
     /**
      * constructor
      *
-     * @data string the response body
+     * @param string $data the response body
      *
      * @return void
-     * @access public
+     *
      */
 	public function __construct($data, $parent = null) {
         $this->data = $data;
@@ -385,7 +385,7 @@ abstract class RestResponse implements iRestResponse {
      * getter function for data protected attribute
      *
      * @return string
-     * @access public
+     *
      */
     public function getData() {
 	    return $this->data;
@@ -540,7 +540,7 @@ class XMLRestResponse extends XMLRestResponseBase {
  */
 class XMLFragmentRestResponse extends XMLRestResponseBase {
     /**
-     * @overrides XMLRestResponse::isFragment()
+     * @param XMLRestResponse $overrides::isFragment()
      */
 	public function isFragment() {
 		return true;
@@ -781,10 +781,10 @@ class RestErrorEnum {
     /**
      * constructor
      *
-     * @state integer the enumeration that represents the error state
+     * @param integer $state the enumeration that represents the error state
      *
      * @return void
-     * @access public
+     *
      */
 	public function __construct($state) {
 		$this->_state = $state;
@@ -794,7 +794,7 @@ class RestErrorEnum {
      * PHP string representation magic function
      *
      * @return string
-     * @access public
+     *
      */
 	public function __toString() {
 		return RestErrorEnum::toString($this->_state);
@@ -803,10 +803,10 @@ class RestErrorEnum {
     /**
      * returns a text description of the error state
      *
-     * @e integer the enumeration that represents the error state
+     * @param integer $e the enumeration that represents the error state
      * 
      * @return string
-     * @access public
+     *
      */
 	public static function toString($e) {
 		switch($e) {
@@ -832,22 +832,22 @@ abstract class RestXMLParser {
     /*** Attributes ***/
     /**
      * internal error state during parsing
-     * @access protected
+     *
      */
     protected $_error;
     /** 
      * internal extended error state during parsing
-     * @access protected
+     *
      */
     protected $_extError;
     /** 
      * reference to the parent REST resource that instanciated us
-     * @access protected
+     *
      */
     protected $_parent;
     /** 
      * reference to parent's user attribute
-     * @access protected
+     *
      */
 	protected $_user;
 
@@ -855,11 +855,11 @@ abstract class RestXMLParser {
      * helper function which returns the 1st element of a certain name under 
      * the XML tree. handy due to PHP syntax restrictions
      *
-     * @xml SimpleXMLElement the XML document at hand
-     * @name string the name of the element that we want
+     * @param SimpleXMLElement $xml the XML document at hand
+     * @param string $name the name of the element that we want
      *
      * @return SimpleXMLElement
-     * @access protected
+     *
      */
 	protected function el($xml,$name) {
 		$i = $xml->xpath($name);
@@ -869,10 +869,10 @@ abstract class RestXMLParser {
     /**
      * constructor
      *
-     * @parent RestResource the REST resource class that instanciated us
+     * @param RestResource $parent the REST resource class that instanciated us
      *
      * @return void
-     * @access public
+     *
      */
 	public function __construct($parent) {
 		$this->_parent = $parent;
@@ -885,7 +885,7 @@ abstract class RestXMLParser {
      * getter function for _error attribute
      *
      * @return integer
-     * @access public
+     *
      */
 	public function getError() {
 		return $this->_error;
@@ -895,7 +895,7 @@ abstract class RestXMLParser {
      * getter function for _error attribute
      *
      * @return integer
-     * @access public
+     *
      */
 	public function getExtError() {
 		return $this->_extError;
@@ -904,7 +904,7 @@ abstract class RestXMLParser {
     /**
      * actual parsing function. To be implemented by each subclass
      *
-     * @xml SimpleXMLElement the XML representation of the resource
+     * @param SimpleXMLElement $xml the XML representation of the resource
      * 
      * @return iDefault_Model_Item
      * access public
@@ -915,9 +915,9 @@ abstract class RestXMLParser {
      * eliminate duplicate entries for properties with 0..* cardinality, so 
      * that they may not be inserted twice in the database
      *
-     * @data string[] array of application property data
+     * @param string $data[] array of application property data
      *
-     * @access protected
+     *
      */
 	protected function noDupes($data) {
 		return $data;
@@ -927,20 +927,20 @@ abstract class RestXMLParser {
      * synchronize data collections such as middlwares, disciplines, etc., about an 
      * entiity in the backend
      *
-     * @masterName string the name of the attribute that represents the 
+     * @param string $masterName the name of the attribute that represents the 
      * entity id
-     * @masterID integer the entity id
-     * @slaveName string the name of the attribute that represents the 
+     * @param integer $masterID the entity id
+     * @param string $slaveName the name of the attribute that represents the 
      * collection item (slave) id
-     * @collectionName string the classname of the class that represents the 
+     * @param string $collectionName the classname of the class that represents the 
      * collection of items related to the entity 
-     * @collectionItemName string the classname of the class that represents idividual 
+     * @param string $collectionItemName the classname of the class that represents idividual 
      * items in such a collection
-     * @data string[] array of actual collection data
-     * @dataSlaveName string the array key used to retrieve relevant data from 
+     * @param string $data[] array of actual collection data
+     * @param string $dataSlaveName the array key used to retrieve relevant data from 
      * the array above. If empty, it is considered to be equal to @slaveName
      *
-     * @access protected
+     *
      */
     protected function syncDBCollection($masterName, $masterID, $slaveName, $collectionName, $collectionItemName, &$data, $dataSlaveName = "") {
         if ( is_null($data) ) return;
@@ -1089,13 +1089,13 @@ abstract class RestXMLParser {
      * otherwise, return an array of new element so that they may be synced 
      * with the existing ones (i.e. add/remove accordingly)
      *
-     * @xml SimpleXMLElement the resource's XML representation root element
-     * @path string XPath to the elements that belong to the collection in 
+     * @param SimpleXMLElement $xml the resource's XML representation root element
+     * @param string $path XPath to the elements that belong to the collection in 
      * question
-     * @key string the key that will be used to put data in the array
+     * @param string $key the key that will be used to put data in the array
      *
      * @return string[]
-     * @access protected
+     *
      */
     protected function buildCollection($xml, $path, $key) {
         $xmli = @$xml->xpath($path);
@@ -1148,11 +1148,11 @@ abstract class RestXMLParser {
      * returns the root element's ID attribute, if any. Useful before calling 
      * parse(), in order to validate existence of resource in the backend
      *
-     * @xml SimpleXMLElement the XML representation of the resource
-     * @path string optional XPath for the main element
+     * @param SimpleXMLElement $xml the XML representation of the resource
+     * @param string $path optional XPath for the main element
      *
      * @return string
-     * @access public
+     *
      */
     public function getID($xml, $path = "") {
 		$this->_error = RestErrorEnum::RE_OK;
@@ -1194,7 +1194,7 @@ interface iRestAuthModule {
     /**
      * authorize a request to a REST method
      *
-     * @method integer the enumeration that represents the request method, 
+     * @param integer $method the enumeration that represents the request method, 
      * according to RestMethodEnum
      * 
      * @return bool
@@ -1257,7 +1257,7 @@ interface iRestResource {
      * getter function for internal array of named parameters, set at 
      * construction time
      *
-     * @v string the name of the requested parameter
+     * @param string $v the name of the requested parameter
      *
      * @return string
      */
@@ -1443,7 +1443,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
      * request (e.g. PUTed, or POSTed as 'data=')
      *
      * @return string
-     * @access protected
+     *
      */
 	protected function getData() {
         if ( $this->getMethod() === RestMethodEnum::RM_PUT ) {
@@ -1470,7 +1470,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
      * according the RestMethodEnum
      *
      * @return integer
-     * @access public
+     *
      */
 	public function getMethod() {
 		return $this->_method;
@@ -1479,11 +1479,11 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
     /**
      * check that the apikey is valid for the IP that made the request
      *
-     * @key string the API key
-     * @netfilter string the netfilter for which the key is valid
+     * @param string $key the API key
+     * @param string $netfilter the netfilter for which the key is valid
      *
      * @return boolean
-     * @access private
+     *
      */
     private function _validateAPIKey($key) {
         $valid = false;
@@ -1640,7 +1640,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
      * for meaningful GET operations
      *
      * @return iDefault_Model_ItemCollection
-     * @access protected
+     *
      */
 	protected function getModel() {
 		return null;
@@ -1649,10 +1649,10 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
     /**
      * constructor
      *
-     * @pars string[] parameters for the REST request (e.g. HTTP query string, 
+     * @param string $pars[] parameters for the REST request (e.g. HTTP query string, 
      * etc)
      *
-     * @access public
+     *
      */
 	public function __construct($pars = null) {
 		$this->_requestTime = microtime(true);
@@ -1688,7 +1688,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
      * this function instead of the constructor, unless there is specific 
      * reason to do otherwise
      *
-     * @access protected
+     *
      */
 	protected function init() {
 		return true;
@@ -1709,7 +1709,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
     /**
      * PHP magic property getter function
      * 
-     * @access public
+     *
      */
     public function __get($name) {
         $method = 'get' . $name;
@@ -1723,7 +1723,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
     /**
      * getter function for the internal _error attribute
      *
-     * @access public
+     *
      */
     public function getError() {
         return $this->_error;
@@ -1732,7 +1732,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
     /**
      * getter function for the internal _extError attribute
      *
-     * @access public
+     *
      */
 	public function getExtError() {
 		return $this->_extError;
@@ -1743,12 +1743,12 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
      * be encrypted. The appropriate HTTP headers are also set, according to 
      * the error state specified.
      *
-     * @e RestErrorEnum the error state
-     * @ext string optional extended error information
-     * @enc bool whether the extended error information should be encrypted or 
+     * @param RestErrorEnum $e the error state
+     * @param string $ext optional extended error information
+     * @param bool $enc whether the extended error information should be encrypted or 
      * not (i.e. sensitive debug data, or not)
      *
-     * @access public
+     *
      */
 	protected function setError($e, $ext = null, $enc = true) {
 		$this->_error = $e;
@@ -1800,7 +1800,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
      * returns a reference to the internal array of request parameters
      *
      * @return string[]
-     * @access public
+     *
      */
 	public function getParams() {
 		return $this->_pars;
@@ -1810,7 +1810,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
 	 * returns a "key" which identifies a request cache file, based on the request's parameters
 	 *
 	 * @return string
-	 * @access public
+	 *
 	 */
 	public function cachekey() {
 		return md5(var_export($this->_pars,true));
@@ -1820,7 +1820,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
 	 * returns the name of the request's cache file. File existence is based on isCachable attribute
 	 *
 	 * @return string
-	 * @access public
+	 *
 	 */	
 	public function cachefile() {		
 		$ext = ".xml";
@@ -2064,7 +2064,7 @@ abstract class RestResourceList extends RestResource {
      * the request parameters. Their value may change after an HTTP request, to 
      * reflect the result.
      *
-     * @access public
+     *
      */
     public function __construct($pars = null) {
         parent::__construct($pars);
@@ -2107,13 +2107,13 @@ abstract class RestResourceList extends RestResource {
      * conformance to CRUDL. Called by get when _listMode == RL_LISTING. 
      * _listMode is set in the constructor
      *
-     * @access protected
+     *
      * @return iRestResponse
      */
     protected abstract function _list();
 
     /**
-     * @overrides iRestResource::get()
+     * @param iRestResource $overrides::get()
      * if the parent's get() operation does not fail, we check for a 
      * valid GET model. If there is one, use it to return the data. If not, then just
      * delegate the parent's return value and let the derived class handle the GET request.
@@ -2171,7 +2171,7 @@ abstract class RestROResourceList extends RestResourceList {
     }
 
     /**
-     * @overrides RestResourceList::authorize()
+     * @param RestResourceList $overrides::authorize()
      */
     public function authorize($method) {
         $res = false;
@@ -2202,7 +2202,7 @@ abstract class RestROAuthResourceList extends RestROResourceList {
     }
 
     /**
-     * @overrides RestROResourceList::authorize()
+     * @param RestROResourceList $overrides::authorize()
      */
     public function authorize($method) {
         $res = false;
@@ -2235,7 +2235,7 @@ abstract class RestROAdminResourceList extends RestROAuthResourceList {
     }
 
     /**
-     * @overrides RestROAuthResourceList::authorize()
+     * @param RestROAuthResourceList $overrides::authorize()
      */
     public function authorize($method) {
         $res = false;
@@ -2264,18 +2264,18 @@ abstract class RestResourceItem extends RestResource {
 
     /**
      * internal reference to RestResourceList parent resource
-     * @access protected
+     *
      */
     protected $_parent;
 
     /**
      * constructor.
      *
-     * @pars string[] request parameters. If set, then parameters will be 
+     * @param string $pars[] request parameters. If set, then parameters will be 
      * merged with the parent's parameters.
-     * @parent RestResourceList optional reference to parent resource
+     * @param RestResourceList $parent optional reference to parent resource
      *
-     * @access public
+     *
      */
     public function __construct($pars = null, $parent = null) {
 		if ( ! is_null($parent) ) {
@@ -2292,7 +2292,7 @@ abstract class RestResourceItem extends RestResource {
      * getter function for the _parent attribute
      *
      * @return RestResourceList
-     * @access public
+     *
      */
     public function getParent() {
         return $this->_parent;
@@ -2321,7 +2321,7 @@ abstract class RestResourceItem extends RestResource {
     }
 
     /**
-     * @overrides RestResource::get()
+     * @param RestResource $overrides::get()
      * if the parent's get() operation does not fail, we check for a 
      * valid GET model. If there is one, use it to return the data. If not, then just
      * delegate the parent's return value and let the derived class handle the GET request.
@@ -2395,7 +2395,7 @@ abstract class RestROAuthResourceItem extends RestROResourceItem {
     }
 
     /**
-     * @overrides RestROResourceItem::authorize()
+     * @param RestROResourceItem $overrides::authorize()
      */
     public function authorize($method) {
         $res = false;
@@ -2428,7 +2428,7 @@ abstract class RestROAdminResourceItem extends RestROAuthResourceItem {
     }
 
      /**
-     * @overrides RestROResourceItem::authorize()
+     * @param RestROResourceItem $overrides::authorize()
      */
     public function authorize($method) {
         $res = false;

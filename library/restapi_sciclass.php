@@ -24,7 +24,7 @@ class RestSciClassList extends RestROResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "classification";
@@ -35,7 +35,7 @@ class RestSciClassList extends RestROResourceList {
     }
 
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	public function get() {
 		if (parent::get() !== false) {
@@ -63,7 +63,7 @@ class RestSciClassItem extends RestROResourceItem {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "classification";

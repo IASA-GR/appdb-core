@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos -->
+			<title>Docs For Class iRestAPILogger</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+			<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'/>
+		</head>
+		<body>
+			<div class="page-body">			
+
+
+<h2 class="class-name">Interface iRestAPILogger</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+															<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+					</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">interface iRestAPILogger</p>
+
+		<p class="notes">
+			Located in <a class="field" href="_restapi_base.php.html">/restapi_base.php</a> (line <span class="field">39</span>)
+		</p>
+		
+				
+		<pre></pre>
+	
+			</div>
+</div>
+
+
+
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+												<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																												
+												<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#logAction" title="details" class="method-name">logAction</a>
+											(<span class="var-type">string</span>&nbsp;<span class="var-name">$event</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$target</span>, <span class="var-type">integer</span>&nbsp;<span class="var-name">$id</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$old</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$new</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$disposition</span> = <span class="var-default">null</span>])
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#startLogging" title="details" class="method-name">startLogging</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$logfile</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#stopLogging" title="details" class="method-name">stopLogging</a>
+										()
+									</div>
+								</div>
+		</div>
+	</div>		
+
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+																<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+
+<a name="methodlogAction" id="logAction"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">logAction</span> (line <span class="line-number">73</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Function to be called when an action that modifies data occurs, if  logging has been requested. If @old and @new are the same, then no  logging occurs.</p>
+<p class="description"><p>Logs are in partial XML format (no root node), and representations given  in the @old and @new parameters are bzip2 compressed and stored as base64  encoded node values</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			logAction
+		</span>
+					(<span class="var-type">string</span>&nbsp;<span class="var-name">$event</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$target</span>, <span class="var-type">integer</span>&nbsp;<span class="var-name">$id</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$old</span>, <span class="var-type">string</span>&nbsp;<span class="var-name">$new</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$disposition</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$event</span><span class="var-description">: one of &quot;insert&quot;, &quot;update&quot;, &quot;delete&quot;</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$target</span><span class="var-description">: the name of the resource that gets acted upon (e.g.  &quot;application&quot;, &quot;person&quot;, etc., as specified by the datatype attribute of  iRestResource</span>			</li>
+					<li>
+				<span class="var-type">integer</span>
+				<span class="var-name">$id</span><span class="var-description">: the id of the resource that gets modified</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$old</span><span class="var-description">: the representation of the resource before the modification</span>			</li>
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$new</span><span class="var-description">: the representation of the resource after the modification</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$disposition</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodstartLogging" id="startLogging"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">startLogging</span> (line <span class="line-number">46</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">indicate the intention to log API calls which make changes to the  database</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			startLogging
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$logfile</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$logfile</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodstopLogging" id="stopLogging"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">stopLogging</span> (line <span class="line-number">53</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">indicate that logging is no longer wanted</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			stopLogging
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+
+						
+		</div>
+	</div>
+
+
+	<p class="notes" id="credit">
+		Documentation generated on Fri, 19 Jan 2018 16:28:58 +0000 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.4</a>
+	</p>
+	</div></body>
+</html>
+

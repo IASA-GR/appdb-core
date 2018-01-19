@@ -23,7 +23,7 @@ class RestSchemaList extends RestROResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */	
 	public function getDataType() {
 		return "schema";
@@ -34,7 +34,7 @@ class RestSchemaList extends RestROResourceList {
     }
 
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if ( parent::get() !== false ) {
@@ -65,14 +65,14 @@ class RestSchemaItem extends RestROResourceItem {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
 	public function getDataType() {
 		return "schema";
 	}
 
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if ( parent::get() !== false ) {
@@ -97,7 +97,7 @@ class RestMWList extends RestROResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
 	public function getDataType() {
         return "middleware";
@@ -120,7 +120,7 @@ class RestMWList extends RestROResourceList {
 //	}
 
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		return new Default_Model_Middlewares();
@@ -136,7 +136,7 @@ class RestStatusList extends RestROResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
 	public function getDataType() {
         return "status";
@@ -147,7 +147,7 @@ class RestStatusList extends RestROResourceList {
     }
 
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		return new Default_Model_Statuses();
@@ -163,7 +163,7 @@ class RestRoleList extends RestROResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "role";
@@ -174,7 +174,7 @@ class RestRoleList extends RestROResourceList {
     }
 
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		$res = new Default_Model_PositionTypes();
@@ -192,7 +192,7 @@ class RestContactTypeList extends RestROResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "contact";
@@ -203,7 +203,7 @@ class RestContactTypeList extends RestROResourceList {
     }
 
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		return new Default_Model_ContactTypes();
@@ -219,7 +219,7 @@ class RestCategoryList extends RestROResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "category";
@@ -230,7 +230,7 @@ class RestCategoryList extends RestROResourceList {
     }
 
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		$res = new Default_Model_Categories();
@@ -246,14 +246,14 @@ class RestCategoryItem extends RestROResourceItem {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "category";
 	}
 
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if ( parent::get() !== false ) {
@@ -373,7 +373,7 @@ class RestDisciplineList extends RestROResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "discipline";
@@ -384,7 +384,7 @@ class RestDisciplineList extends RestROResourceList {
     }
 
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		$res = new Default_Model_Disciplines();
@@ -403,14 +403,14 @@ class RestDisciplineItem extends RestROResourceItem {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "discipline";
 	}
 
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if ( parent::get() !== false ) {
@@ -626,7 +626,7 @@ class RestRegionalList extends RestROResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "regional";
@@ -653,7 +653,7 @@ class RestRegionalList extends RestROResourceList {
     }
 
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if ( parent::get() !== false ) {
@@ -700,14 +700,14 @@ class RestDisseminationList extends RestResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "dissemination";
     }
     
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		$res = new Default_Model_Dissemination();
@@ -756,14 +756,14 @@ class RestDisseminationItem extends RestResourceItem {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "dissemination";
     }
     
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if ( parent::get() !== false ) {	
@@ -811,7 +811,7 @@ class RestDisseminationFilterNormalization extends RestROResourceItem {
     }
     
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if (  parent::get() !== false ) {
@@ -834,7 +834,7 @@ class RestDisseminationFilterReflection extends RestROResourceItem {
     }
     
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() {
 		if ( parent::get() !== false ) {
@@ -855,7 +855,7 @@ class RestTagList extends RestROResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
 	public function getDataType() {
 		return "tag";
@@ -866,7 +866,7 @@ class RestTagList extends RestROResourceList {
     }
 	
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		$res = new Default_Model_AppTags();
@@ -881,7 +881,7 @@ class RestBroker extends RestResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
 	public function getDataType() {
 		return "request";		
@@ -1128,7 +1128,7 @@ class RestAppDBResourceList extends RestROResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
 	public function getDataType() {
 		return "resource";
@@ -1275,7 +1275,7 @@ class RestVMIFmtList extends RestROResourceList {
 
 class RestVAProvidersList extends RestROResourceList {
 	/**
-     * @overrides init() from RestResource
+     * overrides RestResource::init()
      */
 	protected function init() {
 		parent::init();
@@ -1300,12 +1300,12 @@ class RestVAProviderItem extends RestROResourceItem {
 
     /**
      * reference to model representing the requested resource item
-     * @access private
+     *
      */
     private $_res;
     /**
      * reference to parent collection of the model representing the requested resource item
-     * @access private
+     *
      */    
     private $_resParent;
 
@@ -1318,7 +1318,7 @@ class RestVAProviderItem extends RestROResourceItem {
 	}
 
 	/**
-     * @overrides init() from RestResource
+     * overrides RestResource::init()
      */
     protected function init() {
 		$this->_logged = false;

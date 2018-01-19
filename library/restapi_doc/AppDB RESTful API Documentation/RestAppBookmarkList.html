@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos -->
+			<title>Docs For Class RestAppBookmarkList</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+			<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'/>
+		</head>
+		<body>
+			<div class="page-body">			
+
+
+<h2 class="class-name">Class RestAppBookmarkList</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+													<a href="#sec-vars">Vars</a>
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+					</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">class RestAppBookmarkList</p>
+<p class="description"><p>handles application bookmark resources</p></p>
+
+		<p class="notes">
+			Located in <a class="field" href="_restapi_app.php.html">/restapi_app.php</a> (line <span class="field">1487</span>)
+		</p>
+		
+				
+		<pre><a href="../AppDB RESTful API Documentation/RestResource.html">RestResource</a>
+   |
+   --<a href="../AppDB RESTful API Documentation/RestResourceList.html">RestResourceList</a>
+      |
+      --RestAppBookmarkList</pre>
+	
+			</div>
+</div>
+
+
+
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+																		<a href="#sec-vars">Vars</a>
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																																												
+												<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#authorize" title="details" class="method-name">authorize</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$method</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#getDataType" title="details" class="method-name">getDataType</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#getModel" title="details" class="method-name">getModel</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#init" title="details" class="method-name">init</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#put" title="details" class="method-name">put</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#_list" title="details" class="method-name">_list</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#_options" title="details" class="method-name">_options</a>
+										()
+									</div>
+								</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			
+
+							<h4>Inherited Variables</h4>
+				<A NAME='inherited_vars'><!-- --></A>
+									<p>Inherited from <span class="classname"><a href="../AppDB RESTful API Documentation/RestResourceList.html">RestResourceList</a></span></p>
+					<blockquote>
+													<span class="var-title">
+								<span class="var-name"><a href="../AppDB RESTful API Documentation/RestResourceList.html#var$_listMode">RestResourceList::$_listMode</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../AppDB RESTful API Documentation/RestResourceList.html#var$_pageLength">RestResourceList::$_pageLength</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../AppDB RESTful API Documentation/RestResourceList.html#var$_pageOffset">RestResourceList::$_pageOffset</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../AppDB RESTful API Documentation/RestResourceList.html#var$_total">RestResourceList::$_total</a></span><br>
+							</span>
+											</blockquote> 
+									<p>Inherited from <span class="classname"><a href="../AppDB RESTful API Documentation/RestResource.html">RestResource</a></span></p>
+					<blockquote>
+													<span class="var-title">
+								<span class="var-name"><a href="../AppDB RESTful API Documentation/RestResource.html#var$_cacheable">RestResource::$_cacheable</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../AppDB RESTful API Documentation/RestResource.html#var$_cacheLife">RestResource::$_cacheLife</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../AppDB RESTful API Documentation/RestResource.html#var$_error">RestResource::$_error</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../AppDB RESTful API Documentation/RestResource.html#var$_extError">RestResource::$_extError</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../AppDB RESTful API Documentation/RestResource.html#var$_logfile">RestResource::$_logfile</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../AppDB RESTful API Documentation/RestResource.html#var$_model">RestResource::$_model</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../AppDB RESTful API Documentation/RestResource.html#var$_pars">RestResource::$_pars</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../AppDB RESTful API Documentation/RestResource.html#var$_requestTime">RestResource::$_requestTime</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../AppDB RESTful API Documentation/RestResource.html#var$_userGroups">RestResource::$_userGroups</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../AppDB RESTful API Documentation/RestResource.html#var$_userid">RestResource::$_userid</a></span><br>
+							</span>
+											</blockquote> 
+										
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<a href="#sec-vars">Vars</a>
+																	<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+
+<a name="methodauthorize" id="authorize"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">authorize</span> (line <span class="line-number">1561</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of authorize from iRestAuthModule</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			authorize
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$method</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$method</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodgetDataType" id="getDataType"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getDataType</span> (line <span class="line-number">1503</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of getDataType() from iRestResource</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			getDataType
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetModel" id="getModel"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getModel</span> (line <span class="line-number">1517</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">overrides RestResource::getModel</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			getModel
+		</span>
+				()
+			</div>
+	
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../AppDB RESTful API Documentation/RestResource.html#methodgetModel">RestResource::getModel()</a></dt>
+						<dd>returns the model that may be used to fetch GET request resources.</dd>
+					</dl>
+			
+	</div>
+<a name="methodinit" id="init"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">init</span> (line <span class="line-number">1510</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">overrides RestResource::init</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			init
+		</span>
+				()
+			</div>
+	
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../AppDB RESTful API Documentation/RestResource.html#methodinit">RestResource::init()</a></dt>
+					</dl>
+			
+	</div>
+<a name="methodput" id="put"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">put</span> (line <span class="line-number">1529</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">overrides RestResource::put()</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			put
+		</span>
+				()
+			</div>
+	
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../AppDB RESTful API Documentation/RestResource.html#methodput">RestResource::put()</a></dt>
+						<dd>realization of put() from iRestResource. Checks for authorization and calls accessDenied() and returns FALSE if  it fails.</dd>
+					</dl>
+			
+	</div>
+<a name="method_list" id="_list"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">_list</span> (line <span class="line-number">1496</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_list
+		</span>
+				()
+			</div>
+	
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../AppDB RESTful API Documentation/RestResourceList.html#method_list">RestResourceList::_list()</a></dt>
+						<dd>alternative to get() which returns a short reference list, in  conformance to CRUDL. Called by get when _listMode == RL_LISTING.</dd>
+					</dl>
+			
+	</div>
+<a name="method_options" id="_options"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">_options</span> (line <span class="line-number">1489</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			_options
+		</span>
+				()
+			</div>
+	
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../AppDB RESTful API Documentation/RestResource.html#method_options">RestResource::_options()</a></dt>
+					</dl>
+			
+	</div>
+
+							<h4>Inherited Methods</h4>
+				<a name='inherited_methods'><!-- --></a>	
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../AppDB RESTful API Documentation/RestResourceList.html">RestResourceList</a></span></p>
+					<blockquote>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResourceList.html#method__construct">RestResourceList::__construct()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResourceList.html#methodget">RestResourceList::get()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResourceList.html#methodgetPageLength">RestResourceList::getPageLength()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResourceList.html#methodgetPageOffset">RestResourceList::getPageOffset()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResourceList.html#methodgetTotal">RestResourceList::getTotal()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResourceList.html#method_list">RestResourceList::_list()</a></span><br>
+											</blockquote>
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../AppDB RESTful API Documentation/RestResource.html">RestResource</a></span></p>
+					<blockquote>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#method__construct">RestResource::__construct()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodauthenticate">RestResource::authenticate()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodcachefile">RestResource::cachefile()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodcachekey">RestResource::cachekey()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodcanSync">RestResource::canSync()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methoddelete">RestResource::delete()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodget">RestResource::get()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodgetCacheLife">RestResource::getCacheLife()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodgetData">RestResource::getData()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodgetError">RestResource::getError()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodgetExtError">RestResource::getExtError()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodgetMethod">RestResource::getMethod()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodgetModel">RestResource::getModel()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodgetParam">RestResource::getParam()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodgetParams">RestResource::getParams()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodgetRequestTime">RestResource::getRequestTime()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodgetUser">RestResource::getUser()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodinit">RestResource::init()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodisCacheable">RestResource::isCacheable()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodldapErrorFunc">RestResource::ldapErrorFunc()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodlogAction">RestResource::logAction()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodlogActionDB">RestResource::logActionDB()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodlogActionFile">RestResource::logActionFile()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodoptions">RestResource::options()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodpost">RestResource::post()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodput">RestResource::put()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodsetError">RestResource::setError()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodstartLogging">RestResource::startLogging()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodstopLogging">RestResource::stopLogging()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methodunknown">RestResource::unknown()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#methoduserIsAdmin">RestResource::userIsAdmin()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#method_options">RestResource::_options()</a></span><br>
+													<span class="method-name"><a href="../AppDB RESTful API Documentation/RestResource.html#method__get">RestResource::__get()</a></span><br>
+											</blockquote>
+										
+		</div>
+	</div>
+
+
+	<p class="notes" id="credit">
+		Documentation generated on Fri, 19 Jan 2018 16:28:57 +0000 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.4</a>
+	</p>
+	</div></body>
+</html>
+
