@@ -5162,6 +5162,7 @@ appdb.pages.connectprofile = (function(){
 		});
 		model.get({flt: flt.join(" ")});
 	};
+
 	page.renderSearchedProfiles = function(filter){
 		filter = $.trim(filter);
 		filter = filter.replace(/\ {2,}/g," "); //reduce whitespace to single whitespace
@@ -5211,6 +5212,7 @@ appdb.pages.connectprofile = (function(){
 		},caller: page } );
 		pager.current();
 	};
+
 	page.initActions = function(){
 		$(".connectprofile > .header > .actions > .action").unbind("click").bind("click", (function(p){
 			return function(ev){
