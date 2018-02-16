@@ -5054,7 +5054,7 @@ class VMCaster{
             // Try to collect the associated VMI Instances of the given VA Version
             while($retries > 0) {
                 $valists = new Default_Model_VALists();
-                $valists->filter->vappversionid->equals($vaversionid);
+                $valists->filter->vappversionid->numequals($vaversionid);
                 $valists->refresh();
                 if (count($valists->items) > 0) {
                     error_log("[VMCASTER:SECANT][VA Version " . $vaversionid . "][INFO] Found " . count($valists->items) . " VMI Instances");
@@ -6815,7 +6815,7 @@ class VApplianceService{
 			$vaversion->enabled === true &&
 			$vaversion->status === "verified" ){
 			VMCaster::createImageList($vaversion->id, "published");
-                        VMCaster::requestSecantCheckByVersionId($version->id, "published");
+                        VMCaster::requestSecantCheckByVersionId($vaversion->id, "published");
 		}else if( $this->state->toBeIntegrityChecked() ){
 			VMCaster::startIntegrityCheck($vaversion->id);
 		}
