@@ -4994,6 +4994,119 @@ class VMCaster{
 		}
 		return true;
 	}
+
+        /**
+         * Request from VMCaster to enqueue a VMI Instance to be checked with secant service.
+         *
+         * @param integer $vmiinstanceid    The DB id of the VMI Instance to be checked.
+         * @param string  $target           Indicate the context this action dispatched. Either of published or unpublished.
+         * @return boolean|string           True when successful. Error description otherwise.
+         */
+        public static function requestSecantCheck($vmiinstanceid, $target = "published") {
+            //Setup request URL fior given VMI Instance.
+            $url = VMCASTER::getVMCasterUrl() . '/secant/queue/' . $vmiinstanceid . '/' . $target;
+
+            try {
+                // Dispatch request to VM Caster
+                $result = web_get_contents($url);
+
+                // Parse XML Response.
+                $xml = simplexml_load_string($result);
+
+                // Retrieve the outcome element.
+                $outcome = trim('' . $xml->outcome);
+
+                // If the request was a success it should contain the word "OK".
+                if($outcome == 'OK') {
+                    return true;
+                } else {
+                    // Something went wrong. Return the error as described in the "code" and "message" elements of the XML repsonse.
+                    return '[VMI Instance ' . $vmiinstanceid .'][ERROR] ' . $xml->code . ': ' . $xml->message;
+                }
+            } catch(Exception $ex) {
+                // Either there where a network error or the reposne was not a valid XML.
+                return '[VMI Instance ' . $vmiinstanceid .'][EXCEPTION] ' . $ex->getMessage();
+            }
+
+            //Everything was successful.
+            return true;
+        }
+
+        /**
+         * Request from VM Caster to enqueue all VMI Instances of a VA Version to be checked with secant service.
+         *
+         * @param integer $vaversionid      The DB id of the VA Version, whose VMI Instances will be checked.
+         * @param string  $target           Indicate the context this action dispatched. Either of published or unpublished.
+         * @return boolean|string           True if successful. Error description otherwise.
+         */
+        public static function requestSecantCheckByVersionId($vaversionid, $target = "published") {
+            //Place holder for error description.
+            $error = true;
+            //Container of VMI Instances to be checked.
+            $vmiinstanceids = array();
+            //To be used as VALists model
+            $valists = null;
+            //Number of retries if the VA Version does not return VMI Instances
+            $retries = 3;
+
+            error_log("[VMCASTER:SECANT][VA Version " . $vaversionid . "][INFO] Start dispatching security checks to VMCaster.");
+
+            // Try to collect the associated VMI Instances of the given VA Version
+            while($retries > 0) {
+                $valists = new Default_Model_VALists();
+                $valists->filter->vappversionid->numequals($vaversionid);
+                $valists->refresh();
+                if (count($valists->items) > 0) {
+                    error_log("[VMCASTER:SECANT][VA Version " . $vaversionid . "][INFO] Found " . count($valists->items) . " VMI Instances");
+                    // Collect VMI Instance ids
+                    foreach($valists->items as $valist) {
+                        $vmiinstanceids[] = $valist->VmiinstanceID;
+                    }
+                    // No more tries needed. Exit loop.
+                    $retries = 0;
+                    break;
+                } else {
+                    // No VMI Instance associations found. Retry after 1 second.
+                    $retries = $retries - 1;
+                    sleep(1);
+                }
+            }
+
+            // If no VMI Instance is found from previous tries, log and exit with error description.
+            if (count($vmiinstanceids) === 0) {
+                $error = "[VMCASTER:SECANT][VA Version " . $vaversionid . "][ERROR] Could not retrieve any VMI Instances for this version.";
+                error_log($error);
+                return $error;
+            }
+
+            // Initialize array to collect errors from secant requests.
+            $errors = array();
+            foreach($vmiinstanceids as $vmiinstanceid) {
+                //Sent request to VM Caster.
+                $resp = VMCaster::requestSecantCheck($vmiinstanceid, $target);
+                if ($resp !== true) {
+                    // The request was unsuccessful. Log it and store the error in a collection.
+                    error_log("[VMCASTER:SECANT][VA Version " . $vaversionid . "]" . $resp);
+                    $errors[] = $resp;
+                } else {
+                    // Request was a success. Log it.
+                    error_log("[VMCASTER:SECANT][VA Version " . $vaversionid . "][SUCCESS] Enqueued VMI Instance (ID: " . $vmiinstanceid . ") for security check.");
+                }
+            }
+
+            //If there where errors in at least one of the requests, log the overall report of iteration and exit.
+            if (count($errors) > 0) {
+                $error = "[VMCASTER:SECANT][VA Version " . $vaversionid . "][ERROR] Failed to queue " . count($errors) . " out of " . count($vmiinstanceids) . " VMI Instance IDs for security checks.";
+                error_log($error);
+                return $error;
+            } else {
+                //Everything went ok.
+                error_log("[VMCASTER:SECANT][VA Version " . $vaversionid . "][SUCCESS] All VMI Instances enqueued for security check successfully");
+            }
+
+            return true;
+        }
+
 	private static function parseIntegrityCheckResponse($response){
 		if( is_string($response) && substr($response, 0, strlen('[ERROR]')) === '[ERROR]') {
 			return array(
@@ -5539,6 +5652,7 @@ class VMCaster{
 		try {
 			db()->exec("START TRANSACTION ISOLATION LEVEL REPEATABLE READ");
 			VMCaster::createImageList($version->id, "published");
+                        VMCaster::requestSecantCheckByVersionId($version->id, "published");
 			db()->exec("COMMIT");
 			error_log("VMCaster notified");
 		} catch (Exception $e) {
@@ -6701,6 +6815,7 @@ class VApplianceService{
 			$vaversion->enabled === true &&
 			$vaversion->status === "verified" ){
 			VMCaster::createImageList($vaversion->id, "published");
+                        VMCaster::requestSecantCheckByVersionId($vaversion->id, "published");
 		}else if( $this->state->toBeIntegrityChecked() ){
 			VMCaster::startIntegrityCheck($vaversion->id);
 		}
