@@ -1746,4 +1746,102 @@ class VoController extends Zend_Controller_Action
 			VoAdminNotifications::sendVOObsoleteNotifications();
 		}
 	}
+
+        public function secantreportAction() {
+            $this->_helper->layout->disableLayout();
+            $this->_helper->viewRenderer->setNoRender();
+
+            if($_SERVER['REQUEST_METHOD'] !== "GET" ){
+                header('HTTP/1.0 404 Not Found');
+                header("Status: 404 Not Found");
+                return;
+            }
+            $appid = ((isset($_GET['appid']) && is_numeric($_GET['appid'])) ? intval($_GET['appid']) : -1);
+            $void = ((isset($_GET['id']) && is_numeric($_GET['id'])) ? intval($_GET['id']) : -1);
+            if ($void === -1) {
+                header('HTTP/1.0 404 Not Found');
+                header("Status: 404 Not Found");
+                return;
+            }
+
+            $format = strtolower((isset($_GET['format']) && trim($_GET['format']) !== '') ? trim($_GET['format']) : 'xml');
+            if ($format != 'js' && $format !== 'xml') {
+                $format = 'xml';
+            }
+
+            $appidsql = '';
+            if ($appid !== -1) {
+                $appidsql = 'AND vaviews.appid = ' . $appid . ' ';
+            }
+
+            $sql = "SELECT
+              vaviews.appid AS app_id,
+              vaviews.appname AS app_name,
+              vaviews.appcname AS app_cname,
+              vaviews.vapplistid AS vapplist_id,
+              vaviews.vappversionid AS vaversion_id,
+              vaviews.va_version AS vaversion,
+              CASE WHEN vowideitem.vapplistid = vaviews.vapplistid AND vowideitem.state = 'published' THEN 'current'
+                   WHEN vaviews.va_version_archived = FALSE AND vaviews.va_version_published = TRUE THEN 'latest'
+                   WHEN vaviews.va_version_archived = TRUE AND vaviews.va_version_published = TRUE THEN 'previous'
+              END AS vaversion_type,
+              vaviews.vmiinstanceid AS vmiinstance_id,
+              vaviews.vmiinstance_guid AS vmiinstance_guid,
+              vaviews.va_version_archived AS vmiinstance_archived,
+              vowideitem.vowide_image_list_id AS vowideimagelist_id,
+              secant.queuedon AS queuedon,
+              secant.senton AS senton,
+              secant.closedon AS closedon,
+              secant.state AS state,
+              secant.report_outcome AS report_outcome,
+              secant.report_data AS report_data
+            FROM vaviews
+            LEFT OUTER JOIN (
+              SELECT vowide_image_list_id, vapplistid, vowide_image_lists.state, void FROM vowide_image_lists
+              INNER JOIN vowide_image_list_images ON vowide_image_list_images.vowide_image_list_id = vowide_image_lists.id
+              WHERE (vowide_image_lists.state = 'draft' OR vowide_image_lists.state = 'published') AND vowide_image_lists.void = " . $void . "
+              ) AS vowideitem ON vowideitem.vapplistid = vaviews.vapplistid
+            INNER JOIN va_sec_check_queue AS secant ON secant.vmiinstanceid = vaviews.vmiinstanceid
+            WHERE vaviews.va_version_published = true
+            AND vaviews.imglst_private = false
+            AND secant.state <> 'aborted'
+            AND ((vowideitem.vapplistid = vaviews.vapplistid AND  vaviews.va_version_archived = TRUE) OR vaviews.va_version_archived = false) " . $appidsql . " 
+            ORDER BY vaviews.appid, vaviews.vapplistid";
+
+            $rs = db()->query($sql)->fetchAll();
+            $res = '<?xml version="1.0" encoding="UTF-8"?>';
+            $res .= "\n<result count='" . count($rs) . "'>\n";
+            if (count($rs) > 0) {
+                foreach ($rs as $r) {
+                    $res .= "<report>\n";
+                    $res .= "  <app_id>" . $r["app_id"] . "</app_id>\n";
+                    $res .= "  <app_name>" . $r["app_name"] . "</app_name>\n";
+                    $res .= "  <app_cname>" . $r["app_cname"] . "</app_cname>\n";
+                    $res .= "  <vapplist_id>" . $r["vapplist_id"] . "</vapplist_id>\n";
+                    $res .= "  <vaversion>" . $r["vaversion"] . "</vaversion>\n";
+                    $res .= "  <vaversion_id>" . $r["vaversion_id"] . "</vaversion_id>\n";
+                    $res .= "  <vaversion_type>" . $r["vaversion_type"] . "</vaversion_type>\n";
+                    $res .= "  <vmiinstance_id>" . $r["vmiinstance_id"] . "</vmiinstance_id>\n";
+                    $res .= "  <vmiinstance_guid>" . $r["vmiinstance_guid"] . "</vmiinstance_guid>\n";
+                    $res .= "  <vmiinstance_archived>" . ($r["vmiinstance_archived"] == 1 ? 'true' : 'false') . "</vmiinstance_archived>\n";
+                    $res .= "  <vowideimagelist_id>" . $r["vowideimagelist_id"] . "</vowideimagelist_id>\n";
+                    $res .= "  <queuedon>" . $r["queuedon"] . "</queuedon>\n";
+                    $res .= "  <senton>" . $r["senton"] . "</senton>\n";
+                    $res .= "  <closedon>" . $r["closedon"] . "</closedon>\n";
+                    $res .= "  <state>" . $r["state"] . "</state>\n";
+                    $res .= "  <report_outcome>" . $r["report_outcome"] . "</report_outcome>\n";
+                    $res .= "  <report_data>\n" . str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', trim($r["report_data"])) . "\n</report_data>\n";
+                    $res .= "</report>\n";
+                }
+            }
+            $res .= "</result>";
+            if ($format === 'xml') {
+                header('Content-type: application/xml');
+            } else {
+                header('Content-type: application/json');
+                $res = RestAPIHelper::transformXMLtoJSON($res);
+            }
+
+            echo $res;
+        }
 }
