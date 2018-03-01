@@ -1,0 +1,692 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos -->
+			<title>Docs For Class RestResourceItem</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+			<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'/>
+		</head>
+		<body>
+			<div class="page-body">			
+
+
+<h2 class="class-name">Class RestResourceItem</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+							<a href="#sec-descendents">Descendents</a>
+			|											<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+						|											<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+					</div>
+	<div class="info-box-body">
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">class RestResourceItem</p>
+<p class="description"><p>derived base class for REST resources that are single items and that may belong  to a collection of items</p></p>
+	<ul class="tags">
+				<li><span class="field">abstract:</span> </li>
+			</ul>
+
+		<p class="notes">
+			Located in <a class="field" href="_restapi_base.php.html">/restapi_base.php</a> (line <span class="field">2262</span>)
+		</p>
+		
+				
+		<pre><a href="../default/RestResource.html">RestResource</a>
+   |
+   --RestResourceItem</pre>
+	
+			</div>
+</div>
+
+	<a name="sec-descendents"></a>
+	<div class="info-box">
+		<div class="info-box-title">Direct descendents</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+			<span class="disabled">Descendents</span>
+			|												<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+								|															<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+								</div>
+		<div class="info-box-body">
+			<table cellpadding="2" cellspacing="0" class="class-table">
+				<tr>
+					<th class="class-table-header">Class</th>
+					<th class="class-table-header">Description</th>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em"><a href="../default/RestAppFollowedItem.html">RestAppFollowedItem</a></td>
+					<td>
+											class RestAppFollowedItem
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em"><a href="../default/RestAppBookmarkItem.html">RestAppBookmarkItem</a></td>
+					<td>
+											class RestAppBookmarkItem
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em"><a href="../default/RestAppItem.html">RestAppItem</a></td>
+					<td>
+											class RestAppItem
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em"><a href="../default/RestAppTagItem.html">RestAppTagItem</a></td>
+					<td>
+											class RestAppTagItem
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em"><a href="../default/RestAppPubItem.html">RestAppPubItem</a></td>
+					<td>
+											class RestAppPubItem
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em"><a href="../default/RestAppVAItem.html">RestAppVAItem</a></td>
+					<td>
+											class RestResourceItem
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em"><a href="../default/RestAppContextScriptItem.html">RestAppContextScriptItem</a></td>
+					<td>
+											class RestResourceItem
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em"><a href="../default/RestAppVAVersionIntegrityItem.html">RestAppVAVersionIntegrityItem</a></td>
+					<td>
+											class RestResourceItem
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em"><a href="../default/RestROResourceItem.html">RestROResourceItem</a></td>
+					<td>
+											class RestROResourceItem
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em"><a href="../default/RestDisseminationItem.html">RestDisseminationItem</a></td>
+					<td>
+											class RestDisseminationItem
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em"><a href="../default/RestPplItem.html">RestPplItem</a></td>
+					<td>
+											class RestPplItem
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em"><a href="../default/RestProductReleasePropertyItem.html">RestProductReleasePropertyItem</a></td>
+					<td>
+											class RestResourceItem
+										</td>
+				</tr>
+								<tr>
+					<td style="padding-right: 2em"><a href="../default/RestRepositoryAreaPropertyItem.html">RestRepositoryAreaPropertyItem</a></td>
+					<td>
+											class RestResourceItem
+										</td>
+				</tr>
+							</table>
+		</div>
+	</div>
+
+
+	<a name="sec-var-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variable Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+						<span class="disabled">Vars</span> (<a href="#sec-vars">details</a>)
+							| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+								</div>
+		<div class="info-box-body">
+			<div class="var-summary">
+																								<div class="var-title">
+					<span class="var-type">mixed</span>
+					<a href="#$_parent" title="details" class="var-name">$_parent</a>
+				</div>
+											</div>
+		</div>
+	</div>
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+																		<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+				 
+				|
+						<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+																																																				
+												<div class="method-definition">
+											<span class="method-result">RestResourceItem</span>
+										<a href="#__construct" title="details" class="method-name">__construct</a>
+											([<span class="var-type"></span>&nbsp;<span class="var-name">$pars</span> = <span class="var-default">null</span>], [<span class="var-type"><a href="../default/RestResourceList.html">RestResourceList</a></span>&nbsp;<span class="var-name">$parent</span> = <span class="var-default">null</span>], <span class="var-type">string</span>&nbsp;<span class="var-name">$pars[]</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#get" title="details" class="method-name">get</a>
+											(<span class="var-type"><a href="../default/RestResource.html">RestResource</a></span>&nbsp;<span class="var-name">$overrides::get()</span>)
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#getPageLength" title="details" class="method-name">getPageLength</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#getPageOffset" title="details" class="method-name">getPageOffset</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result"><a href="../default/RestResourceList.html">RestResourceList</a></span>
+										<a href="#getParent" title="details" class="method-name">getParent</a>
+										()
+									</div>
+																<div class="method-definition">
+											<span class="method-result">void</span>
+										<a href="#getTotal" title="details" class="method-name">getTotal</a>
+										()
+									</div>
+								</div>
+		</div>
+	</div>		
+
+	<a name="sec-vars"></a>
+	<div class="info-box">
+		<div class="info-box-title">Variables</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+										<a href="#sec-var-summary">Vars</a> (<span class="disabled">details</span>)
+						
+			
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="var$_parent" id="$_parent"><!-- --></A>
+<div class="oddrow">
+
+	<div class="var-header">
+		<span class="var-title">
+			<span class="var-type">mixed</span>
+			<span class="var-name">$_parent</span>
+						(line <span class="line-number">2269</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">internal reference to RestResourceList parent resource</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> protected</li>
+			</ul>
+	
+	
+		
+		
+
+</div>
+
+
+							<h4>Inherited Variables</h4>
+				<A NAME='inherited_vars'><!-- --></A>
+									<p>Inherited from <span class="classname"><a href="../default/RestResource.html">RestResource</a></span></p>
+					<blockquote>
+													<span class="var-title">
+								<span class="var-name"><a href="../default/RestResource.html#var$_cacheable">RestResource::$_cacheable</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../default/RestResource.html#var$_cacheLife">RestResource::$_cacheLife</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../default/RestResource.html#var$_error">RestResource::$_error</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../default/RestResource.html#var$_extError">RestResource::$_extError</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../default/RestResource.html#var$_logfile">RestResource::$_logfile</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../default/RestResource.html#var$_model">RestResource::$_model</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../default/RestResource.html#var$_pars">RestResource::$_pars</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../default/RestResource.html#var$_requestTime">RestResource::$_requestTime</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../default/RestResource.html#var$_userGroups">RestResource::$_userGroups</a></span><br>
+							</span>
+													<span class="var-title">
+								<span class="var-name"><a href="../default/RestResource.html#var$_userid">RestResource::$_userid</a></span><br>
+							</span>
+											</blockquote> 
+										
+		</div>
+	</div>
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+							<a href="#sec-descendents">Descendents</a> |
+															<a href="#sec-var-summary">Vars</a> (<a href="#sec-vars">details</a>)
+																	<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+
+<a name="method__construct" id="__construct"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number">2280</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">constructor.</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">RestResourceItem</span>
+		<span class="method-name">
+			__construct
+		</span>
+					([<span class="var-type"></span>&nbsp;<span class="var-name">$pars</span> = <span class="var-default">null</span>], [<span class="var-type"><a href="../default/RestResourceList.html">RestResourceList</a></span>&nbsp;<span class="var-name">$parent</span> = <span class="var-default">null</span>], <span class="var-type">string</span>&nbsp;<span class="var-name">$pars[]</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type">string</span>
+				<span class="var-name">$pars[]</span><span class="var-description">: request parameters. If set, then parameters will be  merged with the parent's parameters.</span>			</li>
+					<li>
+				<span class="var-type"><a href="../default/RestResourceList.html">RestResourceList</a></span>
+				<span class="var-name">$parent</span><span class="var-description">: optional reference to parent resource</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$pars</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../default/RestResource.html#method__construct">RestResource::__construct()</a></dt>
+						<dd>constructor</dd>
+					</dl>
+			
+	</div>
+<a name="methodget" id="get"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">get</span> (line <span class="line-number">2329</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			get
+		</span>
+					(<span class="var-type"><a href="../default/RestResource.html">RestResource</a></span>&nbsp;<span class="var-name">$overrides::get()</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"><a href="../default/RestResource.html">RestResource</a></span>
+				<span class="var-name">$overrides::get()</span><span class="var-description">: if the parent's get() operation does not fail, we check for a  valid GET model. If there is one, use it to return the data. If not, then just  delegate the parent's return value and let the derived class handle the GET request.</span>			</li>
+				</ul>
+		
+			<hr class="separator" />
+		<div class="notes">Redefinition of:</div>
+		<dl>
+			<dt><a href="../default/RestResource.html#methodget">RestResource::get()</a></dt>
+						<dd>realization of get() from iRestResource. If authorization succeeds, then  sets the GET model. Calls accessDenied() and returns FALSE otherwise.</dd>
+					</dl>
+			
+			<hr class="separator" />
+		<div class="notes">Redefined in descendants as:</div>
+		<ul class="redefinitions">
+					<li>
+				<a href="../default/RestAppTagItem.html#methodget">RestAppTagItem::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestAppVAItem.html#methodget">RestAppVAItem::get()</a>
+							</li>
+					<li>
+				<a href="../default/RestAppVAVersionItem.html#methodget">RestAppVAVersionItem::get()</a>
+							</li>
+					<li>
+				<a href="../default/RestAppContextScriptItem.html#methodget">RestAppContextScriptItem::get()</a>
+							</li>
+					<li>
+				<a href="../default/RestAppVAVersionIntegrityItem.html#methodget">RestAppVAVersionIntegrityItem::get()</a>
+							</li>
+					<li>
+				<a href="../default/RestAppFilterNormalization.html#methodget">RestAppFilterNormalization::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestAppFilterReflection.html#methodget">RestAppFilterReflection::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestAppRatingReport.html#methodget">RestAppRatingReport::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestAppHistoryItem.html#methodget">RestAppHistoryItem::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestAppLogistics.html#methodget">RestAppLogistics::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestOwnAppLogistics.html#methodget">RestOwnAppLogistics::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestEdtAppLogistics.html#methodget">RestEdtAppLogistics::get()</a>
+								: overrides RestAppLogistics::get()
+							</li>
+					<li>
+				<a href="../default/RestAscAppLogistics.html#methodget">RestAscAppLogistics::get()</a>
+								: overrides RestAppLogistics::get()
+							</li>
+					<li>
+				<a href="../default/RestAppBookmarkLogistics.html#methodget">RestAppBookmarkLogistics::get()</a>
+								: overrides RestAppLogistics::get()
+							</li>
+					<li>
+				<a href="../default/RestAppFollowedLogistics.html#methodget">RestAppFollowedLogistics::get()</a>
+								: overrides RestAppLogistics::get()
+							</li>
+					<li>
+				<a href="../default/RestRelAppLogistics.html#methodget">RestRelAppLogistics::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestAppHistoryRBItem.html#methodget">RestAppHistoryRBItem::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestProfile.html#methodget">RestProfile::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestSchemaItem.html#methodget">RestSchemaItem::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestCategoryItem.html#methodget">RestCategoryItem::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestDisciplineItem.html#methodget">RestDisciplineItem::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestDisseminationFilterNormalization.html#methodget">RestDisseminationFilterNormalization::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestDisseminationFilterReflection.html#methodget">RestDisseminationFilterReflection::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestAccessGroupItem.html#methodget">RestAccessGroupItem::get()</a>
+							</li>
+					<li>
+				<a href="../default/RestPplFilterNormalization.html#methodget">RestPplFilterNormalization::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestPplFilterReflection.html#methodget">RestPplFilterReflection::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestPplLogistics.html#methodget">RestPplLogistics::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestProductReleaseItem.html#methodget">RestProductReleaseItem::get()</a>
+							</li>
+					<li>
+				<a href="../default/RestTargetItem.html#methodget">RestTargetItem::get()</a>
+							</li>
+					<li>
+				<a href="../default/RestRepoConfigItem.html#methodget">RestRepoConfigItem::get()</a>
+							</li>
+					<li>
+				<a href="../default/RestRepositoryAreaItem.html#methodget">RestRepositoryAreaItem::get()</a>
+							</li>
+					<li>
+				<a href="../default/RestSciClassItem.html#methodget">RestSciClassItem::get()</a>
+							</li>
+					<li>
+				<a href="../default/RestSiteItem.html#methodget">RestSiteItem::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestSiteFilterReflection.html#methodget">RestSiteFilterReflection::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestSiteFilterNormalization.html#methodget">RestSiteFilterNormalization::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestSiteLogistics.html#methodget">RestSiteLogistics::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestVOFilterNormalization.html#methodget">RestVOFilterNormalization::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestVOFilterReflection.html#methodget">RestVOFilterReflection::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestVOLogistics.html#methodget">RestVOLogistics::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestDisseminationItem.html#methodget">RestDisseminationItem::get()</a>
+								: overrides RestResource::get()
+							</li>
+					<li>
+				<a href="../default/RestProductReleasePropertyItem.html#methodget">RestProductReleasePropertyItem::get()</a>
+							</li>
+					<li>
+				<a href="../default/RestRepositoryAreaPropertyItem.html#methodget">RestRepositoryAreaPropertyItem::get()</a>
+							</li>
+				</ul>
+	</div>
+<a name="methodgetPageLength" id="getPageLength"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getPageLength</span> (line <span class="line-number">2319</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of getPageLength from iRestResource</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			getPageLength
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetPageOffset" id="getPageOffset"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getPageOffset</span> (line <span class="line-number">2312</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of getPageOffset from iRestResource</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			getPageOffset
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetParent" id="getParent"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">getParent</span> (line <span class="line-number">2297</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">getter function for the _parent attribute</p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result"><a href="../default/RestResourceList.html">RestResourceList</a></span>
+		<span class="method-name">
+			getParent
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodgetTotal" id="getTotal"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">getTotal</span> (line <span class="line-number">2305</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">realization of getTotal from iRestResource</p>
+<p class="description"><p>always returns -1 to indicate single item instead of collection</p></p>
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			getTotal
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+
+							<h4>Inherited Methods</h4>
+				<a name='inherited_methods'><!-- --></a>	
+									<!-- =========== Summary =========== -->
+					<p>Inherited From <span class="classname"><a href="../default/RestResource.html">RestResource</a></span></p>
+					<blockquote>
+													<span class="method-name"><a href="../default/RestResource.html#method__construct">RestResource::__construct()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodauthenticate">RestResource::authenticate()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodcachefile">RestResource::cachefile()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodcachekey">RestResource::cachekey()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodcanSync">RestResource::canSync()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methoddelete">RestResource::delete()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodget">RestResource::get()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodgetCacheLife">RestResource::getCacheLife()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodgetData">RestResource::getData()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodgetError">RestResource::getError()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodgetExtError">RestResource::getExtError()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodgetMethod">RestResource::getMethod()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodgetModel">RestResource::getModel()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodgetParam">RestResource::getParam()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodgetParams">RestResource::getParams()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodgetRequestTime">RestResource::getRequestTime()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodgetUser">RestResource::getUser()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodinit">RestResource::init()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodisCacheable">RestResource::isCacheable()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodldapErrorFunc">RestResource::ldapErrorFunc()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodlogAction">RestResource::logAction()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodlogActionDB">RestResource::logActionDB()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodlogActionFile">RestResource::logActionFile()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodoptions">RestResource::options()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodpost">RestResource::post()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodput">RestResource::put()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodsetError">RestResource::setError()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodstartLogging">RestResource::startLogging()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodstopLogging">RestResource::stopLogging()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methodunknown">RestResource::unknown()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#methoduserIsAdmin">RestResource::userIsAdmin()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#method_options">RestResource::_options()</a></span><br>
+													<span class="method-name"><a href="../default/RestResource.html#method__get">RestResource::__get()</a></span><br>
+											</blockquote>
+										
+		</div>
+	</div>
+
+
+	<p class="notes" id="credit">
+		Documentation generated on Fri, 19 Jan 2018 16:26:04 +0000 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.4</a>
+	</p>
+	</div></body>
+</html>
+

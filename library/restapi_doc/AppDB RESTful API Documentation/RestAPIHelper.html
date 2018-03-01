@@ -1,0 +1,1439 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos -->
+			<title>Docs For Class RestAPIHelper</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+			<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'/>
+		</head>
+		<body>
+			<div class="page-body">			
+
+
+<h2 class="class-name">Class RestAPIHelper</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+															<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+						
+											<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+						
+			</div>
+	<div class="info-box-body">
+                <p class="implements">
+            Implements interfaces:
+            <ul>
+                <li><a href="../AppDB RESTful API Documentation/iRestAPIHelper.html">iRestAPIHelper</a></li>            </ul>
+        </p>
+        		<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">class RestAPIHelper</p>
+<p class="description"><p>utility class for REST API classes</p></p>
+
+		<p class="notes">
+			Located in <a class="field" href="_restapi_base.php.html">/restapi_base.php</a> (line <span class="field">105</span>)
+		</p>
+		
+				
+		<pre></pre>
+	
+			</div>
+</div>
+
+
+	<a name="sec-const-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Class Constant Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+						<span class="disabled">Constants</span> (<a href="#sec-consts">details</a>)
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<div class="const-summary">
+								<div class="const-title">
+					<a href="#VERSION" title="details" class="const-name">VERSION</a> = 					<span class="var-type"> '1.0'</span>
+
+				</div>
+								<div class="const-title">
+					<a href="#XMLNS_APPDB_BASE" title="details" class="const-name">XMLNS_APPDB_BASE</a> = 					<span class="var-type"> 'http://appdb.egi.eu/api/'</span>
+
+				</div>
+							</div>
+		</div>
+	</div>
+
+
+	<a name="sec-method-summary"></a>
+	<div class="info-box">
+		<div class="info-box-title">Method Summary</span></div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+									<span class="disabled">Methods</span> (<a href="#sec-methods">details</a>)
+		</div>
+		<div class="info-box-body">			
+			<div class="method-summary">
+												<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#getFolder" title="details" class="method-name">getFolder</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$folder</span>)
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#getVersion" title="details" class="method-name">getVersion</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#namespaces" title="details" class="method-name">namespaces</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#responseHead" title="details" class="method-name">responseHead</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$datatype</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$type</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$count</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$pageLength</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$pageOffset</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$error</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$exterror</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$reqTime</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$authenticated</span> = <span class="var-default">null</span>])
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#responseTail" title="details" class="method-name">responseTail</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#transformXMLtoJSON" title="details" class="method-name">transformXMLtoJSON</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$x</span>)
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#wrapResponse" title="details" class="method-name">wrapResponse</a>
+											(<span class="var-type"></span>&nbsp;<span class="var-name">$response</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$datatype</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$type</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$count</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$pageLength</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$pageOffset</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$error</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$exterror</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$authenticated</span> = <span class="var-default">null</span>])
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_APPDB" title="details" class="method-name">XMLNS_APPDB</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_APPLICATION" title="details" class="method-name">XMLNS_APPLICATION</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_CATEGORY" title="details" class="method-name">XMLNS_CATEGORY</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_CLASSIFICATION" title="details" class="method-name">XMLNS_CLASSIFICATION</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_CONTEXTUALIZATION" title="details" class="method-name">XMLNS_CONTEXTUALIZATION</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_DATASET" title="details" class="method-name">XMLNS_DATASET</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_DISCIPLINE" title="details" class="method-name">XMLNS_DISCIPLINE</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_DISSEMINATION" title="details" class="method-name">XMLNS_DISSEMINATION</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_ENTITY" title="details" class="method-name">XMLNS_ENTITY</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_FILTER" title="details" class="method-name">XMLNS_FILTER</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_HISTORY" title="details" class="method-name">XMLNS_HISTORY</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_LICENSE" title="details" class="method-name">XMLNS_LICENSE</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_LOGISTICS" title="details" class="method-name">XMLNS_LOGISTICS</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_MIDDLEWARE" title="details" class="method-name">XMLNS_MIDDLEWARE</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_ORGANIZATION" title="details" class="method-name">XMLNS_ORGANIZATION</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_PERMISSION" title="details" class="method-name">XMLNS_PERMISSION</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_PERSON" title="details" class="method-name">XMLNS_PERSON</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_PRIVILEGE" title="details" class="method-name">XMLNS_PRIVILEGE</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_PROJECT" title="details" class="method-name">XMLNS_PROJECT</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_PROVIDER" title="details" class="method-name">XMLNS_PROVIDER</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_PROVIDER_TEMPLATE" title="details" class="method-name">XMLNS_PROVIDER_TEMPLATE</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_PUBLICATION" title="details" class="method-name">XMLNS_PUBLICATION</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_RATING" title="details" class="method-name">XMLNS_RATING</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_RATINGREPORT" title="details" class="method-name">XMLNS_RATINGREPORT</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_REGIONAL" title="details" class="method-name">XMLNS_REGIONAL</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_RESOURCE" title="details" class="method-name">XMLNS_RESOURCE</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_SITE" title="details" class="method-name">XMLNS_SITE</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_USER" title="details" class="method-name">XMLNS_USER</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_VIRTUALIZATION" title="details" class="method-name">XMLNS_VIRTUALIZATION</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_VO" title="details" class="method-name">XMLNS_VO</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_XS" title="details" class="method-name">XMLNS_XS</a>
+										()
+									</div>
+																<div class="method-definition">
+					static 						<span class="method-result">void</span>
+										<a href="#XMLNS_XSI" title="details" class="method-name">XMLNS_XSI</a>
+										()
+									</div>
+								
+																																																																																																																																																																																																																																																																																																																												</div>
+		</div>
+	</div>		
+
+	
+	<a name="sec-methods"></a>
+	<div class="info-box">
+		<div class="info-box-title">Methods</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+																		<a href="#sec-const-summary">Constants</a> (<a href="#sec-consts">details</a>)
+							
+										<a href="#sec-method-summary">Methods</a> (<span class="disabled">details</span>)
+						
+		</div>
+		<div class="info-box-body">
+			<A NAME='method_detail'></A>
+<a name="methodgetFolder" id="getFolder"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method getFolder</span> (line <span class="line-number">146</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			getFolder
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$folder</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$folder</span>			</li>
+				</ul>
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestAPIHelper.html#methodgetFolder">iRestAPIHelper::getFolder()</a></dt>
+					</dl>
+			
+	</div>
+<a name="methodgetVersion" id="getVersion"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method getVersion</span> (line <span class="line-number">142</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			getVersion
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestAPIHelper.html#methodgetVersion">iRestAPIHelper::getVersion()</a></dt>
+					</dl>
+			
+	</div>
+<a name="methodnamespaces" id="namespaces"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method namespaces</span> (line <span class="line-number">161</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			namespaces
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestAPIHelper.html#methodnamespaces">iRestAPIHelper::namespaces()</a></dt>
+					</dl>
+			
+	</div>
+<a name="methodresponseHead" id="responseHead"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method responseHead</span> (line <span class="line-number">199</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			responseHead
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$datatype</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$type</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$count</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$pageLength</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$pageOffset</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$error</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$exterror</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$reqTime</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$authenticated</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$datatype</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$type</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$count</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$pageLength</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$pageOffset</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$error</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$exterror</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$reqTime</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$authenticated</span>			</li>
+				</ul>
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestAPIHelper.html#methodresponseHead">iRestAPIHelper::responseHead()</a></dt>
+					</dl>
+			
+	</div>
+<a name="methodresponseTail" id="responseTail"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method responseTail</span> (line <span class="line-number">238</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			responseTail
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestAPIHelper.html#methodresponseTail">iRestAPIHelper::responseTail()</a></dt>
+					</dl>
+			
+	</div>
+<a name="methodtransformXMLtoJSON" id="transformXMLtoJSON"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method transformXMLtoJSON</span> (line <span class="line-number">291</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			transformXMLtoJSON
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$x</span>)
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$x</span>			</li>
+				</ul>
+		
+			
+	</div>
+<a name="methodwrapResponse" id="wrapResponse"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method wrapResponse</span> (line <span class="line-number">242</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			wrapResponse
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$response</span>, [<span class="var-type"></span>&nbsp;<span class="var-name">$datatype</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$type</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$count</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$pageLength</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$pageOffset</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$error</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$exterror</span> = <span class="var-default">null</span>], [<span class="var-type"></span>&nbsp;<span class="var-name">$authenticated</span> = <span class="var-default">null</span>])
+			</div>
+	
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$response</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$datatype</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$type</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$count</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$pageLength</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$pageOffset</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$error</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$exterror</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$authenticated</span>			</li>
+				</ul>
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestAPIHelper.html#methodwrapResponse">iRestAPIHelper::wrapResponse()</a></dt>
+					</dl>
+			
+	</div>
+<a name="methodXMLNS_APPDB" id="XMLNS_APPDB"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_APPDB</span> (line <span class="line-number">111</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_APPDB
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_APPLICATION" id="XMLNS_APPLICATION"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_APPLICATION</span> (line <span class="line-number">112</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_APPLICATION
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_CATEGORY" id="XMLNS_CATEGORY"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_CATEGORY</span> (line <span class="line-number">116</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_CATEGORY
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_CLASSIFICATION" id="XMLNS_CLASSIFICATION"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_CLASSIFICATION</span> (line <span class="line-number">135</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_CLASSIFICATION
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_CONTEXTUALIZATION" id="XMLNS_CONTEXTUALIZATION"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_CONTEXTUALIZATION</span> (line <span class="line-number">114</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_CONTEXTUALIZATION
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_DATASET" id="XMLNS_DATASET"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_DATASET</span> (line <span class="line-number">140</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_DATASET
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_DISCIPLINE" id="XMLNS_DISCIPLINE"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_DISCIPLINE</span> (line <span class="line-number">115</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_DISCIPLINE
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_DISSEMINATION" id="XMLNS_DISSEMINATION"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_DISSEMINATION</span> (line <span class="line-number">117</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_DISSEMINATION
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_ENTITY" id="XMLNS_ENTITY"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_ENTITY</span> (line <span class="line-number">137</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_ENTITY
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_FILTER" id="XMLNS_FILTER"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_FILTER</span> (line <span class="line-number">118</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_FILTER
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_HISTORY" id="XMLNS_HISTORY"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_HISTORY</span> (line <span class="line-number">119</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_HISTORY
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_LICENSE" id="XMLNS_LICENSE"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_LICENSE</span> (line <span class="line-number">132</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_LICENSE
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_LOGISTICS" id="XMLNS_LOGISTICS"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_LOGISTICS</span> (line <span class="line-number">121</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_LOGISTICS
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_MIDDLEWARE" id="XMLNS_MIDDLEWARE"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_MIDDLEWARE</span> (line <span class="line-number">122</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_MIDDLEWARE
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_ORGANIZATION" id="XMLNS_ORGANIZATION"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_ORGANIZATION</span> (line <span class="line-number">138</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_ORGANIZATION
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_PERMISSION" id="XMLNS_PERMISSION"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_PERMISSION</span> (line <span class="line-number">125</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_PERMISSION
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_PERSON" id="XMLNS_PERSON"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_PERSON</span> (line <span class="line-number">123</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_PERSON
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_PRIVILEGE" id="XMLNS_PRIVILEGE"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_PRIVILEGE</span> (line <span class="line-number">124</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_PRIVILEGE
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_PROJECT" id="XMLNS_PROJECT"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_PROJECT</span> (line <span class="line-number">139</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_PROJECT
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_PROVIDER" id="XMLNS_PROVIDER"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_PROVIDER</span> (line <span class="line-number">133</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_PROVIDER
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_PROVIDER_TEMPLATE" id="XMLNS_PROVIDER_TEMPLATE"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_PROVIDER_TEMPLATE</span> (line <span class="line-number">134</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_PROVIDER_TEMPLATE
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_PUBLICATION" id="XMLNS_PUBLICATION"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_PUBLICATION</span> (line <span class="line-number">126</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_PUBLICATION
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_RATING" id="XMLNS_RATING"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_RATING</span> (line <span class="line-number">127</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_RATING
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_RATINGREPORT" id="XMLNS_RATINGREPORT"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_RATINGREPORT</span> (line <span class="line-number">128</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_RATINGREPORT
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_REGIONAL" id="XMLNS_REGIONAL"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_REGIONAL</span> (line <span class="line-number">129</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_REGIONAL
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_RESOURCE" id="XMLNS_RESOURCE"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_RESOURCE</span> (line <span class="line-number">120</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_RESOURCE
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_SITE" id="XMLNS_SITE"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_SITE</span> (line <span class="line-number">136</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_SITE
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_USER" id="XMLNS_USER"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_USER</span> (line <span class="line-number">130</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_USER
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_VIRTUALIZATION" id="XMLNS_VIRTUALIZATION"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_VIRTUALIZATION</span> (line <span class="line-number">113</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_VIRTUALIZATION
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_VO" id="XMLNS_VO"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_VO</span> (line <span class="line-number">131</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_VO
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodXMLNS_XS" id="XMLNS_XS"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_XS</span> (line <span class="line-number">110</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_XS
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestAPIHelper.html#methodXMLNS_XS">iRestAPIHelper::XMLNS_XS()</a></dt>
+					</dl>
+			
+	</div>
+<a name="methodXMLNS_XSI" id="XMLNS_XSI"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<span class="method-title">static method XMLNS_XSI</span> (line <span class="line-number">109</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+
+	
+	<div class="method-signature">
+	    static
+		<span class="method-result">void</span>
+		<span class="method-name">
+			XMLNS_XSI
+		</span>
+				()
+			</div>
+	
+		
+				<hr class="separator" />
+		<div class="notes">Implementation of:</div>
+			<dl>
+			<dt><a href="../AppDB RESTful API Documentation/iRestAPIHelper.html#methodXMLNS_XSI">iRestAPIHelper::XMLNS_XSI()</a></dt>
+					</dl>
+			
+	</div>
+
+
+						
+		</div>
+	</div>
+
+	<a name="sec-consts"></a>
+	<div class="info-box">
+		<div class="info-box-title">Class Constants</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+										<a href="#sec-var-summary">Constants</a> (<span class="disabled">details</span>)
+						
+			
+										| 
+									<a href="#sec-method-summary">Methods</a> (<a href="#sec-methods">details</a>)
+							
+					</div>
+		<div class="info-box-body">
+			<a name="constVERSION" id="VERSION"><!-- --></A>
+<div class="evenrow">
+
+	<div class="const-header">
+		<span class="const-title">
+			<span class="const-name">VERSION</span>
+			 = <span class="const-default"> '1.0'</span>
+			(line <span class="line-number">106</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+<a name="constXMLNS_APPDB_BASE" id="XMLNS_APPDB_BASE"><!-- --></A>
+<div class="oddrow">
+
+	<div class="const-header">
+		<span class="const-title">
+			<span class="const-name">XMLNS_APPDB_BASE</span>
+			 = <span class="const-default"> 'http://appdb.egi.eu/api/'</span>
+			(line <span class="line-number">108</span>)
+		</span>
+	</div>
+
+	<!-- ========== Info from phpDoc block ========= -->
+	
+	
+</div>
+
+
+						
+		</div>
+	</div>
+
+	<p class="notes" id="credit">
+		Documentation generated on Fri, 19 Jan 2018 16:28:58 +0000 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.4</a>
+	</p>
+	</div></body>
+</html>
+

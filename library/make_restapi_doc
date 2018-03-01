@@ -1,0 +1,2 @@
+#!/bin/bash
+phpdoc -f restapi_app.php,restapi_base.php,restapi_dataset.php,restapi_misc.php,restapi_ppl.php,restapi_repo.php,restapi_sciclass.php,restapi_site.php,restapi_vo.php -t restapi_doc -ti "AppDB RESTful API Documentation" -dn "AppDB RESTful API Documentation" -dc "AppDB Documentation"

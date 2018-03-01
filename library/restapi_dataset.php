@@ -24,7 +24,7 @@ class RestDSExchangeFormatList extends RestROResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "exchangeformat";
@@ -35,7 +35,7 @@ class RestDSExchangeFormatList extends RestROResourceList {
     }
 
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		$res = new Default_Model_DatasetExchangeFormats();
@@ -52,7 +52,7 @@ class RestDSConnectionTypeList extends RestROResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "connectiontype";
@@ -63,7 +63,7 @@ class RestDSConnectionTypeList extends RestROResourceList {
     }
 
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		$res = new Default_Model_DatasetConnTypes();
@@ -78,10 +78,10 @@ class RestDSConnectionTypeList extends RestROResourceList {
 class RestDSXMLParser extends RestXMLParser {
     /**
      * implementation of abstract parse() operation from RestXMLParser.
-     * @xml SimpleXMLElement the root element of the dataset XML representation
+     * @param SimpleXMLElement $xml the root element of the dataset XML representation
      * 
      * @return Default_Model_Dataset
-     * @access public
+     *
      */
     public function parse($xml) {
 		global $application;
@@ -259,7 +259,7 @@ class RestDSXMLParser extends RestXMLParser {
 class RestDatasetList extends RestResourceList {
     /**
      * internal reference to XML parser, set during initialization
-     * @access private
+     *
      */
 	private $_parser;
 
@@ -268,7 +268,7 @@ class RestDatasetList extends RestResourceList {
 	}
 
 	/**
-     * @overrides init() from RestResourceList
+     * overrides RestResourceList::init()
      */
 	protected function init() {
 		$this->_parser = new RestDSXMLParser($this);
@@ -278,7 +278,7 @@ class RestDatasetList extends RestResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "dataset";
@@ -291,7 +291,7 @@ class RestDatasetList extends RestResourceList {
     }
 
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		$res = new Default_Model_Datasets();
@@ -360,10 +360,10 @@ class RestDatasetList extends RestResourceList {
     /**
      * handles PUT and POST HTTP methods to REST requests
      *
-     * @method integer the method enumeration according to RestMethodEnum
+     * @param integer $method the method enumeration according to RestMethodEnum
      *
      * @return iRestResponse
-     * @access private
+     *
      */
     private function putpost($method) {
 		db()->beginTransaction();
@@ -393,7 +393,7 @@ class RestDatasetList extends RestResourceList {
 	}
 
     /**
-     * @overrides put() from RestResource
+     * overrides RestResource::put()
      */
 	public function put() {
 		if (  parent::put() !== false ) {
@@ -402,7 +402,7 @@ class RestDatasetList extends RestResourceList {
 	}
 
     /**
-     * @overrides post() from RestResource
+     * overrides RestResource::post()
      */
 	public function post() {
 		if ( parent::post() !== false ) {
@@ -420,14 +420,14 @@ class RestDatasetItem extends RestROResourceItem {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "dataset";
 	}
 
      /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		$res = new Default_Model_Datasets();
@@ -443,7 +443,7 @@ class RestDatasetItem extends RestROResourceItem {
 		return $res;
 	}
     /**
-     * @overrides delete() from RestResource
+     * overrides RestResource::delete()
      */
 	public function delete() {
 		if ( parent::delete() !== false ) {
@@ -511,10 +511,10 @@ class RestDatasetItem extends RestROResourceItem {
 class RestDSVerXMLParser extends RestXMLParser {
     /**
      * implementation of abstract parse() operation from RestXMLParser.
-     * @xml SimpleXMLElement the root element of the dataset XML representation
+     * @param SimpleXMLElement $xml the root element of the dataset XML representation
      * 
      * @return Default_Model_Dataset
-     * @access public
+     *
      */
     public function parse($xml) {
 		global $application;
@@ -694,7 +694,7 @@ class RestDatasetVersionList extends RestResourceList {
     }
 
 	/**
-     * @overrides init() from RestResourceList
+     * overrides RestResourceList::init()
      */
 	protected function init() {
 		$isAdmin = $this->userIsAdmin();
@@ -705,7 +705,7 @@ class RestDatasetVersionList extends RestResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "dataset";
@@ -716,7 +716,7 @@ class RestDatasetVersionList extends RestResourceList {
     }
 
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		$res = new Default_Model_DatasetVersions();
@@ -730,10 +730,10 @@ class RestDatasetVersionList extends RestResourceList {
 	/**
      * handles PUT and POST HTTP methods to REST requests
      *
-     * @method integer the method enumeration according to RestMethodEnum
+     * @param integer $method the method enumeration according to RestMethodEnum
      *
      * @return iRestResponse
-     * @access private
+     *
      */
     private function putpost($method) {
 		$inTrans = false;
@@ -776,7 +776,7 @@ class RestDatasetVersionList extends RestResourceList {
 	}
 
     /**
-     * @overrides put() from RestResource
+     * overrides RestResource::put()
      */
 	public function put() {
 		if ( parent::put() !== false ) {
@@ -785,7 +785,7 @@ class RestDatasetVersionList extends RestResourceList {
 	}
 
     /**
-     * @overrides post() from RestResource
+     * overrides RestResource::post()
      */
 	public function post() {
 		if ( parent::post() !== false ) {
@@ -851,14 +851,14 @@ class RestDatasetVersionItem extends RestROResourceItem {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "dataset";
 	}
 
      /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		$res = new Default_Model_DatasetVersions();
@@ -875,7 +875,7 @@ class RestDatasetVersionItem extends RestROResourceItem {
 	}
 
 	/**
-     * @overrides delete() from RestResource
+     * overrides RestResource::delete()
      */
 	public function delete() {
 		if ( parent::delete() !== false ) {
@@ -943,10 +943,10 @@ class RestDatasetVersionItem extends RestROResourceItem {
 class RestDSLocXMLParser extends RestXMLParser {
     /**
      * implementation of abstract parse() operation from RestXMLParser.
-     * @xml SimpleXMLElement the root element of the dataset XML representation
+     * @param SimpleXMLElement $xml the root element of the dataset XML representation
      * 
      * @return Default_Model_Dataset
-     * @access public
+     *
      */
     public function parse($xml) {
 		global $application;
@@ -1114,7 +1114,7 @@ class RestDatasetLocationList extends RestResourceList {
     }
 
 	/**
-     * @overrides init() from RestResourceList
+     * overrides RestResourceList::init()
      */
 	protected function init() {
 		$this->_parser = new RestDSLocXMLParser($this);
@@ -1124,7 +1124,7 @@ class RestDatasetLocationList extends RestResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "dataset";
@@ -1135,7 +1135,7 @@ class RestDatasetLocationList extends RestResourceList {
     }
 
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		$res = new Default_Model_DatasetLocations();
@@ -1149,10 +1149,10 @@ class RestDatasetLocationList extends RestResourceList {
 	/**
      * handles PUT and POST HTTP methods to REST requests
      *
-     * @method integer the method enumeration according to RestMethodEnum
+     * @param integer $method the method enumeration according to RestMethodEnum
      *
      * @return iRestResponse
-     * @access private
+     *
      */
     private function putpost($method) {
 		$inTrans = false;
@@ -1195,7 +1195,7 @@ class RestDatasetLocationList extends RestResourceList {
 	}
 
     /**
-     * @overrides put() from RestResource
+     * overrides RestResource::put()
      */
 	public function put() {
 		if ( parent::put() !== false ) {
@@ -1204,7 +1204,7 @@ class RestDatasetLocationList extends RestResourceList {
 	}
 
     /**
-     * @overrides post() from RestResource
+     * overrides RestResource::post()
      */
 	public function post() {
 		if ( parent::post() !== false ) {
@@ -1271,14 +1271,14 @@ class RestDatasetLocationItem extends RestROResourceItem {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "dataset";
 	}
 
      /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
 	protected function getModel() {
 		$res = new Default_Model_DatasetLocations();
@@ -1295,7 +1295,7 @@ class RestDatasetLocationItem extends RestROResourceItem {
 	}
 
 	/**
-     * @overrides delete() from RestResource
+     * overrides RestResource::delete()
      */
 	public function delete() {
 		if ( parent::delete() !== false ) {

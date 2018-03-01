@@ -23,10 +23,10 @@ class RestPplXMLParser extends RestXMLParser {
     /**  
      * implementation of abstract parse() operation from RestXMLParser.
      *
-     * @xml SimpleXMLElement the root element of the application XML representation
+     * @param SimpleXMLElement $xml the root element of the application XML representation
      * 
      * @return Default_Model_Researcher
-     * @access public
+     *
      */
     public function parse($xml) {
 		if ( ! is_null($this->_user) ) {
@@ -251,7 +251,7 @@ class RestPplList extends RestResourceList {
 
     /**
      * internal reference to XML parser, set during initialization
-     * @access private
+     *
      */
     private $_parser;
 
@@ -260,21 +260,21 @@ class RestPplList extends RestResourceList {
      * realization of getDataType() from iRestResource
      *
      * @return string
-     * @access public
+     *
      */
     public function getDataType() {
         return "person";
     }
 
     /**
-     * @overrides init() from RestResourceList
+     * overrides RestResourceList::init()
      */
     protected function init() {
         $this->_parser = new RestPplXMLParser($this);
     }
 
     /**
-     * @overrides getModel from RestResource
+     * overrides RestResource::getModel
      */
 	protected function getModel() {
 		$ppl = new Default_Model_Researchers();
@@ -285,10 +285,10 @@ class RestPplList extends RestResourceList {
     /**
      * handles PUT and POST HTTP methods to REST requests
      *
-     * @method integer the method enumeration according to RestMethodEnum
+     * @param integer $method the method enumeration according to RestMethodEnum
      *
      * @return iRestResponse
-     * @access private
+     *
      */
 	private function putpost($method) {
 		db()->beginTransaction();
@@ -318,7 +318,7 @@ class RestPplList extends RestResourceList {
 	}
 
     /**
-     * @overrides put() from RestResource
+     * overrides RestResource::put()
      */
 	public function put() {
 		if (  parent::put() !== false ) {
@@ -327,7 +327,7 @@ class RestPplList extends RestResourceList {
 	}
 
     /**
-     * @overrides post() from RestResource
+     * overrides RestResource::post()
      */
 	public function post() {
 		if ( parent::post() !== false ) {
@@ -397,17 +397,17 @@ class RestPplItem extends RestResourceItem {
 
     /**
      * reference to model representing the requested resource item
-     * @access private
+     *
      */
     private $_res;
     /**
      * reference to parent collection of the model representing the requested resource item
-     * @access private
+     *
      */    
     private $_resParent;
     /**
      * reference to XML parser
-     * @access private
+     *
      */
     private $_parser;
 	private $_logged;
@@ -420,7 +420,7 @@ class RestPplItem extends RestResourceItem {
     }
 
     /**
-     * @overrides init() from RestResource
+     * overrides RestResource::init()
      */
     protected function init() {
 		$this->_logged = false;
@@ -446,7 +446,7 @@ class RestPplItem extends RestResourceItem {
     }
 
     /**
-     * @overrides getModel() from RestResource
+     * overrides RestResource::getModel()
      */
     protected function getModel() {
 		if ( ($this->getMethod() == RestMethodEnum::RM_GET) && (! $this->_logged) ) {
@@ -470,7 +470,7 @@ class RestPplItem extends RestResourceItem {
 
 
 //    /**
-//     * @overrides delete() from RestResource
+//     * overrides RestResource::delete()
 //     */
 //	public function delete() {
 //		if ( parent::delete() !== false ) {
@@ -489,7 +489,7 @@ class RestPplItem extends RestResourceItem {
 //    }
 
     /**
-     * @overrides delete() from RestResource
+     * overrides RestResource::delete()
      */
 	public function delete() {
         if ( parent::delete() !== false ) {
@@ -548,7 +548,7 @@ class RestProfile extends RestROAuthResourceItem {
     }
 
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
     public function get() {
         if ( parent::get() !== false ) {
@@ -586,7 +586,7 @@ class RestPplFilterNormalization extends RestROResourceItem {
     }
 
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get() { 
 		if ( parent::get() !== false ) {
@@ -610,7 +610,7 @@ class RestPplFilterReflection extends RestROResourceItem {
     }
 
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get(){
 		if ( parent::get() !== false ) {
@@ -639,7 +639,7 @@ class RestDelPplList extends RestROAdminResourceList {
     }
 
     /**
-     * @overrides getModel from RestResource
+     * overrides RestResource::getModel
      */
 	protected function getModel() {
 		$res = new Default_Model_Researchers();
@@ -665,7 +665,7 @@ class RestPplLogistics extends RestROResourceItem {
     }
     
     /**
-     * @overrides get() from RestResource
+     * overrides RestResource::get()
      */
 	public function get($extraFilter = null) {
 		if ( parent::get() !== false ) {
