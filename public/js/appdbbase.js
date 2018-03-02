@@ -9254,6 +9254,15 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 		this.options.vodata.imagelist = res;
 		this.mergeDraftToAvailableVApps();
 	};
+	this.loadSecantReports = function(callback) {
+	    $.get(appdb.config.endpoint.base + "vo/secantreport", {id: this.options.id, format: 'js'}).done(function(data) {
+		this.options.secant = (((data || {}).result || {}).report || []);
+		callback.apply(this);
+	    }.bind(this)).fail(function(err) {
+		this.options.secant = [];
+		callback.apply(this);
+	    }.bind(this));
+	}
 	//Update available vappliance data with related vo image list information
 	this.mergeDraftToAvailableVApps = function(){
 		var draft = this.getDraftImageList();
@@ -9270,6 +9279,7 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 		pub.vapps = pub.vapps || {};
 		
 		var res = [];
+		var secantReports = this.options.secant || [];
 		
 		$.each(vapps, function(i, e){
 			var curid = $.trim(e.id);
@@ -9351,9 +9361,67 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 				});
 				e.voimagelist.previousVersions = previousversions;
 			}
+			//Load secant reports
+			/*e.secant = [];
+			$.each(secantReports, function(i, r) {
+			   r.vmiinstance_archived = (r.vmiinstance_archived  === 'true') ? true : false;
+			   if (r.app_id === $.trim(e.id)) {
+			       if (e.voimagelist && e.voimagelist.images && e.voimagelist.images.length > 0) {
+				    $.each(e.voimagelist.images, function(ii, img) {
+				       if (img.vmiinstanceid === r.vmiinstance_id) {
+					   r.vaversion_type = 'current';
+				       }
+				   });
+			       }
+			       if (!r.vaversion_type) {
+				   r.vaversion_type = (r.vmiinstance_archived) ? 'previous' : 'latest';
+			       }
+			       e.secant.push(r);
+			   }
+			});
+
+			e.secant.sort(function(a, b) {
+			   return parseInt(b.vmiinstance_id) - parseInt(a.vmiinstance_id);
+			});*/
+			e = this.getSecantReportsForVAppliance(e, secantReports);
+
 			res.push(e);
-		});
+		}.bind(this));
 		this.options.vapps = res;
+	};
+	this.getSecantReportsForVAppliance = function(vappid, secantReports) {
+		secantReports = secantReports || this.options.secant || [];
+		var entry = null;
+		if (vappid && vappid.id) {
+			entry = vappid;
+		} else {
+			$.each(this.options.vapps || [], function(i, e) {
+			    if (!entry && $.trim(e.id) === $.trim(vappid)) {
+				entry = e;
+			    }
+			});
+		}
+
+		if (!entry) return [];
+
+		entry.secant = [];
+		$.each(secantReports, function(i, r) {
+			if (typeof r.vmiinstance_archived === 'string') {
+			    r.vmiinstance_archived = (r.vmiinstance_archived  === 'true') ? true : false;
+			}
+			if (r.app_id === $.trim(entry.id)) {
+			    if (!r.vaversion_type) {
+				    r.vaversion_type = (r.vmiinstance_archived) ? 'previous' : 'latest';
+			    }
+			    entry.secant.push(r);
+			}
+		 }.bind(secantReports));
+
+		 entry.secant.sort(function(a, b) {
+			return parseInt(b.vmiinstance_id) - parseInt(a.vmiinstance_id);
+		 });
+
+		 return entry;
 	};
 	//Create vapp property with grouped images based on the vappliance container
 	this.groupVApps = function(imagelist){
@@ -9418,7 +9486,7 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 		d = $.extend( true, { "void": this.options.id }, d );
 		_model = new appdb.model.VOWideImageList();
 		_model.subscribe({event: "update", callback: function(v){
-				this.renderLoading(false);
+			this.renderLoading(false);
 			callback(v);
 		}, caller: this});
 		_model.update({query: {}, data: d});
@@ -9427,11 +9495,43 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 		this._RequestAction({ "action":"add", "vappid": vappid }, callback ); 
 	};
 	this.removeVappliance = function(vappid, callback){
-		this._RequestAction({ "action":"remove", "vappid": vappid }, callback ); 
+		this._RequestAction({ "action":"remove", "vappid": vappid }, function(removeResponse) {
+			if (removeResponse && !removeResponse.error) {
+				this.getSecantReport(vappid, function(secantResponse) {
+					if (secantResponse && !secantResponse.error) {
+						removeResponse.data = secantResponse || {};
+					}
+					callback(removeResponse);
+				});
+			} else {
+				callback(removeResponse);
+			}
+		}.bind(this));
 	};
 	this.updateVappliance = function(vappid, callback){
-		this._RequestAction({ "action":"update", "vappid": vappid }, callback ); 
+		this._RequestAction({ "action":"update", "vappid": vappid }, function(updateResponse) {
+			if (updateResponse && !updateResponse.error) {
+				this.getSecantReport(vappid, function(secantResponse) {
+					if (secantResponse && !secantResponse.error) {
+						updateResponse.data = secantResponse || {};
+					}
+					callback(updateResponse);
+				});
+			} else {
+			    callback(updateResponse);
+			}
+		}.bind(this));
 	};
+	this.getSecantReport = function(vappid, callback) {
+		$.get(appdb.config.endpoint.base + "vo/secantreport", {id: this.options.id, appid: vappid, format: 'js'}).done(function(data) {
+			var d = (((data || {}).result || {}).report || []);
+			d = $.isArray(d) ? d : [d];
+			var res = this.getSecantReportsForVAppliance(vappid, d);
+			callback(res);
+		}.bind(this)).fail(function(err) {
+			callback({error: err});
+		}.bind(this));
+	}
 	this.publishImageList = function(callback){
 		this.renderLoading(true, "Publishing changes");
 		this._RequestAction({ "action":"publish" }, callback ); 
@@ -9457,6 +9557,9 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 				break;
 			case "revertchanges":
 				this.revertChanges(callback);
+				break;
+			case "secantreport":
+				this.getSecantReport(data.id, callback);
 				break;
 			default: 
 				callback({error: "Invalid action specified"});
@@ -9555,8 +9658,10 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 				self.options.swapps = $.isArray(self.options.swapps)?self.options.swapps:[self.options.swapps];
 				appdb.model.StaticList.SwapplianceReport = self.options.swapps;
 				appdb.model.StaticList.SwapplianceReportUnique = self.getAllAvailableSWAppliances(self.options.swapps);
-				self.extractVApps();
-				self.render();
+				self.loadSecantReports(function(data) {
+					self.extractVApps();
+					this.render();
+				});
 			};
 		})(this));
 	};
