@@ -16345,7 +16345,373 @@ appdb.views.FilterDecorator = appdb.ExtendClass(appdb.View, "appdb.views.FilterD
 	};
 	this._init();
 });
+appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantReport", function(o) {
+	this.options ={
+		container: $(o.container),
+		parent: o.parent || null,
+		data: o.data || {}
+	};
+	this.render = function(data) {
+		var d = (data.report_data || {}).SECANT || null;
+		if(!d) return null;
+		var logs = (d.LOG || {}).CHECK || null;
+		if (!logs) return null;
+		var table = $('<table ><tbody></tbody></table>');
+		var tbody = $(table).find('tbody');
+		$.each(logs || [], function(i, log) {
+		   var imgSrc = '';
+		   switch(log.OUTCOME) {
+		       case "NA":
+		       case "WARNING":
+			   imgSrc = '/images/vappliance/warning.png';
+			   break;
+		       case "OK":
+			   imgSrc = '/images/tick.png';
+			   break;
+		       default:
+			   imgSrc = '/images/vappliance/redwarning.png';
+			   break;
+		   }
+		   var td1 = $('<td></td>').append($('<img></img>').attr('src', imgSrc).attr('title', log.OUTCOME));
+		   var td2 = $('<td></td>').append($('<div class="test_id"></div>').append(log.TEST_ID).append('<span class="version">v'+log.VERSION+'</span>'))
+			   .append($('<div class="description"></div>').append(log.DESCRIPTION));
+		   if ($.trim(log.DETAILS)) {
+		       $(td2).append($('<div class="details"></div>').append(log.DETAILS));
+		   }
 
+		   $(tbody).append($('<tr></tr>').append(td1).append(td2));
+		});
+	};
+
+	this._init = function() {
+	    this.dom = $(this.options.container);
+	    this.parent = this.options.parent;
+	};
+	this._init();
+},{
+    stateMap: {
+	'queued': { state: 'queued',  status: 'pending', img: '/images/ajax-loader-trans-orange.gif', text: "Ongoing security check for <span class='datavalue vaversion' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span>", content: "<span class='datavalue vaversion capitilize' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span> of VAppliance <span class='datavalue app_name' data-path='app_name'></span> is currently being checked for security issues" },
+	'sent': { state: 'sent',  status: 'pending', img: '/images/ajax-loader-trans-orange.gif', text: "Ongoing security check for <span class='datavalue vaversion' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span>", content: "<span class='datavalue vaversion capitilize' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span> of VAppliance <span class='datavalue app_name' data-path='app_name'></span> is currently being checked for security issues"  },
+	'closed_OK': { state: 'closed', status: 'success', img: '/images/tick.png', text: "<span class='datavalue vaversion capitilize' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span> of VAppliance <span class='datavalue app_name' data-path='app_name'></span> passed <b>ALL</b> security checks"},
+	'closed_WARNING': { state: 'closed', status: 'warning', img: '/images/vappliance/warning.png', text: "<span class='datavalue vaversion capitilize' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span> of VAppliance <span class='datavalue app_name' data-path='app_name'></span> passed <b>SOME</b> security checks"},
+	'closed_ERROR': { state: 'closed', status: 'error', img: '/images/vappliance/redwarning.png', text: "<span class='datavalue vaversion capitilize' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span> of VAppliance <span class='datavalue app_name' data-path='app_name'></span>  <b>failed</b> to pass security checks"}
+    },
+    databindHtmlReportData: function(data, html) {
+	    $(html).find('[data-path]').each(function(i, e) {
+		let val = $.trim(data[$(e).data('path')]);
+		if ($(e).hasClass('capitilize') && val) {
+		    val = val[0].toUpperCase() + val.slice(1);
+		}
+		$(e).text(val);
+	    });
+	    return $(html);
+    },
+    getHtmlReportContent: function(report, container) {
+	    container = container || $('<span></span>');
+	    var state = appdb.views.SecantReport.getReportStatusData(report);
+	    if (!state) return null;
+
+	    return appdb.views.SecantReport.databindHtmlReportData(report, $(container).append(state.content || state.text));
+    },
+    getReportStatusData: function(report) {
+	var mapper = appdb.views.SecantReport.stateMap || {};
+	var state = null;
+	if (report) {
+		var stateKey = report.state;
+
+		if (stateKey === 'closed') {
+		    stateKey = stateKey + '_' + ('' + report.report_outcome).toUpperCase();
+		}
+
+		state = mapper[stateKey];
+	}
+	return (state) ? state : null;
+    },
+    createBadge: function(report, config) {
+	var dom = null;
+	var state = appdb.views.SecantReport.getReportStatusData(report);
+
+	config = config || {};
+	config.displayVersion = (typeof config.displayVersion === 'boolean') ? config.displayVersion : false;
+	config.displayHeader = (typeof config.displayHeader === 'boolean') ? config.displayHeader : true;
+	config.headerText = (typeof config.headerText === 'string') ? $.trim(config.headerText) || 'SECANT': 'SECANT'; 
+	config.size = (typeof config.size === 'string') ? $.trim(config.size) : '';
+
+	if (state) {
+		dom = $('<a class="secant badge"></a>').addClass(state.status);
+
+		if (config.size) {
+			$(dom).addClass(config.size);
+		}
+
+		if(config.displayHeader === true) {
+			$(dom).append($('<span class="header"></span>').text(config.headerText));
+		}
+
+		if (config.displayVersion === true) {
+			$(dom).append($('<span class="version"></span>').text(report.vaversion_type || report.vaversion));
+		}
+
+		$(dom).append($('<span class="status"></span>').text(state.status));
+		$(dom).prepend($('<img></img>').attr('src', state.img));
+		var title = state.content || state.text;
+		if (title) {
+			title = appdb.views.SecantReport.databindHtmlReportData(report, $('<span></span>').append(title )).text();
+			$(dom).attr('title', title);
+		}
+
+		if (config.displayHeader === false && config.displayVersion === false) {
+			$(dom).addClass('single');
+		}
+	}
+
+	return dom;
+    },
+    createReportTable: function(data) {
+	    var d = (data.report_data || {}).SECANT || null;
+	    if(!d) return null;
+	    var logs = (d.LOG || {}).CHECK || null;
+	    if (!logs) return null;
+	    var table = $('<table class="report-data"><tbody></tbody></table>');
+	    var tbody = $(table).find('tbody');
+	    $.each(logs || [], function(i, log) {
+	       var imgSrc = '';
+	       switch(log.OUTCOME) {
+		   case "NA":
+		   case "WARNING":
+		       imgSrc = '/images/vappliance/warning.png';
+		       break;
+		   case "OK":
+		       imgSrc = '/images/tick.png';
+		       break;
+		   default:
+		       imgSrc = '/images/vappliance/redwarning.png';
+		       break;
+	       }
+	       var td1 = $('<td></td>').append($('<img></img>').attr('src', imgSrc).attr('title', log.OUTCOME));
+	       var td2 = $('<td></td>').append($('<div class="test_id"></div>').append(log.TEST_ID).append('<span class="version">v'+log.VERSION+'</span>'))
+		       .append($('<div class="description"></div>').append(log.DESCRIPTION));
+	       if ($.trim(log.DETAILS)) {
+		   $(td2).append($('<div class="details"></div>').append(log.DETAILS));
+	       }
+
+	       $(tbody).append($('<tr></tr>').append(td1).append(td2));
+	    });
+	    return table;
+    },
+    getDiff: function(a, b) {
+	    var ar = ((((a || {}).report_data || {}).SECANT || {}).LOG || {}).CHECK || [];
+	    var br = ((((b || {}).report_data || {}).SECANT || {}).LOG || {}).CHECK || [];
+	    ar = $.isArray(ar) ? ar : [ar];
+	    br = $.isArray(br) ? br : [br];
+
+	    var diff = {};
+	    differ = function(i, r) {
+		    diff[r.TEST_ID] = diff[r.TEST_ID] || {};
+		    r.vaversion= this.vaversion;
+		    diff[r.TEST_ID][this.vaversion] = r;
+	    };
+	    $.each(ar, differ.bind(a));
+	    $.each(br, differ.bind(b));
+
+	    return {
+		    versions: [a.vaversion, b.vaversion],
+		    diff: diff
+	    };
+    },
+    getDiffTable: function(reporta, reportb) {
+	    var comparison = appdb.views.SecantReport.getDiff(reporta, reportb);
+	    var table = $('<table class="diff-data"><tbody></tbody></table>');
+	    var thead = $('<thead><tr><th></th><th>' + comparison.versions[0] + '</th><th>' + comparison.versions[1] + '</th></tr></thead>')
+	    var tbody = $('<tbody></tbody>');
+	    $(table).append(thead).append(tbody);
+	    var diffKeys = Object.keys(comparison.diff);
+	    $.each(diffKeys, function(i, diffKey) {
+		    var diff = comparison.diff[diffKey];
+		    var td1 = $('<td></td>').append(diffKey);
+		    var row = $('<tr></tr>').append(td1);
+		    $(row).append(td1);
+		    var outcomes = {};
+		    $.each(comparison.versions, function(ii, verKey) {
+			    var ver = diff[verKey];
+			    if (!ver) {
+				    $(row).append('<td>-</td>');
+				    return;
+			    }
+			    outcomes[ver.OUTCOME] = true;
+
+			    var imgSrc = '';
+			    switch(ver.OUTCOME) {
+				    case "NA":
+				    case "WARNING":
+					imgSrc = '/images/vappliance/warning.png';
+					break;
+				    case "OK":
+					imgSrc = '/images/tick.png';
+					break;
+				    default:
+					imgSrc = '/images/vappliance/redwarning.png';
+					break;
+			    }
+
+			    var div = $('<div class="outcome"></div>').append($('<img></img>').attr('src', imgSrc).attr('title', ver.DETAILS || ver.OUTCOME));
+			    $(row).append($('<td></td>').append(div));
+		    });
+		    if (Object.keys(outcomes).length > 1) {
+			$(row).addClass('hasdiff');
+		    }
+		    $(tbody).append(row);
+	    });
+	    return table;
+    },
+    getComparableReport: function(report, data) {
+	    if (!data || !data.secant || data.secant.length < 2) {
+		    return null;
+	    }
+
+	    var secantStatus = appdb.views.SecantReport.getReportStatusData(report);
+
+	    if (secantStatus.status === 'pending' || data.secant.length < 2) {
+		    return null;
+	    }
+	    var comparables = [];
+	    $.each(data.secant, function(i, s) {
+		    if ($.trim(s.vmiinstance_id) !== $.trim(report.vmiinstance_id) && ['queued', 'sent'].indexOf($.trim(s.state).toLowerCase()) === -1 && s.vaversion_type === 'current') {
+			comparables.push(s);
+		    }
+	    });
+
+	    return (comparables.length > 0) ? comparables[0] : null;
+    },
+    renderSecantDetails: function(report, data) {
+	    var secantStatus = appdb.views.SecantReport.getReportStatusData(report);
+	    var header = appdb.views.SecantReport.getHtmlReportContent(report, $('<div class="header"></div>'));
+	    var content = $('<div class="content"></div>');
+	    var dialog = $('<div class="secant_dialog"></div>').append(header);
+
+	    if (secantStatus.status !== 'pending') {
+		var comparableReport = appdb.views.SecantReport.getComparableReport(report, data);
+		var secantStatus = $('<div class="secant_status report"></div>');
+		$(secantStatus).append(appdb.views.SecantReport.createReportTable(report));
+		$(content).append(secantStatus);
+		if (comparableReport) {
+		    $(secantStatus).addClass('candiff');
+		    var diffHandler = $('<div class="viewas"></div>');
+		    var viewReportText = 'Back to <b>' +  report.vaversion_type + '</b>(' + comparableReport.vaversion + ') version security report';
+		    var viewReport = $('<a class="view-report"></a>').append(viewReportText).unbind('click').bind('click', function(ev) {
+			ev.preventDefault();
+			ev.stopPropagation();
+			$(this).closest('.secant_status').removeClass('diff').addClass('report');
+			return false;
+		    });
+		    var diffText = 'Diff security report with <b>' + comparableReport.vaversion_type + '</b>(' + comparableReport.vaversion + ') version';
+		    var viewDiff = $('<a class="view-diff"></a>').append(diffText).unbind('click').bind('click', function(ev) {
+			ev.preventDefault();
+			ev.stopPropagation();
+			$(this).closest('.secant_status').removeClass('report').addClass('diff');
+			return false;
+		    });
+		    $(diffHandler).append(viewDiff).append(viewReport);
+		    $(secantStatus).prepend(diffHandler);
+
+		    $(secantStatus).append( appdb.views.SecantReport.getDiffTable(report, comparableReport));
+		}
+		$(dialog).append(content);
+	    }
+	    var date = report.closedon || report.senton || report.queuedon || null;
+	    if (date) {
+		    var footer = $('<div class="footer"></div>');
+		    var reportState = (report.closedon) ? ' completed on' : (report.senton ? ' request sent on' : ' request queued on');
+		    $(footer).append('Security report' + reportState + ' <span class="value date"></span>');
+		    $(footer).find('span.value.date').text(date.split('.')[0]);
+		    $(dialog).append(footer);
+	    }
+	    return dialog;
+	}
+});
+
+appdb.views.VoSecantReport = appdb.ExtendClass(appdb.View, "appdb.views.VoSecantReport", function(o) {
+	this.options = {
+		container: $(o.container),
+		parent: o.parent || null,
+		data: o.data || {},
+		reports : [],
+		popupProvider: o.popupProvider,
+		vaversionTypes: o.vaversionTypes || [],
+		allowVersionDisplay: (typeof o.allowVersionDisplay === 'boolean') ? o.allowVersionDisplay : true
+	};
+
+	this.shouldDisplayVersions = function(data) {
+	    if (this.options.allowVersionDisplay === false) return;
+	    if (data.secant.length > 1) {
+		return true;
+	    }
+	    var vowideimagelist_id = data.secant[0].vowideimagelist_id;
+
+	    if (!vowideimagelist_id) {
+		return false;
+	    }
+
+	    return true;
+	};
+
+	this.getReports = function() {
+	    return this.options.reports || [];
+	}
+
+	this.render = function(data) {
+	    data = data  || this.options.data;
+	    this.options.data = data || this.options.data;
+	    $(this.dom).find('.secant.badge').remove();
+	    if (!data.secant || data.secant.length === 0) {
+		return null;
+	    }
+	    this.options.reports = this.options.reports || [];
+	    this.options.reports = $.isArray(this.options.reports) ? this.options.reports : [this.options.reports];
+
+	    if (data.secant.length > 0) {
+		$.each(data.secant, function(i, s) {
+			if (this.options.vaversionTypes && this.options.vaversionTypes.length > 0 && this.options.vaversionTypes.indexOf(s.vaversion_type) === -1) {
+			    return;
+			}
+			var badge = appdb.views.SecantReport.createBadge(s, {headerText: 'LATEST VERSION CHECK', displayVersion: this.shouldDisplayVersions(data)});
+			if (badge) {
+				$(badge).unbind('click').bind('click', (function(self, content) {
+				    return function(ev) {
+					ev.preventDefault();
+					var popupProvider = (self.options.popupProvider && 'popup' in self.options.popupProvider) ? self.options.popupProvider : appdb.views.VoSecantReport;
+					if (popupProvider.popup) {
+						popupProvider.popup.destroyRecursive(false);
+						popupProvider.popup = null;
+					}
+					if (content) {
+					    popupProvider.popup = new dijit.TooltipDialog({content: $(content)[0]});
+					    dijit.popup.open({
+						    parent: $(this)[0],
+						    popup: popupProvider.popup,
+						    around: $(ev.target)[0],
+						    orient: {'BL': 'TR'}
+					    });
+					}
+					return false;
+				    };
+				}(this, appdb.views.SecantReport.renderSecantDetails(s, data))));
+				$(this.dom).append(badge);
+
+				this.options.reports.push(s);
+			}
+		}.bind(this));
+	    }
+	};
+
+	this._init = function() {
+		this.dom = $(this.options.container);
+		this.parent = this.options.parent;
+	};
+	this._init();
+}, {
+    popup: null
+});
 appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImageListItem", function(o) {
 	this.options = {
 		container: $(o.container),
@@ -16425,7 +16791,7 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 		} else {
 			$(this.dom).removeClass("action-removed");
 		}
-
+		$(this.dom).removeClass('has-newimage');
 		$.each(this.options.cols, (function(self, data) {
 			return function(i, e) {
 				var td = self.addCell(data, e);
@@ -16459,7 +16825,12 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 			this.renderWarning(true, "Marked to be added", "The images of this virtual appliance will be added in the vo wide image list, <b>upon publishing</b>");
 		} else if (vodata.isOutdated === true && this.options.data.isExpired === false) {
 			var verlink = "<a title='View new version in new window' class='icontext newversion' href='" + appdb.config.endpoint.base + "store/vappliance/" + this.options.data.data.cname + "/vaversion/latest' target='_blank'>" + this.options.data.version + "</a>";
-			this.renderWarning(true, "Outdated images", "A new version, ver:" + verlink + ", is available. It is recomended to update. <br/>In such case, the action will take affect <b>upon publishing</b>.");
+			$(this.dom).addClass('has-newimage');
+			this.renderWarning(true, "New image version available"/*"Outdated images"*/, "A new version, ver:" + verlink + ", is available. It is recomended to update. <br/>In such case, the action will take affect <b>upon publishing</b>.");
+		}
+
+		if (this.options.data.secant && this.options.data.secant.length > 0) {
+		    this.renderSecant(this.options.data);
 		}
 	};
 	this.createWarningLink = function(text, errortext) {
@@ -16497,6 +16868,63 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 			$(d).append(this.createWarningLink(errortext, content));
 		}
 	};
+	this.renderCurrentSecant = function(data) {
+		$(this.dom).find("td[data-name='name'] > .customcellwrap").remove('.secant.badge');
+		var secants = (data || {}).secant || [];
+		secants = $.isArray(secants) ? secants : [secants];
+		var currentSecant = null;
+		$.each(secants, function(i,s) {
+		    if (s.vaversion_type === 'current') {
+			currentSecant = s;
+		    }
+		});
+
+		if (!currentSecant) {
+		    return;
+		}
+
+		var badge = appdb.views.SecantReport.createBadge(currentSecant, {displayHeader: true, headerText: 'CURRENT VERSION CHECK', size: ''});
+		if (badge) {
+			$(badge).unbind('click').bind('click', (function(self, content) {
+			    return function(ev) {
+				ev.preventDefault();
+				if (appdb.views.VoImageListItem.popup) {
+					appdb.views.VoImageListItem.popup.destroyRecursive(false);
+					appdb.views.VoImageListItem.popup = null;
+				}
+				if (content) {
+				    appdb.views.VoImageListItem.popup = new dijit.TooltipDialog({content: $(content)[0]});
+				    dijit.popup.open({
+					    parent: $(this)[0],
+					    popup: appdb.views.VoImageListItem.popup,
+					    around: $(ev.target)[0],
+					    orient: {'BR': 'TL'}//{'TR': 'BL'}
+				    });
+				}
+				return false;
+			    };
+			}(this, appdb.views.SecantReport.renderSecantDetails(currentSecant))));
+			$(this.dom).find("td[data-name='name']  > .customcellwrap").append(badge);
+		}
+	};
+	this.renderSecant = function(data) {
+		data = data || {};
+		var dom = $(this.dom).find("td[data-name='warnings'] .value");
+		var secant = new appdb.views.VoSecantReport({
+			container: $(dom),
+			parent: this,
+			popupProvider: appdb.views.VoImageListItem,
+			vaversionTypes: ['latest'],
+			allowVersionDisplay: false
+		});
+		secant.render(data);
+		if (secant.getReports().length > 0) {
+		    $(this.dom).addClass('has-latestreport');
+		} else {
+		    $(this.dom).removeClass('has-latestreport');
+		}
+		this.renderCurrentSecant(data);
+	};
 	this.isAdded = function() {
 		return (this.getStateData().isAdded || false) && (this.getStateData().isPublished === false);
 	};
@@ -16521,6 +16949,8 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 
 }, {
 	popup: null,
+	popupCurrentSecant: null,
+	popupLatestSecant: null,
 	popupswwapp: null,
 	popupswwappinerval: -1
 });
@@ -16913,7 +17343,7 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 					return $(html);
 				}},
 			{name: "hypervisors", columnName: "Hypervisors", display: (!appdb.config.features.swappliance), searchTip: "Search...", renderer: appdb.views.VoImageListItemCell.Expandable},
-			{name: "oses", columnName: "Oses", searchTip: "Search (eg linux, debian, windows ) ...", renderer: appdb.views.VoImageListItemCell.Expandable, maxheight: "25"},
+			{name: "oses", columnName: "Oses", searchTip: "Search (eg ubuntu, windows ) ...", renderer: appdb.views.VoImageListItemCell.Expandable, maxheight: "25"},
 			{name: "archs", columnName: "Achitectures", display: (!appdb.config.features.swappliance), searchTip: "Search (eg x86_64, Alpha, RISK ) ...", renderer: appdb.views.VoImageListItemCell.Expandable, maxheight: "25"},
 			{name: "actions", columnName: "Allowed<br/>Actions", searchRender: function() {
 					var html = $("<select><option value=''></option></select>");
@@ -17133,7 +17563,8 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 				expiresOn: (e.appliance && $.trim(e.appliance.expireson) !== "") ? e.appliance.expireson : "",
 				hypervisors: [],
 				oses: [],
-				archs: []
+				archs: [],
+				secant: (e.secant || [])
 			};
 			e.voimagelist = e.voimagelist || {};
 			e.voimagelist.images = e.voimagelist.images || {};
