@@ -24729,9 +24729,9 @@ a.helperlink.wikilink:hover{
     border: 1px solid #d6d3c6;
     color: #8A6D3B;
     padding-bottom: 2px;
-    width: 212px;
-    min-width: 212px;
-    max-width: 212px;
+    width: 213px;
+    min-width: 213px;
+    max-width: 213px;
     text-align: left;
     font-size: 12px;
     box-sizing: border-box;
@@ -24867,7 +24867,8 @@ a.helperlink.wikilink:hover{
     border: 1px solid #EE7836;
     border-right: none;
 }
-.secant.badge.error > * {
+.secant.badge.error > *,
+.secant.badge.aborted > *{
     background-color: #D2322D;
     color: white;
     border: 1px solid #D2322D;
