@@ -1775,6 +1775,7 @@ class VoController extends Zend_Controller_Action
             }
 
             $sql = "SELECT
+              secant.id as report_id,  
               vaviews.appid AS app_id,
               vaviews.appname AS app_name,
               vaviews.appcname AS app_cname,
@@ -1814,6 +1815,7 @@ class VoController extends Zend_Controller_Action
             if (count($rs) > 0) {
                 foreach ($rs as $r) {
                     $res .= "<report>\n";
+                    $res .= "  <report_id>" . $r["report_id"] . "</report_id>\n";
                     $res .= "  <app_id>" . $r["app_id"] . "</app_id>\n";
                     $res .= "  <app_name>" . $r["app_name"] . "</app_name>\n";
                     $res .= "  <app_cname>" . $r["app_cname"] . "</app_cname>\n";
