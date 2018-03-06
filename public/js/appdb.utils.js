@@ -9562,3 +9562,111 @@ appdb.utils.isLocalDomainUrl = function(url){
 	
 	return ( url.indexOf(ld) === 0 );	
 };
+
+appdb.utils.SecantVOImagelistWatcher = function(voId, callback) {
+    var _registry = {};
+    var _ajx = null;
+    var _timeoutInterval = 5000;
+    var _timer = null;
+
+    var abortRequest = function() {
+	    if (_ajx) {
+		    if (_ajx.abort) {
+			_ajx.abort();
+		    }
+	    }
+	    _ajx = null;
+    };
+
+    var diffResults = function(reports) {
+	var diffs = {};
+
+	$.each(reports, function(i, report) {
+	    var registredItem = _registry[report.report_id];
+	    if (registredItem && registredItem.state !== report.state) {
+		report.oldState = registredItem.state;
+		diffs[report.app_id]= diffs[report.app_id] || [];
+		diffs[report.app_id].push(report);
+		_registry[report.report_id] = report;
+	    }
+	});
+
+	return diffs;
+    };
+
+    var dispatchRequest = function(reportIds, cb) {
+	abortRequest();
+	reportIds = reportIds || [];
+	reportIds = $.isArray(reportIds) ? reportIds : [reportIds];
+
+	if (reportIds.length === 0) {
+		return cb();
+	}
+
+	_ajx = $.get(appdb.config.endpoint.base + "vo/secantreport", {id: voId, format: 'js', reports: reportIds.join(';')}).done(function(data) {
+		_ajx = null;
+		var secant = (((data || {}).result || {}).report || []);
+		var diffs = diffResults(secant);
+		cb(diffs);
+	    }.bind(this)).fail(function(err) {
+		_ajx = null;
+		appdb.debug('[ERROR][Secant report watcher]: ', err);
+		cb(null);
+	    }.bind(this));
+    };
+
+    var start = function() {
+	if (_timer) {
+	    return;
+	}
+
+	_timer = setTimeout(function() {
+	    if (_timer === null) {
+		return;
+	    }
+	    var reportIds = Object.keys(_registry);
+	    dispatchRequest(reportIds, function(diffs) {
+		clearTimeout(_timer);
+		_timer = null;
+		start();
+		if (diffs !== null) {
+		    callback(diffs);
+		}
+	    });
+	}, _timeoutInterval || 5000);
+    }
+
+    var clearAll = function() {
+	abortRequest();
+	_registry = {};
+    };
+
+    var watch = function(vappliance) {
+	var secants = (vappliance || {}).secant || [];
+	secants = $.isArray(secants) ? secants : [secants];
+
+	$.each(secants, function(i, sec) {
+		if (_registry[sec.report_id]) {
+		    return;
+		}
+		_registry[sec.report_id] = sec;
+	});
+	start();
+    };
+
+    var reset = function() {
+	abortRequest();
+	_registry = {}
+	if (_timer) {
+	    clearTimeout(_timer);
+	    _timer = null;
+	}
+    };
+
+    return {
+	clearAll: clearAll,
+	reset: reset,
+	watch: watch,
+	start: start
+    };
+}

@@ -9361,28 +9361,6 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 				});
 				e.voimagelist.previousVersions = previousversions;
 			}
-			//Load secant reports
-			/*e.secant = [];
-			$.each(secantReports, function(i, r) {
-			   r.vmiinstance_archived = (r.vmiinstance_archived  === 'true') ? true : false;
-			   if (r.app_id === $.trim(e.id)) {
-			       if (e.voimagelist && e.voimagelist.images && e.voimagelist.images.length > 0) {
-				    $.each(e.voimagelist.images, function(ii, img) {
-				       if (img.vmiinstanceid === r.vmiinstance_id) {
-					   r.vaversion_type = 'current';
-				       }
-				   });
-			       }
-			       if (!r.vaversion_type) {
-				   r.vaversion_type = (r.vmiinstance_archived) ? 'previous' : 'latest';
-			       }
-			       e.secant.push(r);
-			   }
-			});
-
-			e.secant.sort(function(a, b) {
-			   return parseInt(b.vmiinstance_id) - parseInt(a.vmiinstance_id);
-			});*/
 			e = this.getSecantReportsForVAppliance(e, secantReports);
 
 			res.push(e);
@@ -9421,7 +9399,9 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 			return parseInt(b.vmiinstance_id) - parseInt(a.vmiinstance_id);
 		 });
 
-		 return entry;
+		this.addSecantWatcher(entry);
+
+		return entry;
 	};
 	//Create vapp property with grouped images based on the vappliance container
 	this.groupVApps = function(imagelist){
@@ -9665,8 +9645,46 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 			};
 		})(this));
 	};
+	this.onSecantChange = function(diffs) {
+		var appids = Object.keys(diffs);
+		if (this.views.imagelist && appids.length > 0) {
+			$.each(appids, function(i, appid) {
+				this.views.imagelist.updateSecantReportsForVappliance(appid, diffs[appid]);
+			}.bind(this));
+		}
+	};
+        this.addSecantWatcher = function(entry) {
+		if (!appdb.components.VoImageListManager.secantWatcher) {
+			appdb.components.VoImageListManager.secantWatcher = appdb.utils.SecantVOImagelistWatcher(this.options.id, this.onSecantChange.bind(this));
+		}
+
+		appdb.components.VoImageListManager.secantWatcher.watch(entry);
+	};
+	this.destroy = function(){
+		var i, v = this.views;
+		for(i in v){
+			if(v[i].destroy){
+				v[i].destroy();
+			}
+		}
+		if(this._model){
+			this._model.destroy();
+		}
+		this._mediator.clearAll();
+		if(this._dom){
+		        $(this._dom).empty();
+		}
+		if (appdb.components.VoImageListManager.secantWatcher) {
+			appdb.components.VoImageListManager.secantWatcher.reset();
+			appdb.components.VoImageListManager.secantWatcher = null;
+		}
+		return this;
+	}
 	this._initContainer = function(){
-		
+		if (appdb.components.VoImageListManager.secantWatcher) {
+			appdb.components.VoImageListManager.secantWatcher.reset();
+			appdb.components.VoImageListManager.secantWatcher = null;
+		}
 	};
 	this._init = function(){
 		this.dom = $(this.options.container);
@@ -9679,6 +9697,8 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 		this._initContainer();
 	};
 	this._init();
+}, {
+	secantWatcher: null
 });
 appdb.components.VapplianceResourceProviders = appdb.ExtendClass(appdb.Component, "appdb.components.VapplianceResourceProviders", function(o){
 	this.options = {

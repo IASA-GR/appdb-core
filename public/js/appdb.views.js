@@ -16392,6 +16392,7 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
     stateMap: {
 	'queued': { state: 'queued',  status: 'pending', img: '/images/ajax-loader-trans-orange.gif', text: "Ongoing security check for <span class='datavalue vaversion' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span>", content: "<span class='datavalue vaversion capitilize' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span> of VAppliance <span class='datavalue app_name' data-path='app_name'></span> is currently being checked for security issues" },
 	'sent': { state: 'sent',  status: 'pending', img: '/images/ajax-loader-trans-orange.gif', text: "Ongoing security check for <span class='datavalue vaversion' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span>", content: "<span class='datavalue vaversion capitilize' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span> of VAppliance <span class='datavalue app_name' data-path='app_name'></span> is currently being checked for security issues"  },
+	'aborted': { state: 'aborted', status: 'aborted', img: '/images/vappliance/redwarning.png', text: "Security check for <span class='datavalue vaversion' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span> of VAppliance <span class='datavalue app_name' data-path='app_name'></span>  was <b>aborted</b>"},
 	'closed_OK': { state: 'closed', status: 'success', img: '/images/tick.png', text: "<span class='datavalue vaversion capitilize' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span> of VAppliance <span class='datavalue app_name' data-path='app_name'></span> passed <b>ALL</b> security checks"},
 	'closed_WARNING': { state: 'closed', status: 'warning', img: '/images/vappliance/warning.png', text: "<span class='datavalue vaversion capitilize' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span> of VAppliance <span class='datavalue app_name' data-path='app_name'></span> passed <b>SOME</b> security checks"},
 	'closed_ERROR': { state: 'closed', status: 'error', img: '/images/vappliance/redwarning.png', text: "<span class='datavalue vaversion capitilize' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span> of VAppliance <span class='datavalue app_name' data-path='app_name'></span>  <b>failed</b> to pass security checks"}
@@ -16571,7 +16572,7 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 
 	    var secantStatus = appdb.views.SecantReport.getReportStatusData(report);
 
-	    if (secantStatus.status === 'pending' || data.secant.length < 2) {
+	    if (['pending', 'aborted'].indexOf(secantStatus.status) > -1 || data.secant.length < 2) {
 		    return null;
 	    }
 	    var comparables = [];
@@ -16589,7 +16590,7 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 	    var content = $('<div class="content"></div>');
 	    var dialog = $('<div class="secant_dialog"></div>').append(header);
 
-	    if (secantStatus.status !== 'pending') {
+	    if (['pending', 'aborted'].indexOf(secantStatus.status) === -1) {
 		var comparableReport = appdb.views.SecantReport.getComparableReport(report, data);
 		var secantStatus = $('<div class="secant_status report"></div>');
 		$(secantStatus).append(appdb.views.SecantReport.createReportTable(report));
@@ -17746,6 +17747,28 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 			return;
 		}
 		item[0].render(d[0]);
+	};
+
+	this.updateSecantReportsForVappliance = function(vappid, reports) {
+	    var item = $.grep(this.subviews, function(e) {
+		    return (e.getId && $.trim(e.getId()) === $.trim(vappid));
+	    });
+	    item = (item.length > 0) ? item[0] : null;
+
+	    if (item) {
+		    var itemSecantReports = (((item.options || {}).data || {}).secant || []);
+
+		    $.each(reports, function(ii, report) {
+			for(var i = 0; i < itemSecantReports.length; i++) {
+				if ($.trim(report.report_id) === $.trim(itemSecantReports[i].report_id)) {
+				        itemSecantReports[i] = report;
+				}
+			}
+		    });
+
+		    item.options.data.secant = itemSecantReports;
+		    item.renderSecant(item.options.data);
+	    }
 	};
 
 	this.addItem = function(d) {
