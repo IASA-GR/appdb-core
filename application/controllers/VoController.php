@@ -1769,13 +1769,36 @@ class VoController extends Zend_Controller_Action
                 $format = 'xml';
             }
 
+            $reportIds = strtolower((isset($_GET['reports']) && trim($_GET['reports']) !== '') ? trim($_GET['reports']) : '');
+            if ($reportIds !== '') {
+                $idarr = explode(';', $reportIds);
+                $reportIds = array();
+                foreach ($idarr as $rid) {
+                    if (is_numeric($rid)) {
+                        $reportIds[] = intval($rid);
+                    }
+                }
+            } else {
+                $reportIds = array();
+            }
+
             $appidsql = '';
             if ($appid !== -1) {
-                $appidsql = 'AND vaviews.appid = ' . $appid . ' ';
+                $appidsql = ' AND vaviews.appid = ' . $appid . ' ';
+            }
+
+            $reportidsql = '';
+            if (count($reportIds) > 0) {
+                $reportidsql = ' AND secant.id IN (' . implode(',', $reportIds) . ') ';
+            }
+
+            $secantstatesql = " AND secant.state <> 'aborted' ";
+            if (count($reportIds) > 0) {
+                $secantstatesql = " ";
             }
 
             $sql = "SELECT
-              secant.id as report_id,  
+              secant.id as report_id,
               vaviews.appid AS app_id,
               vaviews.appname AS app_name,
               vaviews.appcname AS app_cname,
@@ -1803,10 +1826,9 @@ class VoController extends Zend_Controller_Action
               WHERE (vowide_image_lists.state = 'draft' OR vowide_image_lists.state = 'published') AND vowide_image_lists.void = " . $void . "
               ) AS vowideitem ON vowideitem.vapplistid = vaviews.vapplistid
             INNER JOIN va_sec_check_queue AS secant ON secant.vmiinstanceid = vaviews.vmiinstanceid
-            WHERE vaviews.va_version_published = true
-            AND vaviews.imglst_private = false
-            AND secant.state <> 'aborted'
-            AND ((vowideitem.vapplistid = vaviews.vapplistid AND  vaviews.va_version_archived = TRUE) OR vaviews.va_version_archived = false) " . $appidsql . " 
+            WHERE vaviews.va_version_published = true 
+            AND vaviews.imglst_private = false " . $secantstatesql . "
+            AND ((vowideitem.vapplistid = vaviews.vapplistid AND  vaviews.va_version_archived = TRUE) OR vaviews.va_version_archived = false) " . $appidsql . $reportidsql . " 
             ORDER BY vaviews.appid, vaviews.vapplistid";
 
             $rs = db()->query($sql)->fetchAll();
