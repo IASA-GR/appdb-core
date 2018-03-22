@@ -5505,8 +5505,9 @@ class VMCaster{
 						$instance->integrityStatus = "error";
 						$instance->integrityMessage = "Integrity check could not calculate the file checksum";
 						$hasimageerrors = true;
-					}
-					$successfulimages[] = $instance->id;
+					}else {
+                                                $successfulimages[] = $instance->id;
+                                        }
 					break;
 				case "cancelled":
 					$instance->integrityStatus = "canceled";
@@ -5523,6 +5524,7 @@ class VMCaster{
 					}
 					$instance->integrityStatus = "error";
 					$hasimageerrors = true;
+                                        break;
 				default:
 					continue;
 			}
