@@ -21,6 +21,8 @@ New version: 8.16.5
 Author: wvkarag@lovecraft.priv.iasa.gr
 */
 
+START TRANSACTION;
+
 CREATE OR REPLACE FUNCTION public.trfn_refresh_app_vos()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -31,8 +33,10 @@ BEGIN
         INSERT INTO app_vos SELECT DISTINCT appid, void FROM v_app_vos;
         IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN RETURN NEW; ELSE RETURN OLD; END IF;
 END;
-$function$
+$function$;
 
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 16, 5, E'Invalidate filtercache where modifying VO-wide image lists'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=16 AND revision=5);
+
+COMMIT;
