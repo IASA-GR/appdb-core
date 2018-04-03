@@ -534,7 +534,17 @@
 					Read-only
 				</xs:appinfo>
 				<xs:documentation>
-					The ID off the application entry. Must be present when performing POST requests, in order to specify the application that is being updated
+					The ID of the application entry. Must be present when performing POST requests, in order to specify the application that is being updated
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="handle" type="xs:string" use="optional" >
+			<xs:annotation>
+				<xs:appinfo>
+					Read-only
+				</xs:appinfo>
+				<xs:documentation>
+					The HANDLE system PID of the application entry
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
