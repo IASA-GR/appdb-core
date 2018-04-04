@@ -2322,6 +2322,9 @@
 			atx = atx.replace(/\<\/*\w+ *(\w+(=['"][a-zA-Z0-9:;\-_#! \.]*["']){0,}){0,}\/{0,}\>/g,"").htmlEscape();
 			$(e).find("pre.app-abstract").text(atx);
 
+			// HANDLE PID
+			$(e).find("span.app-pidhandle").html('<a href="http://hdl.handle.net/' + d.application["handle"] + '" title="' + d.application["handle"] + '">hdl:' + d.application["handle"] + '</a>');
+
 			//display description (only view)
 			if( ($.trim(d.application.description) === $.trim(d.application.name) ) ||
 				($.trim(d.application.description) === "" ) ) {
