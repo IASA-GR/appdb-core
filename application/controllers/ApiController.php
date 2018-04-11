@@ -289,10 +289,10 @@ class ApiController extends Zend_Controller_Action
 				$this->getResponse()->setHeader("Status","400 Bad Request");
 				if ($extError != "") {
 					error_log($error . '\n' . $extError);
-					echo $error . '\n' . $extError;
+					echo RestAPIHelper::wrapResponse("", null, null, 0, null, null, RestErrorEnum::RE_INVALID_RESOURCE, $extError);
 				} else {
 					error_log($error);
-					echo $error;
+					echo RestAPIHelper::wrapResponse("", null, null, 0, null, null, RestErrorEnum::RE_INVALID_RESOURCE, null);
 				}
 				return;
 			}
@@ -304,10 +304,11 @@ class ApiController extends Zend_Controller_Action
 			$this->getResponse()->setHeader("Status","400 Bad Request");			
 			if ($extError != "") {
 				error_log($error . '\n' . $extError);
-				echo $error . '\n' . $extError;
+				echo RestAPIHelper::wrapResponse("", null, null, 0, null, null, RestErrorEnum::RE_INVALID_RESOURCE, $extError);
+
 			} else {
 				error_log($error);
-				echo $error;
+				echo RestAPIHelper::wrapResponse("", null, null, 0, null, null, RestErrorEnum::RE_INVALID_RESOURCE, null);
 			}
 			return;
 		}	
@@ -325,15 +326,12 @@ class ApiController extends Zend_Controller_Action
 		} else {
 			$error = RestErrorEnum::toString($res->getError());
 			$extError = $res->getExtError();
-			$this->getResponse()->clearAllHeaders();
-			$this->getResponse()->setRawHeader("HTTP/1.0 400 Bad Request");
-			$this->getResponse()->setHeader("Status","400 Bad Request");
 			if ($extError != "") {
 				error_log($error . '\n' . $extError);
-				echo $error . '\n' . $extError;
+				echo RestAPIHelper::wrapResponse("", null, null, 0, null, null, $res->getError(), $extError);
 			} else {
 				error_log($error);
-				echo $error;
+				echo RestAPIHelper::wrapResponse("", null, null, 0, null, null, $res->getError(), null);
 			}
 		}
 	}
