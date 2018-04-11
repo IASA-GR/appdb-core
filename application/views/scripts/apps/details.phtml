@@ -70,7 +70,7 @@
 							<span class="app-displayname" itemprop="name"></span>
 							<span class="rightalign" style="bottom: 18px">
 								<span class="app-id">(id:<?php echo $this->entryid; ?>)</span>
-								<span class="app-permalink"><a href="http://<?php echo $_SERVER["HTTP_HOST"].'?p='.base64_encode('/apps/details?id='.$this->entryid); ?>" class="permalink" target="_blank">[permalink]</a></span>
+								<span class="app-permalink"><a href="https://<?php echo $_SERVER["HTTP_HOST"].'?p='.base64_encode('/apps/details?id='.$this->entryid); ?>" class="permalink" target="_blank">[permalink]</a></span>
 							</span><br/>
 							<span class="rightalign" style="bottom: 2px">
 								<span class="app-pidhandle"></span>
@@ -1031,7 +1031,7 @@
 								<div class="value"></div>
 							</div>
 							<div class="property vaversion-imagelist hideondisabled">
-								<a href="http://vmcaster.appdb-dev.marie.hellasgrid.gr" title="Click to open image list" class="icontext imagelistlink" target="_blank">
+								<a href="https://vmcaster.appdb.egi.eu" title="Click to open image list" class="icontext imagelistlink" target="_blank">
 									<img src="/images/export.png" alt=""/>
 									<span>Image List</span>
 									<span class="generatedby">compatible with</span>
@@ -1713,7 +1713,7 @@
 		appdb.pages.application.init({
 			id: '<?php if ($this->entryid === null) echo 'null'; elseif ($this->entryid !== '') echo $this->entryid; ?>',
 			dialogCount: '<?php echo $this->dialogCount;?>',
-			permalink: '<?php echo 'http://'.$_SERVER["HTTP_HOST"].'?p='.base64_encode('/apps/details?id='.$this->entryid); ?>',
+			permalink: '<?php echo 'https://'.$_SERVER["HTTP_HOST"].'?p='.base64_encode('/apps/details?id='.$this->entryid); ?>',
 			historyId: '<?php echo $this->histid; ?>',
 			historyType: '<?php echo $this->histtype;?>',
 			entityType: '<?php echo $this->entitytype;?>'
