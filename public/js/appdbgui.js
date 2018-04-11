@@ -2838,6 +2838,7 @@
 					},
 					error: function(d){
 						hideAjaxLoading();
+						populateAppDataDetails({}, e);
 					}
 				}).call();
 				delete dat;
