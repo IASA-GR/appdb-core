@@ -110,6 +110,7 @@ echo $this->doctype(); fl();?>
 		}
 		loadCSS($this,'/css/contextualization.css');
 		loadCSS($this, '/css/datasets.css');
+		loadCSS($this, '/css/highlight.css');
 	}
 ?>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
@@ -164,6 +165,8 @@ echo $this->doctype(); fl();?>
 		loadJS($this,'/js/appdb.contextualization.js');
 		loadJS($this,'/js/appdb.social.js');
 		loadJS($this,'/js/tinymce/tiny_mce.js', $compat=true);
+		loadJS($this,'/js/highlight.pack.js');
+
 	} else {
 		loadJS($this,'/js/appdb.min.js');
 	}
@@ -185,5 +188,6 @@ echo $this->doctype(); fl();?>
 	<script src="/js/d3.v4.min.js"></script>
 	<script src="/js/tipsy/jquery.tipsy.js"></script>
 	<link rel="stylesheet" href="/css/tipsy/tipsy.css" type="text/css" />
+	<script>hljs.initHighlightingOnLoad();</script>
 </body>
 </html>

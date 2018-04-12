@@ -2487,6 +2487,30 @@ class RestAppHistoryItem extends RestROResourceItem {
     }
 }
 
+class RestAppHistoryDiffItem extends RestROResourceItem {
+    /**
+     * realization of getDataType from iRestResource
+     */
+    public function getDataType() {
+        return "historydiff";
+    }
+   
+    /**
+     * overrides RestResource::get()
+     */
+    public function get() {
+		if ( parent::get() !== false ) {
+			$hid = $this->getParam("hid");
+			db()->setFetchMode(Zend_Db::FETCH_BOTH);
+			$x = db()->query("SELECT (actions).diff FROM apilog.actions WHERE id = '" . pg_escape_string($hid) . "'")->fetchAll();
+			$x = $x[0];
+			$x = $x[0];
+			$xml = RestAPIHelper::wrapResponse('<diff><![CDATA[' . $x . ']]></diff>');
+			return $xml;
+        } else return false;
+    }
+}
+
 /**
  * class RestAppHistoryRBItem
  * handles requests an application's historical representation

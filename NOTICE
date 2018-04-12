@@ -130,6 +130,11 @@ http://momentjs.com
 License: MIT License (https://github.com/moment/moment/blob/master/LICENSE)
 Copyright (c) JS Foundation and other contributors
 
+Syntax highlighting with language autodetection, provided by Ivan Sagalaev
+https://highlightjs.org/
+License: BSD License
+Copyright (c) 2006, Ivan Sagalaev
+
 ------------------------------------------------
 Attribution for Web Font files
 ------------------------------------------------

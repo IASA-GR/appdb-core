@@ -1959,6 +1959,41 @@
 		modrow.show();
 	}
 
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
+	function appHistoryDiff(id, hid) {
+        if ( userID != null ) {
+			u = "?userid="+userID+"&passwd="+$.cookie('scookpass');
+		}
+        dat = new appdb.utils.rest({
+            endpoint: appdb.config.endpoint.proxyapi+"?version=" + appdb.config.apiversion + "&resource=applications/"+id+"/history/" + hid + "/diff" +encodeURIComponent(u),
+            async: true
+        }).create({},{
+            success: function(d) {
+				var s = '<pre><code class="diff">' + d.diff.replaceAll(">", "&gt;").replaceAll("<", "&lt;") + '</code></pre>';
+                var dlg = new dijit.TooltipDialog({
+                    'title': 'Software History Diff',
+					'style': 'width: 800px; height: ',
+                    'content': s
+                });			
+                setTimeout(function() {
+                    dijit.popup.open({
+                        popup: dlg,
+                        parent: $("a.app-history")[0],
+                        around: $("a.app-history")[0],
+                        orient: {BR: 'TR'}
+					});
+					$('pre code').each(function(i, block) {
+						hljs.highlightBlock(block);
+					});
+				}, 500);
+			}		
+		}).call();
+	}
+
     function appHistory(id) {
 		var u = '', dat;
         var notification;
@@ -1985,7 +2020,8 @@
                         if ( h[i].userid ) by = ' by <a target="_blank" href="/store/person/'+h[i].username+'" onclick="appdb.views.Main.showPerson({id: '+h[i].userid+', cname:\''+h[i].usercname+'\'},{mainTitle: \''+h[i].username+'\'});">' + h[i].username + (h[i].usercontact != '' ? ' ('+h[i].usercontact+')' : '') + '</a>'; else by = h[i].username + (h[i].usercontact != '' ? ' ('+h[i].usercontact+')' : '');
 						evt = h[i].event;
 						if ( evt == "update" && h[i].disposition === "rollback" ) evt = "rollback";
-						s = s + '<li><a href="#" onclick="appdb.views.Main.showApplication({id: '+id+', cname: appdb.pages.application.currentCName() + \'/history/' + h[i].id + '\', histid: \''+h[i].id+'\', histtype: 0});">'+appdb.utils.formatDate(h[i].timestamp) + "</a>: "+ evt + by + 
+						var diff = '<a href="#" onclick="appHistoryDiff(' + id + ', \'' + h[i].id + '\');">[DIFF]</a>';
+						s = s + '<li><a href="#" onclick="appdb.views.Main.showApplication({id: '+id+', cname: appdb.pages.application.currentCName() + \'/history/' + h[i].id + '\', histid: \''+h[i].id+'\', histtype: 0});">'+appdb.utils.formatDate(h[i].timestamp) + "</a>: "+ evt + by + ' ' + diff + 
 						'</li>';
                     }
 					s = '<div><h3><a style="font-size: 110%; margin-left: -24px;" href="#" onclick="appdb.views.Main.showApplication({id: '+id+', cname: appdb.pages.application.currentCName(), name: appdb.pages.application.currentName()});">View current state</a></h3></div>' + s;
