@@ -2459,7 +2459,7 @@ class RestAppHistoryItem extends RestROResourceItem {
                 $hid = $this->getParam("hid");
 				$found = false;
                 foreach ($res as $r) {
-                    $rr = strval(RestAPIHelper::wrapResponse($r));
+                    $rr = strval(RestAPIHelper::wrapResponse($r, $this->getDataType()));
                     try {
                         $xml = new SimpleXMLElement($rr);
                         $xml = $xml->xpath("//history:history");
@@ -2492,7 +2492,7 @@ class RestAppHistoryDiffItem extends RestROResourceItem {
      * realization of getDataType from iRestResource
      */
     public function getDataType() {
-        return "historydiff";
+        return "diff";
     }
    
     /**
@@ -2505,7 +2505,7 @@ class RestAppHistoryDiffItem extends RestROResourceItem {
 			$x = db()->query("SELECT (actions).diff FROM apilog.actions WHERE id = '" . pg_escape_string($hid) . "'")->fetchAll();
 			$x = $x[0];
 			$x = $x[0];
-			$xml = RestAPIHelper::wrapResponse('<diff><![CDATA[' . $x . ']]></diff>');
+			$xml = RestAPIHelper::wrapResponse('<appdb:diff><![CDATA[' . $x . ']]></appdb:diff>', $this->getDataType());
 			return $xml;
         } else return false;
     }
@@ -2537,7 +2537,7 @@ class RestAppHistoryRBItem extends RestROAuthResourceItem {
 				$xml = $xml->xpath('//history:oldvalue/application:application');
 				if ( count($xml) > 0 ) {
 					$this->_pars['routeXslt'] = 'applications';
-					$xml = RestAPIHelper::wrapResponse($xml[0]->asXML());
+					$xml = RestAPIHelper::wrapResponse($xml[0]->asXML(), $this->getDataType());
 					$this->_pars['data'] = $xml;
 					$res = new RestAppList($this->_pars);
 					$res->startLogging($this->_logfile);

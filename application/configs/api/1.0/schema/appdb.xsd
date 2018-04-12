@@ -122,6 +122,9 @@
         <xs:attribute name="uri" type="xs:string" use="required"/>
     </xs:complexType>
     
+	<xs:complexType name="diffType" mixed="true">
+	</xs:complexType>
+
     <xs:complexType name="schemaType" mixed="true">
         <xs:annotation>
             <xs:documentation>
@@ -132,6 +135,7 @@
     </xs:complexType>
     
     <xs:element name="option" type="appdb:optionType"/>
+    <xs:element name="diff" type="appdb:diffType"/>
     <xs:element name="schema" type="appdb:schemaType"/>
     <xs:element name="resource" type="appdb:resourceType"/>
 
@@ -166,6 +170,7 @@
 			<xs:enumeration value="contact" />
 			<xs:enumeration value="classification" />
 			<xs:enumeration value="accessgroup" />
+			<xs:enumeration value="diff" />
         </xs:restriction>
     </xs:simpleType>
 
@@ -232,6 +237,7 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:choice>
+                    <xs:element ref="appdb:diff" minOccurs="1" maxOccurs="unbounded" />
                     <xs:element ref="appdb:schema" minOccurs="1" maxOccurs="unbounded" />
                     <xs:element ref="appdb:option" minOccurs="1" maxOccurs="unbounded" />
                     <xs:element ref="application:application" minOccurs="1" maxOccurs="unbounded" />

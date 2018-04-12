@@ -144,7 +144,7 @@
 	<resource>RestAppHistoryItem</resource>
 	<comment>The historical state of a software entry specified by parameter :hid</comment>
 </route>
-<route type="rest" name="apphistoryitem" url="/:version/applications/:id/history/:hid/diff">
+<route type="rest" name="apphistorydiff" url="/:version/applications/:id/history/:hid/diff">
 	<format xslt="history">xml</format>
     <param name="id" fmt="(\d+|s:.+)"/>
     <param name="hid" fmt=".+"/>
