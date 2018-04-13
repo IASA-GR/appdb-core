@@ -11299,7 +11299,8 @@ input::-ms-reveal {
 	display: none;
 }
 
-.entityvirtualappliance .vappliance.groupcontainer {
+.entityvirtualappliance .vappliance.groupcontainer,
+.information .identifiers.groupcontainer{
 	padding: 3px;
 	margin:5px;
 }
@@ -11361,28 +11362,34 @@ input::-ms-reveal {
 .entityvirtualappliance .vappliance.groupcontainer > ul > li > a > span {
 	font-family: "Open Sans", Arial;
 }
-.entityvirtualappliance .vappliance.groupcontainer > div{
+.entityvirtualappliance .vappliance.groupcontainer > div,
+.information .identifiers.groupcontainer > div{
 	min-height: 400px;
 }
 
-.entityvirtualappliance .vappliance.groupcontainer > div .fieldvalue{
+.entityvirtualappliance .vappliance.groupcontainer > div .fieldvalue,
+.information .identifiers.groupcontainer > div .fieldvalue{
 	font-family: "Open Sans",Arial;
 	padding: 2px;
 	vertical-align: middle;
 }
-.entityvirtualappliance .vappliance.groupcontainer > div .fieldvalue > span{
+.entityvirtualappliance .vappliance.groupcontainer > div .fieldvalue > span,
+.information .identifiers.groupcontainer > div .fiedlvalue > span{
 	display: inline-block;
 	vertical-align: middle;
 }
-.entityvirtualappliance .vappliance.groupcontainer > div .fieldvalue .field{
+.entityvirtualappliance .vappliance.groupcontainer > div .fieldvalue .field,
+.information .identifiers.groupcontainer > div .fieldvalue .field{
 	padding-right: 10px; 
 	min-width:150px;
 	text-align: right;
 }
-.entityvirtualappliance .vappliance.groupcontainer > div > .fieldvalue .value{
+.entityvirtualappliance .vappliance.groupcontainer > div > .fieldvalue .value,
+.information .identifiers.groupcontainer > div > .fieldvalue .value{
 	
 }
-.entityvirtualappliance .vappliance.groupcontainer  > div.tabcontent{
+.entityvirtualappliance .vappliance.groupcontainer  > div.tabcontent,
+.information .identifiers.groupcontainer > div.tabcontent{
 	max-width: 100%;
 	min-width: 100%;
 	width:auto;
@@ -15764,7 +15771,9 @@ color: #555;
 	padding-bottom: 5px;
 }
 .entityvirtualappliance .information .vappliance,
-.entityvirtualappliance .information .vappliance.groupcontainer{
+.entityvirtualappliance .information .vappliance.groupcontainer,
+.information .identifiers.groupcontainer
+{
 	margin: 0;
 	padding: 0;
 	min-height: 10px;
@@ -15777,11 +15786,13 @@ color: #555;
 	z-index:900;
 }
 .entityvirtualappliance .information .vappliance > .tabcontent,
-.entityvirtualappliance .information .vappliance.groupcontainer > .tabcontent{
+.entityvirtualappliance .information .vappliance.groupcontainer > .tabcontent,
+.information .identifiers.groupcontainer > .tabcontent{
 	border: none;
 }
 .entityvirtualappliance .information .vappliance > .property.popupvalue.hiddengroup,
-.entityvirtualappliance .information .vappliance.groupcontainer > .property.popupvalue.hiddengroup{
+.entityvirtualappliance .information .vappliance.groupcontainer > .property.popupvalue.hiddengroup,
+.information .identifiers.groupcontainer > .property.popupvalue.hiddengroup{
 	display: inline-block;
 	padding: 0px;
 	margin: 0px;
@@ -15789,7 +15800,8 @@ color: #555;
 	max-height: 17px;
 }
 .entityvirtualappliance .information .vappliance > .property.popupvalue.hiddengroup > .header ,
-.entityvirtualappliance .information .vappliance.groupcontainer > .property.popupvalue.hiddengroup > .header{
+.entityvirtualappliance .information .vappliance.groupcontainer > .property.popupvalue.hiddengroup > .header,
+.information .identifiers.groupcontainer > .property.popupvalue.hiddengroup > .header{
 	display: block;
 	padding: 0px;
 	max-height: 17px;
@@ -15798,20 +15810,23 @@ color: #555;
 }
 
 .entityvirtualappliance .information .vappliance > .property.popupvalue.hiddengroup > .header > .popup,
-.entityvirtualappliance .information .vappliance.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup{
+.entityvirtualappliance .information .vappliance.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup,
+.information .identifiers.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup {
 	padding: 0px;
 	margin: 0px;
 	max-height: 12px;
 }
 .entityvirtualappliance .information .vappliance > .property.popupvalue.hiddengroup > .header > .popup > .field,
-.entityvirtualappliance .information .vappliance.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup > .field{
+.entityvirtualappliance .information .vappliance.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup > .field,
+.information .identifiers.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup > .field{
 	margin: 0;
 	padding: 0;
 	margin-top: 1px;
 	max-height: 15px;
 }
 .entityvirtualappliance .information .vappliance > .property.popupvalue.hiddengroup > .header > .popup > .field > span,
-.entityvirtualappliance .information .vappliance.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup > .field > span{
+.entityvirtualappliance .information .vappliance.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup > .field > span,
+.information .identifiers.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup > .field > span{
 	display: inline-block; 
 	font-size: 11px;
     height: 12px;
@@ -15821,7 +15836,8 @@ color: #555;
 }
 
 .entityvirtualappliance .information .vappliance > .property.popupvalue.hiddengroup > .header > .popup > .value,
-.entityvirtualappliance .information .vappliance.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup > .value{
+.entityvirtualappliance .information .vappliance.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup > .value,
+.information .identifiers.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup > .value{
 	font-size: 12px;
 	line-height: 10px;
 	padding: 5px;
@@ -15829,16 +15845,19 @@ color: #555;
 	right: -1px;
 }
 .entityvirtualappliance .information .vappliance > .property.popupvalue.hiddengroup > .header > .popup > .value > .item,
-.entityvirtualappliance .information .vappliance.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup > .value > .item{
+.entityvirtualappliance .information .vappliance.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup > .value > .item,
+.information .identifiers.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup > .value > .item{
 	padding: 2px 0px;
 }
 .entityvirtualappliance .information .vappliance > .property.popupvalue.hiddengroup > .header > .popup > .value > .item > span,
-.entityvirtualappliance .information .vappliance.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup > .value > .item > span{
+.entityvirtualappliance .information .vappliance.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup > .value > .item > span,
+.information .identifiers.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup > .value > .item > span{
 	display: inline-block;
 	color: #333;
 }
 .entityvirtualappliance .information .vappliance > .property.popupvalue.hiddengroup > .header > .popup > .value > .item > span.name,
-.entityvirtualappliance .information .vappliance.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup > .value > .item > span.name{
+.entityvirtualappliance .information .vappliance.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup > .value > .item > span.name,
+.information .identifiers.groupcontainer > .property.popupvalue.hiddengroup > .header > .popup > .value > .item > span.name {
 	min-width: 110px;
 	text-align: right;
 	padding-right: 3px;
@@ -23212,7 +23231,7 @@ a.helperlink.wikilink:hover{
 	background-color: #fafafa;
 }
 .relationlist > ul.relations > li:nth-child(even){
-//	background-color: white;
+	/** background-color: white;**/
 }
 .relationlist > ul.relations > li > .relationtype{
 	position: relative;
@@ -23325,7 +23344,7 @@ a.helperlink.wikilink:hover{
 	color: #225896;
 }
 .relationlist.viewmode > ul > li:nth-child(odd){
-	// background-color: white;
+	/** background-color: white;**/
 }
 .relationlist.viewmode > ul > li::after{
 	content: ',';
@@ -23620,7 +23639,7 @@ a.helperlink.wikilink:hover{
 }
 
 .entityrelations.tabcontent .relationlist.viewmode > ul.relations > li:nth-child(odd){
-	//background-color: #fafafa;
+	/** background-color: #fafafa;**/
 }
 .entityrelations.tabcontent .relationlist.viewmode > ul.relations > li:hover {
 	background-color: #F0F0F0;

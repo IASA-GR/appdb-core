@@ -32,6 +32,7 @@ appdb.config = {
 		vmcaster: '<?php echo $appconf->vmcasterUrl; ?>/',
 		wiki: 'https://wiki.appdb.egi.eu/',
 		drafts: '<?php echo ApplicationConfiguration::url('/storage/drafts/');?>',
+                hdl: 'http://hdl.handle.net/'
     },
 	authBackend: "<?php echo ( (trim($appconf->authbackend) !== '')?strtolower(trim($appconf->authbackend)):""); ?>",
     images : {

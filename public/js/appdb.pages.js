@@ -2349,22 +2349,35 @@ appdb.pages.application = (function(){
 			$("#navdiv" + page.currentDialogCount()).find(".releasecounter").text("(0)");
 		}
 	};
-	page.renderVapplianceIdentifier = function(){
+	page.renderAppIdentifiers = function(){
 		var data  = ( page.currentData() || {} ).application || {};
 		$(dom).find(".app-id").removeClass("hidden");
-		if( !data.vappliance || !data.vappliance.identifier) return;
+		if (!$.trim(data.handle) && (!data.vappliance || !data.vappliance.identifier)) return;
 		var dom = $("#navdiv" + page.currentDialogCount() + " #infodiv" + page.currentDialogCount());
 		$(dom).find(".app-id").addClass("hidden");
 		$(dom).find(".vappliance").remove();
-		var innerhtml = '<div class="vappliance"><div class="property fieldnamevalue small compact popupvalue" ><div class="header">';
+		var innerhtml = '<div class="identifiers vappliance groupcontainer"><div class="property fieldnamevalue small compact popupvalue hiddengroup tabcontent" ><div class="header">';
 		innerhtml += '<div class="popup"><div class="field"><span class="title">Identifiers</span><span class="arrow">▼</span></div>';
-		innerhtml += '<div class="value"><div class="item"><span class="name">Item ID:</span><span>'+data.id+'</span></div><div class="item"><span class="name">vApp identifier:</span><span>'+data.vappliance.identifier+'</span></div></div>';
+		innerhtml += '<div class="value">';
+		innerhtml += '<div class="item"><span class="name">Item ID:</span><span>'+data.id+'</span></div>';
+		if (data.vappliance && data.vappliance.identifier) {
+		    innerhtml += '<div class="item"><span class="name">vApp identifier:</span><span>'+data.vappliance.identifier+'</span></div>';
+		}
+		if ($.trim(data.handle)) {
+		    innerhtml += '<div class="item"><span class="name">PID Handle:</span><span><a class="hdlhandle" href="'+ appdb.config.endpoint.hdl + $.trim(data.handle) + '" target="_blank">' + $.trim(data.handle) + '</a></span></div>';
+		}
+		innerhtml += '</div>';
 		innerhtml += '</div></div></div>';
 		innerhtml = $(innerhtml);
 		$(innerhtml).find(".property").unbind("click").bind("click",function(ev){
+			if ($(ev.target).hasClass('hdlhandle')) return;
 			ev.preventDefault();
 			$(this).children(".header").addClass("selected");
 			return false;
+		});
+		$("body").unbind("click.appidentifierspopup").bind("click.appidentifierspopup", function(ev) {
+		    $("body .property.popupvalue > .header.selected").removeClass("selected");
+		    $("body .propertypopupvalue > .header.selected").removeClass("selected");
 		});
 		$(dom).find(".app-id").after(innerhtml);
 	};
@@ -2603,12 +2616,12 @@ appdb.pages.application = (function(){
 			$("#navdiv" + page.currentDialogCount() + " #valatest").removeClass("hidden");
 			$("#navdiv" + page.currentDialogCount() + " .app-group > ul > li:first").removeClass("hidden");
 			appdb.pages.index.navigationList(appdb.pages.index.navigationListVApps());
-			page.renderVapplianceIdentifier();
 		}else{
 			$("#navdiv" + page.currentDialogCount() + " #valatest").remove();
 			$("#navdiv" + page.currentDialogCount() + " .app-group > ul > li:first").remove();
 			appdb.pages.index.navigationList(appdb.pages.index.navigationListSW());
 		}
+		page.renderAppIdentifiers();
 		page.initSectionGroup();
 		if ( !(page.currentId()<<0) )  {
 			setTimeout(function(){

@@ -68,13 +68,10 @@
 					<td>
 						<div class="app-title">
 							<span class="app-displayname" itemprop="name"></span>
-							<span class="rightalign" style="bottom: 18px">
+							<span class="rightalign">
 								<span class="app-id">(id:<?php echo $this->entryid; ?>)</span>
 								<span class="app-permalink"><a href="https://<?php echo $_SERVER["HTTP_HOST"].'?p='.base64_encode('/apps/details?id='.$this->entryid); ?>" class="permalink" target="_blank">[permalink]</a></span>
 							</span><br/>
-							<span class="rightalign" style="bottom: 2px">
-								<span class="app-pidhandle"></span>
-							</span>
 						</div>
 						<div class="app-subtitle">
 							<?php if ( $this->entryid != ''  ) { ?>
