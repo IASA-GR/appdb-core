@@ -25061,3 +25061,114 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
     width: 20px;
     height: 20px;
 }
+
+.loggedin .entityvirtualappliance .action.contactvos.showonvappliance.showonloggedin,
+.loggedin .entityvirtualappliance .action.cd_select.showonvappliance.showonloggedin{
+        display: inline-block;
+}
+
+.action.cd_select {
+        display: inline-block;
+}
+
+.action.cd_select > .cd_option,
+.action.cd_select > .cd_option > .popup {
+        display: none;
+        position: relative;
+        margin-right: 10px;
+}
+
+.action.cd_select > .cd_option > .popup > .header {
+        font-size: 16px;
+        color: #111;
+        padding-bottom: 10px;
+}
+
+.action.cd_select > .cd_option > .popup > .footer {
+        text-align: center;
+}
+
+.action.cd_select > .cd_option > a {
+        padding: 5px;
+        border: 1px solid transparent;
+}
+
+.action.cd_select > .cd_option.enable_cd {
+        display: block;
+}
+.action.cd_select > .cd_option.disable_cd {
+        display: none;
+}
+.action.cd_select.enabled > .cd_option.enable_cd {
+        display: none;
+}
+.action.cd_select.enabled > .cd_option.disable_cd {
+        display: block;
+}
+.action.cd_select > .cd_option:hover > a {
+        background-color: white;
+        color: #333;
+        border: 1px solid #666;
+        border-bottom: none;
+        display: inline-block;
+        margin-top: -5px;
+        text-decoration: none;
+        z-index: 150;
+        position: relative;
+        border-radius: 3px 3px 0px 0px;
+}
+
+.action.cd_select > .cd_option:hover > .popup {
+        display: block;
+        position: absolute;
+        background-color: white;
+        z-index: 100;
+        border: 1px solid #666;
+        right: -10px;
+        padding: 15px;
+        min-width: 500px;
+        border-radius: 3px 0px 3px 3px;
+        color: #333;
+        top: 19px;
+}
+.action.cd_select .footer .message {
+    text-align: left;
+    width: auto;
+    min-width: 50px;
+    vertical-align: middle;
+    border: 1px solid #F5D8AE;
+    border-radius: 2px;
+    padding: 3px;
+    line-height: 14px;
+    margin: 3px auto;
+    position: relative;
+    background-color: #FCF8E3;
+    color: #222;
+}
+.action.cd_select .message > img {
+    width: 18px;
+    height: 18px;
+    border: none;
+    line-height: 14px;
+    vertical-align: middle;
+}
+.action.cd_select .message > span {
+    vertical-align: middle;
+    font-size: 12px;
+    line-height: 14px;
+    vertical-align: middle;
+    padding-left: 5px;
+}
+
+.action.cd_select .footer > button {
+    display: none;
+}
+.action.cd_select .footer > .message {
+    display: block;
+}
+.action.cd_select.canHandle .footer > button {
+    display: block;
+}
+.action.cd_select.canHandle .footer > .message {
+    display: none;
+}

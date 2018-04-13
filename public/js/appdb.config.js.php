@@ -99,7 +99,8 @@ appdb.config = {
 	"groupvaprovidertemplates": true,
 	"swappliance": <?php echo ( ( Supports::swappliance() )?"true":"false"); ?>,
 	"singleVMIPolicy": <?php echo ( ( Supports::singleVMIPolicy() )?"true":"false"); ?>,
-	"email": <?php echo ( ( ApplicationConfiguration::email('enable', false) )?"true":"false"); ?>
+	"email": <?php echo ( ( ApplicationConfiguration::email('enable', false) )?"true":"false"); ?>,
+        "cd": <?php echo (ApplicationConfiguration::isProductionInstance()?"false":"true"); ?>
 	}
 };
 if( <?php echo $hasRepository; ?> ){

@@ -2609,6 +2609,80 @@ appdb.pages.application = (function(){
 		count = $.trim(count) || "0";
 		$("#navdiv" + page.currentDialogCount()).find(".commentscounter").text("(" + count + ")");
 	};
+	page.currentContacts = function(propertyName) {
+	    propertyName = $.trim(propertyName);
+	    var contacts = [];
+	    var data = ((page.currentData() || {}).application || {}) || {};
+	    data.contact = data.contact || [];
+	    data.contact = $.isArray(data.contact) ? data.contact: [data.contact];
+	    $.each(data.contact, function(i, e) {
+		if (propertyName) {
+		    contacts.push(e[propertyName]);
+		} else {
+		    contacts.push(e);
+		}
+	    });
+	    return contacts;
+	};
+	page.currentUserIsContact = function(userId) {
+	    userId = parseInt($.trim(userId || window.userID));
+	    var isContact = false;
+
+	    $.each(page.currentContacts(), function(index, item) {
+		if (!isContact && parseInt(item.id) === userId) {
+		    isContact = true;
+		}
+	    });
+
+	    return isContact;
+	};
+	page.currentUserIsOwner = function(userId) {
+	   userId = userId || window.userID;
+	   var owner = (page.getOwner() ||{});
+	   return (owner.id && parseInt(userId) === parseInt(owner.id));
+	};
+	page.loadCDHandler = function(callback) {
+	    callback = $.isFunction(callback) ? callback : function() {console.log('empty callback for CD handler'); };
+	   if (appdb.config.features.cd === false) {
+	       return;
+	   }
+	   var data = ((page.currentData() || {}).application || {}) || {};
+	   var owner = (page.getOwner() ||{});
+
+	   var isOwner = page.currentUserIsOwner();
+	   var isContact = page.currentUserIsContact();
+	   var canView = userIsAdmin || isOwner || isContact || false;
+	   var handler = $("#navdiv" + page.currentDialogCount() + " .action.cd_select");
+	   var canHandle = userIsAdmin || isOwner;
+
+	   if (canView) {
+	       $(handler).removeClass('hidden');
+	       if ($.trim(data.cd)) {
+		   $(handler).addClass('enabled');
+	       } else {
+		   $(handler).removeClass('enabled');
+	       }
+
+	       if(canHandle) {
+		   $(handler).addClass('canHandle');
+	       } else {
+		   $(handler).removeClass('canHandle');
+	       }
+
+	       let ownerLink = $('<a href="'+ appdb.config.endpoint.base+ 'store/person/'+owner.cname+'" title="Click to view owner\'s profile" target="_blank"></a>').text(owner.firstname + ' ' + owner.lastname);
+	       $(handler).find('.footer .message .owner').empty().append(ownerLink);
+	   } else {
+	       $(handler).addClass('hidden');
+	   }
+
+	   $(handler).find('button.cd_action_enable').unbind('click').bind('click', function() {
+	      callback(true);
+	   });
+
+	   $(handler).find('button.cd_action_disable').unbind('click').bind('click', function() {
+	      callback(false);
+	   });
+	};
 	page.onApplicationLoad = function(){
 		page.checkPermissions();
 		var perms = page.currentPermissions();

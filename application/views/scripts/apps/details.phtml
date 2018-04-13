@@ -514,6 +514,45 @@
 	<div id="repositorydiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" data-forentity="software"></div>
 	<div id="vappliancediv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" class="vappliancecontainer" data-forentity="vappliance">
 		<div class="actions">
+                        <?php if(ApplicationConfiguration::isProductionInstance()===false) { ?>
+                        <div class="action cd_select showonvappliance showonloggedin hidden">
+                            <div class="cd_option enable_cd">
+                                <a title="Enable Continuous Delivery for this VAppliance" class="icontext"><img src="/images/vappliance/publish.png" alt=""> Continuous Delivery</a>
+                                <div class="popup">
+                                    <div class="header">Continuous Delivery release policy</div>
+                                    <div class="content">
+                                        <p>Continuous delivery is an AppDB mechanism to automatically publish a new VAppliance version based on the contents of a user specified remote file. This reduces maintenance as the user does not have to visit the portal to execute the publishing flow and can integrate this process with existing release flows.</p>
+                                        <p>As long as this release policy is enabled, the working version won't be available and you no longer be able to manually release. You can however disable it at any point and revert to previous (manual) release policy.</p>
+                                        <p>If this is the first time enabling this policy, you will have to provide some settings in the related tab, in order to get started. You can update these settings at any time.</p>
+                                    </div>
+                                    <div class="footer">
+                                        <span class="message not-owner">
+                                            <img src="/images/vappliance/warning.png" alt="">
+                                            <span>Only <span class="owner"></span> (owner) can enable or disable continuous delivery</span>
+                                        </span>
+                                        <button class="btn btn-primary cd_action_enable">ENABLE CONTINUOUS DELIVERY</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cd_option disable_cd">
+                                <a title="Enable Manual Delivery for this VAppliance">Manual Delivery</a>
+                                <div class="popup">
+                                    <div class="header">Manual Delivery</div>
+                                    <div class="content">
+                                        <p>Manual delivery is the default AppDB release policy where the user has to explicitly interact and provide release information to the portal.</p>
+                                        <p>By enabling this policy any possible running continuous delivery tasks for this VAppliance will be canceled.</p>
+                                    </div>
+                                    <div class="footer">
+                                        <span class="message not-owner">
+                                            <img src="/images/vappliance/warning.png" alt="">
+                                            <span>Only <span class="owner"></span> (owner) can enable or disable continuous delivery</span>
+                                        </span>
+                                        <button class="btn btn-primary cd_action_disable">ENABLE MANUAL DELIVERY</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php } ?>
 			<div class="action contactvos showonvappliance showonloggedin" ><a title="Contact Virtual Organizations" href="#" class="icontext"><img src="/images/other.png" alt="" style="width:18px;height:18px;"></img><span>Notify VOs</span></a><a class="helperlink wikilink" title="Learn more about VO notifications" target="_blank" href="<?php echo $wiki; ?>main:guides:notify_virtual_organization_representatives">?</a></div>
 		</div>
 		<div class="loader emptycontent">
