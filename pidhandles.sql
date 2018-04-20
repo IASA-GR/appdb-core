@@ -85,20 +85,16 @@ CREATE OR REPLACE FUNCTION public.handle_extras(applications)
 AS $function$
 SELECT (
 	'{' || 
-        '"name": ' || COALESCE(to_json(applications.name::text), 'null') || ', ' || 
-        '"cname": ' || COALESCE(to_json(COALESCE(applications.cname::text, normalize_cname(applications.name))), 'null') || ', ' || 
-        '"description": ' || COALESCE(to_json(applications.description::text), 'null') || ', ' || 
+        '"name": ' || COALESCE(to_json($1.name::text), 'null') || ', ' || 
+        '"cname": ' || COALESCE(to_json(COALESCE($1.cname::text, normalize_cname($1.name))), 'null') || ', ' || 
+        '"description": ' || COALESCE(to_json($1.description::text), 'null') || ', ' || 
         '"discipline": ' || COALESCE(to_json(CASE array_to_string(array_agg(DISTINCT ddd.name), ', ') WHEN '' THEN NULL ELSE array_to_string(array_agg(DISTINCT ddd.name), ', ') END ), 'null') || ', ' ||
         '"category":  ' || COALESCE(to_json(CASE array_to_string(array_agg(DISTINCT ccc.name), ', ') WHEN '' THEN NULL ELSE array_to_string(array_agg(DISTINCT ccc.name), ', ') END), 'null') ||
 	'}')::jsonb
-FROM applications
-LEFT OUTER JOIN disciplines ON disciplines.id = ANY(applications.disciplineid) 
-LEFT OUTER JOIN htree_text('disciplines') AS ddd ON ddd.id = ANY(applications.disciplineid) AND (ddd.id NOT IN (SELECT parentid FROM htree_text('disciplines') AS d2 WHERE d2.id = ANY(applications.disciplineid) AND NOT parentid IS NULL))
-LEFT OUTER JOIN appcategories ON appcategories.categoryid = ANY(applications.categoryid) AND appcategories.appid = $1.id
-LEFT OUTER JOIN categories ON categories.id = appcategories.categoryid
-LEFT OUTER JOIN htree_text('categories') AS ccc ON ccc.id = ANY(applications.categoryid) AND (ccc.id NOT IN (SELECT parentid FROM htree_text('categories') AS c2 WHERE c2.id = ANY(applications.categoryid) AND NOT parentid IS NULL))
-WHERE applications.id = $1.id
-GROUP BY applications.id, applications.name, applications.cname, applications.description, applications.rating, applications.tool;
+FROM (SELECT $1) AS applications 
+LEFT OUTER JOIN htree_text('disciplines') AS ddd ON ddd.id = ANY($1.disciplineid) AND (ddd.id NOT IN (SELECT parentid FROM htree_text('disciplines') AS d2 WHERE d2.id = ANY($1.disciplineid) AND NOT parentid IS NULL))
+LEFT OUTER JOIN htree_text('categories') AS ccc ON ccc.id = ANY($1.categoryid) AND (ccc.id NOT IN (SELECT parentid FROM htree_text('categories') AS c2 WHERE c2.id = ANY($1.categoryid) AND NOT parentid IS NULL))
+GROUP BY $1.id, $1.name, $1.cname, $1.description;
 $function$;
 ALTER FUNCTION handle_extras(applications) OWNER TO appdb;
 
@@ -203,7 +199,9 @@ DECLARE vav_suffix TEXT;
 BEGIN
 	IF  TG_WHEN = 'AFTER' THEN
 		IF TG_OP = 'INSERT' THEN
-			IF NEW.cname IS NULL THEN NEW.cname = normalize_cname(NEW.name); END IF;
+			IF NEW.cname IS NULL THEN 
+				NEW.cname = normalize_cname(NEW.name); 
+			END IF;
 			INSERT INTO pidhandles (url, suffix, entrytype, entryid, extras) VALUES (
 				CASE NEW.metatype 
 					WHEN 0 THEN
@@ -225,46 +223,49 @@ BEGIN
 			IF NEW.deleted OR NEW.moderated THEN
 				UPDATE pidhandles SET result = result | 8 WHERE suffix = NEW.guid::TEXT;
 			ELSE
-				IF NEW.cname IS NULL THEN NEW.cname = NEW.guid; END IF;
-				IF NEW.cname IS DISTINCT FROM OLD.cname THEN 
+				IF NEW.cname IS NULL THEN 
+					NEW.cname = NEW.guid; 
+				END IF;
+				IF (NEW::applications).handle_extras IS DISTINCT FROM (OLD::applications).handle_extras THEN
 					UPDATE pidhandles SET 
 						result = CASE 
-								WHEN (result & 1)::BOOLEAN THEN result | 4 -- update::mintaction
-								ELSE 0 -- mark it as unregistered
-							END,
+							WHEN (result & 1)::BOOLEAN THEN result | 4 -- update::mintaction
+							ELSE 0 -- mark it as unregistered
+						END,
 						url = CASE NEW.metatype 
 							WHEN 0 THEN
 								'http://' || (SELECT data FROM config WHERE var = 'ui-host') || '/store/software/' || NEW.cname
 							WHEN 1 THEN
 								'http://' || (SELECT data FROM config WHERE var = 'ui-host') || '/store/vappliance/' || NEW.cname									
-						END
+						END,
+						extras = (NEW::applications).handle_extras
 					WHERE suffix = NEW.guid::TEXT;
 
-					-- also update URLs for sw releases / va versions due to cname change
-
-					IF NEW.metatype = 0 THEN
-						FOR rel IN relcurs(NEW.id) LOOP						
-							UPDATE pidhandles SET
-								result = result | 4,
-								url = 'http://' || (SELECT data FROM config WHERE var = 'ui-host') || '/store/software/' || NEW.cname || '/releases/' || rel.series || '/' || rel.release
-							WHERE suffix = rel.guid;
-						END LOOP;
-					ELSIF NEW.metatype = 1 THEN
-						FOR vav IN vavcurs(NEW.id) LOOP
-							IF vav.published AND NOT vav.archived THEN
-								vav_suffix = 'latest';
-							ELSIF vav.published AND vav.archived THEN
-								vav_suffix = 'previous/' || (vav.id)::TEXT;
-							ELSE
-								vav_suffix = NULL;
-							END IF;
-							IF NOT vav_suffix IS NULL THEN
+					IF NEW.cname IS DISTINCT FROM OLD.cname THEN -- also update URLs for sw releases / va versions due to cname change
+						IF NEW.metatype = 0 THEN
+							FOR rel IN relcurs(NEW.id) LOOP						
 								UPDATE pidhandles SET
 									result = result | 4,
-									url = 'http://' || (SELECT data FROM config WHERE var = 'ui-host') || '/store/vappliance/' || NEW.cname || '/vaversion/' || vav_suffix
-								WHERE suffix = vav.guid;
-							END IF;
-						END LOOP;
+									url = 'http://' || (SELECT data FROM config WHERE var = 'ui-host') || '/store/software/' || NEW.cname || '/releases/' || rel.series || '/' || rel.release
+								WHERE suffix = rel.guid;
+							END LOOP;
+						ELSIF NEW.metatype = 1 THEN
+							FOR vav IN vavcurs(NEW.id) LOOP
+								IF vav.published AND NOT vav.archived THEN
+									vav_suffix = 'latest';
+								ELSIF vav.published AND vav.archived THEN
+									vav_suffix = 'previous/' || (vav.id)::TEXT;
+								ELSE
+									vav_suffix = NULL;
+								END IF;
+								IF NOT vav_suffix IS NULL THEN
+									UPDATE pidhandles SET
+										result = result | 4,
+										url = 'http://' || (SELECT data FROM config WHERE var = 'ui-host') || '/store/vappliance/' || NEW.cname || '/vaversion/' || vav_suffix
+									WHERE suffix = vav.guid;
+								END IF;
+							END LOOP;
+						END IF;
 					END IF;
 				END IF;
 			END IF;
