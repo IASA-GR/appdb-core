@@ -848,7 +848,42 @@ ALTER FUNCTION public.app_to_json(integer)
 
 ALTER TABLE vapp_versions ADD COLUMN uguid uuid NOT NULL DEFAULT uuid_generate_v4();
 
-
+CREATE OR REPLACE VIEW pidhandle_latest_states AS
+SELECT 
+	entrytype, 
+	entryid, 
+	last_action_id,
+	last_action,
+	last_action_result,
+	parent_action_id
+FROM (
+	SELECT 
+		r,
+		id AS last_action_id,
+		entrytype, 
+		entryid, 
+		action AS last_action,
+		result AS last_action_result,
+		lead(id) OVER (PARTITION BY suffix ORDER BY tstamp DESC) AS parent_action_id
+	FROM (
+		SELECT * FROM (
+			SELECT 
+				ROW_NUMBER() OVER (PARTITION BY suffix ORDER BY tstamp DESC) AS r, 
+				id,
+				suffix,
+				entrytype, 
+				entryid, 
+				tstamp,
+				action,
+				result
+			FROM pidhandlelog
+		) AS t
+		WHERE (t.r = 1) OR (t.r > 1 AND t.action = 'register' AND t.result IN ('successverified', 'success'))
+	) AS tt
+) AS ttt
+WHERE ttt.r = 1
+ORDER BY entrytype, entryid;
+ALTER VIEW pidhandle_latest_states OWNER TO appdb;
 
 ------------ INITIAL IMPORT SCRIPT ---------------
 /*
