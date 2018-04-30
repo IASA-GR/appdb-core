@@ -101,8 +101,13 @@ class ApiController extends Zend_Controller_Action
         $this->handleResource($this->pars["resource"]);
         if ( is_object($this->entry) && $this->entry->getFormat() === "xml" && $this->entry->isFragment() === true) $this->entry = $this->entry->finalize();
         if ( is_object($this->entry) && $this->entry->getFormat() === "xml" ) {
-            $routeXslt = strval($this->_getParam("routeXslt"));
-	    	if ( isset($routeXslt) ) $this->entry = $this->entry->transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).$routeXslt);
+			$routeXslt = strval($this->_getParam("routeXslt"));
+			if ( isset($routeXslt) ) {
+				$routeXslt = explode("/", $routeXslt);
+				foreach($routeXslt as $xslt) {
+					$this->entry = $this->entry->transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).$xslt);
+				}
+			}
         }
 		$ret = strval($this->entry);
 
