@@ -18,9 +18,9 @@
 -->
 
 <!--
-    Document   : applications.xsl
-    Created on : January 30, 2011, 6:06 PM
-    Author     : nakos
+    Document   : datacite.xml
+    Created on : April 30, 2018, 6:06 PM
+    Author     : wvkarag
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
 	xmlns:appdb="http://appdb.egi.eu/api/1.0/appdb"
