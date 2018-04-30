@@ -1585,15 +1585,19 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 		var owner = (page.getOwner() ||{});
 		var userPerms = page.currentPermissions();
 		var isContact = page.isContactPoint();
+		var hasAccessToken = (typeof options.hasAccessToken !== 'undefined' && options.hasAccessToken !== null) ? options.hasAccessToken : true;
+		var hasPermissions = (typeof options.canManageVA !== 'undefined') ? options.canManageVA : true;
 		var canManageVA = ((userPerms && userPerms.canManageVirtualAppliance) ? userPerms.canManageVirtualAppliance() : false);
-		if (canManageVA === true && options.canManageVA === false) {
+		if (canManageVA === true && (hasPermissions === false || hasAccessToken === false)) {
 		    canManageVA = false;
+		} else {
+		    canManageVA = true;
 		}
 		var canView = canManageVA || isContact || false;
 		var canHandle = canManageVA || false;
 		var handler = $("#navdiv" + page.currentDialogCount() + " .action.cd_select");
 
-		 var _setupForm = function(data) {
+		var _setupForm = function(data) {
 			$(handler).removeClass('loading').removeClass('enabling').removeClass('disabling');
 			if (canView) {
 			    $(handler).removeClass('hidden');
@@ -1603,13 +1607,25 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 				    $(handler).removeClass('enabled');
 			    }
 
+			    if (hasAccessToken === false) {
+				$(handler).addClass('no-token');
+			    } else {
+				$(handler).removeClass('no-token');
+			    }
+
+			    if (hasPermissions === false) {
+				    $(handler).addClass('no-permissions');
+			    } else {
+				    $(handler).removeClass('no-permissions');
+			    }
+
 			    if(canHandle) {
 				    $(handler).addClass('canHandle');
 			    } else {
 				    $(handler).removeClass('canHandle');
 			    }
 
-			    let ownerLink = $('<a href="'+ appdb.config.endpoint.base+ 'store/person/'+owner.cname+'" title="Click to view owner\'s profile" target="_blank"></a>').text(owner.firstname + ' ' + owner.lastname);
+			    var ownerLink = $('<a href="'+ appdb.config.endpoint.base+ 'store/person/'+owner.cname+'" title="Click to view owner\'s profile" target="_blank"></a>').text(owner.firstname + ' ' + owner.lastname);
 			    $(handler).find('.footer .message .owner').empty().append(ownerLink);
 		     } else {
 			    $(handler).addClass('hidden');
@@ -1617,7 +1633,7 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 		};
 
 		_setupForm(data);
-
+		$(handler).find('.userpreferences').attr('href', appdb.config.endpoint.base + 'store/person/' + userCName + '/preferences').attr('target', '_blank');
 		$(handler).find('button.cd_action_enable').unbind('click').bind('click', function() {
 			$(handler).addClass('loading').addClass('enabling').removeClass('disabling');
 
@@ -2918,13 +2934,21 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		allowedCdLogSizes: [5, 10, 20, 50, 100],
 		actionState: null,
 		runningInstanceId: null,
-		userExpandedSettings: null
+		userExpandedSettings: null,
+		userHadPermissions: null,
+		userHadAccessToken: null 
 	};
 	this.hasPermissions = function() {
 		var defaultPublisher = this.getDefaultPublisher() || {};
 		var status = defaultPublisher.status || {};
 
 		return status.canManageVA || false;
+	};
+	this.hasAccessToken = function() {
+	    var defaultPublisher = this.getDefaultPublisher() || {};
+		var status = defaultPublisher.status || {};
+
+		return status.hasAccessToken || false;
 	};
 	this.canRun = function() {
 		var d = this.options.cddata || {};
@@ -3797,20 +3821,24 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 	};
 	this.doRender = function() {
 		var d = this.options.cddata || {};
-		this.options.userHasPermissions = this.hasPermissions();
+
 		if ($.trim(d.paused) === 'true') {
 			$(this.dom).addClass('paused').removeClass('resumed');
 		} else {
 			$(this.dom).removeClass('paused').addClass('resumed');
 		}
+
+		this.options.userHasPermissions = this.hasPermissions();
+		this.options.userHasAccessToken = this.hasAccessToken();
+		if (this.options.userHadPermissions === !this.options.userHasPermissions || this.options.userHadAccessToken !== this.options.userHasAccessToken) {
+			appdb.vappliance.ui.CurrentVAManager.loadCDHandler(d, {canManageVA: this.options.userHasPermissions, hasAccessToken: this.options.userHasAccessToken});
+		}
+		this.options.userHadPermissions = this.options.userHasPermissions;
+		this.options.userHadAccessToken = this.options.userHasAccessToken;
+
 		if (this.options.userHasPermissions === false) {
 			this.renderErrorLoading(true, {title: 'No access to continuous delivery functionality.', message: 'It seems your permissions to manage this virtual appliance are revoked.'});
-			if (this.options.userHadPermissions === true) {
-				appdb.vappliance.ui.CurrentVAManager.loadCDHandler(d, {canManageVA: false });
-			}
-			this.options.userHadPermissions = false;
 		} else {
-			this.options.userHadPermissions = true;
 			this.renderSetup(true);
 			this.renderMetaData();
 			this.renderLogs();

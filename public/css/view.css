@@ -25260,8 +25260,14 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
     display: block;
     margin: 0 auto;
 }
-.action.cd_select.canHandle .footer > .message {
+.action.cd_select .footer > .message {
     display: none;
+}
+.action.cd_select.no-token .footer > .message.no-token {
+    display: block;
+}
+.action.cd_select.no-permissions .footer > .message.no-permissions{
+    display: block;
 }
 .action.cd_select .footer > button.cd_performing_action,
 .action.cd_select.canHandle.loading .footer > button.cd_action {
