@@ -637,7 +637,7 @@ REFRESH MATERIALIZED VIEW permissions;
 
 /* UPSERT config TO enable managed_site_admins */
 UPDATE config SET data = '1' WHERE var = 'managed_site_admins';
-INSERT INTO config (var, data) VALUES ('managed_site_admins', 1) WHERE NOT EXISTS (
+INSERT INTO config (var, data) SELECT 'managed_site_admins', 1 WHERE NOT EXISTS (
         SELECT * FROM config WHERE var = 'managed_site_admins'
 );
 
