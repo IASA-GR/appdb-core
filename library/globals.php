@@ -28,6 +28,7 @@ include('harvest.php');
 include('contextualization.php');
 include('datasets.php');
 include('Storage.php');
+include('ContinuousDelivery.php');
 
 $aaimp = $this->getOption("aaimp");
 Zend_Registry::set('aaimp',$aaimp);
@@ -8353,8 +8354,7 @@ class SamlAuth{
 	  foreach( $entitlements as $e ){
 		$matches = array();
 
-		//Check if entitlement specifies a site role
-		//preg_match("/^urn\:(mace\:)?(.*)\:user\-role\:(.*)\:on-entity\:(.*)\:primary\-key:(.*):in\-project:(.*):(.*)$/", $e, $matches);
+		//Check if entitlement specifies a site role, eg urn:mace:egi.eu:goc.egi.eu:347G0:HG-02-IASA:Site+Operations+Manager@egi.eu
 		preg_match("/^urn\:(mace\:)?(egi\.eu)\:(goc\.egi\.eu)\:([^\:]*)\:([^\:]*)\:([^\:]*)\@(egi\.eu)$/", $e, $matches);
 		if( count($matches) === 8) {
 			$role = self::getEGIAAISiteRoleMapping($matches[6]);
@@ -8384,17 +8384,25 @@ class SamlAuth{
 			);
 			continue;
 		}
-		
-		//Check if entitlement specifies a vo role
-		//preg_match("/^urn\:(mace\:)?(.*)\:vo\:(.*)\:role\:(.*)$/", $e, $matches); 
-		preg_match("/^urn\:(mace\:)?(egi\.eu)\:([^\:]*)\:(.*\:)*([^\:]*)\@(.*)$/", $e, $matches);
+
+		/* previous schema eg. urn:mace:egi.eu:aai.egi.eu:member@see. Uncomment to revert
+                preg_match("/^urn\:(mace\:)?(egi\.eu)\:([^\:]*)\:(.*\:)*([^\:]*)\@(.*)$/", $e, $matches);
 		if( count($matches) === 7 && $matches[6] !== 'egi.eu') {
 		  $scope = $matches[2];
 		  $source = $matches[3];
 		  $group = $matches[4];
 		  $role = self::getEGIAAIVORoleMapping($matches[5]);
 		  $voname = $matches[6];
-		  
+		*/
+
+                // Check if entitlement specifies a vo role with current schema eg. urn:mace:egi.eu:group:see:role=member#aai.egi.eu
+                preg_match("/^urn\:(mace\:)?(egi\.eu)\:group\:([^\:]*)\:role\=(\w*)\#([a-zA-Z\.\_]*)", $e, $matches);
+                if( count($matches) === 6) {
+                    $scope = $matches[2];
+                    $source = $matches[5];
+                    $group = $matches[3];
+                    $role = self::getEGIAAIVORoleMapping($matches[4]);
+                    $voname = $matches[3];
 /*		  if ($role === 'VM OPERATOR' && strpos($source, 'appdb_auth') === false && strpos($source, 'unity.egi.eu') === false) {
 			//Do not accept vm_operator role if it is not given by AppDB auth source
 			continue;
@@ -8500,6 +8508,14 @@ class SamlAuth{
                                 db()->query("SELECT add_egiaai_user_vocontact_info(?, ?, ?, ?, ?)", array($puid, $name, $vocontact['vo'], $vocontact['role'], $email))->fetchAll();
 			}
 		}
+
+                //Check if entitlements have sites contact information
+                if($entitlements && isset($entitlements['sites'])) {
+			$siteentitlements = $entitlements['sites'];
+                        foreach($siteentitlements as $sitecontact) {
+                            db()->query("SELECT add_egiaai_user_site_contact_info(?, ?, ?)", array($puid, $sitecontact["site_key"], $sitecontact["role"]));
+                        }
+                }
 
 		return $entitlements;
 	}
