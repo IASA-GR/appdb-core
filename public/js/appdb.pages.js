@@ -3322,6 +3322,9 @@ appdb.pages.application = (function(){
 		if( hard === true ){
 			$("body #details").empty();
 		}
+		if (appdb.vappliance && appdb.vappliance.components && appdb.vappliance.components.CDVersion) {
+			appdb.vappliance.components.CDVersion.stopMonitor();
+		}
 	};
 	page.init = function(o){
 		var _perms = page.currentPermissions();
