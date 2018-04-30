@@ -59,6 +59,13 @@
 	<param name="id" fmt="(\d+|s:.+)"/>
 	<comment>The software entry specified by the parameter :id</comment>
 </route>
+<route type="rest" name="appItemOpenAIRE" url="/:version/applications/:id/OpenAIRE">
+	<format xslt="applications/datacite">xml</format>
+	<format>json</format>
+    <resource>RestAppItem</resource>
+	<param name="id" fmt="(\d+|s:.+)"/>
+	<comment>OpenAIRE-compliant representation of sowtware entrOpenAIRE-compliant representation of sowtware entry</comment>
+</route>
 <route type="rest" name="appItemPerms" url="/:version/applications/:id/privileges">
 	<format>xml</format>
 	<format>json</format>
