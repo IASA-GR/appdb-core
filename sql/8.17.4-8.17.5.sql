@@ -115,7 +115,7 @@ UNION
    FROM site_contacts
      JOIN sites ON sites.id = site_contacts.siteid
      JOIN researchers ON researchers.id = site_contacts.researcherid
-  WHERE site_contacts.role = 'Site.Operations.Manager.*'::text AND (EXISTS ( SELECT config.var,
+  WHERE site_contacts.role ~* 'Site.Operations.Manager.*'::text AND (EXISTS ( SELECT config.var,
             config.data
            FROM config
           WHERE config.var = 'managed_site_admins'::text AND config.data = '1'::text))
@@ -127,7 +127,7 @@ SELECT NULL::integer AS id,
    FROM site_contacts
      JOIN sites ON sites.id = site_contacts.siteid
      JOIN researchers ON researchers.id = site_contacts.researcherid
-  WHERE site_contacts.role = 'Site.Operations.Deputy.Manager.*'::text AND (EXISTS ( SELECT config.var,
+  WHERE site_contacts.role ~* 'Site.Operations.Deputy.Manager.*'::text AND (EXISTS ( SELECT config.var,
             config.data
            FROM config
           WHERE config.var = 'managed_site_admins'::text AND config.data = '1'::text))
@@ -139,7 +139,7 @@ SELECT NULL::integer AS id,
    FROM site_contacts
      JOIN sites ON sites.id = site_contacts.siteid
      JOIN researchers ON researchers.id = site_contacts.researcherid
-  WHERE site_contacts.role = 'Site.Security.Officer.*'::text AND (EXISTS ( SELECT config.var,
+  WHERE site_contacts.role ~* 'Site.Security.Officer.*'::text AND (EXISTS ( SELECT config.var,
             config.data
            FROM config
           WHERE config.var = 'managed_site_admins'::text AND config.data = '1'::text))
@@ -702,11 +702,11 @@ BEGIN
                 rid := (SELECT DISTINCT researcherid FROM user_accounts WHERE accountid = $1 AND account_type = 'egi-aai');
                 DELETE FROM egiaai.vo_members WHERE egiaai.vo_members.puid IN (SELECT DISTINCT accountid FROM user_accounts WHERE account_type = 'egi-aai' AND researcherid = rid) OR egiaai.vo_members.puid = $1;
                 DELETE FROM egiaai.vo_contacts WHERE egiaai.vo_contacts.puid IN (SELECT DISTINCT accountid FROM user_accounts WHERE account_type = 'egi-aai' AND researcherid = rid) OR egiaai.vo_contacts.puid = $1;
-		DELETE FROM gocdb.site_contacts WHERE (gocdb.site_contacts.account_type = 'egi-aai'::e_contact_type) AND (gocdb.site_contacts.accountid IN (SELECT DISTINCT accountid FROM user_accounts WHERE account_type = 'egi-aai' AND researcherid = rid) OR gocdb.site_contacts.account_type = $1);
+		DELETE FROM gocdb.site_contacts WHERE (gocdb.site_contacts.account_type = 'egi-aai'::e_account_type) AND (gocdb.site_contacts.accountid IN (SELECT DISTINCT accountid FROM user_accounts WHERE account_type = 'egi-aai' AND researcherid = rid) OR gocdb.site_contacts.account_type = $1);
         ELSE
                 DELETE FROM egiaai.vo_members WHERE egiaai.vo_members.puid = $1;
                 DELETE FROM egiaai.vo_contacts WHERE egiaai.vo_contacts.puid = $1;
-		DELETE FROM gocdb.site_contacts WHERE (gocdb.site_contacts.account_type = 'egi-aai'::e_contact_type) AND (gocdb.site_contacts.accountid = $1);
+		DELETE FROM gocdb.site_contacts WHERE (gocdb.site_contacts.account_type = 'egi-aai'::e_account_type) AND (gocdb.site_contacts.accountid = $1);
         END IF;
 END
 $function$;
