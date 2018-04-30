@@ -74,6 +74,6 @@ ALTER FUNCTION public.clear_egiaai_user_info(text, boolean)
 
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 17, 6, E'Add function to insert site contact information from egi aai entitlements'
-	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=17 AND revision=5);
+	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=17 AND revision=6);
 
 COMMIT;
