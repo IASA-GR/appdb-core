@@ -2454,4 +2454,76 @@ class AppsController extends Zend_Controller_Action
 		echo json_encode( array("result" => array("success" => true, "versions"=> $versions) ) );
 	}
 	
+        
+        public function cdAction() {
+            $this->_helper->layout->disableLayout();
+            $this->_helper->viewRenderer->setNoRender();
+            header('Content-type: application/json');
+            $appid = (isset($_GET['appid']) ? trim($_GET['appid']) : '');
+            $cdLogSize = (isset($_GET['cdLogSize']) ? trim($_GET['cdLogSize']) : '');
+            $userId = $this->session->userid;
+
+
+            if (!$userId) {
+                header('HTTP/1.0 403 Forbidden');
+                header("Status: 403 Forbidden");error_log('eching forbidden');
+                echo json_encode(array('error'=> 'Forbidden'));
+                return;
+            }
+            if ($_SERVER["REQUEST_METHOD"] === 'GET') {
+                try {
+                    $cd = new CD($appid, $userId);
+                    $data = $cd->loadData(array('cdLogSize' => $cdLogSize))->getData();
+                    echo json_encode($data);
+                    return;
+                } catch (Exception $ex) {
+                    header('HTTP/1.0 400 Bad Request');
+                    header("Status: 400 Bad Request");
+                    echo json_encode(array('error'=> $ex->getMessage()));
+                    return;
+                }
+            } else if($_SERVER["REQUEST_METHOD"] === 'POST') {
+                try {
+                    $props = json_decode(trim(file_get_contents("php://input")),true);
+                    $action = '';
+                    if (isset($props['_action'])) {
+                        $action = trim($props['_action']);
+                        unset($props['_action']);
+                    }
+                    $cd = new CD($appid, $userId);
+                    $data = array();
+                    
+                    switch($action) {
+                        case 'start':
+                            $props['triggerType'] = 2;
+                            $props['triggerBy'] = $userId;
+                            $cd->start($props);
+                            $data = $cd->getData();
+                            echo json_encode($data);
+                            break;
+                        case 'cancel':
+                            $reason = (isset($props['reason'])) ? trim($props['reason']) : null;
+                            $cd->cancel($reason);
+                            $data = $cd->getData();
+                            echo json_encode($data);
+                            break;
+                        case 'update':
+                            $cd->setProps($props);
+                            $cd->loadData();
+                            $data = $cd->getData();
+                            echo json_encode($data);
+                            break;
+                        default:
+                            throw new Exception('Unknown continuous delivery action requested');
+                    }
+                    return;                    
+                } catch (Exception $ex) {
+                    error_log($ex->getMessage());
+                    header('HTTP/1.0 400 Bad Request');
+                    //header("Status: 400 Bad Request");
+                    echo json_encode(array('error'=> $ex->getMessage()));
+                    return;
+                }
+            }
+        }
 }

@@ -516,8 +516,9 @@
 		<div class="actions">
                         <?php if(ApplicationConfiguration::isProductionInstance()===false) { ?>
                         <div class="action cd_select showonvappliance showonloggedin hidden">
+                            <div class="header">Delivery policy:</div>
                             <div class="cd_option enable_cd">
-                                <a title="Enable Continuous Delivery for this VAppliance" class="icontext"><img src="/images/vappliance/publish.png" alt=""> Continuous Delivery</a>
+                                <a title="Enable Continuous Delivery for this VAppliance" class="icontext"><img src="/images/vappliance/publish.png" alt=""> Continuous</a>
                                 <div class="popup">
                                     <div class="header">Continuous Delivery release policy</div>
                                     <div class="content">
@@ -526,28 +527,30 @@
                                         <p>If this is the first time enabling this policy, you will have to provide some settings in the related tab, in order to get started. You can update these settings at any time.</p>
                                     </div>
                                     <div class="footer">
-                                        <span class="message not-owner">
+                                        <span class="message not-access">
                                             <img src="/images/vappliance/warning.png" alt="">
-                                            <span>Only <span class="owner"></span> (owner) can enable or disable continuous delivery</span>
+                                            <span>You must be graded with permissions to edit virtual appliance versions in order to enable or disable continuous delivery. You can contact the owner of this virtual appliance (<span class="owner"></span>) to grad you these permissions.</span>
                                         </span>
-                                        <button class="btn btn-primary cd_action_enable">ENABLE CONTINUOUS DELIVERY</button>
+                                        <button class="btn btn-primary cd_action cd_action_enable">ENABLE CONTINUOUS DELIVERY</button>
+                                        <button class="btn btn-disabled cd_performing_action" disabled="disabled"><img src='/images/ajax-loader-trans-orange.gif' /><span>ENABLING CONTINUOUS DELIVERY</span></button>
                                     </div>
                                 </div>
                             </div>
                             <div class="cd_option disable_cd">
-                                <a title="Enable Manual Delivery for this VAppliance">Manual Delivery</a>
+                                <a title="Enable Manual Delivery for this VAppliance">Manual</a>
                                 <div class="popup">
-                                    <div class="header">Manual Delivery</div>
+                                    <div class="header">Manual</div>
                                     <div class="content">
                                         <p>Manual delivery is the default AppDB release policy where the user has to explicitly interact and provide release information to the portal.</p>
                                         <p>By enabling this policy any possible running continuous delivery tasks for this VAppliance will be canceled.</p>
                                     </div>
                                     <div class="footer">
-                                        <span class="message not-owner">
+                                        <span class="message not-access">
                                             <img src="/images/vappliance/warning.png" alt="">
-                                            <span>Only <span class="owner"></span> (owner) can enable or disable continuous delivery</span>
+                                            <span>You must be graded with permissions to edit virtual appliance versions in order to enable or disable continuous delivery. You can contact the owner of this virtual appliance (<span class="owner"></span>) to grad you these permissions.</span>
                                         </span>
-                                        <button class="btn btn-primary cd_action_disable">ENABLE MANUAL DELIVERY</button>
+                                        <button class="btn btn-primary cd_action cd_action_disable">ENABLE MANUAL DELIVERY</button>
+                                        <button class="btn btn-disabled cd_performing_action" disabled="disabled"><img src='/images/ajax-loader-trans-orange.gif' /><span>DISBALING CONTINUOUS DELIVERY</span></button>
                                     </div>
                                 </div>
                             </div>
@@ -1100,9 +1103,9 @@
 					<a href="#latestvadiv<?php echo $this->dialogCount;?>" data-name="latestversion"><span>Latest version</span></a></li>
 				</li>
 				<li class="workingversion">
-					<a href="#workingvadiv<?php echo $this->dialogCount;?>" data-name="workingversion"><span>Working / New version</span></a></li>
+					<a href="#workingvadiv<?php echo $this->dialogCount;?>" data-name="workingversion"><span class="vappliance-workingversion-tab-text">Working / New version</span></a></li>
 				</li>
-				<li class="previousversions">
+                                <li class="previousversions">
 					<a href="#previousvadiv<?php echo $this->dialogCount;?>" data-name="previousversion"><span>Previous versions</span></a></li>
 				</li>
 			</ul>
@@ -1135,7 +1138,183 @@
 				</div>
 			</div>
 			<div id="workingvadiv<?php echo $this->dialogCount;?>" class="workingversion" data-usetemplate="vappliance-version">
-				<div class="toolbar">
+                                <div class="cdversion hidden">
+                                    <div class='onloaderror hidden'></div>
+                                    <div class='onstatuserror hidden'><img src='/images/vappliance/redwarning.png'/><div style="display: inline-block;color: black;"><span class="message"></span></div></div>
+                                    <div class="cdversion-loading panel hidden">
+                                        <div class="loader"><div class="content"><img src='/images/ajax-loader-trans-orange.gif' /><span class="message">...Loading</span></div></div>
+                                    </div>
+                                    <div class="cdversion-error panel hidden">
+                                        <div class="header"><img src='/images/vappliance/redwarning.png'/> <span class="title"> Could not load Continuous Delivery information.</span></div>
+                                        <div class="content"><span class="message"></span></div>
+                                    </div>
+                                    <div class="cd-version-contents hidden">
+                                        <div class="cdversion-setup panel wide hidden">
+                                            <div class="header"><span class="collapse">Settings<i class="icon collapse-icon">&#9650;</i><i class="icon expand-icon">&#9660;</i></div>
+                                            <div class="content">
+                                                <div class="description">
+                                                    <p>Continuous Delivery needs the remote file location of the description file and a user as a default publisher for the new versions, if any occurs.<br />
+                                                    If you click the <b>Update</b> button, you will update the URL <b>AND</b> automatically become the <b>default publisher</b>.</p>
+                                                </div>
+                                                <div class="fieldvalue url" >
+                                                    <div class="field">Remote file URL:</div>
+                                                    <div class="value"><input type="textbox" data-path="url"/></div>
+                                                </div>
+                                                <div class="fieldvalue defaultactor">
+                                                    <div class="field" title="This user will be displayed as publisher">Publisher:</div>
+                                                    <div class="value" data-path="defautlActorId"></div>
+                                                </div>
+                                            </div>
+                                            <div class="warning hidden">
+                                                <img src='/images/vappliance/warning.png'/><span class="message"></span>
+                                            </div>
+                                            <div class="error hidden">
+                                                <img src='/images/vappliance/redwarning.png'/><div style="display: inline-block;color: black;"><span class="message"></span></div>
+                                            </div>
+                                            <div class="updateerror hidden">
+                                                <img src='/images/vappliance/redwarning.png'/><div style="display: inline-block;color: black;"><span class="message"></span></div>
+                                            </div>
+                                            <div class="footer">
+                                                <button class="btn btn-primary cdversion-action cdversion-save-setup" title="Updates will apply on next continuous delivery iteration.">Update</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="cdversion-main hidden">
+                                        <div class="cdversion-actions"></div>
+                                        <div class="cdversion-metadata"></div>
+                                        <div class="cdversion-instance">
+                                            <div class="empty-paused">
+                                                <div class="cdversion-paused-process panel wide">
+                                                    <div class="header"><img src='/images/vappliance/warning.png' />Continuous delivery check is <b>paused</b></div>
+                                                    <div class="content">
+                                                        Continuous delivery process runs on an interval and checks for changes in the configured remote file.
+                                                        It then checks for changes that can trigger a new virtual appliance version publish and acts accordingly.
+                                                        Currently, this functionality is paused and won't perform any <b>new</b> checks. <p>To resume its functionality click the 'RESUME' button.</p>
+                                                    </div>
+                                                    <div class="exterror hidden">
+                                                        <img src='/images/vappliance/redwarning.png'/><div style="display: inline-block;color: black;"><span class="message"></span></div>
+                                                    </div>
+                                                    <div class="error hidden">
+                                                        <img src='/images/vappliance/redwarning.png'/><div style="display: inline-block;color: black;"><span class="message"></span></div>
+                                                    </div>
+                                                    <div class="footer"><button class="btn btn-success cdversion-action  cd-action-resume" title="Click here if you want to resume monitoring for remote file changes. You can later pause if you want.">&#9654; RESUME</button></div>
+                                                </div>
+                                            </div>
+                                            <div class="empty-resumed">
+                                                <div class="cdversion-noprocess panel wide">
+                                                    <div class="header">No continuous delivery process is running right now</div>
+                                                    <div class="content">
+                                                        Continuous delivery process runs on an interval and checks for changes in the configured remote file.
+                                                        It then checks for changes that can trigger a new virtual appliance version publish and acts accordingly.
+                                                        However, you can always force it to check by click the button bellow.
+                                                    </div>
+                                                    <div class="exterror hidden">
+                                                        <img src='/images/vappliance/redwarning.png'/><div style="display: inline-block;color: black;"><span class="message"></span></div>
+                                                    </div>
+                                                    <div class="error hidden">
+                                                        <img src='/images/vappliance/redwarning.png'/><div style="display: inline-block;color: black;"><span class="message"></span></div>
+                                                    </div>
+                                                    <div class="footer">
+                                                        <button class="btn btn-warning cdversion-action cd-action-pause" title="Click here if you want to pause monitoring for remote file changes. You can later resume if you want.">&#10074;&#10074; PAUSE</button>
+                                                        <button class="btn btn-danger cdversion-action cdversion-force-check">FORCE CHECK</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="cdversion-lastinstance panel wide hidden">
+                                                <div class="header">Last continuous delivery outcome<span class="ui label small cdversion-lastinstance-result"></span></div>
+                                                <div class="content">
+                                                    <div class="last-cdinstance">
+                                                        <div class="cdinstance-metadata">
+                                                            <div class="fieldvalue triggeredby">
+                                                                <div class="field">Triggered By:</div>
+                                                                <div class="value"></div>
+                                                            </div>
+                                                            <div class="fieldvalue startedby">
+                                                                <div class="field">Started By:</div>
+                                                                <div class="value"></div>
+                                                            </div>
+                                                            <div class="fieldvalue startedat">
+                                                                <div class="field">Started At:</div>
+                                                                <div class="value"></div>
+                                                            </div>
+                                                            <div class="fieldvalue completedat">
+                                                                <div class="field">Completed At:</div>
+                                                                <div class="value"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="previous-tasks">
+                                                            <div class="header">Executed steps:</div>
+                                                            <table class="cdtaskinstance-list">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="img"></th>
+                                                                        <th class="name">Step</th>
+                                                                        <th class="startedat">Started At</th>
+                                                                        <th class="state">State</th>
+                                                                        <th class="result">Result</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="cdversion-running-instance">
+                                                <div class="panel wide">
+                                                    <div class="header"><img src='/images/ajax-loader-trans-orange.gif' alt=''/> Continuous delivery running process<button class="btn btn-danger btn-small cdversion-action cdversion-cancel-running">CANCEL</button></div>
+                                                    <div class="content">
+                                                        <div class="cdinstance">
+                                                            <div class="cdinstance-metadata">
+                                                                <div class="fieldvalue triggeredby">
+                                                                    <div class="field">Triggered By:</div>
+                                                                    <div class="value"></div>
+                                                                </div>
+                                                                <div class="fieldvalue startedby">
+                                                                    <div class="field">Started By:</div>
+                                                                    <div class="value"></div>
+                                                                </div>
+                                                                <div class="fieldvalue startedat">
+                                                                    <div class="field">Started At:</div>
+                                                                    <div class="value"></div>
+                                                                </div>
+                                                                <div class="fieldvalue progress">
+                                                                    <div class="field">Progress:</div>
+                                                                    <div class="value"><div class="progressbar"></div></div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="previous-tasks">
+                                                                <div class="header">Executed steps:</div>
+                                                                <table class="cdtaskinstance-list">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th class="img"></th>
+                                                                            <th class="name">Step</th>
+                                                                            <th class="startedat">Started At</th>
+                                                                            <th class="state">State</th>
+                                                                            <th class="result">Result</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cdversion-logs panel wide hidden">
+                                            <div class="header">Continuous Delivery Log Entries<span class="page-size">View last: <ul></ul></span></div>
+                                            <div class="content">
+                                                <ul class="cdversion-log-list"></ul>
+                                            </div>
+                                            <div class="footer"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="toolbar">
 					<div class="actions">
 						<a href="#" class="action delete btn btn-danger btn-compact hideonedit" title="">
 							<img src="/images/cancelicon.png" alt=""/><span>delete</span>

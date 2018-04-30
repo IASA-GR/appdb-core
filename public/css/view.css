@@ -25066,7 +25066,76 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
 .loggedin .entityvirtualappliance .action.cd_select.showonvappliance.showonloggedin{
         display: inline-block;
 }
+.loggedin .entityvirtualappliance .action.cd_select.showonvappliance.showonloggedin {
+    position: absolute;
+    left: 15px;
+    text-align: left;
+    top: -5px;
+}
+.loggedin .entityvirtualappliance .vappliancecontainer > .actions {
+    display: block;
+    position: absolute;
+    width: 100%;
+    right: 10px;
+    text-align: right;
+}
+.loggedin .entityvirtualappliance .action.cd_select > .header {
+    border: 1px solid transparent;
+    margin-top: 2px;
+}
+.loggedin .entityvirtualappliance .action.cd_select > * {
+    display: inline-block;
+}
 
+.ui.label {
+    display: inline-block;
+    line-height: 1;
+    vertical-align: middle;
+    margin: 0 .14285714em;
+    background-color: #E8E8E8;
+    background-image: none;
+    padding: .5833em .833em;
+    color: rgba(0,0,0,.6);
+    text-transform: none;
+    font-weight: 700;
+    border: 0 solid transparent;
+    border-radius: .28571429rem;
+    -webkit-transition: background .1s ease;
+    transition: background .1s ease;
+}
+.ui.small.label, .ui.small.labels .label {
+    font-size: .91428571rem;
+}
+.ui.tiny.label, .ui.tiny.labels .label {
+    font-size: .71428571rem;
+}
+
+.ui.label.completed,
+.ui.label.success{
+    background-color: #21BA45!important;
+    border-color: #21BA45!important;
+    color: #FFF!important;
+}
+
+.ui.label.primary {
+    background-color: #2185D0!important;
+    border-color: #2185D0!important;
+    color: #FFF!important;
+}
+
+.ui.label.failed,
+.ui.label.error,
+.ui.label.task-failed {
+    background-color: #DB2828!important;
+    border-color: #DB2828!important;
+    color: #FFF!important;
+}
+
+.ui.label.canceled {
+    background-color: #F2711C!important;
+    border-color: #F2711C!important;
+    color: #FFF!important;
+}
 .action.cd_select {
         display: inline-block;
 }
@@ -25075,9 +25144,10 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
 .action.cd_select > .cd_option > .popup {
         display: none;
         position: relative;
-        margin-right: 10px;
 }
-
+.action.cd_select > .cd_option > a > img {
+    display: none;
+}
 .action.cd_select > .cd_option > .popup > .header {
         font-size: 16px;
         color: #111;
@@ -25091,45 +25161,65 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
 .action.cd_select > .cd_option > a {
         padding: 5px;
         border: 1px solid transparent;
+        text-decoration: none;
 }
-
-.action.cd_select > .cd_option.enable_cd {
-        display: block;
+.action.cd_select > .cd_option.enable_cd > a:hover {}
+.action.cd_select > .cd_option.enable_cd > a{
+        color: #225896;
+        font-weight: inherit;
+        text-decoration: none;
 }
-.action.cd_select > .cd_option.disable_cd {
-        display: none;
+.action.cd_select > .cd_option.disable_cd > a{
+        color: #333;
+        font-weight: bold;
+        text-decoration: underline;
 }
-.action.cd_select.enabled > .cd_option.enable_cd {
-        display: none;
+.action.cd_select.enabled > .cd_option.enable_cd > a{
+        color: #333;
+        font-weight: bold;
+        text-decoration: underline;
 }
-.action.cd_select.enabled > .cd_option.disable_cd {
-        display: block;
+.action.cd_select.enabled > .cd_option.disable_cd > a{
+        color: #225896;
+        font-weight: initial;
+        text-decoration: none;
 }
-.action.cd_select > .cd_option:hover > a {
+.action.cd_select.enabled > .cd_option.disable_cd:hover > a,
+.action.cd_select > .cd_option.enable_cd:hover > a{
         background-color: white;
         color: #333;
         border: 1px solid #666;
         border-bottom: none;
         display: inline-block;
         margin-top: -5px;
+        padding-bottom: 6px;
         text-decoration: none;
         z-index: 150;
         position: relative;
         border-radius: 3px 3px 0px 0px;
 }
-
-.action.cd_select > .cd_option:hover > .popup {
-        display: block;
-        position: absolute;
-        background-color: white;
-        z-index: 100;
-        border: 1px solid #666;
-        right: -10px;
-        padding: 15px;
-        min-width: 500px;
-        border-radius: 3px 0px 3px 3px;
-        color: #333;
-        top: 19px;
+.action.cd_select.enabled > .cd_option.disable_cd:hover > .popup,
+.action.cd_select > .cd_option.enable_cd:hover > .popup {
+    display: block;
+    position: absolute;
+    background-color: white;
+    z-index: 100;
+    border: 1px solid #666;
+    left: 0px;
+    padding: 15px;
+    min-width: 500px;
+    border-radius: 0px 3px 3px 3px;
+    color: #333;
+    top: 19px;
+}
+.action.cd_select.enabled > .cd_option.enable_cd:hover > a {
+    border: 1px solid transparent;
+    border-radius: 0;
+    margin-top: 0px;
+    padding: 0 5px;
+}
+.action.cd_select.enabled > .cd_option.enable_cd:hover > .popup {
+    display: none;
 }
 .action.cd_select .footer .message {
     text-align: left;
@@ -25168,7 +25258,399 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
 }
 .action.cd_select.canHandle .footer > button {
     display: block;
+    margin: 0 auto;
 }
 .action.cd_select.canHandle .footer > .message {
     display: none;
+}
+.action.cd_select .footer > button.cd_performing_action,
+.action.cd_select.canHandle.loading .footer > button.cd_action {
+    display: none;
+}
+.action.cd_select.loading .footer > button.cd_performing_action {
+    display: block;
+}
+.entityvirtualappliance .vappliance.groupcontainer .panel > .content .fieldvalue .field {
+    text-align: left;
+}
+
+.cdversion.loading > *,
+.cdversion.error > * {
+    display: none;
+}
+.cdversion > cdversion-loading {
+    display: none;
+}
+.cdversion.error > div.cdversion-error,
+.cdversion.loading > div.cdversion-loading {
+    display: block;
+}
+.cdversion.loading > div.cdversion-loading img {
+    padding-right: 10px;
+    width: 20px;
+    height: 20px;
+}
+
+.cdversion .panel {
+    display: block;
+    max-width: 500px;
+    width: auto;
+    min-width: 100px;
+    margin: 0 auto;
+    margin-top: 30px;
+    padding: 20px;
+    border: 1px solid #D0D0D0;
+    border-radius: 2px;
+    box-shadow: 3px 3px 10px #d0d0d0;
+}
+.cdversion .panel.wide {
+    max-width: 100%;
+}
+.cdversion .panel > .header {
+    position: relative;
+    border-bottom: 1px solid #d0d0d0;
+    color: #444;
+    font-size: 16px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    vertical-align: middle;
+}
+.cdversion .panel > .header > * {
+    vertical-align: middle;
+}
+.cdversion .panel > .header img {
+    width: 20px;
+    height: 20px;
+    padding-right: 10px;
+}
+.cdversion .panel > .header > .collapse {
+    width: 100%;
+}
+.cdversion .panel > .header > .collapse:hover {
+    color: #225896;
+    cursor: pointer;
+}
+.cdversion .panel > .header > .collapse .expand-icon{
+    display: inline-block;
+}
+.cdversion .panel > .header > .collapse .collapse-icon {
+    display: none;
+}
+.cdversion .panel > .header > .collapse.expanded .collapse-icon {
+    display: inline-block;
+}
+.cdversion .panel > .header > .collapse.expanded > .expand-icon {
+    display: none;
+}
+.cdversion .panel.collapsed {
+    padding-bottom: 10px;
+}
+.cdversion .panel.collapsed > * {
+    display: none !important;
+}
+.cdversion .panel.collapsed > .header {
+    display: block !important;
+    border: none;
+    margin-bottom: 0;
+}
+
+.cdversion .panel > .content > .description {
+    background-color: #f5f5f5;
+    padding: 5px 10px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+.cdversion .panel > .content > .description,
+.cdversion .panel > .content > .description p{
+    font-size: 12px;
+    line-height: 18px;
+}
+.cdversion .panel > .content > .description p {
+    margin: 8px 0;
+}
+.cdversion .panel > .footer {
+    padding-top: 10px;
+    text-align: right;
+}
+.cdversion.loading > div.cdversion-loading {
+    max-width: 200px;
+}
+.cdversion.loading > div.cdversion-loading,
+.cdversion.loading > div.cdversion-loading > .loader,
+.cdversion.loading > div.cdversion-loading > .loader > *,
+.cdversion.loading > div.cdversion-loading > .loader > * > *{
+    vertical-align: middle;
+    font-size: 14px;
+}
+.cdversion .cdversion-setup .field {
+    font-size: 14px;
+}
+.cdversion .cdversion-setup .value {
+    height: 20px;
+    margin: 8px 0;
+}
+.cdversion .cdversion-setup input{
+    width: 100%;
+    height: 20px;
+}
+.cdversion .panel > .error,
+.cdversion .panel > .exterror,
+.cdversion .panel > .updateerror,
+.cdversion .panel > .warning,
+.cdversion > .onstatuserror {
+    display: block;
+    background-color: #f98080;
+    padding: 10px;
+    vertical-align: middle;
+    margin: 10px 0;
+}
+.cdversion .panel > .warning {
+    background-color: #f9ed95;
+}
+.cdversion .panel > .error > *,
+.cdversion .panel > .exterror > *,
+.cdversion .panel > .updateerror > *,
+.cdversion > .onstatuserror > *,
+.cdversion .panel > .warning > * {
+    vertical-align: middle;
+}
+.cdversion .panel > .error > img,
+.cdversion .panel > .exterror > img,
+.cdversion .panel > .updateerror > img,
+.cdversion > .onstatuserror > img,
+.cdversion .panel > .warning > img{
+    width: 20px;
+    height: 20px;
+    border: none;
+    padding-right: 10px;
+}
+
+.cdversion > .cdversion-main > .cdversion-actions {
+    position: absolute;
+    display: block;
+    top: -30px;
+    right: 5px;
+}
+
+.cdversion > .cdversion-main > .cdversion-instance {}
+
+.cdversion > .cdversion-main > .cdversion-instance.state-running {}
+.cdversion > .cdversion-main .cdversion-action {
+    font-family: Verdana,Arial,sans-serif;
+    font-size: 12px;
+}
+.cdversion > .cdversion-main > .cdversion-instance > .cdversion-running-instance,
+.cdversion > .cdversion-main > .cdversion-instance > .empty-paused,
+.cdversion > .cdversion-main > .cdversion-instance.state-running > .empty-resumed,
+.cdversion > .cdversion-main > .cdversion-instance.state-running > .empty-resumed,
+.cdversion.paused > .cdversion-main > .cdversion-instance > .empty-resumed{
+    display: none;
+}
+.cdversion > .cdversion-main > .cdversion-instance.state-running > .cdversion-running-instance,
+.cdversion > .cdversion-main > .cdversion-instance > .empty-resumed,
+.cdversion.paused > .cdversion-main > .cdversion-instance > .empty-paused{
+    display: block;
+}
+.cdinstance-metadata {
+    margin-bottom: 10px;
+}
+.cdinstance-metadata .fieldvalue{
+    display: inline-block;
+}
+.cdinstance-metadata .fieldvalue > .field {
+    max-width: 90px;
+    width: 90px;
+    min-width: 70px;
+    font-weight: bold;
+    color: #666;
+    padding-bottom: 3px;
+}
+.cdinstance-metadata .fieldvalue > .value {}
+.cdversion .cdversion-main .cdinstance-metadata .fieldvalue.startedby,
+.cdversion .cdversion-main .cdinstance-metadata .fieldvalue.startedat,
+.cdversion .cdversion-main .cdinstance-metadata .fieldvalue.triggeredby {
+    max-width: 200px;
+    min-width: 200px;
+    width: 200px;
+}
+.cdversion .cdversion-main .cdinstance-metadata  .fieldvalue.progress {
+   max-width: 700px;
+}
+.cdversion > .previous-tasks {
+    margin-top: 10px;
+}
+.cdversion .previous-tasks > .header {
+    font-weight: bold;
+    color: #666;
+    margin-bottom: 10px;
+}
+table.cdtaskinstance-list {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+}
+table.cdtaskinstance-list > thead > tr > th {
+    background-color: #eaeaea;
+    padding: 10px;
+    margin: 0;
+    font-weight: normal;
+    color: #333;
+    border-bottom: 1px solid #b0b0b0;
+}
+table.cdtaskinstance-list > thead > tr > th.name {
+    max-width: 200px;
+    width: 200px;
+    min-width: 200px;
+}
+
+table.cdtaskinstance-list > thead > tr > th.startedat{
+    max-width: 150px;
+    width: 150px;
+    min-width: 150px;
+}
+table.cdtaskinstance-list > thead > tr > th.state {
+    max-width: 100px;
+    width: 100px;
+    min-width: 100px;
+}
+table.cdtaskinstance-list > thead > tr > th.state,
+table.cdtaskinstance-list > tbody > tr > td.state {
+    display: none;
+}
+table.cdtaskinstance-list tr > td {
+    vertical-align: top;
+    padding: 10px;
+    word-break: break-all;
+    white-space: pre-wrap;
+}
+table.cdtaskinstance-list tr > td .fieldvalue > * {
+    display: inline-block;
+    word-break: break-all;
+    white-space: pre-wrap;
+}
+table.cdtaskinstance-list tr > td .fieldvalue > .field {
+    font-weight: bold;
+    color: #666;
+    min-width: 20px !important;
+    width: auto !important;
+}
+table.cdtaskinstance-list tr > .img {
+    width: 20px;
+}
+table.cdtaskinstance-list tr > td.img > img {
+    width: 20px;
+    height: 20px;
+    margin-top: -3px;
+    border: none;
+    background-color: transparent;
+}
+table.cdtaskinstance-list tr > .img > img {
+    width: 18px;
+    height: 18px;
+}
+
+.cdversion .onloaderror{
+    padding: 5px;
+    background-color: #bf3333;
+    color: white;
+    text-align: center;
+    margin-bottom: 5px;
+}
+.cdversion-lastinstance .cdversion-lastinstance-result {
+    margin-left: 10px;
+}
+.cdversion .cdversion-cancel-running {
+    position: absolute;
+    right: 0;
+    bottom: 5px;
+}
+.cdversion-logs > .header > .page-size {
+    position: absolute;
+    right: 0px;
+    bottom: 5px;
+    color: #444;
+    padding: 5px;
+}
+.cdversion-logs > .header > .page-size > ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+}
+.cdversion-logs > .header > .page-size > ul > li {
+    display: inline-block;
+    padding: 0 5px;
+    cursor: pointer;
+}
+.cdversion-logs > .header > .page-size > ul > li.selected {
+    font-weight: bold;
+}
+.cdversion-logs > .header > .page-size > ul > li.sep {
+    margin: 0;
+    padding: 0;
+}
+.cdversion .cdversion-log-list{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.cdversion .cdversion-log-list > li {
+    padding: 5px;
+    border-bottom: 1px solid #d0d0d0;
+    margin: 0 auto;
+}
+.cdversion .cdversion-log-list > li:nth-child(even) {
+    background-color: #f7fafd;
+}
+.cdversion .cdversion-log-list > li > .item {
+    padding: 5px 0;
+}
+
+.cdversion .cdversion-log-list > li > .item .summary {
+    padding: 5px 0;
+}
+.cdversion .cdversion-log-list > li > .item .summary > *,
+.cdversion .cdversion-log-list > li > .item .summary > * > *{
+    vertical-align: middle;
+}
+.cdversion .cdversion-log-list > li > .item .summary > .label {
+    margin-left: 4px;
+}
+.cdversion .cdversion-log-list > li > .item .summary > .name {
+    padding-left: 10px;
+}
+.cdversion .cdversion-log-list > li > .item .summary > .name .property-name,
+.cdversion .cdversion-log-list > li > .item .summary > .name .version,
+.cdversion .cdversion-log-list > li > .item .summary > .name .new-value,
+.cdversion .cdversion-log-list > li > .item .summary > .name .old-value{
+    font-weight: bold;
+}
+.cdversion .cdversion-log-list > li > .item .summary > .name .new-value,
+.cdversion .cdversion-log-list > li > .item .summary > .name .old-value {
+    color: #555;
+}
+.cdversion .cdversion-log-list > li > .item .summary > .description {
+    display: block;
+    padding: 0;
+    padding-left: 5px;
+    padding-top: 5px;
+}
+.cdversion .cdversion-log-list > li > .item .meta {
+    margin-top: 5px;
+    padding: 5px;
+}
+.cdversion .cdversion-log-list > li > .item .meta > .user {
+    margin-right: 5px;
+}
+.cdversion .cdversion-log-list > li > .item .meta > .user > .actor,
+.cdversion .cdversion-log-list > li > .item .meta > .createdat {
+    margin-left: 5px;
+}
+.cdversion .cdversion-log-list .ui.label {
+    width: 60px;
+    vertical-align: middle;
+    text-align: center;
+}
+.cdversion .cdversion-log-list .ui.label > * {
+    vertical-align: middle;
 }

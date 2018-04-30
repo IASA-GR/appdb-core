@@ -1488,12 +1488,8 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 	};
 	this.canEdit = function(){
 		if( !userID ) return false;
-		var owner = this.getOwner();
-		
-		if( owner && owner.id === userID ){
-			return true;
-		}
 		var perms = appdb.pages.application.currentPermissions();
+
 		if( perms ){
 			return perms.canManageVirtualAppliance() || false;
 		}
@@ -1573,9 +1569,114 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 				}
 				$(this.dom).find(".reloadappliance").removeClass("hidden");
 				this.initContextualizationRegistry();
+				this.loadCDHandler(v);
 				this.publish({event: "load", value: this});
 		}, caller: this});
 		this._model.get(d);
+	};
+	this.loadCDHandler = function(vappliancedata, options) {
+		options = options || {};
+		var page = appdb.pages.application;
+		if (appdb.config.features.cd === false) {
+			return;
+		}
+		vappliancedata = vappliancedata || {};
+		var data = ((vappliancedata.appliance || {}).cd) || ((vappliancedata.cdFlowId) ? vappliancedata : {});
+		var owner = (page.getOwner() ||{});
+		var userPerms = page.currentPermissions();
+		var isContact = page.isContactPoint();
+		var canManageVA = ((userPerms && userPerms.canManageVirtualAppliance) ? userPerms.canManageVirtualAppliance() : false);
+		if (canManageVA === true && options.canManageVA === false) {
+		    canManageVA = false;
+		}
+		var canView = canManageVA || isContact || false;
+		var canHandle = canManageVA || false;
+		var handler = $("#navdiv" + page.currentDialogCount() + " .action.cd_select");
+
+		 var _setupForm = function(data) {
+			$(handler).removeClass('loading').removeClass('enabling').removeClass('disabling');
+			if (canView) {
+			    $(handler).removeClass('hidden');
+			    if ($.trim(data) && $.trim(data.enabled) === 'true') {
+				    $(handler).addClass('enabled');
+			    } else {
+				    $(handler).removeClass('enabled');
+			    }
+
+			    if(canHandle) {
+				    $(handler).addClass('canHandle');
+			    } else {
+				    $(handler).removeClass('canHandle');
+			    }
+
+			    let ownerLink = $('<a href="'+ appdb.config.endpoint.base+ 'store/person/'+owner.cname+'" title="Click to view owner\'s profile" target="_blank"></a>').text(owner.firstname + ' ' + owner.lastname);
+			    $(handler).find('.footer .message .owner').empty().append(ownerLink);
+		     } else {
+			    $(handler).addClass('hidden');
+		     }
+		};
+
+		_setupForm(data);
+
+		$(handler).find('button.cd_action_enable').unbind('click').bind('click', function() {
+			$(handler).addClass('loading').addClass('enabling').removeClass('disabling');
+
+			$.ajax({
+			    "type": 'POST',
+			    url: appdb.config.endpoint.base + 'apps/cd?appid=' + page.currentId(),
+			    data: JSON.stringify({
+				    _action: 'update',
+				    enabled: true,
+				    paused: true
+			    }),
+			    success: function(cddata, textStatus, jqXHR) {
+				    $(handler).removeClass('loading').removeClass('enabling').removeClass('disabling');
+				    _setupForm(cddata);
+				    appdb.pages.Application.reload();
+			    }.bind(this),
+			    error: function( jqXHR, textStatus, errorThrown) {
+				    $(handler).removeClass('loading').removeClass('enabling').removeClass('disabling');
+				    console.log(textStatus, errorThrown);
+				    _setupForm(vappliancedata);
+				    var errText = errorThrown + ' (' + textStatus + ')';
+				    try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
+				    var err = new appdb.views.ErrorHandler();
+				    err.handle({
+					    "status": "Could not enable continuous delivery",
+					    "description": errText
+				    });
+			    }
+			});
+		}.bind(this));
+
+		$(handler).find('button.cd_action_disable').unbind('click').bind('click', function() {
+			$(handler).addClass('loading').addClass('disabling').removeClass('enabling');
+			$.ajax({
+				"type": 'POST',
+				url: appdb.config.endpoint.base + 'apps/cd?appid=' + page.currentId(),
+				data: JSON.stringify({
+					_action: 'update',
+					enabled: false,
+					paused: true
+				}),
+				success: function(cddata, textStatus, jqXHR) {
+					$(handler).removeClass('loading').removeClass('enabling').removeClass('disabling');
+					_setupForm(cddata);
+					appdb.pages.Application.reload();
+				}.bind(this),
+				error: function( jqXHR, textStatus, errorThrown) {
+					$(handler).removeClass('loading').removeClass('enabling').removeClass('disabling');
+					 _setupForm(vappliancedata);
+					var errText = errorThrown + ' (' + textStatus + ')';
+					try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
+					var err = new appdb.views.ErrorHandler();
+					err.handle({
+						"status": "Could not enable continuous delivery",
+						"description": errText
+					});
+				}
+			});
+		}.bind(this));
 	};
 	this.getVersionById = function(id){
 		id = $.trim(id);
@@ -1942,6 +2043,7 @@ appdb.vappliance.components.VAppliance = appdb.ExtendClass(appdb.Component,"appd
 		return d;
 	};
 	this.load = function(d,status){
+		this.options.unfilteredData = Object.assign({}, d || {});
 		this.options.data = this.filterData(d);
 		if( $.trim(status) !==  "" && this.options.data){
 			switch(status){
@@ -2753,11 +2855,30 @@ appdb.vappliance.components.WorkingVersion = appdb.ExtendClass(appdb.vappliance.
 		}else{
 			this.model.update({query: modelOpts, data: {data: encodeURIComponent(xml)}});	
 		}
-	};	
+	};
+	this.isCDEnabled = function() {
+	   var d = this.options.unfilteredData || {};
+	   var cd = ((d || {}).cd || {});
+	   return ($.trim(cd.enabled) === 'true');
+	};
 	this.render = function(d){
 		d = d || this.options.data;
 		this.options.data = d || this.options.data;
 		appdb.vappliance.components.WorkingVersion.versionInstance = null;
+		if (this.isCDEnabled()) {
+		    $(this.dom).children('.toolbar').remove();
+		    $(this.dom).children('.noworkingversion').remove();
+		    $(this.dom).children('.vappliance-version').remove();
+
+		    $(this.dom).closest('.vappliance.groupcontainer').children('ul').find('.vappliance-workingversion-tab-text').text('Continuous Delivery');
+		    this.options.cd = new appdb.vappliance.components.CDVersion({
+			parent: this.options.parent,
+			container: $(this.dom).children('.cdversion'),
+			data: this.options.unfilteredData
+		    });
+		    this.options.cd.render();
+		    return;
+		}
 		if( this.isEmpty() ){
 			this.renderEmpty(true);
 		}else{
@@ -2785,6 +2906,1051 @@ appdb.vappliance.components.WorkingVersion = appdb.ExtendClass(appdb.vappliance.
 		errs = errs || [];
 		this.disableSave( ( errs.length > 0 ) );
 	};
+});
+
+appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.components.VAppliance, "appdb.vappliance.components.CDVersion", function(o){
+	this.options = {
+		container: $(o.container),
+		parent: o.parent || null,
+		data: o.data,
+		cddata: {},
+		cdLogSize: 5,
+		allowedCdLogSizes: [5, 10, 20, 50, 100],
+		actionState: null,
+		runningInstanceId: null,
+		userExpandedSettings: null
+	};
+	this.hasPermissions = function() {
+		var defaultPublisher = this.getDefaultPublisher() || {};
+		var status = defaultPublisher.status || {};
+
+		return status.canManageVA || false;
+	};
+	this.canRun = function() {
+		var d = this.options.cddata || {};
+		return ($.trim(d.url) !== '' && $.trim(d.defaultActorId) !== '');
+	};
+	this.getDefaultPublisher = function() {
+		var actors = ((this.options.cddata || {}).AvailableActorStatuses || []);
+		actors = actors  || [];
+		actors = $.isArray(actors) ? actors: [actors];
+		var found = null;
+
+		$.each(actors, function(i, actor) {
+			if (!found && $.trim(actor.id) === $.trim(userID)) {
+			    found = actor;
+			}
+		});
+
+		return found;
+	};
+	this.isRunning = function() {
+		var d = this.options.cddata || {};
+		var running = $.trim((d.runningInstance || {}).id || '');
+		return (running !== '' || d.start === 'running');
+	};
+	this.showContents = function(enable) {
+		enable = (typeof enable === 'boolean') ? enable : true;
+		if (enable) {
+			$(this.dom).find('.cd-version-contents').removeClass('hidden');
+		} else {
+			$(this.dom).find('.cd-version-contents').addClass('hidden');
+		}
+	};
+	this.saveSetupData = function() {
+		var url = $.trim($(this.dom).find('.cdversion-setup input[data-path="url"]').val());
+		var defaultActor = this.getDefaultPublisher();
+		var defaultActorId = (defaultActor || {}).id;
+		var _renderSetupError = function(enable, error) {
+			enable = (typeof enable === 'boolean') ? enable : true;
+			var dom = $(this.dom).find('.cdversion-setup > .updateerror');
+			if (enable) {
+				$(dom).find('.message').text(error);
+				$(dom).removeClass('hidden');
+			} else {
+				$(dom).addClass('hidden');
+			}
+		}.bind(this);
+		_renderSetupError(false);
+		var btn = $(this.dom).find('.cdversion-setup button.cdversion-save-setup');
+		$(btn).addClass('disabled').attr('disabled','disabled').text('Updating');
+		$.ajax({
+			url: this.getCDUrl(),
+			"type": 'POST',
+			data: JSON.stringify({
+				'_action': 'update',
+				url: url,
+				defaultActorId: defaultActorId
+			}),
+			success: function(cddata, textStatus, jqXHR) {
+				this.renderLoadingData(false);
+				$(btn).removeClass('disabled').removeAttr('disabled').text('Update');
+				cddata = cddata || {};
+				if ($.trim(cddata.error)) {
+					_renderSetupError(true, cddata.error);
+				} else {
+					appdb.pages.Application.reload();
+
+				}
+			}.bind(this),
+			error: function( jqXHR, textStatus, errorThrown) {
+				$(btn).removeClass('disabled').removeAttr('disabled').text('Update');
+				this.renderLoadingData(false);
+				var errText = errorThrown + ' (' + textStatus + ')';
+				try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
+				_renderSetupError(true, errText);
+			}.bind(this)
+		})
+	}
+	this.validateSetupData = function() {
+		var btn = $(this.dom).find('.cdversion-setup button.cdversion-save-setup');
+		var input = $(this.dom).find('.cdversion-setup input[data-path="url"]');
+		var d = (this.options.cddata || {})
+		var invalid = false;
+		var warning = [];
+		var error = [];
+
+		if ($.trim($(input).val()) === '') {
+			invalid = true;
+			error.push('Remote file URL must not be blank');
+		}
+
+		if (d.AvailableActorStatuses && $.isArray(d.AvailableActorStatuses) && d.AvailableActorStatuses.length > 0) {
+			var current = null;
+			$.each(d.AvailableActorStatuses, function(i, actor) {
+				if (!current && actor.id === userID) {
+					current = actor;
+				}
+			});
+
+			if (current && current.status) {
+				if (current.status.canManageVA === false) {
+					error.push('You need permissions to manage this virtual appliance');
+				}
+				if (current.status.hasAccessToken === false) {
+					error.push('You do not own a <b>personal</b> access token. You can create one from your profile at the end of the <a href="'+appdb.config.endpoint.base + 'store/person/' + current.cname + '/preferences" target="_blank" title="Click to open your profile preferences page">preferences</a> tab.');
+				}
+			}
+		}
+
+		if (d.DefaultActor && d.DefaultActor.id && $.trim(d.DefaultActor.id) !== $.trim(userID)) {
+			warning.push('Currently the default publisher is user <a href="'+appdb.config.endpoint.base + 'store/person/' + d.DefaultActor.cname + '" target="_blank" title="Click to view user profile">'+d.DefaultActor.firstname + ' ' + d.DefaultActor.lastname +'</a>. If you update the settings you will become the default publisher.<a class="wiki-link" href="'+ appdb.config.endpoint.wiki + 'main:faq:cd_how_to_replace_default_publisher" target="_blank">learn more</a>');
+		}
+
+		invalid = invalid || (error.length > 0);
+
+		if (invalid !== false) {
+			$(btn).addClass('disabled').attr('disabled', 'disabled').unbind('click');
+		} else {
+			$(btn).removeClass('disabled').removeAttr('disabled').unbind('click').bind('click', function() {
+				this.saveSetupData();
+			}.bind(this));
+		}
+
+		if (error.length) {
+		    $(this.dom).find('.cdversion-setup .error').removeClass('hidden').find('.message').html(error.join('<br/>'));
+		} else {
+		    $(this.dom).find('.cdversion-setup .error').addClass('hidden').find('.message').empty();
+		}
+
+		if (warning.length) {
+		    $(this.dom).find('.cdversion-setup .warning').removeClass('hidden').find('.message').html(warning.join('<br/>'));
+		} else {
+		    $(this.dom).find('.cdversion-setup .warning').addClass('hidden').find('.message').empty();
+		}
+	};
+	this.getOwner = function() {
+		var owner = null;
+		if (userIsAdmin) {
+			owner = {
+				id: userID,
+				cname: userCName,
+				firstname: userFullname.split(' ')[0],
+				lastname: userFullname.split(' ')[1]
+			};
+		} else  {
+			owner = appdb.pages.Application.getOwner() || {};
+		}
+		return owner || {};
+	};
+	this.getCdTaskInstances = function(data) {
+		var d = data || ((this.options.cddata || {}).runningInstance || {});
+
+		d.CdTaskInstances = d.CdTaskInstances || [];
+		d.CdTaskInstances = $.isArray(d.CdTaskInstances) ? d.CdTaskInstances : [d.CdTaskInstances];
+
+		d.CdTaskInstances.sort(function(a, b) {
+			return (a.ord > b.ord) ? -1 : 1;
+		})
+
+		return d.CdTaskInstances;
+	};
+	this.cancelRunning = function() {
+		var btnCancel = $(this.dom).find('.cdversion-cancel-running');
+		$(btnCancel).addClass('loading').addClass('disabled').attr('disabled', 'disabled').text('CANCELING');
+		$.ajax({
+			url: this.getCDUrl(),
+			"type": 'POST',
+			data: JSON.stringify({
+				'_action': 'cancel',
+				'reason': 'Canceled by user (ID: ' + userID + ')'
+			}),
+			success: function(cddata, textStatus, jqXHR) {
+				$(btnCancel).removeClass('disabled').removeAttr('disabled').text('CANCEL');
+				cddata = cddata || {};
+				if ($.trim(cddata.error)) {
+					var err = new appdb.views.ErrorHandler();
+					err.handle({
+						"status": "Could not cancel continuous delivery process",
+						"description": cddata.error
+					});
+					$(btnCancel).removeClass('loading').removeClass('disabled').removeAttr('disabled').text('CANCEL');
+				} else {
+					appdb.pages.Application.reload();
+				}
+			}.bind(this),
+			error: function( jqXHR, textStatus, errorThrown) {
+			    $(btnCancel).removeClass('loading').removeClass('disabled').removeAttr('disabled').text('CANCEL');
+			    var errText = errorThrown + ' (' + textStatus + ')';
+			    try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
+			    var err = new appdb.views.ErrorHandler();
+			    err.handle({
+				    "status": "Could not cancel continuous delivery process",
+				    "description": errText
+			    });
+		    }.bind(this)
+	    });
+	};
+	this.forceCheck = function() {
+		var bt = $(this.dom).find('.cdversion-force-check');
+		var btPause = $(this.dom).find('.cd-action-pause');
+		$(bt).addClass('disabled').attr('disabled', 'disabled').text('CHECKING');
+		$(btPause).addClass('disabled').attr('disabled', 'disabled');
+		$.ajax({
+		    url: this.getCDUrl(),
+		    "type": 'POST',
+		    data: JSON.stringify({
+			    '_action': 'start'
+		    }),
+		    success: function(cddata, textStatus, jqXHR) {
+			    $(bt).text('FORCE CHECK');
+			    cddata = cddata || {};
+			    if ($.trim(cddata.error)) {
+				    var err = new appdb.views.ErrorHandler();
+				    err.handle({
+					    "status": "Could not start continuous delivery process",
+					    "description": cddata.error
+				    });
+			    } else {
+				    this.load();
+			    }
+		    }.bind(this),
+		    error: function( jqXHR, textStatus, errorThrown) {
+			    $(bt).removeClass('disabled').removeAttr('disabled').text('FORCE CHECK');
+			    var errText = errorThrown + ' (' + textStatus + ')';
+			    try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
+			    var err = new appdb.views.ErrorHandler();
+			    err.handle({
+				    "status": "Could not start continuous delivery process",
+				    "description": errText
+			    });
+		    }.bind(this)
+	    });
+	};
+	this.pause = function () {
+		var btnPause = $(this.dom).find('button.cd-action-pause');
+		$(btnPause).addClass('loading').addClass('disabled').attr('disabled', 'disabled').text('PAUSING');
+		$.ajax({
+			url: this.getCDUrl(),
+			"type": 'POST',
+			data: JSON.stringify({
+				'_action': 'update',
+				paused: true
+			}),
+			success: function(cddata, textStatus, jqXHR) {
+				cddata = cddata || {};
+				if ($.trim(cddata.error)) {
+					var err = new appdb.views.ErrorHandler();
+					err.handle({
+						"status": "Could not resume continuous delivery process",
+						"description": cddata.error
+					});
+					$(btnPause).removeClass('loading').removeClass('disabled').removeAttr('disabled').text('PAUSE');
+				} else {
+					appdb.pages.Application.reload();
+				}
+			}.bind(this),
+			error: function( jqXHR, textStatus, errorThrown) {
+				$(btnPause).removeClass('loading').removeClass('disabled').removeAttr('disabled').text('PAUSE');
+				var errText = errorThrown + ' (' + textStatus + ')';
+				try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
+				var err = new appdb.views.ErrorHandler();
+				err.handle({
+					"status": "Could not resume continuous delivery process",
+					"description": errText
+				});
+			}.bind(this)
+		});
+	};
+	this.resume = function() {
+		var btnResume = $(this.dom).find('button.cd-action-resume');
+		$(btnResume).addClass('loading').addClass('disabled').attr('disabled', 'disabled').text('RESUMING');
+		$.ajax({
+			url: this.getCDUrl(),
+			"type": 'POST',
+			data: JSON.stringify({
+				'_action': 'update',
+				paused: false
+			}),
+			success: function(cddata, textStatus, jqXHR) {
+				cddata = cddata || {};
+				if ($.trim(cddata.error)) {
+					var err = new appdb.views.ErrorHandler();
+					err.handle({
+						"status": "Could not resume continuous delivery process",
+						"description": cddata.error
+					});
+					$(btnResume).removeClass('loading').removeClass('disabled').removeAttr('disabled').text('RESUME');
+				} else {
+					appdb.pages.Application.reload();
+				}
+			}.bind(this),
+			error: function( jqXHR, textStatus, errorThrown) {
+				$(btnResume).removeClass('loading').removeClass('disabled').removeAttr('disabled').text('RESUME');
+				this.renderLoadingData(false);
+				var errText = errorThrown + ' (' + textStatus + ')';
+				try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
+				var err = new appdb.views.ErrorHandler();
+				err.handle({
+					"status": "Could not resume continuous delivery process",
+					"description": errText
+				});
+			}.bind(this)
+		});
+	}
+	this.renderSetup = function(enable) {
+		var dom = $(this.dom).find('.cdversion-setup');
+		var urlInput = $(dom).find('input[data-path="url"]');
+		var defautlActorHtml = $(dom).find('.value[data-path="defautlActorId"]');
+		var owner = this.getDefaultPublisher();
+		var d = this.options.cddata || {};
+		var old = this.options.oldcddata || null;
+
+		enable = (typeof enable === 'boolean') ? enable : true;
+
+		if (enable) {
+			if (!old || $.trim(d.url) !== $.trim(old.url)) {
+			    $(urlInput).val($.trim(d.url));
+			}
+			$(urlInput).unbind('keyup').bind('keyup', function() {
+			        this.validateSetupData();
+			}.bind(this));
+			if (owner) {
+				if ($.trim($(defautlActorHtml).find('a[data-actorid').data('actorid')) !== $.trim(owner.id)) {
+				    var a = $('<a target="_blank"></a>')
+						.attr('data-actorid', $.trim(owner.id))
+						.attr('href', appdb.config.endpoint.base + 'store/person/' + owner.cname)
+						.attr('title', 'Click to view profile in a new tab')
+						.append('<img src="/people/getimage?id='+owner.id+'" style="width:24px;height:24px;padding-right: 10px;vertical-align: middle;" /><span style="vertical-align: middle;font-size: 14px;">' + owner.firstname + ' ' + owner.lastname + '</span>');
+				    $(defautlActorHtml).empty().append(a);
+				}
+			} else {
+				$(defautlActorHtml).empty().append('<div style="color:red;">No owner found for this virtual appliance</div>');
+			}
+			$(dom).removeClass('hidden');
+			$(this.dom).children('.cdversion-main').addClass('hidden');
+			this.validateSetupData();
+		} else {
+		    $(dom).addClass('hidden');
+		}
+
+		if (parseInt(d.defaultActorId) > 0) {
+		    $(this.dom).children('.cdversion-main').removeClass('hidden');
+		}
+		this.initSettingsExpanse();
+	};
+	this.checkSettingsExpanse = function() {
+		var dom = $(this.dom).find('.cdversion-setup');
+		if (this.options.userExpandedSettings === true) {
+			$(dom).find('.header .collapse').addClass('expanded');
+			$(dom).removeClass('collapsed');
+		} else {
+			$(dom).find('.header .collapse').removeClass('expanded');
+			$(dom).addClass('collapsed');
+		}
+	};
+	this.initSettingsExpanse = function() {
+		var dom = $(this.dom).find('.cdversion-setup');
+		var d = this.options.cddata || {};
+		if (!d.defaultActorId && !$.trim(d.url) && d.paused) {
+		    this.options.userExpandedSettings = true;
+		    this.checkSettingsExpanse();
+		    $(dom).find('.header .collapse .icon').remove();
+		    return;
+		}
+		if ($(dom).find('.header .collapse').hasClass('inited') === false) {
+			this.options.userExpandedSettings = (this.options.userExpandedSettings === null && !d.defaultActorId && !$.trim(d.url) && d.paused) ? true : this.options.userExpandedSettings;
+			$(dom).find('.header .collapse').addClass('inited').unbind('click').bind('click', function(ev) {
+				this.options.userExpandedSettings = !this.options.userExpandedSettings;
+				this.checkSettingsExpanse();
+			}.bind(this));
+		}
+		this.checkSettingsExpanse();
+	};
+	this.renderLoadingData = function(enable, text) {
+		enable = (typeof enable === 'boolean') ? enable : true;
+		if (enable) {
+			$(this.dom).addClass('loading');
+			if ($.trim(text) ) {
+				$(this.dom).find('.cdversion-loading .message').text(text);
+			} else {
+				$(this.dom).find('.cdversion-loading .message').text('Loading CD information');
+			}
+			$(this.dom).find('.cdversion-loading').removeClass('hidden');
+		} else {
+			$(this.dom).removeClass('loading');
+			$(this.dom).find('.cdversion-loading').addClass('hidden');
+		}
+	};
+	this.renderErrorLoading = function(enable, error) {
+		enable = (typeof enable === 'boolean') ? enable : true;
+		error = error || {title: 'Could not load information', message: 'Unknown error occured'};
+		if (typeof error === 'string') {
+			error = { message: error };
+		}
+		if (!error.message) {
+			error.message = 'Unknown error occured';
+		}
+		if (!error.title) {
+			error.title = 'Could not load information';
+		}
+
+		if (enable) {
+			$(this.dom).find('.cdversion-error .title').html($.trim(error.title));
+			$(this.dom).find('.cdversion-error .message').html($.trim(error.message));
+			$(this.dom).addClass('error');
+			$(this.dom).find('.cdversion-error').removeClass('hidden');
+		} else {
+			$(this.dom).removeClass('error');
+			$(this.dom).find('.cdversion-error').addClass('hidden');
+		}
+	};
+	this.renderMetaData = function() {
+	    var d = this.options.cddata || {};
+	    var dom = $(this.dom).children('.cdversion-main');
+	    var instanceDom = $(dom).find('.cdversion-instance');
+
+	    if (this.isRunning()) {
+		    $(instanceDom).addClass('state-running');
+	    } else {
+		    $(instanceDom).removeClass('state-running');
+	    }
+
+	    this.renderRunningInstance();
+	    this.renderLastInstance();
+	};
+	this.getUserLink = function(user) {
+	    user = user || {};
+
+	    return $('<a class="userlink" target="_blank" title="Click to view profile in new tab"></a>').attr('href', appdb.config.endpoint.base + 'store/person/' + user.cname).text(user.firstname + ' ' + user.lastname);
+	};
+	this.renderNoProcessPanel = function() {
+		var d = (this.options.cddata || {});
+		var defaultActorStatus = (d.DefaultActorStatus || {});
+		var error = $('<span></span>').append('No continuous delivery checks will be performed until the following issues are resolved:<br/>');
+		var ulErrors = $('<ul></ul>');
+
+		if (this.options.userHasPermissions && !this.isRunning()) {
+			if (defaultActorStatus.exists === false) {
+				var actorHtml = (d.DefaultActor && $.trim(d.DefaultActor.cname)) ? this.getUserLink(d.DefaultActor) : ' (ID: ' + d.defaultActorId + ')';
+				$(ulErrors).append(
+					$('<li></li>').append('Current default publisher ' )
+						.append(actorHtml)
+						.append(' does not exist.')
+						.append($('<a class="wiki-link" target="_blank">learn more</a>').attr('href', appdb.config.endpoint.wiki + 'main:faq:cd_default_publisher_does_not_exist_anymore'))
+				);
+			}else {
+				if (defaultActorStatus.hasAccessToken === false) {
+					$(ulErrors).append(
+						$('<li></li>').append('Current default publisher ' )
+							.append(this.getUserLink(d.DefaultActor))
+							.append(' does not own a personal access token anymore.')
+							.append($('<a class="wiki-link" target="_blank">learn more</a>').attr('href', appdb.config.endpoint.wiki + 'main:faq:cd_default_publisher_revoked_access_token'))
+					);
+				}
+
+				if (defaultActorStatus.canManageVA === false) {
+					$(ulErrors).append(
+						$('<li></li>').append('Current default publisher ' )
+							.append(this.getUserLink(d.DefaultActor))
+							.append(' does not have permissions to publish new virtual appliance versions.')
+							.append($('<a class="wiki-link" target="_blank">learn more</a>').attr('href', appdb.config.endpoint.wiki + 'main:faq:cd_default_publisher_revoked_permissions'))
+					);
+				}
+			}
+		}
+
+		var errorStr = $(ulErrors).html();
+		if (this.options.previousStatusErrorStr === errorStr) {
+			return;
+		} else {
+			this.options.previousStatusErrorStr = errorStr;
+		}
+
+		if ($(ulErrors).children().length > 0) {
+			$(error).append(ulErrors);
+			$(this.dom).find('.cdversion-noprocess .exterror').removeClass('hidden').find('.message').empty().append($(error).clone());
+			$(this.dom).find('.cdversion-noprocess .cdversion-force-check').attr('disabled', 'disabled').addClass('disabled');
+			$(this.dom).find('.onstatuserror').removeClass('hidden').find('.message').empty().append($(error).clone());
+		} else {
+			$(this.dom).find('.cdversion-noprocess .exterror').addClass('hidden').find('.message').empty();
+			$(this.dom).find('.cdversion-noprocess .cdversion-force-check').removeAttr('disabled').removeClass('disabled');
+			$(this.dom).find('.onstatuserror').addClass('hidden').find('.message').empty();
+		}
+	};
+	this.renderRunningInstance =  function(data) {
+	    data = data || this.options.cddata || {};
+	    var runningInstance = data.runningInstance || {};
+	    if ($.trim(runningInstance.id) !== '') {
+		this.renderInstance($(this.dom).find('.cdversion-running-instance .cdinstance'), runningInstance);
+	    }
+	};
+	this.renderLastInstance = function(data) {
+	    data = data || this.options.cddata || {};
+	    var runningInstance = data.runningInstance || {};
+	    var lastInstance = data.lastInstance || {};
+	    var container = $(this.dom).find('.cdversion-lastinstance');
+	    var dom = $(container).find('.last-cdinstance');
+	    if ($.trim(runningInstance.id) === '' && $.trim(lastInstance.id) !== '') {
+		    $(container).removeClass('hidden');
+		    if ($.trim(lastInstance.id) !== $(dom).data('id')) {
+			$(dom).data('id', $.trim(lastInstance.id));
+			this.renderInstance(dom, lastInstance);
+		    }
+	    } else {
+		    $(container).addClass('hidden');
+	    }
+
+	    if (lastInstance && lastInstance.state) {
+		    if (lastInstance.state === 'failed') {
+			    $(container).addClass('failed').removeClass('success').removeClass('canceled');
+			    $(container).find('.cdversion-lastinstance-result').addClass('failed').removeClass('success').removeClass('canceled').text('FAILED');
+		    } else if (lastInstance.state === 'completed') {
+			    $(container).addClass('success').removeClass('canceled').removeClass('failed');
+			    $(container).find('.cdversion-lastinstance-result').addClass('success').removeClass('canceled').removeClass('failed').text('SUCCESS');
+		    } else if (lastInstance.state === 'canceled') {
+			    $(container).addClass('canceled').removeClass('success').removeClass('failed');
+			    $(container).find('.cdversion-lastinstance-result').addClass('canceled').removeClass('success').removeClass('failed').text('CANCELED');
+		    } else {
+			    $(container).removeClass('success').removeClass('failed').removeClass('canceled');
+			    $(container).find('.cdversion-lastinstance-result').removeClass('success').removeClass('failed').removeClass('canceled').text('');
+		    }
+	    }
+	};
+	this.renderInstance = function(container, d) {
+		var inst = d || {};
+		var metadom = $(container).find('.cdinstance-metadata ');
+		var actorLink = '-';
+		if (inst.DefaultActor && inst.DefaultActor.id) {
+			actorLink = $('<a></a>').attr('href', appdb.config.endpoint.base + 'stroe/person/' + inst.DefaultActor.cname).attr('title', 'Click to view profile in a new tab');
+			$(actorLink).append('<img src="/people/getimage?id=' + inst.DefaultActor.id + '" style="width:24px;height:24px;padding-right: 10px;vertical-align: middle;"/>');
+			$(actorLink).append($('<span style="vertical-align: middle;font-size: 14px;"></span>').text(inst.DefaultActor.name));
+		}
+
+		$(metadom).find('.fieldvalue.completedat> .value').empty().append(this.formatDate(inst.completedAt));
+		$(metadom).find('.fieldvalue.triggeredby > .value').empty().append(inst.RelatedTriggerType.name);
+		$(metadom).find('.fieldvalue.startedat > .value').text(this.formatDate(inst.startedAt));
+		$(metadom).find('.fieldvalue.startedby > .value').empty().append(actorLink);
+
+		var percentage = Math.round((inst.progressVal / inst.progressMax) * 100);
+		result = $('<div class="progressbar" title="Overall progress of continuous delivery process." style="display: block;position: relative;padding-top: 4px;color: black;"><span class="bar" style="display: block; width: '+percentage+'%;"></span><span class="percent" style="position: relative;z-index: 10;">'+percentage+'% ('+inst.progressVal+' of '+inst.progressMax+' steps)</span></div>');
+		$(metadom).find('.fieldvalue.progress > .value').html(result);
+
+
+		this.renderTaskInstanceList(container, d);
+	};
+	this.renderTaskInstanceList = function(container, data) {
+		var tasks = this.getCdTaskInstances(data);
+		var prevTasksDom = $(container).find('.previous-tasks');
+
+		if (tasks.length === 0) {
+			$(prevTasksDom).addClass('empty');
+		} else {
+			$(prevTasksDom).removeClass('empty');
+		}
+
+		var prevTasksTable = $(prevTasksDom).find('.cdtaskinstance-list');
+		var prevTaskBody = $(prevTasksTable).find('tbody').empty();
+
+		$.each(tasks, function (index, task) {
+			var tr = $('<tr></tr>');
+			var stateDom = null;
+			var result = $.trim(task.result);
+			switch(task.state) {
+			    case 'failed':
+				stateDom = $('<img src="/images/cancelicon.png" title="The task failed to complete."/>');
+				break;
+			    case 'canceled':
+				stateDom = $('<img src="/images/stop2.png" title="The task was canceled."/>');
+				break;
+			    case 'completed':
+			    case 'success':
+				stateDom = $('<img src="/images/yes.png" title="The task completed successfully."/>');
+				break;
+			    case 'running':
+				stateDom = $('<img src="/images/ajax-loader-trans-orange.gif" title="The task is still running."/>');
+				break;
+
+			}
+
+			if (task.CdTask.cname === 'appdb.cd.task.integrity.check') {
+				if (task.state==='completed') {
+					var tmpresult = result.split(',');
+					result = $('<div></div>');
+					$.each(tmpresult, function(index, prop) {
+					    var tmp = prop.split(':');
+					    var field = $.trim(tmp[0]) + ':';
+					    var value = '-';
+					    if (tmp.length > 1) {
+						    value = $.trim(tmp[1]);
+					    }
+					    var d = $('<div class="fieldvalue"></div>');
+					    $(d).append($('<div class="field"></div>').text(field));
+					    $(d).append($('<div class="value"></div>').text(value));
+
+					    $(result).append(d);
+					});
+				} else if (task.state === 'running') {
+					var percentage = Math.round((task.progressVal / task.progressMax) * 100);
+					result = $('<div class="progressbar" title="Downloading and calculating checksum of VM image file." style="display: block;position: relative;padding-top: 4px;color: black;"><span class="bar" style="display: block; width: '+percentage+'%;"></span><span class="percent" style="position: relative;z-index: 10;">'+percentage+'%</span></div>');
+				}
+			} else if (task.CdTask.cname === 'appdb.cd.task.publishvaversion.publish') {
+				if (task.state==='completed') {
+				    var tmpresult = {};
+				    try { tmpresult = JSON.parse(result); } catch(e) {tmpresult = {};}
+				    if (!tmpresult.version) {
+					    result = $('<div>Successfully published new virtual appliance version.</div>');
+				    } else {
+					    result = $('<div></div>').append('Successfully published new virtual appliance version ').append($('<b></b>').text(tmpresult.version)).append('.');
+				    }
+				}
+			}
+
+			$(tr).append($('<td class="img"></td>').append(stateDom));
+			$(tr).append($('<td class="name"></td>').append($("<span></span>").attr('title', task.CdTask.description).append(task.CdTask.name)));
+			$(tr).append($('<td class="startedat"></td>').append(this.formatDate(task.startedAt)));
+			$(tr).append($('<td class="state"></td>').append(task.state));
+			$(tr).append($('<td class="result"></td>').append(result));
+
+			$(prevTaskBody).append(tr);
+		}.bind(this));
+	};
+	this.formatDate = function(d) {
+		d = $.trim(d);
+		if (!d) return '-';
+
+		d = d.split('T');
+		var res = d[0];
+		if (d.length > 1) {
+			res += ' ';
+			d = d[1].split('.');
+			res += d[0];
+		}
+
+		return res;
+	};
+	this.renderLogSizeHandler = function(){
+		var allowedCdLogSizes = (this.options.allowedCdLogSizes || []).join(',|,').split(',');
+		var sizeLinks = $(this.dom).find('.cdversion-logs .page-size > ul').empty();
+
+		$.each(allowedCdLogSizes, function(i, s) {
+			var li = $('<li></li>').text(s);
+			if (s === '|') {
+			    sizeLinks.push($(li).addClass('sep'));
+			} else {
+			    if ($.trim($(li).text()) === $.trim(this.options.cdLogSize)) {
+				    $(li).addClass('selected');
+			    } else {
+				    $(li).removeClass('selected');
+			    }
+
+			    $(li).unbind('click').bind('click', function(el) {
+				    this.options.cdLogSize = parseInt($(el.target).text());
+				    $(sizeLinks).find('li').removeClass('selected');
+				    $(el.target).addClass('selected');
+			    }.bind(this));
+			}
+			$(sizeLinks).append(li);
+		}.bind(this));
+	};
+	this.renderLogs = function () {
+		var container = $(this.dom).find('.cdversion-logs');
+		var dom = $(container).find('.cdversion-log-list');
+		var d = this.options.cddata || {};
+		var logs = d.CdLogs || [];
+		var oldLogs = (this.options.oldcddata || {}).CdLogs || [];
+		var logIds = [];
+		var oldLogIds = [];
+
+		if (logs.length === 0) {
+			$(container).addClass('hidden');
+		} else {
+			$(container).removeClass('hidden');
+		}
+
+		$.each(logs, function(i, log) {
+			logIds.push(log.id);
+		});
+		$.each(oldLogs, function(i, log){
+			oldLogIds.push(log.id);
+		})
+
+		if (oldLogIds.join(',') === logIds.join(',')) {
+			return;
+		}
+
+		$(dom).empty();
+
+		$.each(logs, function(i, log) {
+			var li = $('<li></li>').attr('data-id', log.id).attr('data-action', log.action);
+			var div = $('<div class="item"></div>');
+			var summary = $('<div></div>').addClass('summary');
+			var meta = $('<div></div>').addClass('meta');
+			var actor = null;
+
+			if (log.Actor && log.Actor.id) {
+				actor = $('<a class="actor" target="_blank"></a>').attr('href', appdb.config.endpoint.base + 'store/person/' + log.Actor.cname).append($('<span class="actor-name"></span>').text(log.Actor.firstname + ' ' + log.Actor.lastname));
+				$(meta).append($('<span class="user"></span>').append('by user').append(actor).append(', '));
+			}
+
+			$(meta).append('at').append($('<span class="createdat"></span>').text(this.formatDate(log.createdAt)));
+
+			var action = $('<span class="ui label tiny action"></span>');
+			var name = $('<span class="name"></span>');
+			var description = $('<span class="description"></div>');
+
+			if (log.action === 'cd-prop-change') {
+				if (log.subject === 'paused') {
+					if ($.trim(log.payload) === 'true') {
+						$(action).addClass('canceled').append($('<span></span>').text('PAUSED'));
+						$(name).text('Continuous delivery checks were paused.')
+					} else {
+						$(action).addClass('completed').append($('<span></span>').text('RESUMED'));
+						$(name).text('Continuous delivery checks were resumed from previous pause.')
+					}
+				} else if (log.subject === 'enabled') {
+					if ($.trim(log.payload) === 'true') {
+						$(action).addClass('primary').append($('<span></span>').text('ENABLED'));
+						$(name).text('Continuous delivery was enabled.')
+					} else {
+						$(action).append($('<span></span>').text('DISABLED'));
+						$(name).text('Continuous delivery was disabled.')
+					}
+				} else {
+					$(action).addClass('primary').append($('<span></span>').text('PROPERTY'));
+					var comments = {};
+					if ($.trim(log.comments)) {
+						try {
+							comments = JSON.parse(log.comments);
+						} catch(e) {comments = {};}
+					}
+
+					if (log.subject === 'defaultActorId') {
+						var newActorVal = $('<span class="new-value"></span>').text(log.payload);
+						var prevActorVal = $('<span class="prev-value"></span>').text(log.payload);
+						if (comments.to && $.trim(comments.to.cname)) {
+							var newActorLink = $('<a target="_blank" title="Click to view profile in a new tab"></a>').attr('href', appdb.config.endpoint.base + 'store/person/' + comments.to.cname).text(comments.to.firstname + ' ' + comments.to.lastname + ' (ID: '+comments.to.id+')');
+							$(newActorVal).text('').append(newActorLink);
+						} else if (comments.to && $.trim(comments.to.id)) {
+							$(newActorVal).text('ID: ' + comments.to.id)
+						} else {
+							newActorVal = null;
+						}
+
+						if (comments.from && $.trim(comments.from.cname) ) {
+							var prevActorLink = $('<a target="_blank" title="Click to view profile in a new tab"></a>').attr('href', appdb.config.endpoint.base + 'store/person/' + comments.from.cname).text(comments.from.firstname + ' ' + comments.from.lastname + ' (ID: '+comments.from.id+')');
+							$(prevActorVal).text('').append(prevActorLink);
+						} else if (comments.from && $.trim(comments.from.id)) {
+							$(prevActorVal).text('ID: ' + comments.from.id);
+						} else {
+							prevActorVal = null;
+						}
+
+						if (newActorVal && prevActorVal) {
+							$(name).append('Updated <span class="property-name">Default Publisher</span> to ').append(newActorVal).append(' from ').append(prevActorVal);
+						} else if (newActorVal && !prevActorVal) {
+							$(name).append('Updated <span class="property-name">Default Publisher</span> to ').append(newActorVal);
+						} else if (!newActorVal && prevActorVal) {
+							$(name).append('Updated <span class="property-name">Default Publisher</span> from ').append(prevActorVal).append(' to unknown publisher.');
+						} else {
+							$(name).append('Updated <span class="property-name">Default Publisher</span>. No information regarding previous or new publisher.');
+						}
+						$(description).empty();
+					} else {
+						$(name).append('Updated <span class="property-name">' + log.subject + '</span> to ')
+						       .append($('<span class="new-value"></span>').text(log.payload));
+						if ($.trim(comments.from)) {
+							$(name).append(' from ').append($('<span class="old-value"></span>').text(comments.from));
+						}
+					}
+				}
+			} else if ($.trim(log.cdInstanceId) !== '') {
+				if (log.action === 'canceled') {
+					$(action).addClass($.trim(log.action).toLowerCase()).text($.trim(log.action).toUpperCase());
+					$(name).append('Continous Delivery process was canceled. ');
+					if (log.Actor && log.Actor.id) {
+						$(name).append($.trim(log.payload));
+					}
+				} else if (['failed', 'task-failed', 'error'].indexOf(log.action) > -1) {
+					$(action).addClass($.trim(log.action).toLowerCase()).text($.trim(log.action).toUpperCase());
+					$(name).append('Continous Delivery process failed to complete. ');
+					$(name).append($.trim(log.payload));
+				} else {
+					$(action).addClass($.trim(log.action).toLowerCase()).text($.trim(log.action).toUpperCase());
+					var payload = {};
+					try {
+						payload = JSON.parse(log.payload);
+					} catch(e) {payload = {}}
+					$(name).append('Successfully published new Virtual Appliance version ').append($('<span class="version"></span>').text(payload.version));
+					if (payload.publishedBy && $.trim(payload.publishedBy.id)) {
+						$(name).append(' as user ');
+						$(name).append($('<a target="_blank" title="Click to view profile in new tab"></a>').attr('href', appdb.config.endpoint.base + 'store/person/' + payload.publishedBy.cname).text(payload.publishedBy.firstname + ' ' + payload.publishedBy.lastname));
+					}
+					$(name).append('.');
+				}
+			}
+			$(summary).append(action).append(name);
+			if ($(description).text() !== '') {
+				$(summary).append(description);
+			}
+
+			$(div).append(summary).append(meta);
+			$(li).append(div);
+			$(dom).append(li);
+		}.bind(this));
+		this.renderLogSizeHandler();
+	};
+	this.renderActions = function() {
+		var dom = $(this.dom).find('.cdversion-action');
+		var d = this.options.cddata || {};
+		var publisher = this.getDefaultPublisher();
+		var publisherStatus = (publisher || {}).status || {};
+		var btnPause = $(this.dom).find('button.cd-action-pause');
+		var btnResume = $(this.dom).find('button.cd-action-resume');
+		var btnForceCheck = $(this.dom).find('.cdversion-force-check');
+		var btnCancel = $(this.dom).find('.cdversion-cancel-running');
+		var resumedPanelError = $(this.dom).find('.cdversion-noprocess.panel > .error');
+		var pausedPanelError = $(this.dom).find('.cdversion-paused-process.panel > .error');
+
+		if ($.trim(d.paused) === "true") {
+			$(btnPause).addClass('hidden');
+			$(btnResume).removeClass('hidden');
+		} else {
+			$(btnPause).removeClass('hidden');
+			$(btnResume).addClass('hidden');
+		}
+
+		if (publisherStatus.hasAccessToken !== true) {
+			$(btnPause).unbind('click').addClass('disabled').attr('disabled', 'disabled');
+			$(btnResume).unbind('click').addClass('disabled').attr('disabled', 'disabled');
+			$(btnForceCheck).unbind('click').addClass('disabled').attr('disabled', 'disabled');
+			$(btnCancel).unbind('click').addClass('disabled').attr('disabled', 'disabled');
+
+			var resumedError = 'You need to own a <b>personal</b> access token in order to <b>pause</b>/<b>force check</b> continuous delivery. You can create one from your profile at the end of the <a href="'+appdb.config.endpoint.base + 'store/person/' + publisher.cname + '/preferences" target="_blank" title="Click to open your profile preferences page">preferences</a> tab.';
+			var pausedError = 'You need to own a <b>personal</b> access token in order to <b>resume</b> continuous delivery. You can create one from your profile at the end of the <a href="'+appdb.config.endpoint.base + 'store/person/' + publisher.cname + '/preferences" target="_blank" title="Click to open your profile preferences page">preferences</a> tab.';
+
+			$(resumedPanelError).removeClass('hidden').find('.message').empty().append(resumedError);
+			$(pausedPanelError).removeClass('hidden').find('.message').empty().append(pausedError);
+			return;
+		} else {
+			$(btnPause).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
+			$(btnResume).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
+			$(btnForceCheck).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
+			$(btnCancel).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
+			$(resumedPanelError).addClass('hidden').find('.message').empty();
+			$(pausedPanelError).addClass('hidden').find('.message').empty();
+		}
+
+		if (!$(btnPause).hasClass('loading')) {
+			$(btnPause).unbind('click').bind('click', function() {
+				this.pause();
+			}.bind(this));
+		}
+
+		if (!$(btnResume).hasClass('loading')) {
+			$(btnResume).unbind('click').bind('click', function() {
+				this.resume();
+			}.bind(this));
+		}
+
+		if (!$(btnForceCheck).hasClass('loading')) {
+			$(btnForceCheck).unbind('click').bind('click', function(){
+				this.forceCheck();
+			}.bind(this));
+		}
+
+		if (!$(btnCancel).hasClass('loading')) {
+			$(btnCancel).unbind('click').bind('click', function(){
+				this.cancelRunning();
+			}.bind(this));
+		}
+	};
+	this.doRender = function() {
+		var d = this.options.cddata || {};
+		this.options.userHasPermissions = this.hasPermissions();
+		if ($.trim(d.paused) === 'true') {
+			$(this.dom).addClass('paused').removeClass('resumed');
+		} else {
+			$(this.dom).removeClass('paused').addClass('resumed');
+		}
+		if (this.options.userHasPermissions === false) {
+			this.renderErrorLoading(true, {title: 'No access to continuous delivery functionality.', message: 'It seems your permissions to manage this virtual appliance are revoked.'});
+			if (this.options.userHadPermissions === true) {
+				appdb.vappliance.ui.CurrentVAManager.loadCDHandler(d, {canManageVA: false });
+			}
+			this.options.userHadPermissions = false;
+		} else {
+			this.options.userHadPermissions = true;
+			this.renderSetup(true);
+			this.renderMetaData();
+			this.renderLogs();
+			this.renderActions();
+		}
+		this.renderNoProcessPanel();
+		this.showContents(true);
+	};
+	this.checkForNewVAVersion = function() {
+		var d = this.options.cddata || {};
+		var lastInstance = d.lastInstance || {};
+		var runningInstance = d.runningInstance || {};
+		if ($.trim(lastInstance.id) && $.trim(lastInstance.id) === $.trim(this.options.runningInstanceId) && $.trim(lastInstance.state) === 'completed') {
+			this.options.runningInstanceId = null;
+			return true;
+		} else if ($.trim(runningInstance.id)) {
+			this.options.runningInstanceId = $.trim(runningInstance.id);
+		}
+		return false;
+	};
+	this.getCDUrl = function() {
+	    return appdb.config.endpoint.base + 'apps/cd?appid=' + appdb.pages.application.currentId() + '&cdLogSize=' + this.options.cdLogSize;
+	};
+	this.load = function(cb) {
+	    $(this.dom).removeClass('error');
+	    this.showContents(false);
+	    this.renderErrorLoading(false);
+	    this.renderLoadingData(true);
+	    appdb.vappliance.components.CDVersion.stopMonitor(this);
+	    $.ajax({
+		    "type": 'GET',
+		    url: this.getCDUrl(),
+		    success: function(cddata, textStatus, jqXHR) {
+			    this.renderLoadingData(false);
+			    cddata = cddata || {};
+			    if ($.trim(cddata.error)) {
+				  this.renderErrorLoading(true, {title: "Could not load continuous delivery information", message: cddata.error});
+			    } else {
+				  this.onLoadComplete(cddata);
+			    }
+		    }.bind(this),
+		    error: function( jqXHR, textStatus, errorThrown) {
+			this.renderLoadingData(false);
+			var errText = errorThrown + ' (' + textStatus + ')';
+			try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
+			this.renderErrorLoading(true, {title: "Could not load continuous delivery information", message: errText});
+			appdb.vappliance.components.CDVersion.startMonitor(this);
+		    }.bind(this)
+	    });
+	};
+	this.onLoadComplete = function(cddata) {
+		this.renderErrorLoading(false);
+		appdb.vappliance.components.CDVersion.stopMonitor();
+		$(this.dom).find('.onloaderror').addClass('hidden').empty();
+		if (this.options.cddata && this.options.cddata.id) {
+			this.options.oldcddata = this.options.cddata || {};
+		}
+		this.options.cddata = cddata || {};
+		if (this.checkForNewVAVersion()) {
+			this.options.runningInstanceId = null;
+			appdb.pages.Application.reload();
+			return;
+		}
+		this.doRender(this.options.cddata);
+		appdb.vappliance.components.CDVersion.startMonitor(this);
+	};
+	this.onLoadError = function(err) {
+		$(this.dom).find('.onloaderror').removeClass('hidden').empty().append(err);
+	};
+	this.render = function() {
+		$(this.dom).removeClass('hidden');
+		this.load();
+	};
+	this._init = function(){
+		this.dom = this.options.container;
+		this.parent = this.options.parent;
+		appdb.vappliance.components.CDVersion.stopMonitor();
+	};
+	this._init();
+}, {
+    monitor: {
+	    state: 'idle',
+	    timer: null,
+	    xhr: null,
+	    interval: 2000
+    },
+    stopMonitor: function() {
+	    if (appdb.vappliance.components.CDVersion.monitor.timer) {
+		    clearTimeout(appdb.vappliance.components.CDVersion.monitor.timer);
+	    }
+	    if (appdb.vappliance.components.CDVersion.monitor.xhr && appdb.vappliance.components.CDVersion.monitor.xhr.abort) {
+		    appdb.vappliance.components.CDVersion.monitor.xhr.abort();
+		    appdb.vappliance.components.CDVersion.monitor.xhr = null;
+	    }
+    },
+    isMonitoring: function() {
+	return (appdb.vappliance.components.CDVersion.monitor.state !== 'idle' || appdb.vappliance.components.CDVersion.monitor.xhr);
+    },
+    startMonitor: function(cdversion) {
+	    //appdb.vappliance.components.CDVersion.stopMonitor();
+	    if (appdb.vappliance.components.CDVersion.isMonitoring()) {
+		return;
+	    }
+	    function _scheduleCheck() {
+		    if (appdb.vappliance.components.CDVersion.monitor.state === 'idle') {
+			    appdb.vappliance.components.CDVersion.monitor.timer = setTimeout(_check, appdb.vappliance.components.CDVersion.monitor.interval);
+		    }
+	    }
+	    function _check() {
+		    appdb.vappliance.components.CDVersion.monitor.state = 'running';
+		    appdb.vappliance.components.CDVersion.monitor.xhr = $.ajax({
+			"type": 'GET',
+			url: cdversion.getCDUrl(),
+			success: function(cddata, textStatus, jqXHR) {
+				appdb.vappliance.components.CDVersion.monitor.state = 'idle';
+				cddata = cddata || {};
+				if ($.trim(cddata.error)) {
+				      cdversion.onLoadError(cddata.error);
+				} else {
+				      cdversion.onLoadComplete(cddata);
+				}
+				appdb.vappliance.components.CDVersion.monitor.state = 'idle';
+				if (appdb.vappliance.components.CDVersion.monitor.xhr) {
+				    _scheduleCheck();
+				}
+			},
+			error: function( jqXHR, textStatus, errorThrown) {
+				var errText = errorThrown + ' (' + textStatus + ')';
+				try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
+				cdversion.onLoadError(errText);
+				appdb.vappliance.components.CDVersion.monitor.state = 'idle';
+				clearTimeout(appdb.vappliance.components.CDVersion.monitor.timer);
+				appdb.vappliance.components.CDVersion.monitor.state = 'idle';
+				appdb.vappliance.components.CDVersion.monitor.xhr = null;
+				_scheduleCheck();
+			}
+		    });
+	    }
+	    _scheduleCheck();
+    }
 });
 
 appdb.vappliance.ui.views.DataValueHandler = appdb.DefineClass("appdb.vappliance.ui.views.DataValueHandler", function(o){
