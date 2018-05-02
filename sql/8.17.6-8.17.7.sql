@@ -21,8 +21,12 @@ New version: 8.17.7
 Author: wvkarag@lovecraft.priv.iasa.gr
 */
 
+START TRANSACTION;
+
 CREATE OR REPLACE FUNCTION xsltproc(xslt TEXT, x XML) RETURNS XML AS
 $$
+$_[1] =~ s/\$/\\\$/;
+$_[1] =~ s/\`/\\\`/;
 return `(cat << EOF
 $_[1]
 EOF
@@ -50,3 +54,5 @@ ALTER FUNCTION openaire(applications) OWNER TO appdb;
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 17, 7, E'Add xsltproc Perl function and OpenAIRE-compliant app to XML function'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=17 AND revision=7);
+
+COMMIT;
