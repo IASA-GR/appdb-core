@@ -209,7 +209,7 @@ CREATE INDEX idx_cds_flow_id ON cds(cd_flow_id);
 
 CREATE OR REPLACE FUNCTION valid_cd_instance_state(state TEXT) RETURNS BOOLEAN AS
 $$
-	SELECT $1 IN ('running', 'success', 'error', 'canceled', 'idle');
+	SELECT $1 IN ('running', 'success', 'error', 'canceled', 'failed', 'completed', 'idle', 'task-failed');
 $$ LANGUAGE sql IMMUTABLE;
 COMMENT ON FUNCTION valid_cd_instance_state(TEXT) IS 'Validates state value for continuous delivery instances etc';
 ALTER FUNCTION valid_cd_instance_state(TEXT) OWNER TO appdb;
