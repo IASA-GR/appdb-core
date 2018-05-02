@@ -3181,7 +3181,7 @@ class RestOwnAppLogistics extends RestAppLogistics {
     /**
      * overrides RestResource::get()
      */
-	public function get() {
+	public function get($extraFilter = NULL) {
 		if ( trim($this->getParam("flt")) != "" ) {
 			$this->_pars["flt"] = "application.addedby:" . $this->getParam("id") . " application.owner:" . $this->getParam("id") . " | " . $this->getParam("flt");
 		} else {
@@ -3206,7 +3206,7 @@ class RestEdtAppLogistics extends RestAppLogistics {
    	/**
      * overrides RestAppLogistics::get()
      */
-	public function get() {
+	public function get($extraFilter = NULL) {
 		$f = new Default_Model_PermissionsFilter();
 		$f->actor->numequals("(SELECT guid FROM researchers WHERE id = " . $this->getParam("id") . ")")->and($f->actionid->any("app_metadata_actions()", false, false));
 return parent::get($f);
@@ -3227,7 +3227,7 @@ class RestAscAppLogistics extends RestAppLogistics {
 	/**
      * overrides RestAppLogistics::get()
      */
-	public function get() {
+	public function get($extraFilter = NULL) {
 		$f = new Default_Model_ResearchersFilter();
 		$f->id->equals($this->getParam("id"));
 		return parent::get($f);
@@ -3248,7 +3248,7 @@ class RestAppBookmarkLogistics extends RestAppLogistics {
 	/**
      * overrides RestAppLogistics::get()
      */
-	public function get() {
+	public function get($extraFilter = NULL) {
 		$f = new Default_Model_AppBookmarksFilter();
 		$f->researcherid->equals($this->getParam("id"));
 		return parent::get($f);
@@ -3269,7 +3269,7 @@ class RestAppFollowedLogistics extends RestAppLogistics {
 	/**
      * overrides RestAppLogistics::get()
      */
-	public function get() {
+	public function get($extraFilter = NULL) {
 		$ids = array();
 		$f = new Default_Model_MailSubscriptions();
 		$f->filter->flt->like('%id:SYSTAG_FOLLOW')->and($f->filter->researcherid->equals($this->getParam("id")));
@@ -3303,7 +3303,7 @@ class RestRelAppLogistics extends RestAppLogistics {
     /**
      * overrides RestResource::get()
      */
-	public function get() {
+	public function get($extraFilter = NULL) {
 		if ( trim($this->getParam("flt")) != "" ) {
 			$this->_pars["flt"] = "=application.relatedto:" . $this->getParam("id") . " | " . $this->getParam("flt");
 		} else {
