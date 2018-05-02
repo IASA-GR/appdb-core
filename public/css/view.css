@@ -25413,6 +25413,20 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
 .cdversion .panel > .warning {
     background-color: #f9ed95;
 }
+.cdversion-paused-process-warning {
+    background-color: #fbf6d4;
+}
+.cdversion-paused-process-warning .failedtimes {
+    font-weight: bold;
+}
+.cdversion-paused-process-warning .lasterror {
+    display: block;
+    padding: 10px;
+    background-color: whitesmoke;
+    border-radius: 2px;
+    border: 1px solid #d0d0d0;
+    margin: 10px 5px;
+}
 .cdversion .panel > .error > *,
 .cdversion .panel > .exterror > *,
 .cdversion .panel > .updateerror > *,

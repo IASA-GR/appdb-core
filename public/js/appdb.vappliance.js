@@ -3819,6 +3819,31 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			}.bind(this));
 		}
 	};
+	this.setWarningDueToFailedAttempts = function() {
+	    var pausedPanelWarning = $(this.dom).find('.cdversion-paused-process-warning');
+	    var d = (this.options.cddata || {});
+	    var allowedFailedAttempts = -1;
+
+	    if (d.paused === true && d.failedAttempts > 0 && $.trim(d.lastAttemptError) !== '') {
+		try {
+		    allowedFailedAttempts = parseInt(d.CdConfig.service.cd.failedAttempts.maximum.value);
+		} catch (e) { allowedFailedAttempts = -1; }
+	    }
+
+	    if (allowedFailedAttempts > 0 && d.failedAttempts >= allowedFailedAttempts) {
+		if ($(pausedPanelWarning).hasClass('hidden')) {
+		    $(pausedPanelWarning).removeClass('hidden');
+		}
+		var lasterror = $(pausedPanelWarning).removeClass('hidden').find('.lasterror').text();
+		if ($.trim(lasterror) !== $.trim(d.lastAttemptError)) {
+		    $(pausedPanelWarning).find('.header > .message').find('.failedtimes').text(d.failedAttempts);
+		    $(pausedPanelWarning).find('.content').empty().append('Last reported error:<span class="lasterror"></span>').find('.lasterror').text(d.lastAttemptError);
+		    $(pausedPanelWarning).find('.learnmore').attr('href', appdb.config.endpoint.wiki + 'main:faq:cd_why_cd_paused_due_to_failed_attempts');
+		}
+	    } else {
+		$(pausedPanelWarning).addClass('hidden').empty();
+	    }
+	};
 	this.doRender = function() {
 		var d = this.options.cddata || {};
 
@@ -3845,6 +3870,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			this.renderActions();
 		}
 		this.renderNoProcessPanel();
+		this.setWarningDueToFailedAttempts();
 		this.showContents(true);
 	};
 	this.checkForNewVAVersion = function() {
