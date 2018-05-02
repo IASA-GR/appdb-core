@@ -60,8 +60,8 @@ INSERT INTO public.cd_configs (cname, name, description, data) VALUES ('service.
 CREATE TABLE public.cd_flows
 (
   id BIGSERIAL NOT NULL,
-  cname text NOT NULL,
   name text NOT NULL,
+  cname text NOT NULL,
   description text,
   CONSTRAINT uniq_cd_flow_name UNIQUE (name),
   CONSTRAINT uniq_cd_flow_cname UNIQUE (cname),

@@ -3481,9 +3481,9 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			$(actorLink).append($('<span style="vertical-align: middle;font-size: 14px;"></span>').text(inst.DefaultActor.name));
 		}
 
-		$(metadom).find('.fieldvalue.completedat> .value').empty().append(this.formatDate(inst.completedAt));
+		$(metadom).find('.fieldvalue.completedon> .value').empty().append(this.formatDate(inst.completedOn));
 		$(metadom).find('.fieldvalue.triggeredby > .value').empty().append(inst.RelatedTriggerType.name);
-		$(metadom).find('.fieldvalue.startedat > .value').text(this.formatDate(inst.startedAt));
+		$(metadom).find('.fieldvalue.startedon > .value').text(this.formatDate(inst.startedOn));
 		$(metadom).find('.fieldvalue.startedby > .value').empty().append(actorLink);
 
 		var percentage = Math.round((inst.progressVal / inst.progressMax) * 100);
@@ -3562,7 +3562,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 
 			$(tr).append($('<td class="img"></td>').append(stateDom));
 			$(tr).append($('<td class="name"></td>').append($("<span></span>").attr('title', task.CdTask.description).append(task.CdTask.name)));
-			$(tr).append($('<td class="startedat"></td>').append(this.formatDate(task.startedAt)));
+			$(tr).append($('<td class="startedon"></td>').append(this.formatDate(task.startedOn)));
 			$(tr).append($('<td class="state"></td>').append(task.state));
 			$(tr).append($('<td class="result"></td>').append(result));
 
@@ -3647,7 +3647,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 				$(meta).append($('<span class="user"></span>').append('by user').append(actor).append(', '));
 			}
 
-			$(meta).append('at').append($('<span class="createdat"></span>').text(this.formatDate(log.createdAt)));
+			$(meta).append('at').append($('<span class="createdon"></span>').text(this.formatDate(log.createdOn)));
 
 			var action = $('<span class="ui label tiny action"></span>');
 			var name = $('<span class="name"></span>');

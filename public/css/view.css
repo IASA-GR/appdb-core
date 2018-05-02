@@ -25473,7 +25473,7 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
 }
 .cdinstance-metadata .fieldvalue > .value {}
 .cdversion .cdversion-main .cdinstance-metadata .fieldvalue.startedby,
-.cdversion .cdversion-main .cdinstance-metadata .fieldvalue.startedat,
+.cdversion .cdversion-main .cdinstance-metadata .fieldvalue.startedon,
 .cdversion .cdversion-main .cdinstance-metadata .fieldvalue.triggeredby {
     max-width: 200px;
     min-width: 200px;
@@ -25509,7 +25509,7 @@ table.cdtaskinstance-list > thead > tr > th.name {
     min-width: 200px;
 }
 
-table.cdtaskinstance-list > thead > tr > th.startedat{
+table.cdtaskinstance-list > thead > tr > th.startedon{
     max-width: 150px;
     width: 150px;
     min-width: 150px;
