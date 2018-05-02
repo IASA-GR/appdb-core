@@ -2014,7 +2014,7 @@ String.prototype.replaceAll = function(search, replacement) {
         }).create({},{
             success: function(d) {
                 var s = '', by, evt;
-                if ( d.history ) {
+				if ( d.history && d.history.id) {
                     h = d.history;if ( ! $.isArray(h) ) h = [h];
                     for(var i=0; i<h.length; i++) {
                         if ( h[i].userid ) by = ' by <a target="_blank" href="/store/person/'+h[i].username+'" onclick="appdb.views.Main.showPerson({id: '+h[i].userid+', cname:\''+h[i].usercname+'\'},{mainTitle: \''+h[i].username+'\'});">' + h[i].username + (h[i].usercontact != '' ? ' ('+h[i].usercontact+')' : '') + '</a>'; else by = h[i].username + (h[i].usercontact != '' ? ' ('+h[i].usercontact+')' : '');
