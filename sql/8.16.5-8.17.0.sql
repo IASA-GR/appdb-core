@@ -17,7 +17,7 @@
 /* 
 EGI AppDB incremental SQL script
 Previous version: 8.16.5
-New version: 8.16.6
+New version: 8.17.0
 Author: wvkarag@lovecraft.priv.iasa.gr
 */
 
@@ -84,7 +84,7 @@ $$ LANGUAGE sql STABLE CALLED ON NULL INPUT;
 ALTER FUNCTION history(applications) OWNER TO appdb;
 
 INSERT INTO version (major,minor,revision,notes) 
-	SELECT 8, 16, 6, E'Move api history log from file to DB'
-	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=16 AND revision=6);
+	SELECT 8, 17, 0, E'Move api history log from file to DB'
+	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=17 AND revision=0);
 
 COMMIT;	
