@@ -23,21 +23,22 @@ Author: nakos.al@iasa.gr
 
 START TRANSACTION;
 
--- drop table if exists cd_logs;
--- drop table if exists cd_instance_states;
--- drop table if exists cd_task_instances;
--- drop table if exists cd_instances;
--- drop table if exists cds;
--- drop table if exists cd_trigger_types;
--- drop table if exists cd_flow_tasks;
--- drop table if exists cd_tasks;
--- drop table if exists cd_task_groups;
--- drop table if exists cd_flows;
--- drop table if exists cd_configs;
-
+ drop table if exists cd_logs CASCADE;
+ drop table if exists cd_instance_states CASCADE;
+ drop table if exists cd_task_instances CASCADE;
+ drop table if exists cd_instances CASCADE;
+ drop table if exists cds CASCADE;
+ drop table if exists cd_trigger_types CASCADE;
+ drop table if exists cd_flow_tasks CASCADE;
+ drop table if exists cd_tasks CASCADE;
+ drop table if exists cd_task_groups CASCADE;
+ drop table if exists cd_flows CASCADE;
+ drop table if exists cd_configs CASCADE;
+ drop table if exists cd_published_vaversions CASCADE;
+ 
 CREATE TABLE public.cd_configs
 (
-  id BIGSERIAL NOT NULL,
+  id SERIAL NOT NULL,
   cname TEXT NOT NULL,
   name TEXT,
   description TEXT,
@@ -59,7 +60,7 @@ INSERT INTO public.cd_configs (cname, name, description, data) VALUES ('service.
 
 CREATE TABLE public.cd_flows
 (
-  id BIGSERIAL NOT NULL,
+  id SERIAL NOT NULL,
   name text NOT NULL,
   cname text NOT NULL,
   description text,
@@ -77,7 +78,7 @@ INSERT INTO public.cd_flows VALUES (1, 'Publish new VA Version', 'publish.vavers
 
 CREATE TABLE public.cd_task_groups
 (
-  id BIGSERIAL NOT NULL,
+  id SERIAL NOT NULL,
   name text NOT NULL,
   description text,
   CONSTRAINT cd_task_groups_pk PRIMARY KEY (id)
@@ -90,7 +91,7 @@ ALTER TABLE public.cd_task_groups
 
 CREATE TABLE public.cd_tasks
 (
-  id BIGSERIAL NOT NULL,
+  id SERIAL NOT NULL,
   name text NOT NULL,
   cname text NOT NULL,
   description text,
@@ -125,7 +126,7 @@ INSERT INTO public.cd_tasks VALUES (7, 'Publish new VA Version', 'appdb.cd.task.
 
 CREATE TABLE public.cd_flow_tasks
 (
-  id BIGSERIAL NOT NULL,
+  id SERIAL NOT NULL,
   cd_flow_id integer NOT NULL,
   cd_task_id integer NOT NULL,
   ord integer NOT NULL DEFAULT 0,
@@ -158,7 +159,7 @@ INSERT INTO public.cd_flow_tasks VALUES (7, 1, 7, 6);
 
 CREATE TABLE public.cd_trigger_types
 (
-  id BIGSERIAL NOT NULL,
+  id SERIAL NOT NULL,
   name text NOT NULL,
   cname text NOT NULL,
   description text,
@@ -175,7 +176,7 @@ INSERT INTO public.cd_trigger_types VALUES (2, 'AppDB Portal Service', 'appdb.re
 
 CREATE TABLE public.cds
 (
-  id BIGSERIAL NOT NULL,
+  id SERIAL NOT NULL,
   cd_flow_id integer NOT NULL,
   app_id integer NOT NULL,
   enabled boolean NOT NULL DEFAULT false,
@@ -206,7 +207,7 @@ CREATE INDEX idx_cds_appid ON cds(app_id);
 CREATE INDEX idx_cds_act_id ON cds(default_actor_id);
 CREATE INDEX idx_cds_flow_id ON cds(cd_flow_id);
 
-CREATE FUNCTION valid_cd_instance_state(state TEXT) RETURNS BOOLEAN AS
+CREATE OR REPLACE FUNCTION valid_cd_instance_state(state TEXT) RETURNS BOOLEAN AS
 $$
 	SELECT $1 IN ('running', 'success', 'error', 'canceled', 'idle');
 $$ LANGUAGE sql IMMUTABLE;
@@ -216,7 +217,7 @@ ALTER FUNCTION valid_cd_instance_state(TEXT) OWNER TO appdb;
 
 CREATE TABLE public.cd_instances
 (
-  id BIGSERIAL NOT NULL,
+  id SERIAL NOT NULL,
   cd_id integer NOT NULL,
   trigger_type integer NOT NULL,
   trigger_by_id integer,
@@ -260,7 +261,7 @@ CREATE INDEX idx_cd_instances_state ON cd_instances(state);
 
 CREATE TABLE public.cd_task_instances
 (
-  id BIGSERIAL NOT NULL,
+  id SERIAL NOT NULL,
   cd_task_id integer NOT NULL,
   cd_instance_id integer NOT NULL,
   request_id text NOT NULL,
@@ -292,7 +293,7 @@ CREATE INDEX idx_cd_task_instances_state ON cd_task_instances(state);
 
 CREATE TABLE public.cd_instance_states
 (
-  id BIGSERIAL NOT NULL,
+  id SERIAL NOT NULL,
   cd_instance_id integer NOT NULL,
   cd_task_instance_id integer,
   group_name text,
@@ -321,7 +322,7 @@ CREATE INDEX idx_cd_task_instance_states_instance_id ON cd_instance_states(cd_ta
 
 CREATE TABLE public.cd_logs
 (
-  id BIGSERIAL NOT NULL,
+  id SERIAL NOT NULL,
   cd_id integer NOT NULL,
   cd_instance_id integer,
   cd_task_instance_id integer,
@@ -360,7 +361,7 @@ CREATE INDEX idx_cd_logs_subject ON cd_logs(subject);
 
 CREATE TABLE public.cd_published_vaversions
 (
-  id BIGSERIAL NOT NULL,
+  id SERIAL NOT NULL,
   app_id INTEGER NOT NULL,
   vapp_version_id INTEGER NOT NULL,
   cd_instance_id INTEGER NOT NULL,
