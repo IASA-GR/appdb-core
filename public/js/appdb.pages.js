@@ -2669,7 +2669,7 @@ appdb.pages.application = (function(){
 		   $(handler).removeClass('canHandle');
 	       }
 
-	       let ownerLink = $('<a href="'+ appdb.config.endpoint.base+ 'store/person/'+owner.cname+'" title="Click to view owner\'s profile" target="_blank"></a>').text(owner.firstname + ' ' + owner.lastname);
+		   var ownerLink = $('<a href="'+ appdb.config.endpoint.base+ 'store/person/'+owner.cname+'" title="Click to view owner\'s profile" target="_blank"></a>').text(owner.firstname + ' ' + owner.lastname);
 	       $(handler).find('.footer .message .owner').empty().append(ownerLink);
 	   } else {
 	       $(handler).addClass('hidden');
