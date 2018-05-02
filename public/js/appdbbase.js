@@ -9369,6 +9369,7 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 	};
 	this.getSecantReportsForVAppliance = function(vappid, secantReports) {
 		secantReports = secantReports || this.options.secant || [];
+		secantReports = $.isArray(secantReports) ? secantReports : [secantReports];		
 		var entry = null;
 		if (vappid && vappid.id) {
 			entry = vappid;
@@ -9646,7 +9647,7 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 		})(this));
 	};
 	this.onSecantChange = function(diffs) {
-		var appids = Object.keys(diffs);
+		var appids = Object.keys(diffs || {});
 		if (this.views.imagelist && appids.length > 0) {
 			$.each(appids, function(i, appid) {
 				this.views.imagelist.updateSecantReportsForVappliance(appid, diffs[appid]);
