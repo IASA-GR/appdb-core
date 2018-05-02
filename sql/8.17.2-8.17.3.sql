@@ -22,8 +22,7 @@ Author: wvkarag@lovecraft.priv.iasa.gr
 */
 START TRANSACTION;
 
-ALTER TABLE apilog.t_apphistory ADD COLUMN displosition TEXT;
-
+ALTER TABLE apilog.t_apphistory ADD COLUMN disposition TEXT;
 
 CREATE OR REPLACE FUNCTION public.history(applications)
  RETURNS SETOF apilog.t_apphistory
