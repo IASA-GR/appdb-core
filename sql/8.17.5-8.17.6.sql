@@ -1,4 +1,4 @@
-/*
+﻿/*
  Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,12 +37,12 @@ START TRANSACTION;
 
 CREATE TABLE public.cd_configs
 (
-  id SERIAL,
+  id BIGSERIAL NOT NULL,
   cname TEXT NOT NULL,
   name TEXT,
   description TEXT,
   data TEXT,
-  idx INTEGER DEFAULT 0,
+  idx INTEGER NOT NULL DEFAULT 0,
   CONSTRAINT cd_configs_pk PRIMARY KEY (id),
   CONSTRAINT uniq_cd_config_cname UNIQUE (cname, idx)
 )
@@ -59,9 +59,9 @@ INSERT INTO public.cd_configs (cname, name, description, data) VALUES ('service.
 
 CREATE TABLE public.cd_flows
 (
-  id SERIAL,
+  id BIGSERIAL NOT NULL,
+  cname text NOT NULL,
   name text NOT NULL,
-  cname text,
   description text,
   CONSTRAINT uniq_cd_flow_name UNIQUE (name),
   CONSTRAINT uniq_cd_flow_cname UNIQUE (cname),
@@ -77,7 +77,7 @@ INSERT INTO public.cd_flows VALUES (1, 'Publish new VA Version', 'publish.vavers
 
 CREATE TABLE public.cd_task_groups
 (
-  id SERIAL,
+  id BIGSERIAL NOT NULL,
   name text NOT NULL,
   description text,
   CONSTRAINT cd_task_groups_pk PRIMARY KEY (id)
@@ -90,7 +90,7 @@ ALTER TABLE public.cd_task_groups
 
 CREATE TABLE public.cd_tasks
 (
-  id SERIAL,
+  id BIGSERIAL NOT NULL,
   name text NOT NULL,
   cname text NOT NULL,
   description text,
@@ -106,6 +106,8 @@ WITH (
 );
 ALTER TABLE public.cd_tasks
   OWNER TO appdb;
+
+CREATE INDEX idx_cd_tasks_group_id ON cd_tasks(group_id);
 
 INSERT INTO public.cd_task_groups VALUES (1, 'Check for new version', 'Retrieve remote CD file to check if a new vappliance version is available for publishing');
 INSERT INTO public.cd_task_groups VALUES (2, 'Perform VM image integrity check', 'Download VM image from remote url and calculate its checksum');
@@ -123,7 +125,7 @@ INSERT INTO public.cd_tasks VALUES (7, 'Publish new VA Version', 'appdb.cd.task.
 
 CREATE TABLE public.cd_flow_tasks
 (
-  id SERIAL,
+  id BIGSERIAL NOT NULL,
   cd_flow_id integer NOT NULL,
   cd_task_id integer NOT NULL,
   ord integer NOT NULL DEFAULT 0,
@@ -142,6 +144,9 @@ WITH (
 ALTER TABLE public.cd_flow_tasks
   OWNER TO appdb;
 
+CREATE INDEX idx_cd_flow_tasks_task_id ON cd_flow_tasks(cd_task_id);
+CREATE INDEX idx_cd_flow_tasks_flow_id ON cd_flow_tasks(cd_flow_id);
+
 INSERT INTO public.cd_flow_tasks VALUES (1, 1, 1, 0);
 INSERT INTO public.cd_flow_tasks VALUES (2, 1, 2, 1);
 INSERT INTO public.cd_flow_tasks VALUES (3, 1, 3, 2);
@@ -153,7 +158,7 @@ INSERT INTO public.cd_flow_tasks VALUES (7, 1, 7, 6);
 
 CREATE TABLE public.cd_trigger_types
 (
-  id SERIAL,
+  id BIGSERIAL NOT NULL,
   name text NOT NULL,
   cname text NOT NULL,
   description text,
@@ -170,7 +175,7 @@ INSERT INTO public.cd_trigger_types VALUES (2, 'AppDB Portal Service', 'appdb.re
 
 CREATE TABLE public.cds
 (
-  id SERIAL,
+  id BIGSERIAL NOT NULL,
   cd_flow_id integer NOT NULL,
   app_id integer NOT NULL,
   enabled boolean NOT NULL DEFAULT false,
@@ -178,7 +183,7 @@ CREATE TABLE public.cds
   url text DEFAULT NULL,
   default_actor_id integer DEFAULT NULL,
   failed_attempts integer DEFAULT 0,
-  last_failed_attempt_at timestamp without time zone DEFAULT NULL,
+  last_failed_attempt_on timestamp without time zone DEFAULT NULL,
   last_attempt_error TEXT DEFAULT NULL,
   CONSTRAINT cds_pk PRIMARY KEY (id),
   CONSTRAINT fk_cds_cd_flow_id FOREIGN KEY (cd_flow_id)
@@ -197,9 +202,21 @@ WITH (
 ALTER TABLE public.cds
   OWNER TO appdb;
 
+CREATE INDEX idx_cds_appid ON cds(app_id);
+CREATE INDEX idx_cds_act_id ON cds(default_actor_id);
+CREATE INDEX idx_cds_flow_id ON cds(cd_flow_id);
+
+CREATE FUNCTION valid_cd_instance_state(state TEXT) RETURNS BOOLEAN AS
+$$
+	SELECT $1 IN ('running', 'success', 'error', 'canceled', 'idle');
+$$ LANGUAGE sql IMMUTABLE;
+COMMENT ON FUNCTION valid_cd_instance_state(TEXT) IS 'Validates state value for continuous delivery instances etc';
+ALTER FUNCTION valid_cd_instance_state(TEXT) OWNER TO appdb;
+
+
 CREATE TABLE public.cd_instances
 (
-  id SERIAL,
+  id BIGSERIAL NOT NULL,
   cd_id integer NOT NULL,
   trigger_type integer NOT NULL,
   trigger_by_id integer,
@@ -207,13 +224,13 @@ CREATE TABLE public.cd_instances
   process_id text NOT NULL,
   default_actor_id integer,
   url text,
-  started_at timestamp without time zone DEFAULT now(),
-  completed_at timestamp without time zone DEFAULT NULL,
-  lastupdated_at timestamp without time zone DEFAULT NULL,
+  started_on timestamp without time zone DEFAULT now(),
+  completed_on timestamp without time zone DEFAULT NULL,
+  lastupdated_on timestamp without time zone DEFAULT NULL,
   progress_min integer DEFAULT 0,
   progress_max integer DEFAULT 0,
   progress_val integer DEFAULT 0,
-  state text, -- running, success, error, canceled
+  state text CHECK (valid_cd_instance_state(state)), -- running, success, error, canceled
   result text,
   CONSTRAINT cd_instances_pk PRIMARY KEY (id),
   CONSTRAINT fk_cd_instances_cd_id FOREIGN KEY (cd_id)
@@ -224,7 +241,7 @@ CREATE TABLE public.cd_instances
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_cd_instances_default_actor FOREIGN KEY (default_actor_id)
       REFERENCES public.researchers (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_cd_instances_trigger_by_id FOREIGN KEY (trigger_by_id)
       REFERENCES public.researchers (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
@@ -235,19 +252,25 @@ WITH (
 ALTER TABLE public.cd_instances
   OWNER TO appdb;
 
+CREATE INDEX idx_cd_instances_cd_id ON cd_instances(cd_id);
+CREATE INDEX idx_cd_instances_trigger_type ON cd_instances(trigger_type);
+CREATE INDEX idx_cd_instances_act_id ON cd_instances(default_actor_id);
+CREATE INDEX idx_cd_instances_triggeredby_id ON cd_instances(trigger_by_id);
+CREATE INDEX idx_cd_instances_state ON cd_instances(state);
+
 CREATE TABLE public.cd_task_instances
 (
-  id SERIAL,
+  id BIGSERIAL NOT NULL,
   cd_task_id integer NOT NULL,
   cd_instance_id integer NOT NULL,
   request_id text NOT NULL,
-  started_at timestamp without time zone DEFAULT now(),
-  completed_at timestamp without time zone DEFAULT NULL,
-  lastupdated_at timestamp without time zone DEFAULT NULL,
+  started_on timestamp without time zone DEFAULT now(),
+  completed_on timestamp without time zone DEFAULT NULL,
+  lastupdated_on timestamp without time zone DEFAULT NULL,
   progress_min integer DEFAULT 0,
   progress_max integer DEFAULT 0,
   progress_val integer DEFAULT 0,
-  state text, -- running, success, error, canceled
+  state text CHECK (valid_cd_instance_state(state)), -- running, success, error, canceled
   result text,
   CONSTRAINT cd_task_instances_pk PRIMARY KEY (id),
   CONSTRAINT fk_cd_task_instances_cd_task_id FOREIGN KEY (cd_task_id)
@@ -263,19 +286,23 @@ WITH (
 ALTER TABLE public.cd_task_instances
   OWNER TO appdb;
 
+CREATE INDEX idx_cd_task_instances_cd_task_id ON cd_task_instances(cd_task_id);
+CREATE INDEX idx_cd_task_instances_cd_instance_id ON cd_task_instances(cd_instance_id);
+CREATE INDEX idx_cd_task_instances_state ON cd_task_instances(state);
+
 CREATE TABLE public.cd_instance_states
 (
-  id SERIAL,
+  id BIGSERIAL NOT NULL,
   cd_instance_id integer NOT NULL,
   cd_task_instance_id integer,
   group_name text,
   name text NOT NULL,
   value text,
-  idx integer DEFAULT 0,
-  created_at timestamp without time zone DEFAULT now(),
-  updated_at timestamp without time zone DEFAULT NULL,
+  idx integer NOT NULL DEFAULT 0,
+  created_on timestamp without time zone NOT NULL DEFAULT now(),
+  updated_on timestamp without time zone DEFAULT NULL,
+  CONSTRAINT cd_instance_states_pk PRIMARY KEY (id),  
   CONSTRAINT unique_state_keys UNIQUE(cd_instance_id, group_name, name, idx),
-  CONSTRAINT cd_instance_states_pk PRIMARY KEY (id),
   CONSTRAINT fk_cd_instance_states_cd_instance_id FOREIGN KEY (cd_instance_id)
       REFERENCES public.cd_instances (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
@@ -289,13 +316,16 @@ WITH (
 ALTER TABLE public.cd_instance_states
   OWNER TO appdb;
 
+CREATE INDEX idx_cd_instance_states_instance_id ON cd_instance_states(cd_instance_id);
+CREATE INDEX idx_cd_task_instance_states_instance_id ON cd_instance_states(cd_task_instance_id);
+
 CREATE TABLE public.cd_logs
 (
-  id SERIAL,
+  id BIGSERIAL NOT NULL,
   cd_id integer NOT NULL,
   cd_instance_id integer,
   cd_task_instance_id integer,
-  created_at timestamp without time zone DEFAULT now(),
+  created_on timestamp without time zone NOT NULL DEFAULT now(),
   action text, -- completed, failed, canceled, error, cd-prop-change, task-completed, task-started, task-failed, task-canceled
   subject text,-- CdInstance, defaultActorId, enabled, paused, url, and cd task cnames
   payload text,
@@ -321,14 +351,20 @@ WITH (
 ALTER TABLE public.cd_logs
   OWNER TO appdb;
 
+CREATE INDEX idx_cd_logs_cd_task_instance_id ON cd_logs(cd_task_instance_id);
+CREATE INDEX idx_cd_logs_cd_instance_id ON cd_logs(cd_instance_id);
+CREATE INDEX idx_cd_logs_cd_id ON cd_logs(cd_id);
+CREATE INDEX idx_cd_logs_actor_id ON cd_logs(actor_id);
+CREATE INDEX idx_cd_logs_action ON cd_logs(action);
+CREATE INDEX idx_cd_logs_subject ON cd_logs(subject);
 
 CREATE TABLE public.cd_published_vaversions
 (
-  id SERIAL,
+  id BIGSERIAL NOT NULL,
   app_id INTEGER NOT NULL,
   vapp_version_id INTEGER NOT NULL,
   cd_instance_id INTEGER NOT NULL,
-  created_at timestamp without time zone DEFAULT now(),
+  created_on timestamp without time zone NOT NULL DEFAULT now(),
   CONSTRAINT cd_published_vas_pk PRIMARY KEY (id),
   CONSTRAINT fk_cd_published_vaversions_app_id FOREIGN KEY (app_id)
       REFERENCES public.applications (id) MATCH SIMPLE
@@ -346,8 +382,12 @@ WITH (
 ALTER TABLE public.cd_published_vaversions
   OWNER TO appdb;
 
+CREATE INDEX idx_cd_published_vaversions_app_id ON cd_published_vaversions(app_id);
+CREATE INDEX idx_cd_published_vaversions_vapp_version_id ON cd_published_vaversions(vapp_version_id);
+CREATE INDEX idx_cd_published_vaversions_cd_instance_id ON cd_published_vaversions(cd_instance_id);
+
 INSERT INTO version (major,minor,revision,notes) 
-	SELECT 8, 17, 6, E'Add continuous delivery service tables'
-	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=17 AND revision=6);
+        SELECT 8, 17, 6, E'Add continuous delivery service tables'
+        WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=17 AND revision=6);
 
 COMMIT;
