@@ -24767,9 +24767,9 @@ a.helperlink.wikilink:hover{
     width: 159px;
 }
 .voimagelistcontainer table > tbody > tr > td[data-name="warnings"] .secant.badge { 
-    width: 215px;
-    min-width: 215px;
-    max-width: 215px;
+    width: 220px;
+    min-width: 220px;
+    max-width: 220px;
     box-sizing: border-box;
 }
 .voimagelistcontainer table > tbody > tr > td[data-name="warnings"] .icontext.warningmessage > * {
