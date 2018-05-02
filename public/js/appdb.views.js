@@ -16399,7 +16399,7 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
     },
     databindHtmlReportData: function(data, html) {
 	    $(html).find('[data-path]').each(function(i, e) {
-		let val = $.trim(data[$(e).data('path')]);
+		var val = $.trim(data[$(e).data('path')]);
 		if ($(e).hasClass('capitilize') && val) {
 		    val = val[0].toUpperCase() + val.slice(1);
 		}
