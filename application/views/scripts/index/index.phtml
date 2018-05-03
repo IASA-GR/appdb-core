@@ -800,7 +800,7 @@ if( $browserSupported == false ){
 	var appViewMode = 1;
 	var detailsHistory = new Array();
 	var searchDlg;
-	
+	var userHasPersonalAccessTokens = <?php echo ($this->userHasPersonalAccessTokens ? 'true' : 'false'); ?>;
 	
 	(function() {
 		var _loadIndex = function(){

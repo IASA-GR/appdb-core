@@ -183,6 +183,12 @@ class IndexController extends Zend_Controller_Action
 				}
 			}
 			$this->view->userRequests = count($uritems);
+
+                        if ($this->session->userHasPersonalAccessTokens === true) {
+                            $this->view->userHasPersonalAccessTokens = true;
+                        } else {
+                            $this->view->userHasPersonalAccessTokens = userHasPersonalAccessTokens($this->session->userid);
+                        }
 		}
 		$p = '';
 		if ( $this->session->permaLink != '' ) {
