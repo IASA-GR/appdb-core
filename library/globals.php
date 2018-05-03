@@ -161,6 +161,33 @@ function getAdminsAndManagers() {
 	return $admins->items;
 }
 
+function userHasPersonalAccessTokens($id) {
+        if (is_null($id) === false) {
+                $users = new Default_Model_Researchers();
+                $users->filter->id->numequals($id);
+                if (count($users->items) === 0) {
+                    return false;
+                }
+                $user = $users->items[0];
+                if (trim($user->guid) === '') {
+                    return false;
+                }
+                $ats = new Default_Model_AccessTokens();
+                $f1 = new Default_Model_AccessTokensFilter();
+                $f2  = new Default_Model_AccessTokensFilter();
+                $f1->actor->equals($user->guid);
+                $f2->type->equals('personal');
+
+                $ats->filter->chain($f1, 'AND');
+                $ats->filter->chain($f2, 'AND');
+
+                if( count($ats->items) > 0 ){
+                        return true;
+                }
+        }
+        return false;
+}
+
 /**
  * establish an LDAP connection (bind)
  *
@@ -8017,6 +8044,7 @@ class SamlAuth{
 			);
 			//load available user accounts
 			$session->currentUserAccounts = self::getUserAccountsByUser($user->id, true);
+                        $session->userHasPersonalAccessTokens = userHasPersonalAccessTokens($user->id);
 		}
 		//collect session data for new user based on saml source
 		$accounttype = strtolower( trim($account->accounttypeid) );
