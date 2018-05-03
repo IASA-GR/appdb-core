@@ -529,7 +529,7 @@
                                     <div class="footer">
                                         <span class="message no-permissions">
                                             <img src="/images/vappliance/warning.png" alt="">
-                                            <span>You must be graded with permissions to edit virtual appliance versions in order to enable or disable continuous delivery. You can contact the owner of this virtual appliance (<span class="owner"></span>) to grad you these permissions.</span>
+                                            <span>You must have permissions to edit virtual appliance versions in order to enable or disable continuous delivery. You can contact the owner of this virtual appliance (<span class="owner"></span>) to grand you these permissions.</span>
                                         </span>
                                         <span class="message no-token">
                                             <img src="/images/vappliance/warning.png" alt="">
@@ -551,7 +551,7 @@
                                     <div class="footer">
                                         <span class="message no-permissions">
                                             <img src="/images/vappliance/warning.png" alt="">
-                                            <span>You must be graded with permissions to edit virtual appliance versions in order to enable or disable continuous delivery. You can contact the owner of this virtual appliance (<span class="owner"></span>) to grad you these permissions.</span>
+                                            <span>You must have permissions to edit virtual appliance versions in order to enable or disable continuous delivery. You can contact the owner of this virtual appliance (<span class="owner"></span>) to grand you these permissions.</span>
                                         </span>
                                         <span class="message no-token">
                                             <img src="/images/vappliance/warning.png" alt="">
@@ -1946,6 +1946,7 @@
 			entityType: '<?php echo $this->entitytype;?>'
 		});
 	}
+        window.userHasPersonalAccessTokens = <?php echo ($this->userHasPersonalAccessTokens ? 'true' : 'false'); ?>;
 	window.autoinit = true;
 </script>
 <?php } ?>

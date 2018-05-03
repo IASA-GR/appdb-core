@@ -497,17 +497,17 @@ class AppsController extends Zend_Controller_Action
 		$appID = $this->_getParam("id");
 		$format = $this->_getParam("format");
 		if ( $format === "json" ) $format = "xml";
-        trackPage('/apps/details/'.$appID, $format);
+                trackPage('/apps/details/'.$appID, $format);
 		if ( ($appID == '') ) $appID = $this->session->lastAppID;
 		$this->view->dialogCount=$_GET['dc'];
 		if($appID == '0'){
 			$appID = '';
 		}
 		$this->view->entryid = $appID;
-        $this->view->session = $this->session;
+                $this->view->session = $this->session;
 		$this->view->entitytype = 'software';
-        if ( $this->_getParam('histid') != '' ) $this->view->histid = $this->_getParam('histid');
-        if ( $this->_getParam('histtype') != '' ) $this->view->histtype= $this->_getParam('histtype');
+                if ( $this->_getParam('histid') != '' ) $this->view->histid = $this->_getParam('histid');
+                if ( $this->_getParam('histtype') != '' ) $this->view->histtype= $this->_getParam('histtype');
 		if ( $this->_getParam('entitytype') != '') {
 			$this->view->entitytype= strtolower( trim( $this->_getParam('entitytype') ) );
 			switch ($this->view->entitytype){
@@ -528,6 +528,10 @@ class AppsController extends Zend_Controller_Action
 					break;
 			}
 		}
+                $this->view->userHasPersonalAccessTokens = false;
+                if ($this->session->userid !== null) {
+                        $this->view->userHasPersonalAccessTokens = userHasPersonalAccessTokens($this->session->userid);
+                }
 		
     }
 
