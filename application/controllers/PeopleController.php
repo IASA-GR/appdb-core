@@ -1098,7 +1098,7 @@ class PeopleController extends Zend_Controller_Action
 	
 	public function accesstokenlistAction(){
 		$this->_helper->layout->disableLayout();
-        $this->_helper->viewRenderer->setNoRender();
+                $this->_helper->viewRenderer->setNoRender();
 		$uid = $this->session->userid;
 		header("Content-Type:text/xml");
 		echo "<" . "?xml version='1.0'?" . ">";
@@ -1146,9 +1146,11 @@ class PeopleController extends Zend_Controller_Action
 		echo "<accesstokens count='" . count($acctokens) . "' >";
 		
 		if(count($acctokens) === 0){
+                        $this->session->userHasPersonalAccessTokens = false;
 			echo "</accesstokens>";
 			return;
 		}
+                $this->session->userHasPersonalAccessTokens = true;
 		
 		foreach($acctokens as $acctoken){
 			echo "<accesstoken id='" . $acctoken->id . "' token='" . $acctoken->token . "' addedby='" . $acctoken->addedbyid . "' createdon='" . $acctoken->createdon . "' tokentype='" . $acctoken->type . "' ";
@@ -1164,6 +1166,19 @@ class PeopleController extends Zend_Controller_Action
 		
 		echo "</accesstokens>";
 	}
+
+        public function getstatusAction() {
+                $this->_helper->layout->disableLayout();
+		$this->_helper->viewRenderer->setNoRender();
+		$uid = $this->session->userid;
+                header("Content-Type:application/json");
+                if (is_null($uid) || intval($uid) <= 0) {
+                    echo json_encode(array());
+                } else {
+                    $this->session->userHasPersonalAccessTokens = userHasPersonalAccessTokens($uid);
+                    echo json_encode(array('hasPersonalAccessTokens' => $this->session->userHasPersonalAccessTokens));
+                }
+        }
 	
 	public function authenticationAction(){
 		$this->_helper->layout->disableLayout();
