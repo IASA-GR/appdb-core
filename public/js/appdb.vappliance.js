@@ -1530,7 +1530,9 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 		this.checkUnsavedData((function(self,vid){
 			return function(){
 				var undef;
-				self.load(undef, id);
+				appdb.pages.application.checkUserAccessTokens(function() {
+				    self.load(undef, id);
+				});
 			};
 		})(this,id));
 	};
@@ -1585,15 +1587,18 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 		var owner = (page.getOwner() ||{});
 		var userPerms = page.currentPermissions();
 		var isContact = page.isContactPoint();
-		var hasAccessToken = (typeof options.hasAccessToken !== 'undefined' && options.hasAccessToken !== null) ? options.hasAccessToken : true;
-		var hasPermissions = (typeof options.canManageVA !== 'undefined') ? options.canManageVA : true;
-		var canManageVA = ((userPerms && userPerms.canManageVirtualAppliance) ? userPerms.canManageVirtualAppliance() : false);
-		if (canManageVA === true && (hasPermissions === false || hasAccessToken === false)) {
-		    canManageVA = false;
-		} else {
-		    canManageVA = true;
+		var hasAccessToken = (typeof options.hasAccessToken !== 'undefined' && options.hasAccessToken !== null) ? options.hasAccessToken : userHasPersonalAccessTokens;
+		var hasPermissions = (typeof options.canManageVA !== 'undefined') ? options.canManageVA : null;
+		if (hasPermissions === null) {
+		    if (page.currentPermissions() !== null){
+			hasPermissions = page.currentPermissions().canManageVirtualAppliance();
+		    } else {
+			hasPermissions = false;
+		    }
 		}
-		var canView = canManageVA || isContact || false;
+
+		var canManageVA = (hasPermissions && hasAccessToken);
+		var canView = canManageVA || isContact || userIsAdminOrManager || false;
 		var canHandle = canManageVA || false;
 		var handler = $("#navdiv" + page.currentDialogCount() + " .action.cd_select");
 
@@ -1652,7 +1657,6 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 			    }.bind(this),
 			    error: function( jqXHR, textStatus, errorThrown) {
 				    $(handler).removeClass('loading').removeClass('enabling').removeClass('disabling');
-				    console.log(textStatus, errorThrown);
 				    _setupForm(vappliancedata);
 				    var errText = errorThrown + ' (' + textStatus + ')';
 				    try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
@@ -1661,7 +1665,14 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 					    "status": "Could not enable continuous delivery",
 					    "description": errText
 				    });
-			    }
+				    if (errText.indexOf('Access Denied.') > -1 && errText.indexOf('permissions') > -1) {
+					appdb.pages.application.reload();
+				    } else {
+					appdb.pages.application.checkUserAccessTokens(function() {
+					    this.loadCDHandler(vappliancedata);
+					}.bind(this));
+				    }
+			    }.bind(this)
 			});
 		}.bind(this));
 
@@ -3294,8 +3305,14 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		this.initSettingsExpanse();
 	};
 	this.checkSettingsExpanse = function() {
+		var d = this.options.cddata || {};
 		var dom = $(this.dom).find('.cdversion-setup');
-		if (this.options.userExpandedSettings === true) {
+		if (!d.defaultActorId || !$.trim(d.url)) {
+		    $(dom).find('.header .collapse .icon').addClass('hidden');
+		} else {
+		    $(dom).find('.header .collapse .icon').removeClass('hidden');
+		}
+		if (this.options.userExpandedSettings === true || !d.defaultActorId || !$.trim(d.url)) {
 			$(dom).find('.header .collapse').addClass('expanded');
 			$(dom).removeClass('collapsed');
 		} else {
