@@ -8396,7 +8396,7 @@ class SamlAuth{
 		*/
 
                 // Check if entitlement specifies a vo role with current schema eg. urn:mace:egi.eu:group:see:role=member#aai.egi.eu
-                preg_match("/^urn\:(mace\:)?(egi\.eu)\:group\:([^\:]*)\:role\=(\w*)\#([a-zA-Z\.\_]*)", $e, $matches);
+                preg_match("/^urn\:(mace\:)?(egi\.eu)\:group\:([^\:]*)\:role\=(\w*)\#([a-zA-Z\.\_]*)$/", $e, $matches);
                 if( count($matches) === 6) {
                     $scope = $matches[2];
                     $source = $matches[5];
