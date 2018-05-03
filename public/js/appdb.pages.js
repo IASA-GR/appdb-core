@@ -2641,48 +2641,6 @@ appdb.pages.application = (function(){
 	   var owner = (page.getOwner() ||{});
 	   return (owner.id && parseInt(userId) === parseInt(owner.id));
 	};
-	page.loadCDHandler = function(callback) {
-	    callback = $.isFunction(callback) ? callback : function() {console.log('empty callback for CD handler'); };
-	   if (appdb.config.features.cd === false) {
-	       return;
-	   }
-	   var data = ((page.currentData() || {}).application || {}) || {};
-	   var owner = (page.getOwner() ||{});
-
-	   var isOwner = page.currentUserIsOwner();
-	   var isContact = page.currentUserIsContact();
-	   var canView = userIsAdmin || isOwner || isContact || false;
-	   var handler = $("#navdiv" + page.currentDialogCount() + " .action.cd_select");
-	   var canHandle = userIsAdmin || isOwner;
-
-	   if (canView) {
-	       $(handler).removeClass('hidden');
-	       if ($.trim(data.cd)) {
-		   $(handler).addClass('enabled');
-	       } else {
-		   $(handler).removeClass('enabled');
-	       }
-
-	       if(canHandle) {
-		   $(handler).addClass('canHandle');
-	       } else {
-		   $(handler).removeClass('canHandle');
-	       }
-
-		   var ownerLink = $('<a href="'+ appdb.config.endpoint.base+ 'store/person/'+owner.cname+'" title="Click to view owner\'s profile" target="_blank"></a>').text(owner.firstname + ' ' + owner.lastname);
-	       $(handler).find('.footer .message .owner').empty().append(ownerLink);
-	   } else {
-	       $(handler).addClass('hidden');
-	   }
-
-	   $(handler).find('button.cd_action_enable').unbind('click').bind('click', function() {
-	      callback(true);
-	   });
-
-	   $(handler).find('button.cd_action_disable').unbind('click').bind('click', function() {
-	      callback(false);
-	   });
-	};
 	page.onApplicationLoad = function(){
 		page.checkPermissions();
 		var perms = page.currentPermissions();
@@ -3294,6 +3252,22 @@ appdb.pages.application = (function(){
 			appdb.views.Main.showSoftwareMarketplace();
 		}
 		return false;
+	};
+	page.checkUserAccessTokens = function(cb) {
+	    if (!cb || $.isFunction(cb) === false) {
+		cb = function(){};
+	    }
+	    $.ajax({
+		url: appdb.config.endpoint.base + 'people/getstatus',
+		success: function(data) {
+		    data = data || {};
+		    userHasPersonalAccessTokens = (data.hasPersonalAccessTokens) ? true : false;
+		    cb();
+		},
+		error: function() {
+		    cb();
+		}
+	    })
 	};
 	page.reload = function(){
 		page.requests.reset();
