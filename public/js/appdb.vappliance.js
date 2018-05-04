@@ -3587,18 +3587,20 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		}.bind(this));
 	};
 	this.formatDate = function(d) {
-		d = $.trim(d);
-		if (!d) return '-';
+		if (!$.trim(d)) return '-';
+		var date = new Date($.trim(d));
+		var months = (date.getMonth()+1);
+		var days = date.getDate();
+		var hours = date.getHours();
+		var mins = date.getMinutes();
+		var secs = date.getSeconds();
+		months = ((months < 10) ? '0' : '') + months;
+		days = ((days < 10) ? '0' : '') + days;
+		hours = ((hours < 10) ? '0' : '') + hours;
+		mins =  ((mins < 10) ? '0' : '') + mins;
+		secs = ((secs < 10) ? '0' : '') + secs;
 
-		d = d.split('T');
-		var res = d[0];
-		if (d.length > 1) {
-			res += ' ';
-			d = d[1].split('.');
-			res += d[0];
-		}
-
-		return res;
+		return date.getFullYear()+'-' + months + '-'+ days + ' ' + hours + ':' + mins + ':' + secs;
 	};
 	this.renderLogSizeHandler = function(){
 		var allowedCdLogSizes = (this.options.allowedCdLogSizes || []).join(',|,').split(',');
@@ -3664,7 +3666,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 				$(meta).append($('<span class="user"></span>').append('by user').append(actor).append(', '));
 			}
 
-			$(meta).append('at').append($('<span class="createdon"></span>').text(this.formatDate(log.createdOn)));
+			$(meta).append('at ').append($('<span class="createdon"></span>').text(this.formatDate(log.createdOn)));
 
 			var action = $('<span class="ui label tiny action"></span>');
 			var name = $('<span class="name"></span>');
