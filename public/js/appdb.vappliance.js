@@ -1539,6 +1539,7 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 	this.load = function(d,vid){
 		vid = $.trim(vid);
 		appdb.vappliance.ui.CurrentVAVersionSelectionRegister.clear();
+		console.log(d);
 		if( typeof d === "undefined" ){
 			d = {id: this.getSWId() };
 		}
@@ -1571,19 +1572,36 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 				}
 				$(this.dom).find(".reloadappliance").removeClass("hidden");
 				this.initContextualizationRegistry();
-				this.loadCDHandler(v);
+				this.loadCDHandler(d);
 				this.publish({event: "load", value: this});
 		}, caller: this});
 		this._model.get(d);
 	};
-	this.loadCDHandler = function(vappliancedata, options) {
+	this.getCDData = function(data) {
+	    data = data || {};
+
+	    if (data.cdFlowId) {
+		return data;
+	    }
+	    if (data.software) {
+		data = (data.software || {}).application || {};
+	    }
+
+	    data.cd = data.cd || {};
+	    data.cd.paused = ($.trim(data.cd.paused) === 'true') ? true : false;
+	    data.cd.enabled = ($.trim(data.cd.enabled) === 'true') ? true : false;
+
+	    return data.cd;
+	};
+	this.loadCDHandler = function(application, options) {
 		options = options || {};
 		var page = appdb.pages.application;
 		if (appdb.config.features.cd === false) {
 			return;
 		}
-		vappliancedata = vappliancedata || {};
-		var data = ((vappliancedata.appliance || {}).cd) || ((vappliancedata.cdFlowId) ? vappliancedata : {});
+		application = application || {};
+		 //var data = ((vappliancedata.appliance || {}).cd) || ((vappliancedata.cdFlowId) ? vappliancedata : {});
+		var data = this.getCDData(application);//((application.cd) || ((application.cdFlowId) ? application : {}));
 		var owner = (page.getOwner() ||{});
 		var userPerms = page.currentPermissions();
 		var isContact = page.isContactPoint();
@@ -1657,7 +1675,7 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 			    }.bind(this),
 			    error: function( jqXHR, textStatus, errorThrown) {
 				    $(handler).removeClass('loading').removeClass('enabling').removeClass('disabling');
-				    _setupForm(vappliancedata);
+				    _setupForm(application);
 				    var errText = errorThrown + ' (' + textStatus + ')';
 				    try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
 				    var err = new appdb.views.ErrorHandler();
@@ -1669,7 +1687,7 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 					appdb.pages.application.reload();
 				    } else {
 					appdb.pages.application.checkUserAccessTokens(function() {
-					    this.loadCDHandler(vappliancedata);
+					    this.loadCDHandler(application);
 					}.bind(this));
 				    }
 			    }.bind(this)
@@ -1693,7 +1711,7 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 				}.bind(this),
 				error: function( jqXHR, textStatus, errorThrown) {
 					$(handler).removeClass('loading').removeClass('enabling').removeClass('disabling');
-					 _setupForm(vappliancedata);
+					 _setupForm(application);
 					var errText = errorThrown + ' (' + textStatus + ')';
 					try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
 					var err = new appdb.views.ErrorHandler();
@@ -2884,9 +2902,8 @@ appdb.vappliance.components.WorkingVersion = appdb.ExtendClass(appdb.vappliance.
 		}
 	};
 	this.isCDEnabled = function() {
-	   var d = this.options.unfilteredData || {};
-	   var cd = ((d || {}).cd || {});
-	   return ($.trim(cd.enabled) === 'true');
+	    var cd = ((appdb.pages.application.currentData() || {}).application || {}).cd || {};
+	    return ($.trim(cd.enabled) === 'true');
 	};
 	this.render = function(d){
 		d = d || this.options.data;
