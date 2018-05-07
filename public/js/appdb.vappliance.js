@@ -3838,6 +3838,18 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			}.bind(this));
 		}
 	};
+	this.renderNextCheck = function() {
+	    var d = (this.options.cddata || {});
+	    var nextIterationOn = d.nextIterationOn || null;
+
+	    if (nextIterationOn) {
+		    var time = this.formatDate(nextIterationOn);
+		    $(this.dom).find('.scheduled-check .scheduled-check-on').text(time);
+		    $(this.dom).find('.scheduled-check').removeClass('hidden');
+	    } else {
+		    $(this.dom).find('.scheduled-check').addClass('hidden');
+	    }
+	};
 	this.setWarningDueToFailedAttempts = function() {
 	    var pausedPanelWarning = $(this.dom).find('.cdversion-paused-process-warning');
 	    var d = (this.options.cddata || {});
@@ -3890,6 +3902,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		}
 		this.renderNoProcessPanel();
 		this.setWarningDueToFailedAttempts();
+		this.renderNextCheck();
 		this.showContents(true);
 	};
 	this.checkForNewVAVersion = function() {

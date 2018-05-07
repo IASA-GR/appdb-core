@@ -25375,6 +25375,7 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
     margin: 8px 0;
 }
 .cdversion .panel > .footer {
+    position: relative;
     padding-top: 10px;
     text-align: right;
 }
@@ -25672,5 +25673,20 @@ table.cdtaskinstance-list tr > .img > img {
     text-align: center;
 }
 .cdversion .cdversion-log-list .ui.label > * {
+    vertical-align: middle;
+}
+
+.cdversion .scheduled-check {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    color: #999;
+    vertical-align: middle;
+}
+
+.cdversion .scheduled-check > .scheduled-check-on {
+    color: #999;
+    font-size: 11px;
+    font-weight: bold;
     vertical-align: middle;
 }
