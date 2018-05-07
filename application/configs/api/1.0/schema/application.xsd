@@ -71,7 +71,36 @@
         schemaLocation="user.xsd"/>
 
     <xs:import namespace="http://appdb.egi.eu/api/1.0/person"
-        schemaLocation="person.xsd"/>
+		schemaLocation="person.xsd"/>
+
+	<xs:complexType name="cdTriggerTypeType" mixed="true">
+		<xs:attribute name="id" type="xs:integer" use="required"/>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="cdInstanceType" mixed="true">
+		<xs:sequence>
+			<xs:element name="cdtriggertype" type="application:cdTriggerTypeType" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:integer" use="required"/>
+		<xs:attribute name="state" type="xs:string" use="required"/>
+		<xs:attribute name="startedon" type="xs:date" use="required"/>
+		<xs:attribute name="stepcount" type="xs:integer" use="optional"/>
+		<xs:attribute name="stepcomplete" type="xs:integer" use="optional"/>
+		<xs:attribute name="triggeredbyid" type="xs:integer" use="optional"/>
+	</xs:complexType>
+
+	<xs:complexType name="cdType" mixed="true">
+		<xs:sequence>
+			<xs:element name="cdinstance" type="application:cdInstanceType" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:integer" use="required"/>
+		<xs:attribute name="paused" type="xs:boolean" use="required"/>
+		<xs:attribute name="enabled" type="xs:boolean" use="required"/>
+		<xs:attribute name="state" type="xs:string" use="required"/>
+		<xs:attribute name="url" type="xs:string" use="optional"/>
+		<xs:attribute name="defaultactorid" type="xs:integer" use="optional"/>
+	</xs:complexType>
 
     <xs:complexType name="statusType" mixed="true">
 		<xs:annotation>
@@ -92,7 +121,12 @@
 	</xs:complexType>
 
 	<xs:complexType name="vapplianceType" mixed="true">
-		<xs:attribute name="identifier" type="xs:string" use="required" />
+		<xs:attribute name="id" type="xs:integer" use="required" />
+		<xs:attribute name="appid" type="xs:integer" use="required" />
+		<xs:attribute name="name" type="xs:string" use="optional" />
+		<xs:attribute name="guid" type="xs:string" use="optional" />
+		<xs:attribute name="imageListsPrivate" type="xs:boolean" use="optional" />
+		<xs:attribute name="identifier" type="xs:string" use="optional" />
 	</xs:complexType>
 
     <xs:complexType name="urlType" mixed="true">
@@ -654,13 +688,60 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-        <xs:attribute name="relcount" type="xs:integer" use="required" >
+        <xs:attribute name="relcount" type="xs:integer" use="optional" >
 			<xs:annotation>
 				<xs:appinfo>
 					Read-only
 				</xs:appinfo>
 				<xs:documentation>
 					The number of software releases for this entry
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="sitecount" type="xs:integer" use="optional" >
+			<xs:annotation>
+				<xs:appinfo>
+					Read-only
+				</xs:appinfo>
+				<xs:documentation>
+					The number of sites supporting this entry 
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="vaprovidercount" type="xs:integer" use="optional" >
+			<xs:annotation>
+				<xs:appinfo>
+					Read-only
+				</xs:appinfo>
+				<xs:documentation>
+					The number of VA providers supporting this entry 
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="swprovidercount" type="xs:integer" use="optional" >
+			<xs:annotation>
+				<xs:appinfo>
+					Read-only
+				</xs:appinfo>
+				<xs:documentation>
+
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="metatype" type="xs:integer" use="required" >
+			<xs:annotation>
+				<xs:documentation>
+					The type of entry (0 = software, 1 = virtual appliance, 2 = software appliance)
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+        <xs:attribute name="guid" type="xs:string" use="optional" >
+			<xs:annotation>
+				<xs:appinfo>
+					Read-only
+				</xs:appinfo>
+				<xs:documentation>
+					A global UUID string
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
@@ -778,4 +859,5 @@
     <xs:element name="os" type="application:OStype"/>
     <xs:element name="license" type="license:licenseType"/>
     <xs:element name="tag" type="application:tagType"/>
+    <xs:element name="cd" type="application:cdType"/>
 </xs:schema>
