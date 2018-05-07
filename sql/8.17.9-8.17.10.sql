@@ -197,7 +197,7 @@ SELECT
 				ELSE
 					'idle'
 			END AS state,
-			cds.url,
+--			cds.url,
 			cds.default_actor_id AS defaultactorid
 		),
 		CASE WHEN EXISTS (SELECT 1 FROM cd_instances WHERE cd_instances.cd_id = cds.id AND cd_instances.state = 'running'::text) THEN
@@ -230,7 +230,7 @@ LEFT JOIN cds ON cds.app_id = a.id
 LEFT JOIN cd_instances cd_instances ON cd_instances.cd_id = cds.id AND cd_instances.state = 'running'::text
 LEFT JOIN cd_trigger_types ON cd_trigger_types.id = cd_instances.trigger_type
 GROUP BY cds.id
-LIMIT 1 -- FIXME: properly aggregate rows when and if multiple CD types are supported. (LIMIT used to prevent acardinality errors)
+-- LIMIT 1 -- FIXME: properly aggregate rows when and if multiple CD types are supported. (LIMIT used to prevent acardinality errors)
 ) AS appcds ON appcds.id = applications.id
 /* CONTINUOUS DELIVERY -- END */
 
