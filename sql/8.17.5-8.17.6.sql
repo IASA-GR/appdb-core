@@ -186,6 +186,7 @@ CREATE TABLE public.cds
   failed_attempts integer DEFAULT 0,
   last_failed_attempt_on timestamp without time zone DEFAULT NULL,
   last_attempt_error TEXT DEFAULT NULL,
+  activeSince timestamp without time zone DEFAULT NULL,
   CONSTRAINT cds_pk PRIMARY KEY (id),
   CONSTRAINT fk_cds_cd_flow_id FOREIGN KEY (cd_flow_id)
       REFERENCES public.cd_flows (id) MATCH SIMPLE
