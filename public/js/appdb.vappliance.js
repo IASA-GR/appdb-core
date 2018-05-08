@@ -3417,8 +3417,20 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		var defaultActorStatus = (d.DefaultActorStatus || {});
 		var error = $('<span></span>').append('No continuous delivery checks will be performed until the following issues are resolved:<br/>');
 		var ulErrors = $('<ul></ul>');
+		if ($.trim(d.lastIterationOn)) {
+		    if ($.trim(d.url) === '') {
+			    $(ulErrors).append(
+				    $('<li></li>').append('Remote file URL must not be blank. Please, provide a valid URL in the <b>settings</b> section.')
+			    );
+		    }
 
-		if (this.options.userHasPermissions && !this.isRunning()) {
+		    if ($.trim(d.defaultActorId) === '' || parseInt(d.defaultActorId) <= 0) {
+			    $(ulErrors).append(
+				    $('<li></li>').append('No publisher is set. You can become the default publisher in the <b>settings</b> section.')
+			    );
+		    }
+		}
+		if (this.options.userHasPermissions) {
 			if (defaultActorStatus.exists === false) {
 				var actorHtml = (d.DefaultActor && $.trim(d.DefaultActor.cname)) ? this.getUserLink(d.DefaultActor) : ' (ID: ' + d.defaultActorId + ')';
 				$(ulErrors).append(
@@ -3459,10 +3471,14 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			$(error).append(ulErrors);
 			$(this.dom).find('.cdversion-noprocess .exterror').removeClass('hidden').find('.message').empty().append($(error).clone());
 			$(this.dom).find('.cdversion-noprocess .cdversion-force-check').attr('disabled', 'disabled').addClass('disabled');
+			$(this.dom).find('.cdversion-paused-process .exterror').removeClass('hidden').find('.message').empty().append($(error).clone());
+			$(this.dom).find('.cdversion-paused-process .cd-action-resume').attr('disabled', 'disabled').addClass('disabled');
 			$(this.dom).find('.onstatuserror').removeClass('hidden').find('.message').empty().append($(error).clone());
 		} else {
 			$(this.dom).find('.cdversion-noprocess .exterror').addClass('hidden').find('.message').empty();
 			$(this.dom).find('.cdversion-noprocess .cdversion-force-check').removeAttr('disabled').removeClass('disabled');
+			$(this.dom).find('.cdversion-paused-process .exterror').addClass('hidden').find('.message').empty();
+			$(this.dom).find('.cdversion-paused-process .cd-action-resume').removeAttr('disabled').removeClass('disabled');
 			$(this.dom).find('.onstatuserror').addClass('hidden').find('.message').empty();
 		}
 	};
@@ -3812,8 +3828,6 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 
 		if (publisherStatus.hasAccessToken !== true) {
 			$(btnPause).unbind('click').addClass('disabled').attr('disabled', 'disabled');
-			$(btnResume).unbind('click').addClass('disabled').attr('disabled', 'disabled');
-			$(btnForceCheck).unbind('click').addClass('disabled').attr('disabled', 'disabled');
 			$(btnCancel).unbind('click').addClass('disabled').attr('disabled', 'disabled');
 
 			var resumedError = 'You need to own a <b>personal</b> access token in order to <b>pause</b>/<b>force check</b> continuous delivery. You can create one from your profile at the end of the <a href="'+appdb.config.endpoint.base + 'store/person/' + publisher.cname + '/preferences" target="_blank" title="Click to open your profile preferences page">preferences</a> tab.';
@@ -3824,11 +3838,17 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			return;
 		} else {
 			$(btnPause).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
-			$(btnResume).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
-			$(btnForceCheck).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
 			$(btnCancel).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
 			$(resumedPanelError).addClass('hidden').find('.message').empty();
 			$(pausedPanelError).addClass('hidden').find('.message').empty();
+		}
+
+		if (publisherStatus.hasAccessToken !== true || $.trim(d.url) === '' || parseInt(d.defaultActorId) <= 0) {
+		    $(btnResume).unbind('click').addClass('disabled').attr('disabled', 'disabled');
+		    $(btnForceCheck).unbind('click').addClass('disabled').attr('disabled', 'disabled');
+		} else {
+		    $(btnResume).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
+		    $(btnForceCheck).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
 		}
 
 		if (!$(btnPause).hasClass('loading')) {
