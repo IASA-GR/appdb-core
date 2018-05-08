@@ -2470,7 +2470,7 @@ class AppsController extends Zend_Controller_Action
 
             if (!$userId) {
                 header('HTTP/1.0 403 Forbidden');
-                header("Status: 403 Forbidden");error_log('eching forbidden');
+                header("Status: 403 Forbidden");
                 echo json_encode(array('error'=> 'Forbidden'));
                 return;
             }
@@ -2522,9 +2522,7 @@ class AppsController extends Zend_Controller_Action
                     }
                     return;                    
                 } catch (Exception $ex) {
-                    error_log($ex->getMessage());
                     header('HTTP/1.0 400 Bad Request');
-                    //header("Status: 400 Bad Request");
                     echo json_encode(array('error'=> $ex->getMessage()));
                     return;
                 }
