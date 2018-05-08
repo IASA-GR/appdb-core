@@ -1297,6 +1297,90 @@ class RestAppList extends RestResourceList {
     }
 }
 
+class RestAppOpenAIREList extends RestROResourceList {
+    /**
+     * realization of getDataType from iRestResource
+     */
+    public function getDataType() {
+        return "software";
+    }
+
+	protected function _list() {
+        return $this->get();
+    }
+ 
+    /**
+     * overrides RestResource::get()
+     */
+	public function get() {
+		if ( parent::get() !== false ) {
+//            if ( isset($this->_pars["flt"]) ) $flt = $this->_pars["flt"]; else $flt = "";
+			if (isset($this->_pars["verb"]) XOR isset($this->_pars["resumptionToken"])) {
+				if (isset($this->_pars["resumptionToken"]) OR ($this->_pars["verb"] == "ListRecords")) {
+					if (isset($this->_pars["resumptionToken"]) XOR (isset($this->_pars["metadataPrefix"]) && ($this->_pars["metadataPrefix"] == "oai_datacite"))) {
+						if (isset($this->_pars["resumptionToken"])) {						
+							$token = $this->_pars["resumptionToken"];
+						} else {
+							$token = null;
+						}
+						if (isset($this->_pars["from"])) {						
+							$from = $this->_pars["from"];
+						} else {
+							$from = null;
+						}
+						if (isset($this->_pars["until"])) {						
+							$until = $this->_pars["until"];
+						} else {
+							$until = null;
+						}
+						db()->setFetchMode(Zend_Db::FETCH_BOTH);
+						$s = db()->query("SELECT oai_app_cursor(?,?,?)", array($from, $until, $token))->fetchAll();
+						if (count($s) > 0) {
+							$s = $s[0];
+							$s = json_decode($s[0], true);
+							if (is_array($s)) {
+								if (array_key_exists("error", $s)) {
+									$this->setError(RestErrorEnum::RE_BACKEND_ERROR, $s["error"]);
+									$this->_extError = $s["error"];
+									return false;
+								} else {
+									//error_log(var_export($s, true));
+									$body = base64_decode($s["payload"]);
+									$header = base64_decode($s["header"]);
+									$footer = base64_decode($s["footer"]);
+									$s = $header . $body . $footer;
+								}
+							} else {
+								$this->setError(RestErrorEnum::RE_ITEM_NOT_FOUND);
+								return false;
+							}
+						} else {
+							$this->setError(RestErrorEnum::RE_ITEM_NOT_FOUND);
+							return false;
+						};
+						return new XMLRestResponse(
+							$s, 
+							$this
+						);
+					} else {
+						$this->setError(RestErrorEnum::RE_BACKEND_ERROR, "cannotDisseminateFormat");
+						$this->_extError = "cannotDisseminateFormat";
+						return false;
+					}
+				} else {
+					$this->setError(RestErrorEnum::RE_BACKEND_ERROR, "badVerb");
+					$this->_extError = "badVerb";
+					return false;
+				}
+			} else {
+				$this->setError(RestErrorEnum::RE_BACKEND_ERROR, "badArgument");
+				$this->_extError = "badArgument";
+				return false;
+			}
+		} else return false;
+	}
+}
+
 /**
  * class RestAppFollowedList
  * handles followed application list resources
