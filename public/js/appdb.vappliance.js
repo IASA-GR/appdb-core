@@ -3889,7 +3889,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		    $(pausedPanelWarning).find('.learnmore').attr('href', appdb.config.endpoint.wiki + 'main:faq:cd_why_cd_paused_due_to_failed_attempts');
 		}
 	    } else {
-		$(pausedPanelWarning).addClass('hidden').empty();
+		$(pausedPanelWarning).addClass('hidden').find('.content').empty();
 	    }
 	};
 	this.doRender = function() {
