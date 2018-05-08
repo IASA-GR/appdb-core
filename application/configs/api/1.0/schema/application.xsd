@@ -98,7 +98,6 @@
 		<xs:attribute name="paused" type="xs:boolean" use="required"/>
 		<xs:attribute name="enabled" type="xs:boolean" use="required"/>
 		<xs:attribute name="state" type="xs:string" use="required"/>
-		<xs:attribute name="url" type="xs:string" use="optional"/>
 		<xs:attribute name="defaultactorid" type="xs:integer" use="optional"/>
 	</xs:complexType>
 
