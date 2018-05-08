@@ -25623,6 +25623,10 @@ table.cdtaskinstance-list tr > .img > img {
 .cdversion .cdversion-log-list > li:nth-child(even) {
     background-color: #f7fafd;
 }
+.cdversion .cdversion-log-list > li:last-child {
+    border-bottom: none;
+    margin-bottom: -15px;
+}
 .cdversion .cdversion-log-list > li > .item {
     padding: 5px 0;
 }
