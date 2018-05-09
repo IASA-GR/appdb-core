@@ -44,7 +44,7 @@
 				<xsl:for-each select="./person:person[@metatype='contact']">
 					<creator>
 						<creatorName>
-							<xsl:value-of select="concat(./person:lastname, ' ',./person:firstname)" />
+							<xsl:value-of select="concat(./person:lastname, ', ',./person:firstname)" />
 						</creatorName>
 						<givenName>
 							<xsl:value-of select="./person:firstname" />
@@ -63,7 +63,7 @@
 				 <!-- addedby -->
 				<contributor contributorType="ContactPerson">
 					<contributorName>
-						<xsl:value-of select="concat(./person:person[@metatype='actor']/person:lastname, ' ',./person:person[@metatype='actor']/person:firstname)" />
+						<xsl:value-of select="concat(./person:person[@metatype='actor']/person:lastname, ', ',./person:person[@metatype='actor']/person:firstname)" />
 					</contributorName>
 					<givenName>
 						<xsl:value-of select="./person:person[@metatype='actor']/person:firstname" />
@@ -80,7 +80,7 @@
 				<xsl:if test="not(./application:addedby/@id=./application:owner/@id)">
 					<contributor contributorType="ContactPerson">
 					<contributorName>
-						<xsl:value-of select="concat(./person:person[@metatype='owner']/person:lastname, ' ',./person:person[@metatype='owner']/person:firstname)" />
+						<xsl:value-of select="concat(./person:person[@metatype='owner']/person:lastname, ', ',./person:person[@metatype='owner']/person:firstname)" />
 					</contributorName>
 					<givenName>
 						<xsl:value-of select="./person:person[@metatype='owner']/person:firstname" />
