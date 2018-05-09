@@ -71,12 +71,18 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 		} else {
 			$set = 'NULL';
 		}
+		if (! is_null($this->_mdPrefix)) {
+			$mdPrefix = "'" . pg_escape_string($this->_mdPrefix). "'";
+		} else {
+			$mdPrefix = "NULL";
+		}
+
 		if ($action == "list") {
-			$res = $this->dbQuery("SELECT oai_app_cursor($this->_from, $this->_until, NULL, FALSE, $set)");
+			$res = $this->dbQuery("SELECT oai_app_cursor($this->_from, $this->_until, NULL, FALSE, $set, $mdPrefix)");
 		} elseif ($action == "resume") {
 			$res = $this->dbQuery("SELECT oai_app_cursor(NULL, NULL, $this->_token)");
 		} elseif ($action == "listids") {
-			$res = $this->dbQuery("SELECT oai_app_cursor($this->_from, $this->_until, NULL, TRUE, $set)");
+			$res = $this->dbQuery("SELECT oai_app_cursor($this->_from, $this->_until, NULL, TRUE, $set, $mdPrefix)");
 		} else {
 			return $this->requestError(500);
 		}
@@ -118,7 +124,17 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 	protected function getRecord($id) {
 		// the $id parameter should hold the record's GUID
 		$id = pg_escape_string($id);
-		$res = $this->dbQuery("SELECT applications.openaire FROM applications WHERE guid = '" . $id . "'");
+		switch ($this->_mdPrefix) {
+			case 'oai_datacite':
+				$res = $this->dbQuery("SELECT applications.openaire FROM applications WHERE guid = '" . $id . "'");
+				break;
+			case 'oai_dc':
+				$res = $this->dbQuery("SELECT applications.oaidc FROM applications WHERE guid = '" . $id . "'");
+				break;
+			case 'datacite':
+			default:
+				return $this->requestError("cannotDisseminateFormat");
+		}
 		if (is_array($res)) {
 			$res = $res[0];
 			$res = $res[0];
