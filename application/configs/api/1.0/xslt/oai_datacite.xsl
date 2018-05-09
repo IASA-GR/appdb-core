@@ -28,16 +28,12 @@
 	xmlns:person="http://appdb.egi.eu/api/1.0/person"
 	xmlns:virtualization="http://appdb.egi.eu/api/1.0/virtualization"
 	xmlns:license="http://appdb.egi.eu/api/1.0/license"
+	xmlns:entity="http://appdb.egi.eu/api/1.0/entity"
+	xmlns:organization="http://appdb.egi.eu/api/1.0/organization"
 	xmlns:php="http://php.net/xsl"
 	exclude-result-prefixes="appdb application virtualization php person license">
 	<xsl:output method="xml"/>
 	<xsl:strip-space elements="*" />
-	<!--	<xsl:template match="*">
-		<xsl:copy>
-			<xsl:copy-of select="@*"/>
-			<xsl:apply-templates />
-		</xsl:copy>
-	</xsl:template> -->
 	<xsl:template match="//application:application">
 		<resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://datacite.org/schema/kernel-4" xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd">
 			<identifier identifierType="Handle">
@@ -106,7 +102,13 @@
 			</titles>
 
 			<publisher>EGI Applications Database</publisher>
-
+			<!--			
+			<xsl:if test="./entity:relation[@verbname='developer' and @reversed='true']/entity:entity[@type='organization']/organization:organization">
+				<publisher>
+					<xsl:value-of select="./entity:relation[@verbname='developer' and @reversed='true']/entity:entity[@type='organization']/organization:organization/@name" />
+				</publisher>
+			</xsl:if>
+			-->
 			<resourceType resourceTypeGeneral="Software" />
 
 			<subjects>
@@ -155,7 +157,7 @@
 				</relatedIdentifiers>
 			</xsl:if>
 
-			<xsl:if test="./application:url[@type='Documentation']">
+			<xsl:if test="./application:language">
 				<formats>
 					<format>
 						<xsl:value-of select="./application:language/text()" />
