@@ -41,7 +41,7 @@
 			</identifier>
 
 			<creators>
-				<xsl:for-each select="./application:contact">
+				<xsl:for-each select="./person:person[@metatype='contact']">
 					<creator>
 						<creatorName>
 							<xsl:value-of select="concat(./person:lastname, ' ',./person:firstname)" />
@@ -63,34 +63,34 @@
 				 <!-- addedby -->
 				<contributor contributorType="ContactPerson">
 					<contributorName>
-						<xsl:value-of select="concat(./application:addedby/person:lastname, ' ',./application:addedby/person:firstname)" />
+						<xsl:value-of select="concat(./person:person[@metatype='actor']/person:lastname, ' ',./person:person[@metatype='actor']/person:firstname)" />
 					</contributorName>
 					<givenName>
-						<xsl:value-of select="./application:addedby/person:firstname" />
+						<xsl:value-of select="./person:person[@metatype='actor']/person:firstname" />
 					</givenName>
 					<familyName>
-						<xsl:value-of select="./application:addedby/person:lastname" />
+						<xsl:value-of select="./person:person[@metatype='actor']/person:lastname" />
 					</familyName>
 					<affiliation>
-						<xsl:value-of select="./application:addedby/person:institute" />
+						<xsl:value-of select="./person:person[@metatype='actor']/person:institute" />
 					</affiliation>
 				</contributor>
 
 				<!-- owner -->
 				<xsl:if test="not(./application:addedby/@id=./application:owner/@id)">
 					<contributor contributorType="ContactPerson">
-						<contributorName>
-							<xsl:value-of select="concat(./application:owner/person:lastname, ' ',./application:owner/person:firstname)" />
-						</contributorName>
-						<givenName>
-							<xsl:value-of select="./application:owner/person:firstname" />
-						</givenName>
-						<familyName>
-							<xsl:value-of select="./application:owner/person:lastname" />
-						</familyName>
-						<affiliation>
-							<xsl:value-of select="./application:owner/person:institute" />
-						</affiliation>
+					<contributorName>
+						<xsl:value-of select="concat(./person:person[@metatype='owner']/person:lastname, ' ',./person:person[@metatype='owner']/person:firstname)" />
+					</contributorName>
+					<givenName>
+						<xsl:value-of select="./person:person[@metatype='owner']/person:firstname" />
+					</givenName>
+					<familyName>
+						<xsl:value-of select="./person:person[@metatype='owner']/person:lastname" />
+					</familyName>
+					<affiliation>
+						<xsl:value-of select="./person:person[@metatype='owner']/person:institute" />
+					</affiliation>
 					</contributor>
 				</xsl:if>
 			</contributors>
