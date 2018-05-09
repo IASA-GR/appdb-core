@@ -28,16 +28,12 @@
 	xmlns:person="http://appdb.egi.eu/api/1.0/person"
 	xmlns:virtualization="http://appdb.egi.eu/api/1.0/virtualization"
 	xmlns:license="http://appdb.egi.eu/api/1.0/license"
+	xmlns:entity="http://appdb.egi.eu/api/1.0/entity"
+	xmlns:organization="http://appdb.egi.eu/api/1.0/organization"
 	xmlns:php="http://php.net/xsl"
 	exclude-result-prefixes="appdb application virtualization php person license">
 	<xsl:output method="xml"/>
 	<xsl:strip-space elements="*" />
-	<!--	<xsl:template match="*">
-		<xsl:copy>
-			<xsl:copy-of select="@*"/>
-			<xsl:apply-templates />
-		</xsl:copy>
-	</xsl:template> -->
 	<xsl:template match="//application:application">
 		<resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://datacite.org/schema/kernel-4" xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd">
 			<identifier identifierType="Handle">
@@ -45,10 +41,10 @@
 			</identifier>
 
 			<creators>
-				<xsl:for-each select="./application:contact">
+				<xsl:for-each select="./person:person[@metatype='contact']">
 					<creator>
 						<creatorName>
-							<xsl:value-of select="concat(./person:lastname, ' ',./person:firstname)" />
+							<xsl:value-of select="concat(./person:lastname, ', ',./person:firstname)" />
 						</creatorName>
 						<givenName>
 							<xsl:value-of select="./person:firstname" />
@@ -67,34 +63,34 @@
 				 <!-- addedby -->
 				<contributor contributorType="ContactPerson">
 					<contributorName>
-						<xsl:value-of select="concat(./application:addedby/person:lastname, ' ',./application:addedby/person:firstname)" />
+						<xsl:value-of select="concat(./person:person[@metatype='actor']/person:lastname, ', ',./person:person[@metatype='actor']/person:firstname)" />
 					</contributorName>
 					<givenName>
-						<xsl:value-of select="./application:addedby/person:firstname" />
+						<xsl:value-of select="./person:person[@metatype='actor']/person:firstname" />
 					</givenName>
 					<familyName>
-						<xsl:value-of select="./application:addedby/person:lastname" />
+						<xsl:value-of select="./person:person[@metatype='actor']/person:lastname" />
 					</familyName>
 					<affiliation>
-						<xsl:value-of select="./application:addedby/person:institute" />
+						<xsl:value-of select="./person:person[@metatype='actor']/person:institute" />
 					</affiliation>
 				</contributor>
 
 				<!-- owner -->
 				<xsl:if test="not(./application:addedby/@id=./application:owner/@id)">
 					<contributor contributorType="ContactPerson">
-						<contributorName>
-							<xsl:value-of select="concat(./application:owner/person:lastname, ' ',./application:owner/person:firstname)" />
-						</contributorName>
-						<givenName>
-							<xsl:value-of select="./application:owner/person:firstname" />
-						</givenName>
-						<familyName>
-							<xsl:value-of select="./application:owner/person:lastname" />
-						</familyName>
-						<affiliation>
-							<xsl:value-of select="./application:owner/person:institute" />
-						</affiliation>
+					<contributorName>
+						<xsl:value-of select="concat(./person:person[@metatype='owner']/person:lastname, ', ',./person:person[@metatype='owner']/person:firstname)" />
+					</contributorName>
+					<givenName>
+						<xsl:value-of select="./person:person[@metatype='owner']/person:firstname" />
+					</givenName>
+					<familyName>
+						<xsl:value-of select="./person:person[@metatype='owner']/person:lastname" />
+					</familyName>
+					<affiliation>
+						<xsl:value-of select="./person:person[@metatype='owner']/person:institute" />
+					</affiliation>
 					</contributor>
 				</xsl:if>
 			</contributors>
@@ -106,7 +102,13 @@
 			</titles>
 
 			<publisher>EGI Applications Database</publisher>
-
+			<!--			
+			<xsl:if test="./entity:relation[@verbname='developer' and @reversed='true']/entity:entity[@type='organization']/organization:organization">
+				<publisher>
+					<xsl:value-of select="./entity:relation[@verbname='developer' and @reversed='true']/entity:entity[@type='organization']/organization:organization/@name" />
+				</publisher>
+			</xsl:if>
+			-->
 			<resourceType resourceTypeGeneral="Software" />
 
 			<subjects>
@@ -155,7 +157,7 @@
 				</relatedIdentifiers>
 			</xsl:if>
 
-			<xsl:if test="./application:url[@type='Documentation']">
+			<xsl:if test="./application:language">
 				<formats>
 					<format>
 						<xsl:value-of select="./application:language/text()" />

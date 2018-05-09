@@ -1,0 +1,106 @@
+<?php
+function dbQuery($sql) {
+	$conn = pg_connect("dbname=appdb8 host=172.16.0.115 user=appdb password=appdb");
+	$res = pg_query($conn, $sql);
+	$r = array();
+	while ($row = pg_fetch_row($res)) {
+		$r[] = $row;
+	}
+	pg_close($conn);
+	return $r;
+}
+
+function identify() {
+	$host = '';
+	$repoName = 'EGI Applications Database';
+	$baseURL = 'appdb-aoi-wvk.priv.iasa.gr';
+	$supportEmail = 'appdb-support@iasa.gr';
+	$earliest = '1970-01-01 00:00:00Z';
+	$repoID = 'appdb.egi.eu';
+
+	$ret = '<?xml version="1.0" encoding="UTF-8" ?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+<responseDate>' . str_replace('+0000', 'Z', date(DateTime::ISO8601)) .'</responseDate>
+<request verb="Identify">' . $host . '</request>
+<Identify><repositoryName>' . $repoName . '</repositoryName>
+<baseURL>' . $baseURL . '</baseURL>
+<protocolVersion>2.0</protocolVersion>
+<adminEmail>' . $supportEmail . '</adminEmail>
+<earliestDatestamp>'. $earliest . '</earliestDatestamp>
+<deletedRecord>persistent</deletedRecord>
+<granularity>YYYY-MM-DDThh:mm:ssZ</granularity>
+<compression>gzip</compression>
+<compression>deflate</compression>
+<description><oai-identifier xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">
+<scheme>oai</scheme>
+<repositoryIdentifier>' . $repoID . '</repositoryIdentifier>
+<delimiter>:</delimiter>
+<sampleIdentifier>oai:' . $repoID . ':d6c26dd2-ec9c-442f-9fc9-0c44cb7125b1</sampleIdentifier>
+</oai-identifier></description></Identify></OAI-PMH>';
+
+	echo $ret;
+}
+
+
+
+
+header('Content-Type: text/xml');
+switch ($_SERVER['REQUEST_METHOD']) {
+case "POST":
+	$args = $_POST;
+case "GET":
+	$args = $_GET;
+default:
+	echo "500";
+}
+if (isset($args["resumptionToken"])) {
+	$token = "'" . pg_escape_string($args["resumptionToken"]) . "'";
+	resume($token);
+} elseif (isset($args["verb"])) {
+	switch ($args["verb"]) {
+	case "ListIdentifiers":
+	case "ListRecords":
+		if ($args["verb"] == "ListRecords") {
+			$func = "listRecs";
+		} else {
+			$func = "listIds";
+		}
+		$canList = true;
+		if (isset($args["metadataPrefix"])) {						
+			switch ($args["metadataPrefix"]) {
+			case "oai_datacite":
+				break;
+			default:
+				echo "cannotDisseminateFormat";
+				$canList = false;
+			}
+			if (isset($args["from"])) {
+				$from = "'" . pg_escape_string($args["from"]) . "'";
+			} else {
+				$from = "NULL";
+			}
+			if (isset($args["until"])) {
+				$until = "'" . pg_escape_string($args["until"]). "'";
+			} else {
+				$until = "NULL";
+			}
+			if ($canList) {
+				$func($from, $until);
+			}
+		} else {
+			echo "badArgument";
+		}
+		break;
+	case "Identify":
+		identify();
+		break;
+	case "GetRecord":
+	case "ListSets":
+	case "ListMetadataFormats":
+	default:
+		echo "error";
+	}
+} else {
+	echo "error";
+}
+?>
