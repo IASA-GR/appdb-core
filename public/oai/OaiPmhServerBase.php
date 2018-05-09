@@ -70,8 +70,8 @@ abstract class OaiPmhServerBase {
 	}
 
 	private function responseHead() {
-		$ret = '<' . '?xml version="1.0" encoding="UTF-8" ?>' . 
-			'<' . '?xml-stylesheet type="text/xsl" href="xsl/oaitohtml.xsl" ?>' . 
+		$ret = '<' . '?xml version="1.0" encoding="UTF-8" ?' .'>' . 
+			'<' . '?xml-stylesheet type="text/xsl" href="xsl/oaitohtml.xsl" ?' . '>' . 
 			'<' . 'OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">' .
 			'<' . 'responseDate>' . str_replace('+0000', 'Z', date(DateTime::ISO8601)) . '<' . '/responseDate>' .
 			'<' . 'request verb="' . $this->_verb . '"';
@@ -117,7 +117,7 @@ abstract class OaiPmhServerBase {
 
 	}
 
-	abstract protected function getRecord();
+	abstract protected function getRecord($id);
 
 	abstract protected function listSets();
 
@@ -182,7 +182,13 @@ abstract class OaiPmhServerBase {
 					$ret = $this->identify();
 					break;
 				case "GetRecord":
-					$ret = $this->getRecord();
+					if (isset($args["identifier"])) {
+						error_log("id=" . var_export($args["identifier"], true));
+						error_log("guid=" . var_export(str_replace("oai" . $this->_delimiter . $this->_repoID . $this->_delimiter, '', $args["identifier"]), true));
+						$ret = $this->getRecord(str_replace("oai" . $this->_delimiter . $this->_repoID . $this->_delimiter, '', $args["identifier"]));
+					} else {
+						$ret = $this->requestError("badArgument");
+					}					
 					break;
 				case "ListSets":
 					$ret = $this->listSets();
@@ -191,8 +197,10 @@ abstract class OaiPmhServerBase {
 					$ret = $this->listMetadataFormats();
 					break;
 				default:
-					$ret = $this->requestError();
+					$ret = $this->requestError("badVerb");
 			}
+		} else {
+			$ret = $this->requestError("badVerb");
 		}
 		return $ret;
 	}

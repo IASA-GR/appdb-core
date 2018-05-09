@@ -104,8 +104,20 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 		}
 	}
 
-	protected function getRecord() {
-	
+	protected function getRecord($id) {
+		// the $id parameter should hold the record's GUID
+		$id = pg_escape_string($id);
+		$res = $this->dbQuery("SELECT applications.openaire FROM applications WHERE guid = '" . $id . "'");
+		if (is_array($res)) {
+			$res = $res[0];
+			$res = $res[0];
+			$ret = '<' . 'GetRecord>' . $res . '<' . '/GetRecord>';
+		} else {
+			return $this->responseError("idDoesNotExist");
+		}
+
+		$ret = $this->wrapResponse($ret);
+		return $ret;
 	}
 
 	protected function listSets() {
@@ -113,11 +125,25 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 	}
 
 	protected function listMetadataFormats() {
-	
+		$ret = '<' . 'ListMetadataFormats>';
+		$ret .= '<' . 'metadataFormat><' . 'metadataPrefix>oai_dc<' . '/metadataPrefix>' .
+			'<' . 'schema>http://www.openarchives.org/OAI/2.0/oai_dc.xsd<' . '/schema>' . 
+			'<' . 'metadataNamespace>http://www.openarchives.org/OAI/2.0/oai_dc/<' . '/metadataNamespace>' . 
+			'<' . '/metadataFormat>';
+		$ret .= '<' . 'metadataFormat><' . 'metadataPrefix>oai_datacite<' . '/metadataPrefix>' . 
+			'<' . 'schema>http://schema.datacite.org/oai/oai-1.1/oai.xsd<' . '/schema>' . 
+			'<' . 'metadataNamespace>http://schema.datacite.org/oai/oai-1.1/<' . '/metadataNamespace>' . 
+			'<' . '/metadataFormat>';
+		$ret .= '<' . 'metadataFormat><' . 'metadataPrefix>datacite<' . '/metadataPrefix>' .
+			'<' . 'schema>http://schema.datacite.org/meta/nonexistant/nonexistant.xsd<' . '/schema>' . 
+			'<' . 'metadataNamespace>http://datacite.org/schema/nonexistant<' . '/metadataNamespace>' . 
+			'<' . '/metadataFormat>';
+		$ret .= '<' . '/ListMetadataFormats>';
+		return $this->wrapResponse($ret);
 	}
 
 	protected function listIdentifiers() {
-		return $this->listIds($from, $until);
+		return $this->listIds();
 	}
 
 	protected function listRecords() {
