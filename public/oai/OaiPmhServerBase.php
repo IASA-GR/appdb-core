@@ -23,18 +23,18 @@ function uuid_generate_v4() {
 }
 
 abstract class OaiPmhServerBase {
-	private $_host;
-	private $_repoName;
-	private $_baseURL;
-	private $_supportEmail;
-	private $_earliest;
-	private $_repoID;
-	private $_protoVer;
-	private $_granularity;
-	private $_deletedRecord;
-	private $_compression;
-	private $_delimiter;
-	private $_sampleID;
+	protected $_host;
+	protected $_repoName;
+	protected $_baseURL;
+	protected $_supportEmail;
+	protected $_earliest;
+	protected $_repoID;
+	protected $_protoVer;
+	protected $_granularity;
+	protected $_deletedRecord;
+	protected $_compression;
+	protected $_delimiter;
+	protected $_sampleID;
 	protected $_mdPrefix;
 	protected $_verb;
 	protected $_from;
