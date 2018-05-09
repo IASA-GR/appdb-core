@@ -3774,9 +3774,9 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 				if (log.action === 'canceled') {
 					$(action).addClass($.trim(log.action).toLowerCase()).text($.trim(log.action).toUpperCase());
 					$(name).append('Continous Delivery process was canceled. ');
-					if (log.Actor && log.Actor.id) {
+					//if (log.Actor && log.Actor.id) {
 						$(name).append($.trim(log.payload));
-					}
+					//}
 				} else if (['failed', 'task-failed', 'error'].indexOf(log.action) > -1) {
 					$(action).addClass($.trim(log.action).toLowerCase()).text($.trim(log.action).toUpperCase());
 					$(name).append('Continous Delivery process failed to complete. ');
