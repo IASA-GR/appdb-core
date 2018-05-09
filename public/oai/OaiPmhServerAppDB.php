@@ -125,19 +125,28 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 		// the $id parameter should hold the record's GUID
 		$id = pg_escape_string($id);
 		switch ($this->_mdPrefix) {
+			case 'datacite':
 			case 'oai_datacite':
 				$res = $this->dbQuery("SELECT applications.openaire FROM applications WHERE guid = '" . $id . "'");
 				break;
 			case 'oai_dc':
 				$res = $this->dbQuery("SELECT applications.oaidc FROM applications WHERE guid = '" . $id . "'");
 				break;
-			case 'datacite':
 			default:
 				return $this->requestError("cannotDisseminateFormat");
 		}
 		if (is_array($res)) {
 			$res = $res[0];
 			$res = $res[0];
+			if ($this->_mdPrefix == "datacite") {
+				$xml = new SimpleXMLElement('<root><root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' . $res . '</root></root>');
+				$xml = $xml->xpath("//record/metadata/*/*/*");
+				$res = '';
+				foreach ($xml as $x) {
+					$res .= $x->asXML();
+				}
+				$res = '<record><header><identifier>oai' . $this->_delimiter . $this->_repoID . $this->_delimiter . $id . '</identifier></header><metadata>' . $res . '</metadata></record>';
+			}
 			$ret = '<' . 'GetRecord>' . $res . '<' . '/GetRecord>';
 		} else {
 			return $this->responseError("idDoesNotExist");
