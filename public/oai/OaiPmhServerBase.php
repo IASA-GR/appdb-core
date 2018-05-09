@@ -40,6 +40,8 @@ abstract class OaiPmhServerBase {
 	protected $_from;
 	protected $_until;
 	protected $_token;
+	protected $_sets;
+	protected $_set;
 
 	public function __construct(
 		$host = null, 
@@ -53,7 +55,8 @@ abstract class OaiPmhServerBase {
 		$deletedRecord = null,
 		$compression = null,
 		$delimiter = null,
-		$sampleID = null
+		$sampleID = null,
+		$sets = null
 	) {
 		$this->_host = is_null($host) ? 'localhost' : $host;
 		$this->_repoName = is_null($repoName) ? 'Local OAI-PHM repository' : $repoName; 
@@ -67,6 +70,7 @@ abstract class OaiPmhServerBase {
 		$this->_compression = is_null($compression) ? array() : $compression;
 		$this->_delimiter = is_null($delimiter) ? ':' : $delimiter;
 		$this->_sampleID = 'oai' . $this->_delimiter . $this->_repoID . $this->_delimiter . (is_null($sampleID) ? 'd6c26dd2-ec9c-442f-9fc9-0c44cb7125b1' : $sampleID);
+		$this->_sets = is_null($sets) ? array() : $sets;
 	}
 
 	private function responseHead() {
@@ -148,9 +152,17 @@ abstract class OaiPmhServerBase {
 		$this->_token = null;
 		$this->_until = null;
 		$this->_from = null;
+		$this->_set = null;
 		if (isset($args["resumptionToken"])) {
 			$this->_token = $args["resumptionToken"];
 		} else {
+			if (isset($args["set"])) {
+				if (is_null($this->_sets)) {
+					return $this->requestError("noSetHierarchy");
+				} else {
+					$this->_set = $args["set"];
+				}
+			}
 			if (isset($args["from"])) {
 				$this->_from = $args["from"];
 			}

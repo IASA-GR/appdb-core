@@ -9,6 +9,10 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 	private $_dbport;
 
 	public function __construct($dbname, $dbhost, $dbuser, $dbpass, $dbport = "5432") {
+		$sets = array();
+		$sets[] = array("sw", "Software");
+		$sets[] = array("va", "Virtual Appliances");
+//		$sets[] = array("sa", "Software Appliances");
 		parent::__construct(
 			'https://appdb.egi.eu',
 			'EGI Applications Database',
@@ -20,7 +24,9 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 			null,
 			'persistent',	
 			$compression = null,
-			':'
+			':',
+			null,
+			$sets
 		);
 		$this->_dbname = $dbname;
 		$this->_dbhost = $dbhost;
@@ -60,12 +66,17 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 
 	private function listOrResume($action) {
 		//error_log("act=" . var_export($action, true) . " tok=" . var_export($this->_token, true) . ' from=' . var_export($this->_from, true) . ' until=' . var_export($this->_until, true));
+		if (! is_null($this->_set)) {
+			$set = '\'{' . pg_escape_string($this->_set) . '}\'';
+		} else {
+			$set = 'NULL';
+		}
 		if ($action == "list") {
-			$res = $this->dbQuery("SELECT oai_app_cursor($this->_from, $this->_until)");
+			$res = $this->dbQuery("SELECT oai_app_cursor($this->_from, $this->_until, NULL, FALSE, $set)");
 		} elseif ($action == "resume") {
 			$res = $this->dbQuery("SELECT oai_app_cursor(NULL, NULL, $this->_token)");
 		} elseif ($action == "listids") {
-			$res = $this->dbQuery("SELECT oai_app_cursor($this->_from, $this->_until, NULL, TRUE)");
+			$res = $this->dbQuery("SELECT oai_app_cursor($this->_from, $this->_until, NULL, TRUE, $set)");
 		} else {
 			return $this->requestError(500);
 		}
@@ -121,7 +132,12 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 	}
 
 	protected function listSets() {
-	
+		$ret = '<' . 'ListSets>';
+		foreach ($this->_sets as $set) {
+			$ret .= '<' . 'set><' . 'setSpec>' . $set[0] . '<' . '/setSpec><' . 'setName>' . $set[1] . '<' . '/setName><' . '/set>';
+		}
+		$ret .= '<' . '/ListSets>';
+		return $this->wrapResponse($ret);
 	}
 
 	protected function listMetadataFormats() {
