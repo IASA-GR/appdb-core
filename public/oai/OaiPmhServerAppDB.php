@@ -84,14 +84,14 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 		} elseif ($action == "listids") {
 			$res = $this->dbQuery("SELECT oai_app_cursor($this->_from, $this->_until, NULL, TRUE, $set, $mdPrefix)");
 		} else {
-			return $this->requestError(500);
+			return $this->requestError(OaiPmhErrorEnum::OAIPMHERR_INTERNAL);
 		}
 		if (is_array($res)) {
 			$res = $res[0];
 			$res = $res[0];
 			$res = json_decode($res, true);
 			if (array_key_exists("error", $res)) {
-				return $this->requestError($res["error"]);
+				return $this->requestError(OaiPmhErrorEnum::fromString($res["error"]));
 			} else {
 				//$header = base64_decode($res["header"]);
 				$payload = base64_decode($res["payload"]);
@@ -117,7 +117,7 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 				return $this->wrapResponse('<' . $this->_verb . '>' . $payload . $rt . '<' . '/' . $this->_verb . '>');
 			}
 		} else {
-			return $this->requestError(500);
+			return $this->requestError(OaiPmhErrorEnum::OAIPMHERR_INTERNAL);
 		}
 	}
 	protected function getRecord($id) {
@@ -132,7 +132,7 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 				$res = $this->dbQuery("SELECT applications.oaidc FROM applications WHERE guid = '" . $id . "'");
 				break;
 			default:
-				return $this->requestError("cannotDisseminateFormat");
+				return $this->requestError(OaiPmhErrorEnum::OAIPMHERR_BADFMT);
 		}
 		if (is_array($res)) {
 			$res = $res[0];
