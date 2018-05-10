@@ -1,26 +1,6 @@
 <?php
 
-function uuid_generate_v4() {
-    return sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-        // 32 bits for "time_low"
-        mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),
 
-        // 16 bits for "time_mid"
-        mt_rand( 0, 0xffff ),
-
-        // 16 bits for "time_hi_and_version",
-        // four most significant bits holds version number 4
-        mt_rand( 0, 0x0fff ) | 0x4000,
-
-        // 16 bits, 8 bits for "clk_seq_hi_res",
-        // 8 bits for "clk_seq_low",
-        // two most significant bits holds zero and one for variant DCE1.1
-        mt_rand( 0, 0x3fff ) | 0x8000,
-
-        // 48 bits for "node"
-        mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff )
-    );
-}
 
 class OaiPmhVerbEnum {
   	const OAIPMHVERB_GETREC = 1;
@@ -219,6 +199,7 @@ abstract class OaiPmhServerBase {
 	protected $_token;
 	protected $_sets;
 	protected $_set;
+	private $_scheme;
 
 	public function __construct(
 		$host = null, 
@@ -235,6 +216,7 @@ abstract class OaiPmhServerBase {
 		$sampleID = null,
 		$sets = null
 	) {
+		$this->_scheme = 'oai';
 		$this->_host = is_null($host) ? 'localhost' : $host;
 		$this->_repoName = is_null($repoName) ? 'Local OAI-PHM repository' : $repoName; 
 		$this->_baseURL = is_null($baseURL) ? 'http://localhost/oai' : $baseURL;
@@ -246,8 +228,40 @@ abstract class OaiPmhServerBase {
 		$this->_deletedRecord = is_null($deletedRecord) ? 'persistent' : $deletedRecord;
 		$this->_compression = is_null($compression) ? array() : $compression;
 		$this->_delimiter = is_null($delimiter) ? ':' : $delimiter;
-		$this->_sampleID = 'oai' . $this->_delimiter . $this->_repoID . $this->_delimiter . (is_null($sampleID) ? 'd6c26dd2-ec9c-442f-9fc9-0c44cb7125b1' : $sampleID);
+		$this->_sampleID = $this->buildIdentifier($sampleID);
 		$this->_sets = is_null($sets) ? array() : $sets;
+	}
+
+	protected function safexml($s) {
+		return htmlspecialchars($s, ENT_XML1, 'UTF-8');
+	}
+
+	private function uuid_generate_v4() {
+		return sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+			// 32 bits for "time_low"
+			mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),
+
+			// 16 bits for "time_mid"
+			mt_rand( 0, 0xffff ),
+
+			// 16 bits for "time_hi_and_version",
+			// four most significant bits holds version number 4
+			mt_rand( 0, 0x0fff ) | 0x4000,
+
+			// 16 bits, 8 bits for "clk_seq_hi_res",
+			// 8 bits for "clk_seq_low",
+			// two most significant bits holds zero and one for variant DCE1.1
+			mt_rand( 0, 0x3fff ) | 0x8000,
+
+			// 48 bits for "node"
+			mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff )
+		);
+	} 
+	protected function buildIdentifier($id = null) {
+		if (is_null($id)) {
+			$id = $this->uuid_generate_v4();
+		}
+		return $this->_scheme . $this->safexml($this->_delimiter) . $this->safexml($this->_repoID) . $this->safexml($this->_delimiter) . $this->safexml($id);
 	}
 
 	private function responseHead() {
@@ -258,13 +272,13 @@ abstract class OaiPmhServerBase {
 			'<' . 'request';
 		if (! is_null($this->_verb)) {
 			if (! is_null(OaiPmhVerbEnum::fromString($this->_verb))) {
-				$ret .= ' verb="' . $this->_verb . '"';
+				$ret .= ' verb="' . $this->safexml($this->_verb) . '"';
 			}
 		}
 		if (! is_null($this->_mdPrefix)) {
-			$ret .= ' metadataPrefix="' . $this->_mdPrefix . '"';
+			$ret .= ' metadataPrefix="' . $this->safexml($this->_mdPrefix) . '"';
 		}
-		$ret .= '>' . $this->_baseURL . '<' . '/request>';
+		$ret .= '>' . $this->safexml($this->_baseURL) . '<' . '/request>';
 		return $ret;
 	}
 
@@ -279,23 +293,23 @@ abstract class OaiPmhServerBase {
 
 	protected function identify() {
 		$ret = 
-			'<' . 'Identify><repositoryName>' . $this->_repoName . '<' . '/repositoryName>' .
-			'<' . 'baseURL>' . $this->_baseURL . '<' . '/baseURL>' .
-			'<' . 'protocolVersion>' . $this->_protoVer . '<' . '/protocolVersion>' .
-			'<' . 'adminEmail>' . $this->_supportEmail . '<' . '/adminEmail>' .
-			'<' . 'earliestDatestamp>'. $this->_earliest . '<' . '/earliestDatestamp>' .
-			'<' . 'deletedRecord>' . $this->_deletedRecord . '<' . '/deletedRecord>' .
-			'<' . 'granularity>' . $this->_granularity . '<' . '/granularity>';
+			'<' . 'Identify><repositoryName>' . $this->safexml($this->_repoName) . '<' . '/repositoryName>' .
+			'<' . 'baseURL>' . $this->safexml($this->_baseURL) . '<' . '/baseURL>' .
+			'<' . 'protocolVersion>' . $this->safexml($this->_protoVer) . '<' . '/protocolVersion>' .
+			'<' . 'adminEmail>' . $this->safexml($this->_supportEmail) . '<' . '/adminEmail>' .
+			'<' . 'earliestDatestamp>'. $this->safexml($this->_earliest) . '<' . '/earliestDatestamp>' .
+			'<' . 'deletedRecord>' . $this->safexml($this->_deletedRecord) . '<' . '/deletedRecord>' .
+			'<' . 'granularity>' . $this->safexml($this->_granularity) . '<' . '/granularity>';
 
 		foreach ($this->_compression as $c) {
-			$ret .= '<' . 'compression>' . $c . '<' . '/compression>';
+			$ret .= '<' . 'compression>' . $this->safexml($c) . '<' . '/compression>';
 		}
 		$ret .= 
 			'<' . 'description><' . 'oai-identifier xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">' .
 			'<' . 'scheme>oai</scheme>' . 
-			'<' . 'repositoryIdentifier>' . $this->_repoID . '<' . '/repositoryIdentifier>' .
-			'<' . 'delimiter>' . $this->_delimiter . '<' . '/delimiter>' .
-			'<' . 'sampleIdentifier>' . $this->_sampleID . '<' . '/sampleIdentifier>' .
+			'<' . 'repositoryIdentifier>' . $this->safexml($this->_repoID) . '<' . '/repositoryIdentifier>' .
+			'<' . 'delimiter>' . $this->safexml($this->_delimiter) . '<' . '/delimiter>' .
+			'<' . 'sampleIdentifier>' . $this->safexml($this->_sampleID) . '<' . '/sampleIdentifier>' .
 			'<' . '/oai-identifier><' . '/description><'. '/Identify>';
 		$ret = $this->wrapResponse($ret);
 		return $ret;
@@ -352,8 +366,8 @@ abstract class OaiPmhServerBase {
 					default:
 				}
 			}
-			$ret = '<' . 'error code="' . htmlspecialchars(OaiPmhErrorEnum::toString($code)) . '"';
-			$ret .= '>' . htmlspecialchars($desc) . '<' . '/error>';
+			$ret = '<' . 'error code="' . $this->safexml(OaiPmhErrorEnum::toString($code)) . '"';
+			$ret .= '>' . $this->safexml($desc) . '<' . '/error>';
 			return $this->wrapResponse($ret);
 		}
 	}

@@ -144,7 +144,7 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 				foreach ($xml as $x) {
 					$res .= $x->asXML();
 				}
-				$res = '<record><header><identifier>oai' . $this->_delimiter . $this->_repoID . $this->_delimiter . $id . '</identifier></header><metadata>' . $res . '</metadata></record>';
+				$res = '<record><header><identifier>' . $this->buildIdentifier($id) . '</identifier></header><metadata>' . $res . '</metadata></record>';
 			}
 			$ret = '<' . 'GetRecord>' . $res . '<' . '/GetRecord>';
 		} else {
