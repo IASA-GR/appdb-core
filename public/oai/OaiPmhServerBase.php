@@ -437,10 +437,30 @@ abstract class OaiPmhServerBase {
 				$this->_until = $args["until"];
 			}
 		}
+		// validate min from value
+		if (! is_null($this->_from)) {
+			if (strtotime($this->_earliest) > strtotime($this->_from)) {
+				return $this->requestError(OaiPmhErrorEnum::OAIPMHERR_BADARG, 'Value of "from" argument is smaller than the repository\'s earliest allowed timestamp.');
+			}
+		}
+		if (! is_null($this->_until)) {
+			if (strtotime($this->_earliest) > strtotime($this->_until)) {
+				return $this->requestError(OaiPmhErrorEnum::OAIPMHERR_BADARG, 'Value of "until" argument is smaller than the repository\'s earliest allowed timestamp.');
+			}
+		}
+		if ((! is_null($this->_from)) && (! is_null($this->_until)))  {
+			if (strtotime($this->_from) > strtotime($this->_until)) {
+				return $this->requestError(OaiPmhErrorEnum::OAIPMHERR_BADARG, 'Value of "until" argument is smaller than that of "from" argument.');
+			}
+		}
+		return true;
 	}
 
-	public function processRequest($args) {		
-		$this->preprocessRequest($args);
+	public final function processRequest($args) {		
+		$ret = $this->preprocessRequest($args);
+		if ($ret !== true) {
+			return $ret;
+		}
 		$ret = false;
 		if (isset($args["verb"])) {
 			$this->_verb = $args["verb"];
