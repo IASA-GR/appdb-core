@@ -46,12 +46,12 @@ class OaiPmhVerbEnum {
      */
 	public static function toString($e) {
 		switch($e) {
-			case OAIPMHVERB_GETREC: return "GetRecord";
-			case OAIPMHVERB_ID: return "Identify";
-			case OAIPMHVERB_LISTIDS: return "ListIdentifiers";
-			case OAIPMHVERB_LISTFMTS: return "ListMetadataFormats";
-			case OAIPMHVERB_LISTRECS: return "ListRecords";
-			case OAIPMHVERB_LISTSETS: return "ListSets";
+			case OaiPmhVerbEnum::OAIPMHVERB_GETREC: return "GetRecord";
+			case OaiPmhVerbEnum::OAIPMHVERB_ID: return "Identify";
+			case OaiPmhVerbEnum::OAIPMHVERB_LISTIDS: return "ListIdentifiers";
+			case OaiPmhVerbEnum::OAIPMHVERB_LISTFMTS: return "ListMetadataFormats";
+			case OaiPmhVerbEnum::OAIPMHVERB_LISTRECS: return "ListRecords";
+			case OaiPmhVerbEnum::OAIPMHVERB_LISTSETS: return "ListSets";
 			default: return "Illegal verb";
 		}
 	}
@@ -80,7 +80,50 @@ class OaiPmhVerbEnum {
 			default: 
 				return null;
 		}
-		return new OaiPmhVerbEnum($e);
+		return $e;
+	}
+
+	public static function validate($e, $args) {
+		if (! array_key_exists("verb", $args)) return false;
+		if ($args["verb"] != OaiPmhVerbEnum::toString($e)) return false;
+		switch($e) {
+			case OaiPmhVerbEnum::OAIPMHVERB_GETREC:
+				if (! array_key_exists("identifier", $args)) return false;
+				if (! array_key_exists("metadataPrefix", $args)) return false;
+				if (count($args) > 3) return false;
+				break;
+			case OaiPmhVerbEnum::OAIPMHVERB_ID:
+				if (count($args) > 1) return false;
+				break;
+			case OaiPmhVerbEnum::OAIPMHVERB_LISTRECS:
+			case OaiPmhVerbEnum::OAIPMHVERB_LISTIDS:
+				if (! array_key_exists("metadataPrefix", $args)) {
+					if (! array_key_exists("resumptionToken", $args)) {
+						return false;
+					}
+				}
+				if (array_key_exists("resumptionToken", $args) && (count($args) > 2)) return false;				
+				if (count($args) > 5) return false;
+				foreach ($args as $k => $v) {
+					if (! in_array($k, array("from", "until", "set", "metadataPrefix", "resumptionToken", "verb"))) return false;
+				}
+				break;
+			case OaiPmhVerbEnum::OAIPMHVERB_LISTFMTS:
+				if (count($args) > 2) return false;
+				foreach ($args as $k => $v) {
+					if (! in_array($k, array("identifier", "verb"))) return false;
+				}
+				break;
+			case OaiPmhVerbEnum::OAIPMHVERB_LISTSETS:
+				if (count($args) > 2) return false;
+				foreach ($args as $k => $v) {
+					if (! in_array($k, array("resumptionToken", "verb"))) return false;
+				}
+				break;
+			default:
+				return false;
+		}
+		return true;
 	}
 }
 
@@ -175,7 +218,7 @@ class OaiPmhErrorEnum {
 			default: 
 				$e = 500;
 		}
-		return new OaiPmhErrorEnum($e);
+		return $e;
 	}
 }
 
@@ -401,39 +444,43 @@ abstract class OaiPmhServerBase {
 		$ret = false;
 		if (isset($args["verb"])) {
 			$this->_verb = $args["verb"];
-			if (isset($args["resumptionToken"])) {
-				$ret = $this->resume();
-				return $ret;
-			} elseif (isset($args["metadataPrefix"])) {						
-				$this->_mdPrefix = $args["metadataPrefix"];
-			}
-			switch ($args["verb"]) {
-				case "ListIdentifiers":
-					$ret = $this->listIdentifiers();
-					break;
-				case "ListRecords":
-					$ret = $this->listRecords();
-					break;
-				case "Identify":
-					$ret = $this->identify();
-					break;
-				case "GetRecord":
-					if (isset($args["identifier"])) {
-						error_log("id=" . var_export($args["identifier"], true));
-						error_log("guid=" . var_export(str_replace("oai" . $this->_delimiter . $this->_repoID . $this->_delimiter, '', $args["identifier"]), true));
-						$ret = $this->getRecord(str_replace("oai" . $this->_delimiter . $this->_repoID . $this->_delimiter, '', $args["identifier"]));
-					} else {
-						$ret = $this->requestError(OaiPmhErrorEnum::OAIPMHERR_BADARG);
-					}					
-					break;
-				case "ListSets":
-					$ret = $this->listSets();
-					break;
-				case "ListMetadataFormats":
-					$ret = $this->listMetadataFormats();
-					break;
-				default:
-					$ret = $this->requestError(OaiPmhErrorEnum::OAIPMHERR_BADVERB, "Illegal verb");
+			if (OaiPmhVerbEnum::validate(OaiPmhVerbEnum::fromString($this->_verb), $args)) {
+				if (isset($args["resumptionToken"])) {
+					$ret = $this->resume();
+					return $ret;
+				} elseif (isset($args["metadataPrefix"])) {						
+					$this->_mdPrefix = $args["metadataPrefix"];
+				}
+				switch ($args["verb"]) {
+					case "ListIdentifiers":
+						$ret = $this->listIdentifiers();
+						break;
+					case "ListRecords":
+						$ret = $this->listRecords();
+						break;
+					case "Identify":
+						$ret = $this->identify();
+						break;
+					case "GetRecord":
+						if ((! isset($args["metadataPrefix"])) || (! isset($args["identifier"]))) {
+							$ret = $this->requestError(OaiPmhErrorEnum::OAIPMHERR_BADARG);
+						} else {
+							//error_log("id=" . var_export($args["identifier"], true));
+							//error_log("guid=" . var_export(str_replace("oai" . $this->_delimiter . $this->_repoID . $this->_delimiter, '', $args["identifier"]), true));
+							$ret = $this->getRecord(str_replace("oai" . $this->_delimiter . $this->_repoID . $this->_delimiter, '', $args["identifier"]));
+						}					
+						break;
+					case "ListSets":
+						$ret = $this->listSets();
+						break;
+					case "ListMetadataFormats":
+						$ret = $this->listMetadataFormats();
+						break;
+					default:
+						$ret = $this->requestError(OaiPmhErrorEnum::OAIPMHERR_BADVERB, "Illegal verb");
+				}
+			} else {
+				$ret = $this->requestError(OaiPmhErrorEnum::OAIPMHERR_BADARG);
 			}
 		} else {
 			$ret = $this->requestError(OaiPmhErrorEnum::OAIPMHERR_BADVERB, "Missing verb");
