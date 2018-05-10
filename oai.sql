@@ -22,7 +22,7 @@ BEGIN
                                 COALESCE((SELECT tstamp::TIMESTAMPTZ AT TIME ZONE 'UTC' FROM cache.appxmlcache WHERE id = $1.id), (NOW() AT TIME ZONE 'UTC'))::TEXT,
                         ' ', 'T') || 'Z', '\.[0-9]*Z$', 'Z') || 
                         E'</datestamp>' || 
-			CASE $1.metatype WHEN 0 THEN '<setSpec>sw</setSpec>' WHEN 1 THEN '<setSpec>va</setSpec>' ELSE '' END ||
+                        CASE $1.metatype WHEN 0 THEN '<setSpec>sw</setSpec>' WHEN 1 THEN '<setSpec>va</setSpec>' ELSE '' END ||
                         -- E'<setSpec>SET1</setSpec><setSpec>SET2</setSpec>' || 
                         E'</header>')::XML;
         ELSE
@@ -39,8 +39,27 @@ BEGIN
         END IF;
 END;
 $function$;
+ALTER FUNCTION openaire2(applications) OWNER TO appdb;
 
 CREATE OR REPLACE FUNCTION public.openaire(applications)
+RETURNS xml
+ LANGUAGE plpgsql
+ VOLATILE
+AS $function$
+DECLARE x XML;
+BEGIN
+	IF EXISTS (SELECT 1 FROM cache.appxmlcache WHERE id = $1.id AND openairexml IS DISTINCT FROM NULL) THEN
+		RETURN (SELECT openairexml FROM cache.appxmlcache WHERE id = $1.id);
+	ELSE
+		x := (($1::applications).__openaire)::XML;
+		UPDATE cache.appxmlcache SET openairexml = x WHERE id = $1.id;
+		RETURN x;
+	END IF;
+END;
+$function$;
+ALTER FUNCTION openaire(applications) OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION public.__openaire(applications)
  RETURNS xml
  LANGUAGE plpgsql
  VOLATILE
@@ -56,13 +75,13 @@ BEGIN
                                 COALESCE((SELECT tstamp::TIMESTAMPTZ AT TIME ZONE 'UTC' FROM cache.appxmlcache WHERE id = $1.id), (NOW() AT TIME ZONE 'UTC'))::TEXT,
                         ' ', 'T') || 'Z', '\.[0-9]*Z$', 'Z') || 
                         E'</datestamp>' || 
-			CASE $1.metatype WHEN 0 THEN '<setSpec>sw</setSpec>' WHEN 1 THEN '<setSpec>va</setSpec>' ELSE '' END ||
+                        CASE $1.metatype WHEN 0 THEN '<setSpec>sw</setSpec>' WHEN 1 THEN '<setSpec>va</setSpec>' ELSE '' END ||
                         E'</header></record>')::XML;
         ELSE
-                IF EXISTS (SELECT 1 FROM cache.appxmlcache WHERE id = $1.id AND openairexml IS DISTINCT FROM NULL) THEN
-                        -- RAISE NOTICE '% has openaire xml cached', $1.id;
-                        x := (SELECT openairexml::TEXT FROM cache.appxmlcache WHERE id = $1.id);
-                ELSE
+--                IF EXISTS (SELECT 1 FROM cache.appxmlcache WHERE id = $1.id AND openairexml IS DISTINCT FROM NULL) THEN
+--                        -- RAISE NOTICE '% has openaire xml cached', $1.id;
+--                        x := (SELECT openairexml::TEXT FROM cache.appxmlcache WHERE id = $1.id);
+--                ELSE
                         -- RAISE NOTICE '% has no openaire xml cache', $1.id;
                         t1 := (SELECT EXTRACT(EPOCH FROM(clock_timestamp())));
                         x := (SELECT 
@@ -97,13 +116,32 @@ BEGIN
                         dt := t2 - t1;
                         x := (REPLACE(REPLACE(REPLACE(x, '###REQUESTED_ON###', t1::TEXT), '###DELIVERED_ON###', t2::TEXT), '###PROCESSING_TIME###', dt::TEXT));
                         -- UPDATE cache.appxmlcache SET openairexml = x::XML WHERE id = $1.id;
-                END IF;
+--                END IF;
                 RETURN x;
         END IF;
 END;
 $function$;
+ALTER FUNCTION __openaire(applications) OWNER TO appdb;
 
 CREATE OR REPLACE FUNCTION public.oaidc(applications)
+ RETURNS xml
+ LANGUAGE plpgsql
+ VOLATILE
+AS $function$
+DECLARE x XML;
+BEGIN
+	IF EXISTS (SELECT 1 FROM cache.appxmlcache WHERE id = $1.id AND oaidcxml IS DISTINCT FROM NULL) THEN
+		RETURN (SELECT oaidcxml FROM cache.appxmlcache WHERE id = $1.id);
+	ELSE
+		x := (($1::applications).__oaidc)::XML;
+		UPDATE cache.appxmlcache SET oaidcxml = x WHERE id = $1.id;
+		RETURN x;
+	END IF;
+END;
+$function$;
+ALTER FUNCTION oaidc(applications) OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION public.__oaidc(applications)
  RETURNS xml
  LANGUAGE plpgsql
  VOLATILE
@@ -119,13 +157,13 @@ BEGIN
                                 COALESCE((SELECT tstamp::TIMESTAMPTZ AT TIME ZONE 'UTC' FROM cache.appxmlcache WHERE id = $1.id), (NOW() AT TIME ZONE 'UTC'))::TEXT,
                         ' ', 'T') || 'Z', '\.[0-9]*Z$', 'Z') || 
                         E'</datestamp>' || 
-			CASE $1.metatype WHEN 0 THEN '<setSpec>sw</setSpec>' WHEN 1 THEN '<setSpec>va</setSpec>' ELSE '' END ||
+                        CASE $1.metatype WHEN 0 THEN '<setSpec>sw</setSpec>' WHEN 1 THEN '<setSpec>va</setSpec>' ELSE '' END ||
                         E'</header></record>')::XML;
         ELSE
-                IF EXISTS (SELECT 1 FROM cache.appxmlcache WHERE id = $1.id AND oaidcxml IS DISTINCT FROM NULL) THEN
-                        -- RAISE NOTICE '% has oaidc xml cached', $1.id;
-                        x := (SELECT oaidcxml::TEXT FROM cache.appxmlcache WHERE id = $1.id);
-                ELSE
+--                IF EXISTS (SELECT 1 FROM cache.appxmlcache WHERE id = $1.id AND oaidcxml IS DISTINCT FROM NULL) THEN
+--                        -- RAISE NOTICE '% has oaidc xml cached', $1.id;
+--                        x := (SELECT oaidcxml::TEXT FROM cache.appxmlcache WHERE id = $1.id);
+--                ELSE
                         -- RAISE NOTICE '% has no oaidc xml cache', $1.id;
                         t1 := (SELECT EXTRACT(EPOCH FROM(clock_timestamp())));
                         x := (SELECT 
@@ -159,12 +197,12 @@ BEGIN
                         dt := t2 - t1;
                         x := (REPLACE(REPLACE(REPLACE(x, '###REQUESTED_ON###', t1::TEXT), '###DELIVERED_ON###', t2::TEXT), '###PROCESSING_TIME###', dt::TEXT));
                         -- UPDATE cache.appxmlcache SET openairexml = x::XML WHERE id = $1.id;
-                END IF;
+--                END IF;
                 RETURN x;
         END IF;
 END;
 $function$;
-
+ALTER FUNCTION __oaidc(applications) OWNER TO appdb;
 
 DROP TABLE IF EXISTS oai_app_cursors;
 CREATE TABLE oai_app_cursors (
@@ -218,7 +256,7 @@ BEGIN
                                 (CASE WHEN muntil IS NULL THEN (SELECT TIMESTAMP WITH TIME ZONE 'epoch' + 999999999999 * INTERVAL '1 second') AT TIME ZONE 'UTC' ELSE muntil::TIMESTAMPTZ AT TIME ZONE 'UTC' END)::TEXT
                         , ' ', 'T') || 'Z', '\.[0-9]*Z$', 'Z')
                         || ',' || mabbrev::TEXT
-			|| ',' || COALESCE(array_to_string(mtype::TEXT[], ';'), 'NULL')
+                        || ',' || COALESCE(array_to_string(mtype::TEXT[], ';'), 'NULL')
                         || ',50,' || mformat;
                 
                 /* record app id list for resumption token idempotency */
@@ -227,17 +265,17 @@ BEGIN
                         FROM applications a
                         INNER JOIN cache.appxmlcache c ON c.id = a.id
                         WHERE (
-				c.tstamp::TIMESTAMPTZ BETWEEN
+                                c.tstamp::TIMESTAMPTZ BETWEEN
                                 CASE WHEN mfrom IS NULL THEN (SELECT TIMESTAMP WITH TIME ZONE 'epoch' + 0 * INTERVAL '1 second') AT TIME ZONE 'UTC' ELSE mfrom::TIMESTAMPTZ AT TIME ZONE 'UTC' END
                                 AND
                                 CASE WHEN muntil IS NULL THEN (SELECT TIMESTAMP WITH TIME ZONE 'epoch' + 999999999999 * INTERVAL '1 second') AT TIME ZONE 'UTC' ELSE muntil::TIMESTAMPTZ AT TIME ZONE 'UTC' END
-			) AND (
-				CASE WHEN mtype IS NULL THEN 
-					TRUE
-				ELSE
-					a.metatype IN (SELECT CASE n WHEN 'sw' THEN 0 WHEN 'va' THEN 1 ELSE -1 END AS metatype FROM UNNEST(mtype::TEXT[]) AS n)
-				END
-			)
+                        ) AND (
+                                CASE WHEN mtype IS NULL THEN 
+                                        TRUE
+                                ELSE
+                                        a.metatype IN (SELECT CASE n WHEN 'sw' THEN 0 WHEN 'va' THEN 1 ELSE -1 END AS metatype FROM UNNEST(mtype::TEXT[]) AS n)
+                                END
+                        )
                 ) THEN
                         INSERT INTO oai_app_cursors (token, appids) 
                         SELECT 
@@ -246,17 +284,17 @@ BEGIN
                         FROM applications a
                         INNER JOIN cache.appxmlcache c ON c.id = a.id
                         WHERE (
-				c.tstamp::TIMESTAMPTZ BETWEEN
+                                c.tstamp::TIMESTAMPTZ BETWEEN
                                 CASE WHEN mfrom IS NULL THEN (SELECT TIMESTAMP WITH TIME ZONE 'epoch' + 0 * INTERVAL '1 second') AT TIME ZONE 'UTC' ELSE mfrom::TIMESTAMPTZ AT TIME ZONE 'UTC' END
                                 AND
                                 CASE WHEN muntil IS NULL THEN (SELECT TIMESTAMP WITH TIME ZONE 'epoch' + 999999999999 * INTERVAL '1 second') AT TIME ZONE 'UTC' ELSE muntil::TIMESTAMPTZ AT TIME ZONE 'UTC' END
-			) AND (
-				CASE WHEN mtype IS NULL THEN 
-					TRUE
-				ELSE
-					a.metatype IN (SELECT CASE n WHEN 'sw' THEN 0 WHEN 'va' THEN 1 ELSE -1 END AS metatype FROM UNNEST(mtype::TEXT[]) AS n)
-				END
-			)
+                        ) AND (
+                                CASE WHEN mtype IS NULL THEN 
+                                        TRUE
+                                ELSE
+                                        a.metatype IN (SELECT CASE n WHEN 'sw' THEN 0 WHEN 'va' THEN 1 ELSE -1 END AS metatype FROM UNNEST(mtype::TEXT[]) AS n)
+                                END
+                        )
                         ;
                 ELSE
                         RETURN '{"error": "noRecordsMatch"}';
@@ -269,7 +307,7 @@ BEGIN
         IF tokenarray[4]::BOOLEAN THEN
                 mabbrev = TRUE;
         END IF;
-	mformat := tokenarray[7]::TEXT;
+        mformat := tokenarray[7]::TEXT;
 
         UPDATE oai_app_cursors 
         SET pos = pos + 50,
@@ -281,12 +319,12 @@ BEGIN
         body := (SELECT ARRAY_TO_STRING(ARRAY_AGG(x), '') FROM (
                         SELECT
                                 CASE mabbrev WHEN FALSE THEN
-					CASE mformat 
-						WHEN 'oai_dc' THEN
-							a.oaidc::TEXT
-						ELSE
-							a.openaire::TEXT
-					END
+                                        CASE mformat 
+                                                WHEN 'oai_dc' THEN
+                                                        a.oaidc::TEXT
+                                                ELSE
+                                                        a.openaire::TEXT
+                                        END
                                 ELSE
                                         a.openaire2::TEXT
                                 END AS x
@@ -345,8 +383,13 @@ BEGIN
         NEW.tstamp := NOW();
         IF (TG_OP = 'INSERT' AND NEW.openairexml IS NULL) OR (TG_OP = 'UPDATE' AND NEW.xml::TEXT IS DISTINCT FROM OLD.xml::TEXT AND NOT (NEW.openairexml::TEXT IS DISTINCT FROM OLD.openairexml::TEXT)) THEN
                 -- RAISE NOTICE 'Updating OpenAIRE XML cache for %', NEW.id;
-                NEW.openairexml := (SELECT applications.openaire FROM applications WHERE id = NEW.id);
+                NEW.openairexml := (SELECT applications.__openaire FROM applications WHERE id = NEW.id);
                 -- RAISE NOTICE '%', NEW.openairexml;
+        END IF;
+	IF (TG_OP = 'INSERT' AND NEW.oaidcxml IS NULL) OR (TG_OP = 'UPDATE' AND NEW.xml::TEXT IS DISTINCT FROM OLD.xml::TEXT AND NOT (NEW.oaidcxml::TEXT IS DISTINCT FROM OLD.oaidcxml::TEXT)) THEN
+                -- RAISE NOTICE 'Updating OAI-DC XML cache for %', NEW.id;
+                NEW.oaidcxml := (SELECT applications.__oaidc FROM applications WHERE id = NEW.id);
+                -- RAISE NOTICE '%', NEW.oaidcxml;
         END IF;
         RETURN NEW;
 END;
