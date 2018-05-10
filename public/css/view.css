@@ -25157,7 +25157,14 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
 .action.cd_select > .cd_option > .popup > .footer {
         text-align: center;
 }
-
+.action.cd_select > .cd_option > .popup > .footer .wikilink {
+    display: inline-block;
+    text-align: right;
+    position: absolute;
+    right: 10px;
+    bottom: 3px;
+    color: #346092;
+}
 .action.cd_select > .cd_option > a {
         padding: 5px;
         border: 1px solid transparent;
@@ -25379,6 +25386,7 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
     padding-top: 10px;
     text-align: right;
 }
+
 .cdversion.loading > div.cdversion-loading {
     max-width: 200px;
 }
