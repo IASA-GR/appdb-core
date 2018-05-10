@@ -199,7 +199,10 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 	}
 
 	protected function preprocessRequest($args) {
-		parent::preprocessRequest($args);
+		$ret = parent::preprocessRequest($args);
+		if ($ret !== true) {
+			return $ret;
+		}
 		if (! is_null($this->_token)) {
 			$this->_token= "'" . pg_escape_string($this->_token) . "'";
 		} else {
@@ -215,6 +218,7 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 		} else {
 			$this->_until = "NULL";
 		}
+		return true;
 	}
 }
 
