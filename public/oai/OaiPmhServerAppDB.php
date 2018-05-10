@@ -76,6 +76,14 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 		} else {
 			$mdPrefix = "NULL";
 		}
+		if (! in_array($mdPrefix, array(
+			"'oai_dc'",
+			"'oai_datacite'",
+			"'datacite'",
+			"NULL" // for resumptionToken
+		))) {
+			return $this->requestError(OaiPmhErrorEnum::OAIPMHERR_BADFMT);
+		}
 
 		if ($action == "list") {
 			$res = $this->dbQuery("SELECT oai_app_cursor($this->_from, $this->_until, NULL, FALSE, $set, $mdPrefix)");
