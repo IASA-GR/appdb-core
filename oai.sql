@@ -294,7 +294,7 @@ BEGIN
                                 ELSE
                                         a.metatype IN (SELECT CASE n WHEN 'sw' THEN 0 WHEN 'va' THEN 1 ELSE -1 END AS metatype FROM UNNEST(mtype::TEXT[]) AS n)
                                 END
-                        )
+                        ) /*AND NOT a.pidhandle IS NULL -- FIXME: enable this once HANDLE PIDs are available*/
                         ;
                 ELSE
                         RETURN '{"error": "noRecordsMatch"}';
