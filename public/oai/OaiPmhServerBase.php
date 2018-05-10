@@ -65,7 +65,7 @@ abstract class OaiPmhServerBase {
 		$this->_earliest = is_null($earliest) ? '1970-01-01T00:00:00Z' : $earliest;
 		$this->_repoID = is_null($repoID) ? 'localhost' : $repoID;
 		$this->_protoVer = is_null($protoVer) ? '2.0' : $protoVer;
-		$this->_granilarity = is_null($granularity) ? 'YYYY-MM-DDThh:mm:ssZ' : $granularity;
+		$this->_granularity = is_null($granularity) ? 'YYYY-MM-DDThh:mm:ssZ' : $granularity;
 		$this->_deletedRecord = is_null($deletedRecord) ? 'persistent' : $deletedRecord;
 		$this->_compression = is_null($compression) ? array() : $compression;
 		$this->_delimiter = is_null($delimiter) ? ':' : $delimiter;
@@ -78,7 +78,7 @@ abstract class OaiPmhServerBase {
 			'<' . '?xml-stylesheet type="text/xsl" href="xsl/oaitohtml.xsl" ?' . '>' . 
 			'<' . 'OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">' .
 			'<' . 'responseDate>' . str_replace('+0000', 'Z', date(DateTime::ISO8601)) . '<' . '/responseDate>' .
-			'<' . 'request verb="' . $this->_verb . '"';
+			'<' . 'request' . (is_null($this->_verb) ? '' : ' verb="' . $this->_verb . '"');
 		if (! is_null($this->_mdPrefix)) {
 			$ret .= ' metadataPrefix="' . $this->_mdPrefix . '"';
 		}
@@ -115,8 +115,7 @@ abstract class OaiPmhServerBase {
 			'<' . 'delimiter>' . $this->_delimiter . '<' . '/delimiter>' .
 			'<' . 'sampleIdentifier>' . $this->_sampleID . '<' . '/sampleIdentifier>' .
 			'<' . '/oai-identifier><' . '/description><'. '/Identify>';
-
-		$ret = $this->wrapResponse("Identify", $ret);
+		$ret = $this->wrapResponse($ret);
 		return $ret;
 
 	}
@@ -138,9 +137,9 @@ abstract class OaiPmhServerBase {
 			header("HTTP/1.0 500 Internal Server Error");
 			return false;
 		} else {
-			$ret = '<' . 'error code="' . $code . '"';
+			$ret = '<' . 'error code="' . htmlspecialchars($code) . '"';
 			if (isset($desc)) {
-				$ret .= ">$desc<" . '/error>';
+				$ret .= '>' . htmlspecialchars($desc) . '<' . '/error>';
 			} else {
 				$ret .= '/>';
 			}
@@ -212,7 +211,7 @@ abstract class OaiPmhServerBase {
 					$ret = $this->requestError("badVerb");
 			}
 		} else {
-			$ret = $this->requestError("badVerb");
+			$ret = $this->requestError("badVerb", "Missing verb");
 		}
 		return $ret;
 	}

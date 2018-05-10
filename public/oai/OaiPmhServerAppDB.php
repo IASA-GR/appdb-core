@@ -18,7 +18,7 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 			'EGI Applications Database',
 			'https://appdb.egi.eu/oai',
 			'appdb-support@iasa.gr',
-			null,
+			'2008-01-01T00:00:00Z',
 			'appdb.egi.eu',
 			'2.0',	
 			null,
@@ -120,7 +120,6 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 			return $this->requestError(500);
 		}
 	}
-
 	protected function getRecord($id) {
 		// the $id parameter should hold the record's GUID
 		$id = pg_escape_string($id);
