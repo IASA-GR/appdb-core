@@ -232,7 +232,7 @@ abstract class OaiPmhServerBase {
 		$this->_sets = is_null($sets) ? array() : $sets;
 	}
 
-	protected function safexml($s) {
+	protected function safeXML($s) {
 		return htmlspecialchars($s, ENT_XML1, 'UTF-8');
 	}
 
@@ -261,7 +261,7 @@ abstract class OaiPmhServerBase {
 		if (is_null($id)) {
 			$id = $this->uuid_generate_v4();
 		}
-		return $this->_scheme . $this->safexml($this->_delimiter) . $this->safexml($this->_repoID) . $this->safexml($this->_delimiter) . $this->safexml($id);
+		return $this->_scheme . $this->safeXML($this->_delimiter) . $this->safeXML($this->_repoID) . $this->safeXML($this->_delimiter) . $this->safeXML($id);
 	}
 
 	private function responseHead() {
@@ -272,13 +272,13 @@ abstract class OaiPmhServerBase {
 			'<' . 'request';
 		if (! is_null($this->_verb)) {
 			if (! is_null(OaiPmhVerbEnum::fromString($this->_verb))) {
-				$ret .= ' verb="' . $this->safexml($this->_verb) . '"';
+				$ret .= ' verb="' . $this->safeXML($this->_verb) . '"';
 			}
 		}
 		if (! is_null($this->_mdPrefix)) {
-			$ret .= ' metadataPrefix="' . $this->safexml($this->_mdPrefix) . '"';
+			$ret .= ' metadataPrefix="' . $this->safeXML($this->_mdPrefix) . '"';
 		}
-		$ret .= '>' . $this->safexml($this->_baseURL) . '<' . '/request>';
+		$ret .= '>' . $this->safeXML($this->_baseURL) . '<' . '/request>';
 		return $ret;
 	}
 
@@ -293,23 +293,23 @@ abstract class OaiPmhServerBase {
 
 	protected function identify() {
 		$ret = 
-			'<' . 'Identify><repositoryName>' . $this->safexml($this->_repoName) . '<' . '/repositoryName>' .
-			'<' . 'baseURL>' . $this->safexml($this->_baseURL) . '<' . '/baseURL>' .
-			'<' . 'protocolVersion>' . $this->safexml($this->_protoVer) . '<' . '/protocolVersion>' .
-			'<' . 'adminEmail>' . $this->safexml($this->_supportEmail) . '<' . '/adminEmail>' .
-			'<' . 'earliestDatestamp>'. $this->safexml($this->_earliest) . '<' . '/earliestDatestamp>' .
-			'<' . 'deletedRecord>' . $this->safexml($this->_deletedRecord) . '<' . '/deletedRecord>' .
-			'<' . 'granularity>' . $this->safexml($this->_granularity) . '<' . '/granularity>';
+			'<' . 'Identify><repositoryName>' . $this->safeXML($this->_repoName) . '<' . '/repositoryName>' .
+			'<' . 'baseURL>' . $this->safeXML($this->_baseURL) . '<' . '/baseURL>' .
+			'<' . 'protocolVersion>' . $this->safeXML($this->_protoVer) . '<' . '/protocolVersion>' .
+			'<' . 'adminEmail>' . $this->safeXML($this->_supportEmail) . '<' . '/adminEmail>' .
+			'<' . 'earliestDatestamp>'. $this->safeXML($this->_earliest) . '<' . '/earliestDatestamp>' .
+			'<' . 'deletedRecord>' . $this->safeXML($this->_deletedRecord) . '<' . '/deletedRecord>' .
+			'<' . 'granularity>' . $this->safeXML($this->_granularity) . '<' . '/granularity>';
 
 		foreach ($this->_compression as $c) {
-			$ret .= '<' . 'compression>' . $this->safexml($c) . '<' . '/compression>';
+			$ret .= '<' . 'compression>' . $this->safeXML($c) . '<' . '/compression>';
 		}
 		$ret .= 
 			'<' . 'description><' . 'oai-identifier xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">' .
 			'<' . 'scheme>oai</scheme>' . 
-			'<' . 'repositoryIdentifier>' . $this->safexml($this->_repoID) . '<' . '/repositoryIdentifier>' .
-			'<' . 'delimiter>' . $this->safexml($this->_delimiter) . '<' . '/delimiter>' .
-			'<' . 'sampleIdentifier>' . $this->safexml($this->_sampleID) . '<' . '/sampleIdentifier>' .
+			'<' . 'repositoryIdentifier>' . $this->safeXML($this->_repoID) . '<' . '/repositoryIdentifier>' .
+			'<' . 'delimiter>' . $this->safeXML($this->_delimiter) . '<' . '/delimiter>' .
+			'<' . 'sampleIdentifier>' . $this->safeXML($this->_sampleID) . '<' . '/sampleIdentifier>' .
 			'<' . '/oai-identifier><' . '/description><'. '/Identify>';
 		$ret = $this->wrapResponse($ret);
 		return $ret;
@@ -366,8 +366,8 @@ abstract class OaiPmhServerBase {
 					default:
 				}
 			}
-			$ret = '<' . 'error code="' . $this->safexml(OaiPmhErrorEnum::toString($code)) . '"';
-			$ret .= '>' . $this->safexml($desc) . '<' . '/error>';
+			$ret = '<' . 'error code="' . $this->safeXML(OaiPmhErrorEnum::toString($code)) . '"';
+			$ret .= '>' . $this->safeXML($desc) . '<' . '/error>';
 			return $this->wrapResponse($ret);
 		}
 	}
