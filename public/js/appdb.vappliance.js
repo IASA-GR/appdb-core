@@ -3531,7 +3531,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		var metadom = $(container).find('.cdinstance-metadata ');
 		var actorLink = '-';
 		if (inst.DefaultActor && inst.DefaultActor.id) {
-			actorLink = $('<a></a>').attr('href', appdb.config.endpoint.base + 'stroe/person/' + inst.DefaultActor.cname).attr('title', 'Click to view profile in a new tab');
+			actorLink = $('<a></a>').attr('href', appdb.config.endpoint.base + 'store/person/' + inst.DefaultActor.cname).attr('title', 'Click to view profile in a new tab');
 			$(actorLink).append('<img src="/people/getimage?id=' + inst.DefaultActor.id + '" style="width:24px;height:24px;padding-right: 10px;vertical-align: middle;"/>');
 			$(actorLink).append($('<span style="vertical-align: middle;font-size: 14px;"></span>').text(inst.DefaultActor.name));
 		}
