@@ -1,3 +1,95 @@
+CREATE OR REPLACE FUNCTION hasparent(mid INT, mpid INT, mtbl TEXT) 
+RETURNS BOOLEAN AS
+$$
+DECLARE cur REFCURSOR;
+DECLARE p INT;
+DECLARE ret BOOLEAN;
+BEGIN
+	ret := FALSE;
+	OPEN cur FOR EXECUTE FORMAT('SELECT DISTINCT parentid FROM %I WHERE id = $1', mtbl) USING mid;
+	FETCH NEXT FROM cur INTO p;
+	WHILE NOT p IS NULL LOOP
+		IF p = mpid THEN 
+			ret := TRUE;
+			EXIT;
+		END IF;
+		ret := ret OR hasparent(p, mpid, mtbl);
+		IF ret THEN
+			EXIT;
+		END IF;
+		FETCH NEXT FROM cur INTO p;
+	END LOOP;
+	CLOSE cur;
+	RETURN ret;
+END;
+$$
+LANGUAGE plpgsql;
+ALTER FUNCTION hasparent(int, int, text) OWNER TO appdb;
+
+DROP FUNCTION IF EXISTS oai_sw_setspecs;
+CREATE OR REPLACE FUNCTION oai_sw_setspecs() RETURNS SETOF XML AS
+$$
+SELECT XMLELEMENT(name "set", XMLELEMENT(name "setName", 'Software'), XMLELEMENT(name "setSpec", 'sw'))
+UNION ALL
+SELECT
+--	XMLAGG(
+		XMLELEMENT(
+			name "set",
+			XMLELEMENT(
+				name "setName",
+				'Software / ' || REPLACE(name, ':', ' / ')
+			), 
+			XMLELEMENT(
+				name "setSpec",
+				'sw:' || REGEXP_REPLACE(LOWER(name), '[^a-zA-Z0-9:]{1,}', '.', 'g')
+			)
+		)
+--	)
+FROM 
+	htree_text('categories','',1,':')
+WHERE (
+	NOT hasparent(id, (SELECT id FROM categories WHERE name = 'Virtual Appliances'), 'categories')
+) AND (
+	NOT hasparent(id, (SELECT id FROM categories WHERE name = 'Software Appliances'), 'categories')
+)
+$$ LANGUAGE sql STABLE;
+ALTER FUNCTION oai_sw_setspecs() OWNER TO appdb;
+
+DROP FUNCTION IF EXISTS oai_va_setspecs;
+CREATE OR REPLACE FUNCTION oai_va_setspecs() RETURNS SETOF XML AS
+$$
+SELECT XMLELEMENT(name "set", XMLELEMENT(name "setName", 'Virtual Appliances'), XMLELEMENT(name "setSpec", 'va'))
+UNION ALL
+SELECT 
+--	XMLAGG(
+		XMLELEMENT(
+			name "set",
+			XMLELEMENT(
+				name "setName",
+				'Virtual Appliances / ' || REPLACE(name, ':', ' / ')
+			), 
+			XMLELEMENT(
+				name "setSpec",
+				'va:' || REGEXP_REPLACE(LOWER(name), '[^a-zA-Z0-9:]{1,}', '.', 'g')
+			)
+		)
+--	)
+FROM 
+	htree_text('categories','',1,':')
+WHERE 
+	hasparent(id, (SELECT id FROM categories WHERE name = 'Virtual Appliances'), 'categories')
+$$ LANGUAGE sql STABLE;
+ALTER FUNCTION oai_va_setspecs() OWNER TO appdb;
+
+DROP FUNCTION oai_setspecs;
+CREATE OR REPLACE FUNCTION oai_setspecs() RETURNS SETOF XML AS
+$$
+SELECT oai_sw_setspecs()
+UNION ALL
+SELECT oai_va_setspecs()
+$$ LANGUAGE SQL STABLE;
+ALTER FUNCTION oai_setspecs() OWNER TO appdb;
+
 ALTER TABLE cache.appxmlcache ADD COLUMN tstamp TIMESTAMP NOT NULL DEFAULT NOW();
 ALTER TABLE cache.appxmlcache ADD COLUMN openairexml xml;
 ALTER TABLE cache.appxmlcache ADD COLUMN oaidcxml xml;
@@ -48,13 +140,13 @@ RETURNS xml
 AS $function$
 DECLARE x XML;
 BEGIN
-	IF EXISTS (SELECT 1 FROM cache.appxmlcache WHERE id = $1.id AND openairexml IS DISTINCT FROM NULL) THEN
-		RETURN (SELECT openairexml FROM cache.appxmlcache WHERE id = $1.id);
-	ELSE
-		x := (($1::applications).__openaire)::XML;
-		UPDATE cache.appxmlcache SET openairexml = x WHERE id = $1.id;
-		RETURN x;
-	END IF;
+        IF EXISTS (SELECT 1 FROM cache.appxmlcache WHERE id = $1.id AND openairexml IS DISTINCT FROM NULL) THEN
+                RETURN (SELECT openairexml FROM cache.appxmlcache WHERE id = $1.id);
+        ELSE
+                x := (($1::applications).__openaire)::XML;
+                UPDATE cache.appxmlcache SET openairexml = x WHERE id = $1.id;
+                RETURN x;
+        END IF;
 END;
 $function$;
 ALTER FUNCTION openaire(applications) OWNER TO appdb;
@@ -130,13 +222,13 @@ CREATE OR REPLACE FUNCTION public.oaidc(applications)
 AS $function$
 DECLARE x XML;
 BEGIN
-	IF EXISTS (SELECT 1 FROM cache.appxmlcache WHERE id = $1.id AND oaidcxml IS DISTINCT FROM NULL) THEN
-		RETURN (SELECT oaidcxml FROM cache.appxmlcache WHERE id = $1.id);
-	ELSE
-		x := (($1::applications).__oaidc)::XML;
-		UPDATE cache.appxmlcache SET oaidcxml = x WHERE id = $1.id;
-		RETURN x;
-	END IF;
+        IF EXISTS (SELECT 1 FROM cache.appxmlcache WHERE id = $1.id AND oaidcxml IS DISTINCT FROM NULL) THEN
+                RETURN (SELECT oaidcxml FROM cache.appxmlcache WHERE id = $1.id);
+        ELSE
+                x := (($1::applications).__oaidc)::XML;
+                UPDATE cache.appxmlcache SET oaidcxml = x WHERE id = $1.id;
+                RETURN x;
+        END IF;
 END;
 $function$;
 ALTER FUNCTION oaidc(applications) OWNER TO appdb;
@@ -229,7 +321,25 @@ DECLARE ret TEXT;
 DECLARE expdat TEXT;
 DECLARE nrec TEXT;
 DECLARE tokenarray TEXT[];
+DECLARE mt INT; -- parsed metatype from mtype (i.e. setSpec)
+DECLARE setspec TEXT[];
 BEGIN
+	-- parse setSpec
+	IF NOT mtype IS NULL THEN
+		setspec := STRING_TO_ARRAY(mtype, ':');
+		IF setspec[1] = 'sw' THEN 
+			mt = 0;
+		ELSIF setspec[1] = 'va' THEN
+			mt = 1;
+		ELSE 
+			mt = -1; --invalid
+		END IF;
+	ELSE
+		mt := NULL;
+	END IF;
+	RAISE NOTICE 'setspec=%', mtype;
+	RAISE NOTICE 'mt=%', mt;
+	
         -- delete expired tokens
         DELETE FROM oai_app_cursors 
         WHERE NOW() - lastusedon > INTERVAL '1 hour';
@@ -256,7 +366,7 @@ BEGIN
                                 (CASE WHEN muntil IS NULL THEN (SELECT TIMESTAMP WITH TIME ZONE 'epoch' + 999999999999 * INTERVAL '1 second') AT TIME ZONE 'UTC' ELSE muntil::TIMESTAMPTZ AT TIME ZONE 'UTC' END)::TEXT
                         , ' ', 'T') || 'Z', '\.[0-9]*Z$', 'Z')
                         || ',' || mabbrev::TEXT
-                        || ',' || COALESCE(array_to_string(mtype::TEXT[], ';'), 'NULL')
+                        || ',' || COALESCE(mtype, 'NULL')
                         || ',50,' || mformat;
                 
                 /* record app id list for resumption token idempotency */
@@ -270,11 +380,33 @@ BEGIN
                                 AND
                                 CASE WHEN muntil IS NULL THEN (SELECT TIMESTAMP WITH TIME ZONE 'epoch' + 999999999999 * INTERVAL '1 second') AT TIME ZONE 'UTC' ELSE muntil::TIMESTAMPTZ AT TIME ZONE 'UTC' END
                         ) AND (
-                                CASE WHEN mtype IS NULL THEN 
-                                        TRUE
-                                ELSE
-                                        a.metatype IN (SELECT CASE n WHEN 'sw' THEN 0 WHEN 'va' THEN 1 ELSE -1 END AS metatype FROM UNNEST(mtype::TEXT[]) AS n)
+                                CASE WHEN mt IS NULL THEN 
+					TRUE
+				ELSE
+					a.metatype = mt
                                 END
+                        ) AND (
+				CASE WHEN mtype IS NULL THEN 
+					TRUE
+				ELSE (
+					CASE WHEN EXISTS (SELECT 1 FROM (SELECT
+						hasparent(
+							ac.id, (
+								SELECT id 
+								FROM htree_text('categories','',1,':') 
+								WHERE CASE mt WHEN 0 THEN 'sw' WHEN 1 THEN 'va' ELSE '' END || ':' || REGEXP_REPLACE(LOWER(name), '[^a-zA-Z0-9:]{1,}', '.', 'g') = mtype
+							), 
+							'categories'
+						) AS hp
+					FROM appcategories ac
+					WHERE ac.appid = a.id
+					) AS hpq WHERE hpq.hp) OR EXISTS (SELECT 1 FROM appcategories WHERE appid = a.id AND categoryid = (
+						SELECT id 
+						FROM htree_text('categories','',1,':') 
+						WHERE CASE mt WHEN 0 THEN 'sw' WHEN 1 THEN 'va' ELSE '' END || ':' || REGEXP_REPLACE(LOWER(name), '[^a-zA-Z0-9:]{1,}', '.', 'g') = mtype
+					)
+					) THEN TRUE ELSE FALSE END
+				) END
                         )
                 ) THEN
                         INSERT INTO oai_app_cursors (token, appids) 
@@ -289,11 +421,33 @@ BEGIN
                                 AND
                                 CASE WHEN muntil IS NULL THEN (SELECT TIMESTAMP WITH TIME ZONE 'epoch' + 999999999999 * INTERVAL '1 second') AT TIME ZONE 'UTC' ELSE muntil::TIMESTAMPTZ AT TIME ZONE 'UTC' END
                         ) AND (
-                                CASE WHEN mtype IS NULL THEN 
-                                        TRUE
-                                ELSE
-                                        a.metatype IN (SELECT CASE n WHEN 'sw' THEN 0 WHEN 'va' THEN 1 ELSE -1 END AS metatype FROM UNNEST(mtype::TEXT[]) AS n)
+                                CASE WHEN mt IS NULL THEN 
+					TRUE
+				ELSE
+					a.metatype = mt
                                 END
+                        ) AND (
+				CASE WHEN mtype IS NULL THEN 
+					TRUE
+				ELSE (
+					CASE WHEN EXISTS (SELECT 1 FROM (SELECT
+						hasparent(
+							ac.id, (
+								SELECT id 
+								FROM htree_text('categories','',1,':') 
+								WHERE CASE mt WHEN 0 THEN 'sw' WHEN 1 THEN 'va' ELSE '' END || ':' || REGEXP_REPLACE(LOWER(name), '[^a-zA-Z0-9:]{1,}', '.', 'g') = mtype
+							), 
+							'categories'
+						) AS hp
+					FROM appcategories ac
+					WHERE ac.appid = a.id
+					) AS hpq WHERE hpq.hp) OR EXISTS (SELECT 1 FROM appcategories WHERE appid = a.id AND categoryid = (
+						SELECT id 
+						FROM htree_text('categories','',1,':') 
+						WHERE CASE mt WHEN 0 THEN 'sw' WHEN 1 THEN 'va' ELSE '' END || ':' || REGEXP_REPLACE(LOWER(name), '[^a-zA-Z0-9:]{1,}', '.', 'g') = mtype
+					)
+					) THEN TRUE ELSE FALSE END
+				) END
                         ) /*AND NOT a.pidhandle IS NULL -- FIXME: enable this once HANDLE PIDs are available*/
                         ;
                 ELSE
@@ -386,7 +540,7 @@ BEGIN
                 NEW.openairexml := (SELECT applications.__openaire FROM applications WHERE id = NEW.id);
                 -- RAISE NOTICE '%', NEW.openairexml;
         END IF;
-	IF (TG_OP = 'INSERT' AND NEW.oaidcxml IS NULL) OR (TG_OP = 'UPDATE' AND NEW.xml::TEXT IS DISTINCT FROM OLD.xml::TEXT AND NOT (NEW.oaidcxml::TEXT IS DISTINCT FROM OLD.oaidcxml::TEXT)) THEN
+        IF (TG_OP = 'INSERT' AND NEW.oaidcxml IS NULL) OR (TG_OP = 'UPDATE' AND NEW.xml::TEXT IS DISTINCT FROM OLD.xml::TEXT AND NOT (NEW.oaidcxml::TEXT IS DISTINCT FROM OLD.oaidcxml::TEXT)) THEN
                 -- RAISE NOTICE 'Updating OAI-DC XML cache for %', NEW.id;
                 NEW.oaidcxml := (SELECT applications.__oaidc FROM applications WHERE id = NEW.id);
                 -- RAISE NOTICE '%', NEW.oaidcxml;
