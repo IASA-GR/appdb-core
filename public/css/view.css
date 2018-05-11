@@ -25156,6 +25156,7 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
 
 .action.cd_select > .cd_option > .popup > .footer {
         text-align: center;
+        padding-bottom: 10px;
 }
 .action.cd_select > .cd_option > .popup > .footer .wikilink {
     display: inline-block;
@@ -25702,3 +25703,19 @@ table.cdtaskinstance-list tr > .img > img {
     font-weight: bold;
     vertical-align: middle;
 }
+
+.cdversion .paused-url {
+    padding: 10px;
+    padding-left: 20px;
+}
+.cdversion .paused-url  > .field {
+    width: auto;
+    min-width: 50px;
+    font-weight: bold;
+    color: #666;
+}
+.cdversion .paused-url  > .value {
+    color: #333;
+    padding-left: 10px;
+}
+

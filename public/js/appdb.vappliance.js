@@ -1539,7 +1539,6 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 	this.load = function(d,vid){
 		vid = $.trim(vid);
 		appdb.vappliance.ui.CurrentVAVersionSelectionRegister.clear();
-		console.log(d);
 		if( typeof d === "undefined" ){
 			d = {id: this.getSWId() };
 		}
@@ -3086,7 +3085,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		}
 
 		if (d.DefaultActor && d.DefaultActor.id && $.trim(d.DefaultActor.id) !== $.trim(userID)) {
-			warning.push('Currently the default publisher is user <a href="'+appdb.config.endpoint.base + 'store/person/' + d.DefaultActor.cname + '" target="_blank" title="Click to view user profile">'+d.DefaultActor.firstname + ' ' + d.DefaultActor.lastname +'</a>. If you update the settings you will become the default publisher.<a class="wiki-link" href="'+ appdb.config.endpoint.wiki + 'main:faq:cd_how_to_replace_default_publisher" target="_blank">learn more</a>');
+			warning.push('Currently the default publisher is user <a href="'+appdb.config.endpoint.base + 'store/person/' + d.DefaultActor.cname + '" target="_blank" title="Click to view user profile">'+d.DefaultActor.firstname + ' ' + d.DefaultActor.lastname +'</a>. If you update the settings you will become the default publisher. <a class="wiki-link" href="'+ appdb.config.endpoint.wiki + 'main:faq:cd_how_to_replace_default_publisher" target="_blank">Learn more.</a>');
 		}
 
 		invalid = invalid || (error.length > 0);
@@ -3406,6 +3405,12 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 
 	    this.renderRunningInstance();
 	    this.renderLastInstance();
+
+	    var url = $.trim(d.url) || '';
+	    var pausedUrl = $(this.dom).find('.paused-url .value a');
+	    if (url !== $(pausedUrl).attr('href')) {
+		$(this.dom).find('.paused-url .value a').attr('href', url).text(url || '<none>');
+	    }
 	};
 	this.getUserLink = function(user) {
 	    user = user || {};
@@ -3437,7 +3442,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 					$('<li></li>').append('Current default publisher ' )
 						.append(actorHtml)
 						.append(' does not exist.')
-						.append($('<a class="wiki-link" target="_blank">learn more</a>').attr('href', appdb.config.endpoint.wiki + 'main:faq:cd_default_publisher_does_not_exist_anymore'))
+						.append($('<a class="wiki-link" target="_blank">Learn more.</a>').attr('href', appdb.config.endpoint.wiki + 'main:faq:cd_default_publisher_does_not_exist_anymore'))
 				);
 			}else {
 				if (defaultActorStatus.hasAccessToken === false) {
@@ -3445,7 +3450,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 						$('<li></li>').append('Current default publisher ' )
 							.append(this.getUserLink(d.DefaultActor))
 							.append(' does not own a personal access token anymore.')
-							.append($('<a class="wiki-link" target="_blank">learn more</a>').attr('href', appdb.config.endpoint.wiki + 'main:faq:cd_default_publisher_revoked_access_token'))
+							.append($('<a class="wiki-link" target="_blank">Learn more.</a>').attr('href', appdb.config.endpoint.wiki + 'main:faq:cd_default_publisher_revoked_access_token'))
 					);
 				}
 
@@ -3454,7 +3459,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 						$('<li></li>').append('Current default publisher ' )
 							.append(this.getUserLink(d.DefaultActor))
 							.append(' does not have permissions to publish new virtual appliance versions.')
-							.append($('<a class="wiki-link" target="_blank">learn more</a>').attr('href', appdb.config.endpoint.wiki + 'main:faq:cd_default_publisher_revoked_permissions'))
+							.append($('<a class="wiki-link" target="_blank">Learn more.</a>').attr('href', appdb.config.endpoint.wiki + 'main:faq:cd_default_publisher_revoked_permissions'))
 					);
 				}
 			}
@@ -3811,6 +3816,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		var d = this.options.cddata || {};
 		var publisher = this.getDefaultPublisher();
 		var publisherStatus = (publisher || {}).status || {};
+		var currentPublisherStatus = (d.DefaultActorStatus || {});
 		var btnPause = $(this.dom).find('button.cd-action-pause');
 		var btnResume = $(this.dom).find('button.cd-action-resume');
 		var btnForceCheck = $(this.dom).find('.cdversion-force-check');
@@ -3837,13 +3843,18 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			$(pausedPanelError).removeClass('hidden').find('.message').empty().append(pausedError);
 			return;
 		} else {
-			$(btnPause).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
-			$(btnCancel).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
+			if (currentPublisherStatus.hasAccessToken !== true || currentPublisherStatus.canManageVA !== true) {
+			    //$(btnPause).unbind('click').addClass('disabled').attr('disabled', 'disabled');
+			    $(btnCancel).unbind('click').addClass('disabled').attr('disabled', 'disabled');
+			} else {
+			    //$(btnPause).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
+			    $(btnCancel).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
+			}
 			$(resumedPanelError).addClass('hidden').find('.message').empty();
 			$(pausedPanelError).addClass('hidden').find('.message').empty();
 		}
 
-		if (publisherStatus.hasAccessToken !== true || $.trim(d.url) === '' || parseInt(d.defaultActorId) <= 0) {
+		if (publisherStatus.hasAccessToken !== true || $.trim(d.url) === '' || parseInt(d.defaultActorId) <= 0 || currentPublisherStatus.hasAccessToken !== true || currentPublisherStatus.canManageVA !== true) {
 		    $(btnResume).unbind('click').addClass('disabled').attr('disabled', 'disabled');
 		    $(btnForceCheck).unbind('click').addClass('disabled').attr('disabled', 'disabled');
 		} else {

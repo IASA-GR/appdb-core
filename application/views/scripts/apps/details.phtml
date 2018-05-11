@@ -1189,7 +1189,7 @@
                                                 <img src='/images/vappliance/redwarning.png'/><div style="display: inline-block;color: black;"><span class="message"></span></div>
                                             </div>
                                             <div class="footer">
-                                                <button class="btn btn-primary cdversion-action cdversion-save-setup" title="Updates will apply on next continuous delivery iteration.">Update</button>
+                                                <button class="btn btn-primary cdversion-action cdversion-save-setup" title="Updates will apply on the next continuous delivery iteration.">Update</button>
                                             </div>
                                         </div>
                                     </div>
@@ -1202,8 +1202,9 @@
                                                     <div class="header"><img src='/images/vappliance/warning.png' />Continuous delivery check is <b>paused</b></div>
                                                     <div class="content">
                                                         Continuous delivery process runs on an interval and checks for changes in the configured remote file.
-                                                        It then checks for changes that can trigger a new virtual appliance version publish and acts accordingly.
-                                                        Currently, this functionality is paused and won't perform any <b>new</b> checks. <p>To resume its functionality click the 'RESUME' button.</p>
+                                                        <div class="paused-url"><span class="field url">remote file</span>:<span class="value"><a title="Click to view remote file contents in a new tab" target="_blank"></a></span></div>
+                                                        If there is a change, a new virtual appliance version publishing is triggered.
+                                                        <p>Currently, this functionality is paused and won't perform any <b>new</b> checks. To resume its functionality click the 'RESUME' button.</p>
                                                     </div>
                                                     <div class="exterror hidden">
                                                         <img src='/images/vappliance/redwarning.png'/><div style="display: inline-block;color: black;"><span class="message"></span></div>
@@ -1219,8 +1220,8 @@
                                                     <div class="header">No continuous delivery process is running right now</div>
                                                     <div class="content">
                                                         Continuous delivery process runs on an interval and checks for changes in the configured remote file.
-                                                        It then checks for changes that can trigger a new virtual appliance version publish and acts accordingly.
-                                                        However, you can always force it to check by click the button bellow.
+                                                        <div class="paused-url"><span class="field url">remote file</span>:<span class="value"><a title="Click to view remote file contents in a new tab" target="_blank"></a></span></div>
+                                                        If there is a change, a new virtual appliance version publishing is triggered. However, you can always force it to check by clickinkg the "force check" button bellow.
                                                     </div>
                                                     <div class="exterror hidden">
                                                         <img src='/images/vappliance/redwarning.png'/><div style="display: inline-block;color: black;"><span class="message"></span></div>
@@ -1231,7 +1232,7 @@
                                                     <div class="footer">
                                                         <div class="scheduled-check hidden">Next check will occur on <span class="scheduled-check-on"></span></div>
                                                         <button class="btn btn-warning cdversion-action cd-action-pause" title="Click here if you want to pause monitoring for remote file changes. You can later resume if you want.">&#10074;&#10074; PAUSE</button>
-                                                        <button class="btn btn-danger cdversion-action cdversion-force-check">FORCE CHECK</button>
+                                                        <button class="btn btn-danger cdversion-action cdversion-force-check" title="Click here if you want to explicitly trigger a new check without having to wait the monitoring service.">FORCE CHECK</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1278,7 +1279,7 @@
                                             </div>
                                             <div class="cdversion-running-instance">
                                                 <div class="panel wide">
-                                                    <div class="header"><img src='/images/ajax-loader-trans-orange.gif' alt=''/> Continuous delivery running process<button class="btn btn-danger btn-small cdversion-action cdversion-cancel-running">CANCEL</button></div>
+                                                    <div class="header"><img src='/images/ajax-loader-trans-orange.gif' alt=''/> Continuous delivery running process<button class="btn btn-danger btn-small cdversion-action cdversion-cancel-running" title="Click here to cancel the current running check">CANCEL</button></div>
                                                     <div class="content">
                                                         <div class="cdinstance">
                                                             <div class="cdinstance-metadata">
