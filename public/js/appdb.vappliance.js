@@ -3409,7 +3409,14 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 	    var url = $.trim(d.url) || '';
 	    var pausedUrl = $(this.dom).find('.paused-url .value a');
 	    if (url !== $(pausedUrl).attr('href')) {
-		$(this.dom).find('.paused-url .value a').attr('href', url).text(url || '<none>');
+		$(this.dom).find('.paused-url .value a').unbind('click').attr('href', url).text(url || '<none>');
+		if (!url) {
+		    $(this.dom).find('.paused-url .value a').bind('click', function(ev) {
+			ev.preventDefault();
+			ev.stopPropagation();
+			return false;
+		    });
+		}
 	    }
 	};
 	this.getUserLink = function(user) {
@@ -3531,7 +3538,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		var metadom = $(container).find('.cdinstance-metadata ');
 		var actorLink = '-';
 		if (inst.DefaultActor && inst.DefaultActor.id) {
-			actorLink = $('<a></a>').attr('href', appdb.config.endpoint.base + 'store/person/' + inst.DefaultActor.cname).attr('title', 'Click to view profile in a new tab');
+			actorLink = $('<a target="_blank"></a>').attr('href', appdb.config.endpoint.base + 'store/person/' + inst.DefaultActor.cname).attr('title', 'Click to view profile in a new tab');
 			$(actorLink).append('<img src="/people/getimage?id=' + inst.DefaultActor.id + '" style="width:24px;height:24px;padding-right: 10px;vertical-align: middle;"/>');
 			$(actorLink).append($('<span style="vertical-align: middle;font-size: 14px;"></span>').text(inst.DefaultActor.name));
 		}

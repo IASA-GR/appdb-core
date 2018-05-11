@@ -25409,6 +25409,9 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
     width: 100%;
     height: 20px;
 }
+.cdversion .cdversion-setup .fieldvalue {
+    margin: 10px 0;
+}
 .cdversion .panel > .error,
 .cdversion .panel > .exterror,
 .cdversion .panel > .updateerror,
@@ -25706,7 +25709,7 @@ table.cdtaskinstance-list tr > .img > img {
 
 .cdversion .paused-url {
     padding: 10px;
-    padding-left: 20px;
+    padding-left: 0;
 }
 .cdversion .paused-url  > .field {
     width: auto;
