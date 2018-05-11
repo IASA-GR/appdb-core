@@ -9704,6 +9704,45 @@ class AccessGroups{
 	}
 }
 
+
+class Netfilter {
+	private $_netfilter = null;
+
+	public function __construct($netfilter) {
+		$this->_netfilter = $netfilter;
+	}
+
+	public function matches($s) {
+		if ( $this->_netfilter == '' ) {
+			// NULL this->_netfilter
+			return true;
+		} elseif ( isCIDR($this->_netfilter) ) {
+			if ( ipCIDRCheck($ip, $this->_netfilter) ) {
+				return true;
+			}
+		} elseif ( isCIDR6($this->_netfilter) ) {
+			if ( ipCIDRCheck6($ip, $this->_netfilter) ) {
+				return true;
+			}
+		} elseif ( isIPv4($this->_netfilter) || isIPv6($this->_netfilter) ) {
+			if ( $ip == $this->_netfilter ) {
+				return true;
+			}
+		} else {
+			// domain name based this->_netfilter
+			$hostname = gethostbyaddr($ip);
+			$this->_netfilter = str_replace('\\', '', $this->_netfilter);     // do not permit escaping
+			if ( 
+				preg_match('/\.'.str_replace('.','\.',$this->_netfilter).'$/', $hostname) ||   // domain name match
+				preg_match('/^'.str_replace('.','\.',$this->_netfilter).'$/', $hostname)       // host name match
+			) {
+				return true;
+			}
+		}
+		return false;
+	}
+}
+
 class AccessTokens{
 	/**
 	 * Helper function to retrieve a user's profile.
@@ -10135,53 +10174,42 @@ class AccessTokens{
 				return false;
 			}
 			$token = $tokens->items[0];
-		}else if($token instanceof Default_Model_AccessToken) {
+		} elseif ($token instanceof Default_Model_AccessToken) {
 			//nothing to do
-		}else{
+		} else {
 			return false;
 		}
-        $valid = false;
-        $ip = $_SERVER['REMOTE_ADDR'];
+
+		$ip = $_SERVER['REMOTE_ADDR'];
+
 		$netfilters = $token->getNetfilters();
         if ( count($netfilters) === 0 ) {
 			return true;
 		}
-        foreach($netfilters as $netfilter) {
-            if ( $netfilter == '' ) {
-                // NULL netfilter
-                $valid = true;
-                break;
-            } elseif ( isCIDR($netfilter) ) {
-                if ( ipCIDRCheck($ip, $netfilter) ) {
-                    $valid = true;
-                    break;
-                }
-            } elseif ( isCIDR6($netfilter) ) {
-                if ( ipCIDRCheck6($ip, $netfilter) ) {
-                    $valid = true;
-                    break;
-                }
-            } elseif ( isIPv4($netfilter) || isIPv6($netfilter) ) {
-                if ( $ip == $netfilter ) {
-                    $valid = true;
-                    break;
-                }
-            } else {
-                // domain name based netfilter
-                $hostname = gethostbyaddr($ip);
-                $netfilter = str_replace('\\', '', $netfilter);     // do not permit escaping
-                if ( 
-                    preg_match('/\.'.str_replace('.','\.',$netfilter).'$/', $hostname) ||   // domain name match
-                    preg_match('/^'.str_replace('.','\.',$netfilter).'$/', $hostname)       // host name match
-                ) {
-                    $valid = true;
-                    break;
-                }
-            }
-        }
-        if ( ! $valid ) debug_log('[AccessTokens::validateToken]: Invalid API key ' . $token->getToken());
-        return $valid;
-    
+
+		// check for application-specific whitelists (override user-specific netfilters)
+		$wips = trim(ApplicationConfiguration::api('netfilters.whitelist', ''));
+		if ($wips != '') {
+			$wips = explode(";", $wips);
+			foreach ($wips as $wip) {
+				$nf = new Netfilter($wip);
+				if ($nf->matches($wip)) {
+					debug_log("[AccessTokens::validateToken]: server IP whitelisted, ignoring user-specified netfilters");
+					return true;
+				}
+			}
+		}
+
+		// check user-specific netfilters
+		foreach($netfilters as $netfilter) {
+			$nf = new Netfilter($netfilter);
+			if ($nf->matches($ip)) {
+				return true;
+			}
+		}
+
+        debug_log('[AccessTokens::validateToken]: Invalid API key ' . $token->getToken());
+        return false;
 	}
 }
 
