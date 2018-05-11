@@ -9,9 +9,15 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 	private $_dbport;
 
 	public function __construct($dbname, $dbhost, $dbuser, $dbpass, $dbport = "5432") {
+		$this->_dbname = $dbname;
+		$this->_dbhost = $dbhost;
+		$this->_dbuser = $dbuser;
+		$this->_dbpass = $dbpass;
+		$this->_dbport = $dbport;
 		$sets = array();
-		$sets[] = array("sw", "Software");
-		$sets[] = array("va", "Virtual Appliances");
+// Sets are populated by the DB. Add additional sets here		
+//		$sets[] = array("sw", "Software");
+//		$sets[] = array("va", "Virtual Appliances");
 //		$sets[] = array("sa", "Software Appliances");
 		parent::__construct(
 			'https://appdb.egi.eu',
@@ -28,11 +34,6 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 			null,
 			$sets
 		);
-		$this->_dbname = $dbname;
-		$this->_dbhost = $dbhost;
-		$this->_dbuser = $dbuser;
-		$this->_dbpass = $dbpass;
-		$this->_dbport = $dbport;
 	}
 
 	private function dbQuery($sql) {
@@ -67,7 +68,8 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 	private function listOrResume($action) {
 		//error_log("act=" . var_export($action, true) . " tok=" . var_export($this->_token, true) . ' from=' . var_export($this->_from, true) . ' until=' . var_export($this->_until, true));
 		if (! is_null($this->_set)) {
-			$set = '\'{' . pg_escape_string($this->_set) . '}\'';
+			//$set = '\'{' . pg_escape_string($this->_set) . '}\'';
+			$set = "'" . pg_escape_string($this->_set) . "'";
 		} else {
 			$set = 'NULL';
 		}
@@ -90,6 +92,7 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 		} elseif ($action == "resume") {
 			$res = $this->dbQuery("SELECT oai_app_cursor(NULL, NULL, $this->_token)");
 		} elseif ($action == "listids") {
+			error_log("SELECT oai_app_cursor($this->_from, $this->_until, NULL, TRUE, $set, $mdPrefix)");
 			$res = $this->dbQuery("SELECT oai_app_cursor($this->_from, $this->_until, NULL, TRUE, $set, $mdPrefix)");
 		} else {
 			return $this->requestError(OaiPmhErrorEnum::OAIPMHERR_INTERNAL);
@@ -167,6 +170,13 @@ class OaiPmhServerAppDB extends OaiPmhServerBase {
 		$ret = '<' . 'ListSets>';
 		foreach ($this->_sets as $set) {
 			$ret .= '<' . 'set><' . 'setSpec>' . $set[0] . '<' . '/setSpec><' . 'setName>' . $set[1] . '<' . '/setName><' . '/set>';
+		}
+		$res = $this->dbQuery("SELECT oai_setspecs()");
+		if (is_array($res)) {
+			foreach ($res as $r) {
+				$r = $r[0];
+				$ret .= $r;
+			}
 		}
 		$ret .= '<' . '/ListSets>';
 		return $this->wrapResponse($ret);
