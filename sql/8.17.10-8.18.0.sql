@@ -430,7 +430,7 @@ BEGIN
 						FROM htree_text('categories','',1,':') 
 						WHERE CASE mt WHEN 0 THEN 'sw' WHEN 1 THEN 'va' ELSE '' END || ':' || REGEXP_REPLACE(LOWER(name), '[^a-zA-Z0-9:]{1,}', '.', 'g') = mtype
 					)
-					) THEN TRUE ELSE FALSE END
+					) OR (mtype = 'sw') OR (mtype = 'va') THEN TRUE ELSE FALSE END					
 				) END
                         )
                 ) THEN
@@ -471,7 +471,7 @@ BEGIN
 						FROM htree_text('categories','',1,':') 
 						WHERE CASE mt WHEN 0 THEN 'sw' WHEN 1 THEN 'va' ELSE '' END || ':' || REGEXP_REPLACE(LOWER(name), '[^a-zA-Z0-9:]{1,}', '.', 'g') = mtype
 					)
-					) THEN TRUE ELSE FALSE END
+					) OR (mtype = 'sw') OR (mtype = 'va') THEN TRUE ELSE FALSE END					
 				) END
                         ) /*AND NOT a.pidhandle IS NULL -- FIXME: enable this once HANDLE PIDs are available*/
                         ;
