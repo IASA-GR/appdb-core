@@ -3867,6 +3867,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		} else {
 		    $(btnResume).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
 		    $(btnForceCheck).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
+		    $(btnPause).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
 		}
 
 		if (!$(btnPause).hasClass('loading')) {
