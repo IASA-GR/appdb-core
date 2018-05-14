@@ -156,7 +156,6 @@
 						<xsl:attribute name="cname"><xsl:value-of select="./addedby/cname" /></xsl:attribute>
 						<xsl:element name="person:firstname"><xsl:value-of select="./addedby/firstname" /></xsl:element>
 						<xsl:element name="person:lastname"><xsl:value-of select="./addedby/lastname" /></xsl:element>
-						<xsl:element name="person:gender"><xsl:value-of select="./addedby/gender" /></xsl:element>
 						<xsl:element name="person:permalink"><xsl:value-of select="./addedby/permalink" /></xsl:element>
 					</xsl:element>
 				</xsl:when>
@@ -169,7 +168,6 @@
 						<xsl:attribute name="cname"><xsl:value-of select="./lastupdatedby/cname" /></xsl:attribute>
 						<xsl:element name="person:firstname"><xsl:value-of select="./lastupdatedby/firstname" /></xsl:element>
 						<xsl:element name="person:lastname"><xsl:value-of select="./lastupdatedby/lastname" /></xsl:element>
-						<xsl:element name="person:gender"><xsl:value-of select="./lastupdatedby/gender" /></xsl:element>
 						<xsl:element name="person:permalink"><xsl:value-of select="./lastupdatedby/permalink" /></xsl:element>
 					</xsl:element>
 				</xsl:when>

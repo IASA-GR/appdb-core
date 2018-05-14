@@ -72,14 +72,6 @@
         <xs:attribute name="validated" type="xs:boolean" use="optional" default="true"/>
     </xs:complexType>
 
-    <xs:simpleType name="genderType" >
-        <xs:restriction base="xs:token">
-            <xs:enumeration value="male" />
-            <xs:enumeration value="female" />
-            <xs:enumeration value="robot" />
-        </xs:restriction>
-    </xs:simpleType>
-
     <xs:simpleType name="contactTypeType">
         <xs:restriction base="xs:token">
             <xs:enumeration value="Phone" />
@@ -115,7 +107,6 @@
         <xs:sequence>
             <xs:element name="firstname" type="xs:string" />
             <xs:element name="lastname" type="xs:string" />
-            <xs:element name="gender" type="person:genderType" nillable="true" minOccurs="0" maxOccurs="1" />
             <xs:element name="registeredOn" type="xs:date" nillable="true" minOccurs="0" maxOccurs="1"  />
             <xs:element name="lastUpdated" type="xs:dateTime" nillable="true" minOccurs="0" maxOccurs="1"  />
             <xs:element name="institute" type="xs:string"  minOccurs="0" maxOccurs="1" />
@@ -139,6 +130,7 @@
         <xs:attribute name="nodissemination" type="xs:boolean" use="optional" />
         <xs:attribute name="deleted" type="xs:boolean" use="optional" />
         <xs:attribute name="cname" type="xs:string" use="required" />
+        <xs:attribute name="accounttype" type="xs:integer" use="optional" />
     </xs:complexType>
 
     <xs:element name="person" type="person:personType" />

@@ -3297,7 +3297,7 @@ appdb.components.Person = appdb.ExtendClass(appdb.Component,"appdb.components.Pe
 		});
         appdb.views.Main.setNavigationTitle(d.firstname+' '+d.lastname);
 		$("#ppl_details #personTabContainer ul li").each(function(i,el){
-			if(i===1 && d.gender && $.trim(d.gender) === 'robot'){
+			if(i === 1 && d.accounttype && $.trim(d.accounttype ) == '1') {
 				$(el).addClass("hiddentab");
 			}else{
 				$(el).removeClass("hiddentab");

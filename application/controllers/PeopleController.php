@@ -194,32 +194,20 @@ class PeopleController extends Zend_Controller_Action
     {
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
-		$gender = '';
 		if ( ($this->_getParam("id") == "0") || ($this->_getParam("id") == '')) {
 			$image = 'NULL';
 		} else {
 			if ( file_exists(APPLICATION_PATH . "/../cache/ppl-image-".$this->_getParam("id").".png") ) {
                 $image = file_get_contents(APPLICATION_PATH . "/../cache/ppl-image-".$this->_getParam("id").".png");
-                $gender = '';
 			} else {
 				$ppl = new Default_Model_Researchers();
 				$ppl->filter->id->equals($this->_getParam("id"));
                 $image = base64_decode($ppl->items[0]->image);
-                $gender = strtolower($ppl->items[0]->gender);
 				$this->cacheimages($ppl->items);
 			}
 		}
         if (empty($image) || ($image == 'NULL') ) {
-			switch ($gender) {
-            case "female":
-			    $image = file_get_contents(APPLICATION_PATH . "/../public/images/" . "person.png");
-                break;
-            case "robot":
-			    $image = file_get_contents(APPLICATION_PATH . "/../public/images/" . "robot.gif");
-                break;
-            default:
-			    $image = file_get_contents(APPLICATION_PATH . "/../public/images/" . "person.png");
-            }
+			$image = file_get_contents(APPLICATION_PATH . "/../public/images/" . "person.png");
 		}
 		header('Content-type: image/png');
 		echo $image;
@@ -339,18 +327,8 @@ class PeopleController extends Zend_Controller_Action
 		$ppl->filter->id->equals($this->_getParam("id"));
 		if ( count($ppl->items) > 0 ) {
 			$person = $ppl->items[0];
-            $gender = strtolower($ppl->items[0]->gender);
 			if ( isnull($person->image) ) {
-                switch ($gender) {
-                case "female":
-                    $this->view->image = "/images/" . "person.png";
-                    break;
-                case "robot":
-                    $this->view->image = "/images/" . "robot.gif";
-                    break;
-                default:
-                    $this->view->image = "/images/" . "person.png";
-                }
+				$this->view->image = "/images/" . "person.png";
 			} else {
 				$this->view->image = "/people/getimage?id=".$person->id."&req=".urlencode($person->lastUpdated);
 			}
@@ -384,7 +362,7 @@ class PeopleController extends Zend_Controller_Action
 			echo '</researchers>';
 
 		} else {
-			echo '"Firstname","Lastname","Gender","Registered","Institution","Country","Role","Permalink","Software","Contacts"' . "\n";
+			echo '"Firstname","Lastname","Registered","Institution","Country","Role","Permalink","Software","Contacts"' . "\n";
 			echo $s;
 		}
     }
@@ -494,7 +472,6 @@ class PeopleController extends Zend_Controller_Action
 
 			$entry->lastName = $_POST['lastName'];
 			$entry->firstName = $_POST['firstName'];
-			$entry->gender = $_POST['gender'];
 			$entry->institution = $_POST['institution'];
 			$oldCountryID = $entry->countryID;
 			$entry->countryID = $_POST['countryID'];		
@@ -529,11 +506,7 @@ class PeopleController extends Zend_Controller_Action
 				return;
 			}
 			$entry = $entries->items[0];
-			$ant = 'his/her';
-			if ( ! isnull($entry->gender) ) {
-				if ($entry->gender == 'male') $ant = 'his';
-				if ($entry->gender == 'female') $ant = 'her';
-			}
+			$ant = 'their';
 
 			$conts = new Default_Model_Contacts();
 			$conts->refresh();

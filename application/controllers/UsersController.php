@@ -117,9 +117,6 @@ class UsersController extends Zend_Controller_Action
 								}
 							}
 						}
-						if ( array_key_exists('destinationindicator', $info[0]) ) {
-							echo "gender: ".$info[0]['destinationindicator'][0]."\n";
-						}
 						if ( array_key_exists('sn',$info[0]) ) {
 							echo "lastname: ".$info[0]['sn'][0]."\n";
 							echo "firstname: ".str_replace($info[0]['sn'][0],"",$info[0]['cn'][0])."\n";
@@ -348,9 +345,6 @@ class UsersController extends Zend_Controller_Action
 									$this->view->lastname = $info[0]['sn'][0];
 									$this->view->firstname = str_replace($info[0]['sn'][0],"",$info[0]['cn'][0]);
 								}
-								if ( array_key_exists('destinationindicator', $info[0]) ) {
-									$this->view->gender = $info[0]['destinationindicator'][0];
-								}
 								if ( array_key_exists('ou',$info[0]) ) $this->view->institute = $info[0]['ou']['0'];
                                 if ( array_key_exists('employeetype',$info[0]) ) {                                                                    
                                     if ( ( $info[0]['employeetype'][0] == "Experienced researcher") || ( $info[0]['employeetype'][0] == "Management" ) ) {
@@ -465,7 +459,7 @@ class UsersController extends Zend_Controller_Action
 		
 		return;
 
-		$ldap=  ApplicationConfiguration::service('egi.ldap.host');
+		$ldap = ApplicationConfiguration::service('egi.ldap.host');
 		$ldapbind=false;
 		$ds=ldap_connect($ldap); 
 		if(ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3))
@@ -481,8 +475,6 @@ class UsersController extends Zend_Controller_Action
 					$info = ldap_get_entries($ds, $sr);
 					if ($info["count"] > 0) {
 						if ( array_key_exists('destinationindicator', $info[0]) ) {
-							$gender = $info[0]['destinationindicator'][0];
-							$u->gender = $gender;
 							$u->save();
 						}
 					}

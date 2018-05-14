@@ -384,18 +384,8 @@ class Api02actionController extends Zend_Controller_Action
 		$ppl->filter->id->equals($this->_getParam("id"));
 		if ( count($ppl->items) > 0 ) {
 			$person = $ppl->items[0];
-            $gender = strtolower($ppl->items[0]->gender);
 			if ( isnull($person->image) ) {
-                switch ($gender) {
-                case "female":
-                    $this->view->image = "/images/" . "person.png";
-                    break;
-                case "robot":
-                    $this->view->image = "/images/" . "robot.gif";
-                    break;
-                default:
-                    $this->view->image = "/images/" . "person.png";
-                }
+				$this->view->image = "/images/" . "person.png";
 			} else {
 				$this->view->image = "/people/getimage?id=".$person->id."&req=".urlencode($person->lastUpdated);
 			}

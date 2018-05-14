@@ -341,7 +341,6 @@
 											<xsl:attribute name="cname"><xsl:value-of select="person:person/@cname" /></xsl:attribute>
 											<xsl:element name="person:firstname"><xsl:value-of select="person:person/person:firstname" /></xsl:element>
 											<xsl:element name="person:lastname"><xsl:value-of select="person:person/person:lastname" /></xsl:element>
-											<xsl:element name="person:gender"><xsl:value-of select="person:person/person:gender" /></xsl:element>
 											<xsl:element name="person:institute"><xsl:value-of select="person:person/person:institute" /></xsl:element>
 											<xsl:element name="person:role">
 												<xsl:attribute name="id"><xsl:value-of select="person:person/person:role/@id" /></xsl:attribute>

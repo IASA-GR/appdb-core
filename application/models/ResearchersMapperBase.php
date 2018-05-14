@@ -57,7 +57,6 @@ class Default_Model_ResearchersMapperBase
 		if ( ! isnull($value->getCountryID()) ) $data['countryid'] = $value->getCountryID();
 		if ( ! isnull($value->getPositionTypeID()) ) $data['positiontypeid'] = $value->getPositionTypeID();
 		if ( ! isnull($value->getGuid()) ) $data['guid'] = $value->getGuid();
-		if ( ! isnull($value->getGender()) ) $data['gender'] = $value->getGender();
 		if ( ! isnull($value->getLastUpdated()) ) $data['lastupdated'] = $value->getLastUpdated();
 		if ( ! isnull($value->getName()) ) $data['name'] = $value->getName();
 		if ( ! isnull($value->getMailUnsubscribePwd()) ) $data['mail_unsubscribe_pwd'] = $value->getMailUnsubscribePwd();
@@ -99,7 +98,6 @@ class Default_Model_ResearchersMapperBase
 		$entry->setCountryID($row->countryid);
 		$entry->setPositionTypeID($row->positiontypeid);
 		$entry->setGuid($row->guid);
-		$entry->setGender($row->gender);
 		$entry->setLastUpdated($row->lastupdated);
 		$entry->setName($row->name);
 		$entry->setMailUnsubscribePwd($row->mail_unsubscribe_pwd);

@@ -873,7 +873,7 @@ class VMCaster{
 			"cores" => array( "minimum" => $img->coreMinimum, "recommended" => $img->coreRecommend ),
 			"ram" => array( "minimum" => $img->RAMminimum, "recommended" => $img->RAMrecommend ),
 			"addedon" => str_replace("+00:00","Z",gmdate("c", strtotime($img->addedon))),
-			"addedby" => array( "id" => $addedby->id, "cname" => $addedby->cname, "firstname" => $addedby->firstname, "lastname" => $addedby->lastname, "gender" => $addedby->gender, "permalink" =>  'https://'.$_SERVER['HTTP_HOST'].'/store/person/'.$addedby->cname),
+			"addedby" => array( "id" => $addedby->id, "cname" => $addedby->cname, "firstname" => $addedby->firstname, "lastname" => $addedby->lastname, "permalink" =>  'https://'.$_SERVER['HTTP_HOST'].'/store/person/'.$addedby->cname),
 			"published" => $ver->published,
 			"archived" => $ver->archived,
 			"vappliance" => array( "version" => $ver->version,),
@@ -924,7 +924,7 @@ class VMCaster{
 		}
 		if( trim($img->lastUpdatedOn)!== "" ){
 			$d["lastupdatedon"] =  str_replace("+00:00","Z",gmdate("c", strtotime($img->lastUpdatedOn)));
-			$d["lastupdatedby"] = array( "id" => $updatedby->id, "cname" => $updatedby->cname, "firstname" => $updatedby->firstname, "lastname" => $updatedby->lastname, "gender" => $updatedby->gender,"permalink" =>  'http://'.$_SERVER['HTTP_HOST'].'/store/person/'.$updatedby->cname );
+			$d["lastupdatedby"] = array( "id" => $updatedby->id, "cname" => $updatedby->cname, "firstname" => $updatedby->firstname, "lastname" => $updatedby->lastname, "permalink" =>  'http://'.$_SERVER['HTTP_HOST'].'/store/person/'.$updatedby->cname );
 		}
 		if( trim($ver->createdon) !== "" ){
 			$d["vappliance"]["createdon"] = str_replace("+00:00","Z",gmdate("c", strtotime($ver->createdon)));

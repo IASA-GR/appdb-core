@@ -22,14 +22,7 @@ class Default_Model_ResearchersMapper extends Default_Model_ResearchersMapperBas
 
 	public function save(Default_Model_Researcher $value){
         $value->lastUpdated = date('Y-m-d H:i:s');
-        if ( $value->gender === 'n/a' ) {
-            $value->gender = null;
-            $gender = 'n/a';
-        } else $gender = null;
         $ret = parent::save($value);
-        if ( $gender === 'n/a' ) {
-            $this->getDbTable()->getAdapter()->query("UPDATE researchers SET gender = NULL WHERE id = ".$value->id);
-        }
         return $ret;
 	}
 	

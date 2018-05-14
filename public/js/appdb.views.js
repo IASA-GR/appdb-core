@@ -2145,11 +2145,6 @@ appdb.views.PeopleListItem = appdb.ExtendClass(appdb.views.ListItem, "appdb.view
 			};
 		})(this, d));
 		pimg = d.image;
-		if (!d.gender ) {
-			pgender = "";
-		} else {
-			pgender = d.gender.toLowerCase();
-		}
 
 		if (pimg) {
 			prot = pimg.substr(4, 1);
@@ -2162,7 +2157,7 @@ appdb.views.PeopleListItem = appdb.ExtendClass(appdb.views.ListItem, "appdb.view
 		div = doc.createElement("div");
 		$(div).addClass("item");
 		img = $(doc.createElement("img")).
-				attr("src", ((pimg) ? "/people/getimage?req=" + encodeURI(d.lastUpdated) + "&id=" + d.id : ((pgender === "robot") ? appdb.config.images.robot : appdb.config.images.person))).addClass("itemimage");
+				attr("src", ((pimg) ? "/people/getimage?req=" + encodeURI(d.lastUpdated) + "&id=" + d.id : (appdb.config.images.person))).addClass("itemimage");
 		span = $(doc.createElement("span")).append(fullname).addClass("itemname");
 		if (isos.length > 1) {
 			$(span).addClass("flagcount" + isos.length);
@@ -2429,11 +2424,6 @@ appdb.views.RelatedContactListItem = appdb.ExtendClass(appdb.views.ListItem, "ap
 			};
 		})(this, d));
 		pimg = d.image;
-		if (!d.gender /*&& d.gender.nil == "true"*/) {
-			pgender = "";
-		} else {
-			pgender = d.gender.toLowerCase();
-		}
 		if (pimg) {
 			prot = pimg.substr(4, 1);
 			if (ishttps === true && prot === ":") {
@@ -2445,7 +2435,7 @@ appdb.views.RelatedContactListItem = appdb.ExtendClass(appdb.views.ListItem, "ap
 		div = doc.createElement("div");
 		$(div).addClass("item");
 		img = $(doc.createElement("img")).
-				attr("src", ((pimg) ? "/people/getimage?req=" + encodeURI(d.lastUpdated) + "&id=" + d.id : ((pgender === "robot") ? appdb.config.images.robot : appdb.config.images.person))).addClass("itemimage");
+				attr("src", ((pimg) ? "/people/getimage?req=" + encodeURI(d.lastUpdated) + "&id=" + d.id : (appdb.config.images.person))).addClass("itemimage");
 		span = $(doc.createElement("span")).append(fullname).addClass("itemname");
 		if (isos && isos.length > 1) {
 			$(span).addClass("flagcount" + isos.length);
@@ -14502,11 +14492,6 @@ appdb.views.ProfileListItem = appdb.ExtendClass(appdb.views.ListItem, "appdb.vie
 			};
 		})(this, d));
 		pimg = d.image;
-		if (!d.gender) {
-			pgender = "";
-		} else {
-			pgender = d.gender.toLowerCase();
-		}
 
 		if (pimg) {
 			prot = pimg.substr(4, 1);
@@ -14519,7 +14504,7 @@ appdb.views.ProfileListItem = appdb.ExtendClass(appdb.views.ListItem, "appdb.vie
 		div = doc.createElement("div");
 		$(div).addClass("item");
 		img = $(doc.createElement("img")).
-				attr("src", ((pimg) ? "/people/getimage?req=" + encodeURI(d.lastUpdated) + "&id=" + d.id : ((pgender === "robot") ? appdb.config.images.robot : appdb.config.images.person))).addClass("itemimage");
+				attr("src", ((pimg) ? "/people/getimage?req=" + encodeURI(d.lastUpdated) + "&id=" + d.id : (appdb.config.images.person))).addClass("itemimage");
 		span = $(doc.createElement("span")).append(fullname).addClass("itemname");
 		if (isos.length > 1) {
 			$(span).addClass("flagcount" + isos.length);

@@ -4763,7 +4763,6 @@ appdb.pages.newprofile = (function(){
 	page.contactTypes = new appdb.utils.SimpleProperty();
 	page.positionTypes = new appdb.utils.SimpleProperty();
 	page.countries = new appdb.utils.SimpleProperty();
-	page.gender = new appdb.utils.SimpleProperty();
 	page.errorDialog = (function(){
 		var _dialog = null;
 		var _destroy  = function(){
@@ -4905,7 +4904,7 @@ appdb.pages.newprofile = (function(){
 		$(dom).removeClass("hidden");
 		
 		var err = errs[0];
-		if( $.inArray($.trim(err).toLowerCase(), ["first name", "last name", "gender", "role", "institute", "country", "organization"]) > -1 ){
+		if( $.inArray($.trim(err).toLowerCase(), ["first name", "last name", "role", "institute", "country", "organization"]) > -1 ){
 			err = "Please provide a value for <b>" + err + "</b>";
 		}
 		$(dom).append("<img src='/images/vappliance/redwarning.png' alt=''/><span>" + err + "</span>");
@@ -5074,12 +5073,6 @@ appdb.pages.newprofile = (function(){
 						valid = false;
 					}
 					break;
-				case "gender":
-					if ( subvalue === '0' || subvalue === '' ) {
-						invalidMessages.push( "gender" );
-						valid = false;
-					}
-					break;
 				case "positiontypeid":
 					if ( subvalue === '0' || subvalue === '' ) {
 						invalidMessages.push( "role" );
@@ -5164,7 +5157,6 @@ appdb.pages.newprofile = (function(){
 		page.currentIndex(null);
 		page.contactTypes(null);
 		page.positionTypes(null);
-		page.gender({ids: ['male', 'female', 'NULL'], vals: ['Male', 'Female', 'N/A']});
 		page.currentProfile(null);
 	};
 	

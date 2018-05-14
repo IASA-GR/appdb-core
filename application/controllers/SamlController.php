@@ -490,7 +490,6 @@ class SamlController extends Zend_Controller_Action
 		
 		$firstname = ( isset($_POST["firstName"])?trim($_POST["firstName"]):null );
 		$lastname = ( isset($_POST["lastName"])?trim($_POST["lastName"]):null );
-		$gender = ( isset($_POST["gender"])?trim($_POST["gender"]):null );
 		$institution = ( isset($_POST["institution"])?trim($_POST["institution"]):null );
 		$countryid = ( isset($_POST["countryID"])?intval($_POST["countryID"]):null );
 		$positiontypeid = ( isset($_POST["positionTypeID"])?intval($_POST["positionTypeID"]):null );
@@ -513,7 +512,6 @@ class SamlController extends Zend_Controller_Action
 		$entry = new Default_Model_Researcher();
 		$entry->lastName = $lastname;
 		$entry->firstName = $firstname;
-		$entry->gender = $gender;
 		$entry->institution = "";
 		$entry->countryID = $countryid;
 		$entry->positionTypeID = $positiontypeid;

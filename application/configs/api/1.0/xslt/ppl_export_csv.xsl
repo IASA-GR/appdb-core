@@ -26,7 +26,7 @@ xmlns:regional="http://appdb.egi.eu/api/1.0/regional">
 	<xsl:strip-space elements="*"/>
     
 	<xsl:template match="//people">
-		<xsl:text>"Firstname","Lastname","Gender","Registered","Institution","Country","Role","Permalink","Applications","Contacts"&#x0A;</xsl:text>
+		<xsl:text>"Firstname","Lastname","Registered","Institution","Country","Role","Permalink","Applications","Contacts"&#x0A;</xsl:text>
 		<xsl:apply-templates />
 	</xsl:template>
 

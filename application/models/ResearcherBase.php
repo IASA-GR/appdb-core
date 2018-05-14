@@ -29,7 +29,6 @@ class Default_Model_ResearcherBase
 	protected $_positionTypeID;
 	protected $_positionType;
 	protected $_guid;
-	protected $_gender;
 	protected $_lastUpdated;
 	protected $_name;
 	protected $_mailUnsubscribePwd;
@@ -223,19 +222,6 @@ class Default_Model_ResearcherBase
 	public function getGuid()
 	{
 		return $this->_guid;
-	}
-
-	public function setGender($value)
-	{
-		/* if ( $value === null ) {
-			$this->_gender = 'NULL';
-		} else */ $this->_gender = $value;
-		return $this;
-	}
-
-	public function getGender()
-	{
-		return $this->_gender;
 	}
 
 	public function setLastUpdated($value)
@@ -447,7 +433,6 @@ class Default_Model_ResearcherBase
 		if ( $recursive ) if ( $this->_positionType === null ) $this->getPositionType();
 		if ( ! ($this->_positionType === null) ) $XML .= $this->_positionType->toXML();
 		if ($this->_guid !== null) $XML .= "<guid>".recode_string("utf8..xml",$this->_guid)."</guid>\n";
-		if ($this->_gender !== null) $XML .= "<gender>".recode_string("utf8..xml",$this->_gender)."</gender>\n";
 		if ($this->_lastUpdated !== null) $XML .= "<lastUpdated>".recode_string("utf8..xml",$this->_lastUpdated)."</lastUpdated>\n";
 		if ($this->_name !== null) $XML .= "<name>".recode_string("utf8..xml",$this->_name)."</name>\n";
 		if ($this->_mailUnsubscribePwd !== null) $XML .= "<mailUnsubscribePwd>".recode_string("utf8..xml",$this->_mailUnsubscribePwd)."</mailUnsubscribePwd>\n";
