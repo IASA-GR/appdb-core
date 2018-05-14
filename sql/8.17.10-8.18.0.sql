@@ -23,6 +23,40 @@ Author: nakos.al@iasa.gr
 
 START TRANSACTION;
 
+CREATE OR REPLACE FUNCTION public.htree_text(tbl text, padding character DEFAULT ' '::bpchar, padding_count integer DEFAULT 2, indicator text DEFAULT '>'::text)
+ RETURNS TABLE(id integer, name text, parentid integer, lvl integer)
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+/**
+* this function assumes the requested table has the following columns:
+*   - id: the entry's numeric representation
+*   - name: the entry's text repesentation
+*   - parentid: the numeric representation of the entry's parent entry
+* 
+* the recursive CTE used computes "l" as the entry's nesting level (1-based),
+* and "o" as the inheritance chain, which serves as an ordering field
+*/
+RETURN QUERY
+EXECUTE
+'WITH RECURSIVE lvl(cid,l,cname,pid,o) AS (
+        VALUES (NULL::int,0,'''',0,NULL::text)
+        UNION ALL
+        SELECT 
+                id, 
+                l+1,
+                CASE WHEN COALESCE(lvl.cname, '''') = '''' THEN '''' ELSE lvl.cname || LPAD(''' || indicator || ''', ' || padding_count::text || ', ''' || padding || ''') || RPAD('''', ' || (padding_count - 1)::text || ', ''' || padding || ''') END || name,
+                parentid,
+                CASE WHEN o IS NULL THEN CASE COALESCE(ord, 0) WHEN 0 THEN ''Z'' ELSE ord::text END || '' '' || name ELSE o || ''_'' || name END
+        FROM lvl, ' || tbl || ' WHERE NOT ' || tbl || '.parentid IS DISTINCT FROM cid
+)
+SELECT cid,cname,pid,l FROM lvl
+WHERE l>0
+ORDER BY o';
+END;
+$function$;
+ALTER FUNCTION htree_text(text, bpchar, int, text) OWNER TO appdb;
+
 CREATE OR REPLACE FUNCTION hasparent(mid INT, mpid INT, mtbl TEXT) 
 RETURNS BOOLEAN AS
 $$
@@ -51,7 +85,7 @@ $$
 LANGUAGE plpgsql;
 ALTER FUNCTION hasparent(int, int, text) OWNER TO appdb;
 
-DROP FUNCTION IF EXISTS oai_sw_setspecs;
+DROP FUNCTION IF EXISTS oai_sw_setspecs();
 CREATE OR REPLACE FUNCTION oai_sw_setspecs() RETURNS SETOF XML AS
 $$
 SELECT XMLELEMENT(name "set", XMLELEMENT(name "setName", 'Software'), XMLELEMENT(name "setSpec", 'sw'))
@@ -80,7 +114,7 @@ WHERE (
 $$ LANGUAGE sql STABLE;
 ALTER FUNCTION oai_sw_setspecs() OWNER TO appdb;
 
-DROP FUNCTION IF EXISTS oai_va_setspecs;
+DROP FUNCTION IF EXISTS oai_va_setspecs();
 CREATE OR REPLACE FUNCTION oai_va_setspecs() RETURNS SETOF XML AS
 $$
 SELECT XMLELEMENT(name "set", XMLELEMENT(name "setName", 'Virtual Appliances'), XMLELEMENT(name "setSpec", 'va'))
@@ -106,7 +140,7 @@ WHERE
 $$ LANGUAGE sql STABLE;
 ALTER FUNCTION oai_va_setspecs() OWNER TO appdb;
 
-DROP FUNCTION oai_setspecs;
+DROP FUNCTION IF EXISTS oai_setspecs();
 CREATE OR REPLACE FUNCTION oai_setspecs() RETURNS SETOF XML AS
 $$
 SELECT oai_sw_setspecs()
@@ -123,9 +157,11 @@ INSERT INTO config (var, data) VALUES ('datacite_xslt', NULL);
 INSERT INTO config (var, data) VALUES ('oaidc_xslt', NULL);
 INSERT INTO config (var, data) VALUES ('oaidatacite_xslt', NULL);
 
+/*
 UPDATE cache.appxmlcache AS c SET openairexml = a.openaire
 FROM applications a
 WHERE c.id = a.id;
+*/
 
 CREATE OR REPLACE FUNCTION public.openaire2(applications)
  RETURNS xml
