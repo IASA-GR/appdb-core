@@ -59,8 +59,8 @@ app.va_sync_scopes='CommaSepareted,StringOf,Scopes"
 infosys.host = "";
 infosys.db = "";
 infosys.glueVersion = "2.0";
-cd.enabled = '<true: enable continuous delivery>';
-cd.endpoint = '<Continuous Delivery remote service url>';
+service.cd.enabled = '<true: enable continuous delivery>';
+service.cd.endpoint = '<Continuous Delivery remote service url>';
 
 [staging : production]
 
