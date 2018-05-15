@@ -618,6 +618,6 @@ EXECUTE PROCEDURE trfn_cache_appxmlcache_openaire();
 
 INSERT INTO version (major,minor,revision,notes) 
         SELECT 8, 18, 0, E'Add initial support for OAI-PMH server functionality'
-        WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=17 AND revision=6);
+        WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=18 AND revision=0);
 
 COMMIT;
