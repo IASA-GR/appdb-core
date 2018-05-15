@@ -142,3 +142,12 @@ Attribution for Web Font files
 OpenSans designed by Steve Matteson, Type Director of Ascender Corp
 https://www.google.com/fonts/specimen/Open+Sans
 License: Apache v.2
+
+------------------------------------------------
+Attribution for PostgreSQL extensions
+------------------------------------------------
+
+PL/XSLT Procedural Language Handler for PostgeSQL
+https://github.com/petere/plxslt
+License: PostgreSQL License (MIT Variant)
+Copyright © 2013 by Peter Eisentraut <peter_e@gmx.net>
