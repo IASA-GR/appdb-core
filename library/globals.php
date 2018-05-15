@@ -9712,7 +9712,7 @@ class Netfilter {
 		$this->_netfilter = $netfilter;
 	}
 
-	public function matches($s) {
+	public function matches($ip) {
 		if ( $this->_netfilter == '' ) {
 			// NULL this->_netfilter
 			return true;
@@ -10183,7 +10183,7 @@ class AccessTokens{
 		$ip = $_SERVER['REMOTE_ADDR'];
 
 		$netfilters = $token->getNetfilters();
-        if ( count($netfilters) === 0 ) {
+                if ( count($netfilters) === 0 ) {
 			return true;
 		}
 
@@ -10193,7 +10193,7 @@ class AccessTokens{
 			$wips = explode(";", $wips);
 			foreach ($wips as $wip) {
 				$nf = new Netfilter($wip);
-				if ($nf->matches($wip)) {
+				if ($nf->matches($ip)) {
 					debug_log("[AccessTokens::validateToken]: server IP whitelisted, ignoring user-specified netfilters");
 					return true;
 				}
@@ -10202,7 +10202,7 @@ class AccessTokens{
 
 		// check user-specific netfilters
 		foreach($netfilters as $netfilter) {
-			$nf = new Netfilter($netfilter);
+                        $nf = new Netfilter($netfilter->netfilter);
 			if ($nf->matches($ip)) {
 				return true;
 			}
