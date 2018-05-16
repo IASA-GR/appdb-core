@@ -21,6 +21,8 @@ New version: 8.18.5
 Author: wvkarag@lovecraft.priv.iasa.gr
 */
 
+START TRANSACTION;
+ 
 DROP VIEW IF EXISTS cd_log_cantor CASCADE;
 CREATE VIEW cd_log_cantor AS
 SELECT 	
@@ -110,3 +112,5 @@ ALTER VIEW cd_log_partitions OWNER TO appdb;
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 18, 5, E'Create partitioned view for cd_logs'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=18 AND revision=5);
+
+COMMIT;	
