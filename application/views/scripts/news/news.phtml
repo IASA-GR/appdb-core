@@ -117,11 +117,7 @@
         } elseif ($entry->action == "update") {
 			if ( $entry->subjectType == "ppl" ) {
 				if ($this->ppl->item($entry->subjectID) != null) {
-					$ant = 'his/her';
-					if ( ! isnull($this->ppl->item($entry->subjectID)->gender) ) {
-						if ($this->ppl->item($entry->subjectID)->gender == 'male') $ant = 'his';
-						if ($this->ppl->item($entry->subjectID)->gender == 'female') $ant = 'her';
-					}
+					$ant = 'their';
 					$line.='<a href="#" onclick="appdb.views.Main.showPerson({id: '.$entry->subjectID.'}, {mainTitle: \''.str_replace("'","\\'",$this->ppl->item($entry->subjectID)->fullname).'\'});">'.$this->ppl->item($entry->subjectID)->fullname.'</a> has updated '.$ant.' profile information <span class="newsfields">'.($entry->fields!=''?'('.$entry->fields.')':'').'</span></li>'; 
 				} else $line="";				
             } elseif ( $entry->subjectType == "app" ) { 

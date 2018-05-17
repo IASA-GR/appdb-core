@@ -1,0 +1,4 @@
+#!/bin/bash
+echo $'CREATE OR REPLACE FUNCTION oai_dc_xslt(x xml) RETURNS XML AS\n$$';cat oai_dc.xsl; echo $'$$ LANGUAGE xslt STABLE;\nALTER FUNCTION oai_dc_xslt(xml) OWNER TO appdb;'
+echo
+echo $'CREATE OR REPLACE FUNCTION oai_datacite_xslt(x xml) RETURNS XML AS\n$$';cat oai_datacite.xsl; echo $'$$ LANGUAGE xslt STABLE;\nALTER FUNCTION oai_datacite_xslt(xml) OWNER TO appdb;'

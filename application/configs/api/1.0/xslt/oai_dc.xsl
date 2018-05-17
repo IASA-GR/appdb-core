@@ -51,9 +51,11 @@
 				</dc:creator>
 			</xsl:for-each>
 
-			<dc:contributor>
-				<xsl:value-of select="concat(./person:person[@metatype='actor']/person:lastname, ', ', ./person:person[@metatype='actor']/person:firstname)" />
-			</dc:contributor>
+			<xsl:if test="not(./person:person[@metatype='actor']/@id=./person:person[@metatype='contact']/@id)">
+				<dc:contributor>
+					<xsl:value-of select="concat(./person:person[@metatype='actor']/person:lastname, ', ', ./person:person[@metatype='actor']/person:firstname)" />
+				</dc:contributor>
+			</xsl:if>
 
 			<xsl:if test="not(./person:person[@metatype='actor']/@id=./person:person[@metatype='owner']/@id)">
 				<dc:contributor>

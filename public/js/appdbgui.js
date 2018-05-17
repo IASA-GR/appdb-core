@@ -125,15 +125,7 @@
 			}
 			return p.image+"&req="+encodeURIComponent(p.lastUpdated);
 		} else {
-            var gender = ""+p.gender;
-            gender = gender.toLowerCase();
-            switch (p.gender) {
-                case "robot":
-                    return appdb.config.images.robot;
-                    break;
-                default:
-                    return appdb.config.images.person;
-            }
+			return appdb.config.images.person;
         }
 	}
 
@@ -1064,7 +1056,6 @@
 		var e = $($.find("#ppl_details"));
 		e.find("span.ppl-firstname").addClass("editable").attr("edit_name","firstName").attr("edit_type","text");
 		e.find("span.ppl-lastname").addClass("editable").attr("edit_name","lastName").attr("edit_type","text");
-		e.find("span.ppl-gender").addClass("editable").attr("edit_name","gender").attr("edit_type","combo").attr("edit_data","{ids: ['male', 'female', 'NULL'], vals: ['Male', 'Female', 'N/A']}");
 		e.find("span.ppl-country").addClass("editable").attr("edit_name","countryID").attr("edit_type","combo").attr("edit_data",countryData);
 		e.find("span.ppl-contactType").addClass("editable").attr("edit_name","contactType").attr("edit_type","combo").attr("edit_data",contactTypeData).attr("edit_group","true");
 		e.find("span.ppl-contact").addClass("editable").attr("edit_name","contact").attr("edit_type","text").attr("edit_group","true");
@@ -4769,7 +4760,6 @@ appdb.utils.DataWatcher.Registry.set("person",{items :[
  }, type : "newimage", name : "Profile image"},
  {selector : ":input[name='firstName']:last", type : "firstname", name : "First Name"},
  {selector : ":input[name='lastName']:last", type : "lastname", name : "Last Name"},
- {selector : ":input[name='gender']:last", type : "gender", name : "Gender"},
  {selector : ":input[name='positionTypeID']:last",  type : "positiontypeid" , name : "Role"},
  {selector : ":input[name='institution']:last",  type : "institution" , name : "Institute"},
  {selector : ":input[name='countryID']:last",  type : "countryID", name : "Country"},

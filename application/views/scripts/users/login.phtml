@@ -250,11 +250,6 @@ var selectProfile=function(id) {
         $(".prefsdiv").hide();
         $("ul.tab li+li").remove();
 		if ( id == 0 ) { 
-			<?php if ( isset($this->gender) ) { 
-				$string = $this->gender;
-				$string = substr_replace($string, strtoupper(substr($string, 0, 1)), 0, 1); ?>
-				$('span[edit_name="gender"]').html('<?php echo $string;?>');
-			<?php } ?>
 			<?php if ( isset($this->country) ) { ?>
             $('span[edit_name="countryID"]').html('<?php echo $this->country;?>');
 			<?php } ?>

@@ -1569,7 +1569,7 @@ class FilterParser {
 						break;
 					case("sender"):
 					case("person"):
-						$fltstr = "id:numeric firstname:string lastname:string name:string registeredon:datetime institute:string activated:boolean lastlogin:datetime lastupdated:datetime gender:string nodissemination:boolean contact:string role:string roleid:numeric language:string os:string arch:string phonebook:string license:complex accessgroup:complex";
+						$fltstr = "id:numeric firstname:string lastname:string name:string registeredon:datetime institute:string activated:boolean lastlogin:datetime lastupdated:datetime nodissemination:boolean contact:string role:string roleid:numeric language:string os:string arch:string phonebook:string license:complex accessgroup:complex";
 						if ( $base === $i ) {
 							$fltstr = $fltstr." country:complex application:complex middleware:complex vo:complex discipline:complex category:complex";
 						}
@@ -6099,7 +6099,7 @@ class VMCaster{
                         "defaultaccess" => $img->defaultAccess,
                         "contextformat" => self::getImageSupportedContextFormats($img),
                         "addedon" => str_replace("+00:00","Z",gmdate("c", strtotime($img->addedon))),
-			"addedby" => array( "id" => $addedby->id, "cname" => $addedby->cname, "firstname" => $addedby->firstname, "lastname" => $addedby->lastname, "gender" => $addedby->gender, "permalink" =>  'https://'.$_SERVER['HTTP_HOST'].'/store/person/'.$addedby->cname),
+			"addedby" => array( "id" => $addedby->id, "cname" => $addedby->cname, "firstname" => $addedby->firstname, "lastname" => $addedby->lastname, "permalink" =>  'https://'.$_SERVER['HTTP_HOST'].'/store/person/'.$addedby->cname),
 			"published" => $ver->published,
 			"archived" => $ver->archived,
 			"vappliance" => array( "version" => $ver->version,),
@@ -6156,7 +6156,7 @@ class VMCaster{
 		}
 		if( trim($img->lastUpdatedOn)!== "" ){
 			$d["lastupdatedon"] =  str_replace("+00:00","Z",gmdate("c", strtotime($img->lastUpdatedOn)));
-			$d["lastupdatedby"] = array( "id" => $updatedby->id, "cname" => $updatedby->cname, "firstname" => $updatedby->firstname, "lastname" => $updatedby->lastname, "gender" => $updatedby->gender,"permalink" =>  'http://'.$_SERVER['HTTP_HOST'].'/store/person/'.$updatedby->cname );
+			$d["lastupdatedby"] = array( "id" => $updatedby->id, "cname" => $updatedby->cname, "firstname" => $updatedby->firstname, "lastname" => $updatedby->lastname, "permalink" =>  'http://'.$_SERVER['HTTP_HOST'].'/store/person/'.$updatedby->cname );
 		}
 		if( trim($ver->createdon) !== "" ){
 			$d["vappliance"]["createdon"] = str_replace("+00:00","Z",gmdate("c", strtotime($ver->createdon)));

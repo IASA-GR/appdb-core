@@ -3959,7 +3959,6 @@ appdb.entity.Person = appdb.EntityTypes.define("person",[
 	{name: "cname", canRef: true},
 	{name: "firstname"},
 	{name: "lastname"},
-	{name: "gender"},
 	{name: "institute", canIgnore: true},
 	{name: "country", ref: "country", isExternalRef: true},
 	{name: "permalink", canIgnore: true},
@@ -5417,12 +5416,6 @@ appdb.utils.EntityEditMapper.Person = function(entity){
 			this.entity["lastname"](v);
 		}
 	};
-	this.setGender = function(v){
-		if(v==="NULL"){
-			v = null;
-		}
-		this.entity["gender"](v);
-	};
 	this.setPositionTypeID = function(v){
 		if(this.isChanged("role")===false){
 		}
@@ -5548,11 +5541,6 @@ appdb.utils.EntityEditMapper.Person = function(entity){
 				}
 			};
 		})(this));
-		//In case no gender is editable it means the profile is a system user
-		if(!mapcontext["setGender"]){
-			mapcontext["setGender"] = "robot";
-		}
-		
 		return mapcontext;
 	};
 	this.UpdateEntity = function(frmelem){
@@ -7445,7 +7433,6 @@ appdb.utils.FilterAggregator = appdb.DefineClass("appdb.utils.FilterAggregator",
 		"people": {
 			"country": "+=&country.id:{#}",
 			"phonebook": "+=&phonebook:{$}",
-			"gender": "+=&gender:{#}",
 			"discipline": "+=&discipline.id:{#}",
 			"proglang": "+=&language.id:{#}",
 			"group": "+=&accessgroup.id:{#}",

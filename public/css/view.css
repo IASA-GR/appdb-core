@@ -25683,6 +25683,16 @@ table.cdtaskinstance-list tr > .img > img {
 .cdversion .cdversion-log-list > li > .item .meta > .createdat {
     margin-left: 5px;
 }
+.cdversion .cdversion-log-list > li > .item .meta > .sep {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.cdversion .cdversion-log-list > li > .item .meta > .repeated {
+    color: #555;
+}
+.cdversion .cdversion-log-list > li > .item .meta > .repeated > .count {
+    font-weight: bold;
+}
 .cdversion .cdversion-log-list .ui.label {
     width: 60px;
     vertical-align: middle;

@@ -28,7 +28,6 @@ class Default_Model_ResearchersFilterBase extends Default_Model_Filter {
 		$this->_fields[] = 'countryid';
 		$this->_fields[] = 'positiontypeid';
 		$this->_fields[] = 'guid';
-		$this->_fields[] = 'gender';
 		$this->_fields[] = 'lastupdated';
 		$this->_fields[] = 'name';
 		$this->_fields[] = 'mail_unsubscribe_pwd';
@@ -47,7 +46,6 @@ class Default_Model_ResearchersFilterBase extends Default_Model_Filter {
 		$this->_fieldTypes['countryid'] = 'integer';
 		$this->_fieldTypes['positiontypeid'] = 'integer';
 		$this->_fieldTypes['guid'] = 'string';
-		$this->_fieldTypes['gender'] = 'string';
 		$this->_fieldTypes['lastupdated'] = 'string';
 		$this->_fieldTypes['name'] = 'string';
 		$this->_fieldTypes['mail_unsubscribe_pwd'] = 'string';

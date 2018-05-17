@@ -18,6 +18,9 @@ REQUIREMENTS
 		- gd
 		- process
 
+- PostgreSQL Extensions
+	- plxslt (https://github.com/petere/plxslt)
+
 - Perl Modules
 	- perl-Text-Unidecode (on PostgreSQL server machine)
 	- Text::Diff (on PostgreSQL server machine)

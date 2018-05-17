@@ -344,7 +344,6 @@
 	$profile = $profiles[0];
 	$editable = false;
 	$image = "/images/person.png";
-	$gender = "N/A";
 	$institute = "";
 	$country = $profile->country;
 	$isocodes = array();
@@ -352,10 +351,6 @@
 	
 	if ( isnull($profile->image) === false ) {
 		$image = "/people/getimage?id=".$profile->id."&req=".urlencode($profile->lastUpdated);
-	}
-	
-	if ( !isnull($profile->gender) ) {
-		$gender = $this->escape(substr_replace($profile->gender,strtoupper(substr($profile->gender, 0, 1)), 0, 1));
 	}
 	
 	if ( !isnull($profile->institution) ) {
@@ -394,12 +389,6 @@
 					<div class="value">
 						<span <?php if ($editable ) echo 'class="editable smalltext" edit_type="text" edit_watermark="First name" edit_name="firstName" edit_required="true" edit_style="{\'width\':\'200px\'}"';?>><?php echo($this->escape($profile->firstName));?></span>
 						<span <?php if ($editable ) echo 'class="editable smalltext" edit_type="text" edit_watermark="Last name" edit_name="lastName" edit_required="true" edit_style="{\'width\':\'200px\'}"';?>><?php echo($this->escape($profile->lastName)); ?></span>
-					</div>
-				</div>
-				<div class="fieldvalue gender">
-					<div class="field">Gender:</div>
-					<div class="value">
-						<span <?php if ($editable ) echo 'class="editable" edit_type="combo" edit_data="{ids: [\'male\', \'female\', \'NULL\'], vals: [\'Male\', \'Female\', \'N/A\']}" edit_name="gender" edit_watermark="Select gender" edit_style="{\'width\':\'200px\'}"';?>><?php echo $gender ?></span>
 					</div>
 				</div>
 				<div class="fieldvalue role">
@@ -484,7 +473,6 @@ appdb.pages.newprofile.init({
 	profile: {
 		firstName: "<?php echo $profile->firstName; ?>",
 		lastName: "<?php echo $profile->lastName; ?>",
-		gender: "",
 		positionTypeID: '4',
 		positionTypeDescription: 'other',
 		institute: "<?php echo $profile->institution; ?>",

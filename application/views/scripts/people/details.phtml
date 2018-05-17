@@ -149,11 +149,6 @@
 										<?php $canEdit = checkRegister($this); if ($this->session->userid !== null) if ($canEditProfile) $canEdit=true; if ($canEdit) echo '';?>
 									</td>
 									</tr>
-									<tr>
-									<td style="vertical-align:middle;width: 120px;">Gender: </td><td style="vertical-align:middle">
-										<span <?php $canEdit = checkRegister($this); if ($this->session->userid !== null) if ( $canEditProfile ) $canEdit=true; if ($canEdit && $this->entry->accounttype !== 1) echo 'class="editable" edit_type="combo" edit_data="{ids: [\'male\', \'female\', \'NULL\'], vals: [\'Male\', \'Female\', \'N/A\']}" edit_name="gender"';?>><?php if (!isnull($this->entry->gender)) echo $this->escape(substr_replace($this->entry->gender,strtoupper(substr($this->entry->gender, 0, 1)), 0, 1)); else echo "N/A"?></span>
-									</td>
-									</tr>
 									<tr><td>Scientific Orientation: </td><td style="vertical-align: middle">
 									<span <?php
 									$canEdit = checkRegister($this); if ($this->session->userid !== null) if ( $canEditProfile ) $canEdit = true; if ($canEdit) {

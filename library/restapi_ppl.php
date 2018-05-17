@@ -59,18 +59,6 @@ class RestPplXMLParser extends RestXMLParser {
 			if ( ! is_null($firstname) && trim(strval($firstname)) !== "" ) $person->firstName = trim(strval($firstname));
 			$lastname = $this->el($xml, "person:lastname");
 			if ( ! is_null($lastname) && trim(strval($lastname)) !== "" ) $person->lastName = trim(strval($lastname));
-            $gender = $this->el($xml, "person:gender");
-            if ( ! is_null($gender) ) {
-                if ( trim(strval($gender->attributes(RestAPIHelper::XMLNS_XSI())->nil)) === "true" ) {
-                    $person->gender = 'n/a';
-                } elseif ( trim(strval($gender)) !== "" ) {
-                    if ( trim(strtolower(strval($gender))) === "male" ) {
-                        $person->gender = "male";
-                    } elseif ( trim(strtolower(strval($gender))) === "female" ) {
-                        $person->gender = "female";
-                    }
-                }
-			}
 			if ( $this->_parent->getMethod() === RestMethodEnum::RM_PUT ) {
 				$person->dateInclusion = date("Y-m-d");
 				$person->addedByID = $this->_parent->getUser()->id;

@@ -574,14 +574,6 @@ appdb.model.FollowApplication = function(opts,ext){
 	};
 	return _init();
 };
-appdb.model.Genders = {
-        get : function(){
-            return [{key : "male", name : "Male"},
-                {key : "robot", name : "Robot"},
-                {key : "female", name : "Female"},
-                {key : "", name : "N\\A"}];
-        }
-    };
 appdb.model.Disciplines = function(opts,ext){
 	return new function(){
 		opts = opts || {};
