@@ -91,7 +91,11 @@ echo $this->doctype(); fl();?>
 	var userID = <?php if ($this->session->userid === null) echo 'null'; else echo $this->session->userid; ?>;
 	var djConfig = {"usePlainJson":true,"parseOnLoad":true,"parseWidgets":true};
 	</script><?php fl(); ?>
+	<?php if (ApplicationConfiguration::isProductionInstance()) { ?>
 	<link rel="shortcut icon" href="/favicon.ico" />
+	<?php } else { ?>
+	<link rel="shortcut icon" href="/favicon-dev.ico" />
+	<?php } ?>
   <?php
 	debug_log("JS/CSS CUSTOM BUILDS: " . ($this->customBuild?"ON":"OFF"));
 	if ( $this->customBuild ) {
