@@ -58,9 +58,11 @@
 			</xsl:if>
 
 			<xsl:if test="not(./person:person[@metatype='actor']/@id=./person:person[@metatype='owner']/@id)">
-				<dc:contributor>
-					<xsl:value-of select="concat(./person:person[@metatype='owner']/person:lastname, ', ', ./person:person[@metatype='owner']/person:firstname)" />
-				</dc:contributor>
+				<xsl:if test="not(./person:person[@metatype='owner']/@id=./person:person[@metatype='contact']/@id)">				
+					<dc:contributor>
+						<xsl:value-of select="concat(./person:person[@metatype='owner']/person:lastname, ', ', ./person:person[@metatype='owner']/person:firstname)" />
+					</dc:contributor>
+				</xsl:if>
 			</xsl:if>
 
 			<dc:publisher>EGI Applications Database</dc:publisher>
