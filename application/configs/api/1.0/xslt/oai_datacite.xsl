@@ -139,7 +139,7 @@
 					<xsl:value-of select="./application:permalink/text()" />
 				</alternateIdentifier>
 				<alternateIdentifier alternateIdentifierType="URL">
-					<xsl:value-of select="concat('https://', //appdb:appdb/@host, '/store/software/', ./application:application/@cname)" />
+					<xsl:value-of select="concat('https://', //appdb:appdb/@host, '/store/software/', ./@cname)" />
 				</alternateIdentifier>
 				<xsl:if test="./application:url[@type='Website']">
 					<alternateIdentifier alternateIdentifierType = "LandingPage">
@@ -170,7 +170,14 @@
 			</xsl:if>
 
 			<rightsList>
-				<rights rightsURI="http://purl.org/coar/access_right/c_abf2">Open Access</rights>
+				<xsl:choose>
+					<xsl:when test="./application:vappliance[@imageListsPrivate='true']">
+						<rights rightsURI="http://purl.org/coar/access_right/c_16ec">Restricted Access</rights>
+					</xsl:when>
+					<xsl:otherwise>
+						<rights rightsURI="http://purl.org/coar/access_right/c_abf2">Open Access</rights>
+					</xsl:otherwise>
+				</xsl:choose>
 				<xsl:if test="./application:license">
 					<xsl:element name="rights">
 						<xsl:attribute name="rightsURI">

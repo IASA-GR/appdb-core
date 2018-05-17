@@ -52,16 +52,20 @@
 			</xsl:for-each>
 
 			<xsl:if test="not(./person:person[@metatype='actor']/@id=./person:person[@metatype='contact']/@id)">
-				<dc:contributor>
+				<dc:creator>
+				<!--				<dc:contributor> -->
 					<xsl:value-of select="concat(./person:person[@metatype='actor']/person:lastname, ', ', ./person:person[@metatype='actor']/person:firstname)" />
-				</dc:contributor>
+				<!--				</dc:contributor> -->
+				</dc:creator>
 			</xsl:if>
 
 			<xsl:if test="not(./person:person[@metatype='actor']/@id=./person:person[@metatype='owner']/@id)">
 				<xsl:if test="not(./person:person[@metatype='owner']/@id=./person:person[@metatype='contact']/@id)">				
-					<dc:contributor>
+					<!--					<dc:contributor> -->
+					<dc:creator>
 						<xsl:value-of select="concat(./person:person[@metatype='owner']/person:lastname, ', ', ./person:person[@metatype='owner']/person:firstname)" />
-					</dc:contributor>
+					<!--					</dc:contributor> -->
+					</dc:creator>
 				</xsl:if>
 			</xsl:if>
 
@@ -88,7 +92,14 @@
 				</dc:format>
 			</xsl:if>
 
-			<dc:rights>Open Access</dc:rights>
+			<xsl:choose>
+				<xsl:when test="./application:vappliance[@imageListsPrivate='true']">
+					<dc:rights>Restricted Access</dc:rights>
+				</xsl:when>
+				<xsl:otherwise>
+					<dc:rights>Open Access</dc:rights>
+				</xsl:otherwise>
+			</xsl:choose>
 
 			<dc:description>
 				<xsl:value-of select="./application:description" />
