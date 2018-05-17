@@ -514,7 +514,7 @@
 	<div id="repositorydiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" data-forentity="software"></div>
 	<div id="vappliancediv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" class="vappliancecontainer" data-forentity="vappliance">
 		<div class="actions">
-                        <?php if(ApplicationConfiguration::isProductionInstance()===false) { ?>
+                        <?php if(ApplicationConfiguration::service("cd.enabled", false)) { ?>
                         <div class="action cd_select showonvappliance showonloggedin hidden">
                             <div class="header">Delivery policy:</div>
                             <div class="cd_option enable_cd">

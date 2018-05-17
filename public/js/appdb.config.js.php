@@ -100,7 +100,7 @@ appdb.config = {
 	"swappliance": <?php echo ( ( Supports::swappliance() )?"true":"false"); ?>,
 	"singleVMIPolicy": <?php echo ( ( Supports::singleVMIPolicy() )?"true":"false"); ?>,
 	"email": <?php echo ( ( ApplicationConfiguration::email('enable', false) )?"true":"false"); ?>,
-        "cd": <?php echo (ApplicationConfiguration::isProductionInstance()?"false":"true"); ?>
+        "cd": <?php echo (ApplicationConfiguration::service("cd.enabled", false) ? "true" : "false"); ?>
 	}
 };
 if( <?php echo $hasRepository; ?> ){

@@ -3671,7 +3671,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			$(sizeLinks).append(li);
 		}.bind(this));
 	};
-	this.renderLogs = function () {
+	/*this.renderRawLogs = function () {
 		var container = $(this.dom).find('.cdversion-logs');
 		var dom = $(container).find('.cdversion-log-list');
 		var d = this.options.cddata || {};
@@ -3712,6 +3712,166 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			}
 
 			$(meta).append('at ').append($('<span class="createdon"></span>').text(this.formatDate(log.createdOn)));
+
+			var action = $('<span class="ui label tiny action"></span>');
+			var name = $('<span class="name"></span>');
+			var description = $('<span class="description"></div>');
+
+			if (log.action === 'cd-prop-change') {
+				if (log.subject === 'paused') {
+					if ($.trim(log.payload) === 'true') {
+						$(action).addClass('canceled').append($('<span></span>').text('PAUSED'));
+						$(name).text('Continuous delivery checks were paused.')
+					} else {
+						$(action).addClass('completed').append($('<span></span>').text('RESUMED'));
+						$(name).text('Continuous delivery checks were resumed from previous pause.')
+					}
+				} else if (log.subject === 'enabled') {
+					if ($.trim(log.payload) === 'true') {
+						$(action).addClass('primary').append($('<span></span>').text('ENABLED'));
+						$(name).text('Continuous delivery was enabled.')
+					} else {
+						$(action).append($('<span></span>').text('DISABLED'));
+						$(name).text('Continuous delivery was disabled.')
+					}
+				} else {
+					$(action).addClass('primary').append($('<span></span>').text('PROPERTY'));
+					var comments = {};
+					if ($.trim(log.comments)) {
+						try {
+							comments = JSON.parse(log.comments);
+						} catch(e) {comments = {};}
+					}
+
+					if (log.subject === 'defaultActorId') {
+						var newActorVal = $('<span class="new-value"></span>').text(log.payload);
+						var prevActorVal = $('<span class="prev-value"></span>').text(log.payload);
+						if (comments.to && $.trim(comments.to.cname)) {
+							var newActorLink = $('<a target="_blank" title="Click to view profile in a new tab"></a>').attr('href', appdb.config.endpoint.base + 'store/person/' + comments.to.cname).text(comments.to.firstname + ' ' + comments.to.lastname + ' (ID: '+comments.to.id+')');
+							$(newActorVal).text('').append(newActorLink);
+						} else if (comments.to && $.trim(comments.to.id)) {
+							$(newActorVal).text('ID: ' + comments.to.id)
+						} else {
+							newActorVal = null;
+						}
+
+						if (comments.from && $.trim(comments.from.cname) ) {
+							var prevActorLink = $('<a target="_blank" title="Click to view profile in a new tab"></a>').attr('href', appdb.config.endpoint.base + 'store/person/' + comments.from.cname).text(comments.from.firstname + ' ' + comments.from.lastname + ' (ID: '+comments.from.id+')');
+							$(prevActorVal).text('').append(prevActorLink);
+						} else if (comments.from && $.trim(comments.from.id)) {
+							$(prevActorVal).text('ID: ' + comments.from.id);
+						} else {
+							prevActorVal = null;
+						}
+
+						if (newActorVal && prevActorVal) {
+							$(name).append('Updated <span class="property-name">Default Publisher</span> to ').append(newActorVal).append(' from ').append(prevActorVal);
+						} else if (newActorVal && !prevActorVal) {
+							$(name).append('Updated <span class="property-name">Default Publisher</span> to ').append(newActorVal);
+						} else if (!newActorVal && prevActorVal) {
+							$(name).append('Updated <span class="property-name">Default Publisher</span> from ').append(prevActorVal).append(' to unknown publisher.');
+						} else {
+							$(name).append('Updated <span class="property-name">Default Publisher</span>. No information regarding previous or new publisher.');
+						}
+						$(description).empty();
+					} else {
+						$(name).append('Updated <span class="property-name">' + log.subject + '</span> to ')
+						       .append($('<span class="new-value"></span>').text(log.payload));
+						if ($.trim(comments.from)) {
+							$(name).append(' from ').append($('<span class="old-value"></span>').text(comments.from));
+						}
+					}
+				}
+			} else if ($.trim(log.cdInstanceId) !== '') {
+				if (log.action === 'canceled') {
+					$(action).addClass($.trim(log.action).toLowerCase()).text($.trim(log.action).toUpperCase());
+					$(name).append('Continous Delivery process was canceled. ');
+					//if (log.Actor && log.Actor.id) {
+						$(name).append($.trim(log.payload));
+					//}
+				} else if (['failed', 'task-failed', 'error'].indexOf(log.action) > -1) {
+					$(action).addClass($.trim(log.action).toLowerCase()).text($.trim(log.action).toUpperCase());
+					$(name).append('Continous Delivery process failed to complete. ');
+					$(name).append($.trim(log.payload));
+				} else {
+					$(action).addClass($.trim(log.action).toLowerCase()).text($.trim(log.action).toUpperCase());
+					var payload = {};
+					try {
+						payload = JSON.parse(log.payload);
+					} catch(e) {payload = {}}
+					$(name).append('Successfully published new Virtual Appliance version ').append($('<span class="version"></span>').text(payload.version));
+					if (payload.publishedBy && $.trim(payload.publishedBy.id)) {
+						$(name).append(' as user ');
+						$(name).append($('<a target="_blank" title="Click to view profile in new tab"></a>').attr('href', appdb.config.endpoint.base + 'store/person/' + payload.publishedBy.cname).text(payload.publishedBy.firstname + ' ' + payload.publishedBy.lastname));
+					}
+					$(name).append('.');
+				}
+			}
+			$(summary).append(action).append(name);
+			if ($(description).text() !== '') {
+				$(summary).append(description);
+			}
+
+			$(div).append(summary).append(meta);
+			$(li).append(div);
+			$(dom).append(li);
+		}.bind(this));
+		this.renderLogSizeHandler();
+	};*/
+	this.renderLogs = function () {
+		var container = $(this.dom).find('.cdversion-logs');
+		var dom = $(container).find('.cdversion-log-list');
+		var d = this.options.cddata || {};
+		var logs = d.CdLogPartitioned || d.CdLogs || [];
+		var olddata = (this.options.oldcddata || {});
+		var oldLogs = olddata.CdLogPartitioned || olddata.CdLogs || [];
+		var logIds = [];
+		var oldLogIds = [];
+
+		if (logs.length === 0) {
+			$(container).addClass('hidden');
+		} else {
+			$(container).removeClass('hidden');
+		}
+
+		$.each(logs, function(i, log) {
+			logIds.push(log.partitionId || log.id);
+		});
+
+		$.each(oldLogs, function(i, log){
+			oldLogIds.push(log.partitionId || log.id);
+		})
+
+		if (oldLogIds.join(',') === logIds.join(',')) {
+			return;
+		}
+
+		$(dom).empty();
+
+		$.each(logs, function(i, log) {
+			log.Actor = log.CdLogPartitionActor || log.Actor;
+			log.id = log.partitionId || log.id;
+			log.createdOn = log.maxCreatedOn || log.createdOn;
+			log.cdInstanceId =  log.cdInstanceIds || log.cdInstanceId
+
+			var li = $('<li></li>').attr('data-id', log.id).attr('data-action', log.action);
+			var div = $('<div class="item"></div>');
+			var summary = $('<div></div>').addClass('summary');
+			var meta = $('<div></div>').addClass('meta');
+			var actor = null;
+
+			if (log.Actor && log.Actor.id) {
+				actor = $('<a class="actor" target="_blank"></a>').attr('href', appdb.config.endpoint.base + 'store/person/' + log.Actor.cname).append($('<span class="actor-name"></span>').text(log.Actor.firstname + ' ' + log.Actor.lastname));
+				$(meta).append($('<span class="user"></span>').append('by user').append(actor).append(', '));
+			}
+
+			$(meta).append('at ').append($('<span class="createdon"></span>').text(this.formatDate(log.createdOn)));
+			if (log.partitionId && log.cnt > 1) {
+			    var repeated = $('<span class="repeated">Message repeated <span class="count"></span> times since <span class="since"></span></span>');
+			    $(repeated).find('.count').text(log.cnt);
+			    $(repeated).find('.since').text(this.formatDate(log.minCreatedOn));
+			    $(meta).append('<span class="sep">-</span>').append(repeated);
+			}
 
 			var action = $('<span class="ui label tiny action"></span>');
 			var name = $('<span class="name"></span>');
@@ -3867,6 +4027,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		} else {
 		    $(btnResume).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
 		    $(btnForceCheck).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
+		    $(btnPause).unbind('click').removeClass('disabled').removeAttr('disabled', 'disabled');
 		}
 
 		if (!$(btnPause).hasClass('loading')) {
