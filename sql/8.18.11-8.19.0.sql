@@ -23,9 +23,12 @@ Author: wvkarag@lovecraft.priv.iasa.gr
 
 START TRANSACTION;
 
+ALTER TYPE e_entity ADD VALUE 'software_release';
+ALTER TYPE e_entity ADD VALUE 'vappliance_version';
+
 CREATE TABLE public.pidhandles
 (
-  id bigint NOT NULL DEFAULT nextval('pidhandles_id_seq'::regclass),
+  id SERIAL NOT NULL PRIMARY KEY,
   url text NOT NULL,
   extras jsonb,
   suffix text,
@@ -36,9 +39,8 @@ CREATE TABLE public.pidhandles
   entrytype e_entity NOT NULL,
   entryid integer NOT NULL,
   prefix text,
-  CONSTRAINT pidhandles_pkey PRIMARY KEY (id),
   CONSTRAINT pidhandles_url_key UNIQUE (url),
-  ADD CONSTRAINT pidhandles_suffix_key UNIQUE (suffix)
+  CONSTRAINT pidhandles_suffix_key UNIQUE (suffix)
 )
 WITH (
   OIDS=FALSE
@@ -62,7 +64,7 @@ url TEXT NOT NULL,
 extras TEXT,
 suffix TEXT,
 action mintaction NOT NULL, -- 0 = insert, 1 = update, 2 = delete
-result minstate NOT NULL DEFAULT 'pending'::mintstate, -- 0 = pending, 1 = success, 2 = successverified, 3 = failed
+result mintstate NOT NULL DEFAULT 'pending'::mintstate, -- 0 = pending, 1 = success, 2 = successverified, 3 = failed
 tstamp TIMESTAMP,
 entrytype e_entity NOT NULL,
 entryid INT NOT NULL
@@ -311,7 +313,6 @@ CREATE TRIGGER rtr_99_applications_pidhandle
 ------------
 
 ALTER TABLE app_releases ADD COLUMN guid UUID NOT NULL DEFAULT uuid_generate_v4();
-ALTER TYPE e_entity ADD VALUE 'software_release';
 
 CREATE OR REPLACE FUNCTION trfn_app_releases_pidhandle() RETURNS TRIGGER
 AS
@@ -354,7 +355,6 @@ CREATE TRIGGER rtr_99_app_releases_pidhandle
 
 -------------
 
-ALTER TYPE e_entity ADD VALUE 'vappliance_version';
 
 CREATE OR REPLACE FUNCTION trfn_vapp_versions_pidhandle() RETURNS TRIGGER
 AS
