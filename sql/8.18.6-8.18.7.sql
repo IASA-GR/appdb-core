@@ -16,8 +16,8 @@
 
 /* 
 EGI AppDB incremental SQL script
-Previous version: 8.18.0
-New version: 8.18.1
+Previous version: 8.18.6
+New version: 8.18.7
 Author: wvkarag@lovecraft.priv.iasa.gr
 */
 
@@ -680,7 +680,7 @@ ALTER TABLE rankedppl DROP COLUMN gender;
 DELETE FROM cache.filtercache;
 
 INSERT INTO version (major,minor,revision,notes) 
-	SELECT 8, 18, 1, E'drop gender-related info from database'
-	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=18 AND revision=1);
+	SELECT 8, 18, 7, E'drop gender-related info from database'
+	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=18 AND revision=7);
 
 COMMIT;
