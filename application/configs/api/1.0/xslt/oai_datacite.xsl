@@ -113,7 +113,12 @@
 				</publisher>
 			</xsl:if>
 			-->
-			<resourceType resourceTypeGeneral="Software" />
+			<xsl:if test="./@metatype='0'">
+				<resourceType resourceTypeGeneral="Software" />
+			</xsl:if>
+			<xsl:if test="./@metatype='1'">
+				<resourceType resourceTypeGeneral="Other">EGI Virtual Appliance"</resourceType>
+			</xsl:if>
 
 			<subjects>
 				<subject>
@@ -153,20 +158,39 @@
 				</xsl:if>
 			</alternateIdentifiers>
 
-			<xsl:if test="./application:url[@type='Documentation']">
-				<relatedIdentifiers>
+			<relatedIdentifiers>
+				<xsl:if test="./application:url[@type='Documentation']">
 					<relatedIdentifier relatedIdentifierType="URL" relationType="IsDocumentedBy">
 						<xsl:value-of select="./application:url[@type='Documentation']/text()" />
 					</relatedIdentifier>
-				</relatedIdentifiers>
-			</xsl:if>
+				</xsl:if>
+				<xsl:if test="./@metatype='1'">
+					<xsl:if test="./entity:relation[@verbname='usage']/entity:entity[@type='software']/@handle">
+						<relatedIdentifier relatedIdentifierType="Handle" relationType="HasPart">
+							<xsl:value-of select="./entity:relation[@verbname='usage' and not(@reversed='true')]/entity:entity[@type='software']/@handle" />
+						</relatedIdentifier>
+					</xsl:if>
+				</xsl:if>
+			</relatedIdentifiers>
 
-			<xsl:if test="./application:language">
-				<formats>
-					<format>
-						<xsl:value-of select="./application:language/text()" />
-					</format>
-				</formats>
+
+			<xsl:if test="./@metatype='0'">
+				<xsl:if test="./application:language">
+					<formats>
+						<format>
+							<xsl:value-of select="./application:language/text()" />
+						</format>
+					</formats>
+				</xsl:if>
+			</xsl:if>
+			<xsl:if test="./@metatype='1'">
+				<xsl:if test="./@vaformat">
+					<formats>
+						<format>
+							<xsl:value-of select="./@vaformat" />
+						</format>
+					</formats>
+				</xsl:if>
 			</xsl:if>
 
 			<rightsList>
