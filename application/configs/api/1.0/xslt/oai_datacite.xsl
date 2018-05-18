@@ -214,7 +214,15 @@
 
 			<descriptions>
 				<description descriptionType="Abstract">
-					<xsl:value-of select="concat(./application:description, '&#xA;&#xA;', ./application:abstract)" />
+					<!--					<xsl:value-of select="concat(./application:description, '&#xA;&#xA;', ./application:abstract)" /> -->
+					<xsl:choose>
+						<xsl:when test="./application:abstract">
+							<xsl:value-of select="./application:abstract" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="./application:description" />
+						</xsl:otherwise>
+					</xsl:choose>
 				</description>
 			</descriptions>
 

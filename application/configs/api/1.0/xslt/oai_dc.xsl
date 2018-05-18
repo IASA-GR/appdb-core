@@ -101,9 +101,11 @@
 				</xsl:otherwise>
 			</xsl:choose>
 
-			<dc:description>
+			<!-- <dc:description>
 				<xsl:value-of select="./application:description" />
 			</dc:description>
+			-->
+			<dc:description>Abstract</dc:description>
 			<dc:description>
 				<xsl:value-of select="./application:abstract" />
 			</dc:description>
