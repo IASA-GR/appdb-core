@@ -1,4 +1,29 @@
-﻿CREATE TABLE public.pidhandles
+﻿/*
+ Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and 
+ limitations under the License.
+*/
+
+/* 
+EGI AppDB incremental SQL script
+Previous version: 8.18.11
+New version: 8.19.0
+Author: wvkarag@lovecraft.priv.iasa.gr
+*/
+
+START TRANSACTION;
+
+CREATE TABLE public.pidhandles
 (
   id bigint NOT NULL DEFAULT nextval('pidhandles_id_seq'::regclass),
   url text NOT NULL,
@@ -885,54 +910,8 @@ WHERE ttt.r = 1
 ORDER BY entrytype, entryid;
 ALTER VIEW pidhandle_latest_states OWNER TO appdb;
 
------------- INITIAL IMPORT SCRIPT ---------------
-/*
-START TRANSACTION;
-
-INSERT INTO pidhandles (entryid, suffix, entrytype, result, url)
-
-SELECT * FROM (
-	SELECT id, guid, 'software'::e_entity, 0,
-		'http://' || (SELECT data FROM config WHERE var = 'ui-host') || '/store/software/' || cname AS url
-	FROM applications
-	WHERE guid::TEXT NOT IN (SELECT suffix FROM pidhandles) AND NOT moderated AND NOT deleted AND metatype = 0
-	-- LIMIT 10
-) AS t1
-UNION
-
-SELECT * FROM (
-	SELECT a.id, a.guid, 'vappliance'::e_entity, 0,
-		'http://' || (SELECT data FROM config WHERE var = 'ui-host') || '/store/vappliance/' || a.cname
-	FROM vapplications AS v
-	INNER JOIN applications AS a ON a.id = v.appid
-	WHERE a.guid::TEXT NOT IN (SELECT suffix FROM pidhandles) AND NOT moderated AND NOT deleted AND metatype = 1
-	-- LIMIT 10
-) AS t2
-UNION
-
-SELECT * FROM (
-	SELECT id, guid, 'software_release'::e_entity, 0,
-		'http://' || (SELECT data FROM config WHERE var = 'ui-host') || '/store/software/' || (SELECT cname FROM applications a WHERE a.id = appid) || '/releases/' || series || '/' || release
-	FROM app_releases 
-	WHERE state = 2 AND appid NOT IN (SELECT id FROM applications WHERE deleted OR moderated)
-	-- LIMIT 10
-) AS t3
-UNION
-
-SELECT * FROM (
-	SELECT id, uguid, 'vappliance_version'::e_entity, 0,
-		'http://' || (SELECT data FROM config WHERE var = 'ui-host') || '/store/vappliance/' || (SELECT cname FROM applications WHERE id = (SELECT appid FROM vapplications WHERE id = vappid)) || '/vaversion/' || 
-			CASE WHEN published AND NOT archived THEN
-				'latest'
-			ELSE
-				'previous/' || id::TEXT
-			END
-	FROM vapp_versions
-	WHERE ((published AND NOT archived) OR (published AND archived)) AND (SELECT appid FROM vapplications WHERE id = vappid) NOT IN (SELECT id FROM applications WHERE deleted OR moderated) 
-	AND vappid <> 25 -- exclude monitoring VA
-	-- LIMIT 10
-) AS t4
-;
+INSERT INTO version (major,minor,revision,notes)
+        SELECT 8, 19, 0, E'Add support for Handle PIDs'
+        WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=19 AND revision=0);
 
 COMMIT;
-*/
