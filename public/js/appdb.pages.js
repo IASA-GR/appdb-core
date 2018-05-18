@@ -2364,7 +2364,7 @@ appdb.pages.application = (function(){
 		    innerhtml += '<div class="item"><span class="name">vApp identifier:</span><span>'+data.vappliance.identifier+'</span></div>';
 		}
 		if ($.trim(data.handle)) {
-		    innerhtml += '<div class="item"><span class="name">PID Handle:</span><span><a class="hdlhandle" href="'+ appdb.config.endpoint.hdl + $.trim(data.handle) + '" target="_blank">' + $.trim(data.handle) + '</a></span></div>';
+		    innerhtml += '<div class="item"><span class="name">PID Handle:</span><span><a class="hdlhandle" href="'+ appdb.config.endpoint.hdl + $.trim(data.handle) + '" target="_blank">hdl:' + $.trim(data.handle) + '</a></span></div>';
 		}
 		innerhtml += '</div>';
 		innerhtml += '</div></div></div>';
