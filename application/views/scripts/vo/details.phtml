@@ -118,11 +118,14 @@ function getHtmlDateValue($value, $context){
 								<div class="vo-group small-group groupcontainer" style="margin-top: -8px;">
 									<ul>
 										<li class="resourcesinfo"><a href="#resourcesinfo" title="View Virtual Organization Resources">Virtual Organization Resources</a></li>
+<?php if (false) { ?>
 										<li class="contactinfo current"><a href="#contactinfo" title="View Contact Information">Contact Information</a></li>
+<?php } ?>
 									</ul>
 								   <div id="resourcesinfo">
 									  <div id="docdiv<?php echo $this->dialogCount;?>" title="Resources" ></div>
 								   </div>
+<?php if (false) { ?>
 									<div id="contactinfo" class="current">
 										<?php if ( count($this->entry->contacts) > 0 ) {?>
 										<table border="0" width="99%" id="contactInfoTable<?php echo $this->dialogCount;?>">
@@ -158,6 +161,7 @@ function getHtmlDateValue($value, $context){
 										</div>
 										<?php } ?>
 									</div>
+<?php } ?>
 								</div>
 							</td>
 						</tr>
