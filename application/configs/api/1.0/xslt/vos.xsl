@@ -26,6 +26,14 @@
 xmlns:vo="http://appdb.egi.eu/api/1.0/vo">
 	<xsl:output method="xml"/>
 	<xsl:strip-space elements="*" />
+	<xsl:template match="//vo:contact">
+			<xsl:apply-templates />
+	</xsl:template>
+	<xsl:template match="//vo:voms">
+		<xsl:copy>
+			<xsl:apply-templates select="@*"/>
+		</xsl:copy>
+	</xsl:template>
 	<xsl:template match="@*|node()">
 		<xsl:copy>
 			<xsl:apply-templates select="@*|node()"/>
