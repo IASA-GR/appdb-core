@@ -32,7 +32,7 @@
 					 </center>
 						<div class='registeredrow'><span>Since:</span><t:data p:datamember="registeredOn" p:runat="client" p:transform="appdb.utils.FormatISODate" class='personregistration'/>
                     </td>
-                    <td style="width: 400px;">
+                    <td style="width: 100%;min-width: 400px">
                     <table style="vertical-align: middle;width: 100%">
                         <tbody>
                             <tr >
@@ -46,7 +46,7 @@
                                 </td>
                                 </tr>
                                 <tr>
-                                    <td style="vertical-align: middle;">Scientific Orientation:</td>
+                                    <td style="vertical-align: middle; width: 149px">Scientific Orientation:</td>
                                     <td>
                                         <t:data p:id="roleType" p:datamember="role.type" p:runat="client" p:empty="<i>no role given</i>" style="padding-right:4px;" ></t:data>
                                     </td>
@@ -99,7 +99,8 @@
 <?php } ?>
                             </tbody>
                         </table>
-                    </td>
+					</td>
+<?php if (false) { ?>
                     <td colspan="2" align="center" style="text-align:center;width:45%;border-left: #3a3a3a 1px dashed;" class="viewmode">
 						<div class="person-group small-group groupcontainer">
 							<ul>
@@ -127,7 +128,8 @@
 							   </t:repeat>
 						   </div>
                         </div>
-                    </td>
+					</td>
+<?php } ?>
                 </tr>
                 </tbody>
                 </table>

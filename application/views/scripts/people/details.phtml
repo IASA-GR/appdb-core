@@ -149,7 +149,7 @@
 										<?php $canEdit = checkRegister($this); if ($this->session->userid !== null) if ($canEditProfile) $canEdit=true; if ($canEdit) echo '';?>
 									</td>
 									</tr>
-									<tr><td>Scientific Orientation: </td><td style="vertical-align: middle">
+									<tr><td style="width: 149px">Scientific Orientation: </td><td style="vertical-align: middle">
 									<span <?php
 									$canEdit = checkRegister($this); if ($this->session->userid !== null) if ( $canEditProfile ) $canEdit = true; if ($canEdit) {
 										echo 'edit_style="{\'max-width\': \'87%\'}" class="editable" edit_type="combo" edit_onchange="positionTypeChanged" edit_name="positionTypeID"';
@@ -247,6 +247,8 @@
                                     <?php } ?>
 								</table>
 							</td>
+
+<?php if ($this->session->userid === $this->entry->id) { // if user is viewing own profile ?>
 							<td style="min-width:280px; vertical-align:top; border-left:1px dashed;padding-top: 5px;" align="right" class="viewmode">
 								<div class="person-group small-group groupcontainer">
 									<ul class="hideonedit">
@@ -298,6 +300,7 @@
 									</div>
 								</div>
 							</td>
+<?php } // if user is viewing own profile ?>
 						</tr>
 					</table>
 				</td>
