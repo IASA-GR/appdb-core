@@ -121,14 +121,18 @@
 			</xsl:if>
 
 			<subjects>
-				<subject>
-					<xsl:value-of select="./application:category[@primary='true']/text()" />
-				</subject>
+				<xsl:if test="not(./application:category[@primary='true']/text() = 'Virtual Appliances')">
+					<subject>
+						<xsl:value-of select="./application:category[@primary='true']/text()" />
+					</subject>
+				</xsl:if>
 				<xsl:if test="./application:category[@primary='false']">
 					<xsl:for-each select="./application:category[@primary='false']">
-						<subject>
-							<xsl:value-of select="./text()" />
-						</subject>
+						<xsl:if test="not(./text() = 'Virtual Appliances')">
+							<subject>
+								<xsl:value-of select="./text()" />
+							</subject>
+						</xsl:if>
 					</xsl:for-each>
 				</xsl:if>
 			</subjects>

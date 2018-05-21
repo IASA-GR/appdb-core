@@ -71,14 +71,18 @@
 
 			<dc:publisher>EGI Applications Database</dc:publisher>
 
-			<dc:subject>
-				<xsl:value-of select="./application:category[@primary='true']/text()" />
-			</dc:subject>
+			<xsl:if test="not(./application:category[@primary='true']/text() = 'Virtual Appliances')">
+				<dc:subject>
+					<xsl:value-of select="./application:category[@primary='true']/text()" />
+				</dc:subject>
+			</xsl:if>	
 			<xsl:if test="./application:category[@primary='false']">
 				<xsl:for-each select="./application:category[@primary='false']">
-					<dc:subject>
-						<xsl:value-of select="./text()" />
-					</dc:subject>
+					<xsl:if test="not(./text() = 'Virtual Appliances')">
+						<dc:subject>
+							<xsl:value-of select="./text()" />
+						</dc:subject>
+					</xsl:if>
 				</xsl:for-each>
 			</xsl:if>
 
