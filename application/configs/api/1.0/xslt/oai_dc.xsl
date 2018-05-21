@@ -75,9 +75,11 @@
 				<xsl:value-of select="./application:category[@primary='true']/text()" />
 			</dc:subject>
 			<xsl:if test="./application:category[@primary='false']">
-				<dc:subject>
-					<xsl:value-of select="./application:category[@primary='false']/text()" />
-				</dc:subject>
+				<xsl:for-each select="./application:category[@primary='false']">
+					<dc:subject>
+						<xsl:value-of select="./text()" />
+					</dc:subject>
+				</xsl:for-each>
 			</xsl:if>
 
 			<dc:date>

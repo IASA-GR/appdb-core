@@ -124,9 +124,13 @@
 				<subject>
 					<xsl:value-of select="./application:category[@primary='true']/text()" />
 				</subject>
-				<subject>
-					<xsl:value-of select="./application:category[@primary='false']/text()" />
-				</subject>
+				<xsl:if test="./application:category[@primary='false']">
+					<xsl:for-each select="./application:category[@primary='false']">
+						<subject>
+							<xsl:value-of select="./text()" />
+						</subject>
+					</xsl:for-each>
+				</xsl:if>
 			</subjects>
 
 			<dates>
