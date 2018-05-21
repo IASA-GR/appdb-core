@@ -181,11 +181,11 @@ CREATE OR REPLACE FUNCTION public.oaidatacite(applications)
 AS $function$
 DECLARE x XML;
 BEGIN
-        IF EXISTS (SELECT 1 FROM cache.appxmlcache WHERE id = $1.id AND openairexml IS DISTINCT FROM NULL) THEN
-                RETURN (SELECT openairexml FROM cache.appxmlcache WHERE id = $1.id);
+        IF EXISTS (SELECT 1 FROM cache.appxmlcache WHERE id = $1.id AND oaidatacitexml IS DISTINCT FROM NULL) THEN
+                RETURN (SELECT oaidatacitexml FROM cache.appxmlcache WHERE id = $1.id);
         ELSE
-                x := (($1::applications).__openaire)::XML;
-                UPDATE cache.appxmlcache SET openairexml = x WHERE id = $1.id;
+                x := (($1::applications).__oaidatacite)::XML;
+                UPDATE cache.appxmlcache SET oaidatacitexml = x WHERE id = $1.id;
                 RETURN x;
         END IF;
 END;
