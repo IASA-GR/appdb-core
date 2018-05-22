@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-class RestVoReport extends RestROAuthResourceList {
+class RestVoReport extends RestROSelfAuthResourceList {
     /**
      * realization of getDataType from iRestResource
      */
@@ -58,12 +58,6 @@ class RestVoReport extends RestROAuthResourceList {
 		}
 	}
 
-	public function authorize($method) {
-        $res = parent::authorize($method);
-        $res = $res && (( $this->getParam("id") == $this->_userid ) || $this->userIsAdmin());
-        if ( ! $res && $this->getError() == RestErrorEnum::RE_OK ) $this->setError(RestErrorEnum::RE_ACCESS_DENIED);
-        return $res;
-	}
 }
 
 /**
@@ -231,7 +225,7 @@ class RestVOFilterReflection extends RestROResourceItem {
     }
 }
 
-class RestVOMemberList extends RestROResourceList {
+class RestVOMemberList extends RestROSelfAuthResourceList {
 	public function getDataType() {
 		return "vo";
 	}
@@ -318,7 +312,7 @@ class RestVOShifterList extends RestVOContactList {
 	}
 }
 
-class RestPplVOList extends RestROResourceList {
+class RestPplVOList extends RestROSelfAuthResourceList {
 	public function getDataType() {
 		return "vo";
 	}

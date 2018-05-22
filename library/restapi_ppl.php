@@ -735,7 +735,7 @@ class RestPplLogistics extends RestROResourceItem {
 	}
 }
 
-class RestPplPrivList extends RestROAuthResourceList {
+class RestPplPrivList extends RestROSelfAuthResourceList {
 	public function get() {
 		if ( parent::get() !== false ) {
 			db()->setFetchMode(Zend_Db::FETCH_NUM);

@@ -3162,7 +3162,7 @@ class RestAppPubItem extends RestResourceItem {
  * class RestAppLogistics
  * handles application counting per various properties
  */
-class RestAppLogistics extends RestROResourceItem {
+class RestAppLogistics extends RestROSelfAuthResourceItem {
     /**
      * realization of getDataType from iRestResource
      */
@@ -3248,7 +3248,7 @@ class RestAppLogistics extends RestROResourceItem {
 				getZendSelectParts($select, $from, $where, $orderby, $limit);
 			}
 			$db->setFetchMode(Zend_Db::FETCH_BOTH);
-			debug_log($db->quoteInto('SELECT * FROM app_logistics(?,?,?)', array($flt, $from, $where)));
+//			debug_log($db->quoteInto('SELECT * FROM app_logistics(?,?,?)', array($flt, $from, $where)));
 			$rs = $db->query('SELECT * FROM app_logistics(?,?,?)', array($flt, $from, $where))->fetchAll();
 			if ( count($rs) > 0 ) {
 				$rs = $rs[0];
