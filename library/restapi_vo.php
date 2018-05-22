@@ -59,7 +59,6 @@ class RestVoReport extends RestROAuthResourceList {
 	}
 
 	public function authorize($method) {
-		return true;
         $res = parent::authorize($method);
         $res = $res && (( $this->getParam("id") == $this->_userid ) || $this->userIsAdmin());
         if ( ! $res && $this->getError() == RestErrorEnum::RE_OK ) $this->setError(RestErrorEnum::ACCESS_DENIED);
