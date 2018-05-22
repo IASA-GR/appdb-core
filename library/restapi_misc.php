@@ -1356,6 +1356,11 @@ class RestAccessGroupItem extends RestROResourceItem {
 	public function get() {
 		if ( parent::get() !== false ) {
 			db()->setFetchMode(Zend_Db::FETCH_NUM);
+			if ($this->getParam("id") == "-7") {
+				// Don't show VO members
+				$this->setError(RestErrorEnum::RE_ACCESS_DENIED);
+				return false;
+			}
 			$res = db()->query("SELECT privgroup_to_xml(" . pg_escape_string($this->getParam("id")) . ")")->fetchAll();
 			if ( count($res) > 0 ) {
 				$ret = array();
