@@ -4429,7 +4429,8 @@ appdb.pages.vo = (function(){
 		};
 
 		d3v4.xml("https://appdb.egi.eu/rest/1.0/stats/vos/" + VOid + "/appstats/" + theDates + "?omitunchanged:1", function(error, data) {
-		  if (error) throw error;
+		  //if (error) throw error;
+		  if (error) return;
 
 		  data = [].map.call(data.querySelectorAll("appstats[stats='daily']"), function(appstats) {
 			return {

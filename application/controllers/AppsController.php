@@ -555,13 +555,13 @@ class AppsController extends Zend_Controller_Action
 		header('Content-type: text/'.($type==="xml"?"xml":"x-csv"));
 		header("Pragma: no-cache");
 		header("Expires: 0");
-		header('Content-Length: '.strlen($s));
 		if ( $type === "xml" ) {
-			echo '<applications>'. $s . '</applications>';
+			$s = '<applications>'. $s . '</applications>';
 		} else {
-			echo '"Name","Description","Abstract","Date Added","Added By","Owner","Status","Categories","Middlewares","VOs","Disciplines","Countries","URLs","Researchers"' . "\n";
-			echo $s;
+			$s = '"Name","Description","Abstract","Date Added","Added By","Owner","Status","Categories","Middlewares","VOs","Disciplines","Countries","URLs","Researchers"' . "\n" . $s;
 		}
+		header('Content-Length: '.strlen($s));
+		echo $s;
     }
    
     public function makemapAction() {

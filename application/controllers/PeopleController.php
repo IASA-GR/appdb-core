@@ -355,16 +355,13 @@ class PeopleController extends Zend_Controller_Action
 		header('Content-type: text/'.($type==="xml"?"xml":"x-csv"));
 		header("Pragma: no-cache");
 		header("Expires: 0");
-		header('Content-Length: '.strlen($s));
 		if ( $type === 'xml' ) {
-			echo '<researchers>';
-			echo $s;
-			echo '</researchers>';
-
+			$s = '<researchers>' . $s . '</researchers>';
 		} else {
-			echo '"Firstname","Lastname","Registered","Institution","Country","Role","Permalink","Software","Contacts"' . "\n";
-			echo $s;
+			$s = '"Firstname","Lastname","Registered","Institution","Country","Role","Permalink","Software","Contacts"' . "\n" . $s;
 		}
+		header('Content-Length: '.strlen($s));
+		echo $s;
     }
 
     public function export2Action()
