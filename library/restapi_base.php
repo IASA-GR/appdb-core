@@ -2227,6 +2227,29 @@ abstract class RestROAuthResourceList extends RestROResourceList {
 }
 
 /**
+ * class RestROSelfAuthResourceList
+ * derived base class for read-only authoritative list REST resources
+ */
+abstract class RestROSelfAuthResourceList extends RestROAuthResourceList {
+	
+	public function authorize($method) {
+        $res = false;
+        switch ($method) {
+        case RestMethodEnum::RM_GET:
+			$res = $this->authenticate();
+			$res = $res && (( $this->getParam("id") == $this->_userid ) || $this->userIsAdmin());
+			if ($res !== true) $this->setError(RestErrorEnum::RE_ACCESS_DENIED);
+            break;
+        case RestMethodEnum::RM_POST:
+        case RestMethodEnum::RM_PUT:
+        case RestMethodEnum::RM_DELETE:
+            $res = false;
+            break;
+        }
+        return $res;
+    }
+}
+/**
  * class RestROAdminResourceList
  * derived base class for read-only authoritative list REST resources which require 
  * administrative privileges
@@ -2419,6 +2442,29 @@ abstract class RestROAuthResourceItem extends RestROResourceItem {
     }
 }
 
+/**
+ * class RestROSelfAuthResourceItem
+ * derived base class for read-only authoritative REST resources that are single items
+ */
+abstract class RestROSelfAuthResourceItem extends RestROAuthResourceItem {
+
+    public function authorize($method) {
+        $res = false;
+        switch ($method) {
+        case RestMethodEnum::RM_GET:
+            $res = $this->authenticate();
+			$res = $res && (( $this->getParam("id") == $this->_userid ) || $this->userIsAdmin());
+			if ($res !== true) $this->setError(RestErrorEnum::RE_ACCESS_DENIED);
+            break;
+        case RestMethodEnum::RM_POST:
+        case RestMethodEnum::RM_PUT:
+        case RestMethodEnum::RM_DELETE:
+            $res = false;
+            break;
+        }
+        return $res;
+    }
+}
 /**
  * class RestROAdminResourceItem
  * derived base class for read-only authoritative REST resources that are single items 
