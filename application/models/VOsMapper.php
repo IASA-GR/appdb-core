@@ -21,12 +21,12 @@ class Default_Model_VOsMapper extends Default_Model_VOsMapperBase
 	public function joins(&$select, $filter) {
 		$select->joinLeft('vos.any.any','vos.any.id = vos.id', array());
 		if ( is_array($filter->joins) ) {
-/*			if (in_array("vo_contacts", $filter->joins) ) {
+			if (in_array("vo_contacts", $filter->joins) ) {
 				$select->joinLeft('vo_contacts', 'vos.id = vo_contacts.void');
 			}
 			if (in_array("vo_members", $filter->joins) ) {
 				$select->joinLeft('vo_members', 'vos.id = vo_members.void');
-			}*/
+			}
 			if (in_array("domains", $filter->joins) ) {
 				$select->joinLeft('domains', 'domains.id = vos.domainid');
 			}
