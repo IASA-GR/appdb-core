@@ -1613,6 +1613,11 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
 					if ($actor->type === "ppl") {
 						$this->_userid = $actor->id;
 						$_GET['userid'] = $actor->id;
+						$u = new Default_Model_Researchers();
+						$u->filter->id->numequals($actor->id);
+						if (count($u->items) > 0) {
+							$this->_userGroups = $u->items[0]->actorGroups;
+						}
 						return true;
 					}
 				} else {
