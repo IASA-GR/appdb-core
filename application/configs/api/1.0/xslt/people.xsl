@@ -23,10 +23,30 @@
     Author     : nakos
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-xmlns:application="http://appdb.egi.eu/api/1.0/application"    
+xmlns:application="http://appdb.egi.eu/api/1.0/application"
+xmlns:vo="http://appdb.egi.eu/api/1.0/vo"
+xmlns:privilege="http://appdb.egi.eu/api/1.0/privilege"
+xmlns:person="http://appdb.egi.eu/api/1.0/person"
 xmlns:people="http://appdb.egi.eu/api/1.0/people">    
 	<xsl:output method="xml"/>
 	<xsl:strip-space elements="*" />
+
+	<xsl:template match="//vo:vo">
+		<xsl:apply-templates />
+	</xsl:template>
+	<xsl:template match="//privilege:group[@id=-4 or @id=-7 or @id=-11 or @id=-12 or @id=-13]/text()">
+		<xsl:apply-templates />
+	</xsl:template>
+	<xsl:template match="//privilege:group[@id=-4 or @id=-7 or @id=-11 or @id=-12 or @id=-13]">
+		<xsl:apply-templates />
+	</xsl:template>
+	<xsl:template match="//person:contact/text()">
+		<xsl:apply-templates />
+	</xsl:template>
+	<xsl:template match="//person:contact">
+		<xsl:apply-templates />
+	</xsl:template>
+
 	<xsl:template match="*">
 		<xsl:copy>
 			<xsl:copy-of select="@*"/>
