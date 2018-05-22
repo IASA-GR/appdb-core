@@ -1348,7 +1348,7 @@ class RestAccessGroupList extends RestROResourceList {
 	}
 }
 
-class RestAccessGroupItem extends RestROResourceItem {
+class RestAccessGroupItem extends RestROAdminResourceItem {
 	public function getDataType() {
 		return "accessgroup";
 	}
