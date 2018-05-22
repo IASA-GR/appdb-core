@@ -21,12 +21,12 @@ class Default_Model_VOsMapper extends Default_Model_VOsMapperBase
 	public function joins(&$select, $filter) {
 		$select->joinLeft('vos.any.any','vos.any.id = vos.id', array());
 		if ( is_array($filter->joins) ) {
-			if (in_array("vo_contacts", $filter->joins) ) {
+/*			if (in_array("vo_contacts", $filter->joins) ) {
 				$select->joinLeft('vo_contacts', 'vos.id = vo_contacts.void');
 			}
 			if (in_array("vo_members", $filter->joins) ) {
 				$select->joinLeft('vo_members', 'vos.id = vo_members.void');
-			}
+			}*/
 			if (in_array("domains", $filter->joins) ) {
 				$select->joinLeft('domains', 'domains.id = vos.domainid');
 			}
@@ -36,14 +36,14 @@ class Default_Model_VOsMapper extends Default_Model_VOsMapperBase
 				in_array("countries", $filter->joins) ||
 				in_array("appcountries", $filter->joins) ||
 				in_array("middlewares", $filter->joins) ||
-				in_array("contacts", $filter->joins) || 
+				//in_array("contacts", $filter->joins) || 
 				in_array("positiontypes", $filter->joins) ||
 				in_array("categories", $filter->joins) ||
 				in_array("archs", $filter->joins) ||
 				in_array("oses", $filter->joins) ||
 				in_array("proglangs", $filter->joins) ||
-				in_array("statuses", $filter->joins) ||
-				in_array("researchers", $filter->joins)) {
+				in_array("statuses", $filter->joins)/* ||
+				in_array("researchers", $filter->joins)*/) {
 				$select->joinLeft('app_vos', 'app_vos.void = vos.id', array());
 				$select->joinLeft('applications','applications.id = app_vos.appid AND applications.deleted IS FALSE AND applications.moderated IS FALSE', array());
 				$select->joinLeft('applications.any','applications.any.id = applications.id', array());
@@ -74,23 +74,23 @@ class Default_Model_VOsMapper extends Default_Model_VOsMapperBase
 				}
 				$select->joinLeft('middlewares.any','middlewares.any.id = middlewares.id', array());
 			}
-			if (in_array("researchers", $filter->joins) || in_array("contacts", $filter->joins) || in_array("positiontypes", $filter->joins)) {
+/*			if (in_array("researchers", $filter->joins) || in_array("contacts", $filter->joins) || in_array("positiontypes", $filter->joins)) {
 				$select->joinLeft('researchers_apps','researchers_apps.appid = applications.id', array());
 				$select->joinLeft('researchers','researchers.id = researchers_apps.researcherid AND researchers.deleted IS FALSE', array());
 				$select->joinLeft('researchers.any','researchers.any.id = researchers.id', array());
-			}
+			} */
 			if (in_array("categories", $filter->joins)) {
 				$select->joinLeft('categories','categories.id = ANY(applications.categoryid)', array());
 				$select->joinLeft('categories.any','categories.any.id = categories.id', array());
 			}
-			if (in_array("contacts", $filter->joins)) {
+/*			if (in_array("contacts", $filter->joins)) {
 				$select->joinLeft('contacts','researchers.id = contacts.researcherid', array());
 				$select->joinLeft('contacts.any', 'contacts.any.id = contacts.id', array());
-			}
-			if (in_array("positiontypes", $filter->joins)) {
+			} */
+/*			if (in_array("positiontypes", $filter->joins)) {
 				$select->joinLeft('positiontypes','researchers.positiontypeid = positiontypes.id', array());
 				$select->joinLeft('positiontypes.any','positiontypes.any.id = positiontypes.id', array());
-			}
+			}*/
 			if ( in_array("oses", $filter->joins) ) {
 				$select->joinLeft('app_oses', 'app_oses.appid = applications.id', array());
 				$select->joinLeft('oses', 'app_oses.osid = oses.id', array());

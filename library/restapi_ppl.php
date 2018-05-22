@@ -603,7 +603,7 @@ class RestPplFilterReflection extends RestROResourceItem {
 	public function get(){
 		if ( parent::get() !== false ) {
 			$s = '<person:filter>';
-			$s .= FilterParser::fieldsToXML("any person country application vo discipline middleware category license accessgroup", "person");
+			$s .= FilterParser::fieldsToXML("any person country application discipline middleware category license accessgroup", "person");
 			$s .= '</person:filter>';
 			return new XMLFragmentRestResponse($s, $this);
 		} else return false;

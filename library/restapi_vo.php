@@ -225,7 +225,7 @@ class RestVOFilterReflection extends RestROResourceItem {
 	public function get() {
 		if ( parent::get() !== false ) {
 			$s = '<vo:filter>';
-			$s .= FilterParser::fieldsToXML("any application person country vo discipline middleware category", "vo");
+			$s .= FilterParser::fieldsToXML("any application country vo discipline middleware category", "vo");
 			$s .= '</vo:filter>';
 			return new XMLFragmentRestResponse($s, $this);
 		} else return false;

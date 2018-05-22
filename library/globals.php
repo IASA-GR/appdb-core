@@ -1569,9 +1569,9 @@ class FilterParser {
 						break;
 					case("sender"):
 					case("person"):
-						$fltstr = "id:numeric firstname:string lastname:string name:string registeredon:datetime institute:string activated:boolean lastlogin:datetime lastupdated:datetime nodissemination:boolean contact:string role:string roleid:numeric language:string os:string arch:string phonebook:string license:complex accessgroup:complex";
+						$fltstr = "id:numeric firstname:string lastname:string name:string registeredon:datetime institute:string activated:boolean lastupdated:datetime nodissemination:boolean role:string roleid:numeric language:string os:string arch:string phonebook:string license:complex accessgroup:complex";
 						if ( $base === $i ) {
-							$fltstr = $fltstr." country:complex application:complex middleware:complex vo:complex discipline:complex category:complex";
+							$fltstr = $fltstr." country:complex application:complex middleware:complex discipline:complex category:complex";
 						}
 						$end = '>'.FilterParser::fieldsToXML($fltstr, $base, $n+1).'</filter:field>';
                         break;
