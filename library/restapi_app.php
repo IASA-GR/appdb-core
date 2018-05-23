@@ -2747,8 +2747,9 @@ class RestAppTagList extends RestResourceList {
             if ( $this->_parser->getError() !== RestErrorEnum::RE_OK ) {
     			$this->setError($this->_parser->getError(), $this->_parser->getExtError(), false);
                 return false;
-            } else {
-                $res = new RestAppTagItem(array("tid" => $tag->id), $this);
+			} else {
+				// for some weird reason, the real ID is the ID + 1 (maybe due to the INSTEAD rule)
+                $res = new RestAppTagItem(array("tid" => $tag->id + 1), $this);
                 return $res->get();
             }
         } else return false;
