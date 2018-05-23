@@ -139,30 +139,6 @@ appdb.InheritTemplate = function(target,options){
 };
 appdb.utils = {};
 
-appdb.utils.toggleURLWhitelistItem = function(url, e) {
-	$.ajax('news/togglewhitelist', {
-		async: true,
-		data: {"url": url},
-		success: function() {
-			if ( e ) {
-				var state = $(e).html();
-				if ( state === "YES" ) {
-					$(e).html('NO');
-				} else {
-					$(e).html('YES');
-				}
-			}
-		},
-		error: function(t) {
-			var err = new appdb.views.ErrorHandler();
-			err.handle({
-				"status": "Could not toggle URL whitelist state",
-				"description": t.statusText + ' (' + t.status + ')'
-			});
-		}
-	});
-};
-
 /*
  *Lookups for a variable in an object. 
  *Parameters are:
@@ -3033,12 +3009,6 @@ appdb.Navigator = (function(){
 	   } else {
 		   this.notFound();
 	   }
-	 } else if ( p === "brokenlinks" ) {
-	   if ( ( userID) && ( ((userRole == 5) || (userRole == 7)) ) ) {
-		if ($("#reportsbrokenlink")[0] !== undefined) $("#reportsbrokenlink").trigger("click"); else this.notFound();
-	   } else {
-		   this.notFound();
-	   }
 	 } else if ( p.substr(0,6) === "about:" ) {
 		 item = _escape(p.substr(6));
 		 if ($("#help"+item+"link")[0] !== undefined) $("#help"+item+"link").trigger("click"); else this.notFound();
@@ -3108,15 +3078,13 @@ appdb.Navigator = (function(){
 		   } else if ( p.substr(0,12) === '/ngi/details' ) {
 			 showNGIDetails2(_escape(p));
 			 if (detailsStyle == 1) this.notFound();
-		   } else if (p === "brokenlinks"){
-			 appdb.views.Main.showLinkStatuses();
 		   } else if (p === "/news/report") {
 			 appdb.views.Main.showActivityReport();
 		   } else if (p === "dissemination") {
 			 appdb.views.Main.showDisseminationTool();
 		   } else if(p==="/help/announcements"){
 			  $("#helpannouncelink").click();
-		   } else if( p.substr(0,6) === "/help/" || p.substr(0,9) === "appstats/" || p.substr(0,9) === "pplstats/" || p.substr(0,10)==="/changelog" || p === "brokenlinks") {
+		   } else if( p.substr(0,6) === "/help/" || p.substr(0,9) === "appstats/" || p.substr(0,9) === "pplstats/" || p.substr(0,10)==="/changelog" ) {
 			 var acts = appdb.utils.Faq.getActions(p);
 			 ajaxLoad(p,'main',acts);
 		   }
@@ -3643,7 +3611,6 @@ appdb.Navigator.Registry = {
 	  }
 	  return "mixed";
 	}},
-	"LinkStatuses" :  {datatype : "brokenlinks",type : "item", permalink : function(o){return "brokenlinks";},title : function(){return "Broken Link Statuses";}},
 	"ActivityReport" :  {datatype : "activityreport", type : "item" ,permalink : function(){return "/news/report";},title : function(){return "Activity Report";}},
 	"DisseminationTool" :  {datatype : "disseminationtool", type : "item" ,permalink : function(){return "dissemination";},title : function(){return "Dissemination Tool";}}
 };
@@ -6977,9 +6944,6 @@ appdb.utils.getItemCanonicalUrl = function(type,data,onlyname){
 			break;
 		case "activityreport":
 			return "/pages/admin/activityreport";
-			break;
-		case "brokenlinks":
-			 return "/pages/admin/brokenlinks";
 			break;
 		case "disseminationtool":
 			return "/pages/admin/disseminationtool";
