@@ -2360,7 +2360,7 @@ appdb.views.RelatedContactListItem = appdb.ExtendClass(appdb.views.ListItem, "ap
 				}
 				details += "</div>";
 			}
-			details += "<div class='contactpointprofile'>Click <a href='/store/person/" + this._itemData.cname + "' title='Go to " + this._itemData.firstname + " " + this._itemData.lastname + " profile' onclick='appdb.views.Main.showPerson({id: " + this._itemData.id + ", cname:\"" + this._itemData.cname + "\"},{mainTitle: \"" + this._itemData.firstname + " " + this._itemData.lastname + "\"});'>here</a> to see " + this._itemData.firstname + " " + this._itemData.lastname + " contact details</div>";
+			details += "<div class='contactpointprofile'>Click <a href='/store/person/" + this._itemData.cname + "' title='Go to " + this._itemData.firstname + " " + this._itemData.lastname + " profile' onclick='appdb.views.Main.showPerson({id: " + this._itemData.id + ", cname:\"" + this._itemData.cname + "\"},{mainTitle: \"" + this._itemData.firstname + " " + this._itemData.lastname + "\"});'>here</a> to see " + this._itemData.firstname + " " + this._itemData.lastname + " profile</div>";
 			details += "</div>";
 			var detailslink = document.createElement("a");
 			$(detailslink).attr("href", "#").attr("title", "Click to view contact points").text("details").click((function(__this, msg) {
