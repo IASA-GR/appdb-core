@@ -137,69 +137,6 @@ class NewsController extends Zend_Controller_Action
 		}
 	}
 
-	public function linkstatusAction(){
-		global $application;
-		$db = $application->getBootstrap()->getResource('db');
-		$this->_helper->layout->disableLayout();
-		$this->view->export = false;
-		// FIXME: provide for NIL that are assigned to countries other than their own
-		if ( userIsAdminOrManager($this->session->userid) || userIsNIL($this->session->userid, $this->session->userCountryID) ) {
-			if ( userIsNIL($this->session->userid, $this->session->userCountryID) ) {
-				$this->view->regional = $this->session->userCountryName; 
-			} else {
-				$this->view->regional = '';
-			}
-			if(isset($_GET["format"]) && $_GET["format"]==="csv"){
-				$this->_helper->viewRenderer->setNoRender();				
-				$this->view->export = true;
-				if ( userIsNIL($this->session->userid, $this->session->userCountryID) ) {
-					$countryJoin = " INNER JOIN appcountries ON linkstatuses.appid = appcountries.appid INNER JOIN countries ON countries.id = appcountries.id ";
-					$countryCond = " AND countries.id = " . $this->session->userCountryID . " ";
-				} else {
-					$countryJoin = '';
-					$countyCond = '';
-				}
-				$exportCSV="SELECT string_agg(e,E'\n') AS e FROM ( SELECT CASE linktype WHEN 'APP' THEN '\"application link\"' WHEN 'DOC' THEN '\"publication link\"' ELSE '\"link\"' END || ',\"' || linkstatuses.appid || '\",\"' || REPLACE(appname,'\"','''') || '\",\"' || REPLACE(ownername,'\"','''') || '\",\"' || REPLACE(CASE WHEN contact IS NULL THEN '' ELSE contact END,'\"','''') || '\",\"' || REPLACE(url,'\"','''') || '\",\"' || REPLACE(result,'\"','''') ||  '\";\"' || CEIL(EXTRACT(epoch FROM age)/86400) || '\"'  AS e FROM linkstatuses " . $countryJoin . " WHERE valid='0' AND url <> 'http://' " . $countryCond . " ORDER BY linktype,appname) AS T;";
-				$db->setFetchMode(Zend_Db::FETCH_OBJ);
-				$r = $db->query($exportCSV)->fetchAll();
-				$exportData = '';
-				if ( count($r) > 0 ) $exportData = $r[0]->e;
-				$exportData = trim($exportData);
-				header("Content-type: application/octet-stream");
-				header('Content-Disposition: attachment; filename=appdb_links_report_'.time().'.'.$_GET["format"]);
-				header("Cache-control: private"); //use this to open files directly
-				if ( $exportData !== '' ) {					
-					$fsize = strlen($exportData);
-					header("Content-length: $fsize");
-					echo $exportData;
-				} else { 
-					$this->view->error = "No broken links logged";
-				}		
-			}else{
-				$links = new Default_Model_LinkStatuses();
-				$links->filter->valid->equals("0");
-				if ( userIsNIL($this->session->userid, $this->session->userCountryID) ) {
-					$cnt = new Default_Model_CountriesFilter();
-					$cnt->id->equals($this->session->userCountryID);
-					$links->filter->chain($cnt, "AND");
-				}
-				$links->filter->orderBy("appname");
-				$links->refresh();
-				$this->view->total = $links->count();
-				$this->view->entries=$links->items;
-				$db->setFetchMode(Zend_Db::FETCH_OBJ);
-				$r = $db->query('SELECT MAX(lastchecked) as lastscan FROM linksdb;')->fetchAll();
-				if ( count($r) > 0 ) {
-					$this->view->lastscan = date ("d F Y H:i:s", strtotime($r[0]->lastscan));
-				} else {
-					$this->view->lastscan = null;
-				}
-			}
-		}else {
-			$this->view->error = "Only managers, administrators, and NILs are authorized to view this content";
-		}
-	}
-
     public function newsAction()
     {
 		$this->_helper->layout->disableLayout();
@@ -774,38 +711,6 @@ class NewsController extends Zend_Controller_Action
 		}
 	}
 
-
-	function togglewhitelistAction() {
-   		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
-		$url = $this->getParam('url');
-		$url = str_replace("'", "''"); // ANSI-SQL escape single quotes
-		$ok = false;
-		// FIXME: provide for NIL that are assigned to countries other than their own
-		if ( userIsAdminOrManager($this->session->userid) || userIsNIL($this->session->userid, $this->session->userCountryID) ) {
-			if ( userIsNIL($this->session->userid, $this->session->userCountryID) ) {
-				db()->setFetchMode(Zend_Db::FETCH_OBJ);
-				$rs = db()->query("SELECT appcountries.id AS id FROM linkstatuses INNER JOIN appcountries ON appcountries.appid = linkstatuses.appid WHERE url = '" . $url . "';")->fetchAll();
-				foreach ( $rs as $r ) {
-					if ( $r->id == $this->session->userCountryID ) {
-						$ok = true;
-						break;
-					}
-				}
-			} else $ok = true;
-		} 
-		if ( $ok ) {
-			$rs = db()->query("SELECT id FROM url_whitelist WHERE url = '" . $url . "';")->fetchAll();
-			if ( count($rs) > 0 ) {
-				db()->query("DELETE FROM url_whitelist WHERE url = '" . $url . "';")->fetchAll();
-			} else {
-				db()->query("INSERT INTO url_whitelist (url) VALUES ('" . $url . "');")->fetchAll();
-			}
-		} else {
-			$this->getResponse()->clearAllHeaders();
-			header("HTTP/1.0 403 Forbidden");
-		}
-	}
 
 	function refreshaggnewsAction() {
    		$this->_helper->layout->disableLayout();

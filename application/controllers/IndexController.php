@@ -209,8 +209,6 @@ class IndexController extends Zend_Controller_Action
 		if ( $p != "" ) {
 			if ( $p == "reports" ) {
 				$this->view->permaLink = $p;
-			} elseif ( $p == "brokenlinks" ) {
-				$this->view->permaLink = $p;
 			} elseif ( substr($p,0,6) == "about:" ) {
 				$this->view->permaLink = $p;
 			} elseif ( substr($p,0,5) == "apps:" ) {

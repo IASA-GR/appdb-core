@@ -205,17 +205,6 @@ class HelpController extends Zend_Controller_Action
 		echo $ver;
 	}
 
-	public function apachelogAction() {
-		if ( $this->session->userid !== null ) {
-			if ( userIsAdmin($this->session->userid) ) {
-				echo '<div id="apachelogmain" style="max-width: 100%; width: 100%"><div><ul>' . preg_replace('/(.+ \[(error|warn|notice|emerg|alert|crit|info|debug)\] (\[client [0-9.]+\]){0,1}) /', '<li><span style="color: red">$1</span><pre style="white-space: pre-wrap">', `cat /var/log/httpd/error_log|sed -e 's/$/<\/pre><\/li>/' -e 's/\\\\n/\\n/g'`) . '</ul></div></div>';
-			}
-		} else {
-			$this->getResponse()->clearAllHeaders();
-			header("HTTP/1.0 403 Forbidden");
-		}
-	}
-
 	public function rebuildsearchcacheAction() {
         $this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();

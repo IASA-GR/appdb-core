@@ -255,11 +255,6 @@ appdb.Navigation = (function(){
 					$("#disseminationlink").trigger("click"); 
 				} else ret.noAccess();
 				break;
-			case "brokenlinks":
-				if ( isAdminManager && $("#reportsbrokenlink")[0] !== undefined) {
-					$("#reportsbrokenlink").trigger("click");
-				} else ret.noAccess();
-				break;
 			default:
 				found = false;
 				break;
@@ -304,11 +299,6 @@ appdb.Navigation = (function(){
 			switch( p ){
 				case "home":
 					appdb.views.Main.showHome();
-					break;
-				case "brokenlinks":
-					if( isAdminManager ){
-						appdb.views.Main.showLinkStatuses();
-					} else ret.noAccess();
 					break;
 				case "/news/report":
 					if( isAdminManager ){
@@ -1387,9 +1377,6 @@ appdb.routing.resources.Admin = new appdb.routing.Resource({
 	},
 	activityreport: function(d){
 		appdb.views.Main.showActivityReport({},{mainTitle : 'Activity Report', content: 'admin'});
-	},
-	brokenlinks: function(d){
-		appdb.views.Main.showLinkStatuses({},{mainTitle : 'Broken links report', content: 'admin'});
 	},
 	disseminationtool: function(d){
 		appdb.views.Main.showDisseminationTool({},{mainTitle : 'Dissemination Tool', content: 'admin'});

@@ -4708,60 +4708,6 @@ appdb.components.ContactVOs = appdb.ExtendClass(appdb.Component, "appdb.componen
 	Title: "Notify VOs for virtual appliance "
 });
 
-appdb.components.LinkStatuses = appdb.ExtendClass(appdb.Component, "appdb.components.LinkStatsuses", function(o){
-	this.destroy = function(){
-		$("input#linkStatuses_quicksearch").unbind("keyup");
-		$(this.dom).empty();
-	};
-	this.render = function(){
-		if($.fn.quicksearch){
-			$("input#linkStatuses_quicksearch").quicksearch("table#linkStatuses_results tbody tr");
-			$("input#linkStatuses_quicksearch").bind("keyup",function(){
-				setTimeout(function(){
-					var elem = document.getElementById("linkStatuses_body");
-					if (elem.clientHeight === elem.scrollHeight)
-						$("table#linkStatuses_tableheader").css("padding-right","0px");
-					else
-						$("table#linkStatuses_tableheader").css("padding-right","15px");
-				},100);
-			});
-			$("table#linkStatuses_tableheader thead tr th").mouseup(function(){
-				var th = $($("table#linkStatuses_results thead tr th").get($(this).index()));
-				var t = this;
-				setTimeout(function(){
-					if($(th).hasClass("headerSortUp")){
-						$(t).removeClass("headerSortDown");
-						$(t).addClass("headerSortUp");
-					}else if($(th).hasClass("headerSortDown")){
-						$(t).removeClass("headerSortUp");
-						$(t).addClass("headerSortDown");
-					}else{
-						$(t).removeClass("headerSortUp");
-						$(t).removeClass("headerSortDown");
-					}
-				},100);
-				$(th).trigger('click');
-			});
-		}else{
-			$("#linkStatuses_form").hide();
-		}
-	};
-	this.load = function(){
-		this.publish({event:"loaded",value:{}});
-		this.render();
-	};
-	this._init = function(){
-		var v = {};
-        if(typeof o.container==="string"){
-            this.dom = $(o.container);
-        }else{
-            this.dom = o.container;
-        }
-        this.views = v;
-	};
-	this._init();
-});
-
 appdb.components.DisseminationLog = appdb.ExtendClass(appdb.Component, "appdb.components.DisseminationLog", function(o){
 	this.destroy = function() {
         this.views.pagerview.destroy();
@@ -10351,7 +10297,6 @@ appdb.ViewLoader = (function(){
 		_v["dataset"] = {loadOn: "always",reloadComponent: true, url:"datasets/details",cache:null,selector: "#appdb_component_Dataset", component:"appdb.components.Dataset"};
         _v["persondetails"] = {loadOn:"nocache",url:"people/details2",cache : null,selector : "#ppl_details",component:"appdb.components.Person",isTemplate : true, templatepane : null};
 		_v["reportabuse"] = {loadOn:"nocahce",url: "abuse/report",cache:null,component:"appdb.components.ReportAbuse"};
-		_v["linkstatuses"] = {loadOn: "always",url:"news/linkstatus",cache:null,component:"appdb.components.LinkStatuses"};
 		_v["dissemination"] = {loadOn: "always",url:"news/dissemination",cache:null,component:"appdb.components.DisseminationTool"};
     };
     _init();
@@ -12023,30 +11968,8 @@ appdb.views.Main = (function(){
 			smc.load(appid);
 		};
 	})();
-	var _showLinkStatuses = function(o,e){
-		_currentState = {callback : _showLinkStatuses,query:o,ext:e};
-        e = e || {};
-        o = o || {};
-        e.mainTitle = e.mainTitle || 'Broken links report';
-        if(typeof o.name === "undefined"){
-            o.name="";
-        }
-		e.isList = true;
-        e.componentType = "appdb.components.LinkStatuses";
-        e.componentCaller = appdb.views.Main.showLinkStatuses;
-        e.componentArgs = [o];
-		
-        _clearComponents();
-        _createNavigationList(e);
-		_showComponent(o,e);
-        appdb.views.Main.selectAccordion("adminpane",e.mainTitle);
-		if( e && $.trim(e.content) !== "" ||  $.trim(e.content) !== "current"){
-			appdb.pages.index.setCurrentContent($.trim(e.content),false);
-		}
-		_selectActiveLinks('/pages/admin/brokenlinks');
-	};
 	var _showDisseminationTool = function(o,e){
-		_currentState = {callback : _showLinkStatuses,query:o,ext:e};
+		_currentState = {callback : _showDisseminationTool,query:o,ext:e};
         e = e || {};
         o = o || {};
         e.mainTitle = e.mainTitle || 'Dissemination Tool';
@@ -12426,7 +12349,6 @@ appdb.views.Main = (function(){
 		showReportAbuse : _showReportAbuse,
 		showRequestJoinContacts : _showRequestJoinContacts,
 		showSendMessageToContacts : _showSendMessageToContacts,
-		showLinkStatuses : _showLinkStatuses,
 		showDisseminationTool: _showDisseminationTool,
 		showSoftwareMarketplace: _showSoftwareMarketplace,
 		showCloudMarketplace: _showCloudMarketplace,

@@ -1609,6 +1609,11 @@ class AppsController extends Zend_Controller_Action
 		}
 	}
 	public function dispatchoutdatedmailsAction(){
+
+		// DISABLED
+
+		return;
+
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
 		// Prevent malicious calls

@@ -151,15 +151,13 @@ if( $browserSupported == false ){
 				<ul>
 					<?php if ( $isAdminOrManager ) { ?>			
 					<li><a id="reportslink" href="/pages/admin/activityreport" onclick="appdb.views.Main.showActivityReport({},{mainTitle : 'Activity Report', content: 'admin'});">Activity report</a></li>
-					<?php } ?>
-					<li><a id="reportsbrokenlink" href="/pages/admin/brokenlinks" onclick="appdb.views.Main.showLinkStatuses({},{mainTitle : 'Broken links report', content: 'admin'});">Broken links report</a></li>
+					<?php } // isAdminOrManager ?>
 					<?php if ( $this->user->privs->canUseDisseminationTool() ) { ?>
 					<li class="seperator"></li>
 					<li ><a id="disseminationlink" href="/pages/admin/disseminationtool" onclick="appdb.views.Main.showDisseminationTool({},{mainTitle : 'Dissemination Tool', content: 'admin'});">Dissemination Tool</a></li>
 					<?php } ?>
 					<?php if ( $isAdmin ) { ?>
 					<li class="seperator"></li>
-					<li ><a id="apacheloglink" target="_blank" href="/help/apachelog">Apache Log</a></li>
 					<li ><a id="rebuildsearchcachelink" target="_blank" href="#" onclick="appdb.utils.rebuildSearchCache();">Rebuild Search Cache</a></li>
 					<li ><a id="clearsearchcachelink" target="_blank" href="#" onclick="appdb.utils.clearSearchCache();">Clear Search Cache</a></li>
 					<?php } ?>
