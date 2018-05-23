@@ -12046,7 +12046,7 @@ appdb.views.Main = (function(){
 		_selectActiveLinks('/pages/admin/brokenlinks');
 	};
 	var _showDisseminationTool = function(o,e){
-		_currentState = {callback : _showLinkStatuses,query:o,ext:e};
+		_currentState = {callback : _showDisseminationTool,query:o,ext:e};
         e = e || {};
         o = o || {};
         e.mainTitle = e.mainTitle || 'Dissemination Tool';
