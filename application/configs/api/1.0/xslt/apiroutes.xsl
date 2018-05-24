@@ -34,7 +34,7 @@
 	</xsl:template>
 	<xsl:template match="route[@hidden = 'true']">
 	</xsl:template>
-	<xsl:template match="route">
+	<xsl:template match="route[@type='rest']">
 		<xsl:element name="appdb:resource">
 			<xsl:attribute name="uri">
 				<xsl:value-of select="@url" />
