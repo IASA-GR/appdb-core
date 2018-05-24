@@ -205,7 +205,6 @@ UPDATE researchers SET nodissemination = TRUE;
 DELETE FROM news WHERE subjectguid IN (SELECT guid FROM researchers);
 CREATE UNIQUE INDEX idx_id_aggregate_news ON aggregate_news (id);
 CREATE INDEX idx_news_timestamp ON news(timestamp);
-REFRESH MATERIALIZED VIEW CONCURRENTLY aggregate_news;
 
 DELETE FROM mail_subscriptions WHERE NOT flt LIKE '%SYSTAG_FOLLOW%';
 ALTER TABLE mail_subscriptions ADD COLUMN addedon TIMESTAMP DEFAULT NOW();
@@ -218,18 +217,20 @@ CREATE OR REPLACE FUNCTION public.trfn_mail_subscriptions_lastupdated()
  LANGUAGE plpgsql
 AS $function$
 BEGIN
-        UPDATE mail_subscriptions SET lastupdated = NOW() WHERE id = NEW.id;
+        NEW.lastupdated := NOW();
         RETURN NEW;
 END;
 $function$;
 ALTER FUNCTION trfn_mail_subscriptions_lastupdated() OWNER TO appdb;
 
 CREATE TRIGGER rtr_mail_subscriptions_90_lastupdated
-AFTER UPDATE ON mail_subscriptions
+BEFORE UPDATE ON mail_subscriptions
 FOR EACH ROW EXECUTE PROCEDURE trfn_mail_subscriptions_lastupdated();  
 
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 19, 12, E'Clean-up mail_subscriptions and news'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=19 AND revision=12);
 	
-COMMIT;	
+COMMIT;
+
+REFRESH MATERIALIZED VIEW CONCURRENTLY aggregate_news;
