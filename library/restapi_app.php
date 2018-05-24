@@ -3163,7 +3163,7 @@ class RestAppPubItem extends RestResourceItem {
  * class RestAppLogistics
  * handles application counting per various properties
  */
-class RestAppLogistics extends RestROSelfAuthResourceItem {
+class RestAppLogistics extends RestROResourceItem {
     /**
      * realization of getDataType from iRestResource
      */
@@ -3275,6 +3275,16 @@ class RestOwnAppLogistics extends RestAppLogistics {
 		return parent::get();
 	}
 
+    /**
+     * overrides of authorize() from RestAppLogistics
+     */
+	public function authorize($method) {
+		$wrapper = new RestOwnAppList($this->_pars);
+		$res = $wrapper->authorize($method);
+		$this->_userid = $wrapper->_userid;
+		return $res;
+	}
+
 }
 
 class RestEdtAppLogistics extends RestAppLogistics {
@@ -3287,6 +3297,15 @@ class RestEdtAppLogistics extends RestAppLogistics {
 		return parent::get($f);
 	}
 
+ /**
+     * overrides of authorize() from RestAppLogistics
+     */
+	public function authorize($method) {
+		$wrapper = new RestEdtAppList($this->_pars);
+		$res = $wrapper->authorize($method);
+		$this->_userid = $wrapper->_userid;
+		return $res;
+	}
 }
 
 class RestAscAppLogistics extends RestAppLogistics {
@@ -3299,6 +3318,15 @@ class RestAscAppLogistics extends RestAppLogistics {
 		return parent::get($f);
 	}
 
+	/**
+     * overrides of authorize() from RestAppLogistics
+     */
+	public function authorize($method) {
+		$wrapper = new RestAscAppList($this->_pars);
+		$res = $wrapper->authorize($method);
+		$this->_userid = $wrapper->_userid;
+		return $res;
+	}
 }
 
 class RestAppBookmarkLogistics extends RestAppLogistics {
@@ -3311,6 +3339,15 @@ class RestAppBookmarkLogistics extends RestAppLogistics {
 		return parent::get($f);
 	}
 
+	/**
+     * overrides of authorize() from RestAppLogistics
+     */
+	public function authorize($method) {
+		$wrapper = new RestAppBookmarkList($this->_pars);
+		$res = $wrapper->authorize($method);
+		$this->_userid = $wrapper->_userid;
+		return $res;
+	}
 }
 
 class RestAppFollowedLogistics extends RestAppLogistics {
@@ -3334,6 +3371,17 @@ class RestAppFollowedLogistics extends RestAppLogistics {
 		return parent::get($f);
 	}
 
+	/**
+     * overrides of authorize() from RestAppLogistics
+     */
+	public function authorize($method) {
+		debug_log("A");
+		$wrapper = new RestAppFollowedList($this->_pars);
+		$res = $wrapper->authorize($method);
+		$this->_userid = $wrapper->_userid;
+		debug_log("ans: " . $res);
+		return $res;
+	}
 }
 
 class RestRelAppLogistics extends RestAppLogistics {
@@ -3347,6 +3395,16 @@ class RestRelAppLogistics extends RestAppLogistics {
 			$this->_pars["flt"] = "=application.relatedto:" . $this->getParam("id");
 		}
 		return parent::get();
+	}
+
+    /**
+     * overrides of authorize() from RestAppLogistics
+     */
+	public function authorize($method) {
+		$wrapper = new RestRelAppList($this->_pars);
+		$res = $wrapper->authorize($method);
+		$this->_userid = $wrapper->_userid;
+		return $res;
 	}
 
 }
