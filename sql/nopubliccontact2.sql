@@ -105,12 +105,34 @@ END;$BODY$
 ALTER FUNCTION public.trfn_researchers()
   OWNER TO appdb;
 
-DELETE FROM news WHERE subjectguid IN (SELECT guid FROM researchers);
-
 ALTER TABLE researchers ALTER COLUMN nodissemination DROP DEFAULT;
 ALTER TABLE researchers ALTER COLUMN nodissemination SET DEFAULT TRUE;
 UPDATE researchers SET nodissemination = TRUE;
 
+DELETE FROM news WHERE subjectguid IN (SELECT guid FROM researchers);
+CREATE UNIQUE INDEX idx_id_aggregate_news ON aggregate_news (id);
+CREATE INDEX idx_news_timestamp ON news(timestamp);
+REFRESH MATERIALIZED VIEW CONCURRENTLY aggregate_news;
+
 DELETE FROM mail_subscriptions WHERE NOT flt LIKE '%SYSTAG_FOLLOW%';
+ALTER TABLE mail_subscriptions ADD COLUMN addedon TIMESTAMP DEFAULT NOW();
+UPDATE mail_subscriptions SET addedon = NULL;
+ALTER TABLE mail_subscriptions ADD COLUMN lastupdated TIMESTAMP;
+UPDATE mail_subscriptions SET lastupdated = NULL;
+
+CREATE OR REPLACE FUNCTION public.trfn_mail_subscriptions_lastupdated()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+        UPDATE mail_subscriptions SET lastupdated = NOW() WHERE id = NEW.id;
+        RETURN NEW;
+END;
+$function$;
+ALTER FUNCTION trfn_mail_subscriptions_lastupdated() OWNER TO appdb;
+
+CREATE TRIGGER rtr_mail_subscriptions_90_lastupdated
+AFTER UPDATE ON mail_subscriptions
+FOR EACH ROW EXECUTE PROCEDURE trfn_mail_subscriptions_lastupdated();
 
 ROLLBACK;

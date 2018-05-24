@@ -71,6 +71,3 @@ $BODY$
   COST 100;
 ALTER FUNCTION public.export_researcher(integer, text, integer)
   OWNER TO appdb;
-
-
-SELECT export_researcher(551, 'csv', 520)
