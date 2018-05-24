@@ -29,20 +29,20 @@
 	<resource>RestAppList</resource>
 	<comment>A list of software entry resources</comment>
 </route>
-<route type="rest" hidden="true" name="delappsList" url="/:version/applications/deleted">
+<route type="proxy" hidden="true" name="delappsList" url="/:version/applications/deleted">
 	<format xslt="applications">xml</format>
 	<resource>RestDelAppList</resource>
 </route>
-<route type="rest" hidden="true" name="modappsItem" url="/:version/applications/moderated/:id">
+<route type="proxy" hidden="true" name="modappsItem" url="/:version/applications/moderated/:id">
 	<format xslt="applications">xml</format>
 	<resource>RestModAppItem</resource>
 	<param name="id" fmt="(\d+|s:.+)"/>
 </route>
-<route type="rest" hidden="true" name="modappsList" url="/:version/applications/moderated">
+<route type="proxy" hidden="true" name="modappsList" url="/:version/applications/moderated">
 	<format xslt="applications">xml</format>
 	<resource>RestModAppList</resource>
 </route>
-<route type="rest" name="applogistics" url="/:version/applications/logistics">
+<route type="proxy" name="applogistics" url="/:version/applications/logistics">
 	<format>xml</format>
 	<resource>RestAppLogistics</resource>
 	<comment>A list of software logistics per various properties</comment>
@@ -73,7 +73,7 @@
 	<comment>OpenAIRE-compliant representation of sowtware entrOpenAIRE-compliant representation of sowtware entry</comment>
 </route>
 -->
-<route type="rest" name="appItemPerms" url="/:version/applications/:id/privileges">
+<route type="proxy" name="appItemPerms" url="/:version/applications/:id/privileges">
 	<format>xml</format>
 	<format>json</format>
     <resource>RestAppPrivList</resource>
@@ -113,59 +113,59 @@
 	<resource>RestRelAppList</resource>
 	<comment>A list of software entries that related to the software entry specified by the paramter :id</comment>
 </route>
-<route type="rest" name="relatedAppsLogistics" url="/:version/applications/:id/relatedapps/logistics">
+<route type="proxy" name="relatedAppsLogistics" url="/:version/applications/:id/relatedapps/logistics">
 	<format>xml</format>
 	<resource>RestRelAppLogistics</resource>
     <param name="id" fmt="(\d+|s:.+)"/>
 	<comment>A list of related application logistics per various properties</comment>
 </route>
-<route type="rest" name="rateReport" url="/:version/applications/:id/ratingsreport">
+<route type="proxy" name="rateReport" url="/:version/applications/:id/ratingsreport">
 	<format>xml</format>
     <param name="id" fmt="(\d+|s:.+)"/>
 	<resource>RestAppRatingReport</resource>
 	<comment>A report about ratings the software entry specified by the parameter :id has received by all users</comment>
 </route>
-<route type="rest" name="rateReport2" url="/:version/applications/:id/ratingsreport/:type">
+<route type="proxy" name="rateReport2" url="/:version/applications/:id/ratingsreport/:type">
 	<format>xml</format>
     <param name="id" fmt="(\d+|s:.+)"/>
 	<param name="type" fmt=".+"/>
 	<resource>RestAppRatingReport</resource>
 	<comment>A report about ratings the software entry specified by the parameter :id has received by registered (:type="internal") or anonymous (:type="external") users</comment>
 </route>
-<route type="rest" name="ratings" url="/:version/applications/:id/ratings">
+<route type="proxy" name="ratings" url="/:version/applications/:id/ratings">
 	<format xslt="applications">xml</format>
     <param name="id" fmt="(\d+|s:.+)"/>
 	<resource>RestAppRatingList</resource>
 	<comment>A list of all the ratings the software entry specified by the parameter :id has received by all users</comment>
 </route>
-<route type="rest" name="rating" url="/:version/applications/:id/ratings/:rid">
+<route type="proxy" name="rating" url="/:version/applications/:id/ratings/:rid">
 	<format xslt="applications">xml</format>
 	<resource>RestAppRatingItem</resource>
     <param name="id" fmt="(\d+|s:.+)"/>
 	<param name="rid" fmt="\d+"/>
 	<comment>The rating entry specified by the parameter :rid</comment>
 </route>
-<route type="rest" name="apphistory" url="/:version/applications/:id/history">
+<route type="proxy" name="apphistory" url="/:version/applications/:id/history">
 	<format xslt="history">xml</format>
     <param name="id" fmt="(\d+|s:.+)"/>
 	<resource>RestAppHistoryList</resource>
 	<comment>A list of all previous states that the software entry specified by the parameter :id has been in, with regard to changes by authorized users</comment>
 </route>
-<route type="rest" name="apphistoryitem" url="/:version/applications/:id/history/:hid">
+<route type="proxy" name="apphistoryitem" url="/:version/applications/:id/history/:hid">
 	<format xslt="history">xml</format>
     <param name="id" fmt="(\d+|s:.+)"/>
     <param name="hid" fmt=".+"/>
 	<resource>RestAppHistoryItem</resource>
 	<comment>The historical state of a software entry specified by parameter :hid</comment>
 </route>
-<route type="rest" name="apphistorydiff" url="/:version/applications/:id/history/:hid/diff">
+<route type="proxy" name="apphistorydiff" url="/:version/applications/:id/history/:hid/diff">
 	<format xslt="history">xml</format>
     <param name="id" fmt="(\d+|s:.+)"/>
     <param name="hid" fmt=".+"/>
 	<resource>RestAppHistoryDiffItem</resource>
 	<comment>The unified diff of old/new historical states of a software entry specified by parameter :hid</comment>
 </route>
-<route type="rest" name="apphistoryrbitem" url="/:version/applications/:id/history/:hid/rollback">
+<route type="proxy" name="apphistoryrbitem" url="/:version/applications/:id/history/:hid/rollback">
 	<format xslt="history">xml</format>
     <param name="id" fmt="(\d+|s:.+)"/>
     <param name="hid" fmt=".+"/>
@@ -450,7 +450,7 @@
 	<resource>RestSiteList</resource>
 	<comment>A list of sites</comment>
 </route>
-<route type="rest" name="sitelogistics" url="/:version/sites/logistics">
+<route type="proxy" name="sitelogistics" url="/:version/sites/logistics">
 	<format>xml</format>
 	<resource>RestSiteLogistics</resource>
 	<comment>A list of Site logistics per various properties</comment>
@@ -755,7 +755,7 @@
 	<resource>RestSciClassItem</resource>
 	<comment>Alias for EGI Scientific Discipline Classification API</comment>
 </route>
-<route type="rest" name="vologistics" url="/:version/vos/logistics">
+<route type="proxy" name="vologistics" url="/:version/vos/logistics">
 	<format>xml</format>
 	<resource>RestVOLogistics</resource>
 	<comment>A list of VO logistics per various properties</comment>
