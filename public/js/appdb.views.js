@@ -5271,9 +5271,6 @@ appdb.views.NewsFeed = appdb.ExtendClass(appdb.View, "appdb.views.NewsFeed", fun
 	};
 	this._createFeed = function() {
 		var domain = appdb.config.endpoint.base, q = "", feed = this.feed, f, actions = [];
-		if (domain.substr(0, 6) === "https:") {
-			domain = "http:" + domain.substr(6, domain.length);
-		}
 		domain = domain + "news/" + (feed.format || "atom");
 		if (typeof feed.flt === "string") {
 			f = appdb.utils.base64.encode(feed.flt);
