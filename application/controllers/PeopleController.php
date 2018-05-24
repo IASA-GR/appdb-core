@@ -191,9 +191,17 @@ class PeopleController extends Zend_Controller_Action
     }
 
     public function getimageAction()
-    {
+	{
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
+
+		if ($this->session->userid === null || intval($this->session->userid)<=0) {
+			$image = file_get_contents(APPLICATION_PATH . "/../public/images/" . "person.png");
+			header('Content-type: image/png');
+			echo $image;
+			return;
+		}
+
 		if ( ($this->_getParam("id") == "0") || ($this->_getParam("id") == '')) {
 			$image = 'NULL';
 		} else {
@@ -324,6 +332,12 @@ class PeopleController extends Zend_Controller_Action
     {
 		$this->_helper->layout->disableLayout();
 		$ppl = new Default_Model_Researchers();
+
+		if ($this->session->userid === null || intval($this->session->userid)<=0) {
+			$this->view->image = "/images/" . "person.png";
+			return;
+		}
+
 		$ppl->filter->id->equals($this->_getParam("id"));
 		if ( count($ppl->items) > 0 ) {
 			$person = $ppl->items[0];
@@ -335,9 +349,12 @@ class PeopleController extends Zend_Controller_Action
 		} else $this->view->image= '';
     }
 
-    public function exportAction() {
+	public function exportAction() {
    		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
+
+		return;
+
         if (array_key_exists("type",$_GET))	$type = $_GET['type']; else $type = 'xml';
 		$ppl = new Default_Model_Researchers();
 		$ppl->filter = FilterParser::getPeople($this->_getParam("flt"));
@@ -367,7 +384,10 @@ class PeopleController extends Zend_Controller_Action
     public function export2Action()
     {
         $this->view->isSensitive = true;
-    	$this->_helper->layout->disableLayout();
+		$this->_helper->layout->disableLayout();
+
+		return; 
+
     	$type = $_GET['type'];
 		if ( $type == "csv") {
 			$this->view->type = 'text/x-csv';
