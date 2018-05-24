@@ -1242,7 +1242,7 @@
                 if(appdb.model.PrimaryContact.userPrimaryContact!=null){
                     if($("#defaultnotificationholder").length>0){
                         $(".defaultnotificationresult").empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >loading...</span>');
-                        appdb.components.Person.getDefaultNotification(getDefaultNotifcationHandler,"<?php /* FIXME: NIL thing*/ echo ($userIsNil)?"country:".$this->escape($this->entry->country->name)." id:SYSTTAG1":"~application.name:. id:SYSTAG1";?>");
+                        appdb.components.Person.getDefaultNotification(getDefaultNotifcationHandler,"<?php /* FIXME: NIL thing*/ echo ($userIsNil) ? "country:" . $this->escape($this->entry->country->name) . " id:SYSTAG1" : "~application.name:. id:SYSTAG1"; ?>");
                     }
                     if($("#rolenotificationholder").length>0){
                         $(".rolenotificationresult").empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >loading...</span>');
@@ -1308,10 +1308,10 @@
         <?php  } ?>
 
             $("#defaultnotification").unbind('click').click(function(){
-                var defflt = "<?php /* FIXME: NIL thing*/ echo ($userIsNil)?"country:".$this->escape($this->entry->country->name)." id:SYSTTAG1":"~application.name:. id:SYSTAG1";?>",
+                var defflt = "<?php /* FIXME: NIL thing*/ echo ($userIsNil) ? "country:" . $this->escape($this->entry->country->name) . " id:SYSTAG1" : "~application.name:. id:SYSTAG1"; ?>",
                     chk = $(this).is(':checked'), deliv = dijit.byId('defaultdelivery<?php echo $this->dialogCount;?>').attr('value'),
                     def = appdb.model.MailSubscription.defaultNotification, res = $(".defaultnotificationresult"),
-                    dename = "<?php /* FIXME: NIL thing*/ echo ($userIsNil)?$this->entry->country->name . "'s activities":"Software activities"; ?>";
+                    dename = "<?php /* FIXME: NIL thing*/ echo ($userIsNil) ? $this->entry->country->name . "'s activities" : "Software activities"; ?>";
 
                 if(chk){ //mail subscription exists
                     $(res).empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >adding...</span>');
@@ -1328,7 +1328,7 @@
             });
             dojo.connect(dijit.byId("defaultdelivery<?php echo $this->dialogCount;?>"),"onChange",function(){
                 var res = $(".defaultnotificationresult"), def = appdb.model.MailSubscription.defaultNotification,
-                    defflt = "<?php /* FIXME: NIL thing*/ echo ($userIsNil)?"country:".$this->escape($this->entry->country->name)." id:SYSTTAG1":"~application.name:. id:SYSTAG1";?>",
+                    defflt = "<?php /* FIXME: NIL thing*/ echo ($userIsNil) ? "country:" . $this->escape($this->entry->country->name) . " id:SYSTAG1" : "~application.name:. id:SYSTAG1"; ?>",
                     deliv = dijit.byId('defaultdelivery<?php echo $this->dialogCount;?>').attr('value');
 
                 $(res).empty().append('<img src="/images/ajax-loader-small.gif" alt="" width="12px" height="12px"  /><span >setting...</span>');
