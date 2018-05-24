@@ -152,7 +152,7 @@
 									<tr><td style="width: 149px">Scientific Orientation: </td><td style="vertical-align: middle">
 									<span <?php
 									$canEdit = checkRegister($this); if ($this->session->userid !== null) if ( $canEditProfile ) $canEdit = true; if ($canEdit) {
-										echo 'edit_style="{\'max-width\': \'87%\'}" class="editable" edit_type="combo" edit_onchange="positionTypeChanged" edit_name="positionTypeID"';
+										echo 'edit_style="{\'max-width\': \'87%\'}" class="editable" edit_type="combo" edit_name="positionTypeID"';
 										$ids=array();
 										$vals=array();
 										for ($i=0; $i<$this->positionTypes->count(); $i++) {
@@ -517,14 +517,16 @@
                         </select>
                         <span class="defaultnotificationresult" style="padding-left:5px;vertical-align: middle;"></span>
                     </td>
-                </tr>
+				</tr>
+<?php if (false) { //disabled ?>
                 <tr id="rolenotificationholder">
 					<td style="border-bottom: #d9d9d9  1px dashed;"><div style="width:160px;white-space: pre-wrap;">Receive e-mail notifications about <b>role verification</b> requests<?php /*FIXME: NIL thing*/ echo ($entryIsNil?" from <b>" . $this->entry->country->name."</b>":"");?></div></td>
                     <td>
                         <input id="rolenotification"  type="checkbox" title="Click to enable/disable e-mail notifications about role verification requests" style="vertical-align: middle;"/>
                     </td>
                     <td><span class="rolenotificationresult" style="padding-left:5px;vertical-align: bottom"></span></td>
-                </tr>
+				</tr>
+<?php } //disabled ?>
                 <?php } ?>
 		
                 <tr id="ownednotificationholder">
@@ -1123,16 +1125,6 @@
     var closePermReqDlg = function() {
         permreqdlg.onCancel();
     };
-
-    var positionTypeChanged = function() {
-        if ('<?php echo $this->entry->positionTypeID; ?>' != $("input[name^=positionTypeID]").val()) {
-            $("#roleVerifiedImg<?php echo $this->dialogCount;?>").attr('src','/images/close2.png');
-            $("#roleVerifiedImg<?php echo $this->dialogCount;?>").attr('title','Role will be activated upon verification');
-        } else {
-            $("#roleVerifiedImg<?php echo $this->dialogCount;?>").attr('src','/images/close.png');
-            $("#roleVerifiedImg<?php echo $this->dialogCount;?>").attr('title','Role verified');
-        };
-	};
 
 	var prepareUpload_old = function() {
 		var props = {
