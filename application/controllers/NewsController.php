@@ -157,6 +157,11 @@ class NewsController extends Zend_Controller_Action
 				$r->action[] = "insertrel";
 				$r->action[] = "insertvav";
 			}
+		} else {
+			$this->getResponse()->clearAllHeaders();
+			$this->getResponse()->setRawHeader("HTTP/1.0 404 Not Found");
+			$this->getResponse()->setHeader("Status","404 Not Found");
+			exit;
 		}
         $r->length = 10;
 		$news = NewsFeed::getNews($r);
