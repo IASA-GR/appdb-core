@@ -89,3 +89,5 @@ ALTER FUNCTION public.trfn_vapp_versions_pidhandle()
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 19, 11, E'Prevent NULL violation for URL column in trfn_vapp_versions_pidhandle'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=19 AND revision=11);
+
+COMMIT;
