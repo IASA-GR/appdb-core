@@ -586,7 +586,7 @@ function initItemView() {
 	});
 	animateList();
 	if ( $("#viewtype")[0] !== undefined ) {
-		if ( ($("#viewtype")[0].value === "app" ) || ($("#viewtype")[0].value === "ppl" ) ) {
+		if ( ($("#viewtype")[0].value === "app" ) ) {
 			var exportApps = function(type) {
 				document.getElementById("exportType").value = type;
 				var base = $("#viewtype")[0].value;
