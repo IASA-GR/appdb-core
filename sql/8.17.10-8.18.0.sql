@@ -16,8 +16,8 @@
 
 /* 
 EGI AppDB incremental SQL script
-Previous version: 8.17.5
-New version: 8.17.6
+Previous version: 8.17.10
+New version: 8.18.0
 Author: nakos.al@iasa.gr
 */
 

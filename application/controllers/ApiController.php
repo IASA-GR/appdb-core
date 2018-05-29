@@ -165,6 +165,18 @@ class ApiController extends Zend_Controller_Action
 	}
 
 	public function newproxy() {
+		// optionally run custom server initialization code
+		if (file_exists(APPLICATION_PATH . "/api_proxy_init.php")) {
+			require_once(APPLICATION_PATH . "/api_proxy_init.php");
+		}
+		if (function_exists("appdb_api_proxy_init")) {
+			$func = "appdb_api_proxy_init";
+			$ret = $func($this);
+			if ($ret === false) {
+				return;
+			}
+		}
+
 		$apiroutes = new SimpleXMLElement(APPLICATION_PATH . "/apiroutes.xml", 0, true);
 		$pars = array();
 		$postdata = null;
