@@ -1,0 +1,17 @@
+#!/bin/bash
+for i in 8.1*.sql;do 
+	if [[ "$i" == "8.12.10-8.12.11.sql" ]]; then continue; fi # whitelisted
+	v=`echo ${i%%.sql}|sed -e 's/.\+-//'`
+	v1=$(echo $v|awk -F. '{print $1}')
+	v2=$(echo $v|awk -F. '{print $2}')
+	v3=$(echo $v|awk -F. '{print $3}')
+	if ( ! grep -q "New version: $v" $i ); then 
+		echo "$i: Wrong header"
+	fi
+	if ( ! grep -q "SELECT $v1, $v2, $v3, E" $i ); then 
+		echo "$i: Wrong INSERT"
+	fi
+	if ( ! grep -q "major=$v1 AND minor=$v2 AND revision=$v3" $i ); then 
+		echo "$i: Wrong WHERE"
+	fi
+done
