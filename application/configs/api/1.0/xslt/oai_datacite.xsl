@@ -117,7 +117,7 @@
 				<resourceType resourceTypeGeneral="Software" />
 			</xsl:if>
 			<xsl:if test="./@metatype='1'">
-				<resourceType resourceTypeGeneral="Other">EGI Virtual Appliance"</resourceType>
+				<resourceType resourceTypeGeneral="Other">EGI Virtual Appliance</resourceType>
 			</xsl:if>
 
 			<subjects>
