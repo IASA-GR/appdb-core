@@ -117,7 +117,7 @@
 				<resourceType resourceTypeGeneral="Software" />
 			</xsl:if>
 			<xsl:if test="./@metatype='1'">
-				<resourceType resourceTypeGeneral="Other">EGI Virtual Appliance"</resourceType>
+				<resourceType resourceTypeGeneral="Other">EGI Virtual Appliance</resourceType>
 			</xsl:if>
 
 			<subjects>
@@ -154,11 +154,18 @@
 				<alternateIdentifier alternateIdentifierType="URL">
 					<xsl:value-of select="concat('https://', //appdb:appdb/@host, '/store/software/', ./@cname)" />
 				</alternateIdentifier>
-				<xsl:if test="./application:url[@type='Website']">
-					<alternateIdentifier alternateIdentifierType = "LandingPage">
-						<xsl:value-of select="./application:url[@type='Website']/text()" />
-					</alternateIdentifier>
-				</xsl:if>
+				<xsl:choose>
+					<xsl:when test="./application:url[@type='Website']">
+						<alternateIdentifier alternateIdentifierType = "LandingPage">
+							<xsl:value-of select="./application:url[@type='Website']/text()" />
+						</alternateIdentifier>
+					</xsl:when>
+					<xsl:otherwise>
+						<alternateIdentifier alternateIdentifierType = "LandingPage">
+							<xsl:value-of select="concat('https://', //appdb:appdb/@host, '/store/software/', ./@cname)" />
+						</alternateIdentifier>
+					</xsl:otherwise>
+				</xsl:choose>
 				<xsl:if test="./application:url[@type='Downlod']">
 					<alternateIdentifier alternateIdentifierType = "DistributionLocation">
 						<xsl:value-of select="./application:url[@type='Download']/text()" />
