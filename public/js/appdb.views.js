@@ -16377,7 +16377,8 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 	'aborted': { state: 'aborted', status: 'aborted', img: '/images/vappliance/redwarning.png', text: "Security check for <span class='datavalue vaversion' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span> of VAppliance <span class='datavalue app_name' data-path='app_name'></span>  was <b>aborted</b>"},
 	'closed_OK': { state: 'closed', status: 'success', img: '/images/tick.png', text: "<span class='datavalue vaversion capitilize' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span> of VAppliance <span class='datavalue app_name' data-path='app_name'></span> passed <b>ALL</b> security checks"},
 	'closed_WARNING': { state: 'closed', status: 'warning', img: '/images/vappliance/warning.png', text: "<span class='datavalue vaversion capitilize' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span> of VAppliance <span class='datavalue app_name' data-path='app_name'></span> passed <b>SOME</b> security checks"},
-	'closed_ERROR': { state: 'closed', status: 'error', img: '/images/vappliance/redwarning.png', text: "<span class='datavalue vaversion capitilize' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span> of VAppliance <span class='datavalue app_name' data-path='app_name'></span>  <b>failed</b> to pass security checks"}
+	'closed_ERROR': { state: 'closed', status: 'error', img: '/images/vappliance/redwarning.png', text: "<span class='datavalue vaversion capitilize' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span> of VAppliance <span class='datavalue app_name' data-path='app_name'></span>  <b>failed</b> to pass security checks"},
+	'closed_FAIL': { state: 'closed', status: 'error', img: '/images/vappliance/redwarning.png', text: "<span class='datavalue vaversion capitilize' data-path='vaversion_type'></span> version <span class='datavalue vaversion' data-path='vaversion'></span> of VAppliance <span class='datavalue app_name' data-path='app_name'></span>  <b>failed</b> to pass security checks"}
     },
     databindHtmlReportData: function(data, html) {
 	    $(html).find('[data-path]').each(function(i, e) {
@@ -16890,21 +16891,44 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 			$(this.dom).find("td[data-name='name']  > .customcellwrap").append(badge);
 		}
 	};
+	this.shouldRenderSecantLatestVersion = function(data) {
+	    // If both latest and current secand reports point to the same report(version check)
+	    // then there is no need to display the latest version secant badge
+	    var secants = (data || this.options.data || {}).secant || [];
+	    var currentSecant = null;
+	    var latestSecant = null;
+
+	    $.each(secants, function(i, sec) {
+		    if (!currentSecant && sec.vaversion_type === 'current') {
+			    currentSecant = $.trim(sec.report_id);
+		    }
+
+		    if (!latestSecant && sec.vaversion_type === 'latest') {
+			    latestSecant = $.trim(sec.report_id);
+		    }
+	    });
+
+	    return ( currentSecant === null || currentSecant !== latestSecant ) ? true : false;
+	};
 	this.renderSecant = function(data) {
 		data = data || {};
-		var dom = $(this.dom).find("td[data-name='warnings'] .value");
-		var secant = new appdb.views.VoSecantReport({
-			container: $(dom),
-			parent: this,
-			popupProvider: appdb.views.VoImageListItem,
-			vaversionTypes: ['latest'],
-			allowVersionDisplay: false
-		});
-		secant.render(data);
-		if (secant.getReports().length > 0) {
-		    $(this.dom).addClass('has-latestreport');
-		} else {
-		    $(this.dom).removeClass('has-latestreport');
+		if (this.shouldRenderSecantLatestVersion(data)) {
+			var dom = $(this.dom).find("td[data-name='warnings'] .value");
+			var secant = new appdb.views.VoSecantReport({
+				container: $(dom),
+				parent: this,
+				popupProvider: appdb.views.VoImageListItem,
+				vaversionTypes: ['latest'],
+				allowVersionDisplay: false
+			});
+
+			secant.render(data);
+
+			if (secant.getReports().length > 0) {
+				$(this.dom).addClass('has-latestreport');
+			} else {
+				$(this.dom).removeClass('has-latestreport');
+			}
 		}
 		this.renderCurrentSecant(data);
 	};
