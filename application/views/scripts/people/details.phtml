@@ -898,7 +898,7 @@
 			//remove connected accounts tab
 			$("#navdiv<?php echo $this->dialogCount;?>").tabs("remove",1);
 			<?php } ?>
-			$("#navdiv<?php echo $this->dialogCount;?>" ).tabs("select", 0);
+			$("#navdiv<?php echo $this->dialogCount;?>" ).tabs("option", "active", 0);
 		}
 		editForm('editperson<?php echo $this->dialogCount;?>'); 
 		$('#addcontactinfo<?php echo $this->dialogCount;?>').show(); 
@@ -1583,7 +1583,7 @@
 								txt = $.trim(txt).toLowerCase();
 								
 								if( txt == selected ){
-									$( "#navdiv<?php echo $this->dialogCount;?>" ).tabs("select", index);
+									$( "#navdiv<?php echo $this->dialogCount;?>" ).tabs("option", "active", index);
 									return false;
 								}
 							});

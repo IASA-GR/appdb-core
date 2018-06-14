@@ -4934,7 +4934,7 @@ appdb.components.DisseminationTool = appdb.ExtendClass(appdb.Component, "appdb.c
 			$('textarea.tinymce').val("");
 			this.dom.find('.dissemination_subject :input').val("");
 			this.views.log.reset();
-			$('div.tabs:last').tabs('select', 2);
+			$('div.tabs:last').tabs('option', 'active', 2);
 		}
 	};
 

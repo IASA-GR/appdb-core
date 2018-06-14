@@ -1282,7 +1282,6 @@
 		}
 		if ( doSubmit ) submitEponymousRating(e, d, r, comment_text, voteid, false);
 		if (oldrating !== null) {
-			//$("#navdiv"+dialogCount).tabs("select",5);
 			$("#navdiv"+dialogCount).tabs("option", "active", 5);
 			$("#ratingdiv" + dialogCount).find(".emptycontent").addClass('hidden');
 			$(".newrating textarea").focus();
@@ -2860,7 +2859,6 @@ String.prototype.replaceAll = function(search, replacement) {
 					success: function(d) {
 						showAjaxLoading();
 						setTimeout(function() {
-							//$( "#navdiv"+dialogCount).tabs("select",window.apptabsselect || 0);
 							$( "#navdiv"+dialogCount).tabs("option", "active", window.apptabsselect || 0);
 						}, 1);
 						populateAppDataDetails(d,e,id,histid,histtype);
