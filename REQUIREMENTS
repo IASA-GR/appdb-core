@@ -25,7 +25,7 @@ REQUIREMENTS
 	- perl-Text-Unidecode (on PostgreSQL server machine)
 	- Text::Diff (on PostgreSQL server machine)
 
-- Zend Framework v1.11.10 with DoJo
+- Zend Framework v1.12.20 with DoJo
 	- apply zend patches
 	- copy Dialog.js into /opt/zend/externals/dojo/dojox/
 	- extract /opt/zend/externals/dojo/dojox/grid/compatGrid.tar.gz
@@ -42,7 +42,7 @@ REQUIREMENTS
         - moment.js (v2.19.2) from http://momentjs.com/downloads/moment.min.js
 	- dijit (../zend/externals/dojo/release/dojo/dijit/)
 	- dojo (../zend/externals/dojo/release/dojo/dojo/)
-	- dojox (../zend/externals/dojo/release/dojo/dijit/)
+	- dojox (../zend/externals/dojo/release/dojo/dojox/)
 	- ../compat -> js/dojox/grid
 	- ../cgi -> ../cgi-bin
 
