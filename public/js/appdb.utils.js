@@ -5269,10 +5269,10 @@ appdb.utils.EntityEditMapper.Application = function(entity){
 		$(arr).each((function(_this){
 			return function(index,elem){
 				var name = $(elem).attr("name");
-				var nameIndex = name.match(/[0-9]+/);
 				if(!name){
 					return;
 				}
+				var nameIndex = name.match(/[0-9]+/);
 				name = name.replace(/[0-9]/g,'');
 
 				name = name[0].toUpperCase() + name.substr(1);
