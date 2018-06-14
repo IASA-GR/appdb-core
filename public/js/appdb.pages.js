@@ -2733,7 +2733,7 @@ appdb.pages.application = (function(){
 			if( appdb.config.views.application.social === true ){
 				if( !page.currentSocialToolbox() ){
 					page.currentSocialToolbox(new appdb.social.share.ListToolbox({
-						container: $("#.socialtoolbar.listtoolbox"),
+						container: $(".socialtoolbar.listtoolbox"),
 						entityType: (page.isVirtualAppliance())?"vappliance":"software",
 						data: page.currentData()
 					}));
@@ -2917,14 +2917,15 @@ appdb.pages.application = (function(){
 		}
 		window.apptabselect = tab_index;
 		setTimeout(function(){
-			$( "#navdiv" + appdb.pages.application.currentDialogCount() ).tabs("select",tab_index);
+			//$( "#navdiv" + appdb.pages.application.currentDialogCount() ).tabs("option", "active",tab_index);
+			$( "#navdiv" + appdb.pages.application.currentDialogCount() ).tabs("option", "active",tab_index);
 		},10);
 		
 		if( update === true ){
 			page.currentSection("information");
 			page.updateSection(section.toLowerCase(),true);
 		}
-		$( "#navdiv" + appdb.pages.application.currentDialogCount() ).tabs("select",tab_index);
+		$( "#navdiv" + appdb.pages.application.currentDialogCount() ).tabs("option", "active",tab_index);
 	};
 	page.updateSection = function(section,internal){
 		if( appdb.config.routing.useCanonical == false || !page.currentCName()) return;
@@ -3133,7 +3134,7 @@ appdb.pages.application = (function(){
 			if( page.isVirtualAppliance() && appdb.vappliance.ui.CurrentVAManager.isEditMode() === true && $.trim(window.apptabselect) !== $.trim(ui.index)){
 				appdb.vappliance.ui.CurrentVAManager.checkUnsavedData((function(p, e, u){
 					return function(){
-						$( "#navdiv" + p.currentDialogCount() ).tabs("select",u.index);
+						$( "#navdiv" + p.currentDialogCount() ).tabs("option", "active",u.index);
 					};
 				})(page, event, ui));
 				return false;
@@ -3225,7 +3226,7 @@ appdb.pages.application = (function(){
 			$( "#navdiv"+page.currentDialogCount()).tabs("remove", 2);
 			$( "#navdiv"+page.currentDialogCount()).tabs("remove", 2);
 		}
-		$( "#navdiv"+page.currentDialogCount()).tabs("select",tab_select);
+		$( "#navdiv"+page.currentDialogCount()).tabs("option", "active",tab_select);
 		
 		setTimeout(function(){
 			if( appdb.pages.Application.currentId() > 0 ){
@@ -3396,8 +3397,8 @@ appdb.pages.Person = (function(){
 		}
 		if( window.persontabselect === tab_index ) return;
 		window.persontabselect = tab_index;
-		$( "#navdiv" + dialogCount ).tabs("select",tab_index);
-		$("#ppl_details").tabs("select",tab_index);
+		$( "#navdiv" + dialogCount ).tabs("option", "active",tab_index);
+		$("#ppl_details").tabs("option", "active",tab_index);
 	};
 	page.updateSection = function(section, subsection){
 		var subsection = subsection  || "";
@@ -3497,9 +3498,10 @@ appdb.pages.Person = (function(){
 			}
 		}
 		if( $("#ppl_details").length > 0 ){
-			$("#ppl_details").tabs("select",tab_index);
+			$("#ppl_details").tabs();
+			$("#ppl_details").tabs("option", "active",tab_index);
 		} else {
-			$( "#navdiv" + dialogCount ).tabs("select",tab_index);
+			$( "#navdiv" + dialogCount ).tabs("option", "active",tab_index);
 		}
 		page.setupNilsCountryItems();
 		page.SetupNavigationPane();
@@ -4135,7 +4137,7 @@ appdb.pages.vo = (function(){
 		}
 		
 		window.votabselect = tab_index;
-		$( "#navdiv" + dialogCount ).tabs("select",tab_index);
+		$( "#navdiv" + dialogCount ).tabs("option", "active",tab_index);
 	};
 	page.updateSection = function(section){
 		if( appdb.config.routing.useCanonical == false || !page.currentName()) return;
@@ -4197,7 +4199,7 @@ appdb.pages.vo = (function(){
 					break;
 			}
 		}
-		$( "#navdiv" + dialogCount ).tabs("select",tab_index);
+		$( "#navdiv" + dialogCount ).tabs("option", "active",tab_index);
 		page.renderFilterDecorator();
 	};
 	page.initSectionGroup = function(container,onclick){
@@ -4325,7 +4327,7 @@ appdb.pages.vo = (function(){
 			ev.stopPropagation();
 			window.votabselect = 0;
 			appdb.pages.vo.currentSection("information");
-			$( "#navdiv" + appdb.pages.vo.currentDialogCount() ).tabs("select", 2);
+			$( "#navdiv" + appdb.pages.vo.currentDialogCount() ).tabs("option", "active", 2);
 			return false;
 		});
 		shortcut.add("esc", closeDialog);

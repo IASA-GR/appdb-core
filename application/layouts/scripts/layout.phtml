@@ -103,7 +103,7 @@ echo $this->doctype(); fl();?>
 	} else {	
 		loadCSS($this,'/js/dojox/grid/_grid/tundraGrid.css');
 		loadCSS($this,'/css/tabbar.css');
-		loadCSS($this,'/css/jquery-ui.css');
+//		loadCSS($this,'/css/jquery-ui.css');
 		loadCSS($this,'/css/main.css');
 		loadCSS($this,'/css/view.css');
 		loadCSS($this,'/css/newsfeed.css');
@@ -117,7 +117,22 @@ echo $this->doctype(); fl();?>
 		loadCSS($this, '/css/highlight.css');
 	}
 ?>
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+<?php
+	if ( substr($_SERVER['APPLICATION_ENV'],0,5) === 'devel' ) { 
+?>
+		<script src="https://code.jquery.com/jquery-migrate-1.4.1.js"></script>
+<?php 
+	} else { 
+?>
+	<script src="https://code.jquery.com/jquery-migrate-1.4.1.min.js"></script>
+<?php 
+	} 
+?>
+
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<style type="text/css">
 	<!--
 		@import "/js/dijit/themes/tundra/tundra.css";
@@ -139,7 +154,7 @@ echo $this->doctype(); fl();?>
 		loadJS($this,'/js/appdbbase.js');
 		loadJS($this,'/js/appdb.template.js');
 		loadJS($this,'/js/jquery.cookie.js');
-		loadJS($this,'/js/jquery-ui.js');
+//		loadJS($this,'/js/jquery-ui.js');
 		loadJS($this,'/js/jquery.form.js');
 		loadJS($this,'/js/jquery.center.js');
 		loadJS($this,'/js/editForm.js');

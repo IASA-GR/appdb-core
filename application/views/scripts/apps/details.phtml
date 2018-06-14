@@ -49,7 +49,7 @@
 	<form id="bookmarkapp<?php echo $this->dialogCount;?>" name="bookmarkapp" callback="onToggleBookmark" method="post" action="apps/togglebookmark"><input name="id" style="display: none;" type="text" value="<?php echo $this->entryid;?>"/></form>
 	<form onvalidate="validateApp()" id="editapp<?php echo $this->dialogCount;?>" name="editapp<?php echo $this->dialogCount;?>" action="apps/update" method="post" callback="onAppUpdate" callback_data="{appID: '<?php echo $this->entryid;?>'}" errorcallback="onError" <?php if ( $this->entryid == "" ) { ?>cancelcallback="appdb.pages.application.cancelCallback();"<?php } else {?>cancelcallback="appdb.views.Main.refresh();"<?php } ?>>
 		<input type="hidden" name="metatype" id="metatype" value="<?php echo $this->entitytypeid; ?>" />
-		<div id="infodiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" title="" selected="true" class="information" >
+		<div id="infodiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" title="" class="information">
 			<table width="100%" cellspacing="0">
 			<tr>
 			<td width="100%">
@@ -483,7 +483,7 @@
 		</div> <!--  appInfoTab closes -->
 
 		<?php if ( $this->entryid != "" ) { ?>
-		<div id="docdiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" title="Publications" selected="false" class="publicationcontainer" >
+		<div id="docdiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" title="Publications" class="publicationcontainer" >
 			<div class="emptycontent">
 				<div class="content">	
 					<img src="/images/exclam16.png">
