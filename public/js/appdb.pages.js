@@ -3210,21 +3210,31 @@ appdb.pages.application = (function(){
 			$( "#details" ).addClass("register");
 		}
 		var tab_select = (window.apptabselect > 1 )?0:window.apptabselect;
-		$( "#navdiv"+page.currentDialogCount()).tabs("remove", 2);
+		$( "#navdiv"+page.currentDialogCount()).find(".ui-tabs-nav li:eq(2)").remove();
+		$( "#navdiv"+page.currentDialogCount()).tabs("refresh");
 		if( page.currentId() == '0'){
 			tab_select = 0;
 			//remove publication,software release/virtual appliance/contextualization, comment, permission tabs
-			$( "#navdiv"+page.currentDialogCount()).tabs("remove", 1);
-			$( "#navdiv"+page.currentDialogCount()).tabs("remove", 1);
-			$( "#navdiv"+page.currentDialogCount()).tabs("remove", 1);
-			$( "#navdiv"+page.currentDialogCount()).tabs("remove", 1);
+			$( "#navdiv"+page.currentDialogCount()).find(".ui-tabs-nav li:eq(1)").remove();
+			$( "#navdiv"+page.currentDialogCount()).tabs("refresh");
+			$( "#navdiv"+page.currentDialogCount()).find(".ui-tabs-nav li:eq(1)").remove();
+			$( "#navdiv"+page.currentDialogCount()).tabs("refresh");
+			$( "#navdiv"+page.currentDialogCount()).find(".ui-tabs-nav li:eq(1)").remove();
+			$( "#navdiv"+page.currentDialogCount()).tabs("refresh");
+			$( "#navdiv"+page.currentDialogCount()).find(".ui-tabs-nav li:eq(1)").remove();
+			$( "#navdiv"+page.currentDialogCount()).tabs("refresh");
 		}else {
 			//remove software release/virtual appliance/contextualization, comment, permission tabs
-			$( "#navdiv"+page.currentDialogCount()).tabs("remove", 2);
-			$( "#navdiv"+page.currentDialogCount()).tabs("remove", 2);
-			$( "#navdiv"+page.currentDialogCount()).tabs("remove", 2);
-			$( "#navdiv"+page.currentDialogCount()).tabs("remove", 2);
-			$( "#navdiv"+page.currentDialogCount()).tabs("remove", 2);
+			$( "#navdiv"+page.currentDialogCount()).find(".ui-tabs-nav li:eq(2)").remove();
+			$( "#navdiv"+page.currentDialogCount()).tabs("refresh");
+			$( "#navdiv"+page.currentDialogCount()).find(".ui-tabs-nav li:eq(2)").remove();
+			$( "#navdiv"+page.currentDialogCount()).tabs("refresh");
+			$( "#navdiv"+page.currentDialogCount()).find(".ui-tabs-nav li:eq(2)").remove();
+			$( "#navdiv"+page.currentDialogCount()).tabs("refresh");
+			$( "#navdiv"+page.currentDialogCount()).find(".ui-tabs-nav li:eq(2)").remove();
+			$( "#navdiv"+page.currentDialogCount()).tabs("refresh");
+			$( "#navdiv"+page.currentDialogCount()).find(".ui-tabs-nav li:eq(2)").remove();
+			$( "#navdiv"+page.currentDialogCount()).tabs("refresh");
 		}
 		$( "#navdiv"+page.currentDialogCount()).tabs("option", "active",tab_select);
 		
