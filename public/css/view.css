@@ -18280,7 +18280,7 @@ a.btn.disabled > span{
 .commentscounter.tabcounter{
 	display: none;
 }
-#detailswrapper li.ui-state-default.ui-tabs-selected a > .tabcounter, #main li.ui-state-default.ui-tabs-selected a > .tabcounter{ 
+#detailswrapper li.ui-state-default.ui-tabs-active a > .tabcounter, #main li.ui-state-default.ui-tabs-active a > .tabcounter{ 
 	color: white;
 }
 
@@ -19074,15 +19074,15 @@ li.itemcontainer div.item div.supports.sites > .serviceitem.hasinstances > .inst
 }
 
 
-#detailswrapper li.ui-state-default.ui-tabs-selected, #main li.ui-state-default.ui-tabs-selected {
+#detailswrapper li.ui-state-default.ui-tabs-active, #main li.ui-state-default.ui-tabs-active {
 	margin: -1px;
 	padding: 0px 4px;
 	background-color: #999;
 	border-radius: 0px;
 	color: white;
 }
-#detailswrapper li.ui-state-default.ui-tabs-selected a, #main li.ui-state-default.ui-tabs-selected a,
-#detailswrapper li.ui-state-default.ui-tabs-selected:hover a:hover, #main li.ui-state-default.ui-tabs-selected:hover a:hover,
+#detailswrapper li.ui-state-default.ui-tabs-active a, #main li.ui-state-default.ui-tabs-active a,
+#detailswrapper li.ui-state-default.ui-tabs-active:hover a:hover, #main li.ui-state-default.ui-tabs-active:hover a:hover,
 #detailswrapper li.ui-state-hover:hover a:hover, #main li.ui-state-hover:hover a:hover{ 
 	color: white;
 	padding: 6px 10px;
@@ -19093,7 +19093,7 @@ li.itemcontainer div.item div.supports.sites > .serviceitem.hasinstances > .inst
 	color: #254B65;
 	padding-top: 3px;
 }
-#detailswrapper li.ui-state-default.ui-tabs-selected::after, #main li.ui-state-default.ui-tabs-selected::after{ 
+#detailswrapper li.ui-state-default.ui-tabs-active::after, #main li.ui-state-default.ui-tabs-active::after{ 
 	content: '';
 	width: 0;
 	height: 0;

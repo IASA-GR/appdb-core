@@ -155,7 +155,7 @@ body .ui-widget{
 	font-size:9pt;
 	height:20px;
 }
-#main li.ui-state-default.ui-tabs-selected{
+#main li.ui-state-default.ui-tabs-active{
  background-color: white;
  border-color: #CCC;
  background-image: none;
@@ -297,7 +297,7 @@ body .ui-widget{
 #detailswrapper .ui-tabs-nav li.ui-state-default > a,#main .ui-tabs-nav li.ui-state-default > a{
 	font-family: "Open Sans";
 }
-#detailswrapper li.ui-state-default.ui-tabs-selected, #main li.ui-state-default.ui-tabs-selected{
+#detailswrapper li.ui-state-default.ui-tabs-active, #main li.ui-state-default.ui-tabs-active{
 	/*background-color: #fafafa;
 	border: 1px #bbb inset;
 	border-radius: 3px;	
@@ -314,7 +314,7 @@ body .ui-widget{
  padding-right: 9px;
  color: #254B65;
 }
-#detailswrapper li.ui-state-default.ui-tabs-selected a,#main li.ui-state-default.ui-tabs-selected a{
+#detailswrapper li.ui-state-default.ui-tabs-active a,#main li.ui-state-default.ui-tabs-active a{
 	color: #333;
 	font-weight: bold;
 }
@@ -322,7 +322,7 @@ body .ui-widget{
 	color: #333;
 	font-weight: normal;
 }
-#detailswrapper li.ui-state-default.ui-tabs-selected a:hover, #main li.ui-state-default.ui-tabs-selected a:hover{
+#detailswrapper li.ui-state-default.ui-tabs-active a:hover, #main li.ui-state-default.ui-tabs-active a:hover{
  font-weight: bold;
  padding-left:10px;
  padding-right:10px;
