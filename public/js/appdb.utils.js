@@ -2949,13 +2949,15 @@ appdb.Navigator = (function(){
 
   this.init = function(){
    this.setInternalMode(false);
-   $("a[href='#']").live("click",function(){return false;});
+   $(document).on("click", "a[href='#']", function() {
+	   return false;
+   });
    this.inited = true;
    //Check if the window.load event is already triggered
    if (document.readyState && document.readyState === "complete") {
 	   this.onWindowLoadDelegate();
-   }else{   
-	   $(window).load(this.onWindowLoadDelegate);
+   } else {   
+	   $(window).on('load', this.onWindowLoadDelegate);
    }
    setTimeout((function(_this){ 
 	   return function(){

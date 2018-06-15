@@ -1027,7 +1027,7 @@ appdb.pages.index = (function(){
 			$("#panediv div.dijitTitlePaneTitle").append('<img class="egimenuarrow" src=""/>');
 			loadImage("egiarrowleft.png",'img.egimenuarrow');
 			// Calculate optQueryLen after everything has loaded.
-			$("body").load(function(){
+			$("body").on("load", function(){
 				window.onresize();
 				setTimeout(function(){
 					computeOptQueryLen();
@@ -5497,7 +5497,7 @@ appdb.pages.newaccount = (function(){
 		}
 	};
 	page.initFeatures = function(){
-		$("#maincontent.newprofile div.feature .title").live("click", function(ev){
+		$(document).on("click", "#maincontent.newprofile div.feature .title", function(ev) {
 			ev.preventDefault();
 			if( $("#maincontent.newprofile").hasClass("disablefeatures") ) return false;
 			var sel = $(this).parent().hasClass(".selected");
@@ -5510,7 +5510,7 @@ appdb.pages.newaccount = (function(){
 			}
 			return false;
 		});
-		$("#maincontent.newprofile .feature.dialog .title").live("click", function(ev){
+		$(document).on("click", "#maincontent.newprofile .feature.dialog .title", function(ev) {
 			ev.preventDefault();
 			$("body").children(".notifydialog").remove();
 			var dialog = $('<div class="notifydialog cancelregistration display"></div>');

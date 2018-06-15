@@ -548,24 +548,26 @@ appdb.Navigation = (function(){
 			ret.isInited = true;
 	};
 	var setupNavigator = function(){
-		$("a[href='#']").live("click",function(){return false;});
-			ret.currentHistoryState = {data: {},title: "",url:""};
-			if(appdb.config.routing.useHash !== false){
-				ret.isInited = true;
-				addEvent(window, "hashchange", ret.parseHash);
-				ret.currentHistoryState.url="#";
-				setTimeout(function(){ret.parseHash();},1);
-			}else{
-				ret.isInited = true;
-				setTimeout(function(){ret.popstate();},1);
-				$(window).bind("load",function(){
-					setTimeout(function(){
-						addEvent(window,"popstate", function(e){
-							ret.popstate(e);
-						});
-					},5);
-				});
-			}
+		$(document).on("click", "a[href='#']", function() {
+			return false;
+		});
+		ret.currentHistoryState = {data: {},title: "",url:""};
+		if(appdb.config.routing.useHash !== false){
+			ret.isInited = true;
+			addEvent(window, "hashchange", ret.parseHash);
+			ret.currentHistoryState.url="#";
+			setTimeout(function(){ret.parseHash();},1);
+		}else{
+			ret.isInited = true;
+			setTimeout(function(){ret.popstate();},1);
+			$(window).bind("load",function(){
+				setTimeout(function(){
+					addEvent(window,"popstate", function(e){
+						ret.popstate(e);
+					});
+				},5);
+			});
+		}
 	};
 	ret.isInited = false;
 	ret.init = function(){

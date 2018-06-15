@@ -12423,7 +12423,7 @@ $(document).ready(function(){
 	},1);
 
 });
-$( window ).unload(function(){
+$(window).on('unload', function(){
 	window.unloading = true;
 });
 $(window).bind('beforeunload', function(){

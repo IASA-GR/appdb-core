@@ -247,7 +247,7 @@
         } else {
 			
 		}
-		$(".editdoc .app-doc .dijitReset.dijitRight.dijitButtonNode.dijitArrowButton.dijitDownArrowButton.dijitArrowButtonContainer").live('click', function(){
+		$(document).on('click', ".editdoc .app-doc .dijitReset.dijitRight.dijitButtonNode.dijitArrowButton.dijitDownArrowButton.dijitArrowButtonContainer", function(){
 			setTimeout(function(){
 				$("div.dijitPopup.dijitComboBoxMenuPopup").css({"z-index": "999999999"});
 			},10);
