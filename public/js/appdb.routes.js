@@ -560,7 +560,7 @@ appdb.Navigation = (function(){
 		}else{
 			ret.isInited = true;
 			setTimeout(function(){ret.popstate();},1);
-			$(window).bind("load",function(){
+			$(window).on("load",function(){
 				setTimeout(function(){
 					addEvent(window,"popstate", function(e){
 						ret.popstate(e);

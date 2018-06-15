@@ -73,14 +73,14 @@ $.widget("ui.selectmenu", {
 		// make associated form label trigger focus
 		$('label[for="' + this.element.attr('id') + '"]')
 			.attr('for', this.ids[0])
-			.bind('click.selectmenu', function() {
+			.on('click.selectmenu', function() {
 				self.newelement[0].focus();
 				return false;
 			});
 
 		// click toggle for menu visibility
 		this.newelement
-			.bind('mousedown.selectmenu', function(event) {
+			.on('mousedown.selectmenu', function(event) {
 				self._toggle(event, true);
 				// make sure a click won't open/close instantly
 				if (o.style == "popup") {
@@ -89,10 +89,10 @@ $.widget("ui.selectmenu", {
 				}
 				return false;
 			})
-			.bind('click.selectmenu', function() {
+			.on('click.selectmenu', function() {
 				return false;
 			})
-			.bind("keydown.selectmenu", function(event) {
+			.on("keydown.selectmenu", function(event) {
 				var ret = false;
 				switch (event.keyCode) {
 					case $.ui.keyCode.ENTER:
@@ -131,29 +131,29 @@ $.widget("ui.selectmenu", {
 				}
 				return ret;
 			})
-			.bind('mouseover.selectmenu focus.selectmenu', function() {
+			.on('mouseover.selectmenu focus.selectmenu', function() {
 				if (!o.disabled) {
 					$(this).addClass(self.widgetBaseClass + '-focus ui-state-hover');
 				}
 			})
-			.bind('mouseout.selectmenu blur.selectmenu', function() {
+			.on('mouseout.selectmenu blur.selectmenu', function() {
 				if (!o.disabled) {
 					$(this).removeClass(self.widgetBaseClass + '-focus ui-state-hover');
 				}
 			});
 
 		// document click closes menu
-		$(document).bind("mousedown.selectmenu", function(event) {
+		$(document).on("mousedown.selectmenu", function(event) {
 			self.close(event);
 		});
 
 		// change event on original selectmenu
 		this.element
-			.bind("click.selectmenu", function() {
+			.on("click.selectmenu", function() {
 				self._refreshValue();
 			})
 			// FIXME: newelement can be null under unclear circumstances in IE8
-			.bind("focus.selectmenu", function() {
+			.on("focus.selectmenu", function() {
 				if (this.newelement) {
 					this.newelement[0].focus();
 				}
@@ -174,7 +174,7 @@ $.widget("ui.selectmenu", {
 
 		// transfer menu click to menu button
 		this.list
-			.bind("keydown.selectmenu", function(event) {
+			.on("keydown.selectmenu", function(event) {
 				var ret = false;
 				switch (event.keyCode) {
 					case $.ui.keyCode.UP:
@@ -230,7 +230,7 @@ $.widget("ui.selectmenu", {
 			});
 
 		// needed when window is resized
-		$(window).bind( "resize.selectmenu", $.proxy( self._refreshPosition, this ) );
+		$(window).on( "resize.selectmenu", $.proxy( self._refreshPosition, this ) );
 	},
 
 	_init: function() {
@@ -264,7 +264,7 @@ $.widget("ui.selectmenu", {
 				.data('index', i)
 				.addClass(selectOptionData[i].classes)
 				.data('optionClasses', selectOptionData[i].classes || '')
-				.bind("mouseup.selectmenu", function(event) {
+				.on("mouseup.selectmenu", function(event) {
 						if (self._safemouseup) {
 							var changed = $(this).data('index') != self._selectedIndex();
 							self.index($(this).data('index'));
@@ -276,15 +276,15 @@ $.widget("ui.selectmenu", {
 						}
 					return false;
 				})
-				.bind("click.selectmenu", function() {
+				.on("click.selectmenu", function() {
 					return false;
 				})
-				.bind('mouseover.selectmenu focus.selectmenu', function() {
+				.on('mouseover.selectmenu focus.selectmenu', function() {
 					self._selectedOptionLi().addClass(activeClass);
 					self._focusedOptionLi().removeClass(self.widgetBaseClass + '-item-focus ui-state-hover');
 					$(this).removeClass('ui-state-active').addClass(self.widgetBaseClass + '-item-focus ui-state-hover');
 				})
-				.bind('mouseout.selectmenu blur.selectmenu', function() {
+				.on('mouseout.selectmenu blur.selectmenu', function() {
 					if ($(this).is(self._selectedOptionLi().selector)) {
 						$(this).addClass(activeClass);
 					}
@@ -308,7 +308,7 @@ $.widget("ui.selectmenu", {
 			}
 
 			// this allows for using the scrollbar in an overflowed list
-			this.list.bind('mousedown.selectmenu mouseup.selectmenu', function() { return false; });
+			this.list.on('mousedown.selectmenu mouseup.selectmenu', function() { return false; });
 
 			// append icon if option is specified
 			if (o.icons) {
@@ -396,15 +396,15 @@ $.widget("ui.selectmenu", {
 		this.element.removeData( this.widgetName )
 			.removeClass( this.widgetBaseClass + '-disabled' + ' ' + this.namespace + '-state-disabled' )
 			.removeAttr( 'aria-disabled' )
-			.unbind( ".selectmenu" );
+			.off( ".selectmenu" );
 
-		$( window ).unbind( ".selectmenu" );
-		$( document ).unbind( ".selectmenu" );
+		$( window ).off( ".selectmenu" );
+		$( document ).off( ".selectmenu" );
 
 		// unbind click on label, reset its for attr
 		$( 'label[for=' + this.newelement.attr('id') + ']' )
 			.attr( 'for', this.element.attr( 'id' ) )
-			.unbind( '.selectmenu' );
+			.off( '.selectmenu' );
 
 		if ( this.options.wrapperElement ) {
 			this.newelement.find( this.options.wrapperElement ).remove();

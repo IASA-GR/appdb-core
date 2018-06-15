@@ -146,7 +146,7 @@ appdb.views.DelayedDisplay = function(o) {
 appdb.views.ListViewMode = function(o) {
 	var _container = "", _id = "", _list = null, _mode = 1, _dom = null;
 	this.reset = function() {
-		$(_dom).find("a").unbind("click");
+		$(_dom).find("a").off("click");
 		$(_dom).empty();
 	};
 	this.render = function() {
@@ -2182,7 +2182,7 @@ appdb.views.PeopleListItem = appdb.ExtendClass(appdb.views.ListItem, "appdb.view
 	};
 	this.reset = function() {
 		$(this.dom).find("div > a").each(function(index, elem) {
-			$(this).unbind("click");
+			$(this).off("click");
 		});
 		$(this.dom).empty();
 	};
@@ -2455,7 +2455,7 @@ appdb.views.RelatedContactListItem = appdb.ExtendClass(appdb.views.ListItem, "ap
 	};
 	this.reset = function() {
 		$(this.dom).find("div > a").each(function(index, elem) {
-			$(this).unbind("click");
+			$(this).off("click");
 		});
 		$(this.dom).empty();
 	};
@@ -4420,7 +4420,7 @@ appdb.views.StarBox = appdb.ExtendClass(appdb.View, "appdb.views.StarBox", funct
 	};
 	this.reset = function() {
 		if (this.isInteractive) {
-			$(this.dom).find("img").unbind("mouseenter").unbind("mouseleave").unbind("click");
+			$(this.dom).find("img").off("mouseenter").off("mouseleave").off("click");
 		}
 		$(this.dom).empty();
 	};
@@ -4712,7 +4712,7 @@ appdb.views.TagList = appdb.ExtendClass(appdb.View, "appdb.views.TagList", funct
 	this._adder = document.createElement("li");
 	this.ErrorHandler = new appdb.views.ErrorHandler();
 	this.reset = function() {
-		$(this._toggler).unbind("click").empty();
+		$(this._toggler).off("click").empty();
 		$(this._adder).empty();
 		this._toggler = document.createElement("a");
 		$(this._toggler).addClass("taglist-toggler").attr("title", "Click to view all associated tags").text("more...").click((function(t) {
@@ -5431,7 +5431,7 @@ appdb.views.ApplicationUrls = appdb.ExtendClass(appdb.View, "appdb.views.Applica
 	};
 	this.reset = function() {
 		$(this.dom).find("span > a").each(function() {
-			$(this).unbind("click");
+			$(this).off("click");
 		});
 		$(this.dom).empty();
 	};
@@ -6783,7 +6783,7 @@ appdb.views.peopleGroupList = appdb.ExtendClass(appdb.View, "appdb.views.PeopleG
 		$(a).addClass("itemcontents").append(img).append(flag).append(info);
 		$(li).append(a);
 
-		$(a).bind("click", (function(_this, data) {
+		$(a).on("click", (function(_this, data) {
 			return function() {
 				_this.publish({event: "select", value: {item: $(this).html(), data: data}});
 			};
@@ -6806,7 +6806,7 @@ appdb.views.peopleGroupList = appdb.ExtendClass(appdb.View, "appdb.views.PeopleG
 	};
 	this.render = function(d) {
 		d = d || [];
-		$(this.dom).find("a").unbind("click");
+		$(this.dom).find("a").off("click");
 		$(this.dom).empty();
 		var glist = document.createElement("ul"), len = d.length, i;
 		$(glist).addClass("grouplist");
@@ -6860,7 +6860,7 @@ appdb.views.DropDownGroup = appdb.ExtendClass(appdb.View, "appdb.views.DropDownG
 	this.render = function(d) {
 		this.selected.reset();
 		this.selected.set("", undefined);
-		$(this.dom).find(".combo .selection:last").unbind("click");
+		$(this.dom).find(".combo .selection:last").off("click");
 
 		$(this.dom).find(".combo .selection:last").click((function(_this) {
 			return function() {
@@ -6873,12 +6873,12 @@ appdb.views.DropDownGroup = appdb.ExtendClass(appdb.View, "appdb.views.DropDownG
 			};
 		})(this));
 
-		$(this.dom).find("input").unbind("blur").bind("blur", (function(_this) {
+		$(this.dom).find("input").off("blur").on("blur", (function(_this) {
 			return function() {
 				$(_this.dom).parent().removeClass("active");
 			};
 		})(this));
-		$("body").unbind("mouseup.dropdowngroup").bind("mouseup.dropdowngroup", (function(_this) {
+		$("body").off("mouseup.dropdowngroup").on("mouseup.dropdowngroup", (function(_this) {
 			return function(e) {
 				$(_this.dom).find("input").blur();
 			};
@@ -6924,7 +6924,7 @@ appdb.views.DropDownGroup = appdb.ExtendClass(appdb.View, "appdb.views.DropDownG
 		}
 		this.reset = (function(_reset) {
 			return function() {
-				$("body").unbind("mouseup.dropdowngroup");
+				$("body").off("mouseup.dropdowngroup");
 				_reset();
 			};
 		})(this.reset);
@@ -9239,7 +9239,7 @@ appdb.views.TristateCheckbox = appdb.ExtendClass(appdb.View, "appdb.views.Trista
 	};
 	this.render = function(state) {
 		this.setState(state);
-		$(this.dom).find(".tristate").unbind("click").bind("click", (function(self) {
+		$(this.dom).find(".tristate").off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				if ($(this).hasClass("checked")) {
@@ -9665,7 +9665,7 @@ appdb.views.SimpleTreeCell = appdb.ExtendClass(appdb.View, "appdb.views.SimpleTr
 				value = $(document.createElement("span")).addClass("textvalue").html(value);
 				$(div).append(value);
 				if (typeof this.options.onClick === "function") {
-					$(div).unbind("click").bind("click", (function(self, data) {
+					$(div).off("click").on("click", (function(self, data) {
 						return function(ev) {
 							ev.preventDefault();
 							self.options.onClick.call(self, data, this);
@@ -9844,7 +9844,7 @@ appdb.views.SimpleTreeRow = appdb.ExtendClass(appdb.View, "appdb.views.SimpleTre
 			var expandcell = $(document.createElement("div")).addClass("cell expand");
 			var a = $(document.createElement("a")).addClass("expandhandler").addClass("collapsed");
 			$(a).append("<span class='expand'>+</span><span class='collapse'>-</span>").addClass("collapsed");
-			$(a).unbind("click").bind("click", (function(self, data) {
+			$(a).off("click").on("click", (function(self, data) {
 				return function() {
 					self.toggle();
 				};
@@ -10146,7 +10146,7 @@ appdb.views.SoftwareCategoryEntry = appdb.ExtendClass(appdb.View, "appdb.views.S
 		var arrow = $(document.createElement("span")).addClass("arrow").html(appdb.views.SoftwareCategoryEntry.arrow);
 
 		var a = $(document.createElement("a")).attr("title", "Browse items in this category").attr("href", "#").addClass("value");
-		$(a).unbind("click").bind("click", (function(self) {
+		$(a).off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				var data = self.options.data;
@@ -10159,9 +10159,9 @@ appdb.views.SoftwareCategoryEntry = appdb.ExtendClass(appdb.View, "appdb.views.S
 		if (this.options.data.children && this.options.data.children.length > 0) {
 			$(a).append(arrow);
 			$(div).append(children);
-			$(children).unbind("mouseover").bind("mouseover", function() {
+			$(children).off("mouseover").on("mouseover", function() {
 				$(this).parent().addClass("hover");
-			}).unbind("mouseleave").bind("mouseleave", function() {
+			}).off("mouseleave").on("mouseleave", function() {
 				$(this).parent().removeClass("hover");
 			});
 			$(div).addClass("haschildren");
@@ -10394,7 +10394,7 @@ appdb.views.SoftwareCategoryList = appdb.ExtendClass(appdb.View, "appdb.views.So
 			return;
 
 		var editaction = $(document.createElement("a")).addClass("editcategorylist").addClass("editbutton").attr("title", "Add or modify " + this.options.entityType + " categories").html("<span>add/modify</span>");
-		$(editaction).unbind("click").bind("click", (function(self) {
+		$(editaction).off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				self.showEditor();
@@ -10433,7 +10433,7 @@ appdb.views.SoftwareCategoryList = appdb.ExtendClass(appdb.View, "appdb.views.So
 			};
 		})(this.options.maxViewLength));
 		var more = $("<li class='toggler'><span class='more' title='View all available entries'>..more</span><span class='less' title='View less entries'>...less</span></li>");
-		$(more).unbind("click").bind("click", function(ev) {
+		$(more).off("click").on("click", function(ev) {
 			ev.preventDefault();
 			$(this).parent().toggleClass("expand");
 			return false;
@@ -10627,7 +10627,7 @@ appdb.views.SoftwareDisciplineEntry = appdb.ExtendClass(appdb.View, "appdb.views
 			var data = parent.getData();
 			if ($.isArray(data) && data.length > 0)
 				data = data[0];
-			var a = $(document.createElement("a")).attr("href", "#").unbind("click").bind("click", (function(self, d) {
+			var a = $(document.createElement("a")).attr("href", "#").off("click").on("click", (function(self, d) {
 				return function(ev) {
 					ev.preventDefault();
 					self.onUserAction(d);
@@ -10658,7 +10658,7 @@ appdb.views.SoftwareDisciplineEntry = appdb.ExtendClass(appdb.View, "appdb.views
 		var arrow = $(document.createElement("span")).addClass("arrow").html(appdb.views.SoftwareDisciplineEntry.arrow);
 
 		var a = $(document.createElement("a")).attr("title", "Browse software in this discipline").attr("href", "#").addClass("value");
-		$(a).unbind("click").bind("click", (function(self) {
+		$(a).off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				var data = self.options.data;
@@ -10671,9 +10671,9 @@ appdb.views.SoftwareDisciplineEntry = appdb.ExtendClass(appdb.View, "appdb.views
 		if (this.options.dataview.getParent() && this.options.dataview.getParent().getParent()) {
 			$(a).append(arrow);
 			$(div).append(children);
-			$(children).unbind("mouseover").bind("mouseover", function() {
+			$(children).off("mouseover").on("mouseover", function() {
 				$(this).parent().addClass("hover");
-			}).unbind("mouseleave").bind("mouseleave", function() {
+			}).off("mouseleave").on("mouseleave", function() {
 				$(this).parent().removeClass("hover");
 			});
 			$(div).addClass("haschildren");
@@ -10869,7 +10869,7 @@ appdb.views.SoftwareDisciplineList = appdb.ExtendClass(appdb.View, "appdb.views.
 			return;
 
 		var editaction = $(document.createElement("a")).addClass("editdisciplinelist").addClass("editbutton").attr("title", "Add or modify software disciplines").html("<span>add/modify</span>");
-		$(editaction).unbind("click").bind("click", (function(self) {
+		$(editaction).off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				self.showEditor();
@@ -10927,7 +10927,7 @@ appdb.views.SoftwareDisciplineList = appdb.ExtendClass(appdb.View, "appdb.views.
 			};
 		})(this.options.maxViewLength));
 		var more = $("<li class='toggler'><span class='more' title='View all available disciplines'>..more</span><span class='less' title='View less disciplines'>...less</span></li>");
-		$(more).unbind("click").bind("click", function(ev) {
+		$(more).off("click").on("click", function(ev) {
 			ev.preventDefault();
 			$(this).parent().toggleClass("expand");
 			return false;
@@ -11001,7 +11001,7 @@ appdb.views.VODisciplineEntry = appdb.ExtendClass(appdb.views.SoftwareDiscipline
 			var data = parent.getData();
 			if ($.isArray(data) && data.length > 0)
 				data = data[0];
-			var a = $(document.createElement("span")).addClass("textvalue").unbind("click").bind("click", (function(self, d) {
+			var a = $(document.createElement("span")).addClass("textvalue").off("click").on("click", (function(self, d) {
 				return function(ev) {
 					ev.preventDefault();
 					return false;
@@ -11028,7 +11028,7 @@ appdb.views.VODisciplineEntry = appdb.ExtendClass(appdb.views.SoftwareDiscipline
 		var arrow = $(document.createElement("span")).addClass("arrow").html(appdb.views.VODisciplineEntry.arrow);
 
 		var span = $(document.createElement("span")).addClass("value");
-		$(span).unbind("click").bind("click", (function(self) {
+		$(span).off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				return false;
@@ -11039,9 +11039,9 @@ appdb.views.VODisciplineEntry = appdb.ExtendClass(appdb.views.SoftwareDiscipline
 		if (this.options.dataview.getParent() && this.options.dataview.getParent().getParent()) {
 			$(span).append(arrow);
 			$(div).append(children);
-			$(children).unbind("mouseover").bind("mouseover", function() {
+			$(children).off("mouseover").on("mouseover", function() {
 				$(this).parent().addClass("hover");
-			}).unbind("mouseleave").bind("mouseleave", function() {
+			}).off("mouseleave").on("mouseleave", function() {
 				$(this).parent().removeClass("hover");
 			});
 			$(div).addClass("haschildren");
@@ -11520,7 +11520,7 @@ appdb.views.GenericTreeListSelector = appdb.ExtendClass(appdb.views.TreeListEdit
 			}
 		}
 
-		$(addnew).unbind("click.selection").bind("click.selection", (function(self) {
+		$(addnew).off("click.selection").on("click.selection", (function(self) {
 			return function(ev) {
 				self.closePopups();
 				self.setSelected(true);
@@ -11528,7 +11528,7 @@ appdb.views.GenericTreeListSelector = appdb.ExtendClass(appdb.views.TreeListEdit
 			};
 		})(this));
 
-		$(remove).unbind("click.selection").bind("click.selection", (function(self) {
+		$(remove).off("click.selection").on("click.selection", (function(self) {
 			return function(ev) {
 				self.closePopups();
 				var sel = self.getSelectedChildren();
@@ -11616,7 +11616,7 @@ appdb.views.GenericTreeListSelector = appdb.ExtendClass(appdb.views.TreeListEdit
 		$(content).append(message).append(actions);
 		$(prompt).append(content);
 
-		$(cancel).unbind("click").bind("click", (function(self) {
+		$(cancel).off("click").on("click", (function(self) {
 			return function(ev) {
 				setTimeout(function() {
 					self.removeRemovalPrompt();
@@ -11624,7 +11624,7 @@ appdb.views.GenericTreeListSelector = appdb.ExtendClass(appdb.views.TreeListEdit
 			};
 		})(cntx));
 
-		$(ok).unbind("click").bind("click", (function(self, item) {
+		$(ok).off("click").on("click", (function(self, item) {
 			return function(ev) {
 				setTimeout(function() {
 					item.closePopups();
@@ -11660,7 +11660,7 @@ appdb.views.GenericTreeListSelector = appdb.ExtendClass(appdb.views.TreeListEdit
 
 		if (istext) {
 			$(infocontent).html(info);
-			$(infodom).unbind("click").bind("click", function(ev) {
+			$(infodom).off("click").on("click", function(ev) {
 				ev.preventDefault();
 				return false;
 			});
@@ -11690,7 +11690,7 @@ appdb.views.GenericTreeListSelector = appdb.ExtendClass(appdb.views.TreeListEdit
 			$(this.options.dom.item).append(selection).append(value).append(counting);
 		}
 
-		$(this.options.dom.item).unbind("click.itemdata").bind("click.itemdata", (function(self) {
+		$(this.options.dom.item).off("click.itemdata").on("click.itemdata", (function(self) {
 			return function(ev) {
 				$(this).parent().siblings().removeClass("clicked");
 				$(this).parent().siblings().find(".clicked").removeClass("clicked");
@@ -11728,7 +11728,7 @@ appdb.views.GenericTreeListSelector = appdb.ExtendClass(appdb.views.TreeListEdit
 				$(parentDivs).hide().parent().parent().removeClass("prompting");
 			}
 			this.closePopups();
-			$(categdom).find('div.itemdata.level1').unbind("click.accordion").bind("click.accordion", function(ev) {
+			$(categdom).find('div.itemdata.level1').off("click.accordion").on("click.accordion", function(ev) {
 				ev.preventDefault();
 				if ($(this).parent().hasClass("expanded")) {
 					return false;
@@ -11819,7 +11819,7 @@ appdb.views.CategoriesTreeListSelector = appdb.ExtendClass(appdb.views.GenericTr
 		$(primary).append(span);
 		$(this.options.dom.item).prepend(primary);
 
-		$(primary).unbind("click").bind("click", (function(self) {
+		$(primary).off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				if (self.isPrimary() == false) {
@@ -12119,7 +12119,7 @@ appdb.views.VApplianceCategoriesTreeListEditor = appdb.ExtendClass(appdb.views.S
 		return true;
 	};
 	this.postRender = function() {
-		$(this.dom).find('div.itemdata.level1').unbind("click.accordion").bind("click.accordion", function(ev) {
+		$(this.dom).find('div.itemdata.level1').off("click.accordion").on("click.accordion", function(ev) {
 			ev.preventDefault();
 			return false;
 		});
@@ -12127,7 +12127,7 @@ appdb.views.VApplianceCategoriesTreeListEditor = appdb.ExtendClass(appdb.views.S
 });
 appdb.views.SWApplianceCategoriesTreeListEditor = appdb.ExtendClass(appdb.views.VApplianceCategoriesTreeListEditor, "appdb.views.SWApplianceCategoriesTreeListEditor", function(o) {
 	this.postRender = function() {
-		$(this.dom).find('div.itemdata.level1').unbind("click.accordion").bind("click.accordion", function(ev) {
+		$(this.dom).find('div.itemdata.level1').off("click.accordion").on("click.accordion", function(ev) {
 			ev.preventDefault();
 			return false;
 		});
@@ -12283,7 +12283,7 @@ appdb.views.SoftwareGenericTreeDataEditor = new appdb.ExtendClass(appdb.View, "a
 		$(this.options.dom.actions).append(this.options.dom.actionApply).append(this.options.dom.actionCancel);
 		$(this.options.dom.main).append(this.options.dom.header).append(this.options.dom.content).append(this.options.dom.actions);
 
-		$(this.options.dom.actionCancel).unbind("click").bind("click", (function(self) {
+		$(this.options.dom.actionCancel).off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				self.closeDialog();
@@ -12291,7 +12291,7 @@ appdb.views.SoftwareGenericTreeDataEditor = new appdb.ExtendClass(appdb.View, "a
 				return false;
 			};
 		})(this));
-		$(this.options.dom.actionApply).unbind("click").bind("click", (function(self) {
+		$(this.options.dom.actionApply).off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				self.closeDialog();
@@ -12354,7 +12354,7 @@ appdb.views.SoftwareCategoriesEditor = new appdb.ExtendClass(appdb.views.Softwar
 		maxDisplayLength: (o.maxDisplayLength << 0) || -1
 	};
 	this.onRender = function() {
-		$(this.options.Editor.options.dom.extraemptycontainer).find("a.popup.primary").unbind("mouseover").bind("mouseover", function(ev) {
+		$(this.options.Editor.options.dom.extraemptycontainer).find("a.popup.primary").off("mouseover").on("mouseover", function(ev) {
 			if ($(this).hasClass("popupinited") === false) {
 				var html = $("<div>" + appdb.views.CategoriesTreeListSelector.primaryMessage + "</div>");
 				$(html).find(".actiontype").remove();
@@ -12640,7 +12640,7 @@ appdb.views.ManagedFilterEntry = appdb.ExtendClass(appdb.View, "appdb.views.Mana
 
 		if (this.isClosable()) {
 			$(this.dom).addClass("closable").append(this.options.dom.close);
-			$(this.options.dom.close).unbind("click").bind("click", (function(self) {
+			$(this.options.dom.close).off("click").on("click", (function(self) {
 				return function(ev) {
 					ev.preventDefault();
 					self.publish({event: "remove", value: self.getFilterEntry()});
@@ -12786,7 +12786,7 @@ appdb.views.ManagedFiltering = appdb.ExtendClass(appdb.View, "appdb.views.Manage
 		if (this.options.dom.actiondisplay) {
 			$(this.dom).append($(this.options.dom.actiondisplay).clone(true));
 			$(this.dom).children("a.action.display").hide();
-			$(this.dom).children("a.action.display:first").unbind("click").bind("click", (function(self) {
+			$(this.dom).children("a.action.display:first").off("click").on("click", (function(self) {
 				return function(ev) {
 					ev.preventDefault();
 					self.publish({event: "action", value: "display"});
@@ -12796,7 +12796,7 @@ appdb.views.ManagedFiltering = appdb.ExtendClass(appdb.View, "appdb.views.Manage
 		}
 		if (this.options.dom.actionreset) {
 			$(this.dom).append($(this.options.dom.actionreset).clone(true));
-			$(this.dom).children("a.action.reset:first").unbind("click").bind("click", (function(self) {
+			$(this.dom).children("a.action.reset:first").off("click").on("click", (function(self) {
 				return function(ev) {
 					ev.preventDefault();
 					self.publish({event: "action", value: "reset"});
@@ -12915,7 +12915,7 @@ appdb.views.RefinedFilterType = appdb.ExtendClass(appdb.View, "appdb.views.Refin
 		if (!d.count) {
 			$(dom).addClass("nocount");
 		}
-		$(dom).unbind("click").bind("click", (function(self, data) {
+		$(dom).off("click").on("click", (function(self, data) {
 			return function(ev) {
 				ev.preventDefault();
 				if (data.count) {
@@ -13116,10 +13116,10 @@ appdb.views.RefinedFilterType = appdb.ExtendClass(appdb.View, "appdb.views.Refin
 		if (this.options.css) {
 			$(dom).children("ul").addClass(this.options.css);
 		}
-		$(dom).unbind("mousemove").bind("mousemove", (function(self) {
+		$(dom).off("mousemove").on("mousemove", (function(self) {
 			return function(ev) {
 				self.determineMenuAlingment($(this)[0]);
-				$(this).unbind("mousemove").children("ul").removeClass("hidden");
+				$(this).off("mousemove").children("ul").removeClass("hidden");
 			};
 		})(this)).children("ul").addClass("hidden");
 	};
@@ -13303,7 +13303,7 @@ appdb.views.LicenseListItem = appdb.ExtendClass(appdb.View, "appdb.views.License
 			});
 		};
 		return function(e) {
-			$(e.dom).find(".header .title").unbind("click").bind("click", (function(self) {
+			$(e.dom).find(".header .title").off("click").on("click", (function(self) {
 				return function(ev) {
 					var d = self.getData();
 					$(".dijitPopup.dijitTooltipDialogPopup").remove();
@@ -13313,7 +13313,7 @@ appdb.views.LicenseListItem = appdb.ExtendClass(appdb.View, "appdb.views.License
 					$(link).attr("href", d.url);
 					$(link).attr("target", "_blank");
 					$(link).attr("title", "View license");
-					$(assoc).unbind("click").bind("click", function(ev) {
+					$(assoc).off("click").on("click", function(ev) {
 						appdb.views.Main.showApplications({flt: "+=&license.id:" + d.id});
 						$(".dijitPopup.dijitTooltipDialogPopup").remove();
 						ev.preventDefault();
@@ -13324,7 +13324,7 @@ appdb.views.LicenseListItem = appdb.ExtendClass(appdb.View, "appdb.views.License
 					$(data).addClass("middlewarepopup").append(assoc);
 					if( !!appdb.config.features.swappliance ){
 						var assoc2 = $(document.createElement("a")).attr("href", "#").attr("title", "View related software appliance items");
-						$(assoc2).unbind("click").bind("click", function(ev) {
+						$(assoc2).off("click").on("click", function(ev) {
 							appdb.views.Main.showSoftwareAppliances({flt: "+=&license.id:" + d.id},{content: "swappliance"});
 							$(".dijitPopup.dijitTooltipDialogPopup").remove();
 							ev.preventDefault();
@@ -13345,7 +13345,7 @@ appdb.views.LicenseListItem = appdb.ExtendClass(appdb.View, "appdb.views.License
 		$(this.dom).find(".actions a.action").each((function(self) {
 			return function(i, e) {
 				if ($(e).hasClass("remove")) {
-					$(e).unbind("click").bind("click", function(ev) {
+					$(e).off("click").on("click", function(ev) {
 						ev.preventDefault();
 						self.publish({event: "remove", value: self});
 						return false;
@@ -13648,9 +13648,9 @@ appdb.views.CustomLicenseListItem = appdb.ExtendClass(appdb.views.LicenseListIte
 		this.renderEditorComments();
 		this.onValueChange();
 		this.renderValidationStatus();
-		$(this.dom).find(".value .warning").unbind("mouseover").bind("mouseover", function(ev) {
+		$(this.dom).find(".value .warning").off("mouseover").on("mouseover", function(ev) {
 			$(ev.target).addClass("hover");
-		}).unbind("mouseleave").bind("mouseleave", function(ev) {
+		}).off("mouseleave").on("mouseleave", function(ev) {
 			$(ev.target).removeClass("hover");
 		});
 	};
@@ -13680,7 +13680,7 @@ appdb.views.CustomLicenseListItem = appdb.ExtendClass(appdb.views.LicenseListIte
 			});
 		};
 		return function(e) {
-			$(e.dom).find(".header .title").unbind("click").bind("click", (function(self) {
+			$(e.dom).find(".header .title").off("click").on("click", (function(self) {
 				return function(ev) {
 					var d = self.getData();
 					$(".dijitPopup.dijitTooltipDialogPopup").remove();
@@ -13691,7 +13691,7 @@ appdb.views.CustomLicenseListItem = appdb.ExtendClass(appdb.views.LicenseListIte
 					$(link).attr("href", d.url);
 					$(link).attr("target", "_blank");
 					$(link).attr("title", "View license");
-					$(assoc).unbind("click").bind("click", function(ev) {
+					$(assoc).off("click").on("click", function(ev) {
 						appdb.views.Main.showApplications({flt: "+=&license.id:" + d.id});
 						$(".dijitPopup.dijitTooltipDialogPopup").remove();
 						ev.preventDefault();
@@ -13745,7 +13745,7 @@ appdb.views.LicenseList = appdb.ExtendClass(appdb.View, "appdb.views.LicenseList
 		$(this.dom).addClass("editmode");
 		this.render();
 		$(this.dom).append(this.options.dom.addertemplate);
-		$(this.options.dom.addertemplate).children("a").unbind("click").bind("click", (function(self) {
+		$(this.options.dom.addertemplate).children("a").off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				self.newItem();
@@ -13753,14 +13753,14 @@ appdb.views.LicenseList = appdb.ExtendClass(appdb.View, "appdb.views.LicenseList
 			};
 		})(this));
 		$(this.dom).append(this.options.dom.customaddertemplate);
-		$(this.options.dom.customaddertemplate).children("a").unbind("click").bind("click", (function(self) {
+		$(this.options.dom.customaddertemplate).children("a").off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				self.registerNew();
 				return false;
 			};
 		})(this));
-		$(this.dom).parent().find("a.customlicenseadder").unbind("click").bind("click", (function(self) {
+		$(this.dom).parent().find("a.customlicenseadder").off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				self.registerNew();
@@ -13979,7 +13979,7 @@ appdb.views.ConnectedAccountsItem = appdb.ExtendClass(appdb.View, "appdb.views.C
 		if (this.options.data.current === true) {
 			a = $("<span href='#' title='This is the current signed in account' class='action currentaccount' ><img src='/images/yes_grey.png' alt=''/><span>Current account</span></a>");
 		} else {
-			$(a).unbind("click").bind("click", (function(self) {
+			$(a).off("click").on("click", (function(self) {
 				return function(ev) {
 					ev.preventDefault();
 					self.parent.parent.disconnectAccount(self.options.data, self.options.meta);
@@ -14149,7 +14149,7 @@ appdb.views.ConnectedAccountTypeListItem = appdb.ExtendClass(appdb.View, "appdb.
 			return;
                 if (this.options.meta.canAdd === true) {
                     var connect = $("<a href='#' title='Connect to a new " + this.options.meta.name + " account' class='action icontext'><img src='/images/addnew.png' alt=''/><span>Add account</span></a>");
-                    $(connect).unbind("click").bind("click", (function(self) {
+                    $(connect).off("click").on("click", (function(self) {
                         return function(ev) {
                             ev.preventDefault();
                             self.parent.connectAccount(self.options.meta);
@@ -14545,7 +14545,7 @@ appdb.views.ProfileListItem = appdb.ExtendClass(appdb.views.ListItem, "appdb.vie
 		$(a).append(contacts);
 		$(div).append($(a));
 		connect = $("<a class='action icontext connectaction' href='' title='Connect to this profile'><span class='shade'></span><span class='text'>click to connect</span></a>");
-		$(connect).unbind("click").bind("click", (function(self, profiledata) {
+		$(connect).off("click").on("click", (function(self, profiledata) {
 			return function(ev) {
 				ev.preventDefault();
 				self.publish({event: "connect", value: {data: profiledata, el: $(this).closest(".item")[0]}});
@@ -14558,7 +14558,7 @@ appdb.views.ProfileListItem = appdb.ExtendClass(appdb.views.ListItem, "appdb.vie
 	};
 	this.reset = function() {
 		$(this.dom).find("div > a").each(function(index, elem) {
-			$(this).unbind("click");
+			$(this).off("click");
 		});
 		$(this.dom).empty();
 	};
@@ -14650,7 +14650,7 @@ appdb.views.VOMembershipList = appdb.ExtendClass(appdb.View, "appdb.views.VOMemb
 
 		var voname = $("<div class='voname'></div>");
 		var volink = $('<a href="#" class="voname icontext" data="' + d.discipline + '" title="' + d.discipline + '"><img src="' + ((d.discipline) ? "/vo/getlogo?name="+encodeURI(d.name)+"&vid="+ (d.id<<0) +"&id=" + encodeURI(d.discipline) : "/images/homepage.png") + '" alt=""/><span>' + d.name.htmlEscape() + '</span></a>');
-		$(volink).unbind("click").bind("click", (function(voname, vodiscipline) {
+		$(volink).off("click").on("click", (function(voname, vodiscipline) {
 			return function(ev) {
 				ev.preventDefault();
 				var img = "/images/homepage";
@@ -14809,7 +14809,7 @@ appdb.views.GenericCheckbox = appdb.ExtendClass(appdb.View, "appdb.views.Generic
 		} else {
 			$(this.dom).empty().append(chkbox);
 		}
-		$(chkbox).unbind("click").bind("click", (function(self) {
+		$(chkbox).off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				if (self.options.enabled) {
@@ -15998,7 +15998,7 @@ appdb.views.PermissionGroupList = appdb.ExtendClass(appdb.View, "appdb.views.Per
 	};
 	this._initActions = function() {
 		if ($(this.dom).find(".actions").length > 0) {
-			$(this.dom).find(".actions > .action[data-action]").unbind("click").bind("click", (function(self) {
+			$(this.dom).find(".actions > .action[data-action]").off("click").on("click", (function(self) {
 				return function(ev) {
 					ev.preventDefault();
 					self.publish({event: "action", value: {action: $(this).data("action"), source: self}});
@@ -16067,7 +16067,7 @@ appdb.views.EntityPrivacy = appdb.ExtendClass(appdb.View, "appdb.views.EntityPri
 	};
 	this._initActions = function() {
 		if ($(this.dom).find(".actions").length > 0) {
-			$(this.dom).find(".actions > .action[data-action]").unbind("click").bind("click", (function(self) {
+			$(this.dom).find(".actions > .action[data-action]").off("click").on("click", (function(self) {
 				return function(ev) {
 					ev.preventDefault();
 					self.publish({event: "action", value: {action: $(this).data("action"), source: self}});
@@ -16241,7 +16241,7 @@ appdb.views.FilterDecorator = appdb.ExtendClass(appdb.View, "appdb.views.FilterD
 			itemcount = parseInt(itemcount) * parseInt(pagenumber);
 		}
 		this.showItems(filterclass, itemcount);
-		$(this.dom).find(".filterpager > .action").unbind("click").bind("click", (function(self, fc) {
+		$(this.dom).find(".filterpager > .action").off("click").on("click", (function(self, fc) {
 			return function(ev) {
 				ev.preventDefault();
 				self.getNextPage(fc);
@@ -16250,7 +16250,7 @@ appdb.views.FilterDecorator = appdb.ExtendClass(appdb.View, "appdb.views.FilterD
 		})(this, filterclass));
 	};
 	this._initActions = function() {
-		$(this.options.dom.filters).children().unbind("click").bind("click", (function(self) {
+		$(this.options.dom.filters).children().off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				self.selectFilter($(this).parent());
@@ -16495,8 +16495,8 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 		    r.vaversion= this.vaversion;
 		    diff[r.TEST_ID][this.vaversion] = r;
 	    };
-	    $.each(ar, differ.bind(a));
-	    $.each(br, differ.bind(b));
+	    $.each(ar, differ.on(a));
+	    $.each(br, differ.on(b));
 
 	    return {
 		    versions: [a.vaversion, b.vaversion],
@@ -16582,14 +16582,14 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 		    $(secantStatus).addClass('candiff');
 		    var diffHandler = $('<div class="viewas"></div>');
 		    var viewReportText = 'Back to <b>' +  report.vaversion_type + '</b>(' + comparableReport.vaversion + ') version security report';
-		    var viewReport = $('<a class="view-report"></a>').append(viewReportText).unbind('click').bind('click', function(ev) {
+		    var viewReport = $('<a class="view-report"></a>').append(viewReportText).off('click').on('click', function(ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
 			$(this).closest('.secant_status').removeClass('diff').addClass('report');
 			return false;
 		    });
 		    var diffText = 'Diff security report with <b>' + comparableReport.vaversion_type + '</b>(' + comparableReport.vaversion + ') version';
-		    var viewDiff = $('<a class="view-diff"></a>').append(diffText).unbind('click').bind('click', function(ev) {
+		    var viewDiff = $('<a class="view-diff"></a>').append(diffText).off('click').on('click', function(ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
 			$(this).closest('.secant_status').removeClass('report').addClass('diff');
@@ -16660,7 +16660,7 @@ appdb.views.VoSecantReport = appdb.ExtendClass(appdb.View, "appdb.views.VoSecant
 			}
 			var badge = appdb.views.SecantReport.createBadge(s, {headerText: 'LATEST VERSION CHECK', displayVersion: this.shouldDisplayVersions(data)});
 			if (badge) {
-				$(badge).unbind('click').bind('click', (function(self, content) {
+				$(badge).off('click').on('click', (function(self, content) {
 				    return function(ev) {
 					ev.preventDefault();
 					var popupProvider = (self.options.popupProvider && 'popup' in self.options.popupProvider) ? self.options.popupProvider : appdb.views.VoSecantReport;
@@ -16684,7 +16684,7 @@ appdb.views.VoSecantReport = appdb.ExtendClass(appdb.View, "appdb.views.VoSecant
 
 				this.options.reports.push(s);
 			}
-		}.bind(this));
+		}.on(this));
 	    }
 	};
 
@@ -16824,7 +16824,7 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 		$(a).find("span").text(text);
 		var content = $("<div class='voimagelistaction warning'></div>");
 		$(content).html(errortext);
-		$(a).unbind("click").bind("click", (function(self, content) {
+		$(a).off("click").on("click", (function(self, content) {
 			return function(ev) {
 				ev.preventDefault();
 				if (appdb.views.VoImageListItem.popup) {
@@ -16869,7 +16869,7 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 
 		var badge = appdb.views.SecantReport.createBadge(currentSecant, {displayHeader: true, headerText: 'CURRENT VERSION CHECK', size: ''});
 		if (badge) {
-			$(badge).unbind('click').bind('click', (function(self, content) {
+			$(badge).off('click').on('click', (function(self, content) {
 			    return function(ev) {
 				ev.preventDefault();
 				if (appdb.views.VoImageListItem.popup) {
@@ -17023,7 +17023,7 @@ appdb.views.VoImageListItemCell.Expandable = function(dom, row, col, data, maxhe
 		});
 		$(vals).find(".seperator:last").remove();
 		$(values).html($(vals).html());
-		$(toggle).unbind("click").bind("click", (function(height) {
+		$(toggle).off("click").on("click", (function(height) {
 			return function(ev) {
 				ev.preventDefault();
 				if ($(this).parent().hasClass("collapsed")) {
@@ -17162,7 +17162,7 @@ appdb.views.VoImageListItemCell.SWappSupport = function(dom, row, col, data) {
 			$(v).find(".val").append(warning);
 		}
 		$(a).attr("href", appdb.config.endpoint.base + "store/swappliance/" + item.cname).append(details);
-		$(a).unbind("click").bind("click", (function(d){
+		$(a).off("click").on("click", (function(d){
 			return function(ev){
 				ev.preventDefault();
 				appdb.views.Main.showSoftwareAppliance({id: d.id, cname:d.cname});
@@ -17186,7 +17186,7 @@ appdb.views.VoImageListItemCell.SWappSupport = function(dom, row, col, data) {
 		})(data));
 		$(vals).find(".seperator:last").remove();
 		$(values).html($(vals).html());
-		$(toggle).unbind("click").bind("click", (function(height) {
+		$(toggle).off("click").on("click", (function(height) {
 			return function(ev) {
 				ev.preventDefault();
 				if ($(this).parent().hasClass("collapsed")) {
@@ -17210,7 +17210,7 @@ appdb.views.VoImageListItemCell.SWappSupport = function(dom, row, col, data) {
 		})(((col.maxheight << 0) || 25)));
 		_checkExpand($(toggle));
 		_checkExpand($(toggle));
-		$(html).find(".warning").unbind("mouseenter").bind("mouseenter", function(ev){
+		$(html).find(".warning").off("mouseenter").on("mouseenter", function(ev){
 			ev.preventDefault();
 			ev.stopPropagation();
 			if(appdb.views.VoImageListItem.popupswwapp !== null){
@@ -17224,20 +17224,20 @@ appdb.views.VoImageListItemCell.SWappSupport = function(dom, row, col, data) {
 				around: $(this)[0],
 				orient: {'BR': 'TR', 'BL': 'TL'}
 			});
-			$(content).unbind("mouseenter").bind("mouseenter", function(ev){
+			$(content).off("mouseenter").on("mouseenter", function(ev){
 				clearTimeout(appdb.views.VoImageListItem.popupswwappinerval);
-			}).unbind("mouseleave").bind("mouseleave", function(ev){
+			}).off("mouseleave").on("mouseleave", function(ev){
 				clearTimeout(appdb.views.VoImageListItem.popupswwappinerval);
 				appdb.views.VoImageListItem.popupswwappinerval = setTimeout(function(){
 					dijit.popup.close(appdb.views.VoImageListItem.popupswwapp);
 				},500);
-			}).unbind("click").bind("click", function(ev){
+			}).off("click").on("click", function(ev){
 				ev.stopPropagation();
 				ev.preventDefault();
 				return false;
 			});
 			return false;
-		}).unbind("mouseleave").bind("mouseleave", function(ev){
+		}).off("mouseleave").on("mouseleave", function(ev){
 			clearTimeout(appdb.views.VoImageListItem.popupswwappinerval);
 			appdb.views.VoImageListItem.popupswwappinerval = setTimeout(function(){
 				dijit.popup.close(appdb.views.VoImageListItem.popupswwapp);
@@ -17279,7 +17279,7 @@ appdb.views.VoImageListItemCell.ActionList = function(dom, row, col, data) {
 		});
 	}
 
-	$(html).find("button").unbind("click").bind("click", (function(parent) {
+	$(html).find("button").off("click").on("click", (function(parent) {
 		return function(ev) {
 			ev.preventDefault();
 			parent.onAction({action: $(this).data("action")});
@@ -17317,7 +17317,7 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 							continue;
 						$(html).append("<option value='" + i + "'>" + states[i] + "</option>");
 					}
-					$(html).bind("change", function() {
+					$(html).on("change", function() {
 						var v = $(this).val();
 						$(this).parent().find("input").attr("value", v);
 						$(this).parent().find("input").val(v);
@@ -17341,7 +17341,7 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 					$.each(uniq, function(i,e){
 						$(html).append("<option value='" + e.name + "'>" + e.name + "</option>");
 					});
-					$(html).bind("change", function() {
+					$(html).on("change", function() {
 						var v = $(this).val();
 						$(this).parent().find("input").attr("value", v);
 						$(this).parent().find("input").val(v);
@@ -17364,7 +17364,7 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 							continue;
 						$(html).append("<option value='" + i + "'>" + states[i] + "</option>");
 					}
-					$(html).bind("change", function() {
+					$(html).on("change", function() {
 						var v = $(this).val();
 						$(this).parent().find("input").attr("value", v);
 						$(this).parent().find("input").val(v);
@@ -17417,7 +17417,7 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 			}
 		});
 		this.subviews = [];
-		$(window).unbind("scroll.stickyvo");
+		$(window).off("scroll.stickyvo");
 	};
 	this.createErrorLink = function(text, errortext) {
 		text = $.trim(text) || "An error occured";
@@ -17426,7 +17426,7 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 		$(a).find("span").text(text);
 		var content = $("<div class='voimagelistaction error'></div>");
 		$(content).text(errortext);
-		$(a).unbind("click").bind("click", (function(self, content) {
+		$(a).off("click").on("click", (function(self, content) {
 			return function(ev) {
 				ev.preventDefault();
 				if (appdb.views.VoImageList.popup) {
@@ -17484,7 +17484,7 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 		$(a).find("span").text(text);
 		var content = $("<div class='voimagelistaction warning'></div>");
 		$(content).html(errortext);
-		$(a).unbind("click").bind("click", (function(self, content) {
+		$(a).off("click").on("click", (function(self, content) {
 			return function(ev) {
 				ev.preventDefault();
 				if (appdb.views.VoImageListItem.popup) {
@@ -17884,7 +17884,7 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 			$(li).append("<span class='images'>" + e.instances.length + "</span>");
 			$(ul).append(li);
 		});
-		$(html).find(".footer .action.close").unbind("click").bind("click", (function(self) {
+		$(html).find(".footer .action.close").off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				appdb.views.VoImageList.dialog_deleted.hide();
@@ -17896,7 +17896,7 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 		if (canrepublish || canpublish) {
 			var publishhtml = $("<button class='btn btn-primary btn-compact action publish' title='" + ((canrepublish) ? "Republish image list, excluding deleted VAs" : "Publish changes") + "'>" + displaypublish + "</button>");
 			$(html).find(".footer .actions").append(publishhtml);
-			$(publishhtml).unbind("click").bind("click", (function(self) {
+			$(publishhtml).off("click").on("click", (function(self) {
 				return function(ev) {
 					ev.preventDefault();
 					self.onPublish();
@@ -17930,7 +17930,7 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 		var html = $('<div class="deletedvas-container"><div class="deletedvas"><span class="count"></span><span>published VA' + plural + ' will be excluded due to user deletion</span></div><a href="' + appdb.config.endpoint.wiki + '" target="_blank" title="View explanation" class="icontext action learnmore">learn more</a><button class="btn btn-warning btn-compact action view">view VA' + plural + '</button></div>');
 		$(html).find(".count").text(dels.length);
 		$(this.options.dom.topheader).append(html);
-		$(html).find(".action.view").unbind("click").bind("click", (function(self) {
+		$(html).find(".action.view").off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				self.renderDeletedVAList("republish");
@@ -17980,7 +17980,7 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 				$(th).addClass("hidden");
 			}
 			$(div).html($.trim(e.columnName || e.name));
-			$(div).find("a").unbind("click").bind("click", (function(self){
+			$(div).find("a").off("click").on("click", (function(self){
 				return function(ev){
 					ev.stopPropagation();
 				};
@@ -18135,7 +18135,7 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 	this.renderHeaderFixed = function() {
 		if ($.browser.msie)
 			return;
-		$(window).unbind("scroll.stickyvo").bind("scroll.stickyvo", this.getStickyScroll(40));
+		$(window).off("scroll.stickyvo").on("scroll.stickyvo", this.getStickyScroll(40));
 	};
 	this.hasPublishedList = function() {
 		var d = this.parent.getPublishedImageList();
@@ -18305,7 +18305,7 @@ appdb.views.VoImageListState = appdb.ExtendClass(appdb.View, "appdb.views.VoImag
 		var revertchanges = $("<button class='action btn btn-warning btn-compact revert' title='Revert changes'>Revert changes</button>");
 		var publishaction = $("<button class='action btn btn-primary btn-compact publish' title='Publish changes'>Publish changes</button>");
 
-		$(revertchanges).unbind("click").bind("click", (function(self) {
+		$(revertchanges).off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				if (self.checkPublish()) {
@@ -18314,7 +18314,7 @@ appdb.views.VoImageListState = appdb.ExtendClass(appdb.View, "appdb.views.VoImag
 				return false;
 			};
 		})(this));
-		$(publishaction).unbind("click").bind("click", (function(self) {
+		$(publishaction).off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				if (self.checkPublish()) {
@@ -18326,7 +18326,7 @@ appdb.views.VoImageListState = appdb.ExtendClass(appdb.View, "appdb.views.VoImag
 		$(this.options.dom.actions).append(revertchanges).append(publishaction);
 		if (this.getState("deleted").length > 0) {
 			var viewdeleted = $("<button class='action btn btn-danger btn-compact viewdeleted' title='View deleted VAs'>View deleted VAs</button>");
-			$(viewdeleted).unbind("click").bind("click", (function(self) {
+			$(viewdeleted).off("click").on("click", (function(self) {
 				return function(ev) {
 					ev.preventDefault();
 					self.parent.renderDeletedVAList();
@@ -18532,7 +18532,7 @@ appdb.views.VoImageListLegend = appdb.ExtendClass(appdb.View, "appdb.views.VoIma
 		var label = $("<div class='statelabel'></div>");
 		$(label).text(state.text);
 		$(html).append(chk).append(color).append(label);
-		$(chk).unbind("click").bind("click", (function(self, stateobj) {
+		$(chk).off("click").on("click", (function(self, stateobj) {
 			return function(ev) {
 				var ischecked = $(this).attr("checked");
 				$(self.dom).find(":input").removeAttr("checked");
@@ -18700,7 +18700,7 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 		contextscripts = contextscripts ||[];
 		contextscripts = $.isArray(contextscripts)?contextscripts:[contextscripts];
 		var download = $("<a href='#' target='_blank' class='downloadcscript' title='Download contextualization script'>Download</a>");
-		$(download).unbind("click").bind("click", function(ev){
+		$(download).off("click").on("click", function(ev){
 			ev.stopPropagation();
 			return true;
 		});
@@ -18827,7 +18827,7 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 	};
 	this.renderEmptyTemplate = function(dom) {
 		$(dom).append("<div class='template-empty'><span class='message'>No templates provided</span></div><div class='template-cell action'><div class='getids' title='View related IDs'>get IDs</div></div>");
-		$(dom).find(".getids").unbind("click").bind("click", (function(self) {
+		$(dom).find(".getids").off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				self.showElementIds(this);
@@ -18874,7 +18874,7 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 			$(action).empty();
 		}
 		$(dom).append(memory).append(disk).append(cpus).append(connectivity).append(osfamily).append(action);
-		$(action).find(".getids").unbind("click").bind("click", (function(self, cscript, instance) {
+		$(action).find(".getids").off("click").on("click", (function(self, cscript, instance) {
 			return function(ev) {
 				ev.preventDefault();
 				if( appdb.config.features.groupvaprovidertemplates ){
@@ -18924,7 +18924,7 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 		$(arch).text(d.arch.val());
 		$(hypervisors).text(d.hypervisors);
 		if (typeof d.vmiinstanceid !== "undefined" && typeof d.identifier !== "undefined" && $.trim(d.vmiinstanceid) !== "" && $.trim(d.identifier) !== "") {
-			$(permalink).find("a").attr("href", appdb.config.endpoint.base + "store/vm/image/" + $.trim(d.identifier) + ":" + $.trim(d.vmiinstanceid)).unbind("click").bind("click", function(ev) {
+			$(permalink).find("a").attr("href", appdb.config.endpoint.base + "store/vm/image/" + $.trim(d.identifier) + ":" + $.trim(d.vmiinstanceid)).off("click").on("click", function(ev) {
 				ev.stopPropagation();
 			});
 			$(img).append(permalink);
@@ -18946,7 +18946,7 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 		var ul = $("<ul class='cancollapse'></ul>");
 
 		$(name).find(".value").text($.trim(d.name).toUpperCase());
-		$(name).find("a").attr("href",appdb.config.endpoint.base + "store/site/" + $.trim(d.name).toUpperCase()).unbind("click").bind("click", function(ev) {
+		$(name).find("a").attr("href",appdb.config.endpoint.base + "store/site/" + $.trim(d.name).toUpperCase()).off("click").on("click", function(ev) {
 			ev.stopPropagation();
 		});
 		$(site).append(name);
@@ -18988,7 +18988,7 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 	this.initAccordion = function() {
 		$(this.dom).find(".expandable").each((function(self) {
 			return function(i, e) {
-				$(this).children(".handler:first").unbind("click").bind("click", (function(self) {
+				$(this).children(".handler:first").off("click").on("click", (function(self) {
 					return function(ev) {
 						var list = $(this).siblings(".cancollapse");
 
@@ -19131,7 +19131,7 @@ appdb.views.SwapplianceResourceProvidersList = appdb.ExtendClass(appdb.views.Vap
 		var ul = $("<ul class='cancollapse'></ul>");
 
 		$(name).find(".value").text($.trim(d.name));
-		$(name).find("a").attr("href",appdb.config.endpoint.base + "store/vappliance/" + $.trim(d.cname)).unbind("click").bind("click", function(ev) {
+		$(name).find("a").attr("href",appdb.config.endpoint.base + "store/vappliance/" + $.trim(d.cname)).off("click").on("click", function(ev) {
 			ev.stopPropagation();
 		});
 		$(vapp).append(name);
@@ -19193,7 +19193,7 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 	};
 	this.renderContextScripts = function(dom,contextscripts){
 		var download = $("<a href='#' target='_blank' class='downloadcscript' title='Download contextualization script'>Download</a>");
-		$(download).unbind("click").bind("click", function(ev){
+		$(download).off("click").on("click", function(ev){
 			ev.stopPropagation();
 			return true;
 		});
@@ -19339,7 +19339,7 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 	};
 	this.renderEmptyTemplate = function(dom) {
 		$(dom).append("<div class='template-empty'><span class='message'>No templates provided</span></div><div class='template-cell action'><div class='getids' title='View related IDs'>get IDs</div></div>");
-		$(dom).find(".getids").unbind("click").bind("click", (function(self) {
+		$(dom).find(".getids").off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				self.showElementIds(this);
@@ -19386,7 +19386,7 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 			$(action).empty();
 		}
 		$(dom).append(memory).append(disk).append(cpus).append(connectivity).append(osfamily).append(action);
-		$(action).find(".getids").unbind("click").bind("click", (function(self, cscript, instance) {
+		$(action).find(".getids").off("click").on("click", (function(self, cscript, instance) {
 			return function(ev) {
 				ev.preventDefault();
 				if( appdb.config.features.groupvaprovidertemplates ){
@@ -19477,7 +19477,7 @@ appdb.views.SiteVMUsageList = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 
 		$(li).append(a);
 		$(a).find(".name").text((d.vo) ? d.vo.name : "none");
-		$(a).unbind("click").bind("click", (function(self, data) {
+		$(a).off("click").on("click", (function(self, data) {
 			return function(ev) {
 				ev.preventDefault();
 				$(this).closest("ul").find(".current").removeClass("current");
@@ -19767,7 +19767,7 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 		
 		filter.dom = $("<li><div class='filter'><div class='field'></div><div class='value'></div><a href='#' class='action clear' title='Clear current filter'>x</a></div></li>");
 		$(filter.dom).find(".field").text(filter.name + ":");
-		$(filter.dom).find(".action.clear").unbind("click").bind("click", (function(self, flt) {
+		$(filter.dom).find(".action.clear").off("click").on("click", (function(self, flt) {
 			return function(ev) {
 				ev.preventDefault();
 				delete flt.userValue;
@@ -19815,7 +19815,7 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 	this.render = function(d) {
 		this.renderFilters();
 		
-		$(this.dom).find(".action.clearall").unbind("click").bind("click", (function(self) {
+		$(this.dom).find(".action.clearall").off("click").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				self.clearFilters();
@@ -19859,11 +19859,11 @@ appdb.views.SiteVMImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.Sit
 				$(dialog).find(".header").addClass("hidden");
 			}
 			$(dialog).find(".message").append(html);
-			$(dialog).unbind("click").bind("click", function(ev) {
+			$(dialog).off("click").on("click", function(ev) {
 				ev.preventDefault();
 				return false;
 			});
-			$(dialog).find(".action.close, .shader").unbind("click").bind("click", (function(self) {
+			$(dialog).find(".action.close, .shader").off("click").on("click", (function(self) {
 				return function(ev) {
 					ev.preventDefault();
 					self.renderInlineDialog(false);
@@ -19897,7 +19897,7 @@ appdb.views.SiteVMImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.Sit
 				"<div class='content'><span class='hideonprivate'>Download</span><span class='showonprivate'>Private</span>" +
 				"</div></a>");
 
-		$(usage).unbind("click").bind("click", (function(self, data) {
+		$(usage).off("click").on("click", (function(self, data) {
 			return function(ev) {
 				if ($(self.dom).hasClass("expanded")) {
 					$(self.dom).removeClass("expanded");
@@ -19907,7 +19907,7 @@ appdb.views.SiteVMImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.Sit
 				}
 			};
 		})(this, d));
-		$(details).attr("href", d.mpuri).unbind("click");
+		$(details).attr("href", d.mpuri).off("click");
 		
 		$(download).attr("href", ($.trim(d["private"]) === 'true') ? d.mpuri : d.url);
 		$(actions).append(download).append(usage);
@@ -19948,7 +19948,7 @@ appdb.views.SiteVMImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.Sit
 		var applink = $("<a href='#' target='_blank' title='View item' ></a>");
 		var imageinfo = $("<div class='app-image-info'></div>");
 		var instances = $("<div class='app-image-instances'>" + d.instances.length + "</div>");
-		$(applink).attr("href", appdb.config.endpoint.base + "store/vappliance/" + d.application.cname).unbind("click").bind("click", (function(data) {
+		$(applink).attr("href", appdb.config.endpoint.base + "store/vappliance/" + d.application.cname).off("click").on("click", (function(data) {
 			return function(ev) {
 				ev.preventDefault();
 				appdb.views.Main.showVirtualAppliance({id: data.application.id, cname: data.application.cname});
@@ -20065,7 +20065,7 @@ appdb.views.SiteVMImageList = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMI
 	};
 	this._initContainer = function() {
 		$(this.dom).append($(this.options.statepanels).clone(true));
-		$(this.dom).unbind("click").bind("click", (function(self) {
+		$(this.dom).off("click").on("click", (function(self) {
 			return function(ev) {
 				self.options.items = self.options.items || [];
 				self.options.items = $.isArray(self.options.items) ? self.options.items : [self.options.items];
@@ -20189,7 +20189,7 @@ appdb.views.AutoCompleteList = appdb.ExtendClass(appdb.View, "appdb.views.AutoCo
 					}
 				};
 			})(this));
-			$(this.options.dom.list).children("li").unbind("click").bind("click", (function(self){
+			$(this.options.dom.list).children("li").off("click").on("click", (function(self){
 				return function(ev){
 					ev.preventDefault();
 					ev.stopPropagation();
@@ -20327,7 +20327,7 @@ appdb.views.AutoCompleteList = appdb.ExtendClass(appdb.View, "appdb.views.AutoCo
 	};
 	
 	this._initEvents = function(){
-		$(this.options.dom.input).unbind("keyup").bind("keyup", (function(self){
+		$(this.options.dom.input).off("keyup").on("keyup", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				var keycode = (ev.keyCode ? ev.keyCode : ev.which);
@@ -20370,25 +20370,25 @@ appdb.views.AutoCompleteList = appdb.ExtendClass(appdb.View, "appdb.views.AutoCo
 				return false;
 			};
 		})(this));
-		$(this.options.dom.input).unbind("keypress").bind("keypress", function(ev){
+		$(this.options.dom.input).off("keypress").on("keypress", function(ev){
 			var keycode = (ev.keyCode ? ev.keyCode : ev.which);
 			if( keycode === 13 ){
 				ev.stopPropagation();
 			}
 			return true;
 		});
-		$(this.options.dom.input).unbind("change").bind("change", (function(self){
+		$(this.options.dom.input).off("change").on("change", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				return false;
 			};
 		})(this));
-		$(this.options.dom.input).unbind("focus").bind("focus", (function(self){
+		$(this.options.dom.input).off("focus").on("focus", (function(self){
 			return function(ev){
 				self.focus(true);
 			};
 		})(this));
-		$(this.options.dom.input).unbind("blur").bind("blur", (function(self){
+		$(this.options.dom.input).off("blur").on("blur", (function(self){
 			return function(ev){
 				self.focus(false);
 			};
@@ -20947,13 +20947,13 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 			$(this.dom).find(".relationtype").append("<div class='actions'></div>");
 			var actions = $(this.dom).find(".actions");
 			var remove = $("<button type='button' class='btn btn-danger btn-compact action delete' title='remove relation' tabindex='-1'>X</button>");
-			$(remove).unbind("click").bind("click",(function(self){
+			$(remove).off("click").on("click",(function(self){
 				return function(ev){
 					ev.preventDefault();
 					self.publish({event:"remove", value: self});
 					return false;
 				};
-			})(this)).unbind("keyup").bind("keyup", function(ev){
+			})(this)).off("keyup").on("keyup", function(ev){
 				ev.peventDefault();
 				ev.stopPropagation();
 				return false;
@@ -21098,7 +21098,7 @@ appdb.views.RelationListItemOrganization = appdb.ExtendClass(appdb.views.Relatio
 		$(sname).text(legalshortname);
 		$(dom).append(sname).append(lname);
 		
-		$(dom).unbind("click").bind("click", (function(self){
+		$(dom).off("click").on("click", (function(self){
 			return function(ev){
 				setTimeout(function(){
 					self.showPopupDialog(true);
@@ -21172,7 +21172,7 @@ appdb.views.RelationListItemProject = appdb.ExtendClass(appdb.views.RelationList
 		$(sname).text(acronym);
 		$(dom).append(sname).append(lname);
 		
-		$(dom).unbind("click").bind("click", (function(self){
+		$(dom).off("click").on("click", (function(self){
 			return function(ev){
 				setTimeout(function(){
 					self.showPopupDialog(true);
@@ -21555,7 +21555,7 @@ appdb.views.RelationList = appdb.ExtendClass(appdb.View, "appdb.views.RelationLi
 		}
 	};
 	this._initEvents = function(){
-		$(this.options.dom.actionadd).unbind("click").bind("click", (function(self){
+		$(this.options.dom.actionadd).off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				if( self.isEditMode() && self.canEdit() && self.isValid()){
@@ -21726,7 +21726,7 @@ appdb.views.RelationExternalListItem = appdb.ExtendClass(appdb.View, "appdb.view
 		var hidden = $("<span class='hide-relation'>visible</span>");
 		var visible = $("<span class='view-relation'>hidden</span>");
 		$(button).append(hidden).append(visible);
-		$(button).unbind("click").bind("click", (function(self){
+		$(button).off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.toggleVisibility();
@@ -21970,7 +21970,7 @@ appdb.views.RelatedEntitiesListItem = appdb.ExtendClass(appdb.View, "appdb.views
 			u = appdb.config.endpoint.base + "store/" + seltype +"/" + u;
 			$(ws).children("a").attr('href', u).attr('title', "View details of "+seltype+" " + d.name).text("");
 			$(dom).append(ws);
-			$(ws).unbind("click").bind("click", (function(data,entitytype){ 
+			$(ws).off("click").on("click", (function(data,entitytype){ 
 				return function(ev){
 					ev.preventDefault();
 					if(entitytype === 'vappliance'){
@@ -22180,7 +22180,7 @@ appdb.views.RelatedEntities = appdb.ExtendClass(appdb.View,"appdb.views.RelatedE
 			}
 			$(ul).append(pg);
 		}
-		$(ul).children("li").unbind("click").bind("click", (function(self){
+		$(ul).children("li").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				if( $(this).hasClass("current") ) return false;
@@ -22265,12 +22265,12 @@ appdb.views.RelatedEntities = appdb.ExtendClass(appdb.View,"appdb.views.RelatedE
 				var c = $("<input type='checkbox' checked='checked' />");
 				$(l).append(c).append("<label>"+e.name+" (" + e.count + ")</label>");
 				$(l).attr("data-filter-group",e.group).attr("filter-name",e.name);
-				$(c).data("filter", e).unbind("change").bind("change",(function(self){
+				$(c).data("filter", e).off("change").on("change",(function(self){
 					return function(ev){
 						$(this).data("filter", self.setFilter($(this).data("filter"), $(this).is(":checked")));
 					};
 				})(self));
-				$(l).bind("click", function(ev){
+				$(l).on("click", function(ev){
 					ev.preventDefault();
 					ev.stopPropagation();
 					if( $(this).hasClass("disabled") && $(this).find("input").is(":checked") === false){
@@ -22594,7 +22594,7 @@ appdb.views.SuggestedList = appdb.ExtendClass(appdb.View, "appdb.views.Suggested
 			}
 			$(ul).append(pg);
 		}
-		$(ul).children("li").unbind("click").bind("click", (function(self){
+		$(ul).children("li").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				if( $(this).hasClass("current") ) return false;
@@ -22636,7 +22636,7 @@ appdb.views.SuggestedList = appdb.ExtendClass(appdb.View, "appdb.views.Suggested
 			u = appdb.config.endpoint.base + "store/" + seltype +"/" + u;
 			$(ws).children("a").attr('href', u).attr('title', "View details of "+seltype+" " + d.name).text("");
 			$(dom).append(ws);
-			$(ws).unbind("click").bind("click", (function(data,entitytype){ 
+			$(ws).off("click").on("click", (function(data,entitytype){ 
 				return function(ev){
 					ev.preventDefault();
 					if(entitytype === 'vappliance'){
@@ -22798,7 +22798,7 @@ appdb.views.UrlValidator = appdb.ExtendClass(appdb.View, "appdb.views.UrlValidat
 		this.options.dom.result = $("<div class='result icontext hidden popupmessage' ></div>");
 		$(this.options.dom.container).append(this.options.dom.action).append(this.options.dom.status).append(this.options.dom.result);
 		$(this.dom).append(this.options.dom.container);
-		$(this.options.dom.action).unbind("click").bind("click", (function(self){
+		$(this.options.dom.action).off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.check();

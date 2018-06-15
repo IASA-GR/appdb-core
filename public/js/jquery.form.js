@@ -18,7 +18,7 @@
 	to bind your own submit handler to the form.  For example,
 
 	$(document).ready(function() {
-		$('#myForm').bind('submit', function() {
+		$('#myForm').on('submit', function() {
 			$(this).ajaxSubmit({
 				target: '#output'
 			});
@@ -453,12 +453,12 @@ $.fn.ajaxForm = function(options) {
 		return this;
 	}
 	
-	return this.ajaxFormUnbind().bind('submit.form-plugin', function(e) {
+	return this.ajaxFormUnbind().on('submit.form-plugin', function(e) {
 		if (!e.isDefaultPrevented()) { // if event has been canceled, don't proceed
 			e.preventDefault();
 			$(this).ajaxSubmit(options);
 		}
-	}).bind('click.form-plugin', function(e) {
+	}).on('click.form-plugin', function(e) {
 		var target = e.target;
 		var $el = $(target);
 		if (!($el.is(":submit,input:image"))) {
@@ -491,7 +491,7 @@ $.fn.ajaxForm = function(options) {
 
 // ajaxFormUnbind unbinds the event handlers that were bound by ajaxForm
 $.fn.ajaxFormUnbind = function() {
-	return this.unbind('submit.form-plugin click.form-plugin');
+	return this.off('submit.form-plugin click.form-plugin');
 };
 
 /**

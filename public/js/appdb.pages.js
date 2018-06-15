@@ -210,13 +210,13 @@ function zoomImage(src,el){
    }
   }
 
-  $(el).parent().unbind("mouseover").unbind("mouseenter").bind("mouseenter", function(){
+  $(el).parent().off("mouseover").off("mouseenter").on("mouseenter", function(){
 	$(this).parent().addClass("hover");
-  }).bind("mouseover", function(){
+  }).on("mouseover", function(){
 	$(this).parent().addClass("hover");
-  }).unbind("mouseleave").unbind("mouseout").bind("mouseleave",function(){
+  }).off("mouseleave").off("mouseout").on("mouseleave",function(){
 	$(this).removeClass("hover");
-  }).bind("mouseout", function(){
+  }).on("mouseout", function(){
 	$(this).removeClass("hover");
   });
 
@@ -532,7 +532,7 @@ appdb.pages.index = (function(){
 		}
 	};
 	page.setupContentNavigation = function(){
-		$("body .mainnavpanel .contentlist ul li button").unbind("click").bind("click", function(ev){
+		$("body .mainnavpanel .contentlist ul li button").off("click").on("click", function(ev){
 			ev.preventDefault();
 			var ct = $.trim($(this).data("contenttype")).toLowerCase();
 			if( ct === "" ){
@@ -563,10 +563,10 @@ appdb.pages.index = (function(){
 		if( $.trim($("body").data("content")) === ""){
 			appdb.pages.index.setCurrentContent("home",false);
 		}
-		$("body .mainnavpanel .selectedcontent > ul > li a.supporting").unbind("click").bind("click", function(ev){
+		$("body .mainnavpanel .selectedcontent > ul > li a.supporting").off("click").on("click", function(ev){
 			ev.stopPropagation();
 		});
-		$("body .mainnavpanel .selectedcontent > ul > li").unbind("click").bind("click", function(ev){
+		$("body .mainnavpanel .selectedcontent > ul > li").off("click").on("click", function(ev){
 			ev.preventDefault();
 			appdb.pages.index.setCurrentContent("home");
 			return false;
@@ -600,12 +600,12 @@ appdb.pages.index = (function(){
 			$(e).append(html);
 			$(e).removeClass("init").removeClass("hovered");
 			var more = $(html).find(".action");
-			$(more).unbind("mouseenter").bind("mouseenter", function(ev){
+			$(more).off("mouseenter").on("mouseenter", function(ev){
 				$(this).closest("ul.autohide").stop().animate({"max-height": "1000px"}, 1000,"easeOutQuad", function(){
 					$(this).addClass("hovered").addClass("expanded");
 				}).find("div.autohide-selector").fadeOut();
 			});
-			$(e).closest(".menucontents").unbind("mouseleave").bind("mouseleave", (function(thisdom){ 
+			$(e).closest(".menucontents").off("mouseleave").on("mouseleave", (function(thisdom){ 
 				return function(ev){
 					$(thisdom).stop().animate({"max-height": $(thisdom).data("max") + "px"}, 500,"linear", function(){
 						$(thisdom).removeClass("hovered").removeClass("expanded").find("div.autohide-selector").fadeIn();
@@ -695,7 +695,7 @@ appdb.pages.index = (function(){
 			}else if( $(e).hasClass("manageaccounts") ){
 				tab = "manageaccounts";
 			}
-			$(e).unbind("click").bind("click", (function(t){
+			$(e).off("click").on("click", (function(t){
 				return function(ev){
 					ev.preventDefault();
 					appdb.views.Main.showPerson({id: userID, cname: userCName,tab:t}, {mainTitle: userFullname});
@@ -828,7 +828,7 @@ appdb.pages.index = (function(){
 					}
 					var ev = showEvent || "mouseover";
 					var eventFunc = function(index,elem){
-						$(this).parent().unbind("click").unbind("mouseover");
+						$(this).parent().off("click").off("mouseover");
 						if($(this).next("ul").length>0){
 							$(this).parent().addClass("container");
 							$(this).children("span.arrow").remove();
@@ -854,7 +854,7 @@ appdb.pages.index = (function(){
 							def_ev_end = "";
 						}
 						if( showEvent === "mouseover" ){
-							$(this).parent().bind(def_ev,function(e){
+							$(this).parent().on(def_ev,function(e){
 								e.preventDefault();
 								$(this).addClass("persist");
 								$(opt.dom).find(".active").each(function(index,elem){
@@ -867,12 +867,12 @@ appdb.pages.index = (function(){
 								return false;
 							});
 						
-							$(this).find("a + ul").bind(def_ev, function(e){
+							$(this).find("a + ul").on(def_ev, function(e){
 								if(showEvent === "hover"){
 									$(this).parent("li").addClass("active");
 								}
 								$(this).parent().addClass("hover");
-							}).bind(def_ev_end,function(){
+							}).on(def_ev_end,function(){
 									var elem = this;
 									setTimeout(function(){
 										if($(elem).find(".active")){
@@ -883,7 +883,7 @@ appdb.pages.index = (function(){
 							
 							});
 						} else if( showEvent === "click" ){
-							$(this).parent().bind(def_ev,function(e){
+							$(this).parent().on(def_ev,function(e){
 								if( $(this).hasClass("container") ){
 									e.preventDefault();
 									if( $(this).hasClass("active") && $(this).parent().hasClass("menu") ){
@@ -914,11 +914,11 @@ appdb.pages.index = (function(){
 					});
 					page.setupCategoriesLayout();
 					if( showEvent === "click" ){
-						$("body").bind("click", function(ev){
+						$("body").on("click", function(ev){
 							$(this).find(".menu .active").removeClass("active").removeClass("hover");
 						});
 					}else{
-						$(opt.dom).children("li").bind("mouseleave",function(){
+						$(opt.dom).children("li").on("mouseleave",function(){
 							if($(opt.dom).find(".hover").lenght>0) return;
 							$(opt.dom).find(".active").removeClass("active");
 						});
@@ -991,7 +991,7 @@ appdb.pages.index = (function(){
 			}
 			(function(){
 				var t = new appdb.components.Tags({container: $('#tagcloudmenu')}).subscribe({event:"select", callback: function(){
-					$("#tagcloudmenu div.dijitSliderImageHandle.dijitSliderImageHandleH.dijitSliderThumbFocused.dojoMoveItem").unbind("mouseup").bind("mouseup",function(e){
+					$("#tagcloudmenu div.dijitSliderImageHandle.dijitSliderImageHandleH.dijitSliderThumbFocused.dojoMoveItem").off("mouseup").on("mouseup",function(e){
 						e.preventDefault();
 						return false;
 					});
@@ -1322,7 +1322,7 @@ appdb.pages.home = (function(){
 			}else if( $(e).hasClass("preferences") ){
 				tab = "preferences";
 			}
-			$(e).unbind("click").bind("click", (function(t){
+			$(e).off("click").on("click", (function(t){
 				return function(ev){
 					ev.preventDefault();
 					appdb.views.Main.showPerson({id: userID, cname: userCName}, {mainTitle: userFullname,tab:t});
@@ -1462,7 +1462,7 @@ appdb.pages.home = (function(){
 		fetchbroker(false);
 	};
 	page.initCustomTabs = function(){
-		$(".homepage.custom .tabcontainer > ul.header > li").unbind("click").bind("click", function(ev){
+		$(".homepage.custom .tabcontainer > ul.header > li").off("click").on("click", function(ev){
 			ev.preventDefault();
 			var tname = $(this).data("tab");
 			$(this).closest("ul").children("li").removeClass("current");
@@ -2028,7 +2028,7 @@ appdb.pages.application = (function(){
 		vam.load({id: page.currentId(), software: page.currentData()});
 		page.requests.register(vam._model,"vamanager" + page.currentId());
 		setTimeout(function(){
-			$("body").unbind("click.vamanager").bind("click.vamanager", function(ev){
+			$("body").off("click.vamanager").on("click.vamanager", function(ev){
 				$("body").find(".vappliance .popupvalue > .header.selected").removeClass("selected");
 				$("body").find(".vappliance .propertypopupvalue > .header.selected").removeClass("selected");
 			});
@@ -2211,7 +2211,7 @@ appdb.pages.application = (function(){
 			var hpli = $("<li></li>");
 			var extrali = $("<li class='extra'></li>");
 			var moreli = $("<li class='toggler'><span class='more' title='View all available hypervisors'>..more</span><span class='less'>..less</span></li>");
-			$(moreli).unbind("click").bind("click", function(ev){
+			$(moreli).off("click").on("click", function(ev){
 				ev.preventDefault();
 				$(this).parent().toggleClass("expand");
 				return false;
@@ -2325,7 +2325,7 @@ appdb.pages.application = (function(){
 			});
 			$(panel).find(".fieldvalue.latestreleases").removeClass("hidden");
 			$(panel).find(".fieldvalue.latestreleases > .value").html(html.join("<span>, </span>"));
-			$(panel).find(".fieldvalue.latestreleases > .value > a").unbind("click").bind("click", function(ev){
+			$(panel).find(".fieldvalue.latestreleases > .value > a").off("click").on("click", function(ev){
 				ev.preventDefault();
 				appdb.pages.application.showReleases($(this).data("release"));
 				return false;
@@ -2369,13 +2369,13 @@ appdb.pages.application = (function(){
 		innerhtml += '</div>';
 		innerhtml += '</div></div></div>';
 		innerhtml = $(innerhtml);
-		$(innerhtml).find(".property").unbind("click").bind("click",function(ev){
+		$(innerhtml).find(".property").off("click").on("click",function(ev){
 			if ($(ev.target).hasClass('hdlhandle')) return;
 			ev.preventDefault();
 			$(this).children(".header").addClass("selected");
 			return false;
 		});
-		$("body").unbind("click.appidentifierspopup").bind("click.appidentifierspopup", function(ev) {
+		$("body").off("click.appidentifierspopup").on("click.appidentifierspopup", function(ev) {
 		    $("body .property.popupvalue > .header.selected").removeClass("selected");
 		    $("body .propertypopupvalue > .header.selected").removeClass("selected");
 		});
@@ -2520,7 +2520,7 @@ appdb.pages.application = (function(){
 		}	
 		page.currentPermissionEditor().load({id:page.currentId()});
 		page.requests.register(page.currentPermissionEditor()._model, "permissions"+page.currentId());
-		$("#navdiv" + page.currentDialogCount() + " #permissionsdiv" + page.currentDialogCount() + " .reloadpermissions").unbind("click").bind("click", function(ev){
+		$("#navdiv" + page.currentDialogCount() + " #permissionsdiv" + page.currentDialogCount() + " .reloadpermissions").off("click").on("click", function(ev){
 			ev.preventDefault();
 			$(this).addClass("hidden");
 			appdb.pages.application.reloadPermissions();
@@ -2584,14 +2584,14 @@ appdb.pages.application = (function(){
 		var cvolink = $(selector);
 		if( page.currentContactVOsViewer() ){
 			$(cvolink).removeClass("hidden");
-			$(cvolink).unbind("click").bind("click", function(ev){
+			$(cvolink).off("click").on("click", function(ev){
 				if( $(this).hasClass("helperlink") ) return true;
 				ev.preventDefault();
 				page.currentContactVOsViewer().load();
 				return false;
 			});
 		} else {
-			$(cvolink).unbind("click").addClass("hidden");
+			$(cvolink).off("click").addClass("hidden");
 		}
 	};
 	page.onPermissionsLoaded = function(){
@@ -3104,7 +3104,7 @@ appdb.pages.application = (function(){
 				$("#navdiv" + page.currentDialogCount() + " " + container + " > ul > li:first").addClass("current");
 				$("#navdiv" + page.currentDialogCount() + " " + container + " > div:first").removeClass("hiddengroup");
 			}
-			$( "#navdiv" + page.currentDialogCount() + " " + container + " > ul > li > a").unbind("click").bind("click", function(ev){
+			$( "#navdiv" + page.currentDialogCount() + " " + container + " > ul > li > a").off("click").on("click", function(ev){
 				ev.preventDefault();
 				if( typeof onclick === "function" ){
 					if( onclick(this) === false ) {
@@ -3130,7 +3130,7 @@ appdb.pages.application = (function(){
 		
 		$( "#navdiv" + page.currentDialogCount() ).tabs();
 		$( "#navdiv" + page.currentDialogCount() + " > ul > li > a" ).click(function(e){e.preventDefault();return false;});
-		$( "#navdiv" + page.currentDialogCount() ).bind( "tabsactivate", function(event, ui) {
+		$( "#navdiv" + page.currentDialogCount() ).on( "tabsactivate", function(event, ui) {
 			if( page.isVirtualAppliance() && appdb.vappliance.ui.CurrentVAManager.isEditMode() === true && $.trim(window.apptabselect) !== $.trim(ui.newTab.index())){
 				appdb.vappliance.ui.CurrentVAManager.checkUnsavedData((function(p, e, u){
 					return function(){
@@ -3538,7 +3538,7 @@ appdb.pages.Person = (function(){
 				$(container + " > ul > li:first").addClass("current");
 				$(container + " > div:first").removeClass("hiddengroup");
 			}
-			$(container + " > ul > li > a").unbind("click").bind("click", function(ev){
+			$(container + " > ul > li > a").off("click").on("click", function(ev){
 				ev.preventDefault();
 				if( typeof onclick === "function" ){
 					if( onclick(this) === false ) {
@@ -3601,7 +3601,7 @@ appdb.pages.Person = (function(){
 				if( userID !== null ){
 					dom = $("#navdiv" + dialogCount + " a.nilcountryitems");
 				}
-				$(dom).unbind("click").bind("click",(function(el){
+				$(dom).off("click").on("click",(function(el){
 					return function(ev){
 						$(el).data("country-id", appdb.pages.Person.currentCountryId() );
 						$(el).data("country-name", appdb.pages.Person.currentCountryName() );
@@ -3612,13 +3612,13 @@ appdb.pages.Person = (function(){
 						var vapp = $("<a href='#' title='View related virtual appliances from this country' >View related virtual appliances</a>");
 						$(main).append(sw).append(vapp);
 						$(main).addClass("middlewarepopup").append(sw).append(vapp);
-						$(sw).unbind("click").bind("click", function(ev){
+						$(sw).off("click").on("click", function(ev){
 							ev.preventDefault();
 							appdb.views.Main.showApplications({flt: "+*&application.metatype:0 +=country.id:"+$(el).data("country-id")},{isBaseQuery : true, mainTitle: 'Software of ' + $(el).data("country-name"),filterDisplay : 'Search in software...',content:'software'});
 							$(".dijitPopup.dijitTooltipDialogPopup").remove();
 							return false;
 						});
-						$(vapp).unbind("click").bind("click", function(ev){
+						$(vapp).off("click").on("click", function(ev){
 							ev.preventDefault();
 							appdb.views.Main.showApplications({flt: "+*&application.metatype:1 +=country.id:"+$(el).data("country-id")},{isBaseQuery : true, mainTitle: 'Virtual Appliances of ' + $(el).data("country-name"),filterDisplay : 'Search in Virtual Appliances...', content: 'vappliance'});
 							$(".dijitPopup.dijitTooltipDialogPopup").remove();
@@ -3685,7 +3685,7 @@ appdb.pages.Person = (function(){
 		});
 		
 		$("#navdiv" + dialogCount + " .accessgroupsviewer").html(html.join(", "));
-		$("#navdiv" + dialogCount + " .accessgroupsviewer").children("a").unbind("click").bind("click",function(ev){
+		$("#navdiv" + dialogCount + " .accessgroupsviewer").children("a").off("click").on("click",function(ev){
 			ev.preventDefault();
 			appdb.pages.Person.showGroupEditor();
 			return false;
@@ -3697,7 +3697,7 @@ appdb.pages.Person = (function(){
 			if( userID === null || page.canEditAccessGroups() === false ) return false;
 		$("#navdiv" + dialogCount + " .accessgroupcontainer").addClass("canedit");
 		
-		$("#navdiv" + dialogCount + " .accessgroupcontainer").find("a.editgroups").unbind("click").bind("click", function(ev){
+		$("#navdiv" + dialogCount + " .accessgroupcontainer").find("a.editgroups").off("click").on("click", function(ev){
 			ev.preventDefault();
 			page.showGroupEditor();
 			return false;
@@ -3942,7 +3942,7 @@ appdb.pages.Person = (function(){
 		if( $(".apiaccessmanagement").length === 0 ){
 			return;
 		}
-		$(".apiaccessmanagement > ul > li > a").unbind("click").bind("click", function(ev){
+		$(".apiaccessmanagement > ul > li > a").off("click").on("click", function(ev){
 			ev.preventDefault();
 			$(".apiaccessmanagement > ul > li > a").removeClass("selected");
 			$(".apiaccessmanagement > div").removeClass("selected");
@@ -4221,7 +4221,7 @@ appdb.pages.vo = (function(){
 				$(container + " > ul > li:first").addClass("current");
 				$(container + " > div:first").removeClass("hiddengroup");
 			}
-			$(container + " > ul > li > a").unbind("click").bind("click", function(ev){
+			$(container + " > ul > li > a").off("click").on("click", function(ev){
 				ev.preventDefault();
 				if( typeof onclick === "function" ){
 					if( onclick(this) === false ) {
@@ -4311,7 +4311,7 @@ appdb.pages.vo = (function(){
 			};
 		if ($("#detailsdlg" + page.currentDialogCount() + ":last div span")[0] !== undefined) $("#detailsdlg" + page.currentDialogCount() + ":last div span")[0].innerHTML = 'VO Details - <I>'+page.currentName()+'</I>';
 		$( "#navdiv" + appdb.pages.vo.currentDialogCount() ).tabs();
-		$( "#navdiv" + appdb.pages.vo.currentDialogCount() ).bind( "tabsactivate", function(event, ui) {
+		$( "#navdiv" + appdb.pages.vo.currentDialogCount() ).on( "tabsactivate", function(event, ui) {
 			if( window.votabselect != ui.newTab.index()){
 				window.votabselect = ui.newTab.index();
 				appdb.pages.vo.updateSection(ui.newTab.index());
@@ -4322,7 +4322,7 @@ appdb.pages.vo = (function(){
 		appdb.views.AppsList.SetupRatings();
 		appdb.pages.vo.onVoLoad();
 		$( "#navdiv" + appdb.pages.vo.currentDialogCount() ).find(".vmcatcherlink").attr("href",appdb.config.endpoint.vmcaster + "store/vo/" + page.currentName() + "/image.list");
-		$( "#navdiv" + appdb.pages.vo.currentDialogCount() ).find(".editvowideimagelist").attr("href",appdb.config.endpoint.base + "store/vo/" + page.currentName() + "/imagelist").unbind("click").bind("click", function(ev){
+		$( "#navdiv" + appdb.pages.vo.currentDialogCount() ).find(".editvowideimagelist").attr("href",appdb.config.endpoint.base + "store/vo/" + page.currentName() + "/imagelist").off("click").on("click", function(ev){
 			ev.preventDefault();
 			ev.stopPropagation();
 			window.votabselect = 0;
@@ -4361,7 +4361,7 @@ appdb.pages.vo = (function(){
 					$(elem).attr('href', appdb.config.endpoint.base + surl);
 				});
 			}
-			$("#navdiv" + page.currentDialogCount() + " .vodescription").children(".more").unbind("click").bind("click", function(ev){
+			$("#navdiv" + page.currentDialogCount() + " .vodescription").children(".more").off("click").on("click", function(ev){
 				ev.preventDefault();
 				appdb.pages.vo.toggleVoDescription();
 				return false;
@@ -4682,7 +4682,7 @@ appdb.pages.site = (function(){
 	};
 	page.immediate = function(){
 		$( "#appdb_components_Site #navdiv" ).tabs();
-		$( "#appdb_components_Site #navdiv").bind( "tabsactivate", function(event, ui) {
+		$( "#appdb_components_Site #navdiv").on( "tabsactivate", function(event, ui) {
 			if( window.sitetabselect != ui.newTab.index()){
 				window.sitetabselect = ui.newTab.index();
 			}
@@ -4709,7 +4709,7 @@ appdb.pages.site = (function(){
 				$(container + " > ul > li:first").addClass("current");
 				$(container + " > div:first").removeClass("hiddengroup");
 			}
-			$(container + " > ul > li > a").unbind("click").bind("click", function(ev){
+			$(container + " > ul > li > a").off("click").on("click", function(ev){
 				ev.preventDefault();
 				if( typeof onclick === "function" ){
 					if( onclick(this) === false ) {
@@ -4797,7 +4797,7 @@ appdb.pages.newprofile = (function(){
 		window.dialogCount = index;
 		editForm('editperson' + index );
 		page.makeProfileContactsEditable();
-		$('#savedetails').unbind("click").bind("click",(function(p){
+		$('#savedetails').off("click").on("click",(function(p){
 			return function(ev) {
 				ev.preventDefault();
 				if( $(this).hasClass("disabled") ) return;
@@ -4826,7 +4826,7 @@ appdb.pages.newprofile = (function(){
 		$("#editperson" + index + " .profilecontacts .contactitem").each(function(i, e){
 			$(this).find(".removecontact.button").remove();
 			$(this).append('<span class="removecontact button icontext" ><img alt="remove" border="0" src="/images/cancelicon.png" title="Remove list item"></span>');
-			$(this).find(".removecontact.button").unbind("click").bind("click", function(ev){
+			$(this).find(".removecontact.button").off("click").on("click", function(ev){
 				ev.preventDefault();
 				var parent = $(this).closest(".profilecontacts");
 				$(this).closest(".contactitem").remove();
@@ -5273,7 +5273,7 @@ appdb.pages.connectprofile = (function(){
 	};
 
 	page.initActions = function(){
-		$(".connectprofile > .header > .actions > .action").unbind("click").bind("click", (function(p){
+		$(".connectprofile > .header > .actions > .action").off("click").on("click", (function(p){
 			return function(ev){
 				ev.preventDefault();
 				$(this).parent().children(".action").removeClass("selected");
@@ -5284,7 +5284,7 @@ appdb.pages.connectprofile = (function(){
 				return false;
 			};
 		})(page));
-		$(".connectprofile .filteraction").unbind("click").bind("click", (function(p){
+		$(".connectprofile .filteraction").off("click").on("click", (function(p){
 			return function(ev){
 				ev.preventDefault();
 				if( $(".connectprofile").hasClass("loading") === false ){  
@@ -5294,7 +5294,7 @@ appdb.pages.connectprofile = (function(){
 				return false;
 			};
 		})(page));
-		$(".connectprofile #profilefilter").unbind("keyup").bind("keyup",(function(p){
+		$(".connectprofile #profilefilter").off("keyup").on("keyup",(function(p){
 			return function(ev){
 				ev.preventDefault();
 				if( ev.keyCode !== 13 ) return false;
@@ -5364,7 +5364,7 @@ appdb.pages.newaccount = (function(){
 	page.showConnectResponse = function(){
 		$("#maincontent.newprofile").removeClass().addClass("newprofile connectresponse");
 		$("#maincontent.newprofile .connectresponse .confirmation > .title").trigger("click");
-		$("#maincontent.newprofile .connectresponse .confirmation .submitconfirmationcode").unbind("click").bind("click", (function(p){
+		$("#maincontent.newprofile .connectresponse .confirmation .submitconfirmationcode").off("click").on("click", (function(p){
 			return function(ev){
 				ev.preventDefault();
 				p.submitConfirmationCode();
@@ -5391,7 +5391,7 @@ appdb.pages.newaccount = (function(){
 			}
 		});
 		$("#maincontent.newprofile .primaryemail").empty().html(primary);
-		$("#maincontent.newprofile .feature.sendrequest .sendconfirmationcode").unbind("click").bind("click", (function(p,d){
+		$("#maincontent.newprofile .feature.sendrequest .sendconfirmationcode").off("click").on("click", (function(p,d){
 			return function(ev){
 				ev.preventDefault();
 				p.sendConfirmationCode(d);

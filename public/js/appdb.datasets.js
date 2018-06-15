@@ -673,7 +673,7 @@ appdb.components.Dataset = appdb.ExtendClass(appdb.Component, "appdb.components.
 	};
 	this.renderMainData = function(){
 		var d = this.options.data;
-		this.bind($(this.dom).find(".dataset-main-contents,.derived-datasets-list-container"));
+		this.on($(this.dom).find(".dataset-main-contents,.derived-datasets-list-container"));
 		$(this.dom).find(".dataset-permalink").attr("href", appdb.config.endpoint.base + "store/dataset/" + d.guid);
 	};
 	this.renderAdditionalInfo = function(){
@@ -793,7 +793,7 @@ appdb.components.Dataset = appdb.ExtendClass(appdb.Component, "appdb.components.
 		} else {
 			$(this.dom).find(".entitycontent").addClass("canedit");
 			$(ct).removeClass("hidden");
-			$(ct).find("[data-action='edit']").unbind("click").bind("click", (function(self){
+			$(ct).find("[data-action='edit']").off("click").on("click", (function(self){
 				return function(ev){
 					ev.preventDefault();
 					self.setEditMode(true);
@@ -801,7 +801,7 @@ appdb.components.Dataset = appdb.ExtendClass(appdb.Component, "appdb.components.
 					return false;
 				};
 			})(this));
-			$(ct).find("[data-action='save']").unbind("click").bind("click", (function(self){
+			$(ct).find("[data-action='save']").off("click").on("click", (function(self){
 				return function(ev){
 					ev.preventDefault();
 					if( $(this).hasClass("disabled") === false && self.isValid()){
@@ -810,35 +810,35 @@ appdb.components.Dataset = appdb.ExtendClass(appdb.Component, "appdb.components.
 					return false;
 				};
 			})(this));
-			$(ct).find("[data-action='cancel']").unbind("click").bind("click", (function(self){
+			$(ct).find("[data-action='cancel']").off("click").on("click", (function(self){
 				return function(ev){
 					ev.preventDefault();
 					self.cancel();
 					return false;
 				};
 			})(this));
-			$(ct).find("[data-action='delete']").unbind("click").bind("click", (function(self){
+			$(ct).find("[data-action='delete']").off("click").on("click", (function(self){
 				return function(ev){
 					ev.preventDefault();
 					self.remove();
 					return false;
 				};
 			})(this));
-			$(ct).find("[data-action='moderate']").unbind("click").bind("click", (function(self){
+			$(ct).find("[data-action='moderate']").off("click").on("click", (function(self){
 				return function(ev){
 					ev.preventDefault();
 					self.moderate();
 					return false;
 				};
 			})(this));
-			$(ct).find("[data-action='history']").unbind("click").bind("click", (function(self){
+			$(ct).find("[data-action='history']").off("click").on("click", (function(self){
 				return function(ev){
 					ev.preventDefault();
 					self.showHistory();
 					return false;
 				};
 			})(this));
-			$(ct).find("[data-action='bookmark']").unbind("click").bind("click", (function(self){
+			$(ct).find("[data-action='bookmark']").off("click").on("click", (function(self){
 				return function(ev){
 					ev.preventDefault();
 					self.bookmark();
@@ -858,7 +858,7 @@ appdb.components.Dataset = appdb.ExtendClass(appdb.Component, "appdb.components.
 					$(a).attr("href", appdb.config.endpoint.base + "store/dataset/" + parent.guid);
 					$(a).attr("title", "View dataset details");
 					$(a).text(parent.name);
-					$(a).unbind("click").bind("click", (function(parent) {
+					$(a).off("click").on("click", (function(parent) {
 						return function(ev){
 							if( ev.which !== 1 )return;
 							ev.preventDefault();
@@ -894,7 +894,7 @@ appdb.components.Dataset = appdb.ExtendClass(appdb.Component, "appdb.components.
 		
 		$.each(this.options.viewers, (function(self){
 			return function(i,e){
-				e.bind(self.options.data);	
+				e.on(self.options.data);	
 			};
 		})(this));
 	};
@@ -947,7 +947,7 @@ appdb.components.Dataset = appdb.ExtendClass(appdb.Component, "appdb.components.
 					this.onValidation(v.isValid() || v.getError());
 				}, caller: self});
 			
-				e.bind(self.options.data);	
+				e.on(self.options.data);	
 			};
 		})(this));
 		if( this.views.licenselist ){
@@ -1202,7 +1202,7 @@ appdb.pages.dataset = (function(){
 				$("#navdiv " + container + " > ul > li:first").addClass("current");
 				$("#navdiv " + container + " > div:first").removeClass("hiddengroup");
 			}
-			$( "#navdiv " + container + " > ul > li > a").unbind("click").bind("click", function(ev){
+			$( "#navdiv " + container + " > ul > li > a").off("click").on("click", function(ev){
 				ev.preventDefault();
 				if( typeof onclick === "function" ){
 					if( onclick(this) === false ) {
@@ -1224,7 +1224,7 @@ appdb.pages.dataset = (function(){
 	};
 	page.immediate = function(){
 		$( "#appdb_components_Dataset #navdiv" ).tabs();
-		$( "#appdb_components_Dataset #navdiv").bind( "tabsactivate", function(event, ui) {
+		$( "#appdb_components_Dataset #navdiv").on( "tabsactivate", function(event, ui) {
 			if( $.trim(window.datasettabselect) !== $.trim(ui.newTab.index())){
 				window.datasettabselect = ui.newTab.index();
 			}
@@ -1270,7 +1270,7 @@ appdb.datasets.views.DatasetVersionListItem = appdb.ExtendClass(appdb.View, "app
 	this.render = function(){
 		$(this.dom).find(".id > .value").text(this.options.data.id);
 		$(this.dom).find(".version > .value").text(this.options.data.version);
-		$(this.dom).unbind("click").bind("click", (function(self){
+		$(this.dom).off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.publish({event: "select", value: self});
@@ -1415,7 +1415,7 @@ appdb.datasets.views.DatasetLocationListItem = appdb.ExtendClass(appdb.views.ui.
 	this.renderShowMore = function(el){
 		if( this.overflowUI(el) === false ) return;
 		var showmore = $("<div class='show-more'>...read more</div>");
-		$(showmore).unbind("click").bind("click", function(ev){
+		$(showmore).off("click").on("click", function(ev){
 			ev.preventDefault();
 			if( $(this).parent().hasClass("viewall") ){
 				$(this).text("...read more");
@@ -1441,8 +1441,8 @@ appdb.datasets.views.DatasetLocationListItem = appdb.ExtendClass(appdb.views.ui.
 		}else{
 			$(this.dom).addClass("replica");
 		}
-		this.bind();
-		$(this.dom).find("button.remove").unbind("click").bind("click",(function(self){
+		this.on();
+		$(this.dom).find("button.remove").off("click").on("click",(function(self){
 			return function(ev){
 				ev.preventDefault();
 				setTimeout(function(){
@@ -1454,11 +1454,11 @@ appdb.datasets.views.DatasetLocationListItem = appdb.ExtendClass(appdb.views.ui.
 	};
 	this.postRender = function(){
 		if( this.isEditMode() ){
-			$(this.dom).find("input,select,textarea").unbind("focus").bind("focus", (function(parent){ 
+			$(this.dom).find("input,select,textarea").off("focus").on("focus", (function(parent){ 
 				return function(){
 					$(parent).addClass("focused");
 				};
-			})($(this.dom).parent())).unbind("blur").bind("blur", (function(parent){ 
+			})($(this.dom).parent())).off("blur").on("blur", (function(parent){ 
 				return function(){
 					setTimeout(function(){
 						if( $(parent).find(".dijitFocused").length === 0 && $(parent).find("*:focus").length === 0 ){
@@ -1588,7 +1588,7 @@ appdb.datasets.views.DatasetLocationList = appdb.ExtendClass(appdb.views.ui.Data
 				}
 			};
 		})(this));
-		$(this.dom).find("button.addnew").unbind("click").bind("click", (function(self){
+		$(this.dom).find("button.addnew").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.addNew();
@@ -1674,7 +1674,7 @@ appdb.datasets.views.DatasetVersionDetails = new appdb.ExtendClass(appdb.views.u
 		}
 		$(this.dom).addClass("canedit");
 		
-		$(toolbar).find("button.edit").unbind("click").bind("click",(function(self){
+		$(toolbar).find("button.edit").off("click").on("click",(function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.edit($(self.dom).find(".version-info"));
@@ -1682,7 +1682,7 @@ appdb.datasets.views.DatasetVersionDetails = new appdb.ExtendClass(appdb.views.u
 			};
 		})(this));
 		
-		$(toolbar).find("button.remove").unbind("click").bind("click",(function(self){
+		$(toolbar).find("button.remove").off("click").on("click",(function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.remove();
@@ -1690,7 +1690,7 @@ appdb.datasets.views.DatasetVersionDetails = new appdb.ExtendClass(appdb.views.u
 			};
 		})(this));
 		
-		$(toolbar).find("button.save").unbind("click").bind("click",(function(self){
+		$(toolbar).find("button.save").off("click").on("click",(function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.save();
@@ -1698,7 +1698,7 @@ appdb.datasets.views.DatasetVersionDetails = new appdb.ExtendClass(appdb.views.u
 			};
 		})(this));
 			
-		$(toolbar).find("button.cancel").unbind("click").bind("click",(function(self){
+		$(toolbar).find("button.cancel").off("click").on("click",(function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.cancel();
@@ -1733,7 +1733,7 @@ appdb.datasets.views.DatasetVersionDetails = new appdb.ExtendClass(appdb.views.u
 		}, caller: this});
 		this.subviews.locationlist.render(d.location);
 		
-		this.bind($(this.dom).find(".version-info"));
+		this.on($(this.dom).find(".version-info"));
 		this.renderToolbar();
 		if( this.options.data && this.options.data.parent_version && this.options.data.parent_version.id ){
 			$(this.dom).removeClass("noderivedversion");
@@ -2032,19 +2032,19 @@ appdb.datasets.components.DatasetInfo = new appdb.ExtendClass(appdb.Component, "
 		this.views.versionlist.render(this.options.data);
 		this.selectVersion();
 		$(this.dom).removeClass("init");
-		$(this.dom).find(".group-version-list > .toolbar > button.add").unbind("click");
-		$(this.dom).find(".emptycontainer button.init").unbind("click");
+		$(this.dom).find(".group-version-list > .toolbar > button.add").off("click");
+		$(this.dom).find(".emptycontainer button.init").off("click");
 		if( this.canEdit() ){
 			$(this.dom).addClass("canedit");
 			$(this.dom).find(".group-version-list").addClass("canedit");
-			$(this.dom).find(".group-version-list > .toolbar > button.add").unbind("click").bind("click", (function(self){
+			$(this.dom).find(".group-version-list > .toolbar > button.add").off("click").on("click", (function(self){
 				return function(ev){
 					ev.preventDefault();
 					self.addNewVersion();
 					return false;
 				};
 			})(this));
-			$(this.dom).find(".emptycontainer button.init").unbind("click").bind("click", (function(self){
+			$(this.dom).find(".emptycontainer button.init").off("click").on("click", (function(self){
 				return function(ev){
 					ev.preventDefault();
 					self.addNewVersion();
@@ -2158,7 +2158,7 @@ appdb.views.ui.viewers.dataset.parentlink = appdb.ExtendClass(appdb.views.ui.Gen
 		if( !d ){
 			d = this.getDataSource();
 		}
-		$(this.dom).find("a.value.parentdataset").unbind("click").bind("click", (function(d) {
+		$(this.dom).find("a.value.parentdataset").off("click").on("click", (function(d) {
 			return function(ev){
 				if( ev.which !== 1 )return;
 				ev.preventDefault();
@@ -2180,7 +2180,7 @@ appdb.views.ui.viewers.dataset.deriveddatasets = appdb.ExtendClass(appdb.views.u
 		$(a).attr("href",appdb.config.endpoint.base + "store/dataset/" + d.guid);
 		$(name).text(d.val());
 		$(a).append(img).append(name);
-		$(a).unbind("click").bind("click", (function(d) {
+		$(a).off("click").on("click", (function(d) {
 			return function(ev){
 				if( ev.which !== 1 )return;
 				ev.preventDefault();
@@ -2242,7 +2242,7 @@ appdb.views.ui.viewers.dataset.derivedfrom = appdb.ExtendClass(appdb.views.ui.Ge
 	this.postRender = function(){
 		var d = this.getData();
 		var parent = appdb.components.Dataset.parent();
-		$(this.dom).find("a.value.dataset").unbind("click").bind("click", (function(parent) {
+		$(this.dom).find("a.value.dataset").off("click").on("click", (function(parent) {
 			return function(ev){
 				if( ev.which !== 1 )return;
 				ev.preventDefault();
@@ -2250,7 +2250,7 @@ appdb.views.ui.viewers.dataset.derivedfrom = appdb.ExtendClass(appdb.views.ui.Ge
 				return false;
 			};
 		})(parent));
-		$(this.dom).find("a.value.version").unbind("click").bind("click", (function(parent,d) {
+		$(this.dom).find("a.value.version").off("click").on("click", (function(parent,d) {
 			return function(ev){
 				if( ev.which !== 1 )return;
 				ev.preventDefault();

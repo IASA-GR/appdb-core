@@ -139,7 +139,7 @@
 		this.loader(false);
 		
 		return this.each(function () {
-			$(this).bind(options.bind, function () {
+			$(this).on(options.bind, function () {
 				val = $(this).val();
 				e.trigger();
 			});

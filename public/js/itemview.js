@@ -388,7 +388,7 @@ function showLogo(id,elem) {
 	$(".dijitDialogUnderlay.nonModal_underlay").parent().css({"display":"none"});
 	setTimeout(function(){
 		$(appDlg2.domNode).center();
-		$(elem).unbind("mouseleave").bind("mouseleave", function(){
+		$(elem).off("mouseleave").on("mouseleave", function(){
 			setTimeout(function(){
 				if(appDlg2 && !appDlg2.get("hover")){
 					appDlg2.hide();
@@ -433,7 +433,7 @@ function showImage(id,elem) {
 	$(".dijitDialogUnderlay.nonModal_underlay").parent().css({"display":"none"});
 	setTimeout(function(){
 		$(pplDlg2.domNode).center();
-		$(elem).unbind("mouseleave").bind("mouseleave", function(){
+		$(elem).off("mouseleave").on("mouseleave", function(){
 			setTimeout(function(){
 				if(pplDlg2 && pplDlg2.get("visible") && !pplDlg2.get("hover")){
 					pplDlg2.hide();

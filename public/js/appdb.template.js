@@ -262,7 +262,7 @@ appdb.TemplateControl = appdb.DefineClass("appdb.TemplateControl",function(o){
 		var i, ed = this.eventData;
 		if(this.content){
 			for(i in ed){
-				$(this.content).unbind(i);
+				$(this.content).off(i);
 			}
 		}
 		this.eventData = {};
@@ -274,8 +274,8 @@ appdb.TemplateControl = appdb.DefineClass("appdb.TemplateControl",function(o){
 			if(e[i].isSet===true){
 				f = this.parseData(d,e[i].value || e[i].defaultValue);
 				this.eventData[i] = new Function(f);
-				$(this.content).unbind(i);
-				$(this.content).bind(i,this.eventData[i]);
+				$(this.content).off(i);
+				$(this.content).on(i,this.eventData[i]);
 			}
 		}
 	};

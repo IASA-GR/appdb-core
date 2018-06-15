@@ -241,7 +241,7 @@ appdb.components.LogisticsSelector = appdb.ExtendClass(appdb.Component, "appdb.c
 		
 		var a = $(dom).children("a");
 		$(a).parent().addClass("overflowaction").siblings("li.overflowed").hide();
-		$(a).unbind("click").bind("click", function(ev){
+		$(a).off("click").on("click", function(ev){
 			ev.preventDefault();
 			$(this).fadeOut(100,function(sibls){
 				return function(){
@@ -265,7 +265,7 @@ appdb.components.LogisticsSelector = appdb.ExtendClass(appdb.Component, "appdb.c
 				$(ul).append(entry);
 			};
 		})(this));
-		$(dom).children("ul").children("li").children("a").unbind("click");
+		$(dom).children("ul").children("li").children("a").off("click");
 	};
 	this.renderMoreItems = function(data){
 		var li = $(document.createElement("li")).addClass("logistics").addClass("more");
@@ -2608,7 +2608,7 @@ appdb.components.Site = appdb.ExtendClass(appdb.Component, "appdb.components.Sit
 		this._model.get( { "id": "s:" + $.trim(d.query.name).toUpperCase()} );
 	};
 	this._initSiteContents = function(){
-		$(this.dom).find(".sitecontents .filterdecorator .header ul > li > a").unbind("click").bind("click", function( ev ){
+		$(this.dom).find(".sitecontents .filterdecorator .header ul > li > a").off("click").on("click", function( ev ){
 				ev.preventDefault();
 				$(this).closest("ul").children("li").removeClass("current");
 				$(this).parent().addClass("current");
@@ -2939,7 +2939,7 @@ appdb.components.RelatedContacts = appdb.ExtendClass(appdb.Component,"appdb.comp
 			container: $(this.dom).find(".resCount")
 		});
 		v.peopleList = new appdb.views.RelatedContactList({container : $(this.dom).find("ul.list:last")[0], disableCheckForChanges:this.disableCheckForChanges, permissions : {action : [{id:17}]}, canSetContactPoint : false, excluded : o.excluded, onExclude : o.onExclude || function(li){
-				$(li.dom).find(".item a").unbind("click").bind('click', function(ev){ev.preventDefault();ev.stopPropagation();return false;}).css({"cursor":"default"}).attr("title","Already associated with the software");
+				$(li.dom).find(".item a").off("click").on('click', function(ev){ev.preventDefault();ev.stopPropagation();return false;}).css({"cursor":"default"}).attr("title","Already associated with the software");
 				$(li.dom).css({"cursor":"default"}).find(".item:last").append("<div class='info'>Already associated with the software</div>");
 		}});
         v.pagerview = new appdb.views.PagerPane({container : $(this.dom).find(".pager:last")[0]});
@@ -3277,7 +3277,7 @@ appdb.components.Person = appdb.ExtendClass(appdb.Component,"appdb.components.Pe
         }
 		this.views.permalink.render({query:this._model.getQuery(),ext:this.ext});
 		$( "#ppl_details" ).tabs();
-		$( "#ppl_details" ).bind( "tabsactivate", function(event, ui) {
+		$( "#ppl_details" ).on( "tabsactivate", function(event, ui) {
 			if($.trim(ui.newTab.index())==='1'){
 				$("#ppl_details_pubs").show();
 				setTimeout(function(){
@@ -4105,11 +4105,11 @@ appdb.components.ContactVOs = appdb.ExtendClass(appdb.Component, "appdb.componen
 		this.options.selection.subject = ( validsubject === true )?this.getSubject():"";
 		
 		if( !valid || this.options.mode === "init"){
-			$(this.dom).find(".footer .action.send").unbind("click").removeClass("btn-primary").addClass("btn-disabled").attr("disabled", "disabled");
+			$(this.dom).find(".footer .action.send").off("click").removeClass("btn-primary").addClass("btn-disabled").attr("disabled", "disabled");
 			$(this.dom).find(".footer .action.preview").addClass("hidden");
 			return false;
 		}
-		$(this.dom).find(".footer .action.send").addClass("btn-primary").removeClass("btn-disabled").removeAttr("disabled").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".footer .action.send").addClass("btn-primary").removeClass("btn-disabled").removeAttr("disabled").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.sendMessage();
@@ -4175,7 +4175,7 @@ appdb.components.ContactVOs = appdb.ExtendClass(appdb.Component, "appdb.componen
 				$(e).prepend(chk);
 			};
 		})(this));
-		$(this.dom).find(".vocontactlist ul > li .contactitem").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".vocontactlist ul > li .contactitem").off("click").on("click", (function(self){
 			return function(ev){
 				ev.stopPropagation();
 				if( $(this).find("input").is(":checked") === false ){
@@ -4186,7 +4186,7 @@ appdb.components.ContactVOs = appdb.ExtendClass(appdb.Component, "appdb.componen
 				return true;
 			};
 		})(this));
-		$(this.dom).find(".vocontactlist ul > li .contactitem input").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".vocontactlist ul > li .contactitem input").off("click").on("click", (function(self){
 			return function(ev){
 				ev.stopPropagation();				
 				if( $(this).is(":checked") ){
@@ -4251,7 +4251,7 @@ appdb.components.ContactVOs = appdb.ExtendClass(appdb.Component, "appdb.componen
 		var li = $("<li></li>");
 		var additem = $(item).clone();
 		var actionclose = $("<span class='action close' title='Remove vo from selected contacts'><span>x</span></span>");
-		$(actionclose).unbind("click").bind("click", (function(self, itemid){
+		$(actionclose).off("click").on("click", (function(self, itemid){
 			return function(ev){
 				ev.preventDefault();
 				self.unselectItem(itemid);
@@ -4318,10 +4318,10 @@ appdb.components.ContactVOs = appdb.ExtendClass(appdb.Component, "appdb.componen
 	};
 	this.initMenus = function(){
 		$(this.dom).find(".dropdownoptions-container").removeClass("active");
-		$(this.dom).unbind("click").bind("click", function(ev){
+		$(this.dom).off("click").on("click", function(ev){
 			$(this).find(".dropdownoptions-container").removeClass("active");
 		});
-		$(this.dom).find(".dropdownoptions-handler").unbind("click").bind("click",(function(self){
+		$(this.dom).find(".dropdownoptions-handler").off("click").on("click",(function(self){
 			return function(ev){
 				ev.preventDefault();
 				var isactive = $(this).closest(".dropdownoptions-container").hasClass("active");
@@ -4489,7 +4489,7 @@ appdb.components.ContactVOs = appdb.ExtendClass(appdb.Component, "appdb.componen
 	this.renderPreviewer = function(v){
 		$(this.dom).find(".contactvos-content").addClass("hidden");
 		$(this.dom).find(".contactvos-content.previewer").removeClass("hidden").removeClass("error");
-		$(this.dom).find(".contactvos-content.previewer .actions .action.back").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".contactvos-content.previewer .actions .action.back").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				$(self.dom).find(".contactvos-content").addClass("hidden");
@@ -4508,7 +4508,7 @@ appdb.components.ContactVOs = appdb.ExtendClass(appdb.Component, "appdb.componen
 				$(selected).append("<option value='" + $(e).data("name") + "' >" + $(e).data("name") + "</option>");
 			});
 			$(this.dom).find(".contactvos-content.previewer .voselector").append(selected);
-			$(selected).unbind("change").bind("change", (function(self,msg, contacts){
+			$(selected).off("change").on("change", (function(self,msg, contacts){
 				return function(){
 					var m = ""+msg;
 					m = m.replace(/\{\{vo\.name\}\}/gi, $(this).val());
@@ -4534,7 +4534,7 @@ appdb.components.ContactVOs = appdb.ExtendClass(appdb.Component, "appdb.componen
 		$(this.dom).find(".contactvos-content").addClass("hidden");
 		$(this.dom).find(".contactvos-content.result").removeClass("hidden");
 		$(this.dom).find(".contactvos-content.result .state").children().addClass("hidden");
-		$(this.dom).find(".contactvos-content.result .actions .action.retry").unbind("click").bind("click", (function(self, err){
+		$(this.dom).find(".contactvos-content.result .actions .action.retry").off("click").on("click", (function(self, err){
 			return function(ev){
 				ev.preventDefault();
 				if( $.trim(err) === "" ){
@@ -4546,7 +4546,7 @@ appdb.components.ContactVOs = appdb.ExtendClass(appdb.Component, "appdb.componen
 				return false;
 			};
 		})(this, v.error));
-		$(this.dom).find(".contactvos-content.result .actions .action.close").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".contactvos-content.result .actions .action.close").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.close();
@@ -4610,21 +4610,21 @@ appdb.components.ContactVOs = appdb.ExtendClass(appdb.Component, "appdb.componen
 	};
 	this.initActions = function(){
 		this.initMenus();
-		$(this.dom).find(".footer .action.cancel").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".footer .action.cancel").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.close();
 				return false;
 			};
 		})(this));
-		$(this.dom).find(".footer .action.preview").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".footer .action.preview").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.loadPreviewer();
 				return false;
 			};
 		})(this));
-		$(this.dom).find(".selectcontacttype-container ul > li").unbind("click").bind("click",(function(self){
+		$(this.dom).find(".selectcontacttype-container ul > li").off("click").on("click",(function(self){
 			return function(ev){
 				ev.preventDefault();
 				var action = $.trim($(this).data("action")).toLowerCase();
@@ -4632,7 +4632,7 @@ appdb.components.ContactVOs = appdb.ExtendClass(appdb.Component, "appdb.componen
 				return false;
 			};
 		})(this));
-		$(this.dom).find(".vocontact-filter .actions .action").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".vocontact-filter .actions .action").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				$(this).closest(".actions").find(".selected").removeClass("selected");
@@ -4650,7 +4650,7 @@ appdb.components.ContactVOs = appdb.ExtendClass(appdb.Component, "appdb.componen
 				return false;
 			};
 		})(this));
-		$(this.dom).find(".vocontact-filter .listactions .action").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".vocontact-filter .listactions .action").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				if( $(this).hasClass("selectall") ) {
@@ -6165,7 +6165,7 @@ appdb.components.NameAvailability = appdb.ExtendClass(appdb.Component,"appdb.com
 	this.ctime = -1;
 	this.reset = function(){
 		if(this.input){
-			$(this.input).unbind("keyup").unbind("mouseup").unbind("change");
+			$(this.input).off("keyup").off("mouseup").off("change");
 		}
 		$(this.dom).empty();
 	};
@@ -6217,7 +6217,7 @@ appdb.components.NameAvailability = appdb.ExtendClass(appdb.Component,"appdb.com
 		if(isvalid===true){
 			if(description){
                 $($(this.dom).find(".validatorresult")[0]).removeClass("invalid").removeClass("valid").addClass("valid_warning");
-                $($(this.dom).find(".validatordescription")[0]).attr("src","/images/question_mark.gif").unbind('click').click((function(_this){
+                $($(this.dom).find(".validatordescription")[0]).attr("src","/images/question_mark.gif").off('click').click((function(_this){
                     return function(){
                         _this._showDescription($(_this.dom).find(".validatordescription")[0],description);
                     };
@@ -6232,7 +6232,7 @@ appdb.components.NameAvailability = appdb.ExtendClass(appdb.Component,"appdb.com
 		}else{
 			$($(this.dom).find(".validatorresult")[0]).removeClass("valid").removeClass("valid_warning").addClass("invalid");
             if(description){
-                $($(this.dom).find(".validatordescription")[0]).attr("src","/images/question_mark.gif").unbind('click').click((function(_this){
+                $($(this.dom).find(".validatordescription")[0]).attr("src","/images/question_mark.gif").off('click').click((function(_this){
                     return function(){
                         _this._showDescription($(_this.dom).find(".validatordescription")[0],description);
                     };
@@ -6441,7 +6441,7 @@ appdb.components.RelatedApplications = appdb.ExtendClass(appdb.Component,"appdb.
 		
 		//Check if "Previous" button should be rendered
 		if(this.currentPage>0){
-			$(aprev).attr("href","").append("<span>&#x25C0;</span>").bind("click", (function(_this){
+			$(aprev).attr("href","").append("<span>&#x25C0;</span>").on("click", (function(_this){
 				return function(){
 					setTimeout(function(){
 						$(_this.dom).find("ul:last").animate({opacity:0.2},200,function(){
@@ -6457,7 +6457,7 @@ appdb.components.RelatedApplications = appdb.ExtendClass(appdb.Component,"appdb.
 		
 		//Check if "Next" button should be rendered
 		if(this.currentPage<(this._data.length-1)){
-			$(anext).attr("href","").append("<span>&#x25B6;</span>").bind("click",(function(_this){ 
+			$(anext).attr("href","").append("<span>&#x25B6;</span>").on("click",(function(_this){ 
 				return function(){
 					setTimeout(function(){
 						$(_this.dom).find("ul:last").animate({opacity:0.2},200,function(){
@@ -6552,8 +6552,8 @@ appdb.components.RelatedApplications = appdb.ExtendClass(appdb.Component,"appdb.
 	this._startInterval = function(){
 		//Iniate timer when set pageInterval>=1 (secs) and pages>1 and timer not set
 		if(this.pageInterval && this.pageInterval>=1 && this._timer === null && this._data.length>1){
-			$(this.dom).unbind("mouseover.timer");
-			$(this.dom).bind("mouseover.timer",(function(_this){
+			$(this.dom).off("mouseover.timer");
+			$(this.dom).on("mouseover.timer",(function(_this){
 				return function(){
 					if(_this._timer){
 						clearInterval(_this._timer);
@@ -6833,11 +6833,11 @@ appdb.components.RequestJoinContacts = appdb.ExtendClass(appdb.Component, "appdb
 				break;
 			default:
 				$(this.dom).removeClass("fetchingstatus").find(".status").empty();
-				$(this.dom).find("textarea").val("").unbind("keydown").unbind("change").bind("keydown",(function(_this){ 
+				$(this.dom).find("textarea").val("").off("keydown").off("change").on("keydown",(function(_this){ 
 					return function(){
 						_this._validateMessage($(this).val());
 					};
-				})(this)).bind("change",(function(_this){ 
+				})(this)).on("change",(function(_this){ 
 					return function(){
 						_this._validateMessage($(this).val());
 					};
@@ -6967,11 +6967,11 @@ appdb.components.SendMessageToContacts = appdb.ExtendClass(appdb.Component, "app
 		}, caller: this});
 		this._renderActions();
 		
-		$($(this.dom).find(".main .content .message textarea:last")[0]).unbind("keyup").bind("keyup",(function(_this){
+		$($(this.dom).find(".main .content .message textarea:last")[0]).off("keyup").on("keyup",(function(_this){
 			return function(){
 				_this._validate();
 			};
-		})(this)).unbind("mouseup").bind("mouseup",(function(_this){
+		})(this)).off("mouseup").on("mouseup",(function(_this){
 			return function(){
 				_this._validate();
 			};
@@ -7005,7 +7005,7 @@ appdb.components.SendMessageToContacts = appdb.ExtendClass(appdb.Component, "app
 		if($.trim(appdb.components.SendMessageToContacts.Dialog)!==''){
 			appdb.components.SendMessageToContacts.Dialog.hide();
 			appdb.components.SendMessageToContacts.Dialog.destroyRecursive(false);
-			$("body").unbind("mouseup.dropdowngroup");
+			$("body").off("mouseup.dropdowngroup");
 		}
 	};
 	this.load = function(id){
@@ -7582,7 +7582,7 @@ appdb.components.Banner = appdb.ExtendClass(appdb.Component, "appdb.components.B
 	};
 	this.doPopup = function(){
 		var data = $(this.popupHtml).clone();
-		$(data).children("a").unbind("click").bind("click", function(ev){
+		$(data).children("a").off("click").on("click", function(ev){
 			var el = $(this).data("click");
 			if( $.trim(el) !== "" ){
 				ev.preventDefault();
@@ -7686,7 +7686,7 @@ appdb.components.Banner = appdb.ExtendClass(appdb.Component, "appdb.components.B
 		}
 		var ca = $(this.dom).children("a.more");
 		if( $(ca).length > 0 ) {
-			$(ca).unbind("click").bind("click",(function(_this){
+			$(ca).off("click").on("click",(function(_this){
 				return function(){
 					if( _this.popupHtml !== null ){
 						setTimeout(function(){
@@ -8283,7 +8283,7 @@ appdb.components.EntityPrivileges = appdb.ExtendClass(appdb.Component, "appdb.co
 							assocDesc = $.trim(u[0].associationDescription);
 						}
 					}
-					$(li.dom).find(".item a").unbind("click").bind('click', function(ev){ev.preventDefault(); ev.stopPopagation();return false;}).css({"cursor":"default"}).attr("title",assocDesc);
+					$(li.dom).find(".item a").off("click").on('click', function(ev){ev.preventDefault(); ev.stopPopagation();return false;}).css({"cursor":"default"}).attr("title",assocDesc);
 					$(li.dom).css({"cursor":"default"}).find(".item:last").append("<div class='info'>" + assocDesc + "</div>");
 				},ext:{mainTitle: "Include users in the explicit permissions list"}});
 				relcon.subscribe({event:"close", callback : function(v){
@@ -8718,7 +8718,7 @@ appdb.components.AccessGroupEditor = appdb.ExtendClass(appdb.Component, "appdb.c
 		$(this.dom).children(".actionloader").remove();
 		if( enabled ){
 			$(this.dom).append("<div class='actionloader "+classes+"' ><div class='shader'/><div class='message icontext' style='padding-bottom:30px;'><img src='/images/vappliance/redwarning.png' alt=''/><span>"+text+"</span><button class='btn btn-compact btn-primary'>close</button></div></div>");
-			$(this.dom).children(".actionloader").find("button").css({"display": "block","position": "absolute","right": "5px","padding": "0px 2px","margin": "0px"}).unbind("click").bind("click", (function(self){
+			$(this.dom).children(".actionloader").find("button").css({"display": "block","position": "absolute","right": "5px","padding": "0px 2px","margin": "0px"}).off("click").on("click", (function(self){
 				return function(ev){
 					ev.preventDefault();
 					self.renderError(false);
@@ -8836,7 +8836,7 @@ appdb.components.AccessGroupEditor = appdb.ExtendClass(appdb.Component, "appdb.c
 			}
 		}
 		
-		$(button).unbind("click").bind("click", (function(self,data, toggle){
+		$(button).off("click").on("click", (function(self,data, toggle){
 			return function(ev){
 				ev.preventDefault();
 				delete self.options.changes[item.id];
@@ -8855,7 +8855,7 @@ appdb.components.AccessGroupEditor = appdb.ExtendClass(appdb.Component, "appdb.c
 			};
 		})(this, item, button2));
 		if( button2 !== null ){
-			$(button2).unbind("click").bind("click", (function(self,data, toggle){
+			$(button2).off("click").on("click", (function(self,data, toggle){
 				return function(ev){
 					ev.preventDefault();
 					if( $(this).hasClass("toggled") ){
@@ -8909,7 +8909,7 @@ appdb.components.AccessGroupEditor = appdb.ExtendClass(appdb.Component, "appdb.c
 			$(button).data("action","request").addClass("torequest").append("<span>join this group</span>");
 		}
 		
-		$(button).unbind("click").bind("click", (function(self,data){
+		$(button).off("click").on("click", (function(self,data){
 			return function(ev){
 				ev.preventDefault();
 				if( $(this).hasClass("toggled") ){
@@ -8978,21 +8978,21 @@ appdb.components.AccessGroupEditor = appdb.ExtendClass(appdb.Component, "appdb.c
 		this.render();
 	};
 	this._initActions = function(){
-		$(this.dom).find(".action.save").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".action.save").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.makeSubmit();
 				return false;
 			};
 		})(this));
-		$(this.dom).find(".action.cancel").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".action.cancel").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.cancel();
 				return false;
 			};
 		})(this));
-		$(this.dom).find(".action.request").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".action.request").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.makeRequest();
@@ -9204,10 +9204,10 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 	    $.get(appdb.config.endpoint.base + "vo/secantreport", {id: this.options.id, format: 'js'}).done(function(data) {
 		this.options.secant = (((data || {}).result || {}).report || []);
 		callback.apply(this);
-	    }.bind(this)).fail(function(err) {
+	    }.on(this)).fail(function(err) {
 		this.options.secant = [];
 		callback.apply(this);
-	    }.bind(this));
+	    }.on(this));
 	}
 	//Update available vappliance data with related vo image list information
 	this.mergeDraftToAvailableVApps = function(){
@@ -9310,7 +9310,7 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 			e = this.getSecantReportsForVAppliance(e, secantReports);
 
 			res.push(e);
-		}.bind(this));
+		}.on(this));
 		this.options.vapps = res;
 	};
 	this.getSecantReportsForVAppliance = function(vappid, secantReports) {
@@ -9340,7 +9340,7 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 			    }
 			    entry.secant.push(r);
 			}
-		 }.bind(secantReports));
+		 }.on(secantReports));
 
 		 entry.secant.sort(function(a, b) {
 			return parseInt(b.vmiinstance_id) - parseInt(a.vmiinstance_id);
@@ -9433,7 +9433,7 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 			} else {
 				callback(removeResponse);
 			}
-		}.bind(this));
+		}.on(this));
 	};
 	this.updateVappliance = function(vappid, callback){
 		this._RequestAction({ "action":"update", "vappid": vappid }, function(updateResponse) {
@@ -9447,7 +9447,7 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 			} else {
 			    callback(updateResponse);
 			}
-		}.bind(this));
+		}.on(this));
 	};
 	this.getSecantReport = function(vappid, callback) {
 		$.get(appdb.config.endpoint.base + "vo/secantreport", {id: this.options.id, appid: vappid, format: 'js'}).done(function(data) {
@@ -9455,9 +9455,9 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 			d = $.isArray(d) ? d : [d];
 			var res = this.getSecantReportsForVAppliance(vappid, d);
 			callback(res);
-		}.bind(this)).fail(function(err) {
+		}.on(this)).fail(function(err) {
 			callback({error: err});
-		}.bind(this));
+		}.on(this));
 	}
 	this.publishImageList = function(callback){
 		this.renderLoading(true, "Publishing changes");
@@ -9597,12 +9597,12 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 		if (this.views.imagelist && appids.length > 0) {
 			$.each(appids, function(i, appid) {
 				this.views.imagelist.updateSecantReportsForVappliance(appid, diffs[appid]);
-			}.bind(this));
+			}.on(this));
 		}
 	};
         this.addSecantWatcher = function(entry) {
 		if (!appdb.components.VoImageListManager.secantWatcher) {
-			appdb.components.VoImageListManager.secantWatcher = appdb.utils.SecantVOImagelistWatcher(this.options.id, this.onSecantChange.bind(this));
+			appdb.components.VoImageListManager.secantWatcher = appdb.utils.SecantVOImagelistWatcher(this.options.id, this.onSecantChange.on(this));
 		}
 
 		appdb.components.VoImageListManager.secantWatcher.watch(entry);
@@ -10012,7 +10012,7 @@ appdb.components.VapplianceResourceProviders = appdb.ExtendClass(appdb.Component
 				$(dialog).find(".header").addClass("hidden");
 			}
 			$(dialog).find(".message").append(html);
-			$(dialog).find(".action.close, .shader").unbind("click").bind("click", (function(self){
+			$(dialog).find(".action.close, .shader").off("click").on("click", (function(self){
 				return function(ev){
 					ev.preventDefault();
 					self.renderInlineDialog(false);
@@ -10383,7 +10383,7 @@ appdb.views.NavigationPane = appdb.ExtendClass(appdb.View,"appdb.views.Navigatio
                 this.appendSeperator();
             }
             if(i===(len-2)){
-				$(this._close).find("a").first().unbind("click").bind("click",(function(c){
+				$(this._close).find("a").first().off("click").on("click",(function(c){
                     return function(){
                         if(c.self && c.callerArgs.length===1){
                             c.callerArgs[c.callerArgs.length] = c.self;
@@ -12426,6 +12426,6 @@ $(document).ready(function(){
 $(window).on('unload', function(){
 	window.unloading = true;
 });
-$(window).bind('beforeunload', function(){
+$(window).on('beforeunload', function(){
 	window.unloading = true;
 });

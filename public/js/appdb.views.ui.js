@@ -1027,7 +1027,7 @@ appdb.views.ui.mixins.Collection = appdb.DefineClass("appdb.views.ui.mixins.Coll
 		if( !item ) return;
 		
 		if( typeof data !== 'undefined') {
-			item.bind( this.getItemDataWrapper(data) );
+			item.on( this.getItemDataWrapper(data) );
 		}
 		
 		return item;
@@ -1659,9 +1659,9 @@ appdb.views.ui.editors.TextArea = appdb.ExtendClass(appdb.views.ui.editors.Gener
 		this.options.editor = $("<textarea></textarea>")
 			.attr("name",this.getProp("name"))
 			.attr("placeholder",this.getProp("placeholder"))
-			.unbind("keyup").bind("keyup", onTextAreaValueChange)
-			.unbind("focus").bind("focus", onTextAreaValueChange)
-			.unbind("blur").bind("blur", onTextAreaValueChange);
+			.off("keyup").on("keyup", onTextAreaValueChange)
+			.off("focus").on("focus", onTextAreaValueChange)
+			.off("blur").on("blur", onTextAreaValueChange);
 	
 		$(this.options.editor).text(this.getData());
 		$(this.dom).prepend(this.options.editor);
@@ -2023,7 +2023,7 @@ appdb.views.ui.editors.Collection = appdb.ExtendClass(appdb.views.ui.editors.Gen
 	};
 	
 	this.bindItemCommands = function(item, data, el){
-		$(el).find('[data-command="collection-item-remove"]').unbind('click').bind('click', (function(self, item, data, dom){ 
+		$(el).find('[data-command="collection-item-remove"]').off('click').on('click', (function(self, item, data, dom){ 
 			return function(ev){
 				ev.preventDefault();
 				self.remove( $(dom).data('index') );
@@ -2037,7 +2037,7 @@ appdb.views.ui.editors.Collection = appdb.ExtendClass(appdb.views.ui.editors.Gen
 	};
 	
 	this.bindCommands = function(){	
-		$(this.dom).find('[data-command="collection-item-new"]').unbind('click').bind('click',  (function(self){ 
+		$(this.dom).find('[data-command="collection-item-new"]').off('click').on('click',  (function(self){ 
 			return function(ev){
 				ev.preventDefault();
 				var li = self.addItem({});
@@ -2168,7 +2168,7 @@ appdb.views.ui.Databindable = appdb.ExtendClass(appdb.View, "appdb.views.ui.Data
 		
 		$.each(this.options.viewers, (function(self){
 			return function(i,e){
-				e.bind(self.options.data);	
+				e.on(self.options.data);	
 			};
 		})(this));
 	};
@@ -2314,7 +2314,7 @@ appdb.views.ui.DataEditable = appdb.ExtendClass(appdb.views.ui.Databindable, "ap
 		$.each(this.getEditables(el), (function(self){
 			return function(i,e){
 				if( typeof e.bind === "function" ){
-					e.bind(self.options.data);
+					e.on(self.options.data);
 				}
 				if( typeof e.edit === "function" ){
 					e.edit();

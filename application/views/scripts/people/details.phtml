@@ -1307,7 +1307,7 @@
 			
         <?php  } ?>
 
-            $("#defaultnotification").unbind('click').click(function(){
+            $("#defaultnotification").off('click').click(function(){
                 var defflt = "<?php /* FIXME: NIL thing*/ echo ($userIsNil) ? "country:" . $this->escape($this->entry->country->name) . " id:SYSTAG1" : "~application.name:. id:SYSTAG1"; ?>",
                     chk = $(this).is(':checked'), deliv = dijit.byId('defaultdelivery<?php echo $this->dialogCount;?>').attr('value'),
                     def = appdb.model.MailSubscription.defaultNotification, res = $(".defaultnotificationresult"),
@@ -1360,7 +1360,7 @@
 				if( $entryIsAdminOrManager || $entryIsNil ){ 
 			?>
 
-             $("#rolenotification").unbind('click').click(function(){
+             $("#rolenotification").off('click').click(function(){
                 var defflt = "",
                     chk = $(this).is(':checked'), deliv = 0,
                     def = appdb.model.MailSubscription.roleNotification, res = $(".rolenotificationresult"),
@@ -1402,7 +1402,7 @@
             };
          <?php } ?>
 
-            $("#nodissemination").unbind('click').click(function(){
+            $("#nodissemination").off('click').click(function(){
                 var defflt = "",
                     chk = $(this).is(':checked'),
                     res = $(".nodisseminationresult");
@@ -1432,7 +1432,7 @@
                     appdb.model.MailSubscription.noDissemination = v;
                 }
             };
-            $("#ownednotification").unbind('click').click(function(){
+            $("#ownednotification").off('click').click(function(){
                 var chk = $(this).is(':checked'),
                     res = $(".ownednotificationresult"),
                     del = dijit.byId("owneddelivery<?php echo $this->dialogCount;?>").attr("value");
@@ -1475,7 +1475,7 @@
                 }
             };
 
-            $("#relatednotification").unbind('click').click(function(){
+            $("#relatednotification").off('click').click(function(){
                 var chk = $(this).is(':checked'),
                     res = $(".relatednotificationresult");
                 if(chk){ // relatednotification is false
@@ -1514,7 +1514,7 @@
                     dijit.byId("relateddelivery<?php echo $this->dialogCount;?>").attr("disabled",true);
                 }
             };
-            $("#inboxnotification").unbind('click').click(function(){
+            $("#inboxnotification").off('click').click(function(){
                 var defflt = "",
                     chk = $(this).is(':checked'),
                     res = $(".inboxnotificationresult");
@@ -1545,7 +1545,7 @@
 				<?php if($this->entry->accounttype==1){ ?>
 					$("#navdiv<?php echo $this->dialogCount;?>" ).tabs("remove",1);
 				<?php } ?>
-				$( "#navdiv<?php echo $this->dialogCount;?>" ).bind( "tabsactivate", function(event, ui) {
+				$( "#navdiv<?php echo $this->dialogCount;?>" ).on( "tabsactivate", function(event, ui) {
 					if(ui.newTab.index()==1){
 						$("docdiv"+dialogCount).show();
 						setTimeout(function(){

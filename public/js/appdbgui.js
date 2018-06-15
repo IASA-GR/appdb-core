@@ -1223,9 +1223,9 @@
 					$(".ratingspan").html('<i>Unrated</i>');
 					$(".ratingspan").attr("style",'width:80px;display:inline-block;text-align:center;font-weight:bold;color:gray;');
 				} else { 
-					$(".ratingspan").find("img.ratingstar").unbind('click');
-					$(".ratingspan").find("img.ratingstar").unbind('mouseover');
-					$(".ratingspan").find("img.ratingstar").unbind('mouseout');
+					$(".ratingspan").find("img.ratingstar").off('click');
+					$(".ratingspan").find("img.ratingstar").off('mouseover');
+					$(".ratingspan").find("img.ratingstar").off('mouseout');
 				}
 				$(".ratingspan").removeClass("ratingspan");
 				if(oldtext){
@@ -1316,7 +1316,7 @@
 	}
 	function populateRatingsActions(id,_d){
 		$(".moderateComment a").each(function(){
-			$(this).unbind("click").bind("click", function(){
+			$(this).off("click").on("click", function(){
 				var cid = $(this).parents(".ratingentry").attr("data-id");
 				if ( $(this).text() === "Moderate" ) {
 					$.ajax({
@@ -1365,7 +1365,7 @@
 			});
 		});
 		$(".reportCommentAbuse").each(function(){
-			$(this).unbind("click").bind("click", function(){
+			$(this).off("click").on("click", function(){
 				if ( userID !== null ) {
 					var cid = $(this).parents(".ratingentry").attr("data-id");
 					appdb.debug('cid: '+cid);
@@ -2699,7 +2699,7 @@ String.prototype.replaceAll = function(search, replacement) {
 						});
 					}
 				});
-				$(e).find("div.sendmessage a").unbind("click").bind("click",function(){
+				$(e).find("div.sendmessage a").off("click").on("click",function(){
 					if( $(this).hasClass("helperlink") ) return true;
 					if( userID !== null ) {
 						appdb.views.Main.showSendMessageToContacts(d.application.id);
@@ -2770,7 +2770,7 @@ String.prototype.replaceAll = function(search, replacement) {
 				return function(){
 					if( Math.ceil($(elem).find("pre.app-abstract").height() / 12 /*line height*/) > 13 /*visible lines*/){
 						$(elem).find("pre.app-abstract").parent().addClass("hasmore").append("<a href='#' title='Show more' class='more'><span>show more</span></a>");
-						$(elem).find("pre.app-abstract").parent().find('a.more').unbind("click").bind("click", function(ev){
+						$(elem).find("pre.app-abstract").parent().find('a.more').off("click").on("click", function(ev){
 							ev.preventDefault();
 							$(this).parent().removeClass("hasmore").addClass("showall");
 							return false;
@@ -3569,7 +3569,7 @@ String.prototype.replaceAll = function(search, replacement) {
 		//Function to handle success of moderation and de-moderation
 		var updateModerationDisplay = function(data){
 			appmod = $($.find(".app-mod"));
-			appmod.unbind('click');
+			appmod.off('click');
 			if ( data.application.moderated == "true" ) {
 				//Application is now moderated
 				//Toggle html link to unmoderate
@@ -4359,7 +4359,7 @@ var setupApplicationMiddlewares = (function(){
 	};
 	return function(e){
 		setTimeout(function(){
-			$(e).find("span.app-mws span.app-mw a.mwname").unbind("click").bind("click",function(ev){
+			$(e).find("span.app-mws span.app-mw a.mwname").off("click").on("click",function(ev){
 				var name = $(this).text();
 				$(".dijitPopup.dijitTooltipDialogPopup").remove();
 				var data = $(document.createElement("div")).addClass("middlewarepopup");
@@ -4371,13 +4371,13 @@ var setupApplicationMiddlewares = (function(){
 				];
 				$.each(items, function(i,e){
 					if( e.hidden === true ) return;
-					var a = $(document.createElement("a")).unbind("click").html("<img src='/images/"+e.image+"' border='0'/><span>" + e.title + "</span>");
+					var a = $(document.createElement("a")).off("click").html("<img src='/images/"+e.image+"' border='0'/><span>" + e.title + "</span>");
 					if( e.href ){
 						$(a).attr("href", e.href).attr("target","_blank");
 					}else if( e.onClick ){
 						$(a).attr("onClick", e.onClick);
 					} else {
-						$(a).bind("click", (function(item){
+						$(a).on("click", (function(item){
 							return function(ev){
 								ev.preventDefault();
 								appQuickLink( name, 1, {mainTitle: name, content: item.content} );
@@ -4414,7 +4414,7 @@ var setupApplicationProglangs = (function(){
 	};
 	return function(e){
 		setTimeout(function(){
-			$(e).find("span.app-proglangs span.app-proglang > a").unbind("click").bind("click",function(ev){
+			$(e).find("span.app-proglangs span.app-proglang > a").off("click").on("click",function(ev){
 				var id = $(this).data("id");
 				var name = $(this).text();
 				$(".dijitPopup.dijitTooltipDialogPopup").remove();
@@ -4426,13 +4426,13 @@ var setupApplicationProglangs = (function(){
 				];
 				$.each(items, function(i,e){
 					if( e.hidden === true ) return;
-					var a = $(document.createElement("a")).unbind("click").html("<img src='/images/"+e.image+"' border='0'/><span>" + e.title + "</span>");
+					var a = $(document.createElement("a")).off("click").html("<img src='/images/"+e.image+"' border='0'/><span>" + e.title + "</span>");
 					if( e.href ){
 						$(a).attr("href", e.href).attr("target","_blank");
 					} else if( e.onClick ){
 						$(a).attr("onClick", e.onClick);
 					} else {
-						$(a).bind("click", (function(item){
+						$(a).on("click", (function(item){
 							return function(ev){
 								ev.preventDefault();
 								appQuickLink( id, 7, {mainTitle: name, content: item.content} );
@@ -4469,7 +4469,7 @@ var setupApplicationCountries = (function(){
 	};
 	return function(e){
 		setTimeout(function(){
-			$(e).find("span.app-countries span.app-country > a").unbind("click").bind("click",function(ev){
+			$(e).find("span.app-countries span.app-country > a").off("click").on("click",function(ev){
 				var id = $(this).data("id");
 				var name = $(this).text();
 				$(".dijitPopup.dijitTooltipDialogPopup").remove();
@@ -4481,13 +4481,13 @@ var setupApplicationCountries = (function(){
 				];
 				$.each(items, function(i,e){
 					if( e.hidden === true ) return;
-					var a = $(document.createElement("a")).unbind("click").html("<img src='/images/"+e.image+"' border='0'/><span>" + e.title + "</span>");
+					var a = $(document.createElement("a")).off("click").html("<img src='/images/"+e.image+"' border='0'/><span>" + e.title + "</span>");
 					if( e.href ){
 						$(a).attr("href", e.href).attr("target","_blank");
 					} else if( e.onClick ){
 						$(a).attr("onClick", e.onClick);
 					} else {
-						$(a).bind("click", (function(item){
+						$(a).on("click", (function(item){
 							return function(ev){
 								ev.preventDefault();
 								appQuickLink( id, 2, {mainTitle: name, content: item.content} );
@@ -4524,7 +4524,7 @@ var setupApplicationVOs = (function(){
 	};
 	return function(e){
 		setTimeout(function(){
-			$(e).find("span.app-vos span.app-vo a.voname").unbind("click").bind("click",function(ev){
+			$(e).find("span.app-vos span.app-vo a.voname").off("click").on("click",function(ev){
 				var id = $(this).text();
 				var name = $(this).text();
 				$(".dijitPopup.dijitTooltipDialogPopup").remove();
@@ -4537,13 +4537,13 @@ var setupApplicationVOs = (function(){
 				];
 				$.each(items, function(i,e){
 					if( e.hidden === true ) return;
-					var a = $(document.createElement("a")).attr("target","_blank").unbind("click").html("<img src='/images/"+e.image+"' border='0'/><span>" + e.title + "</span>");
+					var a = $(document.createElement("a")).attr("target","_blank").off("click").html("<img src='/images/"+e.image+"' border='0'/><span>" + e.title + "</span>");
 					if( e.href ){
 						$(a).attr("href", e.href).attr("target","_blank");
 					} else if( e.onClick ){
 						$(a).attr("onClick", e.onClick);
 					} else {
-						$(a).bind("click", (function(item){
+						$(a).on("click", (function(item){
 							return function(ev){
 								ev.preventDefault();
 								appQuickLink( id, 6, {mainTitle: name, content: item.content} );

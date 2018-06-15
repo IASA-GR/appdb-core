@@ -174,7 +174,7 @@ appdb.social.share.ListToolbox = appdb.ExtendClass(appdb.View, "appdb.social.sha
 	this.render = function(){
 		this.initContainer();
 		$(this.dom).removeClass("hidden");
-		$(this.dom).find("a.social.share").unbind("click").bind("click",(function(self){
+		$(this.dom).find("a.social.share").off("click").on("click",(function(self){
 			return function(ev){
 				ev.preventDefault();
 				var h = self.getHandler($(this).data("name"));

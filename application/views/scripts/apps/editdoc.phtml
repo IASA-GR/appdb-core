@@ -307,7 +307,7 @@
 		} 
 		if(disabled == true) {
 			var pu =  new dijit.TooltipDialog({ content : "<div><span class='tip'>Title field and at least one author are mandatory</span></div>" });
-			$("#docSave").unbind("mouseover").bind("mouseover",function(){
+			$("#docSave").off("mouseover").on("mouseover",function(){
 				setTimeout((function(_this){
 					return function(){
 						dijit.popup.open({
@@ -319,12 +319,12 @@
 						setTimeout(function(){dijit.popup.close(pu);},7000);
 					};
 				})(this),1);
-			}).unbind("mouseleave").bind("mouseleave",function(){
+			}).off("mouseleave").on("mouseleave",function(){
 				dijit.popup.close(pu);
 			});
 		} else {
 			$(".pubeditwarning:last").text('');
-			$("#docSave").unbind("mouseover");
+			$("#docSave").off("mouseover");
 		}
 		dijit.byId("docSave").set("disabled",disabled);
 	};

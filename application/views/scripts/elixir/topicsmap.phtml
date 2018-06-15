@@ -410,13 +410,13 @@
 			}
 			elixir.data.on("dataloaded", elixirDataLoaded);
 			$(document).ready(function(){
-				$(".toolbar button.view-selector").unbind("click").bind("click", function(ev){
+				$(".toolbar button.view-selector").off("click").on("click", function(ev){
 					ev.preventDefault();
 					$(".mapper").removeClass().addClass("mapper").addClass("view-" + $(this).data("view"));
 					return false;
 				});
 				elixir.data.loadData();
-				$("body").bind("keyup", function(ev){
+				$("body").on("keyup", function(ev){
 					if (ev.keyCode == 27){
 						$("body").removeClass("showdialog");
 					}

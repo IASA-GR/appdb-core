@@ -2442,7 +2442,7 @@ appdb.utils.DataWatcherItem = function(o){
 	 }
 	 this.connections.dojo = [];
 	 for(i=0; i<this.connections.jquery.length; i+=1){
-	  $(this.connections.jquery[i].element).unbind(this.connections.jquery[i].event,(this.connections.jquery[i].isHandler)?this.onListChangeDelegate:this.onChangeDelegate);
+	  $(this.connections.jquery[i].element).off(this.connections.jquery[i].event,(this.connections.jquery[i].isHandler)?this.onListChangeDelegate:this.onChangeDelegate);
 	 }
 	 this.connections.jquery = [];
 	};
@@ -2478,7 +2478,7 @@ appdb.utils.DataWatcherItem = function(o){
 		   this.connections.dojo[this.connections.dojo.length] = {event : "onChange", element : dojo.connect(dijit.byNode(tst[i]),"onChange",this.onChangeDelegate)};
 		 }else{
 		  this.connections.jquery[this.connections.jquery.length] = {event : "change", element : tst[i]};
-		  $(tst[i]).bind("change",this.onChangeDelegate);
+		  $(tst[i]).on("change",this.onChangeDelegate);
 		 }
 		}
 	  }
@@ -5919,7 +5919,7 @@ appdb.utils.AutoComplete = appdb.DefineClass("appdb.utils.AutoComplete",function
 				}
 			}
 
-			$(e).unbind("keyup").bind("keyup",function(event){
+			$(e).off("keyup").on("keyup",function(event){
 				var txt = $(e).val();
 				if(event.which===13 && $.trim(txt).length>0 && $.trim(txt)[$.trim(txt).length-1]===":" && $(".ac_results").is(":visible")===false){
 					event.preventDefault();
@@ -5940,7 +5940,7 @@ appdb.utils.AutoComplete = appdb.DefineClass("appdb.utils.AutoComplete",function
 				}
 				return true;
 			});
-			$(e).unbind(($.browser.opera ? "keypress" : "keydown"+".autocompletecustom")).bind(($.browser.opera ? "keypress" : "keydown"+".autocompletecustom") ,function(event){
+			$(e).off(($.browser.opera ? "keypress" : "keydown"+".autocompletecustom")).on(($.browser.opera ? "keypress" : "keydown"+".autocompletecustom") ,function(event){
 				var txt = $(this).val();
 				if(event.which===13 && $(".ac_results").is(":visible")){
 					$(e).val(txt);
@@ -6196,10 +6196,10 @@ appdb.utils.Faq = (function(){
 						return false;
 					};
 				})(elem));
-				$(elem).find("span.toctoolbox:first").append(up).append("<span class='seperator'></span>").append(down).append("<span class='seperator'></span>").append(add).append(order).bind("mouseover", function(){
+				$(elem).find("span.toctoolbox:first").append(up).append("<span class='seperator'></span>").append(down).append("<span class='seperator'></span>").append(add).append(order).on("mouseover", function(){
 					$(elem).parent().find(".hover").removeClass("hover");
 					$(elem).addClass("hover");
-				}).bind("mouseleave", function(){
+				}).on("mouseleave", function(){
 					$(elem).removeClass("hover");
 				});
 			});
@@ -6520,7 +6520,7 @@ appdb.utils.Faq = (function(){
 							var o = appdb.utils.convert.toObject(d);
 							newtext = appdb.utils.base64.decode(o.answer);
 							newquestion = appdb.utils.base64.decode(o.question);
-							$(faqmeta).find("a").attr("href","/store/person/"+userCName).removeAttr("onclick").unbind("click").click(function(){
+							$(faqmeta).find("a").attr("href","/store/person/"+userCName).removeAttr("onclick").off("click").click(function(){
 								appdb.views.Main.showPerson({id:o.submitterId,cname:userCName},{mainTitle:o.submitterName});
 							}).attr("href","").text(o.submitterName);
 							$(faqmeta).find("span.submitted").text(o.when);
@@ -6571,7 +6571,7 @@ appdb.utils.Faq = (function(){
 					})(li,id)
 				});
 			});
-			$("li[id^=faq] a.removefaq").bind('click', function(){
+			$("li[id^=faq] a.removefaq").on('click', function(){
 				var id = $(this).parent().parent("li").attr("id").substr(3);
 				if($(this).find(".loading").is(":visible")=== true){
 					return false;
@@ -6605,7 +6605,7 @@ appdb.utils.Faq = (function(){
 				}
 			}).find(".loading").hide();
 			
-			$('div[id^=faq].locked').prev().find('a.removefaq').unbind('click').html("<img src='/images/logout3.png' border='0' width='12px' height='12px'/>").click(function(e){
+			$('div[id^=faq].locked').prev().find('a.removefaq').off('click').html("<img src='/images/logout3.png' border='0' width='12px' height='12px'/>").click(function(e){
 				var pu = new dijit.TooltipDialog({content : "<div style='width:220px;'><span class='ui-icon ui-icon-alert' style='float:left; margin:0 7px 20px 0;'></span><span>This FAQ item has been locked due to its reference from some sections of the portal.</span></div>"});
 				setTimeout((function(_this){
 					return function(){
@@ -6762,7 +6762,7 @@ appdb.utils.ExpandButton = function(o){
 		this.container = $(this.dom).parent();
 		$(this.container).wrapAll("<div class='expandContainer'></div>");
 		$(this.container).before(this.action);
-		$(this.action).addClass("shown").attr("title","hide actions").append("<span> &#9658; </span>").unbind("click").bind("click", (function(_this){
+		$(this.action).addClass("shown").attr("title","hide actions").append("<span> &#9658; </span>").off("click").on("click", (function(_this){
 			return function(){
 				if($(_this.dom).is(":visible")){
 					_this.hide();
@@ -7794,14 +7794,14 @@ appdb.utils.MergeTreeLogistics = function(dataview, data, completezeros){
 appdb.utils.Vm2Appdb = (function(){
 	var init = function init(){
 		$(document).ready(function(){
-			$("form#vmc2appdb #submitxml").unbind("click").bind("click",function(ev){
+			$("form#vmc2appdb #submitxml").off("click").on("click",function(ev){
 				ev.preventDefault();
 				appdb.utils.Vm2Appdb.submit();
 				return false;
 			});
-			$("form#vmc2appdb #data").unbind("mouseup").bind("mouseup", function(){
+			$("form#vmc2appdb #data").off("mouseup").on("mouseup", function(){
 				appdb.utils.Vm2Appdb.checkSubmit();
-			}).unbind("keyup").bind("keyup", function(){
+			}).off("keyup").on("keyup", function(){
 				appdb.utils.Vm2Appdb.checkSubmit();
 			});
 			
@@ -8058,7 +8058,7 @@ appdb.utils.LoggedOutDialog = (function(){
 		refr();
 	};
 	var render = function(){
-		$("#signedoutnotify a.refresh").attr("href", appdb.config.endpoint.base).unbind("click").bind("click", (function(refr){
+		$("#signedoutnotify a.refresh").attr("href", appdb.config.endpoint.base).off("click").on("click", (function(refr){
 			return function(ev){
 				ev.preventDefault();
 				refr();
@@ -8086,7 +8086,7 @@ appdb.utils.ShowNotificationDialog = function(o){
 		var cls = $.trim(o.action).toLowerCase().replace(/\s/g,"");
 		$(html).find(".actions").prepend('<a href="" title="'+(o.actionTitle || "click to proceed")+'" class="action reload ' + cls + '" >'+o.action+'</a>');
 	}
-	$(html).find(".actions > a").unbind("click").bind("click", function(ev){
+	$(html).find(".actions > a").off("click").on("click", function(ev){
 		ev.preventDefault();
 		if(typeof o.callback === "function" ){
 			o.callback($(this).text());
@@ -8111,7 +8111,7 @@ appdb.utils.ShowNotificationWarning = function(o){
 	if( o.action ){
 		$(html).find(".actions").prepend('<a href="" title="'+(o.actionTitle || "click to proceed")+'" class="action reload" >'+o.action+'</a>');
 	}
-	$(html).find(".actions > a").unbind("click").bind("click", function(ev){
+	$(html).find(".actions > a").off("click").on("click", function(ev){
 		ev.preventDefault();
 		if(typeof o.callback === "function" ){
 			o.callback($(this).text());
@@ -8869,7 +8869,7 @@ appdb.utils.pagifyHTMLList = function(ul, pagertype){
 	var prev = $("<div class='prev action'><button type='button' class='btn btn-primary btn-disabled' disabled='disabled'><span></span></button></div>");
 	var next = $("<div class='next action'><button type='button' class='btn btn-primary'><span></span></button></div>");
 	$(prev).find("button > span").text("<");
-	$(prev).find("button").unbind("click").bind("click", function(ev){
+	$(prev).find("button").off("click").on("click", function(ev){
 		ev.preventDefault();
 		if( $(this).attr("disabled") ) return false;
 		
@@ -8882,7 +8882,7 @@ appdb.utils.pagifyHTMLList = function(ul, pagertype){
 		return false;
 	});
 	$(next).find("button > span").text(">");
-	$(next).find("button").unbind("click").bind("click", function(ev){
+	$(next).find("button").off("click").on("click", function(ev){
 		ev.preventDefault();
 		if( $(this).attr("disabled") ) return false;
 		
@@ -8903,7 +8903,7 @@ appdb.utils.pagifyHTMLList = function(ul, pagertype){
 	$(ul).children("li").each(function(i,e){
 		var li = $("<li></li>");
 		var button = $("<button type='button' class='btn btn-compact pageitem disabled'></button>");
-		$(button).unbind("click").bind("click", (function(index){
+		$(button).off("click").on("click", (function(index){
 			return function(ev){
 				ev.preventDefault();
 				ev.stopPropagation();
@@ -9578,11 +9578,11 @@ appdb.utils.SecantVOImagelistWatcher = function(voId, callback) {
 		var secant = (((data || {}).result || {}).report || []);
 		var diffs = diffResults(secant);
 		cb(diffs);
-	    }.bind(this)).fail(function(err) {
+	    }.on(this)).fail(function(err) {
 		_ajx = null;
 		appdb.debug('[ERROR][Secant report watcher]: ', err);
 		cb(null);
-	    }.bind(this));
+	    }.on(this));
     };
 
     var start = function() {

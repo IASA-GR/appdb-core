@@ -71,12 +71,12 @@ window.elixir.view = (function(window,document,$,_){
 		}
 	}
 	function viewSelectedHandler(dom, table){
-		$(dom).unbind("mouseup").bind("mouseup", function(ev){
+		$(dom).off("mouseup").on("mouseup", function(ev){
 			ev.preventDefault();
 			ev.stopPropagation();
 			toggleViewSelected(this,table);
 			return false;
-		}).unbind("click").bind("click", function(ev){
+		}).off("click").on("click", function(ev){
 			ev.preventDefault();
 			ev.stopPropagation();
 			return false;
@@ -90,7 +90,7 @@ window.elixir.view = (function(window,document,$,_){
 		
 	}
 	function viewUsageHandler(dom, table){
-		$(dom).unbind("mouseup").bind("mouseup", function(ev){
+		$(dom).off("mouseup").on("mouseup", function(ev){
 			ev.preventDefault();
 			ev.stopPropagation();
 			if( $(this).find("input").is(":checked") ){
@@ -101,7 +101,7 @@ window.elixir.view = (function(window,document,$,_){
 				$(table).addClass("viewusage");
 			}
 			return false;
-		}).unbind("click").bind("click", function(ev){
+		}).off("click").on("click", function(ev){
 			ev.preventDefault();
 			ev.stopPropagation();
 			return false;
@@ -115,7 +115,7 @@ window.elixir.view = (function(window,document,$,_){
 		$(topics).find("table").remove();
 		_renderTopics(topics);
 		
-		$(dom).find(".actions button.close").unbind("click").bind("click", function(ev){
+		$(dom).find(".actions button.close").off("click").on("click", function(ev){
 			ev.preventDefault();
 			$("body").removeClass("showdialog");
 			return false;
@@ -170,7 +170,7 @@ window.elixir.view = (function(window,document,$,_){
 		var btnselect = $("<button type='button' class='btn btn-primary select'>select</button>");
 		var btnunselect = $("<button type='button' class='btn btn-warning unselect'>unselect</button>");
 		var loader =  $("<div class='sending'>...updating</div>");
-		$(btnselect).unbind("click").bind("click",(function(topic){
+		$(btnselect).off("click").on("click",(function(topic){
 			return function(ev){
 				ev.preventDefault();
 				var discid = $(this).closest(".treetable").data("disciplineid");
@@ -189,7 +189,7 @@ window.elixir.view = (function(window,document,$,_){
 				return false;
 			};
 		})(o));
-		$(btnunselect).unbind("click").bind("click",(function(topic){
+		$(btnunselect).off("click").on("click",(function(topic){
 			return function(ev){
 				ev.preventDefault();
 				var discid = $(this).closest(".treetable").data("disciplineid");
@@ -317,7 +317,7 @@ window.elixir.view = (function(window,document,$,_){
 		$(report).append("<span class='topics children' title='Count of related topics registered for child nodes.'><span class='value'></span></span>");
 		$(usage).append("<span class='usage local' title='explicit usage of discipline'><span class='value'></span></span>");
 		var button = $("<button type='button' class='btn btn-primary'>edit</button>");
-		$(button).unbind("click").bind("click",(function(discipline){
+		$(button).off("click").on("click",(function(discipline){
 			return function(ev){
 				ev.preventDefault();
 				if($("body").hasClass(".showdialog") === false ){

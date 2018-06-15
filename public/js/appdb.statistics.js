@@ -39,7 +39,7 @@ appdb.statistics.TreeNavigationBar = appdb.ExtendClass(appdb.View, "appdb.statis
 		if( d.isClickable ){
 			$(li).addClass("clickable");
 		}
-		$(a).unbind("click").bind("click", (function(self,data){
+		$(a).off("click").on("click", (function(self,data){
 			return function(ev){
 				ev.preventDefault();
 				if( data.isClickable ){
@@ -293,7 +293,7 @@ appdb.statistics.GenericContainer = appdb.ExtendClass(appdb.View, "appdb.statist
 		if( this.getExtData() && this.getExtData().emptyCount > 0 ){
 			$(this.dom).find(".emptyitemswarning").removeClass("hidden");
 			$(this.dom).find(".emptyitemswarning .entitytype").text(this.options.groupType);
-			$(this.dom).find(".emptyitemswarning a").unbind("click").bind("click", (function(self){
+			$(this.dom).find(".emptyitemswarning a").off("click").on("click", (function(self){
 				return function(ev){
 					ev.preventDefault();
 					self.viewEmptyItems();
@@ -476,21 +476,21 @@ appdb.statistics.GenericContainer = appdb.ExtendClass(appdb.View, "appdb.statist
                         around: $("#exportimg")[0],
                         orient: {BR:'TR'}
                 });
-                $("#exportstatisticsmenu").find(".exportsvg").unbind("click").bind("click", (function(self){
+                $("#exportstatisticsmenu").find(".exportsvg").off("click").on("click", (function(self){
                     return function(ev){
                         ev.preventDefault();
                         self.exportImageAs("svg");
 						return false;
                     };
                 })(self));
-                $("#exportstatisticsmenu").find(".exportpng").unbind("click").bind("click", (function(self){
+                $("#exportstatisticsmenu").find(".exportpng").off("click").on("click", (function(self){
                     return function(ev){
                         ev.preventDefault();
                         self.exportImageAs("png");
                         return false;
                     };
                 })(self));
-                $("#exportstatisticsmenu").find(".exportcsv").unbind("click").bind("click", (function(self){
+                $("#exportstatisticsmenu").find(".exportcsv").off("click").on("click", (function(self){
                     return function(ev){
                         ev.preventDefault();
                         self.exportData("png");
@@ -505,7 +505,7 @@ appdb.statistics.GenericContainer = appdb.ExtendClass(appdb.View, "appdb.statist
         var listbox = $(this.dom).find(".listtoolbox.statistics");
         if( $(listbox).length === 0 ) return;
         if( $(listbox).find(".action.charttype.pie").length > 0 ){
-            $(listbox).find(".action.charttype.pie").unbind("click").bind("click", (function(self){
+            $(listbox).find(".action.charttype.pie").off("click").on("click", (function(self){
                 return function(ev){
                     ev.preventDefault();
                     self.options.chartObj = self.getChartType();
@@ -515,7 +515,7 @@ appdb.statistics.GenericContainer = appdb.ExtendClass(appdb.View, "appdb.statist
             })(this));
         }
         if( $(listbox).find(".action.charttype.bar").length > 0 ){
-            $(listbox).find(".action.charttype.bar").unbind("click").bind("click", (function(self){
+            $(listbox).find(".action.charttype.bar").off("click").on("click", (function(self){
                 return function(ev){
                     ev.preventDefault();
                     self.options.chartObj = self.getChartType("bars");
@@ -525,7 +525,7 @@ appdb.statistics.GenericContainer = appdb.ExtendClass(appdb.View, "appdb.statist
             })(this));
         }
         if( $(listbox).find(".action.export").length > 0 ){
-            $(listbox).find(".action.export").unbind("click").bind("click", (function(self){
+            $(listbox).find(".action.export").off("click").on("click", (function(self){
                 return function(ev){
                     ev.preventDefault();
                     self.toggleExport();
@@ -636,7 +636,7 @@ appdb.statistics.software.category = appdb.ExtendClass(appdb.statistics.GenericC
 		}, caller: this});
 		this.options.navigation.render();
 		$(this.dom).find(".chartnavigation").prepend("<span class='chartnavigationtitle'>Filters:</span>");
-		$(this.dom).find(".chartnavigation a.action.zoomout").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".chartnavigation a.action.zoomout").off("click").on("click", (function(self){
 			return function(ev){
 			ev.preventDefault();
 			self.options.chartObj.zoomOut();
@@ -787,7 +787,7 @@ appdb.statistics.software.discipline = appdb.ExtendClass(appdb.statistics.Generi
 		}, caller: this});
 		this.options.navigation.render();
 		$(this.dom).find(".chartnavigation").prepend("<span class='chartnavigationtitle'>Filters:</span>");
-		$(this.dom).find(".chartnavigation a.action.zoomout").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".chartnavigation a.action.zoomout").off("click").on("click", (function(self){
 			return function(ev){
 			ev.preventDefault();
 			self.options.chartObj.zoomOut();
@@ -1121,13 +1121,13 @@ appdb.statistics.charts.Sunburst = appdb.ExtendClass(appdb.View, "appdb.statisti
 	this.renderPopup = function(dom,d){
 		var data = $.extend({},d);
 		$("body").find(".chartpopup").remove();
-		$(dom).unbind("mousemove.popup");
+		$(dom).off("mousemove.popup");
 		if( d === false || data.id == -1 || data.depth == 0){
 			return;
 		}
 		var cpopup = this.getPopupHtml(data);
 		$("body").append(cpopup);
-		$(dom).bind("mousemove.popup", function(ev){
+		$(dom).on("mousemove.popup", function(ev){
 			$(cpopup).css({top:ev.pageY+15, left: ev.pageX});
 			if( $(cpopup).is(":visible") === false ){
 				$(cpopup).fadeIn(500);

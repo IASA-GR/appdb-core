@@ -49,7 +49,7 @@ appdb.contextualization.ui.helpers.TextAreaEditor = function(dom,parent){
 		}
 	};
 	this.render = function(){
-		$(this.dom).unbind("keyup").bind("keyup", (function(self){
+		$(this.dom).off("keyup").on("keyup", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.onValueChange();
@@ -290,14 +290,14 @@ appdb.contextualization.ui.helpers.viewers.personlink = function(dom,v,context){
 	b += "</div>";
 	b = $(b);
 	$(dom).append(h);
-	$(b).find("a").unbind("click").bind("click", (function(data){
+	$(b).find("a").off("click").on("click", (function(data){
 		return function(ev){
 			ev.preventDefault();
 			appdb.views.Main.showPerson({id:data.id, cname:data.cname},{mainTitle: data.firstname + " " + data.lastname});
 			return false;
 		};
 	})(v));
-	$(h).find("a.personcardlink:first").unbind("click").bind("click",(function(content){
+	$(h).find("a.personcardlink:first").off("click").on("click",(function(content){
 		return function(ev){
 			ev.preventDefault();
 			var pu =  new dijit.TooltipDialog({content : content});
@@ -326,7 +326,7 @@ appdb.contextualization.ui.helpers.viewers.vappliancelink = function(dom,v,conte
 	if( v.image.length > 1 ){
 		$(h).parent().find(".imagecount").addClass("plural");
 	}
-	$(h).find("a").unbind("click").bind("click", (function(data){
+	$(h).find("a").off("click").on("click", (function(data){
 		return function(ev){
 			ev.preventDefault();
 			$("body").find(".dijitPopup.dijitTooltipDialogPopup").remove();
@@ -344,7 +344,7 @@ appdb.contextualization.ui.helpers.viewers.link = function(dom,v,context){
 			$(dom).text(v);
 		}
 	}
-	$(dom).attr("href", v).removeAttr("disabled").unbind("click").bind("click", function(ev){
+	$(dom).attr("href", v).removeAttr("disabled").off("click").on("click", function(ev){
 		ev.stopPropagation();
 		return true;
 	});
@@ -364,7 +364,7 @@ appdb.contextualization.ui.helpers.viewers.postSaveContextScriptMessage = functi
 			}
 		};
 	})(div),10000);
-	$(div).find(".closemessage").unbind("click").bind("click", (function(interval){
+	$(div).find(".closemessage").off("click").on("click", (function(interval){
 		return function(ev){
 			ev.preventDefault();
 			clearTimeout(interval);
@@ -376,7 +376,7 @@ appdb.contextualization.ui.helpers.viewers.postSaveContextScriptMessage = functi
 			return false;
 		};
 	})(bannerInterval));
-	$(div).find(".editversion").unbind("click").bind("click",function(ev){
+	$(div).find(".editversion").off("click").on("click",function(ev){
 			ev.preventDefault();
 			window.scroll(0,0);
 			$(this).closest(".contextualization-version.contextualization").find(".context-version-property .action.edit").trigger("click");
@@ -494,7 +494,7 @@ appdb.contextualization.ui.DataBinder = appdb.ExtendClass(appdb.View, "appdb.con
 	};
 	this.rebind = function(data){
 		this.options.datacontext = data || this.options.datacontext;
-		this.bind();
+		this.on();
 		if( this.options.editor ){
 			this.options.editor.set("value",this.getDataValue());
 		}
@@ -719,7 +719,7 @@ appdb.contextualization.ui.views.DataBindable = appdb.ExtendClass(appdb.View, "a
 				if($(e).data("usetemplate") ) return;
 				var db = new appdb.contextualization.ui.DataBinder({container: e, parent: self, datacontext: data, dataid: data.id});
 				self.options.databinders.push(db);
-				db.bind();
+				db.on();
 			};
 		})(this));
 		appdb.contextualization.ui.helpers.executeMacros(dom,data);
@@ -846,7 +846,7 @@ appdb.contextualization.ui.views.ContextScriptVapplianceItem = appdb.ExtendClass
 		this.publish({event: "remove", value: this});
 	};
 	this.postRender = function(){
-		$(this.dom).find(".vappliancelink").bind("click", function(ev){
+		$(this.dom).find(".vappliancelink").on("click", function(ev){
 				ev.preventDefault();
 				var par = $(this).closest(".vappliance-item");
 				var imgs = $(par).children(".images");
@@ -862,7 +862,7 @@ appdb.contextualization.ui.views.ContextScriptVapplianceItem = appdb.ExtendClass
 				}
 				return false;
 		});
-		$(this.dom).find(".action.removecurrentvappliance").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".action.removecurrentvappliance").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.onRemove();
@@ -931,10 +931,10 @@ appdb.contextualization.ui.views.ContextScriptVapplianceItem = appdb.ExtendClass
 		if( outdated.length > 0 ){
 			$(this.dom).addClass("outdated");
 			var latest = this.getLatestVersion();
-			$(this.dom).find(".outdatedpanel a.newversionlink").attr("href",appdb.config.endpoint.base + "store/vappliance/"+this.options.data.cname+"/vaversion/latest" ).text(latest.version).unbind("click").bind("click", function(ev){
+			$(this.dom).find(".outdatedpanel a.newversionlink").attr("href",appdb.config.endpoint.base + "store/vappliance/"+this.options.data.cname+"/vaversion/latest" ).text(latest.version).off("click").on("click", function(ev){
 				ev.stopPropagation();
 			});
-			$(this.dom).find("button.updatecurrentvappliance").unbind("click").bind("click", (function(self){
+			$(this.dom).find("button.updatecurrentvappliance").off("click").on("click", (function(self){
 				return function(ev){
 					ev.preventDefault();
 					ev.stopPropagation();
@@ -1148,7 +1148,7 @@ appdb.contextualization.ui.views.ContextScriptVapplianceList = appdb.ExtendClass
 		}else{
 			$(this.dom).closest(".contextscript-item").removeClass("hasvappliances");
 		}
-		$(this.dom).find(".action.addvappliance").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".action.addvappliance").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.addvappliance();
@@ -1226,7 +1226,7 @@ appdb.contextualization.ui.views.ContextScriptItem = appdb.ExtendClass(appdb.con
 		var toolbar = $(this.dom).find(".toolbar:first");
 		$.each(["edit","save","cancel","remove"], (function(self){
 			return function(i,e){
-				$(toolbar).find(".action." + e).unbind("click").bind("click", function(ev){
+				$(toolbar).find(".action." + e).off("click").on("click", function(ev){
 					ev.preventDefault();
 					self[e]();
 					return false;
@@ -1240,7 +1240,7 @@ appdb.contextualization.ui.views.ContextScriptItem = appdb.ExtendClass(appdb.con
 			$(this.dom).removeClass("hasvappliances");
 		}
 		//Handle url information check
-		$(this.dom).find(".toolbar > .checkurl").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".toolbar > .checkurl").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.checkUrl();
@@ -1274,7 +1274,7 @@ appdb.contextualization.ui.views.ContextScriptItem = appdb.ExtendClass(appdb.con
 				this.options.data.url = v.url;
 				this.validate();
 			}, caller: this });
-			this.options.contextscripteditor.bind(this.getData());
+			this.options.contextscripteditor.on(this.getData());
 		}
 	};
 	this.getId = function(){
@@ -1430,7 +1430,7 @@ appdb.contextualization.ui.views.ContextScriptItem = appdb.ExtendClass(appdb.con
 	this.postRender = function(){
 		var d = this.getData() || {};
 		if( appdb.utils.isLocalDomainUrl(d.url) ){
-			$(this.dom).find("a.pairurl").attr('href', appdb.config.endpoint.base+"store/swapp/"+this.options.data.relationid+"/script").unbind('click').bind('click',function(ev){
+			$(this.dom).find("a.pairurl").attr('href', appdb.config.endpoint.base+"store/swapp/"+this.options.data.relationid+"/script").off('click').on('click',function(ev){
 				ev.stopPropagation();
 				return true;
 			});
@@ -1511,7 +1511,7 @@ appdb.contextualization.ui.views.ContextScriptList = appdb.ExtendClass(appdb.con
 		this.postRender();
 	};
 	this.postRender = function(){
-		$(this.dom).find(".toolbar .action.new").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".toolbar .action.new").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.addNew();
@@ -1652,21 +1652,21 @@ appdb.contextualization.ui.views.ContextualizationVersion = appdb.ExtendClass(ap
 		}
 	};
 	this.renderActions = function(){
-		$(this.dom).find(".action.edit").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".action.edit").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.edit();
 				return false;
 			};
 		})(this));
-		$(this.dom).find(".action.save").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".action.save").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.save();
 				return false;
 			};
 		})(this));
-		$(this.dom).find(".action.cancel").unbind("click").bind("click", (function(self){
+		$(this.dom).find(".action.cancel").off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.cancel();
@@ -1857,7 +1857,7 @@ appdb.contextualization.ui.views.ContextualizationDescription = appdb.ExtendClas
 	this.renderShowMore = function(){
 		if( this.overflowUI() === false ) return;
 		var showmore = $("<div class='show-more'>...read more</div>");
-		$(showmore).unbind("click").bind("click", function(ev){
+		$(showmore).off("click").on("click", function(ev){
 			ev.preventDefault();
 			if( $(this).parent().hasClass("viewall") ){
 				$(this).text("...read more");
@@ -1926,7 +1926,7 @@ appdb.contextualization.ui.views.Contextualization = appdb.ExtendClass(appdb.con
 		});
 	};
 	this._initHelperActions = function(){
-		$(this.dom).find(".fieldvalue.popup").unbind("mouseover").bind("mouseover", function(ev){
+		$(this.dom).find(".fieldvalue.popup").off("mouseover").on("mouseover", function(ev){
 			var hadsticky = $(this).hasClass("sticky");
 			$("body").find(".popup").removeClass("hovered").removeClass("sticky");
 			$(this).addClass("hovered");
@@ -1935,16 +1935,16 @@ appdb.contextualization.ui.views.Contextualization = appdb.ExtendClass(appdb.con
 			}
 			ev.preventDefault();
 			return false;
-		}).unbind("click").bind("click", function(ev){
+		}).off("click").on("click", function(ev){
 			$("body").find(".popup.sticky").removeClass("sticky");
 			$(this).toggleClass("sticky");
 			ev.preventDefault();
 			return false;
 		});
-		$(this.dom).unbind("mouseover").bind("mouseover", function(ev){
+		$(this.dom).off("mouseover").on("mouseover", function(ev){
 			$(this).find(".popup").removeClass("hovered");
 		});
-		$("body").unbind("click").bind("click", function(ev){
+		$("body").off("click").on("click", function(ev){
 			$(this).find(".popup").removeClass("sticky").removeClass("hovered");
 		});
 	};
@@ -2500,7 +2500,7 @@ appdb.components.FileUploader = appdb.ExtendClass(appdb.Component, "appdb.compon
 	this.renderInputElement = function(){
 		var pseudo = this.getPseudoElement();
 		var input = this.getInputElement();
-		$(input).unbind('mouseup').bind('mouseup', (function(self){
+		$(input).off('mouseup').on('mouseup', (function(self){
 			return function(){
 				self.publish({event: "browse", value: {}});
 			};
@@ -2510,7 +2510,7 @@ appdb.components.FileUploader = appdb.ExtendClass(appdb.Component, "appdb.compon
 	this.bindDomEvents = function() {
 		var el = this.getInputElement();
 
-		$(el).unbind('mousenter').bind('mouseenter', (function(self){
+		$(el).off('mousenter').on('mouseenter', (function(self){
 			return function(ev){
 				console.log('refreshing....');
 				self.options.uploader.refresh();
@@ -2520,12 +2520,12 @@ appdb.components.FileUploader = appdb.ExtendClass(appdb.Component, "appdb.compon
 
 	this.bindUploaderEvents = function() {
 		var self = this;
-		this.options.uploader.bind('Init', function(up, params) {
+		this.options.uploader.on('Init', function(up, params) {
 			appdb.debug("Uploader Inited...");
 			self.publish({event: "init", value: {parameters: params}});
 		});
 		this.options.uploader.refresh();
-		this.options.uploader.bind('FilesAdded', function(up, files){
+		this.options.uploader.on('FilesAdded', function(up, files){
 			appdb.debug("Added files: ", files);
 			//prevent duplicates
 			var filenames = {};
@@ -2548,26 +2548,26 @@ appdb.components.FileUploader = appdb.ExtendClass(appdb.Component, "appdb.compon
 			self.publish({event: "addfiles", value: files});
 			up.refresh();
 		});
-		this.options.uploader.bind('FilesRemoved', function(up, files){
+		this.options.uploader.on('FilesRemoved', function(up, files){
 			self.publish({event: "removefiles", value: files});
 		});
-		this.options.uploader.bind('QueueChanged', function(up){
+		this.options.uploader.on('QueueChanged', function(up){
 			self.publish({event: "changefiles", value: {}});
 		});
-		this.options.uploader.bind('BeforeUpload', function(up,file){
+		this.options.uploader.on('BeforeUpload', function(up,file){
 			self.publish({event:"startupload", value: {file: file}});
 		});
-		this.options.uploader.bind('UploadProgress', function(up, file) {
+		this.options.uploader.on('UploadProgress', function(up, file) {
 			self.publish({event: "progress", value: {file: file, percent: file.percent}});
 		});
-		this.options.uploader.bind('FileUploaded', function(up, file, info) {
+		this.options.uploader.on('FileUploaded', function(up, file, info) {
 			info.response = JSON.parse(info.response);
 			self.publish({event: "filecomplete", value: {file: file, info: info, response: info.response}});
 		});
-		this.options.uploader.bind('UploadComplete', function(up, file, info) {
+		this.options.uploader.on('UploadComplete', function(up, file, info) {
 			self.publish({event: "complete", value: {file: file, info: info}});
 		});
-		this.options.uploader.bind('Error', function(up, err) {
+		this.options.uploader.on('Error', function(up, err) {
 			appdb.debug(err);
 			self.publish({event: "error", value: {message: err.message, code: err.code, file: err.file}});
 		});
@@ -2972,7 +2972,7 @@ appdb.components.ContextScriptEditor = appdb.ExtendClass(appdb.views.ui.DataEdit
 					var uieditor = self.getEditor('content');
 					if( uieditor ){
 						self.options.data.code = v;
-						uieditor.bind(self.options.data);
+						uieditor.on(self.options.data);
 					}
 				};
 			})(this),
@@ -2981,7 +2981,7 @@ appdb.components.ContextScriptEditor = appdb.ExtendClass(appdb.views.ui.DataEdit
 				console.log('[CONTEXTSCRIPT EDITOR]: ' + status);
 			}
 		});
-		$(this.dom).find('.content.script .code.loader .cancel-loader').unbind('click').bind('click',(function(xhr){
+		$(this.dom).find('.content.script .code.loader .cancel-loader').off('click').on('click',(function(xhr){
 			return function(ev){
 				ev.preventDefault();
 				if( xhr && xhr.abort && xhr.readyState > 0 && xhr.readyState < 4  ){
@@ -3023,7 +3023,7 @@ appdb.components.ContextScriptEditor = appdb.ExtendClass(appdb.views.ui.DataEdit
 	};
 
 	this.renderCommands = function(){
-		$(this.dom).find(".commands .command.cancel").unbind("cancel").bind("click", (function(self){
+		$(this.dom).find(".commands .command.cancel").off("cancel").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.close();
@@ -3031,7 +3031,7 @@ appdb.components.ContextScriptEditor = appdb.ExtendClass(appdb.views.ui.DataEdit
 			};
 		})(this));
 
-		$(this.dom).find(".commands .command.apply").unbind("cancel").bind("click", (function(self){
+		$(this.dom).find(".commands .command.apply").off("cancel").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.applySelection();
@@ -3063,7 +3063,7 @@ appdb.components.ContextScriptEditor = appdb.ExtendClass(appdb.views.ui.DataEdit
 		this.renderSelector();
 		this.renderCommands();
 		this.renderFormatList();
-		this.bind();
+		this.on();
 		this.edit(this.dom);
 		this.selectType('script', true);
 		this.useFormatList();
@@ -3218,7 +3218,7 @@ appdb.views.ui.editors.ContextScript = appdb.ExtendClass(appdb.views.ui.editors.
 		this.renderPopup();
 
 		var upload = this.options.templates.upload.clone();
-		$(upload).unbind('click').bind('click', (function(self){
+		$(upload).off('click').on('click', (function(self){
 			return function(ev){
 				self.showDialog();
 			};
@@ -3227,7 +3227,7 @@ appdb.views.ui.editors.ContextScript = appdb.ExtendClass(appdb.views.ui.editors.
 		$(this.dom).append(upload);
 
 		var view = this.options.templates.view.clone();
-		$(view).unbind('click').bind('click', (function(self){
+		$(view).off('click').on('click', (function(self){
 			return function(ev){
 				self.showCode();
 			};
