@@ -4224,7 +4224,7 @@ appdb.components.ContactVOs = appdb.ExtendClass(appdb.Component, "appdb.componen
 				availablemodes = this.options.enableModes;
 			}
 		}
-		$.unique(availablemodes);
+		$.uniqueSort(availablemodes);
 		if( availablemodes.length > 1 && $.inArray("init",availablemodes) === -1){
 			availablemodes.push("init");
 		}
@@ -8432,7 +8432,7 @@ appdb.components.EntityPrivileges = appdb.ExtendClass(appdb.Component, "appdb.co
 			u.action = $.isArray(u.action)?u.action:u.action;
 			res = u.action;
 		});
-		return $.unique(res).sort();
+		return $.uniqueSort(res);
 	};
 	this.removeGlobalPrivileges = function(suid, actions){
 		var res = [];
@@ -8463,8 +8463,8 @@ appdb.components.EntityPrivileges = appdb.ExtendClass(appdb.Component, "appdb.co
 		$.each(changes, function(i, e){
 			$.each(e.changes, function(ii, ee){
 				if( !suid[ee.suid] ) suid[ee.suid] = { suid: ee.suid, grant: [], revoke: [] };
-				suid[ee.suid].grant = $.unique( suid[ee.suid].grant.concat(ee.grant) );
-				suid[ee.suid].revoke = $.unique( suid[ee.suid].revoke.concat(ee.revoke) );
+				suid[ee.suid].grant = $.uniqueSort(suid[ee.suid].grant.concat(ee.grant));
+				suid[ee.suid].revoke = $.uniqueSort(suid[ee.suid].revoke.concat(ee.revoke));
 			});
 		});
 		for(var s in suid ){
@@ -8504,8 +8504,8 @@ appdb.components.EntityPrivileges = appdb.ExtendClass(appdb.Component, "appdb.co
 					privs.revoke = privs.revoke.concat( self.removeGlobalPrivileges(s, aids) );
 				};
 			})(this));
-			suid[s].grant = $.unique( privs.grant ).sort();
-			suid[s].revoke = $.unique( privs.revoke ).sort();
+			suid[s].grant = $.uniqueSort(privs.grant);
+			suid[s].revoke = $.uniqueSort(privs.revoke);
 			res.privs.push(suid[s]);
 		}
 		

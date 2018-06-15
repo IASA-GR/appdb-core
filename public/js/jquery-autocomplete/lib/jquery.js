@@ -268,7 +268,7 @@ jQuery.fn = jQuery.prototype = {
 		});
 
 		return this.pushStack( /[^+>] [^+>]/.test( selector ) || selector.indexOf("..") > -1 ?
-			jQuery.unique( elems ) :
+			jQuery.uniqueSort( elems ) :
 			elems );
 	},
 
@@ -341,7 +341,7 @@ jQuery.fn = jQuery.prototype = {
 	},
 
 	add: function( selector ) {
-		return this.pushStack( jQuery.unique( jQuery.merge(
+		return this.pushStack( jQuery.uniqueSort( jQuery.merge(
 			this.get(),
 			typeof selector == 'string' ?
 				jQuery( selector ) :
@@ -1267,7 +1267,7 @@ jQuery.each({
 		if ( selector && typeof selector == "string" )
 			ret = jQuery.multiFilter( selector, ret );
 
-		return this.pushStack( jQuery.unique( ret ) );
+		return this.pushStack( jQuery.uniqueSort( ret ) );
 	};
 });
 

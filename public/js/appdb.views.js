@@ -15306,8 +15306,7 @@ appdb.views.SoftwareActorPrivilegeGroup = appdb.ExtendClass(appdb.views.ActorPri
 					return;
 				names.push(ee.name.replace(/change software/gi, "Change").replace(/Manage software VAs/gi, "Manage Virtual Appliance"));
 			});
-			e.actionNames = $.unique(names);
-			e.actionNames.sort();
+			e.actionNames = $.uniqueSort(names);
 		});
 		$.each(types, function(i, e) {
 			var ul = $("<ul></ul>");
@@ -15374,8 +15373,7 @@ appdb.views.VApplianceActorPrivilegeGroup = appdb.ExtendClass(appdb.views.ActorP
 			$.each(e.list, function(ii, ee) {
 				names.push(ee.name.replace(/change software/gi, "Change").replace(/Manage software VAs/gi, "Manage Virtual Appliance"));
 			});
-			e.actionNames = $.unique(names);
-			e.actionNames.sort();
+			e.actionNames = $.uniqueSort(names);
 		});
 		$.each(types, function(i, e) {
 			var ul = $("<ul></ul>");
@@ -15437,8 +15435,7 @@ appdb.views.SWApplianceActorPrivilegeGroup = appdb.ExtendClass(appdb.views.Actor
 					return;
 				names.push(ee.name.replace(/change software/gi, "Change").replace(/Manage software VAs/gi, "Manage Virtual Appliance"));
 			});
-			e.actionNames = $.unique(names);
-			e.actionNames.sort();
+			e.actionNames = $.uniqueSort(names);
 		});
 		$.each(types, function(i, e) {
 			var ul = $("<ul></ul>");
@@ -17587,7 +17584,7 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 			$.each(e.appliance.os, function(ii, ee) {
 				row.oses.push((ee.val) ? ee.val() : ee);
 			});
-			row.oses = $.unique(row.oses);
+			row.oses = $.uniqueSort(row.oses);
 			row.oses.sort(function(a, b) {
 				if (a === "Other")
 					return 1000;
