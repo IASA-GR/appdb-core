@@ -1225,10 +1225,10 @@ appdb.pages.dataset = (function(){
 	page.immediate = function(){
 		$( "#appdb_components_Dataset #navdiv" ).tabs();
 		$( "#appdb_components_Dataset #navdiv").bind( "tabsselect", function(event, ui) {
-			if( $.trim(window.datasettabselect) !== $.trim(ui.index)){
-				window.datasettabselect = ui.index;
+			if( $.trim(window.datasettabselect) !== $.trim(ui.newTab.index())){
+				window.datasettabselect = ui.newTab.index();
 			}
-			window.sitetabselect = ui.index;
+			window.sitetabselect = ui.newTab.index();
 		});
 		$( ".detailsdlgcontent div:first" ).css("height","100%");
 	};

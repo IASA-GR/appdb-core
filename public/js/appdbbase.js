@@ -3278,7 +3278,7 @@ appdb.components.Person = appdb.ExtendClass(appdb.Component,"appdb.components.Pe
 		this.views.permalink.render({query:this._model.getQuery(),ext:this.ext});
 		$( "#ppl_details" ).tabs();
 		$( "#ppl_details" ).bind( "tabsselect", function(event, ui) {
-			if($.trim(ui.index)==='1'){
+			if($.trim(ui.newTab.index())==='1'){
 				$("#ppl_details_pubs").show();
 				setTimeout(function(){
 					if(dijit.byId("ppl_details_pubs")){
@@ -3287,9 +3287,9 @@ appdb.components.Person = appdb.ExtendClass(appdb.Component,"appdb.components.Pe
 					}
 				},1);
 			}
-			if( $.trim(window.persontabselect) !== $.trim(ui.index)){
-				window.persontabselect = ui.index;
-				appdb.pages.Person.updateSection(ui.index);
+			if( $.trim(window.persontabselect) !== $.trim(ui.newTab.index())){
+				window.persontabselect = ui.newTab.index();
+				appdb.pages.Person.updateSection(ui.newTab.index());
 				if($("#ppl_details").hasClass("editmode") === false ){
 					window.persontabselect = (window.persontabselect>1)?0:window.persontabselect;
 				}

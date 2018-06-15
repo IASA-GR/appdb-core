@@ -3131,7 +3131,7 @@ appdb.pages.application = (function(){
 		$( "#navdiv" + page.currentDialogCount() ).tabs();
 		$( "#navdiv" + page.currentDialogCount() + " > ul > li > a" ).click(function(e){e.preventDefault();return false;});
 		$( "#navdiv" + page.currentDialogCount() ).bind( "tabsselect", function(event, ui) {
-			if( page.isVirtualAppliance() && appdb.vappliance.ui.CurrentVAManager.isEditMode() === true && $.trim(window.apptabselect) !== $.trim(ui.index)){
+			if( page.isVirtualAppliance() && appdb.vappliance.ui.CurrentVAManager.isEditMode() === true && $.trim(window.apptabselect) !== $.trim(ui.newTab.index())){
 				appdb.vappliance.ui.CurrentVAManager.checkUnsavedData((function(p, e, u){
 					return function(){
 						$( "#navdiv" + p.currentDialogCount() ).tabs("option", "active",u.index);
@@ -3165,7 +3165,7 @@ appdb.pages.application = (function(){
 		$("#navdiv" + page.currentDialogCount()).find(".privacycounter").addClass("hidden");
 	};
 	page.eventTabSelect= function(event, ui){
-		if($.trim(ui.index)==='1'){
+		if($.trim(ui.newTab.index())==='1'){
 			setTimeout(function(){
 				if( dijit.byId("docgrid" + page.currentDialogCount()) ){
 					$(dijit.byId("docgrid" + page.currentDialogCount()).domNode).css({"height":"100%","width":"100%"});
@@ -3174,9 +3174,9 @@ appdb.pages.application = (function(){
 			},1);
 		}
 		window.apptabselect_panelid = ui.panel.id;
-		if( typeof window.apptabselect === "undefined" || $.trim(window.apptabselect) !== $.trim(ui.index) ){
-			window.apptabselect = ui.index;
-			page.updateSection(ui.index);
+		if( typeof window.apptabselect === "undefined" || $.trim(window.apptabselect) !== $.trim(ui.newTab.index()) ){
+			window.apptabselect = ui.newTab.index();
+			page.updateSection(ui.newTab.index());
 			if($("#detail").hasClass("editmode") === true ){
 				window.apptabselect = (window.apptabselect>1)?0:window.apptabselect;
 			}
@@ -4322,11 +4322,11 @@ appdb.pages.vo = (function(){
 		if ($("#detailsdlg" + page.currentDialogCount() + ":last div span")[0] !== undefined) $("#detailsdlg" + page.currentDialogCount() + ":last div span")[0].innerHTML = 'VO Details - <I>'+page.currentName()+'</I>';
 		$( "#navdiv" + appdb.pages.vo.currentDialogCount() ).tabs();
 		$( "#navdiv" + appdb.pages.vo.currentDialogCount() ).bind( "tabsselect", function(event, ui) {
-			if( window.votabselect != ui.index){
-				window.votabselect = ui.index;
-				appdb.pages.vo.updateSection(ui.index);
+			if( window.votabselect != ui.newTab.index()){
+				window.votabselect = ui.newTab.index();
+				appdb.pages.vo.updateSection(ui.newTab.index());
 			}
-			window.votabselect = ui.index;
+			window.votabselect = ui.newTab.index();
 		});
 		$( ".detailsdlgcontent div:first" ).css("height","100%");
 		appdb.views.AppsList.SetupRatings();
@@ -4693,10 +4693,10 @@ appdb.pages.site = (function(){
 	page.immediate = function(){
 		$( "#appdb_components_Site #navdiv" ).tabs();
 		$( "#appdb_components_Site #navdiv").bind( "tabsselect", function(event, ui) {
-			if( window.sitetabselect != ui.index){
-				window.sitetabselect = ui.index;
+			if( window.sitetabselect != ui.newTab.index()){
+				window.sitetabselect = ui.newTab.index();
 			}
-			window.sitetabselect = ui.index;
+			window.sitetabselect = ui.newTab.index();
 		});
 		$( ".detailsdlgcontent div:first" ).css("height","100%");
 	};

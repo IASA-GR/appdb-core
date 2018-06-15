@@ -1546,7 +1546,7 @@
 					$("#navdiv<?php echo $this->dialogCount;?>" ).tabs("remove",1);
 				<?php } ?>
 				$( "#navdiv<?php echo $this->dialogCount;?>" ).bind( "tabsselect", function(event, ui) {
-					if(ui.index==1){
+					if(ui.newTab.index()==1){
 						$("docdiv"+dialogCount).show();
 						setTimeout(function(){
 							if(dijit.byId("docgrid<?php echo $this->dialogCount;?>")){
@@ -1556,20 +1556,20 @@
 						},1);
 					}
 					setTimeout(function(){
-						if( ui.index > 0){
+						if( ui.newTab.index() > 0){
 							$("#navdiv<?php echo $this->dialogCount;?> .expandContainer").css("display", "none");
 						}else{
 							$("#navdiv<?php echo $this->dialogCount;?> .expandContainer").css("display", "inline-block");
 						}
 					},10);
-					if( window.persontabselect != ui.index){
-						window.persontabselect = ui.index;
-						appdb.pages.Person.updateSection(ui.index);
+					if( window.persontabselect != ui.newTab.index()){
+						window.persontabselect = ui.newTab.index();
+						appdb.pages.Person.updateSection(ui.newTab.index());
 						if($("#ppl_details").hasClass("editmode") === false ){
 							window.persontabselect = (window.persontabselect>1)?0:window.persontabselect;
 						}
 					}
-					window.persontabselect = ui.index;
+					window.persontabselect = ui.newTab.index();
 				});
 				<?php if( $this->selectedTab  ) { ?>
 					setTimeout(function(){
