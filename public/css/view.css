@@ -25732,3 +25732,4 @@ table.cdtaskinstance-list tr > .img > img {
     padding-left: 10px;
 }
 
+.ui-dialog { z-index: 1001 !important ;}

@@ -3620,6 +3620,7 @@ String.prototype.replaceAll = function(search, replacement) {
 			autoOpen: false,
 			resizable: false,
 			height:'auto',
+			width:500,
 			modal: true,
 			buttons: {
 				OK: function() {
@@ -3735,6 +3736,7 @@ String.prototype.replaceAll = function(search, replacement) {
 			autoOpen: false,
 			resizable: false,
 			height:160,
+			width:350,
 			modal: true,
 			buttons: {
 				Delete: function() {
