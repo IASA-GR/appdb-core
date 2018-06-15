@@ -3277,7 +3277,7 @@ appdb.components.Person = appdb.ExtendClass(appdb.Component,"appdb.components.Pe
         }
 		this.views.permalink.render({query:this._model.getQuery(),ext:this.ext});
 		$( "#ppl_details" ).tabs();
-		$( "#ppl_details" ).bind( "tabsselect", function(event, ui) {
+		$( "#ppl_details" ).bind( "tabsactivate", function(event, ui) {
 			if($.trim(ui.newTab.index())==='1'){
 				$("#ppl_details_pubs").show();
 				setTimeout(function(){

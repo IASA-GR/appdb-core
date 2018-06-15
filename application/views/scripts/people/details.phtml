@@ -1545,7 +1545,7 @@
 				<?php if($this->entry->accounttype==1){ ?>
 					$("#navdiv<?php echo $this->dialogCount;?>" ).tabs("remove",1);
 				<?php } ?>
-				$( "#navdiv<?php echo $this->dialogCount;?>" ).bind( "tabsselect", function(event, ui) {
+				$( "#navdiv<?php echo $this->dialogCount;?>" ).bind( "tabsactivate", function(event, ui) {
 					if(ui.newTab.index()==1){
 						$("docdiv"+dialogCount).show();
 						setTimeout(function(){

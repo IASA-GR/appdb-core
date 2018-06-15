@@ -1224,7 +1224,7 @@ appdb.pages.dataset = (function(){
 	};
 	page.immediate = function(){
 		$( "#appdb_components_Dataset #navdiv" ).tabs();
-		$( "#appdb_components_Dataset #navdiv").bind( "tabsselect", function(event, ui) {
+		$( "#appdb_components_Dataset #navdiv").bind( "tabsactivate", function(event, ui) {
 			if( $.trim(window.datasettabselect) !== $.trim(ui.newTab.index())){
 				window.datasettabselect = ui.newTab.index();
 			}

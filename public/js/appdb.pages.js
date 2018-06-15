@@ -3130,7 +3130,7 @@ appdb.pages.application = (function(){
 		
 		$( "#navdiv" + page.currentDialogCount() ).tabs();
 		$( "#navdiv" + page.currentDialogCount() + " > ul > li > a" ).click(function(e){e.preventDefault();return false;});
-		$( "#navdiv" + page.currentDialogCount() ).bind( "tabsselect", function(event, ui) {
+		$( "#navdiv" + page.currentDialogCount() ).bind( "tabsactivate", function(event, ui) {
 			if( page.isVirtualAppliance() && appdb.vappliance.ui.CurrentVAManager.isEditMode() === true && $.trim(window.apptabselect) !== $.trim(ui.newTab.index())){
 				appdb.vappliance.ui.CurrentVAManager.checkUnsavedData((function(p, e, u){
 					return function(){
@@ -3173,7 +3173,7 @@ appdb.pages.application = (function(){
 				}
 			},1);
 		}
-		window.apptabselect_panelid = ui.panel.id;
+		window.apptabselect_panelid = ui.newPanel.attr("id");
 		if( typeof window.apptabselect === "undefined" || $.trim(window.apptabselect) !== $.trim(ui.newTab.index()) ){
 			window.apptabselect = ui.newTab.index();
 			page.updateSection(ui.newTab.index());
@@ -3182,11 +3182,11 @@ appdb.pages.application = (function(){
 			}
 		}
 
-		if( ui.panel.id === ("repositorydiv" + page.currentDialogCount()) ||  
-			ui.panel.id === ("ratingdiv" + page.currentDialogCount()) || 
-			ui.panel.id === ("vappliancediv" + page.currentDialogCount()) ||
-			ui.panel.id === ("permissionsdiv" + page.currentDialogCount()) ||
-			ui.panel.id === ("contextualizationdiv" + page.currentDialogCount())
+		if( ui.newPanel.attr("id") === ("repositorydiv" + page.currentDialogCount()) ||  
+			ui.newPanel.attr("id") === ("ratingdiv" + page.currentDialogCount()) || 
+			ui.newPanel.attr("id") === ("vappliancediv" + page.currentDialogCount()) ||
+			ui.newPanel.attr("id") === ("permissionsdiv" + page.currentDialogCount()) ||
+			ui.newPanel.attr("id") === ("contextualizationdiv" + page.currentDialogCount())
 		){
 			$( "#navdiv" + page.currentDialogCount() + " .expandContainer" ).addClass("hidden");
 		} else {
@@ -4321,7 +4321,7 @@ appdb.pages.vo = (function(){
 			};
 		if ($("#detailsdlg" + page.currentDialogCount() + ":last div span")[0] !== undefined) $("#detailsdlg" + page.currentDialogCount() + ":last div span")[0].innerHTML = 'VO Details - <I>'+page.currentName()+'</I>';
 		$( "#navdiv" + appdb.pages.vo.currentDialogCount() ).tabs();
-		$( "#navdiv" + appdb.pages.vo.currentDialogCount() ).bind( "tabsselect", function(event, ui) {
+		$( "#navdiv" + appdb.pages.vo.currentDialogCount() ).bind( "tabsactivate", function(event, ui) {
 			if( window.votabselect != ui.newTab.index()){
 				window.votabselect = ui.newTab.index();
 				appdb.pages.vo.updateSection(ui.newTab.index());
@@ -4692,7 +4692,7 @@ appdb.pages.site = (function(){
 	};
 	page.immediate = function(){
 		$( "#appdb_components_Site #navdiv" ).tabs();
-		$( "#appdb_components_Site #navdiv").bind( "tabsselect", function(event, ui) {
+		$( "#appdb_components_Site #navdiv").bind( "tabsactivate", function(event, ui) {
 			if( window.sitetabselect != ui.newTab.index()){
 				window.sitetabselect = ui.newTab.index();
 			}
