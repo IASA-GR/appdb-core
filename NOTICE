@@ -135,6 +135,12 @@ https://highlightjs.org/
 License: BSD License
 Copyright (c) 2006, Ivan Sagalaev
 
+jQuery plugin for browser detection by Gabriel Cebrian
+https://github.com/gabceb/jquery-browser-plugin
+License: MIT License
+Copyright 2015 jQuery Foundation and other contributors, http://jquery.com/
+Modifications Copyright 2015 Gabriel Cebrian, https://www.github.com/gabceb
+
 ------------------------------------------------
 Attribution for Web Font files
 ------------------------------------------------
