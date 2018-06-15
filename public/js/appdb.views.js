@@ -3786,7 +3786,10 @@ appdb.views.VOsList = appdb.ExtendClass(appdb.View, "appdb.views.VOslist", funct
 		return res;
 	};
 	this.render = function(d) {
-		var i, len = (d) ? ((typeof d.length !== "undefined") ? d.length : len) : 0, f = $(this.dom).context;
+		var i, len = (d) ? ((typeof d.length !== "undefined") ? d.length : len) : 0, f = $(this.dom)[0];
+//		if (typeof f === "undefined") {
+//			return;
+//		}
 		$(this.dom).empty();
 		if (typeof len === "undefined") {
 			f.appendChild(this._addItem(d)[0]);
@@ -16681,7 +16684,7 @@ appdb.views.VoSecantReport = appdb.ExtendClass(appdb.View, "appdb.views.VoSecant
 
 				this.options.reports.push(s);
 			}
-		}.on(this));
+		}.bind(this));
 	    }
 	};
 

@@ -9204,10 +9204,10 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 	    $.get(appdb.config.endpoint.base + "vo/secantreport", {id: this.options.id, format: 'js'}).done(function(data) {
 		this.options.secant = (((data || {}).result || {}).report || []);
 		callback.apply(this);
-	    }.on(this)).fail(function(err) {
+	    }.bind(this)).fail(function(err) {
 		this.options.secant = [];
 		callback.apply(this);
-	    }.on(this));
+	    }.bind(this));
 	}
 	//Update available vappliance data with related vo image list information
 	this.mergeDraftToAvailableVApps = function(){
@@ -9310,7 +9310,7 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 			e = this.getSecantReportsForVAppliance(e, secantReports);
 
 			res.push(e);
-		}.on(this));
+		}.bind(this));
 		this.options.vapps = res;
 	};
 	this.getSecantReportsForVAppliance = function(vappid, secantReports) {
@@ -9340,7 +9340,7 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 			    }
 			    entry.secant.push(r);
 			}
-		 }.on(secantReports));
+		 }.bind(secantReports));
 
 		 entry.secant.sort(function(a, b) {
 			return parseInt(b.vmiinstance_id) - parseInt(a.vmiinstance_id);
@@ -9602,7 +9602,7 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 	};
         this.addSecantWatcher = function(entry) {
 		if (!appdb.components.VoImageListManager.secantWatcher) {
-			appdb.components.VoImageListManager.secantWatcher = appdb.utils.SecantVOImagelistWatcher(this.options.id, this.onSecantChange.on(this));
+			appdb.components.VoImageListManager.secantWatcher = appdb.utils.SecantVOImagelistWatcher(this.options.id, this.onSecantChange.bind(this));
 		}
 
 		appdb.components.VoImageListManager.secantWatcher.watch(entry);
