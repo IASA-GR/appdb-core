@@ -16,6 +16,23 @@
 jQuery.support.cors = true;
 $(function(){
 	jQuery.fn.filteringAutocomplete = $.fn.autocomplete;
+
+	$.fn.tabs = (function(oldtabs) {
+		return function(d, i){
+			if (d === "remove" && i > -1) {
+				// Remove the tab
+				var tab = $(this).find(".ui-tabs-nav li:eq(" + i + ")" ).remove();
+				// Find the id of the associated panel
+				var panelId = tab.attr("aria-controls");
+				// Remove the panel
+				$("#" + panelId).remove();
+				// Refresh the tabs widget
+				return oldtabs.apply(this, ["refresh"]);
+			} else {
+				return oldtabs.apply(this, arguments);
+			}
+		}
+	})($.fn.tabs);
 });
 window.userID = window.userID || null;
 String.prototype.htmlEscape = function() {
