@@ -12379,7 +12379,7 @@ appdb.views.Main = (function(){
 	   return function(){
 		
 		var argv = arguments;
-		var ev = appdb.utils.CancelEventTrigger(arguments.callee);
+		//var ev = appdb.utils.CancelEventTrigger(arguments.callee);
 		appdb.utils.DataWatcher.Registry.checkActiveWatcherAsync({notify:true,onClose : function(){
 			if( appdb.config.expandTerminalItems === true ){
 				if($.inArray(fname.toLowerCase(),["showapplication","showperson","showvo","showsendmessagetocontacts","showrequestjoincontacts","showreportabuse","showvirtualappliance", "showsoftwareappliance","showsite","showdataset"]) > -1){
@@ -12395,8 +12395,8 @@ appdb.views.Main = (function(){
 			appdb.pages.index.requests.cancel('logistics');
 			f.apply(null,argv);
 			window.scroll(0,0);
-			var evtype = (ev && ev.type)?ev.type:"";
-			evtype = (evtype === historyEvent)?false:true;
+			//var evtype = (ev && ev.type)?ev.type:"";
+			//evtype = (evtype === historyEvent)?false:true;
 			if( metadata ){
 				appdb.Navigator.handlePermalink(metadata, (argv.length > 0)?argv:[_currentState.query,_currentState.ext]);
 			}
