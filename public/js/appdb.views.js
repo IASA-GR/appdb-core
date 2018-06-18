@@ -3788,19 +3788,19 @@ appdb.views.VOsList = appdb.ExtendClass(appdb.View, "appdb.views.VOslist", funct
 		return res;
 	};
 	this.render = function(d) {
-		var i, len = (d) ? ((typeof d.length !== "undefined") ? d.length : len) : 0, f = $(this.dom)[0];
-//		if (typeof f === "undefined") {
-//			return;
-//		}
+		var i, len = (d) ? ((typeof d.length !== "undefined") ? d.length : len) : 0, f = (($(this.dom).length > 0) ? $(this.dom)[0] : null);
+
 		$(this.dom).empty();
-		if (typeof len === "undefined") {
-			f.appendChild(this._addItem(d)[0]);
-		} else if (len === 0) {
-			f.appendChild($(document.createElement("span")).text("No records returned with the specified criteria")[0]);
-		} else {
-			for (i = 0; i < len; i += 1) {
-				f.appendChild(this._addItem(d[i])[0]);
-			}
+		if (f) {
+		    if (typeof len === "undefined") {
+			    f.appendChild(this._addItem(d)[0]);
+		    } else if (len === 0) {
+			    f.appendChild($(document.createElement("span")).text("No records returned with the specified criteria")[0]);
+		    } else {
+			    for (i = 0; i < len; i += 1) {
+				    f.appendChild(this._addItem(d[i])[0]);
+			    }
+		    }
 		}
 		appdb.utils.animateList();
 	};
@@ -3920,16 +3920,19 @@ appdb.views.SitesList = appdb.ExtendClass(appdb.View, "appdb.views.SitesList", f
 		return res;
 	};
 	this.render = function(d) {
-		var i, len = (d) ? ((typeof d.length !== "undefined") ? d.length : len) : 0, f = $(this.dom).context;
+		var i, len = (d) ? ((typeof d.length !== "undefined") ? d.length : len) : 0, f = (($(this.dom).length > 0) ? $(this.dom)[0] : null);
+
 		$(this.dom).empty();
-		if (typeof len === "undefined") {
-			f.appendChild(this._addItem(d)[0]);
-		} else if (len === 0) {
-			f.appendChild($(document.createElement("span")).text("No records returned with the specified criteria")[0]);
-		} else {
-			for (i = 0; i < len; i += 1) {
-				f.appendChild(this._addItem(d[i])[0]);
-			}
+		if (f) {
+		    if (typeof len === "undefined") {
+			    f.appendChild(this._addItem(d)[0]);
+		    } else if (len === 0) {
+			    f.appendChild($(document.createElement("span")).text("No records returned with the specified criteria")[0]);
+		    } else {
+			    for (i = 0; i < len; i += 1) {
+				    f.appendChild(this._addItem(d[i])[0]);
+			    }
+		    }
 		}
 		appdb.utils.animateList();
 	};
@@ -4036,16 +4039,19 @@ appdb.views.DatasetsList = appdb.ExtendClass(appdb.View, "appdb.views.DatasetsLi
 		return res;
 	};
 	this.render = function(d) {
-		var i, len = (d) ? ((typeof d.length !== "undefined") ? d.length : len) : 0, f = $(this.dom).context;
+		var i, len = (d) ? ((typeof d.length !== "undefined") ? d.length : len) : 0, f = (($(this.dom).length > 0) ? $(this.dom)[0] : null);
+
 		$(this.dom).empty();
-		if (typeof len === "undefined") {
-			f.appendChild(this._addItem(d)[0]);
-		} else if (len === 0) {
-			f.appendChild($(document.createElement("span")).text("No records returned with the specified criteria")[0]);
-		} else {
-			for (i = 0; i < len; i += 1) {
-				f.appendChild(this._addItem(d[i])[0]);
-			}
+		if (f) {
+		    if (typeof len === "undefined") {
+			    f.appendChild(this._addItem(d)[0]);
+		    } else if (len === 0) {
+			    f.appendChild($(document.createElement("span")).text("No records returned with the specified criteria")[0]);
+		    } else {
+			    for (i = 0; i < len; i += 1) {
+				    f.appendChild(this._addItem(d[i])[0]);
+			    }
+		    }
 		}
 		appdb.utils.animateList();
 	};
