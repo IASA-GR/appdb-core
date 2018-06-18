@@ -1671,7 +1671,7 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 				    $(handler).removeClass('loading').removeClass('enabling').removeClass('disabling');
 				    _setupForm(cddata);
 				    appdb.pages.Application.reload();
-			    }.on(this),
+			    }.bind(this),
 			    error: function( jqXHR, textStatus, errorThrown) {
 				    $(handler).removeClass('loading').removeClass('enabling').removeClass('disabling');
 				    _setupForm(application);
@@ -1687,11 +1687,11 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 				    } else {
 					appdb.pages.application.checkUserAccessTokens(function() {
 					    this.loadCDHandler(application);
-					}.on(this));
+					}.bind(this));
 				    }
-			    }.on(this)
+			    }.bind(this)
 			});
-		}.on(this));
+		}.bind(this));
 
 		$(handler).find('button.cd_action_disable').off('click').on('click', function() {
 			$(handler).addClass('loading').addClass('disabling').removeClass('enabling');
@@ -1707,7 +1707,7 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 					$(handler).removeClass('loading').removeClass('enabling').removeClass('disabling');
 					_setupForm(cddata);
 					appdb.pages.Application.reload();
-				}.on(this),
+				}.bind(this),
 				error: function( jqXHR, textStatus, errorThrown) {
 					$(handler).removeClass('loading').removeClass('enabling').removeClass('disabling');
 					 _setupForm(application);
@@ -1720,7 +1720,7 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 					});
 				}
 			});
-		}.on(this));
+		}.bind(this));
 	};
 	this.getVersionById = function(id){
 		id = $.trim(id);
@@ -3021,7 +3021,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			} else {
 				$(dom).addClass('hidden');
 			}
-		}.on(this);
+		}.bind(this);
 		_renderSetupError(false);
 		var btn = $(this.dom).find('.cdversion-setup button.cdversion-save-setup');
 		$(btn).addClass('disabled').attr('disabled','disabled').text('Updating');
@@ -3043,14 +3043,14 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 					appdb.pages.Application.reload();
 
 				}
-			}.on(this),
+			}.bind(this),
 			error: function( jqXHR, textStatus, errorThrown) {
 				$(btn).removeClass('disabled').prop('disabled', false).text('Update');
 				this.renderLoadingData(false);
 				var errText = errorThrown + ' (' + textStatus + ')';
 				try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
 				_renderSetupError(true, errText);
-			}.on(this)
+			}.bind(this)
 		})
 	}
 	this.validateSetupData = function() {
@@ -3095,7 +3095,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		} else {
 			$(btn).removeClass('disabled').prop('disabled', false).off('click').on('click', function() {
 				this.saveSetupData();
-			}.on(this));
+			}.bind(this));
 		}
 
 		if (error.length) {
@@ -3159,7 +3159,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 				} else {
 					appdb.pages.Application.reload();
 				}
-			}.on(this),
+			}.bind(this),
 			error: function( jqXHR, textStatus, errorThrown) {
 			    $(btnCancel).removeClass('loading').removeClass('disabled').prop('disabled', false).text('CANCEL');
 			    var errText = errorThrown + ' (' + textStatus + ')';
@@ -3169,7 +3169,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 				    "status": "Could not cancel continuous delivery process",
 				    "description": errText
 			    });
-		    }.on(this)
+		    }.bind(this)
 	    });
 	};
 	this.forceCheck = function() {
@@ -3195,7 +3195,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			    } else {
 				    this.load();
 			    }
-		    }.on(this),
+		    }.bind(this),
 		    error: function( jqXHR, textStatus, errorThrown) {
 			    $(bt).removeClass('disabled').prop('disabled', false).text('FORCE CHECK');
 			    var errText = errorThrown + ' (' + textStatus + ')';
@@ -3205,7 +3205,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 				    "status": "Could not start continuous delivery process",
 				    "description": errText
 			    });
-		    }.on(this)
+		    }.bind(this)
 	    });
 	};
 	this.pause = function () {
@@ -3230,7 +3230,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 				} else {
 					appdb.pages.Application.reload();
 				}
-			}.on(this),
+			}.bind(this),
 			error: function( jqXHR, textStatus, errorThrown) {
 				$(btnPause).removeClass('loading').removeClass('disabled').prop('disabled', false).text('PAUSE');
 				var errText = errorThrown + ' (' + textStatus + ')';
@@ -3240,7 +3240,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 					"status": "Could not resume continuous delivery process",
 					"description": errText
 				});
-			}.on(this)
+			}.bind(this)
 		});
 	};
 	this.resume = function() {
@@ -3265,7 +3265,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 				} else {
 					appdb.pages.Application.reload();
 				}
-			}.on(this),
+			}.bind(this),
 			error: function( jqXHR, textStatus, errorThrown) {
 				$(btnResume).removeClass('loading').removeClass('disabled').prop('disabled', false).text('RESUME');
 				this.renderLoadingData(false);
@@ -3276,7 +3276,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 					"status": "Could not resume continuous delivery process",
 					"description": errText
 				});
-			}.on(this)
+			}.bind(this)
 		});
 	}
 	this.renderSetup = function(enable) {
@@ -3295,7 +3295,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			}
 			$(urlInput).off('keyup').on('keyup', function() {
 			        this.validateSetupData();
-			}.on(this));
+			}.bind(this));
 			if (owner) {
 				if ($.trim($(defautlActorHtml).find('a[data-actorid').data('actorid')) !== $.trim(owner.id)) {
 				    var a = $('<a target="_blank"></a>')
@@ -3350,7 +3350,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			$(dom).find('.header .collapse').addClass('inited').off('click').on('click', function(ev) {
 				this.options.userExpandedSettings = !this.options.userExpandedSettings;
 				this.checkSettingsExpanse();
-			}.on(this));
+			}.bind(this));
 		}
 		this.checkSettingsExpanse();
 	};
@@ -3629,7 +3629,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			$(tr).append($('<td class="result"></td>').append(result));
 
 			$(prevTaskBody).append(tr);
-		}.on(this));
+		}.bind(this));
 	};
 	this.formatDate = function(d) {
 		if (!$.trim(d)) return '-';
@@ -3666,10 +3666,10 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 				    this.options.cdLogSize = parseInt($(el.target).text());
 				    $(sizeLinks).find('li').removeClass('selected');
 				    $(el.target).addClass('selected');
-			    }.on(this));
+			    }.bind(this));
 			}
 			$(sizeLinks).append(li);
-		}.on(this));
+		}.bind(this));
 	};
 	/*this.renderRawLogs = function () {
 		var container = $(this.dom).find('.cdversion-logs');
@@ -3815,7 +3815,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			$(div).append(summary).append(meta);
 			$(li).append(div);
 			$(dom).append(li);
-		}.on(this));
+		}.bind(this));
 		this.renderLogSizeHandler();
 	};*/
 	this.renderLogs = function () {
@@ -3975,7 +3975,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			$(div).append(summary).append(meta);
 			$(li).append(div);
 			$(dom).append(li);
-		}.on(this));
+		}.bind(this));
 		this.renderLogSizeHandler();
 	};
 	this.renderActions = function() {
@@ -4032,25 +4032,25 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		if (!$(btnPause).hasClass('loading')) {
 			$(btnPause).off('click').on('click', function() {
 				this.pause();
-			}.on(this));
+			}.bind(this));
 		}
 
 		if (!$(btnResume).hasClass('loading')) {
 			$(btnResume).off('click').on('click', function() {
 				this.resume();
-			}.on(this));
+			}.bind(this));
 		}
 
 		if (!$(btnForceCheck).hasClass('loading')) {
 			$(btnForceCheck).off('click').on('click', function(){
 				this.forceCheck();
-			}.on(this));
+			}.bind(this));
 		}
 
 		if (!$(btnCancel).hasClass('loading')) {
 			$(btnCancel).off('click').on('click', function(){
 				this.cancelRunning();
-			}.on(this));
+			}.bind(this));
 		}
 	};
 	this.renderNextCheck = function() {
@@ -4152,14 +4152,14 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			    } else {
 				  this.onLoadComplete(cddata);
 			    }
-		    }.on(this),
+		    }.bind(this),
 		    error: function( jqXHR, textStatus, errorThrown) {
 			this.renderLoadingData(false);
 			var errText = errorThrown + ' (' + textStatus + ')';
 			try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
 			this.renderErrorLoading(true, {title: "Could not load continuous delivery information", message: errText});
 			appdb.vappliance.components.CDVersion.startMonitor(this);
-		    }.on(this)
+		    }.bind(this)
 	    });
 	};
 	this.onLoadComplete = function(cddata) {
@@ -5121,7 +5121,7 @@ appdb.vappliance.ui.views.DataValueHandlerValuelist = appdb.ExtendClass(appdb.va
 					selid = selopts[selopts.length - 1].value;
 					selobj = value;
 				}
-			}.on(this));
+			}.bind(this));
 			this.options.dataCurrentValue = selobj;
 			this.editor = new dijit.form.Select({
 				options: selopts,
@@ -6004,7 +6004,7 @@ appdb.vappliance.ui.views.DataValueHandlerPresetdate = appdb.ExtendClass(appdb.v
 		    this.options.dataCurrentValue = {id: '', val: function() { return ''; }, displayValue: function() {return ''; }};
 		    this.setFocus(false);
 	    }
-	    setTimeout(this.onValidate.on(this), 1);
+	    setTimeout(this.onValidate.bind(this), 1);
     };
     this.postRenderEditor = function(){
 	    this.onValidate();
@@ -6486,9 +6486,9 @@ appdb.vappliance.ui.views.DataValueHandlerTrafficrules = appdb.ExtendClass(appdb
 					    $(tr2).append( $('<td></td>').text(range.to) );
 					    $(tbody).append(tr2);
 					}
-				}.on(this));
+				}.bind(this));
 			}
-		}.on(this));
+		}.bind(this));
 
 		$(table).append( thead );
 		$(table).append( tbody );
@@ -6534,7 +6534,7 @@ appdb.vappliance.ui.views.DataValueHandlerTrafficrules = appdb.ExtendClass(appdb
 				isEmpty = false;
 			}
 			$(v).append( this.renderTable(d.data, d.title) );
-		}.on(this));
+		}.bind(this));
 
 		if (!isEmpty) {
 			$(this.dom).append(v);
@@ -7650,7 +7650,7 @@ appdb.vappliance.ui.views.VApplianceVMIVersionItem = appdb.ExtendClass(appdb.vap
 		});
 		this.options.networkTraffic.render();
 
-		appdb.vappliance.ui.CurrentVAVersionValidatorRegister.register({isValid: function() {return this.isValid(); }.on(this.options.networkTraffic), reset: function() { }.on(this.options.networkTraffic)});
+		appdb.vappliance.ui.CurrentVAVersionValidatorRegister.register({isValid: function() {return this.isValid(); }.bind(this.options.networkTraffic), reset: function() { }.bind(this.options.networkTraffic)});
 	};
 	this.render = function(d){
 		$(this.dom).attr("data-id",d.id);
@@ -10477,11 +10477,11 @@ appdb.vappliance.ui.views.PortRangeListItem = appdb.ExtendClass(appdb.View, "app
 		    ev.stopPropagation();
 		    this.parent.removeItem(this);
 		    return false;
-		}.on(this));
+		}.bind(this));
 
 		setTimeout(function() {
 		    this.onValueChange();
-		}.on(this),1);
+		}.bind(this),1);
 	};
 
 	this._init = function() {
@@ -10634,7 +10634,7 @@ appdb.vappliance.ui.views.PortRangeList = appdb.ExtendClass(appdb.View, "appdb.v
 				this.addItem();
 			}
 			return false;
-		}.on(this));
+		}.bind(this));
 	};
 
 	this.render = function() {
@@ -10649,7 +10649,7 @@ appdb.vappliance.ui.views.PortRangeList = appdb.ExtendClass(appdb.View, "appdb.v
 
 		$.each(this.options.data, function(i, v) {
 			this.addItem(v, i, (hasMany && i > 0));
-		}.on(this));
+		}.bind(this));
 
 		this.renderFooter();
 		this.refreshUI();
@@ -10969,7 +10969,7 @@ appdb.vappliance.ui.views.VMITrafficRulesEditor = appdb.ExtendClass(appdb.View, 
 				this.refreshUI();
 			}
 			return false;
-		}.on(this));
+		}.bind(this));
 	};
 	this.sortData = function(d) {
 	    return appdb.vappliance.utils.sortNetworkTrafficRules(d);
@@ -10985,7 +10985,7 @@ appdb.vappliance.ui.views.VMITrafficRulesEditor = appdb.ExtendClass(appdb.View, 
 		$(this.dom).append(this.options.dom.list);
 		$.each((this.options.data || []), function(i, v) {
 			this.addItem(v, i);
-		}.on(this));
+		}.bind(this));
 
 		$(this.dom).append(this.options.dom.footer);
 		this.refreshUI();
