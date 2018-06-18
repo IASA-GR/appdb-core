@@ -386,9 +386,9 @@ appdb.repository.ui.NewReleaseForm = appdb.ExtendClass(appdb.Component, "appdb.r
 		});	
 		
 		if( $(this.dom).hasClass("basetype") ){
-			$(this.dom).find("#updatereleasetypeselect").attr("disabled","disabled");
+			$(this.dom).find("#updatereleasetypeselect").prop("disabled", true);
 		} else if( $(this.dom).hasClass("updatetype") ) {
-			$(this.dom).find("#basereleasetypeselect").attr("disabled","disabled");
+			$(this.dom).find("#basereleasetypeselect").prop("disabled", true);
 		}
 		
 		$(this.dom).find(".help").each( function(index, elem) {
@@ -2364,7 +2364,7 @@ appdb.repository.ui.views.ReleasePriorityEditor = appdb.ExtendClass(appdb.View, 
 	};
 	this.renderLoading = function(loading,text){
 		loading = (typeof loading === "boolean")?loading:false;
-		$(this.dom).find("select").attr("disabled","disabled");
+		$(this.dom).find("select").prop("disabled", true);
 		$(this.dom).find(".loader").remove();
 		if( loading ){
 			$(this.dom).find(".errormessage").remove();
@@ -2428,7 +2428,7 @@ appdb.repository.ui.views.ReleasePriorityEditor = appdb.ExtendClass(appdb.View, 
 		
 		var select = $(this.dom).find("select:first");
 		$(select).find("option[selected]").prop("selected", false);
-		$(select).find("option[value='" + d.priority + "']").attr("selected","selected");
+		$(select).find("option[value='" + d.priority + "']").prop("selected", true);
 		$(select).off("change").on("change", (function(self){
 			return function(){
 				if( self.getSelectedOptionValue() != self.options.currentPriority){
@@ -2914,7 +2914,7 @@ appdb.repository.ui.views.TargetList = appdb.ExtendClass(appdb.View, "appdb.repo
 			$(this.dom).parent().find(".actions .action.upload button").removeClass("inactive").prop("disabled", false);
 			$(this.dom).parent().find(".actions .action.upload button img:last").attr("src","/images/upload_active.png");
 		} else {
-			$(this.dom).parent().find(".actions .action.upload button").addClass("inactive").attr("disabled","disabled");
+			$(this.dom).parent().find(".actions .action.upload button").addClass("inactive").prop("disabled", true);
 			$(this.dom).parent().find(".actions .action.upload button img:last").attr("src","/images/upload_inactive.png");
 		}
 	};
@@ -10005,7 +10005,7 @@ appdb.repository.ui.CommandView = appdb.ExtendClass(appdb.View,"appdb.repository
 		if( v === true ){
 			$(this.dom).find(".actions .action.next").prop("disabled", false);
 		}else{
-			$(this.dom).find(".actions .action.next").attr("disabled","disabled");
+			$(this.dom).find(".actions .action.next").prop("disabled", true);
 		}
 	};
 	this.render = function(d){

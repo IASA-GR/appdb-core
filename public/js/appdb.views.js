@@ -4670,7 +4670,7 @@ appdb.views.TagOptions = appdb.ExtendClass(appdb.View, "appdb.views.TagOptions",
 		$(form).append("<input type='radio' name='policy' value='0' " + ((policy == '0') ? "checked='checked'" : "") + ">Only me</input><div></div>");
 		$(form).append("<input type='radio' name='policy' value='1' " + ((policy == '1') ? "checked='checked'" : "") + ">Related contacts</input><div></div>");
 		$(form).append("<input type='radio' name='policy' value='2' " + ((policy == '2') ? "checked='checked'" : "") + ">Everyone</input><div></div>");
-		$(form).find("input[value='" + policy + "']").attr("checked", "checked");
+		$(form).find("input[value='" + policy + "']").prop("checked", true);
 		$(form).find("input").click((function(_this) {
 			return function() {
 				_this._setPolicy(appid, $(this).val(), policy);
@@ -4975,7 +4975,7 @@ appdb.views.TagList = appdb.ExtendClass(appdb.View, "appdb.views.TagList", funct
 		$(res).append($("<span></span>").append($(select))).append($("<span></span>").append($(cancel))).append($("<span></span>").append($(ok)));
 		//set elements style
 		$(select).addClass("taglist-add-select").attr("id", "taglist-add-select");
-		$(ok).addClass("taglist-add-ok").addClass("editbutton").attr("disabled", "disabled").attr("title", "Submit new tag").append("<img src='/images/yes_grey.png' alt='' width='10px'></img>");
+		$(ok).addClass("taglist-add-ok").addClass("editbutton").prop("disabled", true).attr("title", "Submit new tag").append("<img src='/images/yes_grey.png' alt='' width='10px'></img>");
 		$(cancel).addClass("taglist-add-cancel").addClass("editbutton").attr("title", "Cancel").append("<img src='/images/cancelicon.png' alt='' width='10px'></img>");
 
 		ts.sort(function(a, b) {
@@ -5021,7 +5021,7 @@ appdb.views.TagList = appdb.ExtendClass(appdb.View, "appdb.views.TagList", funct
 					}
 				}
 				if (found || $.trim(v) === '') {
-					$(ok).attr("disabled", "disabled");
+					$(ok).prop("disabled", true);
 					$($(ok).find("img").get(0)).attr("src", '/images/yes_grey.png').attr("title", "Submit new tag");
 					return true;
 				}
@@ -5045,7 +5045,7 @@ appdb.views.TagList = appdb.ExtendClass(appdb.View, "appdb.views.TagList", funct
 					}
 				}
 				if (found || $.trim(v) == '') {
-					$(ok).attr("disabled", "disabled");
+					$(ok).prop("disabled", true);
 					$($(ok).find("img").get(0)).attr("src", '/images/yes_grey.png').attr("title", "Submit new tag");
 					return true;
 				}
@@ -7798,7 +7798,7 @@ appdb.views.ApiKeyAuthentication = appdb.ExtendClass(appdb.View, "appdb.views.Ap
 		$(systemlabel).addClass("label").append(systemlink);
 		$(systemhelp).addClass("help");
 
-		$(sso).attr("type", "radio").attr("name", "authmethod" + this.apikey).attr("checked", "checked").val("sso");
+		$(sso).attr("type", "radio").attr("name", "authmethod" + this.apikey).prop("checked", true).val("sso");
 		$(system).attr("type", "radio").attr("name", "authmethod" + this.apikey).val("sys");
 
 		$(choise1).append(sso).append($(ssolabel).append($(ssohelp)));
@@ -7834,12 +7834,12 @@ appdb.views.ApiKeyAuthentication = appdb.ExtendClass(appdb.View, "appdb.views.Ap
 		})(this, d, system));
 
 		$(ssolink).click(function() {
-			$(sso).attr("checked", "checked");
+			$(sso).prop("checked", true);
 			$(sso).change();
 		});
 
 		$(systemlink).click(function() {
-			$(system).attr("checked", "checked");
+			$(system).prop("checked", true);
 			$(system).change();
 		});
 
@@ -13394,7 +13394,7 @@ appdb.views.LicenseListItem = appdb.ExtendClass(appdb.View, "appdb.views.License
 			var o = $("<option></option>");
 			$(o).attr("value", e.id).text(e.title);
 			if (selectid === e.id) {
-				$(o).attr("selected", "selected");
+				$(o).prop("selected", true);
 			}
 			$(html).append(o);
 		});
@@ -18291,12 +18291,12 @@ appdb.views.VoImageListState = appdb.ExtendClass(appdb.View, "appdb.views.VoImag
 		if (canpublish === true) {
 			$(this.options.dom.actions).find(".action.publish").removeClass("btn-disabled disabled").addClass("btn-primary").prop("disabled", false);
 		} else {
-			$(this.options.dom.actions).find(".action.publish").addClass("btn-disabled disabled").removeClass("btn-primary").attr("disabled", "disabled");
+			$(this.options.dom.actions).find(".action.publish").addClass("btn-disabled disabled").removeClass("btn-primary").prop("disabled", true);
 		}
 		if (changescount > 0) {
 			$(this.options.dom.actions).find(".action.revert").removeClass("btn-disabled disabled").addClass("btn-warning").prop("disabled", false);
 		} else {
-			$(this.options.dom.actions).find(".action.revert").addClass("btn-disabled disabled").removeClass("btn-warning").attr("disabled", "disabled");
+			$(this.options.dom.actions).find(".action.revert").addClass("btn-disabled disabled").removeClass("btn-warning").prop("disabled", true);
 		}
 		return (canpublish > 0);
 	};
@@ -18538,7 +18538,7 @@ appdb.views.VoImageListLegend = appdb.ExtendClass(appdb.View, "appdb.views.VoIma
 				$(self.dom).find(":input").prop("checked", false);
 				setTimeout((function(el, checked) {
 					if (checked === true) {
-						$(el).attr("checked", "checked");
+						$(el).prop("checked", true);
 					} else {
 						$(el).prop("checked", false);
 					}
@@ -18717,7 +18717,7 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 				$(option).attr("value",e.id);
 				$(select).append(option);
 			});
-			$(select).find("options:first").attr("selected","selected");
+			$(select).find("options:first").prop("selected", true);
 			$(download).attr("href",contextscripts[0].url);
 			$(dom).append(select).append(download);
 			
@@ -19209,7 +19209,7 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 				$(option).attr("value",e.id);
 				$(select).append(option);
 			});
-			$(select).find("options:first").attr("selected","selected");
+			$(select).find("options:first").prop("selected", true);
 			$(download).attr("href",contextscripts[0].url);
 			$(dom).append(select).append(download);
 			
@@ -19731,7 +19731,7 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 			$(filter.dom).addClass("empty");
 		} else {
 			$(filter.dom).addClass("single");
-			$(listdom).children("option:first").attr("selected", "selected");
+			$(listdom).children("option:first").prop("selected", true);
 			filter.currentValue = fd[0].val;
 		}
 
@@ -21313,7 +21313,7 @@ appdb.views.RelationList = appdb.ExtendClass(appdb.View, "appdb.views.RelationLi
 			$(this.options.dom.actionadd).removeClass("disabled").prop("disabled", false);
 		}else{
 			$(this.dom).addClass("invalid");
-			$(this.options.dom.actionadd).addClass("disabled").attr("disabled","disabled");
+			$(this.options.dom.actionadd).addClass("disabled").prop("disabled", true);
 		}
 	};
 	this.isValid = function(){
@@ -22236,7 +22236,7 @@ appdb.views.RelatedEntities = appdb.ExtendClass(appdb.View,"appdb.views.RelatedE
 					$(li).each(function(i,e){
 						if( $(this).attr("filter-name") === ee.name ){
 							if($(this).find("input").is(":checked") === true ){
-								$(this).addClass("disabled").find("input").attr("disabled","disabled");
+								$(this).addClass("disabled").find("input").prop("disabled", true);
 							}
 						}
 					});
@@ -22280,7 +22280,7 @@ appdb.views.RelatedEntities = appdb.ExtendClass(appdb.View,"appdb.views.RelatedE
 					if(inp.is(":checked")){
 						$(inp).prop("checked", false);
 					}else{
-						$(inp).attr("checked","checked");
+						$(inp).prop("checked", true);
 					}
 					$(inp).trigger("change");
 					return false;

@@ -1207,23 +1207,23 @@
         }
         if ( ! detailsStyleAuto ) {
             if (detailsStyle == 0) {
-                $("input[name='displaySettings']").filter("[value='0']:first").attr('checked','checked');
+                $("input[name='displaySettings']").filter("[value='0']:first").prop('checked', true);
             } else if (detailsStyle == 1) {
-                $("input[name='displaySettings']").filter("[value='1']:last").attr('checked','checked');
+                $("input[name='displaySettings']").filter("[value='1']:last").prop('checked', true);
             }
         } else {
             if (detailsStyle == 1) {
-                $("input[name='displaySettings']").filter('[value="-1"]:last').attr('checked','checked');
+                $("input[name='displaySettings']").filter('[value="-1"]:last').prop('checked', true);
             } else if (detailsStyle == 0) { 
-                $("input[name='displaySettings']").filter('[value="-1"]:first').attr('checked','checked');
+                $("input[name='displaySettings']").filter('[value="-1"]:first').prop('checked', true);
             }
 		}
 		try {
-	        if ( $.cookie("rememberme") == "1" ) $("input[name='rememberme']").attr("checked","checked");
+	        if ( $.cookie("rememberme") == "1" ) $("input[name='rememberme']").prop("checked", true);
 		} catch(e) {
 			$("input[name='rememberme']").attr("checked","");
 		}
-        if ( remembernewsfeed ) $("input[name='remembernewsfeed']").attr("checked","checked");
+        if ( remembernewsfeed ) $("input[name='remembernewsfeed']").prop("checked", true);
 		$(".prefsdiv").css('height',dlgHeight+'px');
 		makePersonDocs();
 		<?php if ($this->entry->id != "") { ?>
@@ -1344,7 +1344,7 @@
                     dijit.byId("defaultdelivery<?php echo $this->dialogCount;?>").attr("disabled",false);
                     $(".defaultnotificationresult").empty().append(v.error);
                 }else if(v.id){
-                    $("#defaultnotification").attr("checked","checked");
+                    $("#defaultnotification").prop("checked", true);
                     appdb.model.MailSubscription.defaultNotification = v;
                     dijit.byId("defaultdelivery<?php echo $this->dialogCount;?>").attr("disabled",false);
                     dijit.byId("defaultdelivery<?php echo $this->dialogCount;?>").attr("value",v.delivery);
@@ -1393,7 +1393,7 @@
                     $("#rolenotification").prop("checked", false);
                     $(".rolenotificationresult").empty().append(v.error);
                 }else if(v.id){
-                    $("#rolenotification").attr("checked","checked");
+                    $("#rolenotification").prop("checked", true);
                     appdb.model.MailSubscription.roleNotification = v;
                 }else{
                     $("#rolenotification").prop("checked", false);
@@ -1428,7 +1428,7 @@
                     $("#nodissemination").prop("checked", false);
                     appdb.model.MailSubscription.noDissemination = null;
                 }else{
-                    $("#nodissemination").attr("checked","checked");
+                    $("#nodissemination").prop("checked", true);
                     appdb.model.MailSubscription.noDissemination = v;
                 }
             };
@@ -1464,7 +1464,7 @@
                     dijit.byId("owneddelivery<?php echo $this->dialogCount;?>").attr("disabled",false);
                     $(".ownednotificationresult").empty().append(v.error);
                 }else if(v.id){
-                    $("#ownednotification").attr("checked","checked");
+                    $("#ownednotification").prop("checked", true);
                     appdb.model.MailSubscription.ownedNotification = v;
                     dijit.byId("owneddelivery<?php echo $this->dialogCount;?>").attr("disabled",false);
                     dijit.byId("owneddelivery<?php echo $this->dialogCount;?>").attr("value",v.delivery);
@@ -1504,7 +1504,7 @@
                     dijit.byId("relateddelivery<?php echo $this->dialogCount;?>").attr("disabled",false);
                     $(".relatednotificationresult").empty().append(v.error);
                 }else if(v.id){
-                    $("#relatednotification").attr("checked","checked");
+                    $("#relatednotification").prop("checked", true);
                     appdb.model.MailSubscription.relatedNotification = v;
                     dijit.byId("relateddelivery<?php echo $this->dialogCount;?>").attr("disabled",false);
                     dijit.byId("relateddelivery<?php echo $this->dialogCount;?>").attr("value",v.delivery);
@@ -1533,7 +1533,7 @@
                     $("#inboxnotification").prop("checked", false);
                     $(".inboxnotificationresult").empty().append(v.error);
                 }else if(v.id){
-					$("#inboxnotification").attr("checked","checked");
+					$("#inboxnotification").prop("checked", true);
                     appdb.model.MailSubscription.inboxNotification = v;
                 }else{
                     $("#inboxnotification").prop("checked", false);

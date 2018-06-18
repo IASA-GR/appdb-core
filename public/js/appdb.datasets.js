@@ -1661,7 +1661,7 @@ appdb.datasets.views.DatasetVersionDetails = new appdb.ExtendClass(appdb.views.u
 	};
 	this.postValidate = function(){
 		if( !this.isValid() ){
-			$(this.dom).children(".toolbar").find("button.save").addClass("btn-disabled").attr("disabled","disabled");
+			$(this.dom).children(".toolbar").find("button.save").addClass("btn-disabled").prop("disabled", true);
 		}else{
 			$(this.dom).children(".toolbar").find("button.save").removeClass("btn-disabled").prop("disabled", false);
 		}
@@ -1969,7 +1969,7 @@ appdb.datasets.components.DatasetInfo = new appdb.ExtendClass(appdb.Component, "
 		editmode = (typeof editmode === "boolean")?editmode:false;
 		if( editmode ){
 			$(this.dom).addClass("version-editmode");
-			$(this.dom).find(".group-version-list > .toolbar > button.add").addClass("btn-disabled").attr("disabled","disabled");
+			$(this.dom).find(".group-version-list > .toolbar > button.add").addClass("btn-disabled").prop("disabled", true);
 		}else{
 			$(this.dom).removeClass("version-editmode");
 			$(this.dom).find(".group-version-list > .toolbar > button.add").removeClass("btn-disabled").prop("disabled", false);
