@@ -19076,7 +19076,7 @@ li.itemcontainer div.item div.supports.sites > .serviceitem.hasinstances > .inst
 
 #detailswrapper li.ui-state-default.ui-tabs-active, #main li.ui-state-default.ui-tabs-active {
 	margin: -1px;
-	padding: 0px 4px;
+	padding: 1px 4px;
 	background-color: #999;
 	border-radius: 0px;
 	color: white;
