@@ -3024,7 +3024,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		}.bind(this);
 		_renderSetupError(false);
 		var btn = $(this.dom).find('.cdversion-setup button.cdversion-save-setup');
-		$(btn).addClass('disabled').attr('disabled','disabled').text('Updating');
+		$(btn).addClass('disabled').prop('disabled', true).text('Updating');
 		$.ajax({
 			url: this.getCDUrl(),
 			"type": 'POST',
@@ -3091,7 +3091,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		invalid = invalid || (error.length > 0);
 
 		if (invalid !== false) {
-			$(btn).addClass('disabled').attr('disabled', 'disabled').off('click');
+			$(btn).addClass('disabled').prop('disabled', true).off('click');
 		} else {
 			$(btn).removeClass('disabled').prop('disabled', false).off('click').on('click', function() {
 				this.saveSetupData();
@@ -3138,7 +3138,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 	};
 	this.cancelRunning = function() {
 		var btnCancel = $(this.dom).find('.cdversion-cancel-running');
-		$(btnCancel).addClass('loading').addClass('disabled').attr('disabled', 'disabled').text('CANCELING');
+		$(btnCancel).addClass('loading').addClass('disabled').prop('disabled', true).text('CANCELING');
 		$.ajax({
 			url: this.getCDUrl(),
 			"type": 'POST',
@@ -3175,8 +3175,8 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 	this.forceCheck = function() {
 		var bt = $(this.dom).find('.cdversion-force-check');
 		var btPause = $(this.dom).find('.cd-action-pause');
-		$(bt).addClass('disabled').attr('disabled', 'disabled').text('CHECKING');
-		$(btPause).addClass('disabled').attr('disabled', 'disabled');
+		$(bt).addClass('disabled').prop('disabled', true).text('CHECKING');
+		$(btPause).addClass('disabled').prop('disabled', true);
 		$.ajax({
 		    url: this.getCDUrl(),
 		    "type": 'POST',
@@ -3210,7 +3210,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 	};
 	this.pause = function () {
 		var btnPause = $(this.dom).find('button.cd-action-pause');
-		$(btnPause).addClass('loading').addClass('disabled').attr('disabled', 'disabled').text('PAUSING');
+		$(btnPause).addClass('loading').addClass('disabled').prop('disabled', true).text('PAUSING');
 		$.ajax({
 			url: this.getCDUrl(),
 			"type": 'POST',
@@ -3245,7 +3245,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 	};
 	this.resume = function() {
 		var btnResume = $(this.dom).find('button.cd-action-resume');
-		$(btnResume).addClass('loading').addClass('disabled').attr('disabled', 'disabled').text('RESUMING');
+		$(btnResume).addClass('loading').addClass('disabled').prop('disabled', true).text('RESUMING');
 		$.ajax({
 			url: this.getCDUrl(),
 			"type": 'POST',
@@ -3482,9 +3482,9 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		if ($(ulErrors).children().length > 0) {
 			$(error).append(ulErrors);
 			$(this.dom).find('.cdversion-noprocess .exterror').removeClass('hidden').find('.message').empty().append($(error).clone());
-			$(this.dom).find('.cdversion-noprocess .cdversion-force-check').attr('disabled', 'disabled').addClass('disabled');
+			$(this.dom).find('.cdversion-noprocess .cdversion-force-check').prop('disabled', true).addClass('disabled');
 			$(this.dom).find('.cdversion-paused-process .exterror').removeClass('hidden').find('.message').empty().append($(error).clone());
-			$(this.dom).find('.cdversion-paused-process .cd-action-resume').attr('disabled', 'disabled').addClass('disabled');
+			$(this.dom).find('.cdversion-paused-process .cd-action-resume').prop('disabled', true).addClass('disabled');
 			$(this.dom).find('.onstatuserror').removeClass('hidden').find('.message').empty().append($(error).clone());
 		} else {
 			$(this.dom).find('.cdversion-noprocess .exterror').addClass('hidden').find('.message').empty();
@@ -4000,8 +4000,8 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		}
 
 		if (publisherStatus.hasAccessToken !== true) {
-			$(btnPause).off('click').addClass('disabled').attr('disabled', 'disabled');
-			$(btnCancel).off('click').addClass('disabled').attr('disabled', 'disabled');
+			$(btnPause).off('click').addClass('disabled').prop('disabled', true);
+			$(btnCancel).off('click').addClass('disabled').prop('disabled', true);
 
 			var resumedError = 'You need to own a <b>personal</b> access token in order to <b>pause</b>/<b>force check</b> continuous delivery. You can create one from your profile at the end of the <a href="'+appdb.config.endpoint.base + 'store/person/' + publisher.cname + '/preferences" target="_blank" title="Click to open your profile preferences page">preferences</a> tab.';
 			var pausedError = 'You need to own a <b>personal</b> access token in order to <b>resume</b> continuous delivery. You can create one from your profile at the end of the <a href="'+appdb.config.endpoint.base + 'store/person/' + publisher.cname + '/preferences" target="_blank" title="Click to open your profile preferences page">preferences</a> tab.';
@@ -4011,8 +4011,8 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			return;
 		} else {
 			if (currentPublisherStatus.hasAccessToken !== true || currentPublisherStatus.canManageVA !== true) {
-			    //$(btnPause).off('click').addClass('disabled').attr('disabled', 'disabled');
-			    $(btnCancel).off('click').addClass('disabled').attr('disabled', 'disabled');
+			    //$(btnPause).off('click').addClass('disabled').prop('disabled', true);
+			    $(btnCancel).off('click').addClass('disabled').prop('disabled', true);
 			} else {
 			    $(btnCancel).off('click').removeClass('disabled').prop('disabled', false);
 			}
@@ -4021,8 +4021,8 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		}
 
 		if (publisherStatus.hasAccessToken !== true || $.trim(d.url) === '' || parseInt(d.defaultActorId) <= 0 || currentPublisherStatus.hasAccessToken !== true || currentPublisherStatus.canManageVA !== true) {
-		    $(btnResume).off('click').addClass('disabled').attr('disabled', 'disabled');
-		    $(btnForceCheck).off('click').addClass('disabled').attr('disabled', 'disabled');
+		    $(btnResume).off('click').addClass('disabled').prop('disabled', true);
+		    $(btnForceCheck).off('click').addClass('disabled').prop('disabled', true);
 		} else {
 		    $(btnResume).off('click').removeClass('disabled').prop('disabled', false);
 		    $(btnForceCheck).off('click').removeClass('disabled').prop('disabled', false);
@@ -9794,7 +9794,7 @@ appdb.vappliance.ui.views.ContextualizationScriptEditorList = appdb.ExtendClass(
 		
 		$(dom).attr("value",d.url).text(d.url);
 		if( d.url === this.options.url ){
-			$(dom).attr("selected","selected");
+			$(dom).prop("selected", true);
 		}
 		return dom;
 	};
@@ -10007,7 +10007,7 @@ appdb.vappliance.ui.views.ContextualizationScriptEditor = appdb.ExtendClass(appd
 			$(this.options.dom.script).empty().addClass("hasdata").append(url).append(hash).append(fsize);
 			
 			$(this.options.dom.format).find('option').prop('selected', false);
-			$(this.options.dom.format).find('option[value="'+ this.options.selectedFormat  +'"]').attr('selected','selected');
+			$(this.options.dom.format).find('option[value="'+ this.options.selectedFormat  +'"]').prop('selected', true);
 			
 		 }
 	};
@@ -10058,7 +10058,7 @@ appdb.vappliance.ui.views.ContextualizationScriptEditor = appdb.ExtendClass(appd
 				this.renderValidationError(true, v.error);
 			}
 		}
-		$(this.options.dom.actions).find(".save").removeClass("btn-primary").addClass("btn-disabled").attr("disabled","disabled");
+		$(this.options.dom.actions).find(".save").removeClass("btn-primary").addClass("btn-disabled").prop("disabled", true);
 		this.options.selectedUrl = null;
 		this.renderScriptData();
 	};

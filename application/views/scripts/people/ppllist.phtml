@@ -34,7 +34,7 @@
 		var newdata=$('ul.mainlist:last');
 		//add existing people
 		olddata.find('li').each(function(x){
-			newdata.find('li[name="'+$(this).attr('name')+'"]').find('input').attr('checked','checked');
+			newdata.find('li[name="'+$(this).attr('name')+'"]').find('input').prop('checked', true);
 		});
 		//remove unselected from list
 		$('ul.mainlist:last li').each(function(x){

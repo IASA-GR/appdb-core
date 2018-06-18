@@ -93,7 +93,7 @@ appdb.contextualization.ui.helpers.getSelectHtmlOptions = function(ds, selid){
 	return $.map(ds, function(e){
 		var opt = $("<option></option>").attr("value", e.id).text( (e.val)?e.val():e.name);
 		if( selid === $.trim(e.id) ){
-			$(opt).attr("selected","selected");
+			$(opt).prop("selected", true);
 		}
 		return opt[0];
 	});
@@ -480,7 +480,7 @@ appdb.contextualization.ui.DataBinder = appdb.ExtendClass(appdb.View, "appdb.con
 		var tn = this.getTagName();
 
 		if( this.isEditable() === false ){
-			$(dom).attr("disabled","disabled");
+			$(dom).prop("disabled", true);
 		}else{
 			$(dom).prop("disabled", false);
 		}
@@ -1179,7 +1179,7 @@ appdb.contextualization.ui.views.ContextScriptItem = appdb.ExtendClass(appdb.con
 		if( valid === true ){
 			$(this.dom).removeClass("invalid").find(".action.save").prop("disabled", false);
 		}else{
-			$(this.dom).addClass("invalid").find(".action.save").attr("disabled", "disabled");
+			$(this.dom).addClass("invalid").find(".action.save").prop("disabled", true);
 		}
 		this.renderValidationErrors(valid);
 	};
@@ -1689,7 +1689,7 @@ appdb.contextualization.ui.views.ContextualizationVersion = appdb.ExtendClass(ap
 		if( valid === true ){
 			$(this.dom).removeClass("invalid").find(".action.save").prop("disabled", false);
 		}else{
-			$(this.dom).addClass("invalid").find(".action.save").attr("disabled", "disabled");
+			$(this.dom).addClass("invalid").find(".action.save").prop("disabled", true);
 		}
 		this.renderValidationErrors(valid);
 	};
@@ -1709,7 +1709,7 @@ appdb.contextualization.ui.views.ContextualizationVersion = appdb.ExtendClass(ap
 		if( valid === true ){
 			$(this.dom).removeClass("invalid").find(".action.save").prop("disabled", false);
 		}else{
-			$(this.dom).addClass("invalid").find(".action.save").attr("disabled", "disabled");
+			$(this.dom).addClass("invalid").find(".action.save").prop("disabled", true);
 		}
 		this.renderValidationErrors(valid);
 	};
@@ -1789,7 +1789,7 @@ appdb.contextualization.ui.views.ContextualizationDescription = appdb.ExtendClas
 		if( valid === true ){
 			$(this.dom).removeClass("invalid").find(".action.save").prop("disabled", false);
 		}else{
-			$(this.dom).addClass("invalid").find(".action.save").attr("disabled", "disabled");
+			$(this.dom).addClass("invalid").find(".action.save").prop("disabled", true);
 		}
 		this.renderValidationErrors(valid);
 	};
@@ -2785,7 +2785,7 @@ appdb.components.ContextScriptEditor = appdb.ExtendClass(appdb.views.ui.DataEdit
 			return true;
 		}
 		var valid = this["validate_" + this.getSelectedType()]();
-		$(this.dom).find(".commands .apply").addClass('btn-disabled disabled').attr('disabled','disabled');
+		$(this.dom).find(".commands .apply").addClass('btn-disabled disabled').prop('disabled', true);
 		if( valid ){
 			$(this.dom).find(".commands .apply").removeClass('btn-disabled disabled').prop('disabled', false);
 		}
@@ -3194,7 +3194,7 @@ appdb.views.ui.editors.ContextScript = appdb.ExtendClass(appdb.views.ui.editors.
 		var view = $(this.dom).find(".command.view");
 		$(view).removeClass('disabled').prop('disabled', false);
 		if( $.trim(d) === "" ) {
-			$(view).addClass('disabled').attr('disabled','disabled');
+			$(view).addClass('disabled').prop('disabled', true);
 		}
 	};
 	this.renderPopup = function(){

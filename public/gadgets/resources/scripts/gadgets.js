@@ -385,8 +385,8 @@ gadgets.appdb.applications.disableSearchItems = function(){
 					var i,len=items.length;
 					for(i=0; i<len; i+=1){
 						$(items[i].select + " > input").val(($.isFunction(items[i].value)?items[i].value():items[i].value));
-						$(items[i].select + " > input").attr("disabled","disabled");
-						$(items[i].select + " > button").attr("disabled","disabled");
+						$(items[i].select + " > input").prop("disabled", true);
+						$(items[i].select + " > button").prop("disabled", true);
 					}
 				},1);
 			};
@@ -418,36 +418,36 @@ gadgets.appdb.applications.disableSearchItems = function(){
        return res;
     };
     if(setToBase("name")){
-        $("#searchName").val(gadgets.config.oppars.name).attr("disabled","disabled");
+        $("#searchName").val(gadgets.config.oppars.name).prop("disabled", true);
     }
     if(setToBase("description")){
-        $("#searchDescription").val(gadgets.config.oppars.description).attr("disabled","disabled");
+        $("#searchDescription").val(gadgets.config.oppars.description).prop("disabled", true);
     }
      if(setToBase("abstract")){
-        $("#searchAbstract").val(gadgets.config.oppars['abstract']).attr("disabled","disabled");
+        $("#searchAbstract").val(gadgets.config.oppars['abstract']).prop("disabled", true);
     }
      if(setToBase("vo")){
-        $("#p_search_vos").val(getValueFromText($("#p_search_vos"),gadgets.config.oppars.vo)).attr("disabled","disabled");
+        $("#p_search_vos").val(getValueFromText($("#p_search_vos"),gadgets.config.oppars.vo)).prop("disabled", true);
 		usedListItems.add({select:"#p_appdb_applications_vos",value:function(){return $("#p_search_vos > option:selected").text();}});
     }
     if(setToBase("country")){
-        $("#p_search_countries").val(getValueFromText($("#p_search_countries"),gadgets.config.oppars.country)).attr("disabled","disabled");
+        $("#p_search_countries").val(getValueFromText($("#p_search_countries"),gadgets.config.oppars.country)).prop("disabled", true);
 		usedListItems.add({select:"#p_appdb_applications_countries",value:function(){return $("#p_search_countries > option:selected").text();}});
     }
     if(setToBase("discipline")){
-        $("#p_search_disciplines").val(gadgets.config.oppars.discipline).attr("disabled","disabled");
+        $("#p_search_disciplines").val(gadgets.config.oppars.discipline).prop("disabled", true);
 		usedListItems.add({select:"#p_appdb_applications_disciplines",value: function(){return $("#p_search_disciplines > option:selected").text().replace(/^[\?]+/,"");}});
     }
     if(setToBase("subdiscipline")){
-        $("#p_search_subdesciplines").val(gadgets.config.oppars.subdiscipline).attr("disabled","disabled");
+        $("#p_search_subdesciplines").val(gadgets.config.oppars.subdiscipline).prop("disabled", true);
 		usedListItems.add({select:"#p_appdb_applications_subdisciplines",value:function(){return $("#p_search_subdesciplines > option:selected").text();}});
     }
 	if(setToBase("tag")){
-		$("#p_search_tags").val(gadgets.config.oppars.tag).attr("disabled","disabled");
+		$("#p_search_tags").val(gadgets.config.oppars.tag).prop("disabled", true);
 		usedListItems.add({select:"#p_appdb_applications_tags",value:function(){return $("#p_search_tags > option:selected").text();}});
 	}
 	if(setToBase("category")){
-		$("#p_search_categories").val(gadgets.config.oppars.category).attr("disabled","disabled");
+		$("#p_search_categories").val(gadgets.config.oppars.category).prop("disabled", true);
 		usedListItems.add({select:"#p_appdb_applications_categories",value:function(){return $("#p_search_categories > option:selected").text().replace(/^[\?]+/,"");}});
 	}
 	usedListItems.disable();

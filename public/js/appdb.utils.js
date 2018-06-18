@@ -7834,7 +7834,7 @@ appdb.utils.Vm2Appdb = (function(){
 		if( enable ){
 			$("form#vmc2appdb #submitxml").prop("disabled", false);
 		}else{
-			$("form#vmc2appdb #submitxml").attr("disabled","disabled");
+			$("form#vmc2appdb #submitxml").prop("disabled", true);
 		}
 	};
 	var submit = function submit(){
@@ -8847,13 +8847,13 @@ appdb.utils.pagifyHTMLList = function(ul, pagertype){
 		return function(){
 			var index = $(el).data("index");
 			if( index === 0 ){
-				$(prev).find("button").addClass("btn-disabled").attr("disabled","disabled");
+				$(prev).find("button").addClass("btn-disabled").prop("disabled", true);
 			}else{
 				$(prev).find("button").removeClass("btn-disabled").prop("disabled", false);
 			}
 			
 			if( (index+1) === $(el).children("ul").children("li").length ){
-				$(next).find("button").addClass("btn-disabled").attr("disabled","disabled");
+				$(next).find("button").addClass("btn-disabled").prop("disabled", true);
 			}else{
 				$(next).find("button").removeClass("btn-disabled").prop("disabled", false);
 			}

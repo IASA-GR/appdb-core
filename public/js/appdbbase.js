@@ -4105,7 +4105,7 @@ appdb.components.ContactVOs = appdb.ExtendClass(appdb.Component, "appdb.componen
 		this.options.selection.subject = ( validsubject === true )?this.getSubject():"";
 		
 		if( !valid || this.options.mode === "init"){
-			$(this.dom).find(".footer .action.send").off("click").removeClass("btn-primary").addClass("btn-disabled").attr("disabled", "disabled");
+			$(this.dom).find(".footer .action.send").off("click").removeClass("btn-primary").addClass("btn-disabled").prop("disabled", true);
 			$(this.dom).find(".footer .action.preview").addClass("hidden");
 			return false;
 		}
@@ -4516,7 +4516,7 @@ appdb.components.ContactVOs = appdb.ExtendClass(appdb.Component, "appdb.componen
 					self.renderRecipientList($(this).val(), contacts);
 				};
 			})(this,$.trim(v.message), v.vorecipients ));
-			$(selected).find("option:first").attr("selected","selected");
+			$(selected).find("option:first").prop("selected", true);
 			$(selected).trigger("change");
 			
 			v.from = v.from || {};
