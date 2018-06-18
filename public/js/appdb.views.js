@@ -114,7 +114,9 @@ appdb.views.DelayedDisplay = function(o) {
 			return;
 		} else {
 			o = o || {};
-			if( o.context ){
+			if (o instanceof $) {
+				_dom = $(o);
+			} else if( o.context ){
 				_dom = $(o.context).find(o.selector);
 			}else{
 				_dom = $(o.selector);
