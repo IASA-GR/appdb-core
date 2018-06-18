@@ -9206,7 +9206,7 @@ ul.list > li .row .cell.treeline .treeline{
 	height: 23px;
 	width: 3px;
 	position: absolute;
-	top: -17px;
+	top: -14px;
 	border-right: none;
 	border-top: none;
 	left: -10px;
@@ -9356,7 +9356,7 @@ ul.list > li .row .cell.treeline .treeline{
 	font-size: 11px;
 }
 .treedatalist > li .treedataentry.haschildren .treedatachildren ul.list ul.children > li{
-	padding: 4px 0px 0px 1px;
+	padding: 0px 0px 0px 1px;
 }
 .treedatalist > li .treedataentry.haschildren .treedatachildren > ul.list > li.treedatachildrenwidthfix{
     height:1px;
@@ -24292,7 +24292,7 @@ a.helperlink.wikilink:hover{
 .row {
 	display: table;
 	position: relative;
-	padding: 5px 0px;
+	padding: 2px 0px;
 	margin: 0px;
 	width: 100%;
 }
