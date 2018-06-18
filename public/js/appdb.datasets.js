@@ -1441,7 +1441,7 @@ appdb.datasets.views.DatasetLocationListItem = appdb.ExtendClass(appdb.views.ui.
 		}else{
 			$(this.dom).addClass("replica");
 		}
-		this.on();
+		this.bind();
 		$(this.dom).find("button.remove").off("click").on("click",(function(self){
 			return function(ev){
 				ev.preventDefault();
@@ -1733,7 +1733,7 @@ appdb.datasets.views.DatasetVersionDetails = new appdb.ExtendClass(appdb.views.u
 		}, caller: this});
 		this.subviews.locationlist.render(d.location);
 		
-		this.on($(this.dom).find(".version-info"));
+		this.bind($(this.dom).find(".version-info"));
 		this.renderToolbar();
 		if( this.options.data && this.options.data.parent_version && this.options.data.parent_version.id ){
 			$(this.dom).removeClass("noderivedversion");

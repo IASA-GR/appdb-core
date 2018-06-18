@@ -494,7 +494,7 @@ appdb.contextualization.ui.DataBinder = appdb.ExtendClass(appdb.View, "appdb.con
 	};
 	this.rebind = function(data){
 		this.options.datacontext = data || this.options.datacontext;
-		this.on();
+		this.bind();
 		if( this.options.editor ){
 			this.options.editor.set("value",this.getDataValue());
 		}
@@ -719,7 +719,7 @@ appdb.contextualization.ui.views.DataBindable = appdb.ExtendClass(appdb.View, "a
 				if($(e).data("usetemplate") ) return;
 				var db = new appdb.contextualization.ui.DataBinder({container: e, parent: self, datacontext: data, dataid: data.id});
 				self.options.databinders.push(db);
-				db.on();
+				db.bind();
 			};
 		})(this));
 		appdb.contextualization.ui.helpers.executeMacros(dom,data);
@@ -1274,7 +1274,7 @@ appdb.contextualization.ui.views.ContextScriptItem = appdb.ExtendClass(appdb.con
 				this.options.data.url = v.url;
 				this.validate();
 			}, caller: this });
-			this.options.contextscripteditor.on(this.getData());
+			this.options.contextscripteditor.bind(this.getData());
 		}
 	};
 	this.getId = function(){
@@ -2972,7 +2972,7 @@ appdb.components.ContextScriptEditor = appdb.ExtendClass(appdb.views.ui.DataEdit
 					var uieditor = self.getEditor('content');
 					if( uieditor ){
 						self.options.data.code = v;
-						uieditor.on(self.options.data);
+						uieditor.bind(self.options.data);
 					}
 				};
 			})(this),
@@ -3063,7 +3063,7 @@ appdb.components.ContextScriptEditor = appdb.ExtendClass(appdb.views.ui.DataEdit
 		this.renderSelector();
 		this.renderCommands();
 		this.renderFormatList();
-		this.on();
+		this.bind();
 		this.edit(this.dom);
 		this.selectType('script', true);
 		this.useFormatList();

@@ -1027,7 +1027,7 @@ appdb.views.ui.mixins.Collection = appdb.DefineClass("appdb.views.ui.mixins.Coll
 		if( !item ) return;
 		
 		if( typeof data !== 'undefined') {
-			item.on( this.getItemDataWrapper(data) );
+			item.bind( this.getItemDataWrapper(data) );
 		}
 		
 		return item;
@@ -2168,7 +2168,7 @@ appdb.views.ui.Databindable = appdb.ExtendClass(appdb.View, "appdb.views.ui.Data
 		
 		$.each(this.options.viewers, (function(self){
 			return function(i,e){
-				e.on(self.options.data);	
+				e.bind(self.options.data);	
 			};
 		})(this));
 	};
@@ -2314,7 +2314,7 @@ appdb.views.ui.DataEditable = appdb.ExtendClass(appdb.views.ui.Databindable, "ap
 		$.each(this.getEditables(el), (function(self){
 			return function(i,e){
 				if( typeof e.bind === "function" ){
-					e.on(self.options.data);
+					e.bind(self.options.data);
 				}
 				if( typeof e.edit === "function" ){
 					e.edit();

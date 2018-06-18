@@ -16495,8 +16495,8 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 		    r.vaversion= this.vaversion;
 		    diff[r.TEST_ID][this.vaversion] = r;
 	    };
-	    $.each(ar, differ.on(a));
-	    $.each(br, differ.on(b));
+	    $.each(ar, differ.bind(a));
+	    $.each(br, differ.bind(b));
 
 	    return {
 		    versions: [a.vaversion, b.vaversion],

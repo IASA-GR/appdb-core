@@ -9433,7 +9433,7 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 			} else {
 				callback(removeResponse);
 			}
-		}.on(this));
+		}.bind(this));
 	};
 	this.updateVappliance = function(vappid, callback){
 		this._RequestAction({ "action":"update", "vappid": vappid }, function(updateResponse) {
@@ -9447,7 +9447,7 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 			} else {
 			    callback(updateResponse);
 			}
-		}.on(this));
+		}.bind(this));
 	};
 	this.getSecantReport = function(vappid, callback) {
 		$.get(appdb.config.endpoint.base + "vo/secantreport", {id: this.options.id, appid: vappid, format: 'js'}).done(function(data) {
@@ -9455,9 +9455,9 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 			d = $.isArray(d) ? d : [d];
 			var res = this.getSecantReportsForVAppliance(vappid, d);
 			callback(res);
-		}.on(this)).fail(function(err) {
+		}.bind(this)).fail(function(err) {
 			callback({error: err});
-		}.on(this));
+		}.bind(this));
 	}
 	this.publishImageList = function(callback){
 		this.renderLoading(true, "Publishing changes");
@@ -9597,7 +9597,7 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 		if (this.views.imagelist && appids.length > 0) {
 			$.each(appids, function(i, appid) {
 				this.views.imagelist.updateSecantReportsForVappliance(appid, diffs[appid]);
-			}.on(this));
+			}.bind(this));
 		}
 	};
         this.addSecantWatcher = function(entry) {

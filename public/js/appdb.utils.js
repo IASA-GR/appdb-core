@@ -9578,11 +9578,11 @@ appdb.utils.SecantVOImagelistWatcher = function(voId, callback) {
 		var secant = (((data || {}).result || {}).report || []);
 		var diffs = diffResults(secant);
 		cb(diffs);
-	    }.on(this)).fail(function(err) {
+	    }.bind(this)).fail(function(err) {
 		_ajx = null;
 		appdb.debug('[ERROR][Secant report watcher]: ', err);
 		cb(null);
-	    }.on(this));
+	    }.bind(this));
     };
 
     var start = function() {
