@@ -560,13 +560,21 @@ appdb.Navigation = (function(){
 		}else{
 			ret.isInited = true;
 			setTimeout(function(){ret.popstate();},1);
-			$(window).on("load",function(){
+			if (document.readyState && document.readyState === "complete") {
 				setTimeout(function(){
 					addEvent(window,"popstate", function(e){
 						ret.popstate(e);
 					});
 				},5);
-			});
+			} else {
+				$(window).on("load", function(){
+					setTimeout(function(){
+						addEvent(window,"popstate", function(e){
+							ret.popstate(e);
+						});
+					},5);
+				});
+			}
 		}
 	};
 	ret.isInited = false;
