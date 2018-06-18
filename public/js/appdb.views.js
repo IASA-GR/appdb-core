@@ -4877,9 +4877,10 @@ appdb.views.TagList = appdb.ExtendClass(appdb.View, "appdb.views.TagList", funct
 			})(this, t, appid, res));
 			$(rem).append("<img alt='' src='/images/cancelicon.png' width='12' style='vertical-align:top;padding:0px;margin:0px;padding-right:2px;'></img>");
 			$(dec).addClass("taglist-editable-hide").append($(a)).append($(rem));
-			$(dec).hover(function() {
+			$(dec).on("mouseenter", function() {
 				$(dec).removeClass("taglist-editable-hide").addClass("taglist-editable");
-			}, function() {
+			});
+			$(dec).on("mouseleave", function() {
 				$(dec).removeClass("taglist-editable").addClass("taglist-editable-hide");
 			});
 			$(res).append($(dec));
@@ -6964,7 +6965,7 @@ appdb.views.ApiNetFilterItem = appdb.ExtendClass(appdb.View, "appdb.views.ApiNet
 				}, 0);
 
 			};
-		})(this)).hover(function() {
+		})(this)).on("mouseenter", function() {
 			$(this).parent().toggleClass("hover");
 		});
 		$(this.dom).empty().append(div);
@@ -8285,7 +8286,7 @@ appdb.views.TokenNetFilterItem = appdb.ExtendClass(appdb.View, "appdb.views.Toke
 				}, 0);
 				return false;
 			};
-		})(this)).hover(function() {
+		})(this)).on("mouseenter", function() {
 			$(this).parent().toggleClass("hover");
 		});
 		$(this.dom).empty().append(div);

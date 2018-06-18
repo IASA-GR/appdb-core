@@ -144,7 +144,8 @@
                         }
                     };
                 };
-               $tip.hover(set_hovered(true), set_hovered(false));
+               $tip.on("mouseenter", set_hovered(true));
+               $tip.on("mouseleave", set_hovered(false));
             }
         },
 
