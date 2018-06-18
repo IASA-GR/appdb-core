@@ -475,7 +475,7 @@ function getHierarchyValues($data){
                 
 		$("#tabs").tabs().addClass('ui-tabs-vertical ui-helper-clearfix');
 		$("#tabs li").removeClass('ui-corner-top').addClass('ui-corner-left');
-                $("#aboutLink").click();
+                $("#aboutLink").trigger("click");
                 $("#aboutLink").click(function(){
                     $("#preview").hide();
                     screenHeight = $(window).height();

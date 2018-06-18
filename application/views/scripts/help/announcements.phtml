@@ -42,7 +42,7 @@ if( $haswiki ){
 	$(document).ready(function(){
 		$('.bar1').attr('style', "height: 4px; background: url('" + loadImage('bar1.png') + "') repeat;");
 		if($(".announcementscontainer").parent().parent().attr("id")=="main"){
-			$(".announcementscontainer a.oldannounce").click();
+			$(".announcementscontainer a.oldannounce").trigger("click");
 		}
 	});
 </script>

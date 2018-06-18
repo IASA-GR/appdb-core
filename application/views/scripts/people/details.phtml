@@ -712,7 +712,7 @@
 			Yes: function() {
                 askResult='yes';
 				$askDlg.dialog('close');
-				$("#savedetails").click();
+				$("#savedetails").trigger("click");
 			},
             No: function() {
                 askResult='no';

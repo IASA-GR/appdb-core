@@ -175,7 +175,7 @@ if( $browserSupported == false ){
 						<a href="<?php echo $wiki;?>main:faq" target="_blank" data-href="/pages/about/faq" id="helpfaqlink" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'About > Faq',url:'/help/faq'});">FAQ</a>
 					</li>
 					<li>
-						<a href="<?php echo $wiki; ?>main:about:announcements" target="_blank" data-href="/pages/about/announcements" id="helpannouncelink" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'About > Announcements',url:'/help/announcements', callback:'$(\'a.oldannounce\').click();$(\'#main\').find(\'h3\').remove();'});">Announcements</a>
+						<a href="<?php echo $wiki; ?>main:about:announcements" target="_blank" data-href="/pages/about/announcements" id="helpannouncelink" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'About > Announcements',url:'/help/announcements', callback:'$(\'a.oldannounce\').trigger("click");$(\'#main\').find(\'h3\').remove();'});">Announcements</a>
 					</li>
 					<li>
 						<a href="<?php echo $wiki;?>main:about:credits" target="_blank" data-href="/pages/about/credits" id="helpcreditslink" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'About > Credits',url:'/help/credits'});">Credits</a>
@@ -639,7 +639,7 @@ if( $browserSupported == false ){
 						</a>
 					</li>
 					<li>
-						<a href="<?php echo $wiki;?>main:about:announcements" target="_blank" data-href="/pages/about/announcements" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'Announcements',url:'/help/announcements', callback:'$(\'a.oldannounce\').click();$(\'#main\').find(\'h3\').remove();selectMenuItem(\'helpannouncelink\');'});window.scroll(0,0);">
+						<a href="<?php echo $wiki;?>main:about:announcements" target="_blank" data-href="/pages/about/announcements" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'Announcements',url:'/help/announcements', callback:'$(\'a.oldannounce\').trigger("click");$(\'#main\').find(\'h3\').remove();selectMenuItem(\'helpannouncelink\');'});window.scroll(0,0);">
 							<span>Announcements</span>
 						</a>
 					</li>
@@ -699,7 +699,7 @@ if( $browserSupported == false ){
 						</div>
 					</td>
 					<td class="egibody" style="text-align: center;width:auto;">AppDB is developed by the <a href="http://www.iasa.gr/" target="_blank">Institute of Accelerating Systems and Applications</a>, Greece on behalf of <a href='http://www.egi.eu' target='_blank'>EGI.eu</a>.</td>
-					<td class="egibody" style="text-align: right;width:auto;"><div style="float: right"><a href="#" onclick="$('#helpchangeloglink').click();window.scroll(0,0);">AppDB v<?php echo appdbVerInfo();?></a></div></td>
+					<td class="egibody" style="text-align: right;width:auto;"><div style="float: right"><a href="#" onclick="$('#helpchangeloglink').trigger("click");window.scroll(0,0);">AppDB v<?php echo appdbVerInfo();?></a></div></td>
 				</tr>
 			</table>
 		</div>

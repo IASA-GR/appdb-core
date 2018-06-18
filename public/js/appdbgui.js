@@ -1019,7 +1019,7 @@
 	
 	function onError(e) {
 		new appdb.views.ErrorHandler().handle({status: 'Could not save software data', description:'There was an error processing your request, most probably due to a bug, or a network communication problem.<br/>Please try again, or notify support through the <a href="http://helpdesk.egi.eu" target="_blank">EGI Helpdesk</a> if the problem persists, by copying and pasting any text provided in the details',source: {code: e.status, description: e.responseText}});
-		$("#cancelsavedetails").click();
+		$("#cancelsavedetails").trigger("click");
 
 	}
 
@@ -2909,7 +2909,7 @@ String.prototype.replaceAll = function(search, replacement) {
 			$("span[edit_name='domainID']").attr("edit_data",domainData);
 			$("span[edit_name='owner']").attr("edit_data",peopleData);
 			$("span[edit_name='categoryID']").attr("edit_data",categoriesData);
-			$("a.relatedapps").click();
+			$("a.relatedapps").trigger("click");
 			$("div.altRelatedApps").hide();
 			$("div.relatedapps").parent().empty().css("border-left","");
 			$("div.relatedapps").hide();

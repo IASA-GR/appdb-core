@@ -311,7 +311,7 @@ appdb.Navigation = (function(){
 					} else ret.noAccess();
 					break;
 				case "/help/announcements":
-					$("#helpannouncelink").click();
+					$("#helpannouncelink").trigger("click");
 					break;
 				default:
 					found = false;
@@ -1345,7 +1345,7 @@ appdb.routing.resources.About = new appdb.routing.Resource({
 		appdb.views.Main.showPage('about',{mainTitle:'About > Usage',url:'/help/usage'});
 	},
 	announcements: function(d){
-		appdb.views.Main.showPage('about',{mainTitle:'About > Announcements',url:'/help/announcements', callback:'$(\'a.oldannounce\').click();$(\'#main\').find(\'h3\').remove();'});
+		appdb.views.Main.showPage('about',{mainTitle:'About > Announcements',url:'/help/announcements', callback:'$(\'a.oldannounce\').trigger("click");$(\'#main\').find(\'h3\').remove();'});
 	},
 	faq: function(d){
 		var data = (d.parameters.data)?"/" + d.parameters.data:"";

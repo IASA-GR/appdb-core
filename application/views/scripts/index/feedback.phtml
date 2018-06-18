@@ -225,7 +225,7 @@ var feedback = (function(){
 						name.set("value","");
 						captcha.set("value","");
 					}
-					$(".feedbackform .footer .captcha img:last").click();
+					$(".feedbackform .footer .captcha img:last").trigger("click");
 					$(".feedbackform > .description").css({"display":"block"});
 					$(".feedbackform > .fields").css({"display":"block"});
 					$(".feedbackform > .footer").css({"display":"block"});

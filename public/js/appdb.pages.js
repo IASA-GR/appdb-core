@@ -1135,7 +1135,7 @@ appdb.pages.home = (function(){
 			page.currentBanner_recent().subscribe({event: "select", callback: function(){
 				$(this.dom).parent().parent().removeClass("hidden");
 			}}).subscribe({event: "more", callback: function(){
-				$("#appsLastUpdatedLink").click();
+				$("#appsLastUpdatedLink").trigger("click");
 			}});
 		}
 		if( page.currentBanner_newest() === null ){
@@ -1146,7 +1146,7 @@ appdb.pages.home = (function(){
 			page.currentBanner_newest().subscribe({event: "select", callback: function(){
 				$(this.dom).parent().parent().removeClass("hidden");
 			}}).subscribe({event: "more", callback: function(){
-				$("#appsLastUpdatedLink").click();
+				$("#appsLastUpdatedLink").trigger("click");
 			}});
 		}
 		if( page.currentBanner_toprated() === null ){
@@ -1158,7 +1158,7 @@ appdb.pages.home = (function(){
 			page.currentBanner_toprated().subscribe({event: "select", callback: function(){
 				$(this.dom).parent().parent().removeClass("hidden");
 			}}).subscribe({event: "more", callback: function(){
-				$("#appsMostVisitedLink").click();
+				$("#appsMostVisitedLink").trigger("click");
 			}});
 		}
 		var recent = page.currentBanner_recent(); 

@@ -2785,7 +2785,7 @@ appdb.utils.DataWatcher.Notification = (function(){
 				setTimeout(function(){
 					appdb.utils.DataWatcher.Notification.close();
 					opt.onCancel();
-					$("#savedetails").click();
+					$("#savedetails").trigger("click");
 				},1);
 			}
 		},$(con).find("div.actions > span.save:first")[0]);
@@ -3102,7 +3102,7 @@ appdb.Navigator = (function(){
 		   } else if (p === "dissemination") {
 			 appdb.views.Main.showDisseminationTool();
 		   } else if(p==="/help/announcements"){
-			  $("#helpannouncelink").click();
+			  $("#helpannouncelink").trigger("click");
 		   } else if( p.substr(0,6) === "/help/" || p.substr(0,9) === "appstats/" || p.substr(0,9) === "pplstats/" || p.substr(0,10)==="/changelog" ) {
 			 var acts = appdb.utils.Faq.getActions(p);
 			 ajaxLoad(p,'main',acts);
@@ -6409,7 +6409,7 @@ appdb.utils.Faq = (function(){
 					return false;
 				});
 				if(window.FaqEditMode == true){
-					setTimeout(function(){$(".wikitoc > div.header > span.editcontents > a").click();},1);
+					setTimeout(function(){$(".wikitoc > div.header > span.editcontents > a").trigger("click");},1);
 				}
 			}
 			$("li[id^=faq]").each(function(index,elem){

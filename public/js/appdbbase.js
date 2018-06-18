@@ -7586,7 +7586,7 @@ appdb.components.Banner = appdb.ExtendClass(appdb.Component, "appdb.components.B
 			var el = $(this).data("click");
 			if( $.trim(el) !== "" ){
 				ev.preventDefault();
-				$(el).click();
+				$(el).trigger("click");
 				return false;
 			}
 		});
@@ -10487,7 +10487,7 @@ appdb.views.NavigationPane = appdb.ExtendClass(appdb.View,"appdb.views.Navigatio
 		}
     };
     this.closeCurrentItem = function(){
-        $(this._close).find("a").click();
+        $(this._close).find("a").trigger("click");
     };
     this._constructor();
 });
