@@ -2833,7 +2833,7 @@ appdb.pages.application = (function(){
 		$("#addcountry"+dialogCount).hide();
 		$("#addproglangs"+dialogCount).hide();
 		$("#editdoc"+dialogCount).hide();
-		$("#docdiv"+dialogCount).show();
+		//$("#docdiv"+dialogCount).show();
 		
 		shortcut.add("esc", closeDialog);
 		if ( detailsStyle == 0 ) {
@@ -3144,8 +3144,9 @@ appdb.pages.application = (function(){
 		});
 		$( "#navdiv" + page.currentDialogCount() + " > ul > li > a" ).on("click", function(e){e.preventDefault();return false;});
 		$( "#navdiv" + page.currentDialogCount()).find(".downloadarea").addClass("hidden");
-		$( ".detailsdlgcontent > div:first" ).css("height","100%");
+		$( ".detailsdlg > .detailsdlgcontent > div:first" ).css("height","100%");
 		setTimeout(function(){
+			$( ".detailsdlg > .detailsdlgcontent > div:first" ).css("height","100%");
 			if( !userID ) {
 				return;
 			}
@@ -3160,7 +3161,6 @@ appdb.pages.application = (function(){
 					$( "#navdiv" + page.currentDialogCount() + " .expandContainer" ).removeClass("hidden");
 				}
 			}
-			$( ".detailsdlgcontent > div:first" ).css("height","100%");
 		},100);
 		
 		$("#navdiv" + page.currentDialogCount()).find(".privacycounter").addClass("hidden");
@@ -4320,7 +4320,7 @@ appdb.pages.vo = (function(){
 			}
 			window.votabselect = ui.newTab.index();
 		});
-		$( ".detailsdlgcontent > div:first" ).css("height","100%");
+		$( ".detailsdlg >  .detailsdlgcontent > div:first" ).css("height","100%");
 		appdb.views.AppsList.SetupRatings();
 		appdb.pages.vo.onVoLoad();
 		$( "#navdiv" + appdb.pages.vo.currentDialogCount() ).find(".vmcatcherlink").attr("href",appdb.config.endpoint.vmcaster + "store/vo/" + page.currentName() + "/image.list");
@@ -4334,6 +4334,7 @@ appdb.pages.vo = (function(){
 		});
 		shortcut.add("esc", closeDialog);
 		$(document).ready(function(){
+			$( ".detailsdlg > .detailsdlgcontent > div:first" ).css("height","100%");
 			appdb.pages.vo.loadResources();
 			$(".dijitDialogTitleBar").hide();
 			$("#toolbarContainer").empty();
@@ -4369,7 +4370,6 @@ appdb.pages.vo = (function(){
 				return false;
 			});
 			(new appdb.views.Permalink({container:$("<span></span>"),datatype:"vo"})).render({query:''+page.currentName()});
-			$( ".detailsdlgcontent > div:first" ).css("height","100%");
 		});
 	};
 	page.loadStats = function(VOid){
@@ -4691,7 +4691,7 @@ appdb.pages.site = (function(){
 			}
 			window.sitetabselect = ui.newTab.index();
 		});
-		$( ".detailsdlgcontent > div" ).css("height","100%");
+		$( ".detailsdlg > .detailsdlgcontent > div:first" ).css("height","100%");
 	};
 	page.initSectionGroup = function(container,onclick){
 		container = container || ".site-group";
