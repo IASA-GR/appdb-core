@@ -4109,7 +4109,7 @@ appdb.components.ContactVOs = appdb.ExtendClass(appdb.Component, "appdb.componen
 			$(this.dom).find(".footer .action.preview").addClass("hidden");
 			return false;
 		}
-		$(this.dom).find(".footer .action.send").addClass("btn-primary").removeClass("btn-disabled").removeAttr("disabled").off("click").on("click", (function(self){
+		$(this.dom).find(".footer .action.send").addClass("btn-primary").removeClass("btn-disabled").prop("disabled", false).off("click").on("click", (function(self){
 			return function(ev){
 				ev.preventDefault();
 				self.sendMessage();

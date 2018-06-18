@@ -131,7 +131,11 @@ appdb.TemplateControl = appdb.DefineClass("appdb.TemplateControl",function(o){
           });
         var c = $(this.content);
         $.each(attributes, function(i, item) {
-            c.removeAttr(item);
+			if (item === "disabled" || item === "checked" || item === "selected") {
+				c.prop(item, false);
+			} else {
+	            c.removeAttr(item);
+			}
         });
     };
     this.setStringValue = function(v){

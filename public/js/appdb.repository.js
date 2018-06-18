@@ -2373,7 +2373,7 @@ appdb.repository.ui.views.ReleasePriorityEditor = appdb.ExtendClass(appdb.View, 
 			$(this.dom).find(".actions").addClass("hidden");
 			$(this.dom).append(loader);
 		}else{
-			$(this.dom).find("select").removeAttr("disabled");
+			$(this.dom).find("select").prop("disabled", false);
 		}
 	};
 	this.cancel = function(){
@@ -2427,7 +2427,7 @@ appdb.repository.ui.views.ReleasePriorityEditor = appdb.ExtendClass(appdb.View, 
 		$(this.dom).find(".actions").addClass("hidden");
 		
 		var select = $(this.dom).find("select:first");
-		$(select).find("option[selected]").removeAttr("selected");
+		$(select).find("option[selected]").prop("selected", false);
 		$(select).find("option[value='" + d.priority + "']").attr("selected","selected");
 		$(select).off("change").on("change", (function(self){
 			return function(){
@@ -2911,7 +2911,7 @@ appdb.repository.ui.views.TargetList = appdb.ExtendClass(appdb.View, "appdb.repo
 		res = (res.length>0)?true:false;
 		
 		if( res ){
-			$(this.dom).parent().find(".actions .action.upload button").removeClass("inactive").removeAttr("disabled");
+			$(this.dom).parent().find(".actions .action.upload button").removeClass("inactive").prop("disabled", false);
 			$(this.dom).parent().find(".actions .action.upload button img:last").attr("src","/images/upload_active.png");
 		} else {
 			$(this.dom).parent().find(".actions .action.upload button").addClass("inactive").attr("disabled","disabled");
@@ -10003,7 +10003,7 @@ appdb.repository.ui.CommandView = appdb.ExtendClass(appdb.View,"appdb.repository
 	};
 	this.isValidPage = function(v){
 		if( v === true ){
-			$(this.dom).find(".actions .action.next").removeAttr("disabled");
+			$(this.dom).find(".actions .action.next").prop("disabled", false);
 		}else{
 			$(this.dom).find(".actions .action.next").attr("disabled","disabled");
 		}

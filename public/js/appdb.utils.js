@@ -7832,7 +7832,7 @@ appdb.utils.Vm2Appdb = (function(){
 	var enableSubmit = function(enable){
 		enable = (typeof enable === "boolean")?enable:true;
 		if( enable ){
-			$("form#vmc2appdb #submitxml").removeAttr("disabled");
+			$("form#vmc2appdb #submitxml").prop("disabled", false);
 		}else{
 			$("form#vmc2appdb #submitxml").attr("disabled","disabled");
 		}
@@ -8849,13 +8849,13 @@ appdb.utils.pagifyHTMLList = function(ul, pagertype){
 			if( index === 0 ){
 				$(prev).find("button").addClass("btn-disabled").attr("disabled","disabled");
 			}else{
-				$(prev).find("button").removeClass("btn-disabled").removeAttr("disabled");
+				$(prev).find("button").removeClass("btn-disabled").prop("disabled", false);
 			}
 			
 			if( (index+1) === $(el).children("ul").children("li").length ){
 				$(next).find("button").addClass("btn-disabled").attr("disabled","disabled");
 			}else{
-				$(next).find("button").removeClass("btn-disabled").removeAttr("disabled");
+				$(next).find("button").removeClass("btn-disabled").prop("disabled", false);
 			}
 			
 			$(el).children("ul").children("li").removeClass("current");

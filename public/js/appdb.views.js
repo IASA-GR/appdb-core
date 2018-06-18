@@ -5025,7 +5025,7 @@ appdb.views.TagList = appdb.ExtendClass(appdb.View, "appdb.views.TagList", funct
 					$($(ok).find("img").get(0)).attr("src", '/images/yes_grey.png').attr("title", "Submit new tag");
 					return true;
 				}
-				$(ok).removeAttr("disabled");
+				$(ok).prop("disabled", false);
 				$($(ok).find("img").get(0)).attr("src", "/images/yes.png").attr("title", "Submit new tag");
 				return true;
 			},
@@ -5049,7 +5049,7 @@ appdb.views.TagList = appdb.ExtendClass(appdb.View, "appdb.views.TagList", funct
 					$($(ok).find("img").get(0)).attr("src", '/images/yes_grey.png').attr("title", "Submit new tag");
 					return true;
 				}
-				$(ok).removeAttr("disabled");
+				$(ok).prop("disabled", false);
 				$($(ok).find("img").get(0)).attr("src", "/images/yes.png").attr("title", "Submit new tag");
 				return true;
 			}
@@ -14774,7 +14774,7 @@ appdb.views.GenericCheckbox = appdb.ExtendClass(appdb.View, "appdb.views.Generic
 			$(this.dom).find(".boolbox input").addClass("checked").attr("checked", true);
 		} else {
 			$(this.dom).find(".boolbox").removeClass("checked");
-			$(this.dom).find(".boolbox input").removeClass("checked").removeAttr("checked");
+			$(this.dom).find(".boolbox input").removeClass("checked").prop("checked", false);
 		}
 		if (useraction === true) {
 			this.options.userAction = true;
@@ -18289,12 +18289,12 @@ appdb.views.VoImageListState = appdb.ExtendClass(appdb.View, "appdb.views.VoImag
 		var changescount = this.getState("added").length + this.getState("removed").length + this.getState("updated").length;
 		var canpublish = (((changescount + this.getState("deleted").length) > 0) ? true : false);
 		if (canpublish === true) {
-			$(this.options.dom.actions).find(".action.publish").removeClass("btn-disabled disabled").addClass("btn-primary").removeAttr("disabled");
+			$(this.options.dom.actions).find(".action.publish").removeClass("btn-disabled disabled").addClass("btn-primary").prop("disabled", false);
 		} else {
 			$(this.options.dom.actions).find(".action.publish").addClass("btn-disabled disabled").removeClass("btn-primary").attr("disabled", "disabled");
 		}
 		if (changescount > 0) {
-			$(this.options.dom.actions).find(".action.revert").removeClass("btn-disabled disabled").addClass("btn-warning").removeAttr("disabled");
+			$(this.options.dom.actions).find(".action.revert").removeClass("btn-disabled disabled").addClass("btn-warning").prop("disabled", false);
 		} else {
 			$(this.options.dom.actions).find(".action.revert").addClass("btn-disabled disabled").removeClass("btn-warning").attr("disabled", "disabled");
 		}
@@ -18535,12 +18535,12 @@ appdb.views.VoImageListLegend = appdb.ExtendClass(appdb.View, "appdb.views.VoIma
 		$(chk).off("click").on("click", (function(self, stateobj) {
 			return function(ev) {
 				var ischecked = $(this).attr("checked");
-				$(self.dom).find(":input").removeAttr("checked");
+				$(self.dom).find(":input").prop("checked", false);
 				setTimeout((function(el, checked) {
 					if (checked === true) {
 						$(el).attr("checked", "checked");
 					} else {
-						$(el).removeAttr("checked");
+						$(el).prop("checked", false);
 					}
 				})(this, ischecked), 5);
 				if (ischecked) {
@@ -21310,7 +21310,7 @@ appdb.views.RelationList = appdb.ExtendClass(appdb.View, "appdb.views.RelationLi
 		
 		if( this.options.isvalid ){
 			$(this.dom).removeClass("invalid");
-			$(this.options.dom.actionadd).removeClass("disabled").removeAttr("disabled");
+			$(this.options.dom.actionadd).removeClass("disabled").prop("disabled", false);
 		}else{
 			$(this.dom).addClass("invalid");
 			$(this.options.dom.actionadd).addClass("disabled").attr("disabled","disabled");
@@ -22227,7 +22227,7 @@ appdb.views.RelatedEntities = appdb.ExtendClass(appdb.View,"appdb.views.RelatedE
 		var flts = this.options.filters.data;
 		var dom = $(this.options.dom.filter);
 		var itemcount = this.options.itemsdata.length;
-		$(dom).find("li[data-filter-group]").removeClass("disabled").find("input").removeAttr("disabled");
+		$(dom).find("li[data-filter-group]").removeClass("disabled").find("input").prop("disabled", false);
 		for(var f in flts){
 			if( flts.hasOwnProperty(f) === false ) continue;
 			$.each(flts[f], function(ii,ee){
@@ -22243,7 +22243,7 @@ appdb.views.RelatedEntities = appdb.ExtendClass(appdb.View,"appdb.views.RelatedE
 				}else{
 					$(li).each(function(i,e){
 						if( $(this).attr("filter-name") === ee.name ){
-							$(this).removeClass("disabled").find("input").removeAttr("disabled");
+							$(this).removeClass("disabled").find("input").prop("disabled", false);
 						}
 					});
 				}
@@ -22278,7 +22278,7 @@ appdb.views.RelatedEntities = appdb.ExtendClass(appdb.View,"appdb.views.RelatedE
 					}
 					var inp = $(this).find("input");
 					if(inp.is(":checked")){
-						$(inp).removeAttr("checked");
+						$(inp).prop("checked", false);
 					}else{
 						$(inp).attr("checked","checked");
 					}

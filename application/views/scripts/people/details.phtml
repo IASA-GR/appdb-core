@@ -1340,7 +1340,7 @@
                 v = v || {};
                 $(".defaultnotificationresult").empty();
                 if(v.error){
-                    $("#defaultnotification").removeAttr("checked");
+                    $("#defaultnotification").prop("checked", false);
                     dijit.byId("defaultdelivery<?php echo $this->dialogCount;?>").attr("disabled",false);
                     $(".defaultnotificationresult").empty().append(v.error);
                 }else if(v.id){
@@ -1349,7 +1349,7 @@
                     dijit.byId("defaultdelivery<?php echo $this->dialogCount;?>").attr("disabled",false);
                     dijit.byId("defaultdelivery<?php echo $this->dialogCount;?>").attr("value",v.delivery);
                 }else{
-                    $("#defaultnotification").removeAttr("checked");
+                    $("#defaultnotification").prop("checked", false);
                     appdb.model.MailSubscription.defaultNotification = null;
                     dijit.byId("defaultdelivery<?php echo $this->dialogCount;?>").attr("disabled",true);
                 }
@@ -1390,13 +1390,13 @@
                 v = v || {};
                 $(".rolenotificationresult").empty();
                 if(v.error){
-                    $("#rolenotification").removeAttr("checked");
+                    $("#rolenotification").prop("checked", false);
                     $(".rolenotificationresult").empty().append(v.error);
                 }else if(v.id){
                     $("#rolenotification").attr("checked","checked");
                     appdb.model.MailSubscription.roleNotification = v;
                 }else{
-                    $("#rolenotification").removeAttr("checked");
+                    $("#rolenotification").prop("checked", false);
                     appdb.model.MailSubscription.roleNotification = null;
                 }
             };
@@ -1422,10 +1422,10 @@
                 v = v || {};
                 $(".nodisseminationresult").empty();
                 if(v.error){
-                    $("#nodissemination").removeAttr("checked");
+                    $("#nodissemination").prop("checked", false);
                     $(".nodisseminationresult").empty().append(v.error);
                 }else if(v.value && v.value == "true"){
-                    $("#nodissemination").removeAttr("checked");
+                    $("#nodissemination").prop("checked", false);
                     appdb.model.MailSubscription.noDissemination = null;
                 }else{
                     $("#nodissemination").attr("checked","checked");
@@ -1460,7 +1460,7 @@
                 v = v || {};
                 $(".ownednotificationresult").empty();
                 if(v.error){
-                    $("#ownednotification").removeAttr("checked");
+                    $("#ownednotification").prop("checked", false);
                     dijit.byId("owneddelivery<?php echo $this->dialogCount;?>").attr("disabled",false);
                     $(".ownednotificationresult").empty().append(v.error);
                 }else if(v.id){
@@ -1469,7 +1469,7 @@
                     dijit.byId("owneddelivery<?php echo $this->dialogCount;?>").attr("disabled",false);
                     dijit.byId("owneddelivery<?php echo $this->dialogCount;?>").attr("value",v.delivery);
                 }else{
-                    $("#ownednotification").removeAttr("checked");
+                    $("#ownednotification").prop("checked", false);
                     appdb.model.MailSubscription.ownedNotification = null;
                     dijit.byId("owneddelivery<?php echo $this->dialogCount;?>").attr("disabled",true);
                 }
@@ -1500,7 +1500,7 @@
                 v = v || {};
                 $(".relatednotificationresult").empty();
                 if(v.error){
-                    $("#relatednotification").removeAttr("checked");
+                    $("#relatednotification").prop("checked", false);
                     dijit.byId("relateddelivery<?php echo $this->dialogCount;?>").attr("disabled",false);
                     $(".relatednotificationresult").empty().append(v.error);
                 }else if(v.id){
@@ -1509,7 +1509,7 @@
                     dijit.byId("relateddelivery<?php echo $this->dialogCount;?>").attr("disabled",false);
                     dijit.byId("relateddelivery<?php echo $this->dialogCount;?>").attr("value",v.delivery);
                 }else{
-                    $("#relatednotification").removeAttr("checked");
+                    $("#relatednotification").prop("checked", false);
                     appdb.model.MailSubscription.relatedNotification = null;
                     dijit.byId("relateddelivery<?php echo $this->dialogCount;?>").attr("disabled",true);
                 }
@@ -1530,13 +1530,13 @@
                v = v || {};
                 $(".inboxnotificationresult").empty();
                 if(v.error){
-                    $("#inboxnotification").removeAttr("checked");
+                    $("#inboxnotification").prop("checked", false);
                     $(".inboxnotificationresult").empty().append(v.error);
                 }else if(v.id){
 					$("#inboxnotification").attr("checked","checked");
                     appdb.model.MailSubscription.inboxNotification = v;
                 }else{
-                    $("#inboxnotification").removeAttr("checked");
+                    $("#inboxnotification").prop("checked", false);
                     appdb.model.MailSubscription.inboxNotification = null;
                 }
             };

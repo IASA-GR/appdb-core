@@ -310,7 +310,7 @@ function getHierarchyValues($data){
 									  if ( !valid ) {
 										  // remove invalid value, as it didn't match anything
 										  $( this ).val( "" );
-										  select.children(":selected").removeAttr("selected");
+										  select.children(":selected").prop("selected", false);
 										  select.val( "-1" );
 										  input.data( "autocomplete" ).term = "";
 										  return false;

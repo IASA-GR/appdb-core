@@ -3035,7 +3035,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			}),
 			success: function(cddata, textStatus, jqXHR) {
 				this.renderLoadingData(false);
-				$(btn).removeClass('disabled').removeAttr('disabled').text('Update');
+				$(btn).removeClass('disabled').prop('disabled', false).text('Update');
 				cddata = cddata || {};
 				if ($.trim(cddata.error)) {
 					_renderSetupError(true, cddata.error);
@@ -3045,7 +3045,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 				}
 			}.on(this),
 			error: function( jqXHR, textStatus, errorThrown) {
-				$(btn).removeClass('disabled').removeAttr('disabled').text('Update');
+				$(btn).removeClass('disabled').prop('disabled', false).text('Update');
 				this.renderLoadingData(false);
 				var errText = errorThrown + ' (' + textStatus + ')';
 				try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
@@ -3093,7 +3093,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		if (invalid !== false) {
 			$(btn).addClass('disabled').attr('disabled', 'disabled').off('click');
 		} else {
-			$(btn).removeClass('disabled').removeAttr('disabled').off('click').on('click', function() {
+			$(btn).removeClass('disabled').prop('disabled', false).off('click').on('click', function() {
 				this.saveSetupData();
 			}.on(this));
 		}
@@ -3147,7 +3147,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 				'reason': 'Canceled by user (ID: ' + userID + ')'
 			}),
 			success: function(cddata, textStatus, jqXHR) {
-				$(btnCancel).removeClass('disabled').removeAttr('disabled').text('CANCEL');
+				$(btnCancel).removeClass('disabled').prop('disabled', false).text('CANCEL');
 				cddata = cddata || {};
 				if ($.trim(cddata.error)) {
 					var err = new appdb.views.ErrorHandler();
@@ -3155,13 +3155,13 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 						"status": "Could not cancel continuous delivery process",
 						"description": cddata.error
 					});
-					$(btnCancel).removeClass('loading').removeClass('disabled').removeAttr('disabled').text('CANCEL');
+					$(btnCancel).removeClass('loading').removeClass('disabled').prop('disabled', false).text('CANCEL');
 				} else {
 					appdb.pages.Application.reload();
 				}
 			}.on(this),
 			error: function( jqXHR, textStatus, errorThrown) {
-			    $(btnCancel).removeClass('loading').removeClass('disabled').removeAttr('disabled').text('CANCEL');
+			    $(btnCancel).removeClass('loading').removeClass('disabled').prop('disabled', false).text('CANCEL');
 			    var errText = errorThrown + ' (' + textStatus + ')';
 			    try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
 			    var err = new appdb.views.ErrorHandler();
@@ -3197,7 +3197,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			    }
 		    }.on(this),
 		    error: function( jqXHR, textStatus, errorThrown) {
-			    $(bt).removeClass('disabled').removeAttr('disabled').text('FORCE CHECK');
+			    $(bt).removeClass('disabled').prop('disabled', false).text('FORCE CHECK');
 			    var errText = errorThrown + ' (' + textStatus + ')';
 			    try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
 			    var err = new appdb.views.ErrorHandler();
@@ -3226,13 +3226,13 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 						"status": "Could not resume continuous delivery process",
 						"description": cddata.error
 					});
-					$(btnPause).removeClass('loading').removeClass('disabled').removeAttr('disabled').text('PAUSE');
+					$(btnPause).removeClass('loading').removeClass('disabled').prop('disabled', false).text('PAUSE');
 				} else {
 					appdb.pages.Application.reload();
 				}
 			}.on(this),
 			error: function( jqXHR, textStatus, errorThrown) {
-				$(btnPause).removeClass('loading').removeClass('disabled').removeAttr('disabled').text('PAUSE');
+				$(btnPause).removeClass('loading').removeClass('disabled').prop('disabled', false).text('PAUSE');
 				var errText = errorThrown + ' (' + textStatus + ')';
 				try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
 				var err = new appdb.views.ErrorHandler();
@@ -3261,13 +3261,13 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 						"status": "Could not resume continuous delivery process",
 						"description": cddata.error
 					});
-					$(btnResume).removeClass('loading').removeClass('disabled').removeAttr('disabled').text('RESUME');
+					$(btnResume).removeClass('loading').removeClass('disabled').prop('disabled', false).text('RESUME');
 				} else {
 					appdb.pages.Application.reload();
 				}
 			}.on(this),
 			error: function( jqXHR, textStatus, errorThrown) {
-				$(btnResume).removeClass('loading').removeClass('disabled').removeAttr('disabled').text('RESUME');
+				$(btnResume).removeClass('loading').removeClass('disabled').prop('disabled', false).text('RESUME');
 				this.renderLoadingData(false);
 				var errText = errorThrown + ' (' + textStatus + ')';
 				try { resp = JSON.parse(jqXHR.responseText); errText = resp.error || errText;} catch(e) {}
@@ -3488,9 +3488,9 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			$(this.dom).find('.onstatuserror').removeClass('hidden').find('.message').empty().append($(error).clone());
 		} else {
 			$(this.dom).find('.cdversion-noprocess .exterror').addClass('hidden').find('.message').empty();
-			$(this.dom).find('.cdversion-noprocess .cdversion-force-check').removeAttr('disabled').removeClass('disabled');
+			$(this.dom).find('.cdversion-noprocess .cdversion-force-check').prop('disabled', false).removeClass('disabled');
 			$(this.dom).find('.cdversion-paused-process .exterror').addClass('hidden').find('.message').empty();
-			$(this.dom).find('.cdversion-paused-process .cd-action-resume').removeAttr('disabled').removeClass('disabled');
+			$(this.dom).find('.cdversion-paused-process .cd-action-resume').prop('disabled', false).removeClass('disabled');
 			$(this.dom).find('.onstatuserror').addClass('hidden').find('.message').empty();
 		}
 	};
@@ -4014,8 +4014,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			    //$(btnPause).off('click').addClass('disabled').attr('disabled', 'disabled');
 			    $(btnCancel).off('click').addClass('disabled').attr('disabled', 'disabled');
 			} else {
-			    //$(btnPause).off('click').removeClass('disabled').removeAttr('disabled', 'disabled');
-			    $(btnCancel).off('click').removeClass('disabled').removeAttr('disabled', 'disabled');
+			    $(btnCancel).off('click').removeClass('disabled').prop('disabled', false);
 			}
 			$(resumedPanelError).addClass('hidden').find('.message').empty();
 			$(pausedPanelError).addClass('hidden').find('.message').empty();
@@ -4025,9 +4024,9 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		    $(btnResume).off('click').addClass('disabled').attr('disabled', 'disabled');
 		    $(btnForceCheck).off('click').addClass('disabled').attr('disabled', 'disabled');
 		} else {
-		    $(btnResume).off('click').removeClass('disabled').removeAttr('disabled', 'disabled');
-		    $(btnForceCheck).off('click').removeClass('disabled').removeAttr('disabled', 'disabled');
-		    $(btnPause).off('click').removeClass('disabled').removeAttr('disabled', 'disabled');
+		    $(btnResume).off('click').removeClass('disabled').prop('disabled', false);
+		    $(btnForceCheck).off('click').removeClass('disabled').prop('disabled', false);
+		    $(btnPause).off('click').removeClass('disabled').prop('disabled', false);
 		}
 
 		if (!$(btnPause).hasClass('loading')) {
@@ -10007,7 +10006,7 @@ appdb.vappliance.ui.views.ContextualizationScriptEditor = appdb.ExtendClass(appd
 			$(fsize).find(".value").text(d.size + " bytes");
 			$(this.options.dom.script).empty().addClass("hasdata").append(url).append(hash).append(fsize);
 			
-			$(this.options.dom.format).find('option').removeAttr('selected');
+			$(this.options.dom.format).find('option').prop('selected', false);
 			$(this.options.dom.format).find('option[value="'+ this.options.selectedFormat  +'"]').attr('selected','selected');
 			
 		 }
@@ -10048,7 +10047,7 @@ appdb.vappliance.ui.views.ContextualizationScriptEditor = appdb.ExtendClass(appd
 		this.renderValidationError(false);
 		if( v && !v.error && v.value !== this.getParentUrl() ){
 			if( v.value !== this.getParentUrl() && $.trim(v.value) !== ""){
-				$(this.options.dom.actions).find(".save").addClass("btn-primary").removeClass("disabled").removeAttr("disabled","disabled");
+				$(this.options.dom.actions).find(".save").addClass("btn-primary").removeClass("disabled").prop("disabled", false);
 				this.options.selectedUrl = v.value;
 			}
 			this.renderScriptData();
