@@ -771,6 +771,7 @@ appdb.TemplateParser = function(o){
         return null;
     };
 	this.collectEvents = function(e,evs){
+		if (typeof e === "undefined") return {};
 		var i, ps = e.attributes, len = ps.length, p, pname, res = {}, ns = this.nsevent,f,prop,fc;
         for(i=0; i<len; i+=1){
             p = ps[i];
@@ -789,6 +790,7 @@ appdb.TemplateParser = function(o){
         return res;
 	};
     this.collectProperties = function(e,props){
+		if (typeof e === "undefined") return {};
         var i, ps = e.attributes, len = ps.length, p, pname, res = {}, ns = this.nsproperty,f,prop,fc;
         for(i=0; i<len; i+=1){
             p = ps[i];
@@ -835,6 +837,7 @@ appdb.TemplateParser = function(o){
         return res;
     };
     this.collectAttributes = function(e){
+		if (typeof e === "undefined") return {};
         var i, at = e.attributes, len = at.length, a, res = {};
         for(i=0; i<len; i+=1){
             a = at[i];

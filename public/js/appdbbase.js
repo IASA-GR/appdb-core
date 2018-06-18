@@ -10868,7 +10868,7 @@ appdb.views.Main = (function(){
                         if( typeof _currentComponent.destroy === "function" ) { _currentComponent.destroy(); }
                     }
                     _setViewContent(d);
-                    if(d.isTemplate){
+                    if(d.isTemplate && d.templatepane){
                         d.templatepane.parentContent = _subContainer(e.componentType);
                         _currentComponent = new c({content:d.cache,container:_subContainer(e.componentType),contents:d.cache,templatepane:d.templatepane,ext:e});
                     }else{
