@@ -4379,7 +4379,7 @@ appdb.repository.ui.views.PropertyTOC = function(o){
 			var a = $(document.createElement("a"));
 			var id = $(e).text().toLowerCase().replace(/\ /g,"");
 			$(a).attr("href","#").attr("title",$.trim($(e).text())).attr("id","wikitoc_" + id).html($(e).html());
-			$(a).click((function(_id){
+			$(a).on("click", (function(_id){
 				return function(e){
 					if( e.which != 2 ) {
 						self.scrollTo(_id);
@@ -4392,7 +4392,7 @@ appdb.repository.ui.views.PropertyTOC = function(o){
 			$(list).append(li);			
 		});
 		
-		$(this.dom).find(".wikitoc > div.header > span.hidecontents > a").click(function(){
+		$(this.dom).find(".wikitoc > div.header > span.hidecontents > a").on("click", function(){
 			if ( $(self.dom).find(".wikitoc > ul:last").css("display") === "none" ) {
 				$(self.dom).find(".wikitoc > ul:last").css({"display":"block"});
 				$(this).text("hide");
@@ -8054,7 +8054,7 @@ appdb.repository.ui.ReleaseManager = appdb.ExtendClass(appdb.Component,"appdb.re
 	this.handleLinks = function(){
 		var self = this;
 		if( $(this.dom).find(".empty .newrelease > a").length > 0  ){
-			$(this.dom).find(".empty .newrelease > a").click(function(ev){
+			$(this.dom).find(".empty .newrelease > a").on("click", function(ev){
 				ev.preventDefault();
 				if( $(this).parent().hasClass("update") ){
 					if( $(this).parent().data("parentid") ){

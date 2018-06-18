@@ -1148,7 +1148,7 @@
 					}
 				});
 			});
-			rating.find("img.ratingstar").click(function(){
+			rating.find("img.ratingstar").on("click", function(){
 				var myr = parseInt($(this).attr("data-rating"));
 				rating.attr("data-temprating",myr);
 			});
@@ -1180,7 +1180,7 @@
 		rating = buildRating(userFullname, formatDate(), r, true);
 		$(rating).prependTo(".ratingroot");
 		dojo.parser.parse(rating[0]);
-		rating.find("a.submitrating").click(function(){
+		rating.find("a.submitrating").on("click", function(){
 			if ( $(".newrating").length > 0 ) {
 				comment_text = $.trim($('<span>'+$(".newrating textarea").val()+'</span>').text().replace(/\n/g,"<br/>"));
 			} else {
@@ -1238,7 +1238,7 @@
 			}
 			return false;
  		});
-		rating.find("a.cancelrating").click(function(){
+		rating.find("a.cancelrating").on("click", function(){
 			if ( $(".newrating").length > 0 ) {
 				$(".newrating").empty();
 				$('div.ratingentry[data-submitterid="'+userID+'"]:first').show();
@@ -1484,13 +1484,13 @@
 				}
 				var leaveComment = $('<div style="padding-left: 10px" class="leavecomment" style="padding-left:10px"><a href="#" class="icontext"><img src="/images/comment.png" alt=""/><span>Leave a comment...</span></a></div><br/>');
 				if (userID !== null) {
-					leaveComment.find("a").click(function(){
+					leaveComment.find("a").on("click", function(){
 						addRating(_d, e, 0, false);
 					});
 				} else {
-					leaveComment.find("a").click(function(){
+					leaveComment.find("a").on("click", function(){
 						var leaveCommentMsg = $('<div title="Leave comment"><p><span class="ui-icon ui-icon-info" style="float:left; margin:0 7px 20px 0;"></span>If you wish to leave a comment, please <b>Sign In</b> first with your account.<br/></p></div>');
-						leaveCommentMsg.find("a.login").click(function(){
+						leaveCommentMsg.find("a.login").on("click", function(){
 							leaveCommentMsg.dialog('close');
 							login();
 						});
@@ -1825,7 +1825,7 @@
 		rating_html += '</td></tr></table>';
 		appratingspan.html(rating_html);
 		$(".revokerating").hide();
-		appratingspan.find("img.ratingstar").click(function(){
+		appratingspan.find("img.ratingstar").on("click", function(){
 			var _this = $(this);
 			var hasSubmittedText;
 			if ( userID === null ) {
@@ -1836,7 +1836,7 @@
 				}
 				starmouseoutdisabled = true;
 				var mustLoginMsg = $('<div title="Rating submission"><p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>You are about to submit your rating as an anonymous user. If you would also like to acompany your rating with a comment, please <b>Sign In</b> first with your account.<br/><br/>'+hasSubmittedText+'</p></div>');
-				mustLoginMsg.find("a.login").click(function(){
+				mustLoginMsg.find("a.login").on("click", function(){
 					cancelSubmit();
 					mustLoginMsg.dialog('close');
 					login();
@@ -1866,7 +1866,7 @@
 		setRating(rating_num);
 		var votecount_text;
 		var hideRevokeRating;
-		$(".revokerating a").click(function(){
+		$(".revokerating a").on("click", function(){
 			revokeRating(e,d);
 		});
 		appratingspan.find("img").mouseover(function(){
@@ -1944,7 +1944,7 @@
 		}
 		modtext += '</b> <a class="moddetails" href="#"><span style="font-size:8pt"><i>(more...)</i></span></a>';
 		modrow.find("td").html(modtext);
-		modrow.find("a.moddetails").click(function(){
+		modrow.find("a.moddetails").on("click", function(){
 			showModerationDetails(d.application);
 		});
 		modrow.show();
@@ -2592,7 +2592,7 @@ String.prototype.replaceAll = function(search, replacement) {
 						appmod.find("span").text('Unmoderate');
 					}
 				}
-				appmod.click(function(){
+				appmod.on("click", function(){
 					moderateApplication(d.application.id,d.application.moderated);
 				});
 				appmod.show();
@@ -2634,7 +2634,7 @@ String.prototype.replaceAll = function(search, replacement) {
 				}
 			}
 			setTimeout(function(){
-				$(e).find("div.reportAbuse a").click(function(){
+				$(e).find("div.reportAbuse a").on("click", function(){
 					if( $(this).hasClass("helperlink") ) return true;
 					if (userID !== null) {
 						appdb.views.Main.showReportAbuse({id: d.application.id ,type:'application',name:d.application.name});
@@ -2661,13 +2661,13 @@ String.prototype.replaceAll = function(search, replacement) {
 
 						} catch(e) {}
 
-						reportAbuseDlg.find("a.login").click(function(){
+						reportAbuseDlg.find("a.login").on("click", function(){
 							reportAbuseDlg.dialog('close');
 							login();
 						});
 					}
 				});
-				$(e).find("div.requestjoin a").click(function(){
+				$(e).find("div.requestjoin a").on("click", function(){
 					if( $(this).hasClass("helperlink") ) return true;
 					if( userID !== null ) {
 						appdb.views.Main.showRequestJoinContacts(d.application);
@@ -2693,7 +2693,7 @@ String.prototype.replaceAll = function(search, replacement) {
 							},10);
 						} catch(e){}
 
-						reportAbuseDlg.find("a.login").click(function(){
+						reportAbuseDlg.find("a.login").on("click", function(){
 							reportAbuseDlg.dialog('close');
 							login();
 						});
@@ -2725,7 +2725,7 @@ String.prototype.replaceAll = function(search, replacement) {
 							},10);
 						} catch(e){}
 
-						reportAbuseDlg.find("a.login").click(function(){
+						reportAbuseDlg.find("a.login").on("click", function(){
 							reportAbuseDlg.dialog('close');
 							login();
 						});
@@ -3455,7 +3455,7 @@ String.prototype.replaceAll = function(search, replacement) {
 		$("table.dojoxGrid-row-table").find("tr:first").each(function(){
 			$($(this).find("td.dojoxGrid-cell").get(0)).hide();
 		});
-		$("th.dojoxGrid-cell").click(function(){
+		$("th.dojoxGrid-cell").on("click", function(){
 			setTimeout(function(){hideDocGridCols();},50);
 		});
 	}
@@ -3575,7 +3575,7 @@ String.prototype.replaceAll = function(search, replacement) {
 				//Toggle html link to unmoderate
 				$(".app-mod").find("span").html('Unmoderate');
 				$(".app-modrow").find("td").empty();
-				appmod.click(function(){
+				appmod.on("click", function(){
 					moderateApplication(appID,"true");
 				});
 				var modinfo = {};
@@ -3598,7 +3598,7 @@ String.prototype.replaceAll = function(search, replacement) {
 				$(".app-mod").find("span").html('Moderate');
 				$(".app-modrow").find("td").empty();
 				$(".app-modrow").hide();
-				appmod.click(function(){
+				appmod.on("click", function(){
 					moderateApplication(appID,"false");
 				});
 			}
@@ -3687,7 +3687,7 @@ String.prototype.replaceAll = function(search, replacement) {
                             }
                         }
                     });
-                    $($cannotDelPplDialog).find("a.delPplAppList").click(function(){
+                    $($cannotDelPplDialog).find("a.delPplAppList").on("click", function(){
                         $cannotDelPplDialog.dialog('close'); 
                         appdb.views.Main.showApplications({flt:'=application.owner:'+pplID+' +application.deleted:false'}, {isBaseQuery:true, filterDisplay:'Search...', mainTitle : 'Software owned by person with ID:'+pplID});
                     });
@@ -4082,7 +4082,7 @@ String.prototype.replaceAll = function(search, replacement) {
           var div = document.createElement("div"), a = document.createElement("a"), span = document.createElement("span");
           $(div).addClass("dijitButtonNode").addClass("listremove").append(a);
           $(span).append("<img alt='remove' border='0' src='/images/cancelicon.png' title='Remove list item'></img>");
-          $(a).append(span).attr("href","#").attr("title","Remove item").click(function(e){
+          $(a).append(span).attr("href","#").attr("title","Remove item").on("click", function(e){
 
             if( rem ){
              focusedDijitItem = $(elem);

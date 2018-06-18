@@ -146,7 +146,7 @@ function editForm(formName) {
 				break;
 		}
 		el.removeClass('editable');
-        el.click(function(){
+        el.on("click", function(){
             focusedDijitItem = el;
         });
 		if ( el.attr('edit_style') !== undefined ) {el.find("*:first").css(eval("("+el.attr('edit_style')+")"));};
@@ -451,8 +451,8 @@ function editForm(formName) {
 				jb.attr("callback_data",f.callback_data);
 				jbc.prependTo($("#toolbarContainer div:first"));
 				jb.prependTo($("#toolbarContainer div:first"));
-				jb.click(onSave);
-				jbc.click(function(){
+				jb.on("click", onSave);
+				jbc.on("click", function(){
 					eval(f.getAttribute("cancelcallback"));
 				});
 			}

@@ -288,7 +288,7 @@ var selectProfile=function(id) {
             $(':input[name="lastName"]').val('<?php echo $this->escape($lastName);?>');
             $(':input[name="firstName"]').val('<?php echo $this->escape($firstName);?>');
 	    	$('#savedetails').unbind('click');
-			$('#savedetails').click(function() {
+			$('#savedetails').on("click", function() {
 				if ( eval($("#editperson0").attr("onvalidate")) ) {
 					showAjaxLoading();
 					$.post("/people/update",$("#editperson0").serialize(), onCreateProfile);
@@ -313,7 +313,7 @@ var selectProfile2=function(id) {
 		$('#pplimg<?php echo $this->dialogCount;?>').attr('onmouseout','');
 		prepareUpload();
 		$('#savedetails').unbind('click');
-		$('#savedetails').click(function() {
+		$('#savedetails').on("click", function() {
 			showAjaxLoading();
 			$.post("/people/update",$("#editperson0").serialize(), onCreateProfile);
 		});

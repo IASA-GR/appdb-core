@@ -92,7 +92,7 @@
 
 		dojo.parser.parse(atd[0]);
 		atd.find(".dijitComboBox").each(function() {
-			$(this).click(function() {
+			$(this).on("click", function() {
 				setFocusedItem($(this));
 			});
 			dojo.connect(dijit.byNode($(this)[0]), "onChange", function(){
@@ -332,7 +332,7 @@
    		var atd=$(':input[name="authors"]:last').parent();
         dojo.parser.parse(atd[0]);
         atd.find(".dijitComboBox").each(function(){
-			$(this).click(function() {
+			$(this).on("click", function() {
                 setFocusedItem($(this));
             });
         });

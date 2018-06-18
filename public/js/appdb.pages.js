@@ -222,7 +222,7 @@ function zoomImage(src,el){
 
   var dom = document.createElement("div"), div = document.createElement("div"), zoomback = document.createElement("div");
   $(dom).addClass("zoomimage");
-  $(div).addClass("zoomicon").append("<div class='contents'><img src='"+ loadImage("images/search.png") +"' alt=''/></div>").click(function(){
+  $(div).addClass("zoomicon").append("<div class='contents'><img src='"+ loadImage("images/search.png") +"' alt=''/></div>").on("click", function(){
    if(!pplDlg2){
 	pplDlg2 = new dijit.Dialog({
 	   title: "Image preview",
@@ -357,7 +357,7 @@ appdb.pages.index = (function(){
 			}
 			if ($("#delinboxmsg"+inboxDlgCount+"_"+id)[0] === undefined) { 
 				$('#inboxmsg'+inboxDlgCount+"_"+id+':last').find('td:first').append('<a id="delinboxmsg'+inboxDlgCount+"_"+id+'"  msgid="'+id+'" href="#" style="display:inline-block;width:25px;text-align:center;"><img border="0" src="/images/cancelicon.png"/></a>');
-				$('#delinboxmsg'+inboxDlgCount+"_"+id).click(function(e){
+				$('#delinboxmsg'+inboxDlgCount+"_"+id).on("click", function(e){
 					$("#delmsgid").attr("value",$(this).attr("msgid"));
 					delMsg($(this).attr("msgid"));
 					$('#inboxmsg'+inboxDlgCount+"_"+$(this).attr("msgid")).remove();
@@ -935,7 +935,7 @@ appdb.pages.index = (function(){
 			}
 			checkDetailsStyle();
 			$("#details").hide();
-			$(document).click(function(){
+			$(document).on("click", function(){
 				if (newsfilterbox !== undefined) {
 					dijit.popup.close(newsfilterbox);
 				}
@@ -955,7 +955,7 @@ appdb.pages.index = (function(){
 				});
 			});
 			setTimeout(function(){$("#panediv").find("div.dijitTitlePane").each(function() {
-				$(this).click(function(){navpaneclicks(this);});
+				$(this).on("click", function(){navpaneclicks(this);});
 			});},1000);
 			if(userID !== null) { 
 				setTimeout(function(){
@@ -3129,7 +3129,7 @@ appdb.pages.application = (function(){
 		window.apptabselect=0;
 		
 		$( "#navdiv" + page.currentDialogCount() ).tabs();
-		$( "#navdiv" + page.currentDialogCount() + " > ul > li > a" ).click(function(e){e.preventDefault();return false;});
+		$( "#navdiv" + page.currentDialogCount() + " > ul > li > a" ).on("click", function(e){e.preventDefault();return false;});
 		$( "#navdiv" + page.currentDialogCount() ).on( "tabsactivate", function(event, ui) {
 			if( page.isVirtualAppliance() && appdb.vappliance.ui.CurrentVAManager.isEditMode() === true && $.trim(window.apptabselect) !== $.trim(ui.newTab.index())){
 				appdb.vappliance.ui.CurrentVAManager.checkUnsavedData((function(p, e, u){
@@ -3142,7 +3142,7 @@ appdb.pages.application = (function(){
 			page.eventTabSelect(event,ui);
 			return true;
 		});
-		$( "#navdiv" + page.currentDialogCount() + " > ul > li > a" ).click(function(e){e.preventDefault();return false;});
+		$( "#navdiv" + page.currentDialogCount() + " > ul > li > a" ).on("click", function(e){e.preventDefault();return false;});
 		$( "#navdiv" + page.currentDialogCount()).find(".downloadarea").addClass("hidden");
 		$( ".detailsdlgcontent div:first" ).css("height","100%");
 		setTimeout(function(){

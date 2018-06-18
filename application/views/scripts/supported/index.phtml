@@ -81,7 +81,7 @@ if( $.browser.msie ){
 function showAjaxLoading(){
 	hideAjaxLoading();
 }
-$(".showhome").click(function(){
+$(".showhome").on("click", function(){
 	window.location.href = appdb.config.endpoint.base;
 });
 setTimeout( function() {

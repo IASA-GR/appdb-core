@@ -154,10 +154,10 @@ appdb.views.ListViewMode = function(o) {
 	this.render = function() {
 		var that = this;
 		this.reset();
-		var img1 = $("<a href='#'></a>").click(function() {
+		var img1 = $("<a href='#'></a>").on("click", function() {
 			that.setViewMode(1);
 		}).append("<img id='" + _id + "gridviewimg' border='0' title='Grid view' alt='grid view' src='/images/gridview_s.png' ></img>").css("padding", "5px"),
-		img2 = $("<a href='#'></a>").click(function() {
+		img2 = $("<a href='#'></a>").on("click", function() {
 			that.setViewMode(2);
 		}).
 				append("<img id='" + _id + "listviewimg' border='0' title='List view' alt='list view' src='/images/listview.png' ></img>");
@@ -2140,7 +2140,7 @@ appdb.views.PeopleListItem = appdb.ExtendClass(appdb.views.ListItem, "appdb.view
 		}
 		flags = "<span class='personflags' >" + flags + "</span>";
 		var permlink = appdb.utils.getItemCanonicalUrl("person", d);
-		a = $(doc.createElement("a")).attr("href", permlink).attr("target", "_blank").attr("title", fullname).addClass("itemlink").click((function(_this, data) {
+		a = $(doc.createElement("a")).attr("href", permlink).attr("target", "_blank").attr("title", fullname).addClass("itemlink").on("click", (function(_this, data) {
 			return function() {
 				_this.publish({event: "click", value: data});
 				return false;
@@ -2365,7 +2365,7 @@ appdb.views.RelatedContactListItem = appdb.ExtendClass(appdb.views.ListItem, "ap
 			details += "<div class='contactpointprofile'>Click <a href='/store/person/" + this._itemData.cname + "' title='Go to " + this._itemData.firstname + " " + this._itemData.lastname + " profile' onclick='appdb.views.Main.showPerson({id: " + this._itemData.id + ", cname:\"" + this._itemData.cname + "\"},{mainTitle: \"" + this._itemData.firstname + " " + this._itemData.lastname + "\"});'>here</a> to see " + this._itemData.firstname + " " + this._itemData.lastname + " profile</div>";
 			details += "</div>";
 			var detailslink = document.createElement("a");
-			$(detailslink).attr("href", "#").attr("title", "Click to view contact points").text("details").click((function(__this, msg) {
+			$(detailslink).attr("href", "#").attr("title", "Click to view contact points").text("details").on("click", (function(__this, msg) {
 				return function() {
 					var pu = new dijit.TooltipDialog({content: msg});
 					setTimeout((function(_this) {
@@ -2390,7 +2390,7 @@ appdb.views.RelatedContactListItem = appdb.ExtendClass(appdb.views.ListItem, "ap
 			var edit = document.createElement("span"), editlnk = document.createElement("a");
 			$(edit).addClass("editcontactpoint");
 			$(editlnk).attr("href", "#").attr("title", ((d.length == 0) ? "Set" : "Edit ") + " " + this._itemData.firstname + " " + this._itemData.lastname + "  expertise").text(((d.length == 0) ? "Set expertise" : "Edit expertise"));
-			$(editlnk).click((function(_this) {
+			$(editlnk).on("click", (function(_this) {
 				return function() {
 					_this.editContactPoint();
 				};
@@ -2413,7 +2413,7 @@ appdb.views.RelatedContactListItem = appdb.ExtendClass(appdb.views.ListItem, "ap
 		flags = "<span class='personflags'>" + flags + "</span>";
 		fullname = $.trim(fullname).replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
 		var permlink = appdb.utils.getItemCanonicalUrl("person", d);
-		a = $(doc.createElement("a")).attr("href", (permlink || "#")).attr("title", fullname).addClass("itemlink").click((function(_this, data) {
+		a = $(doc.createElement("a")).attr("href", (permlink || "#")).attr("title", fullname).addClass("itemlink").on("click", (function(_this, data) {
 			return function() {
 				if (_this.parent.EditMode()) {
 					if (_this.useToggleButton == false) {
@@ -3543,7 +3543,7 @@ appdb.views.AppsList = appdb.ExtendClass(appdb.View, "appdb.views.AppsList", fun
 					break;
 			}
 			span3 = $(doc.createElement("span")).append("<a href='#' title='"+downloadtitle+"'><img src='/images/download.png' alt=''/><span>Download</span></a>").addClass("itemrelease");
-			$(span3).children("a:first").attr("href", downloadlink).attr("target", "_blank").click((function(doctitle){ 
+			$(span3).children("a:first").attr("href", downloadlink).attr("target", "_blank").on("click", (function(doctitle){ 
 				return function(ev) {
 					ev.preventDefault();
 					appdb.Navigator.pushState(appdb.Navigator.currentHistoryState.data, doctitle, $(this).attr("href"));
@@ -3554,7 +3554,7 @@ appdb.views.AppsList = appdb.ExtendClass(appdb.View, "appdb.views.AppsList", fun
 			$(div).addClass("hasrelease").append($(span3));
 		} else if (d.appliance) {
 			span3 = $(doc.createElement("span")).append("<a href='#' ><img src='/images/download.png' alt=''/><span title='Browse or download virtual appliances'>Download</span></a>").addClass("itemrelease").addClass("vaversion");
-			$(span3).children("a:first").attr("href", "/store/vappliance/" + d.cname + "/vaversion/latest").attr("target", "_blank").click(function(ev) {
+			$(span3).children("a:first").attr("href", "/store/vappliance/" + d.cname + "/vaversion/latest").attr("target", "_blank").on("click", function(ev) {
 				ev.preventDefault();
 				appdb.Navigator.pushState(appdb.Navigator.currentHistoryState.data, "Software " + d.name + " virtual appliance", $(this).attr("href"));
 				appdb.routing.Dispatch();
@@ -3585,7 +3585,7 @@ appdb.views.AppsList = appdb.ExtendClass(appdb.View, "appdb.views.AppsList", fun
 			$(catcontainer).append(shortcut);
 			setTimeout((function(elem) {
 				return function() {
-					shortcut.click(function() {
+					shortcut.on("click", function() {
 						$(this).parent().addClass("show");
 						$(this).parent().mouseleave(function() {
 							$(this).removeClass("show");
@@ -3691,7 +3691,7 @@ appdb.views.AppsList = appdb.ExtendClass(appdb.View, "appdb.views.AppsList", fun
 				(new appdb.views.StarBox({container: $(rating), style: "width:10px;height:10px;", images: {"full": loadImage("star_full.png"), "half": loadImage("star_half.png"), "empty": loadImage("star_none.png"), "active": loadImage("star_full.png")}})).render($(ratingcount).text());
 			});
 			$("ul.itemgrid li.itemcontainer div.item .categoriescontainer a.shortcut").each(function(index, elem) {
-				$(elem).click(function() {
+				$(elem).on("click", function() {
 					$(this).parent().addClass("show");
 					$(this).parent().mouseleave(function() {
 						$(this).removeClass("show");
@@ -4317,17 +4317,17 @@ appdb.views.Export = appdb.ExtendClass(appdb.View, "appdb.views.Export", functio
 		this.link = $('<a title="Export results" href="#" ></a>');
 		this.imgExport = $('<img border="0" height="29px" src="/images/export.png" alt="export"/></a>');
 		this.form = $('<form id="exportapps" name="exportapps" method="GET" action="' + appdb.config.endpoint.base + this.target + '/export"></form>');
-		this.exportXml = $('<span style="white-space: nowrap;display:block;"><a title="Machine oriented, full data export" href="#">Export to XML</a> <a style="font-size:80%" target="_blank" href="files/app_xml_export.xsd">[XSD]</a></span>').click(function() {
+		this.exportXml = $('<span style="white-space: nowrap;display:block;"><a title="Machine oriented, full data export" href="#">Export to XML</a> <a style="font-size:80%" target="_blank" href="files/app_xml_export.xsd">[XSD]</a></span>').on("click", function() {
 			_this.submit('xml');
 		});
-		this.exportCsv = $('<span style="white-space: nowrap"><a title="Human oriented, concise data export" href="#">Export to CSV</a></span>').click(function() {
+		this.exportCsv = $('<span style="white-space: nowrap"><a title="Human oriented, concise data export" href="#">Export to CSV</a></span>').on("click", function() {
 			_this.submit('csv');
 		});
 		$(this.form).append(this.exportXml);
 		$(this.form).append(this.exportCsv);
 		$(this.link).append(this.imgExport);
 		$(this.link).append(this.form);
-		$(this.link).click(function() {
+		$(this.link).on("click", function() {
 			dijit.popup.open({
 				parent: $(_this.link)[0],
 				popup: _this.tooltip,
@@ -4473,7 +4473,7 @@ appdb.views.StarBox = appdb.ExtendClass(appdb.View, "appdb.views.StarBox", funct
 						t.publish({event: "mouseleave", value: {index: ind, elem: $(this)}});
 					};
 				})(this, (i + 1), d));
-				$(img).click((function(t, ind) {
+				$(img).on("click", (function(t, ind) {
 					return function() {
 						t.publish({event: "click", value: {index: ind, elem: $(this)}});
 					};
@@ -4615,7 +4615,7 @@ appdb.views.ErrorHandler = function() {
 			$(detailsSource).html(this.createDetails(err.source));
 			$(detailsSource).css({width: "99%"});
 			$(detailsSource).hide();
-			$(a).attr("href", "#").attr("alt", "Click to view source error").text("details").click(function() {
+			$(a).attr("href", "#").attr("alt", "Click to view source error").text("details").on("click", function() {
 				if ($(detailsSource).css("display") === "none") {
 					$(detailsSource).css("display", "block");
 				} else {
@@ -4673,7 +4673,7 @@ appdb.views.TagOptions = appdb.ExtendClass(appdb.View, "appdb.views.TagOptions",
 		$(form).append("<input type='radio' name='policy' value='1' " + ((policy == '1') ? "checked='checked'" : "") + ">Related contacts</input><div></div>");
 		$(form).append("<input type='radio' name='policy' value='2' " + ((policy == '2') ? "checked='checked'" : "") + ">Everyone</input><div></div>");
 		$(form).find("input[value='" + policy + "']").prop("checked", true);
-		$(form).find("input").click((function(_this) {
+		$(form).find("input").on("click", (function(_this) {
 			return function() {
 				_this._setPolicy(appid, $(this).val(), policy);
 			};
@@ -4695,7 +4695,7 @@ appdb.views.TagOptions = appdb.ExtendClass(appdb.View, "appdb.views.TagOptions",
 		$(tagButton).addClass("taglist-add").addClass("editbutton").append("<span>options</span>");
 		$(tagButton).attr("id", "tagoptionsbutton");
 		var dialog = this._renderDialog(d.id, d.tagPolicy);
-		$(tagButton).click(function() {
+		$(tagButton).on("click", function() {
 			setTimeout(function() {
 				var d = new dijit.TooltipDialog({content: $(dialog)[0]});
 				dijit.popup.open({
@@ -4720,7 +4720,7 @@ appdb.views.TagList = appdb.ExtendClass(appdb.View, "appdb.views.TagList", funct
 		$(this._toggler).off("click").empty();
 		$(this._adder).empty();
 		this._toggler = document.createElement("a");
-		$(this._toggler).addClass("taglist-toggler").attr("title", "Click to view all associated tags").text("more...").click((function(t) {
+		$(this._toggler).addClass("taglist-toggler").attr("title", "Click to view all associated tags").text("more...").on("click", (function(t) {
 			return function() {
 				t._toggleList();
 				if (t._isExpanded()) {
@@ -4851,7 +4851,7 @@ appdb.views.TagList = appdb.ExtendClass(appdb.View, "appdb.views.TagList", funct
 		var dec = document.createElement("div");
 		var rem = document.createElement("div");
 		var a = document.createElement("a");
-		$(a).attr("title", "Search with tag " + val).attr("href", "#").click(function() {
+		$(a).attr("title", "Search with tag " + val).attr("href", "#").on("click", function() {
 			var content = "software";
 			if (appdb.pages.application.currentEntityType() === "virtualappliance") {
 				content = "vappliance";
@@ -4870,7 +4870,7 @@ appdb.views.TagList = appdb.ExtendClass(appdb.View, "appdb.views.TagList", funct
 		}
 		if (canRemove) {
 			$(rem).addClass("taglist-remove").addClass("taglist-remove-hide").attr("title", "Remove tag " + val);
-			$(rem).click((function(_this, tag, id, elem) {
+			$(rem).on("click", (function(_this, tag, id, elem) {
 				return function() {
 					_this._deleteTag(id, t.id, elem);
 				};
@@ -5060,13 +5060,13 @@ appdb.views.TagList = appdb.ExtendClass(appdb.View, "appdb.views.TagList", funct
 			sel.focus();
 		}, 100);
 		//setup actions
-		$(ok).click((function(_this, _appid) {
+		$(ok).on("click", (function(_this, _appid) {
 			return function() {
 				_this._addTag(_appid, dijit.byId("taglist-add-select").attr('value'), data.owner.id);
 				return false;
 			};
 		})(this, appid));
-		$(cancel).click((function(_this) {
+		$(cancel).on("click", (function(_this) {
 			return function() {
 				_this._closeAdd.apply(_this);
 				return false;
@@ -5090,7 +5090,7 @@ appdb.views.TagList = appdb.ExtendClass(appdb.View, "appdb.views.TagList", funct
 		if (userID === null || (userID !== null && isEditable === true)) {
 			var sp = document.createElement("span");
 			$(sp).attr("id", "taglist-add").attr("title", "Click to add a new tag").text("add");
-			$(this._adder).addClass("taglist-add").addClass("editbutton").append(sp).click((function(_this, id, canEdit) {
+			$(this._adder).addClass("taglist-add").addClass("editbutton").append(sp).on("click", (function(_this, id, canEdit) {
 				return function() {
 					if (canEdit) {
 						if ($(this).find("#taglist-add-edit").length === 0) {
@@ -5108,7 +5108,7 @@ appdb.views.TagList = appdb.ExtendClass(appdb.View, "appdb.views.TagList", funct
 					} else {
 						setTimeout(function() {
 							var c = $("<div style='width:450px;'>If you wish to add a new tag, please <b>Sign In</b> first with your account.</div>");
-							$($(c).find(".login").get(0)).click(function() {
+							$($(c).find(".login").get(0)).on("click", function() {
 								dijit.popup.close(d);
 								login();
 							});
@@ -5394,14 +5394,14 @@ appdb.views.NewsFeed = appdb.ExtendClass(appdb.View, "appdb.views.NewsFeed", fun
 		if (this.customizable) {
 			$(a2).attr("target", "_blank").attr("title", "Customize the news feed").addClass("atomfeed-select").css({visibility: "hidden"}).append(span);
 			this.customDialog = this._renderCustomFeed();
-			$(this.customDialog).click(function(event) {
+			$(this.customDialog).on("click", function(event) {
 				var src = event.srcElement ? event.srcElement : event.target;
 				if (src && src.tagName.toLowerCase() === "a") {
 					return true;
 				}
 				return false;
 			});
-			$(a).click((function(_this, parent) {
+			$(a).on("click", (function(_this, parent) {
 				return function() {
 					setTimeout(function() {
 						var d = new dijit.TooltipDialog({content: $(_this.customDialog)[0]});
@@ -5476,7 +5476,7 @@ appdb.views.ApplicationUrls = appdb.ExtendClass(appdb.View, "appdb.views.Applica
 		$(arrow).addClass("urllistarrow").append("&#9660;");
 		$(a).attr("href", "#").attr("title", "There are " + data.length + " " + name + " urls. Click to view them.").text(name + " (" + data.length + ")");
 		htmllist = this._renderListHtml(data);
-		$(a).click((function(_this, elem, html) {
+		$(a).on("click", (function(_this, elem, html) {
 			return function() {
 				_this._showUrlList(elem, html);
 				return false;
@@ -5588,7 +5588,7 @@ appdb.views.ApplicationUrlsEditorItem = appdb.ExtendClass(appdb.View, "appdb.vie
 		$(td3).addClass("appurlitem").addClass("title").append("<span></span>");
 		$(td4).addClass("appurlitem").addClass("remove").append("<span></span>");
 		$(td4).find("span").append(a);
-		$(a).attr("href", "#").append("<img style='vertical-align: middle; padding-right: 3px;' alt='remove' border='0' src='/images/cancelicon.png' title='Remove url' />").click((function(_this) {
+		$(a).attr("href", "#").append("<img style='vertical-align: middle; padding-right: 3px;' alt='remove' border='0' src='/images/cancelicon.png' title='Remove url' />").on("click", (function(_this) {
 			return function() {
 				setTimeout(function() {
 					_this.parent.removeItem(_this);
@@ -5945,7 +5945,7 @@ appdb.views.ApplicationCategoriesEditorItem = appdb.ExtendClass(appdb.View, "app
 		$(td2).addClass("appcategoryitem").addClass("category").append("<span></span>");
 		$(td3).addClass("appcategoryitem").addClass("remove").append("<span></span>");
 		$(td3).find("span").append(a);
-		$(a).attr("href", "#").append("<img style='vertical-align: middle; padding-right: 3px;' alt='remove' border='0' src='/images/cancelicon.png' title='Remove category' />").click((function(_this) {
+		$(a).attr("href", "#").append("<img style='vertical-align: middle; padding-right: 3px;' alt='remove' border='0' src='/images/cancelicon.png' title='Remove category' />").on("click", (function(_this) {
 			return function() {
 				setTimeout(function() {
 					_this.parent.removeItem(_this);
@@ -6493,7 +6493,7 @@ appdb.views.UserRequests = appdb.ExtendClass(appdb.View, "appdb.views.UserReques
 				prevmsg = prevmsg.slice(0, ((prevmsg.length >= 150) ? 199 : prevmsg.length));
 				prevmsg = $(document.createElement("div")).attr("id", "previewmessage" + d.id).addClass("previewmessage").append(prevmsg);
 				msg = $(document.createElement("div")).attr("id", "fullmessage" + d.id).css("display", "none").addClass("fullmessage").append(msg);
-				$(prevlink).addClass("messagedetailslink").attr("href", "").text("Message").click((function(id) {
+				$(prevlink).addClass("messagedetailslink").attr("href", "").text("Message").on("click", (function(id) {
 					return function() {
 						$("#fullmessage" + id).toggle();
 						$("#previewmessage" + id).toggle();
@@ -6576,7 +6576,7 @@ appdb.views.UserRequests = appdb.ExtendClass(appdb.View, "appdb.views.UserReques
 				prevmsg = prevmsg.slice(0, ((prevmsg.length >= 150) ? 199 : prevmsg.length));
 				prevmsg = $(document.createElement("div")).attr("id", "previewmessage" + d.id).addClass("previewmessage").append(prevmsg);
 				msg = $(document.createElement("div")).attr("id", "fullmessage" + d.id).css("display", "none").addClass("fullmessage").append(msg);
-				$(prevlink).addClass("messagedetailslink").attr("href", "").text("Message").click((function(id) {
+				$(prevlink).addClass("messagedetailslink").attr("href", "").text("Message").on("click", (function(id) {
 					return function() {
 						$("#fullmessage" + id).toggle();
 						$("#previewmessage" + id).toggle();
@@ -6661,7 +6661,7 @@ appdb.views.UserRequests = appdb.ExtendClass(appdb.View, "appdb.views.UserReques
 				prevmsg = prevmsg.slice(0, ((prevmsg.length >= 150) ? 199 : prevmsg.length));
 				prevmsg = $(document.createElement("div")).attr("id", "previewmessage" + d.id).addClass("previewmessage").append(prevmsg);
 				msg = $(document.createElement("div")).attr("id", "fullmessage" + d.id).css("display", "none").addClass("fullmessage").append(msg);
-				$(prevlink).addClass("messagedetailslink").attr("href", "").text("Message").click((function(id) {
+				$(prevlink).addClass("messagedetailslink").attr("href", "").text("Message").on("click", (function(id) {
 					return function() {
 						$("#fullmessage" + id).toggle();
 						$("#previewmessage" + id).toggle();
@@ -6867,7 +6867,7 @@ appdb.views.DropDownGroup = appdb.ExtendClass(appdb.View, "appdb.views.DropDownG
 		this.selected.set("", undefined);
 		$(this.dom).find(".combo .selection:last").off("click");
 
-		$(this.dom).find(".combo .selection:last").click((function(_this) {
+		$(this.dom).find(".combo .selection:last").on("click", (function(_this) {
 			return function() {
 				$(_this.dom).parent().toggleClass("active");
 				if ($(_this.dom).parent().hasClass("active")) {
@@ -6957,7 +6957,7 @@ appdb.views.ApiNetFilterItem = appdb.ExtendClass(appdb.View, "appdb.views.ApiNet
 		var div = document.createElement("div"), deletelink = document.createElement("a");
 		$(div).addClass("apinetfilteritem");
 		$(div).html("<div class='value' >" + this._data + "</div>").append(deletelink);
-		$(deletelink).addClass("action").html(appdb.views.ApiNetFilterItem.actions.remove || "<span></span>").click((function(_this) {
+		$(deletelink).addClass("action").html(appdb.views.ApiNetFilterItem.actions.remove || "<span></span>").on("click", (function(_this) {
 			return function(i, el) {
 				setTimeout(function() {
 					_this.publish({"event": "delete", "value": _this._data});
@@ -7023,7 +7023,7 @@ appdb.views.ApiNetFilterRegister = appdb.ExtendClass(appdb.View, "appdb.views.Ap
 	this.render = function() {
 		var input = document.createElement("div"), add = document.createElement("a");
 		$(add).addClass("action").addClass("disabled").append($(appdb.views.ApiNetFilterRegister.actions.add || "<span></span>"));
-		$(add).click((function(_this) {
+		$(add).on("click", (function(_this) {
 			return function() {
 				if ($(this).hasClass("disabled") === false) {
 					_this.publish({"event": "insert", "value": _this.currentValue});
@@ -7073,7 +7073,7 @@ appdb.views.ApiNetFilterRegister = appdb.ExtendClass(appdb.View, "appdb.views.Ap
 				content: appdb.views.ApiNetFilterRegister.labels.examples
 			});
 
-			$(this.dom).find("a.cidrexamples").click(function() {
+			$(this.dom).find("a.cidrexamples").on("click", function() {
 				if (appdb.views.ApiNetFilterRegister.tips !== null) {
 					dijit.popup.close(appdb.views.ApiNetFilterRegister.tips);
 				}
@@ -7254,19 +7254,19 @@ appdb.views.ApiKeySystemUser = appdb.ExtendClass(appdb.View, "appdb.views.ApiKey
 		$(div).addClass("systemuser").append(username).append(displayname).append(actions).append(actioncontainer);
 		$(this.dom).append(div);
 
-		$(changepassword).click((function(_this) {
+		$(changepassword).on("click", (function(_this) {
 			return function() {
 				_this.changePassword(d);
 			};
 		})(this));
 
-		$(changename).click((function(_this) {
+		$(changename).on("click", (function(_this) {
 			return function() {
 				_this.changeName(d);
 			};
 		})(this));
 
-		$(requestpermissions).click((function(_this) {
+		$(requestpermissions).on("click", (function(_this) {
 			return function() {
 				_this.requestPermissions(d);
 			};
@@ -7313,7 +7313,7 @@ appdb.views.ApiKeySystemUser = appdb.ExtendClass(appdb.View, "appdb.views.ApiKey
 			})(this)
 		}, $(nameinput)[0]);
 
-		$(update).click((function(_this) {
+		$(update).on("click", (function(_this) {
 			return function() {
 				var v = _this.newdisplayname.attr("displayedValue");
 				if ($.trim(v) === "" || v == d.sysdisplayname) {
@@ -7327,7 +7327,7 @@ appdb.views.ApiKeySystemUser = appdb.ExtendClass(appdb.View, "appdb.views.ApiKey
 			};
 		})(this));
 
-		$(cancel).click((function(_this) {
+		$(cancel).on("click", (function(_this) {
 			return function() {
 				$(_this.dom).find(".systemuser > .actions").show();
 				$(dialog).empty().addClass("hidden");
@@ -7470,7 +7470,7 @@ appdb.views.ApiKeySystemUser = appdb.ExtendClass(appdb.View, "appdb.views.ApiKey
 			})(this)
 		}, $(confirminput)[0]);
 
-		$(update).click((function(_this) {
+		$(update).on("click", (function(_this) {
 			return function() {
 				_this.newpass.validate();
 				_this.confirmpass.validate();
@@ -7488,7 +7488,7 @@ appdb.views.ApiKeySystemUser = appdb.ExtendClass(appdb.View, "appdb.views.ApiKey
 			};
 		})(this));
 
-		$(cancel).click((function(_this) {
+		$(cancel).on("click", (function(_this) {
 			return function() {
 				$(_this.dom).find(".systemuser > .actions").show();
 				$(dialog).empty().addClass("hidden");
@@ -7528,7 +7528,7 @@ appdb.views.ApiKeySystemUser = appdb.ExtendClass(appdb.View, "appdb.views.ApiKey
 				}
 			};
 		})(this));
-		$(send).click((function(_this) {
+		$(send).on("click", (function(_this) {
 			return function() {
 				var v = $(text).val();
 				if ($.trim(v) === "") {
@@ -7542,7 +7542,7 @@ appdb.views.ApiKeySystemUser = appdb.ExtendClass(appdb.View, "appdb.views.ApiKey
 			};
 		})(this));
 
-		$(cancel).click((function(_this) {
+		$(cancel).on("click", (function(_this) {
 			return function() {
 				$(_this.dom).find(".systemuser > .actions").show();
 				$(dialog).empty().addClass("hidden");
@@ -7674,7 +7674,7 @@ appdb.views.ApiKeySystemUser = appdb.ExtendClass(appdb.View, "appdb.views.ApiKey
 			})(this)
 		}, $(passwd2).find("div:last")[0]);
 
-		$(newuseraction).click((function(_this) {
+		$(newuseraction).on("click", (function(_this) {
 			return function() {
 				if ($(_this.dom).find(".createnewuser").hasClass("disabled")) {
 					//Cannot send the request
@@ -7835,12 +7835,12 @@ appdb.views.ApiKeyAuthentication = appdb.ExtendClass(appdb.View, "appdb.views.Ap
 			};
 		})(this, d, system));
 
-		$(ssolink).click(function() {
+		$(ssolink).on("click", function() {
 			$(sso).prop("checked", true);
 			$(sso).change();
 		});
 
-		$(systemlink).click(function() {
+		$(systemlink).on("click", function() {
 			$(system).prop("checked", true);
 			$(system).change();
 		});
@@ -7867,7 +7867,7 @@ appdb.views.ApiKeyAuthentication = appdb.ExtendClass(appdb.View, "appdb.views.Ap
 				var systemtip = new dijit.TooltipDialog({
 					content: appdb.views.ApiKeyAuthentication.help.external
 				});
-				$(systemhelp).append("<img src='/images/question_mark.gif' border='0' />").click((function(_this) {
+				$(systemhelp).append("<img src='/images/question_mark.gif' border='0' />").on("click", (function(_this) {
 					return function() {
 						if (appdb.views.ApiNetFilterRegister.helptip) {
 							dijit.popup.close(appdb.views.ApiNetFilterRegister.helptip);
@@ -7887,7 +7887,7 @@ appdb.views.ApiKeyAuthentication = appdb.ExtendClass(appdb.View, "appdb.views.Ap
 				var ssotip = new dijit.TooltipDialog({
 					content: appdb.views.ApiKeyAuthentication.help.sso
 				});
-				$(ssohelp).append("<img src='/images/question_mark.gif' border='0' />").click((function(_this) {
+				$(ssohelp).append("<img src='/images/question_mark.gif' border='0' />").on("click", (function(_this) {
 					return function() {
 						if (appdb.views.ApiNetFilterRegister.helptip) {
 							dijit.popup.close(appdb.views.ApiNetFilterRegister.helptip);
@@ -8001,7 +8001,7 @@ appdb.views.ApiKeyItem = appdb.ExtendClass(appdb.View, "appdb.views.ApiKeyItem",
 		$(this.dom).closest(".apikeylistcontainer").addClass("loading");
 		confirm.show();
 
-		$(remove).click((function(_this) {
+		$(remove).on("click", (function(_this) {
 			return function() {
 				$(_this.dom).closest(".apikeylistcontainer").removeClass("loading");
 				_this.publish({"event": "delete", "value": data});
@@ -8011,7 +8011,7 @@ appdb.views.ApiKeyItem = appdb.ExtendClass(appdb.View, "appdb.views.ApiKeyItem",
 			};
 		})(this));
 
-		$(cancel).click((function(_this) {
+		$(cancel).on("click", (function(_this) {
 			return function() {
 				$(_this.dom).closest(".apikeylistcontainer").removeClass("loading");
 				confirm.hide();
@@ -8092,7 +8092,7 @@ appdb.views.ApiKeyItem = appdb.ExtendClass(appdb.View, "appdb.views.ApiKeyItem",
 				append($(createdon));
 
 		//Setup event handler for api key removal
-		$(deletelink).click((function(_this) {
+		$(deletelink).on("click", (function(_this) {
 			return function(i, el) {
 				_this.removeKey(_this._data, this);
 				return false;
@@ -8216,7 +8216,7 @@ appdb.views.ApiKeyList = appdb.ExtendClass(appdb.View, "appdb.views.ApiKeyList",
 			if (appdb.views.ApiKeyList.actions.add) {
 				$(adderContainer).addClass("addercontainer");
 				$(adderinfo).addClass("adderinfo").append(appdb.views.ApiKeyList.labels.info || "<span></span>");
-				$(adder).addClass("action").append(appdb.views.ApiKeyList.actions.add).click((function(_this) {
+				$(adder).addClass("action").append(appdb.views.ApiKeyList.actions.add).on("click", (function(_this) {
 					return function() {
 						_this.publish({"event": "generate", "value": ""});
 					};
@@ -8277,7 +8277,7 @@ appdb.views.TokenNetFilterItem = appdb.ExtendClass(appdb.View, "appdb.views.Toke
 		var div = document.createElement("div"), deletelink = document.createElement("a");
 		$(div).addClass("netfilteritem");
 		$(div).html("<div class='value' >" + this._data + "</div>").append(deletelink);
-		$(deletelink).addClass("action").html(appdb.views.TokenNetFilterItem.actions.remove || "<span></span>").click((function(self) {
+		$(deletelink).addClass("action").html(appdb.views.TokenNetFilterItem.actions.remove || "<span></span>").on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				setTimeout(function() {
@@ -8344,7 +8344,7 @@ appdb.views.TokenNetFilterRegister = appdb.ExtendClass(appdb.View, "appdb.views.
 	this.render = function() {
 		var input = document.createElement("div"), add = document.createElement("a");
 		$(add).addClass("action").addClass("disabled").append($(appdb.views.TokenNetFilterRegister.actions.add || "<span></span>"));
-		$(add).click((function(self) {
+		$(add).on("click", (function(self) {
 			return function(ev) {
 				ev.preventDefault();
 				if ($(this).hasClass("disabled") === false) {
@@ -8395,7 +8395,7 @@ appdb.views.TokenNetFilterRegister = appdb.ExtendClass(appdb.View, "appdb.views.
 			var tip = new dijit.TooltipDialog({
 				content: appdb.views.TokenNetFilterRegister.labels.examples
 			});
-			$(this.dom).find("a.cidrexamples").click(function() {
+			$(this.dom).find("a.cidrexamples").on("click", function() {
 				if (appdb.views.TokenNetFilterRegister.tips !== null) {
 					dijit.popup.close(appdb.views.TokenNetFilterRegister.tips);
 				}
@@ -8611,7 +8611,7 @@ appdb.views.AccessTokenListItem = appdb.ExtendClass(appdb.View, "appdb.views.Acc
 		$(this.dom).closest(".accesstokenlistcontainer").addClass("loading");
 		confirm.show();
 
-		$(remove).click((function(_this) {
+		$(remove).on("click", (function(_this) {
 			return function() {
 				$(_this.parent.dom).removeClass("loading");
 				_this.publish({"event": "delete", "value": data});
@@ -8621,7 +8621,7 @@ appdb.views.AccessTokenListItem = appdb.ExtendClass(appdb.View, "appdb.views.Acc
 			};
 		})(this));
 
-		$(cancel).click((function(_this) {
+		$(cancel).on("click", (function(_this) {
 			return function() {
 				$(".accesstokenlistcontainer").removeClass("loading");
 				confirm.hide();
@@ -8663,7 +8663,7 @@ appdb.views.AccessTokenListItem = appdb.ExtendClass(appdb.View, "appdb.views.Acc
 				append($(createdon));
 
 		//Setup event handler for api key removal
-		$(deletelink).click((function(self, data) {
+		$(deletelink).on("click", (function(self, data) {
 			return function(ev) {
 				ev.preventDefault();
 				self.removeToken(data, this);
@@ -8761,7 +8761,7 @@ appdb.views.AccessTokenList = appdb.ExtendClass(appdb.View, "appdb.views.AccessT
 			if (appdb.views.AccessTokenList.actions.add) {
 				$(adderContainer).addClass("addercontainer");
 				$(adderinfo).addClass("adderinfo").append(appdb.views.AccessTokenList.labels.info || "<span></span>");
-				$(adder).addClass("action").append(appdb.views.AccessTokenList.actions.add).click((function(_this) {
+				$(adder).addClass("action").append(appdb.views.AccessTokenList.actions.add).on("click", (function(_this) {
 					return function() {
 						_this.publish({"event": "generate", "value": ""});
 					};
@@ -9025,7 +9025,7 @@ appdb.views.CustomMiddleware = appdb.ExtendClass(appdb.View, "appdb.views.Custom
 
 		$(div).addClass("custommiddleware");
 		$(name).addClass("name").append($(namelink).attr("href", this.link()).attr("target", "_blank").text(this.name()));
-		$(edit).addClass("edit").append($(editlink).attr("title", "Edit custom middleware").click((function(caller) {
+		$(edit).addClass("edit").append($(editlink).attr("title", "Edit custom middleware").on("click", (function(caller) {
 			return function() {
 				setTimeout(function() {
 					var frm = new appdb.views.CustomMiddlewareForm(caller._data);
@@ -9042,7 +9042,7 @@ appdb.views.CustomMiddleware = appdb.ExtendClass(appdb.View, "appdb.views.Custom
 			};
 		})(this)).append($(editimg).attr("src", "/images/editicon.png")));
 
-		$(remove).addClass("remove").append($(removelink).attr("title", "Remove custom middleware").click((function(caller) {
+		$(remove).addClass("remove").append($(removelink).attr("title", "Remove custom middleware").on("click", (function(caller) {
 			return function() {
 				caller.publish({"event": "remove", value: caller.index});
 				return false;
@@ -9140,7 +9140,7 @@ appdb.views.CustomMiddlewareHandler = appdb.ExtendClass(appdb.View, "appdb.views
 	this._initContainer = function() {
 		this.editCustomMiddlewares();
 		var span = document.createElement("span"), a = document.createElement("a");
-		$(a).html(appdb.views.CustomMiddlewareHandler.text.handler || "<span>New</span>").click((function(caller) {
+		$(a).html(appdb.views.CustomMiddlewareHandler.text.handler || "<span>New</span>").on("click", (function(caller) {
 			return function() {
 				var frm = new appdb.views.CustomMiddlewareForm({name: "", link: "http://"});
 				frm.subscribe({event: "ok", callback: function(d) {
@@ -14487,7 +14487,7 @@ appdb.views.ProfileListItem = appdb.ExtendClass(appdb.views.ListItem, "appdb.vie
 		}
 		flags = "<span class='personflags' >" + flags + "</span>";
 		var permlink = appdb.utils.getItemCanonicalUrl("person", d);
-		a = $(doc.createElement("a")).attr("href", permlink).attr("target", "_blank").attr("title", fullname).addClass("itemlink").click((function(_this, data) {
+		a = $(doc.createElement("a")).attr("href", permlink).attr("target", "_blank").attr("title", fullname).addClass("itemlink").on("click", (function(_this, data) {
 			return function() {
 				_this.publish({event: "click", value: data});
 				return false;

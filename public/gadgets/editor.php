@@ -394,7 +394,7 @@ function getHierarchyValues($data){
 						  })
 						  .removeClass( "ui-corner-all" )
 						  .addClass( "ui-corner-right ui-button-icon" )
-						  .click(function() {
+						  .on("click", function() {
 							  // close if already visible
 							  if ( input.autocomplete( "widget" ).is( ":visible" ) ) {
 								  input.autocomplete( "close" );
@@ -476,7 +476,7 @@ function getHierarchyValues($data){
 		$("#tabs").tabs().addClass('ui-tabs-vertical ui-helper-clearfix');
 		$("#tabs li").removeClass('ui-corner-top').addClass('ui-corner-left');
                 $("#aboutLink").trigger("click");
-                $("#aboutLink").click(function(){
+                $("#aboutLink").on("click", function(){
                     $("#preview").hide();
                     screenHeight = $(window).height();
 					var headoff = ($(".head").offset())?$(".head").offset().top:0;
@@ -484,7 +484,7 @@ function getHierarchyValues($data){
                      $("#container").height(fixedheight);
                 });
                 
-                $("#basicLink").click(function(){
+                $("#basicLink").on("click", function(){
                     $("#preview").hide();
                     screenHeight = $(window).height();
 					var headoff = ($(".head").offset())?$(".head").offset().top:0;
@@ -492,17 +492,17 @@ function getHierarchyValues($data){
                      $("#container").height(fixedheight);
                 });
 
-                $("#filteringLink").click(function(){
+                $("#filteringLink").on("click", function(){
                     $("#preview").hide();
                     screenHeight = $(window).height();
 					var headoff = ($(".head").offset())?$(".head").offset().top:0;
                      var fixedheight = screenHeight-$("#toolbarrow").outerHeight()-$(".head").outerHeight()-headoff-$("#footer").outerHeight()-15;
                      $("#container").height(fixedheight);
                 });
-                 $("#generateLink").click(function(){
+                 $("#generateLink").on("click", function(){
                     $("#preview").show();
                 });
-                $("a[href='#tabGenerate']").click(function(){createFrameTag();});
+                $("a[href='#tabGenerate']").on("click", function(){createFrameTag();});
                 $('#tabs').removeClass('ui-corner-all');
 
 

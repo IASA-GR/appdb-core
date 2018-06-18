@@ -2813,7 +2813,7 @@ appdb.components.RelatedContacts = appdb.ExtendClass(appdb.Component,"appdb.comp
 			fltval = fltval.trim();
 		} catch (e) {
 		}
-		$(v.filtering.dom).parent().prepend($('<a href="#">Advanced filter</a>').addClass("editfilter").click((function(_this){
+		$(v.filtering.dom).parent().prepend($('<a href="#">Advanced filter</a>').addClass("editfilter").on("click", (function(_this){
 			return function() {
 				$(_this.dom).find(".editfilter").hide();
 				$(_this.views.filtering.dom).fadeIn();
@@ -2884,7 +2884,7 @@ appdb.components.RelatedContacts = appdb.ExtendClass(appdb.Component,"appdb.comp
 			for(var i in this.perspectives) {
 				var p = this.perspectives[i];
 				var a = $("<a class='"+(p.css || "")+focused+"' href='#' title='"+(p.description || "")+"' >"+p.displayName+"</a><span> | </span>");
-				a.click((function(_this,_p){
+				a.on("click", (function(_this,_p){
 					return function() {
 						_this.focusPerspective(_p);
 						_p.callback.apply(_this);
@@ -3261,7 +3261,7 @@ appdb.components.Person = appdb.ExtendClass(appdb.Component,"appdb.components.Pe
 			try{dojo.parser.parse("ppl_details");}catch(e){}
 		}
 		
-        $("#editPerson").click(function(){
+        $("#editPerson").on("click", function(){
             if($(this).text()==="edit"){
                 _this.startEditing(d);
                 $(this).text("cancel");
@@ -3680,7 +3680,7 @@ appdb.components.RatingReport = appdb.ExtendClass(appdb.Component,"appdb.compone
     this._appendMenu = function(type){
         var li = $(document.createElement("li"));
         var a = $(document.createElement("a"));
-        a.attr("href","#").click(
+        a.attr("href","#").on("click", 
             (function(t,mq){
                 return function(){
                     var q = t._model.getQuery();
@@ -4755,7 +4755,7 @@ appdb.components.DisseminationLog = appdb.ExtendClass(appdb.Component, "appdb.co
 
 		} 
 		item.html(h);
-		item.click((function(_this) {
+		item.on("click", (function(_this) {
 			return function() {
                 _this._order = field;
 				if ($.trim(_this._orderOp) === "DESC") {
@@ -4824,14 +4824,14 @@ appdb.components.DisseminationLog = appdb.ExtendClass(appdb.Component, "appdb.co
 				s = s + '<div>'+msg+'</div>';
 				li.html(s);
 				ul.append(li);
-				li.click((function(_this, _parent){
+				li.on("click", (function(_this, _parent){
 					return function() {
 						var dt = new appdb.components.DisseminationTool();
 						var index = _this.attr("data-index");
 						dt.preview(_parent.data[index], false);
 					};
 				})(li, this));
-				li.find("a.composer").click((function(_this, _parent){
+				li.find("a.composer").on("click", (function(_this, _parent){
                     return function() {
 						var index = _this.attr("data-index");
     					appdb.views.Main.showPerson({id: _parent.data[index].composer.id, cname:_parent.data[index].composer.cname},{mainTitle: ""}); 
@@ -5395,7 +5395,7 @@ appdb.components.MainSearch = appdb.ExtendClass(appdb.Component,"appdb.views.Mai
         $(a).attr("href","#").addClass("mainsearch-tags").css({visibility:"hidden"});
         $(footer).append($(a));
         $(this._cloud).addClass("mainsearch-tagcloud").css({"width":"200px"});
-        $(a).click((function(_this){
+        $(a).on("click", (function(_this){
                return function(){
                     setTimeout(function(){
                         dijit.popup.open({
@@ -5405,7 +5405,7 @@ appdb.components.MainSearch = appdb.ExtendClass(appdb.Component,"appdb.views.Mai
                             orient: {'BR':'TR','BL':'TL'}
                         });
                         _this.views.cloud.render();
-                        $(_this._cloud).click(function(event) {
+                        $(_this._cloud).on("click", function(event) {
                             var src = event.srcElement?event.srcElement:event.target;
                             if(src && src.tagName.toLowerCase()==="a"){
                                 return true;
@@ -5477,7 +5477,7 @@ appdb.components.TabContainer = appdb.ExtendClass(appdb.Component,"appdb.compone
 		})(this));
 		$(ul).find("li").each((function(_this){
 			return function(index,elem){
-				$(this).click(function(){
+				$(this).on("click", function(){
 					_this.showTab(index);
 				});
 			};
@@ -5673,7 +5673,7 @@ appdb.components.MailSubscription = appdb.ExtendClass(appdb.Component,"appdb.com
         if(this._subscription.id){//Already subscribed. The actions will be Update and Unsubscribe
             $(commands).append("<span class='command mailfeed' ><a href='' alt='' title='Click to update the current mail notification settings' target='_blank' id='mailsubscriptionupdate'>Update</a></span>").
             append("<span class='command mailfeed' ><a href='' alt='' title='Click to unsubscribe' target='_blank' id='mailsubscriptionremove'>Unsubscribe</a></span>");
-            $(commands).find("#mailsubscriptionupdate").click((function(_this){
+            $(commands).find("#mailsubscriptionupdate").on("click", (function(_this){
                 return function(){
                     if(_this._subscription.id){
                         _this._model.update(_this._subscription);
@@ -5682,7 +5682,7 @@ appdb.components.MailSubscription = appdb.ExtendClass(appdb.Component,"appdb.com
                     }
                 };
             })(this));
-            $(commands).find("#mailsubscriptionremove").click((function(_this){
+            $(commands).find("#mailsubscriptionremove").on("click", (function(_this){
                 return function(){
                     if(_this._subscription.id){
                         _this._model.remove({id:_this._subscription.id,pwd:_this._subscription.unsubscribe_pwd});
@@ -5693,7 +5693,7 @@ appdb.components.MailSubscription = appdb.ExtendClass(appdb.Component,"appdb.com
             })(this));
         }else{
             $(commands).append("<span class='command mailfeed' ><a href='#' alt='' title='Click to subscribe to mail notification service for this list of items'  id='mailsubscriptioninsert' >Subscribe</a></span>");
-            $(commands).find("#mailsubscriptioninsert").click((function(_this){
+            $(commands).find("#mailsubscriptioninsert").on("click", (function(_this){
                 return function(){
                     if(_this._subscription.id){
                         console.log("Invalid action INSERT for mail notification service. Subscription already exists id:" + _this._subscription.id);
@@ -5711,7 +5711,7 @@ appdb.components.MailSubscription = appdb.ExtendClass(appdb.Component,"appdb.com
         $(res).append(title).append(format).append(actions).append(progress).append(commands).append(desc);
         this._dialog = $(res)[0];
 
-        $(this._dialog).click(function(event) {
+        $(this._dialog).on("click", function(event) {
             var src = event.srcElement?event.srcElement:event.target;
             if(src && src.tagName.toLowerCase()==="a"){
                 return false;
@@ -5841,7 +5841,7 @@ appdb.components.MailSubscription = appdb.ExtendClass(appdb.Component,"appdb.com
             title = "Click to customize your subscription to the mail notification services for the current list";
             $(img).attr("src",appdb.components.MailSubscription.images.customize);
         }
-        $(a).attr("href","#").attr("title",title).click((function(_this){
+        $(a).attr("href","#").attr("title",title).on("click", (function(_this){
             return function(){
                 if(userID!==null){
                     if( $.trim(appdb.model.PrimaryContact.userPrimaryContactId) === ""){
@@ -6059,7 +6059,7 @@ appdb.components.EntrySubscription = appdb.ExtendClass(appdb.Component,"appdb.co
   $(this.dom).append(a);
   if( this.displayHelp === true ){
 	$(this.dom).after("<a href='#' class='followhelp'><img src='/images/question_mark.gif'></img></a>");
-	$(this.dom).parent().find(".followhelp").click(function(){
+	$(this.dom).parent().find(".followhelp").on("click", function(){
 		setTimeout((function(_this){
 			return function(){
 				dijit.popup.open({
@@ -6073,7 +6073,7 @@ appdb.components.EntrySubscription = appdb.ExtendClass(appdb.Component,"appdb.co
 			return false;
 	});
   }
-  $(a).attr("href","#").attr("title","").click((function(_this){
+  $(a).attr("href","#").attr("title","").on("click", (function(_this){
        return function(e){
 	   if(! _this.canUseService(true) ) {
 	    return false;
@@ -6217,7 +6217,7 @@ appdb.components.NameAvailability = appdb.ExtendClass(appdb.Component,"appdb.com
 		if(isvalid===true){
 			if(description){
                 $($(this.dom).find(".validatorresult")[0]).removeClass("invalid").removeClass("valid").addClass("valid_warning");
-                $($(this.dom).find(".validatordescription")[0]).attr("src","/images/question_mark.gif").off('click').click((function(_this){
+                $($(this.dom).find(".validatordescription")[0]).attr("src","/images/question_mark.gif").off('click').on("click", (function(_this){
                     return function(){
                         _this._showDescription($(_this.dom).find(".validatordescription")[0],description);
                     };
@@ -6232,7 +6232,7 @@ appdb.components.NameAvailability = appdb.ExtendClass(appdb.Component,"appdb.com
 		}else{
 			$($(this.dom).find(".validatorresult")[0]).removeClass("valid").removeClass("valid_warning").addClass("invalid");
             if(description){
-                $($(this.dom).find(".validatordescription")[0]).attr("src","/images/question_mark.gif").off('click').click((function(_this){
+                $($(this.dom).find(".validatordescription")[0]).attr("src","/images/question_mark.gif").off('click').on("click", (function(_this){
                     return function(){
                         _this._showDescription($(_this.dom).find(".validatordescription")[0],description);
                     };
@@ -6390,7 +6390,7 @@ appdb.components.RelatedApplications = appdb.ExtendClass(appdb.Component,"appdb.
 		
 		a = $(doc.createElement("a")).attr("title",title);
 		$(a).addClass("itemlink");
-		$(a).click((function(_this,data){
+		$(a).on("click", (function(_this,data){
 			return function(){
 				 if(_this.parent && _this.parent.views.pager){
 					_this.publish({event:"itemclick",value : data});
@@ -6515,7 +6515,7 @@ appdb.components.RelatedApplications = appdb.ExtendClass(appdb.Component,"appdb.
 		if(this._data && this._data.length>0 && this.canShowAll){
 			var show = document.createElement("div"),
 			a = document.createElement("a");
-			$(a).attr("href","#").attr("title","Click to view the list of all related software").append("<span>Show all</span>").click((function(_this){
+			$(a).attr("href","#").attr("title","Click to view the list of all related software").append("<span>Show all</span>").on("click", (function(_this){
 				return function(){
 					appdb.views.Main.showRelatedApps({appid:_this._data[0][0].parentid},{mainTitle:'Suggested',appname:_this._data[0][0].parentname});
 					return false;
@@ -10430,7 +10430,7 @@ appdb.views.NavigationPane = appdb.ExtendClass(appdb.View,"appdb.views.Navigatio
 		}
 		$(a).append("<span>" + (txt || "title") + "</span>");
 		if(d.caller){
-			$(a).click(function(){
+			$(a).on("click", function(){
                 if(d.self && d.callerArgs.length===1){
                     d.callerArgs[d.callerArgs.length] = d.self;
                 }

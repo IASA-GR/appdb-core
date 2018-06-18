@@ -6140,7 +6140,7 @@ appdb.utils.Faq = (function(){
 				$(down).append("<a href='#' title='Move item down'><img src='/images/down"+((ord>=toccount)?"_gray":"")+".png' alt='down'/></a>");
 				$(add).append("<a href='#' title='Add new FAQ item below'><img src='/images/add.png' alt='add'/></a>");
 				
-				$(up).find("a:last").click((function(_parent,_id){
+				$(up).find("a:last").on("click", (function(_parent,_id){
 					return function(e){
 						var cur = appdb.utils.Faq.getCurrentOrdering();
 						if(_id != cur[0]){
@@ -6162,7 +6162,7 @@ appdb.utils.Faq = (function(){
 					};
 				})(elem,id));
 				
-				$(down).find("a:last").click((function(_parent,_id){
+				$(down).find("a:last").on("click", (function(_parent,_id){
 					return function(e){
 						var cur = appdb.utils.Faq.getCurrentOrdering();
 						if(_id != cur[cur.length-1]){
@@ -6184,7 +6184,7 @@ appdb.utils.Faq = (function(){
 					};
 				})(elem,id));
 				
-				$(add).find("a:last").click((function(_parent){
+				$(add).find("a:last").on("click", (function(_parent){
 					return function(e){
 						appdb.utils.Faq.NewFaqHandler.show(_parent);
 						if(appdb.utils.Faq.changedOrdering()){
@@ -6351,7 +6351,7 @@ appdb.utils.Faq = (function(){
 		this.setupTOC = function(){
 			$(".wikitoc").empty();
 			$(".wikitoc").append("<div class='header'><h3>Contents</h3><span class='hidecontents'>[<a href='#' title=''>hide</a>]</span></div>").append("<ul/>");
-			$(".wikitoc > div.header > span.hidecontents > a").click(function(){
+			$(".wikitoc > div.header > span.hidecontents > a").on("click", function(){
 				if ( $(".wikitoc > ul").css("display") === "none" ) {
 					$(".wikitoc > ul").css({"display":"block"});
 					$(this).text("hide");
@@ -6363,7 +6363,7 @@ appdb.utils.Faq = (function(){
 			if( canEditFAQs ){
 				$(".wikitoc > div.header").append("<span class='savecontents'>[<a href='#' title=''>Save changes</a>]</span>")
 				$(".wikitoc > div.header").append("<span class='editcontents'>[<a href='#' title=''>Add new / reorder</a>]</span>");
-				$(".wikitoc > div.header > span.editcontents > a").click(function(e){
+				$(".wikitoc > div.header > span.editcontents > a").on("click", function(e){
 					if($(this).parent().hasClass("editing")){
 						$(this).text("Add new / reorder");
 						$(this).parent().removeClass("editing");
@@ -6378,7 +6378,7 @@ appdb.utils.Faq = (function(){
 					e.preventDefault();
 					return false;
 				});
-				$(".wikitoc > div.header > span.savecontents > a").click(function(e){
+				$(".wikitoc > div.header > span.savecontents > a").on("click", function(e){
 					if(appdb.utils.Faq.changedOrdering() === false || $(this).hasClass("saving")){
 						return false;
 					}
@@ -6418,7 +6418,7 @@ appdb.utils.Faq = (function(){
 				var txt = $(elem).clone();
 				$(txt).find(".faqactions").remove();
 				$(".wikitoc > ul").append("<li id='toc"+id+"' data-ord='"+$(elem).data("ord")+"'" + ($(elem).hasClass("locked")?" class='locked'":"") + "><a id='anchor"+id+"' href='"+appdb.utils.Faq.getPermalink(id)+"' title=''>" + $(txt).text() + "</a></li>");
-				$(".wikitoc > ul > li > a#anchor"+id).click((function(_id){
+				$(".wikitoc > ul > li > a#anchor"+id).on("click", (function(_id){
 					return function(e){
 						if( e.which != 2 ) {
 							appdb.utils.Faq.scrollTo(_id);
@@ -6436,7 +6436,7 @@ appdb.utils.Faq = (function(){
 				var id = $(elem).attr("id");
 				var canEdit = (canEditFAQs)?true:false;
 				id = parseInt(id.substring(3));
-				$(this).find("a").attr("href",appdb.utils.Faq.getPermalink(id)).click(function(e){
+				$(this).find("a").attr("href",appdb.utils.Faq.getPermalink(id)).on("click", function(e){
 					if (e.which != 2) {
 						e.preventDefault();
 						return false;
@@ -6444,11 +6444,11 @@ appdb.utils.Faq = (function(){
 				});
 				$(this).append("<span class='faqactions'><a href='#' class='totop' title='Go to top of page'>top</a> " + ((canEdit)?"| <a href='#' class='editfaq' title='Edit item'>edit</a> | <a href='#' class='removefaq' title='Remove item'><span class='loading'>Removing...</span><span class='remove'>remove</span></a>":"")+"</span>");
 			});
-			$("li[id^=faq] a.totop").click(function(){
+			$("li[id^=faq] a.totop").on("click", function(){
 				appdb.utils.Faq.scrollTo(-1);
 			});
 			
-			$("li[id^=faq] a.editfaq").click(function(){
+			$("li[id^=faq] a.editfaq").on("click", function(){
 				var li = $(this).parents("li:first");
 				var question = li.find("a:first");
 				var id = li.attr("id");
@@ -6494,7 +6494,7 @@ appdb.utils.Faq = (function(){
 				
 				//Save Action
 				dojo.connect(dijit.byNode(li.next().find('.savebutton')[0]), "onClick", function(){
-				//li.next().find('.savebutton :input').click(function(){
+				//li.next().find('.savebutton :input').on("click", function(){
 					var faqid = li.attr('id').replace('faq','');
 					var txtid = li.next().find('textarea').attr("id") || ("txtarea"+id);
 					var newquestion =  dijit.byId($(li).find("input").attr("id")).get("value");
@@ -6520,7 +6520,7 @@ appdb.utils.Faq = (function(){
 							var o = appdb.utils.convert.toObject(d);
 							newtext = appdb.utils.base64.decode(o.answer);
 							newquestion = appdb.utils.base64.decode(o.question);
-							$(faqmeta).find("a").attr("href","/store/person/"+userCName).removeAttr("onclick").off("click").click(function(){
+							$(faqmeta).find("a").attr("href","/store/person/"+userCName).removeAttr("onclick").off("click").on("click", function(){
 								appdb.views.Main.showPerson({id:o.submitterId,cname:userCName},{mainTitle:o.submitterName});
 							}).attr("href","").text(o.submitterName);
 							$(faqmeta).find("span.submitted").text(o.when);
@@ -6605,7 +6605,7 @@ appdb.utils.Faq = (function(){
 				}
 			}).find(".loading").hide();
 			
-			$('div[id^=faq].locked').prev().find('a.removefaq').off('click').html("<img src='/images/logout3.png' border='0' width='12px' height='12px'/>").click(function(e){
+			$('div[id^=faq].locked').prev().find('a.removefaq').off('click').html("<img src='/images/logout3.png' border='0' width='12px' height='12px'/>").on("click", function(e){
 				var pu = new dijit.TooltipDialog({content : "<div style='width:220px;'><span class='ui-icon ui-icon-alert' style='float:left; margin:0 7px 20px 0;'></span><span>This FAQ item has been locked due to its reference from some sections of the portal.</span></div>"});
 				setTimeout((function(_this){
 					return function(){

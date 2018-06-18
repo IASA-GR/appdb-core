@@ -166,7 +166,7 @@ var feedback = (function(){
 		this.initCaptcha = (function(_this){
 			return function(){
 				if( $.trim($(".feedbackform .footer .captcha").html()) !== "" ){
-					$(".feedbackform .footer .captcha img:last").click(function(){
+					$(".feedbackform .footer .captcha img:last").on("click", function(){
 						_this.refreshCaptcha();
 					});
 					captcha = dijit.byNode($(".feedbackform .footer .contents .captcha .captchainput > .dijit")[0]);
@@ -216,7 +216,7 @@ var feedback = (function(){
 			}
 			$(".feedbackform .report .reportdata .subject .fielddata").text(d.subject);
 			$(".feedbackform .report .reportdata .body .fielddata").empty().append("<pre>"+d.val()+"</pre>");
-			$(".feedbackform .report .newfeedback > a").click((function(self){ 
+			$(".feedbackform .report .newfeedback > a").on("click", (function(self){ 
 				return function(){
 					email.set("value","");
 					subject.set("value","");

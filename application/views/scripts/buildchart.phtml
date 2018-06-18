@@ -467,7 +467,7 @@
 			});
 		}
 	});
-	$(".exporthelp").click(function(e){
+	$(".exporthelp").on("click", function(e){
 		appdb.views.Main.showPage("about",{mainTitle:"Faq", url:'/help/faq/9',callback:'appdb.utils.Faq.scrollTo(9)'});
 		e.preventDefault();
 		return false;

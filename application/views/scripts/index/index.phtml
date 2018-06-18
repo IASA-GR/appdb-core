@@ -808,7 +808,7 @@ if( $browserSupported == false ){
 				appdb.pages.index.canManageDatasets(<?php echo ($canManageDatasets)?"true":"false"; ?>);
 				<?php } ?>
 				$("#panetd").css("visibility","visible");
-				$("html").click(function(){
+				$("html").on("click", function(){
 					$(".menu").find(".active").removeClass("active");
 				});
 			}else{

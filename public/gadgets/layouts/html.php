@@ -162,7 +162,7 @@ ob_flush();
 					})
 					.removeClass( "ui-corner-all" )
 					.addClass( "ui-corner-right ui-button-icon" )
-					.click(function() {
+					.on("click", function() {
 						// close if already visible
 						if ( input.autocomplete( "widget" ).is( ":visible" ) ) {
 							input.autocomplete( "close" );
