@@ -411,11 +411,11 @@ appdb.Navigation = (function(){
 					break;
 				default:
 					j = appdb.views.Main.showPage;
-					var params = $.parseJSON(pp);
+					var params = JSON.parse(pp);
 					j(params.type, params);
 					return;
 			}
-			j($.parseJSON(query || "{}"), $.parseJSON(ext || "{}"));
+			j(JSON.parse(query || "{}"), JSON.parse(ext || "{}"));
 			return;
 		}
 		ret.notFound();

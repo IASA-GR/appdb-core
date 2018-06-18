@@ -3071,12 +3071,12 @@ appdb.Navigator = (function(){
 				   break;
 			   default:
 				   j = appdb.views.Main.showPage;
-				   var params = $.parseJSON(pp);
+				   var params = JSON.parse(pp);
 				   j(params.type, params);
 				   return;
 				   break;
 		   }
-		   j($.parseJSON(query || "{}"), $.parseJSON(ext || "{}"));
+		   j(JSON.parse(query || "{}"), JSON.parse(ext || "{}"));
 		 } else {
 		  p = pp;
 		   if( p === "home") {
@@ -5054,7 +5054,7 @@ appdb.utils.EntityEditMapper.Application = function(entity){
 			len = v.length;
 			for(i=0; i<len; i+=1){
 				if(v[i].length>0 && v[i][0]=="{"){
-					v[i] = $.parseJSON(v[i]);
+					v[i] = JSON.parse(v[i]);
 					v[i].val = (function(_v){return function(){return _v;}})(v[i].url);
 				}
 			}
@@ -5068,7 +5068,7 @@ appdb.utils.EntityEditMapper.Application = function(entity){
 			len = v.length;
 			for(i=0; i<len; i+=1){
 				if(v[i].length>0 && v[i][0]==="{"){
-					v[i] = $.parseJSON(v[i]);
+					v[i] = JSON.parse(v[i]);
 					v[i].val = (function(_v){return function(){return _v;};})(v[i].url);
 				}
 			}
@@ -5100,7 +5100,7 @@ appdb.utils.EntityEditMapper.Application = function(entity){
 		$(lv).find(selector).each(function(index,elem){
 			docCount++;
 			var j, v = {}, d = decodeURIComponent(appdb.utils.base64.decode($(elem).html()));
-			d = $.parseJSON(d);
+			d = JSON.parse(d);
 			v.id = d.id || "";
 			v.title = d.title || "";
 			v.url = d.url || "";
@@ -5321,7 +5321,7 @@ appdb.utils.EntityEditMapper.Application = function(entity){
 			if(v.hasOwnProperty(i)){
 				if(i==="setCntpnt"){
 					for(var j=0; j<v[i].length; j+=1){
-						contactItems.push($.parseJSON(v[i][j]));
+						contactItems.push(JSON.parse(v[i][j]));
 					}
 				}else{
 					this[i](v[i]);
