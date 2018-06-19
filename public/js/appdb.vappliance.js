@@ -9591,7 +9591,7 @@ appdb.vappliance.ui.views.ContextualizationScript = appdb.ExtendClass(appdb.View
 				  };
 			  }
 			  this.options.editor.setFormat(this.getData().format);
-			  this.options.editor.on(this.getData());
+			  this.options.editor.bind(this.getData());
 			  this.options.editor.showDialog();	
 		  }		
 	};
@@ -9678,7 +9678,11 @@ appdb.vappliance.ui.views.ContextualizationScript = appdb.ExtendClass(appdb.View
 		var permalinkinfo = $(this.dom).find('.info-message').clone();
 		$(permalink).find('a').attr('href', appdb.config.endpoint.base+"store/vmi/"+this.parent.options.data.identifier+"/script");
 		var urllink = $("<a href='#' title='Download script' target='_blank'></a>");
-		$(urllink).attr('href',d.url).text($.trim(d.name) || $.trim(d.url) );
+		var urlData = ('' + (d.url || ''));
+		if (urlData.slice(0,4) === 'http' && window.location.protocol === 'https:' && urlData.slice(0,5) !== 'https') {
+		    urlData = 'https:' + urlData.slice(5);
+		}
+		$(urllink).attr('href',urlData).text($.trim(d.name) || $.trim(urlData) );
 		$(url).find(".value").append(urllink);
 		$(hash).find(".field").text(d.checksum.hashtype + ":");
 		$(hash).find(".value").text(d.checksum.val());
