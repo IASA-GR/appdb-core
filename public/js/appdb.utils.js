@@ -499,7 +499,7 @@ appdb.utils.filterFields = (function(){
 
 appdb.utils.formatDate = function(d) {
 	var date, time;
-	date = $.datepicker.formatDate('D, d M yy', $.datepicker.parseDate('yy-mm-dd', d));
+	date = $.datepicker.formatDate('D, d M yy',new Date(d));
 	time = d.split("T")[1].split(".")[0];
 	time = time.split(":")[0] + ":" + time.split(":")[1];
 	return date+', '+time;
