@@ -85,7 +85,7 @@ if( $browserSupported == false ){
 			<?php if( $this->session->userid != null ) { ?>
 			<li class="">
 				<a href="#">My Items</a>
-				<ul>
+				<ul class="vertical">
 					<li>
 						<a href="#">Software<span class="arrow"></span></a>
 						<ul>
@@ -148,7 +148,7 @@ if( $browserSupported == false ){
 			<?php if ( $this->user && $this->user->privs && $this->user->privs->canUseDisseminationTool() || $isAdminOrManager /*|| $isNIL*/ ) { ?>
 			<li class="">
 				<a href="#">Administrative<span class="arrow"></span></a>
-				<ul>
+				<ul class="vertical">
 					<?php if ( $isAdminOrManager ) { ?>			
 					<li><a id="reportslink" href="/pages/admin/activityreport" onclick="appdb.views.Main.showActivityReport({},{mainTitle : 'Activity Report', content: 'admin'});">Activity report</a></li>
 					<?php } // isAdminOrManager ?>
@@ -167,7 +167,7 @@ if( $browserSupported == false ){
 			<?php } ?>
 			<li>
 				<a href="#" >About</a>
-				<ul>
+				<ul class="vertical">
 					<li>
 						<a href="<?php echo $wiki; ?>" target="_blank" data-href="/pages/about/usage" id="helpusagelink" data-onclick="appdb.views.Main.showPage('about',{mainTitle:'About > Usage',url:'/help/usage'});">Help</a>
 					</li>
@@ -210,7 +210,7 @@ if( $browserSupported == false ){
 			</li>
 			<li>
 				<a href="#">Contact</a>
-				<ul>
+				<ul class="vertical">
 					<li>
 						<a href="/pages/contact/feedback" class="" onclick="appdb.views.Main.showPage('feedback',{mainTitle:'Contact us',url:'/index/feedback',content: 'pages'});window.scroll(0,0);return false;">Feedback</a>
 					</li>
