@@ -3942,7 +3942,7 @@ String.prototype.replaceAll = function(search, replacement) {
 		});
 		var latest = null, added = null;
 		if(els.length === 0 ){
-			$("input[name^=mw]").each(function(index,elem){
+			$("input[name^='mw']").each(function(index,elem){
 				var v=$(elem).prev().val();
 				$("#mwdiv"+dialogCount).append($('<span class="editable app-mw" edit_type="combo" edit_data="'+ed+'" edit_name="mw" edit_group="true">'+v+'</span>'));
 				h=h+' <span class="editable app-mw" edit_type="combo" edit_data="'+ed+'" edit_name="mw" edit_group="true">'+v+'</span>';
@@ -3953,7 +3953,7 @@ String.prototype.replaceAll = function(search, replacement) {
 				if(els[i].isOther){
 					added = els[i].dom;
 				}else{
-					var v=$(els[i].dom).find("input[name=^=mw]:last").prev().val();
+					var v=$(els[i].dom).find("input[name^='mw']:last").prev().val();
 					$(els[i].dom).remove();
 					added = $('<span class="editable app-mw" edit_type="combo" edit_data="'+ed+'" edit_name="mw" edit_group="true">'+v+'</span>');
 				}
@@ -4649,8 +4649,8 @@ appdb.utils.DataWatcher.Registry.set("application",{items :[
  {selector : ".app-vo > .dijitComboBox",type : "vo", name : "Virtual Organization"},
  {selector : ".app-mw > .dijitComboBox",type : "mw", name: "Middleware"},
  {selector : ".app-proglang > .dijitComboBox",  type : "language", name : "Programming languages"},
- {selector : ".app-mw.other input[name^=mw]", type: "mw", name: "Custom Middleware"},
- {selector : ".app-mw.other input[name^=lmw]", type: "lmw", name: "Custom Middleware Link"},
+ {selector : ".app-mw.other input[name^='mw']", type: "mw", name: "Custom Middleware"},
+ {selector : ".app-mw.other input[name^='lmw']", type: "lmw", name: "Custom Middleware Link"},
  {selector : ".app-status > .dijitComboBox", type : "status", name : "Status"},
  {selector : ".app-owner> .dijitComboBox", type : "owner" , name :"Owner"},
  {selector : function(watcher){
