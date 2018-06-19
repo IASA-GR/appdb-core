@@ -3297,7 +3297,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			        this.validateSetupData();
 			}.bind(this));
 			if (owner) {
-				if ($.trim($(defautlActorHtml).find('a[data-actorid').data('actorid')) !== $.trim(owner.id)) {
+				if ($.trim($(defautlActorHtml).find('a[data-actorid]').data('actorid')) !== $.trim(owner.id)) {
 				    var a = $('<a target="_blank"></a>')
 						.attr('data-actorid', $.trim(owner.id))
 						.attr('href', appdb.config.endpoint.base + 'store/person/' + owner.cname)
