@@ -19071,6 +19071,7 @@ li.itemcontainer div.item div.supports.sites > .serviceitem.hasinstances > .inst
 #ppl_details .ui-tabs-nav.ui-helper-reset.ui-helper-clearfix.ui-widget-header.ui-corner-all > li, #detailswrapper .ui-widget-header > li , #main .ui-widget-header > li{
 	padding-top: 8px !important;
 	min-height: 36px;
+        outline: none;
 }
 
 
