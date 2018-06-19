@@ -2520,12 +2520,12 @@ appdb.components.FileUploader = appdb.ExtendClass(appdb.Component, "appdb.compon
 
 	this.bindUploaderEvents = function() {
 		var self = this;
-		this.options.uploader.on('Init', function(up, params) {
+		this.options.uploader.bind('Init', function(up, params) {
 			appdb.debug("Uploader Inited...");
 			self.publish({event: "init", value: {parameters: params}});
 		});
 		this.options.uploader.refresh();
-		this.options.uploader.on('FilesAdded', function(up, files){
+		this.options.uploader.bind('FilesAdded', function(up, files){
 			appdb.debug("Added files: ", files);
 			//prevent duplicates
 			var filenames = {};
@@ -2548,26 +2548,26 @@ appdb.components.FileUploader = appdb.ExtendClass(appdb.Component, "appdb.compon
 			self.publish({event: "addfiles", value: files});
 			up.refresh();
 		});
-		this.options.uploader.on('FilesRemoved', function(up, files){
+		this.options.uploader.bind('FilesRemoved', function(up, files){
 			self.publish({event: "removefiles", value: files});
 		});
-		this.options.uploader.on('QueueChanged', function(up){
+		this.options.uploader.bind('QueueChanged', function(up){
 			self.publish({event: "changefiles", value: {}});
 		});
-		this.options.uploader.on('BeforeUpload', function(up,file){
+		this.options.uploader.bind('BeforeUpload', function(up,file){
 			self.publish({event:"startupload", value: {file: file}});
 		});
-		this.options.uploader.on('UploadProgress', function(up, file) {
+		this.options.uploader.bind('UploadProgress', function(up, file) {
 			self.publish({event: "progress", value: {file: file, percent: file.percent}});
 		});
-		this.options.uploader.on('FileUploaded', function(up, file, info) {
+		this.options.uploader.bind('FileUploaded', function(up, file, info) {
 			info.response = JSON.parse(info.response);
 			self.publish({event: "filecomplete", value: {file: file, info: info, response: info.response}});
 		});
-		this.options.uploader.on('UploadComplete', function(up, file, info) {
+		this.options.uploader.bind('UploadComplete', function(up, file, info) {
 			self.publish({event: "complete", value: {file: file, info: info}});
 		});
-		this.options.uploader.on('Error', function(up, err) {
+		this.options.uploader.bind('Error', function(up, err) {
 			appdb.debug(err);
 			self.publish({event: "error", value: {message: err.message, code: err.code, file: err.file}});
 		});
