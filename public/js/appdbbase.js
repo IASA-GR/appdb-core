@@ -10473,6 +10473,7 @@ appdb.views.NavigationPane = appdb.ExtendClass(appdb.View,"appdb.views.Navigatio
 		return this.data[this.data.length-2];
 	};
     this.setLastItemTitle = function(title){
+		if (typeof title === "undefined") return;
          if(title.length>=55){
             title = title.substring(0,52) + "...";
         }
