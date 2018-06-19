@@ -15869,7 +15869,7 @@ color: #555;
 	padding: 5px;
 	margin: 2px;
 	left: -8px;
-	margin-top: 20px;
+	margin-top: 30px;
 }
 .vappliance .showonedit.previousversionproperty {
 	padding: 0px 0px 8px 12px;
@@ -25079,6 +25079,7 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
     width: 100%;
     right: 10px;
     text-align: right;
+    top: -18px;
 }
 .loggedin .entityvirtualappliance .action.cd_select > .header {
     border: 1px solid transparent;
