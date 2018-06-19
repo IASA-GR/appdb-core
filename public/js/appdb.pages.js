@@ -1430,7 +1430,7 @@ appdb.pages.home = (function(){
 					ex = null;
 					e.reply[replyIDX].appdb.list = $.isArray(e.reply[replyIDX].appdb.list) ? e.reply[replyIDX].appdb.list : [e.reply[replyIDX].appdb.list];
 					$.each(e.reply[replyIDX].appdb.list, function(i, er) {
-						if (er.key == ee.id) {							
+						if (er && er.key == ee.id) {
 							ex = er;
 							//return;
 						}
