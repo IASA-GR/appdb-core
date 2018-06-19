@@ -18138,6 +18138,9 @@ a.btn.disabled > span{
 	top: 3px;
 	padding: 0px 5px;
 }
+.accessgroupcontainer .accessgroupeditor .currentgroups table tbody > tr > td > div.action.pendingrequest > .btn {
+        font-size: 12px;
+}
 .accessgroupcontainer .accessgroupeditor .currentgroups table tbody > tr > td > div.action > button{
 	color: #888;
 }
