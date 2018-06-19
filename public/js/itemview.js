@@ -280,7 +280,7 @@ function showDetails(url, title, histid, histtype, entitytype,dispatcher) {
 	$("#details").removeClass("editmode").removeClass("viewmode").removeClass("register");//clear form previous calls
 	detailsStyle = 0;
 	if (detailsStyle == 1) if ($("#detailsdlg"+dialogCount)[0] !== undefined) dijit.byId("detailsdlg"+dialogCount).onCancel();
-	$('div [id^="dijit_TooltipDialog"]').each(function(x){
+	$("div [id^='dijit_TooltipDialog']").each(function(x){
 		try {
 			dijit.popup.close(dijit.byId($(this).attr('id')));
 		} catch(err) {

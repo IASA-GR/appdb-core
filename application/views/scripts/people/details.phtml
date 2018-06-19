@@ -656,7 +656,7 @@
 	var uploader;
     var rebuildContactData = function() {
 		var ed = "<?php echo $contactTypeData;?>";
-        $("input[name^=contactType]").each(function(e){
+        $("input[name^='contactType']").each(function(e){
 			var v=$(this).prev().val();
             $(this).parent().parent().parent().parent().html(
                 '<span class="editable" edit_type="combo" edit_data="'+ed+'" edit_style="{\'max-width\': \'130px\'}" edit_onchange="setContactType" edit_name="contactType" edit_group="true">'+v+'</span>'

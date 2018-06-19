@@ -6405,7 +6405,7 @@ appdb.vappliance.ui.views.DataValueHandlerAcceleratorstype = appdb.ExtendClass(a
 		}
 		this.parent.options.currentValue = v;
 		this.onValidate(v);
-		var siblings = $(this.dom).closest('.fieldvalueset').find('[data-path^="accelerators."]').not('[data-path="accelerators.type"]');
+		var siblings = $(this.dom).closest('.fieldvalueset').find("[data-path^='accelerators.']").not("[data-path='accelerators.type']");
 		if ($.trim(v) === '-1') {
 		    $(siblings).addClass('disabled');
 		    $(siblings).find('.value > .dijit').each(function(index, el) {

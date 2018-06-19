@@ -33,7 +33,7 @@ function editForm(formName) {
 
 	function findIndex(edit_name) {
 		var edit_index=0;
-		$('#'+formName+' *[name^='+edit_name+']').each(function(x) {
+		$("#" + formName + " *[name^='" + edit_name + "']").each(function(x) {
 			var i = $(this).attr('name').substring(edit_name.length);
 			if ( Number(i) >= Number(edit_index) ) edit_index = Number(i)+1;
 		});

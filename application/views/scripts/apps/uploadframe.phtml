@@ -55,23 +55,23 @@ var submitme = function() {
 var ok1 = function(responseText, statusText, xhr, $form) {
        if ( $(responseText).text() != '') {
            var fname=$(responseText).text();
-           $("body",top.document).find("img[id^=applogo]")[0].setAttribute('height','110px');
-           $("body",top.document).find("img[id^=applogo]")[0].setAttribute('width','110px');
-           $("body",top.document).find("img[id^=applogo]").attr('src','/upload/applogo/'+fname);
+           $("body",top.document).find("img[id^='applogo']")[0].setAttribute('height','110px');
+           $("body",top.document).find("img[id^='applogo']")[0].setAttribute('width','110px');
+           $("body",top.document).find("img[id^='applogo']").attr('src','/upload/applogo/'+fname);
            $("body",top.document).find(':input[name="newimage"]:last').val('/upload/applogo/'+fname);
        } else {
            alert('Error while uploading image');
-           $("body",top.document).find("img[id^=pplimg]")[0].setAttribute('height','110px');
-           $("body",top.document).find("img[id^=pplimg]")[0].setAttribute('width','110px');
-           $("body",top.document).find("img[id^=pplimg]").attr('src',oldpic);
+           $("body",top.document).find("img[id^='pplimg']")[0].setAttribute('height','110px');
+           $("body",top.document).find("img[id^='pplimg']")[0].setAttribute('width','110px');
+           $("body",top.document).find("img[id^='pplimg']").attr('src',oldpic);
        };
 };
 
 var pre1 = function() {
-           oldpic = $("body",top.document).find("img[id^=pplimg]").attr('src');            
-           $("body",top.document).find("img[id^=applogo]")[0].setAttribute('height','32px');
-           $("body",top.document).find("img[id^=applogo]")[0].setAttribute('width','32px');
-           $("body",top.document).find("img[id^=applogo]").attr('src','/images/ajax-loader-small.gif');
+           oldpic = $("body",top.document).find("img[id^='pplimg']").attr('src');            
+           $("body",top.document).find("img[id^='applogo']")[0].setAttribute('height','32px');
+           $("body",top.document).find("img[id^='applogo']")[0].setAttribute('width','32px');
+           $("body",top.document).find("img[id^='applogo']").attr('src','/images/ajax-loader-small.gif');
 };
 
 $("#uploadform").ajaxForm({beforeSubmit: pre1, success: ok1});

@@ -9002,7 +9002,7 @@ appdb.views.CustomMiddleware = appdb.ExtendClass(appdb.View, "appdb.views.Custom
 			return this._data.name || "";
 		}
 		this._data.name = v;
-		$(this.dom).find(":input[name^=mw]:last").val(this._data.name);
+		$(this.dom).find(":input[name^='mw']:last").val(this._data.name);
 		return this;
 	};
 	this.link = function(v) {
@@ -9014,7 +9014,7 @@ appdb.views.CustomMiddleware = appdb.ExtendClass(appdb.View, "appdb.views.Custom
 		if (r.test(this._data.link) === false) {
 			this._data.link = "http://" + encodeURIComponent(this._data.link);
 		}
-		$(this.dom).find(":input[name^=lmw]:last").val(this._data.link);
+		$(this.dom).find(":input[name^='lmw']:last").val(this._data.link);
 		return this;
 	};
 	this.render = function(d) {

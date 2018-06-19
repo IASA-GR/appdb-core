@@ -3057,7 +3057,7 @@ String.prototype.replaceAll = function(search, replacement) {
 		}
 		for(i in lists){
 			found = false;
-			if(lists[i].required && ($('#details :input[name^="'+i+'"]').length === 0 || ($('#details :input[name^="'+i+'"]').length===1 && $($('#details :input[name^="'+i+'"]')[0]).val() == ""))) {
+			if(lists[i].required && ($("#details :input[name^='" + i + "']").length === 0 || ($("#details :input[name^='" + i + "']").length===1 && $($("#details :input[name^='" + i + "']")[0]).val() == ""))) {
 				if ( $("[id^='" + lists[i].witness + "']:visible").length !== 0 ) found = true;
 			} 
 			if(found == true){
@@ -3142,20 +3142,20 @@ String.prototype.replaceAll = function(search, replacement) {
 		if(typeof appID === "undefined"){
 			return;
 		}
-		var verb = ($('#toolbarContainer img[src^="/images/star"]').attr('src').substr(12,1) === "1")?"PUT":"DELETE";
+		var verb = ($("#toolbarContainer img[src^='/images/star']").attr('src').substr(12,1) === "1")?"PUT":"DELETE";
 		var bookmarks = appdb.model.ApplicationBookmarks();
 		bookmarks.subscribe({"event": "insert", "callback": function(d){
 			$('#toolbarContainer .app-bm img:first').remove();
-			$('#toolbarContainer img[src^="/images/star"]').show();
-			$('#toolbarContainer img[src^="/images/star"]').attr('src','/images/star2.png');
+			$("#toolbarContainer img[src^='/images/star']").show();
+			$("#toolbarContainer img[src^='/images/star']").attr('src','/images/star2.png');
 		}}).subscribe({"event": "remove", "callback": function(d){
 			$('#toolbarContainer .app-bm img:first').remove();
-			$('#toolbarContainer img[src^="/images/star"]').show();
-			$('#toolbarContainer img[src^="/images/star"]').attr('src','/images/star1.png');
+			$("#toolbarContainer img[src^='/images/star']").show();
+			$("#toolbarContainer img[src^='/images/star']").attr('src','/images/star1.png');
 		}}).subscribe({"event": "error", "callback": function(d){
 			//Called upon ajax error of application moderation action. E.g. HTTP 500 - Internal Server Error
 			$('#toolbarContainer .app-bm img:first').remove();
-			$('#toolbarContainer img[src^="/images/star"]').show();
+			$("#toolbarContainer img[src^='/images/star']").show();
 			var err = {
 				"status": "Cannot toggle bookmark",
 				"description": d.description
@@ -3178,7 +3178,7 @@ String.prototype.replaceAll = function(search, replacement) {
 			//Display backend error message
 			setTimeout(function(){(new appdb.views.ErrorHandler()).handle(err);},0);
 		}});
-		$('#toolbarContainer img[src^="/images/star"]').hide();
+		$("#toolbarContainer img[src^='/images/star']").hide();
 		$("#toolbarContainer .app-bm").prepend('<img src="' + loadImage('ajax-loader-small.gif') + '"/>');
 		if(verb === "PUT"){
 			var ent = new appdb.entity.ApplicationBookmark();
@@ -3820,8 +3820,8 @@ String.prototype.replaceAll = function(search, replacement) {
 		setTimeout(function(){
 			dijit.popup.open({
 				popup: bmInfoDlg,
-				parent: $('img[src^="/images/star"]')[0],
-				around: $('img[src^="/images/star"]')[0],
+				parent: $("img[src^='/images/star']")[0],
+				around: $("img[src^='/images/star']")[0],
 				orient: {BL:'TL'}                    
 			});
 			setTimeout('dijit.popup.close(bmInfoDlg)',1000);
@@ -3866,7 +3866,7 @@ String.prototype.replaceAll = function(search, replacement) {
 	var rebuildCountryData = function() {
 		var ed = countryData;
         var h="";
-        $("input[name^=countryID]").each(function(index,e){
+        $("input[name^='countryID']").each(function(index,e){
             var v=$(this).prev().val();
             h=h+' <span class="editable app-country" edit_onchange="fixCountryFlags" edit_type="combo" edit_data="'+ed+'" edit_name="countryID" edit_group="true">'+v+'</span> <span class="editable app-countryFlag" edit_type="none"><img border="0" style="vertical-align:middle;border:1px solid #BFBFBF;" src=""/></span>';
             $(this).remove();
@@ -3883,7 +3883,7 @@ String.prototype.replaceAll = function(search, replacement) {
 		var found = -1;
 		def = $.trim(def || '');
 		var invalidelem = null;
-		$(':input[name^="'+datatype+'"]').each(function(index,elem){
+		$(":input[name^='" + datatype + "']").each(function(index,elem){
 			if($.trim($(elem).val()) === def ){
 				found = (found<0)?index:found;
 				invalidelem = $(elem);
@@ -3927,7 +3927,7 @@ String.prototype.replaceAll = function(search, replacement) {
 		resetCategoriesChecker();
 		var ed = categoriesData;
 		var h='';
-		$("input[name^=categoryID]").each(function(e){
+		$("input[name^='categoryID']").each(function(e){
             var v=$(this).prev().val();
 			h=h+' <span class="editable app-category" edit_type="combo"  edit_data="'+ed+'" edit_name="categoryID" edit_group="true">'+v+'</span>';
         });
@@ -3971,7 +3971,7 @@ String.prototype.replaceAll = function(search, replacement) {
     function rebuildDomainData() {
 		var ed = domainData;
 		var h='';
-        $("input[name^=domainID]").each(function(e){
+        $("input[name^='domainID']").each(function(e){
             var v=$(this).prev().val();
 			h=h+' <span class="editable app-domain" edit_type="combo"  edit_data="'+ed+'" edit_name="domainID" edit_group="true">'+v+'</span>';
         });
@@ -3981,7 +3981,7 @@ String.prototype.replaceAll = function(search, replacement) {
     function rebuildSubdomainData() {
 		var ed = subdomainData;
 		var h='';
-        $("input[name^=subdomainID]").each(function(e){
+        $("input[name^='subdomainID']").each(function(e){
             var v=$(this).prev().val();
 			h=h+' <span class="editable app-subdomain" edit_type="combo"  edit_data="'+ed+'" edit_name="subdomainID" edit_group="true">'+v+'</span>';
         });
@@ -3991,7 +3991,7 @@ String.prototype.replaceAll = function(search, replacement) {
     function rebuildVOData() {
 		var ed = voData;
 		var h='';
-        $("input[name^=vo]").each(function(e){
+        $("input[name^='vo']").each(function(e){
             var v=$(this).prev().val();
 			h=h+' <span class="editable app-vo" edit_type="combo"  edit_data="'+ed+'" edit_name="vo" edit_group="true">'+v+'</span>';
         });
@@ -4147,7 +4147,7 @@ String.prototype.replaceAll = function(search, replacement) {
 	var rebuildProgLangData = function(){
 		var ed = proglangData;
 		var h='';
-		$("input[name^=proglangID]").each(function(e){
+		$("input[name^='proglangID']").each(function(e){
             var v=$(this).prev().val();
 			h=h+' <span class="editable app-proglang" edit_type="combo"  edit_data="'+ed+'" edit_name="proglangID" edit_group="true">'+v+'</span>';
         });

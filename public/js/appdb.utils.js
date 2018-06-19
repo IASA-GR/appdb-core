@@ -4954,7 +4954,7 @@ appdb.utils.EntityEditMapper.Application = function(entity){
 		return {val: v};
 	};
 	this.getMiddlewareLink = function(index){
-		return $(":input[name^=lmw" + (index) + "]:last").val() || "";
+		return $(":input[name^='lmw" + (index) + "']:last").val() || "";
 	};
 	this.SetListValue = function(obj,val){
 		var o = obj();
@@ -5299,8 +5299,8 @@ appdb.utils.EntityEditMapper.Application = function(entity){
 				if($.isFunction(_this["set" + name])){
 					if(nameIndex){
 						mapcontext["set"+name] = mapcontext["set"+name] || [];
-						if(name.toLowerCase() === "mw" && $(elem).parent().find("input[name^=lmw]").length!==0){
-							mapcontext["set"+name].push({name: $(elem).val(), link: $(elem).parent().find("input[name^=lmw]:last").val()});
+						if(name.toLowerCase() === "mw" && $(elem).parent().find("input[name^='lmw']").length!==0){
+							mapcontext["set"+name].push({name: $(elem).val(), link: $(elem).parent().find("input[name^='lmw']:last").val()});
 						}else{
 							mapcontext["set"+name].push($(elem).val());
 						}
@@ -6412,7 +6412,7 @@ appdb.utils.Faq = (function(){
 					setTimeout(function(){$(".wikitoc > div.header > span.editcontents > a").trigger("click");},1);
 				}
 			}
-			$("li[id^=faq]").each(function(index,elem){
+			$("li[id^='faq']").each(function(index,elem){
 				var id = $(elem).attr("id");
 				id = parseInt(id.substring(3));
 				var txt = $(elem).clone();
@@ -6431,8 +6431,8 @@ appdb.utils.Faq = (function(){
 		};
 		this.setup = function(){
 			appdb.utils.Faq.setupTOC();
-			$("li[id^=faq]").wrapInner("<a href='' title='' target='_blank' />");
-			$("li[id^=faq]").each(function(index,elem){
+			$("li[id^='faq']").wrapInner("<a href='' title='' target='_blank' />");
+			$("li[id^='faq']").each(function(index,elem){
 				var id = $(elem).attr("id");
 				var canEdit = (canEditFAQs)?true:false;
 				id = parseInt(id.substring(3));
@@ -6444,11 +6444,11 @@ appdb.utils.Faq = (function(){
 				});
 				$(this).append("<span class='faqactions'><a href='#' class='totop' title='Go to top of page'>top</a> " + ((canEdit)?"| <a href='#' class='editfaq' title='Edit item'>edit</a> | <a href='#' class='removefaq' title='Remove item'><span class='loading'>Removing...</span><span class='remove'>remove</span></a>":"")+"</span>");
 			});
-			$("li[id^=faq] a.totop").on("click", function(){
+			$("li[id^='faq'] a.totop").on("click", function(){
 				appdb.utils.Faq.scrollTo(-1);
 			});
 			
-			$("li[id^=faq] a.editfaq").on("click", function(){
+			$("li[id^='faq'] a.editfaq").on("click", function(){
 				var li = $(this).parents("li:first");
 				var question = li.find("a:first");
 				var id = li.attr("id");
@@ -6571,7 +6571,7 @@ appdb.utils.Faq = (function(){
 					})(li,id)
 				});
 			});
-			$("li[id^=faq] a.removefaq").on('click', function(){
+			$("li[id^='faq'] a.removefaq").on('click', function(){
 				var id = $(this).parent().parent("li").attr("id").substr(3);
 				if($(this).find(".loading").is(":visible")=== true){
 					return false;
@@ -6605,7 +6605,7 @@ appdb.utils.Faq = (function(){
 				}
 			}).find(".loading").hide();
 			
-			$('div[id^=faq].locked').prev().find('a.removefaq').off('click').html("<img src='/images/logout3.png' border='0' width='12px' height='12px'/>").on("click", function(e){
+			$("div[id^='faq'].locked").prev().find('a.removefaq').off('click').html("<img src='/images/logout3.png' border='0' width='12px' height='12px'/>").on("click", function(e){
 				var pu = new dijit.TooltipDialog({content : "<div style='width:220px;'><span class='ui-icon ui-icon-alert' style='float:left; margin:0 7px 20px 0;'></span><span>This FAQ item has been locked due to its reference from some sections of the portal.</span></div>"});
 				setTimeout((function(_this){
 					return function(){
@@ -6620,7 +6620,7 @@ appdb.utils.Faq = (function(){
 				})(this),1);
 			});
 			if( !userID ) {
-				$('div[id^=faq] > .faqmeta').remove();
+				$("div[id^='faq'] > .faqmeta").remove();
 			}
 			this.loadOrdering();
 			if(canEditFAQs){

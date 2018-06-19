@@ -30,7 +30,7 @@
 	
 	var saveChanges = function() {
 		$(".mainlist:last li").show();
-		var olddata=$('ul[id^="SciConDiv"]:last');
+		var olddata=$("ul[id^='SciConDiv']:last");
 		var newdata=$('ul.mainlist:last');
 		//add existing people
 		olddata.find('li').each(function(x){

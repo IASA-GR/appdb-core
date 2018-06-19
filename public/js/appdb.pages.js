@@ -947,7 +947,7 @@ appdb.pages.index = (function(){
 					dijit.popup.close(inboxDlg);
 					inboxDlg = undefined;
 				}
-				$('div [id^="dijit_TooltipDialog"]').each(function(x){
+				$("div [id^='dijit_TooltipDialog']").each(function(x){
 					try {
 						if (dijit.byId($(this).attr('id')).title !== "Login")
 							dijit.popup.close(dijit.byId($(this).attr('id')));
@@ -4873,16 +4873,16 @@ appdb.pages.newprofile = (function(){
 	page.rebuildContactData = function(index) {
 		index = index || page.currentIndex();
 		$("#editperson" + index + " .contacts .contactitem").each(function(e){
-			var vtype = $(this).find("input[name^=contactType]").parent().children("input:first").val();
-			var vdata = $(this).find("input[name^=contact]:last").val();
+			var vtype = $(this).find("input[name^='contactType']").parent().children("input:first").val();
+			var vdata = $(this).find("input[name^='contact']:last").val();
 			$(this).closest(".contactitem.field").html( page.getContactDataItemHtml( vtype, vdata ) );
 		});
 	};
 	page.animateInvalidContactItems = function(){
 		var res = [];
 		$("#editperson" + index + " .contacts .contactitem").each(function(e){
-			var vtype = $.trim( $(this).find("input[name^=contactType]").prev().val() );
-			var vdata = $.trim( $(this).find("input[name^=contact]:last").val() );
+			var vtype = $.trim( $(this).find("input[name^='contactType']").prev().val() );
+			var vdata = $.trim( $(this).find("input[name^='contact']:last").val() );
 			if( vtype === "" || vdata === "" ){
 				res.push(this);
 			}
