@@ -8348,14 +8348,14 @@ appdb.repository.UploadFileHandler = appdb.ExtendClass(appdb.Component, "appdb.r
 	this.bindUploader = function(){
 		var self = this;
 		if( this.options.uploader.isBinded == true ) return;
-		this.options.uploader.off("Init");
-		this.options.uploader.on('Init', function(up, params) {
+		this.options.uploader.unbind("Init");
+		this.options.uploader.bind('Init', function(up, params) {
 			appdb.debug("Uploader Inited...");
 			self.options.uploader.refresh();
 			self.publish({event: "init", value: {parameters: params}});
 		});
-		this.options.uploader.off("FilesAdded");
-		this.options.uploader.on('FilesAdded', function(up, files){
+		this.options.uploader.unbind("FilesAdded");
+		this.options.uploader.bind('FilesAdded', function(up, files){
 			appdb.debug("Added files: ", files);
 			//prevent duplicates
 			var filenames = {};
@@ -8378,35 +8378,35 @@ appdb.repository.UploadFileHandler = appdb.ExtendClass(appdb.Component, "appdb.r
 			self.publish({event: "addfiles", value: files});
 			up.refresh();
 		});
-		this.options.uploader.off("FilesRemoved");
-		this.options.uploader.on('FilesRemoved', function(up, files){
+		this.options.uploader.unbind("FilesRemoved");
+		this.options.uploader.bind('FilesRemoved', function(up, files){
 			if(!up.internalFileRemoval){
 				self.publish({event: "removefiles", value: files});
 			}
 		});
-		this.options.uploader.off("QueueChanged");
-		this.options.uploader.on('QueueChanged', function(up){
+		this.options.uploader.unbind("QueueChanged");
+		this.options.uploader.bind('QueueChanged', function(up){
 			self.publish({event: "changefiles", value: {}});
 		});
-		this.options.uploader.off("BeforeUpload");
-		this.options.uploader.on('BeforeUpload', function(up,file){
+		this.options.uploader.unbind("BeforeUpload");
+		this.options.uploader.bind('BeforeUpload', function(up,file){
 			self.publish({event:"startupload", value: {file: file}});
 		});
-		this.options.uploader.off("UploadProgress");
-		this.options.uploader.on('UploadProgress', function(up, file) {
+		this.options.uploader.unbind("UploadProgress");
+		this.options.uploader.bind('UploadProgress', function(up, file) {
 			self.publish({event: "progress", value: {file: file, percent: file.percent}});
 		});
-		this.options.uploader.off("FileUploader");
-		this.options.uploader.on('FileUploaded', function(up, file, info) {
+		this.options.uploader.unbind("FileUploader");
+		this.options.uploader.bind('FileUploaded', function(up, file, info) {
 			var res = appdb.utils.convert.toObject(info.response);
 			self.publish({event: "filecomplete", value: {file: file, info: info, response: res}});
 		});
-		this.options.uploader.off("UploadComplete");
-		this.options.uploader.on('UploadComplete', function(up, file, info) {
+		this.options.uploader.unbind("UploadComplete");
+		this.options.uploader.bind('UploadComplete', function(up, file, info) {
 			self.publish({event: "complete", value: {file: file, info: info}});
 		});
-		this.options.uploader.off("Error");
-		this.options.uploader.on('Error', function(up, err) {
+		this.options.uploader.unbind("Error");
+		this.options.uploader.bind('Error', function(up, err) {
 			self.publish({event: "error", value: {message: err.message, code: err.code, file: err.file}});
 		});
 		this.options.uploader.isBinded = true;
@@ -8417,13 +8417,13 @@ appdb.repository.UploadFileHandler = appdb.ExtendClass(appdb.Component, "appdb.r
 		//create trigger for given ids
 		this.options.trigger = appdb.repository.UploaderRegistry.makeUploadButton($("#"+this.options.container), this.options.postdata, this.options.group, this.options.filters);
 		this.options.uploader = appdb.repository.UploaderRegistry.getUploadObject(this.options.trigger);
-		this.options.uploader.on('Init', function(up, params) {
+		this.options.uploader.bind('Init', function(up, params) {
 			appdb.debug("Uploader Inited...");
 			self.options.uploader.refresh();
 			self.publish({event: "init", value: {parameters: params}});
 		});
 		this.options.uploader.refresh();
-		this.options.uploader.on('FilesAdded', function(up, files){
+		this.options.uploader.bind('FilesAdded', function(up, files){
 			appdb.debug("Added files: ", files);
 			//prevent duplicates
 			var filenames = {};
@@ -8446,28 +8446,28 @@ appdb.repository.UploadFileHandler = appdb.ExtendClass(appdb.Component, "appdb.r
 			self.publish({event: "addfiles", value: files});
 			up.refresh();
 		});
-		this.options.uploader.on('FilesRemoved', function(up, files){
+		this.options.uploader.bind('FilesRemoved', function(up, files){
 			if(!up.internalFileRemoval){
 				self.publish({event: "removefiles", value: files});
 			}
 		});
-		this.options.uploader.on('QueueChanged', function(up){
+		this.options.uploader.bind('QueueChanged', function(up){
 			self.publish({event: "changefiles", value: {}});
 		});
-		this.options.uploader.on('BeforeUpload', function(up,file){
+		this.options.uploader.bind('BeforeUpload', function(up,file){
 			self.publish({event:"startupload", value: {file: file}});
 		});
-		this.options.uploader.on('UploadProgress', function(up, file) {
+		this.options.uploader.bind('UploadProgress', function(up, file) {
 			self.publish({event: "progress", value: {file: file, percent: file.percent}});
 		});
-		this.options.uploader.on('FileUploaded', function(up, file, info) {
+		this.options.uploader.bind('FileUploaded', function(up, file, info) {
 			var res = appdb.utils.convert.toObject(info.response);
 			self.publish({event: "filecomplete", value: {file: file, info: info, response: res}});
 		});
-		this.options.uploader.on('UploadComplete', function(up, file, info) {
+		this.options.uploader.bind('UploadComplete', function(up, file, info) {
 			self.publish({event: "complete", value: {file: file, info: info}});
 		});
-		this.options.uploader.on('Error', function(up, err) {
+		this.options.uploader.bind('Error', function(up, err) {
 			self.publish({event: "error", value: {message: err.message, code: err.code, file: err.file}});
 		});
 	};
