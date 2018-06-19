@@ -12302,8 +12302,8 @@ appdb.views.Main = (function(){
 		};
 	})();
     var retobject =  {
-        showHome : _showHome,
-        showPeople : _showPeople,
+	showHome : _showHome,
+	showPeople : _showPeople,
 		showPeopleByRole: _showPeopleByRole,
 		showPeopleByGroup: _showPeopleByGroup,
 		showOrderedPeople: _showOrderedPeople,
@@ -12370,43 +12370,66 @@ appdb.views.Main = (function(){
 		logout : _logout,
 		selectAccordion : _selectAccordion
     };
+    var _terminalItems = ["showapplication","showperson","showvo","showsendmessagetocontacts","showrequestjoincontacts","showreportabuse","showvirtualappliance", "showsoftwareappliance","showsite","showdataset"];
+    var _unwatchedItems = ["selectAccordion", "setNavigationTitle"];
 
-	for(var i in retobject){
-	 if(retobject.hasOwnProperty(i)){
-	  retobject[i] = (function(f,fname){
-	   var metadata = appdb.Navigator.Registry[(fname.substr(0,4)=="show")?fname.substr(4):fname];
-	   var historyEvent = ( !appdb.config.routing.useHash && typeof history.pushState !== "undefined")?"popstate":"hashchange";
-	   return function(){
-		
-		var argv = arguments;
-		//var ev = appdb.utils.CancelEventTrigger(arguments.callee);
-		appdb.utils.DataWatcher.Registry.checkActiveWatcherAsync({notify:true,onClose : function(){
-			if( appdb.config.expandTerminalItems === true ){
-				if($.inArray(fname.toLowerCase(),["showapplication","showperson","showvo","showsendmessagetocontacts","showrequestjoincontacts","showreportabuse","showvirtualappliance", "showsoftwareappliance","showsite","showdataset"]) > -1){
-					appdb.views.Main.isTerminalItem(true);
-				} else if( fname.substr(0,4)==="show" ) {
-					appdb.pages.Application.reset();
-					appdb.pages.Person.reset();
-					appdb.pages.vo.reset();
-					appdb.pages.site.reset();
-					appdb.views.Main.isTerminalItem(false);
-				}
-			}
-			appdb.pages.index.requests.cancel('logistics');
-			f.apply(null,argv);
-			window.scroll(0,0);
-			//var evtype = (ev && ev.type)?ev.type:"";
-			//evtype = (evtype === historyEvent)?false:true;
-			if( metadata ){
-				appdb.Navigator.handlePermalink(metadata, (argv.length > 0)?argv:[_currentState.query,_currentState.ext]);
-			}
-			appdb.config.routepermalink = window.location.href;			
-		}});
-	   };})(retobject[i],i);
-	 }
-	}
-	retobject["isTerminalItem"] = _isTerminalItem;
-	return retobject;
+    for(var i in retobject){
+	    if(retobject.hasOwnProperty(i) === false) {
+		continue;
+	    }
+
+	    retobject[i] = (function(f,fname){
+		    var metadata = appdb.Navigator.Registry[(fname.substr(0,4)=="show")?fname.substr(4):fname];
+
+		    return function(){
+			    if (window && window.event) {
+				    if (window.event.stopImmediatePropagation) {
+					    window.event.stopImmediatePropagation();
+				    }
+				    if (window.event.stopPropagation) {
+					    window.event.stopPropagation();
+				    }
+				    if (window.preventDefault) {
+					    window.preventDefault();
+				    }
+				    window.event.cancelBubble = true;
+				    window.event.returnValue = false;
+			    }
+
+			    if (_unwatchedItems.indexOf(fname) > -1) {
+				f.apply(null,argv);
+				return false;
+			    }
+
+			    var argv = arguments;
+			    appdb.utils.DataWatcher.Registry.checkActiveWatcherAsync({notify:true,onClose : function(){
+				    if( appdb.config.expandTerminalItems === true ){
+					    if($.inArray(fname.toLowerCase(),_terminalItems) > -1){
+						    appdb.views.Main.isTerminalItem(true);
+					    } else if( fname.substr(0,4)==="show" ) {
+						    appdb.pages.Application.reset();
+						    appdb.pages.Person.reset();
+						    appdb.pages.vo.reset();
+						    appdb.pages.site.reset();
+						    appdb.views.Main.isTerminalItem(false);
+					    }
+				    }
+				    appdb.pages.index.requests.cancel('logistics');
+				    f.apply(null,argv);
+				    window.scroll(0,0);
+
+				    if( metadata ){
+					    appdb.Navigator.handlePermalink(metadata, (argv.length > 0)?argv:[_currentState.query,_currentState.ext]);
+				    }
+				    appdb.config.routepermalink = window.location.href;
+
+				    return false;
+			    }});
+		    };
+	    })(retobject[i],i);
+    }
+    retobject["isTerminalItem"] = _isTerminalItem;
+    return retobject;
 })();
 
 $(document).ready(function(){
