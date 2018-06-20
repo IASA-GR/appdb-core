@@ -82,19 +82,7 @@ class IndexController extends Zend_Controller_Action
 	}
 
     public function indexAction()
-    {
-		trackPage('/');
-        if ( (isset($_COOKIE['rememberme'])) && ($this->session->userid === null) ) {
-			//save permaLink in order to handle it after login
-		    if ( array_key_exists('p',$_GET) ) { $this->session->permaLink = $_GET['p']; }
-			if ( APPLICATION_ENV == "production" ) {
-				header('Location: https://'.$_SERVER['HTTP_HOST'].'/users/login'); 
-			} else {
-				header('Location: http://'.$_SERVER['HTTP_HOST'].'/users/logindev2'); 
-			}
-			return;
-    	};
-		
+	{
 		/*
 		 * Check if user is signed in from a different service or browser tab.
 		 */

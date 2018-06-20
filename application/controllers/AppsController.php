@@ -497,7 +497,6 @@ class AppsController extends Zend_Controller_Action
 		$appID = $this->_getParam("id");
 		$format = $this->_getParam("format");
 		if ( $format === "json" ) $format = "xml";
-                trackPage('/apps/details/'.$appID, $format);
 		if ( ($appID == '') ) $appID = $this->session->lastAppID;
 		$this->view->dialogCount=$_GET['dc'];
 		if($appID == '0'){
