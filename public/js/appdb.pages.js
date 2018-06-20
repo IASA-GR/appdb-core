@@ -124,16 +124,6 @@ function logout() {
 	appdb.views.Main.logout();
 }
 
-function cancelLogin() {
-	$('#username').val("");
-	dijit.popup.close(loginBox);
-	return false;
-}
-
-function validateLogin() {
-	if ( $('#username').val() === "" ) return false; else return true;
-}
-
 function ajaxLoad(url,destination,actions) {
   appdb.views.Main.ajaxLoad(url,destination,actions);
   $(".navigation a[onclick], .menucontainer a[onclick]").each(function(index,elem){
@@ -201,6 +191,7 @@ function selectMenuItem(id){
 	appdb.pages.index.updateCategoriesLayout();
 	
 }
+
 function zoomImage(src,el){
   if( $(el).parent().find(".zoomimage").length > 0 ) {
    if( !$(el).parent().find(".zoomicon:last").data("events") || !$(el).parent().find(".zoomicon:last").data("events").mouseleave ){
@@ -243,6 +234,7 @@ function zoomImage(src,el){
   $(dom).append(div);
   $(el).parent().append(dom).addClass("canzoom").addClass("hover");
 }
+
 function showLogo(id,el){
  zoomImage('/apps/showlogo?id='+id,el);
 }
@@ -250,12 +242,17 @@ function showLogo(id,el){
 function showImage(id,el){
  zoomImage('/people/showimage?id='+id,el);
 }
+
 function preventDefaultEvent(e){
 	var ev = e || window.event;
 	ev.cancelBubble = true;
 	ev.stopPropagation();
 	return false;
-};
+}
+
+function validateLogin() {
+	return true;
+}
 /**************************************
  ********   PER PAGE FUNCTIONS ********
  *************************************/
@@ -445,16 +442,6 @@ appdb.pages.index = (function(){
 			dijit.popup.close(inboxDlg);
 			inboxDlg = undefined;
 		};
-	};
-	page.initCodeLogin = function(){
-		window.loginBoxContent = '<form onsubmit="return doLogin();" id="loginform" name="loginform" method="post" onsubmit="return validateLogin();" action="' + appdb.config.endpoint.base + 'users/login'+ ((appdb.config.appenv!=='production')?'dev2':'') + '"><table width="100%"><tr><td colspan="3"><span style="font-size:8pt">Please provide your <a target="_blank" href="https://www.egi.eu/sso/">EGI SSO</a> credentials</span><br/><br/></td></tr><tr><td><label for="username">Username:</label></td><td colspan="2" style="text-align:right"><input name="username" id="username" dojoType="dijit.form.TextBox" /></td></tr>' +
-		'<tr><td><label for="password">Password:</label></td><td colspan="2" style="text-align: right"><input type="password" name="password" id="password" dojoType="dijit.form.TextBox"/><input type="hidden" name="referrer"/></td></tr>' +
-		'<tr><td style="display: none; vertical-align:middle"><label for="rememberme">Remember me</label></td><td style="vertical-align:middle"> <input style="display:none" dojoType="dijit.form.CheckBox" name="rememberme"/></td><td style="text-align: right"><button onclick="cancelLogin();" dojotype="dijit.form.Button">Cancel</button><button type="submit" dojotype="dijit.form.Button">OK</button></td></tr></table></form>';
-
-		window.loginBox = new dijit.TooltipDialog({
-			title: 'Login',
-			content: loginBoxContent
-		});
 	};
 	page.init = function(){
 		appdb.pages.reset();
