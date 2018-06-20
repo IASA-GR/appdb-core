@@ -42,7 +42,6 @@ class PplstatsController extends Zend_Controller_Action
 
     public function perpositionAction()
     {
-        trackPage('/pplstats/perposition');
 		$stats = new Default_Model_PplStats();
 		$this->view->entries = $stats->perPosition();
 		include 'pplaccounting.php';
@@ -50,7 +49,6 @@ class PplstatsController extends Zend_Controller_Action
 
     public function percountryAction()
     {
-        trackPage('/pplstats/percountry');
 		$stats = new Default_Model_PplStats();
 		$this->view->entries = $stats->perCountry();
 		include 'pplaccounting.php';
@@ -58,7 +56,6 @@ class PplstatsController extends Zend_Controller_Action
 
     public function perregionAction()
     {
-        trackPage('/pplstats/perregion');
 		$stats = new Default_Model_PplStats();
 		$this->view->entries = $stats->perRegion();
 		include 'pplaccounting.php';

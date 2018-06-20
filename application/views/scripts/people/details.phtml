@@ -915,21 +915,6 @@
 		$(".person-group.groupcontainer > ul > li.contactinfo > a").trigger("click");
 	};
 
-    var toggleRememberMe = function() {
-        if ( $("input[name='rememberme']:last").attr("checked")) {
-            $.get('/users/rememberme');
-        } else {
-            $.get('/users/forgetme');
-        }
-	};
-
-	var toggleRememberNews = function() {
-        if ( $("input[name='remembernewsfeed']:last").attr("checked")) {
-            remembernewsfeed=true;
-        } else {
-            remembernewsfeed=false;
-        }
-	};
 
 	$("#addcontactinfo<?php echo $this->dialogCount;?>").hide();
 	var docgrid = false;
@@ -1218,12 +1203,6 @@
                 $("input[name='displaySettings']").filter('[value="-1"]:first').attr('checked','checked');
             }
 		}
-		try {
-	        if ( $.cookie("rememberme") == "1" ) $("input[name='rememberme']").attr("checked","checked");
-		} catch(e) {
-			$("input[name='rememberme']").attr("checked","");
-		}
-        if ( remembernewsfeed ) $("input[name='remembernewsfeed']").attr("checked","checked");
 		$(".prefsdiv").css('height',dlgHeight+'px');
 		makePersonDocs();
 		<?php if ($this->entry->id != "") { ?>

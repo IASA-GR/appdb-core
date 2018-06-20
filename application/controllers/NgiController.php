@@ -60,7 +60,6 @@ class NgiController extends Zend_Controller_Action
 
 	public function indexAction()
     {
-        trackPage('/ngi');
 		$this->_helper->layout->disableLayout();
 		$offset = $this->_getParam('ofs');
 		$length = $this->_getParam('len');

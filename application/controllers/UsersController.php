@@ -23,32 +23,6 @@ class UsersController extends Zend_Controller_Action
     	$this->session = new Zend_Session_Namespace('default');
     }
 
-    public function remembermeAction()
-    {
-        $this->_helper->layout->disableLayout();
-        $this->_helper->viewRenderer->setNoRender();
-        if ( $this->session->userid !== null ) {
-            $users = new Default_Model_Researchers();
-            $users->filter->id->equals($this->session->userid);
-            $users->items[0]->password=$_COOKIE['scookpass'];
-            $users->items[0]->save();
-            setcookie("rememberme", "1", time()+60*60*24*100, "/");
-        }
-    }
-
-	public function forgetmeAction()
-    {
-        $this->_helper->layout->disableLayout();
-        $this->_helper->viewRenderer->setNoRender();
-        if ( $this->session->userid !== null ) {
-            $users = new Default_Model_Researchers();
-            $users->filter->id->equals($this->session->userid);
-            $users->items[0]->password=null;
-            $users->items[0]->save();
-            setcookie("rememberme", "", time()-3600);
-        }
-    }
-
     public function indexAction()
     {
         // action body
