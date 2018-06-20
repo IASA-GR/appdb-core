@@ -39,7 +39,7 @@ CREATE TABLE public.va_sec_check_queue
   report_data text,
   secant_version text,
   image_list_path text,
-  id bigint NOT NULL DEFAULT nextval('va_sec_check_queue_id_seq'::regclass),
+  id bigserial NOT NULL, 
   comment text,
   CONSTRAINT va_sec_check_queue_pkey PRIMARY KEY (id),
   CONSTRAINT va_sec_check_queue_vmiinstanceid_fkey FOREIGN KEY (vmiinstanceid)

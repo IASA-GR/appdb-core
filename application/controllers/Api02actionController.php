@@ -68,7 +68,6 @@ class Api02actionController extends Zend_Controller_Action
 		if ( $this->view->isAdmin || ($this->view->Authenticated && $this->_getParam['id'] == $_GET['id'] ) || ($this->session->userid !== null && $this->_getParam['id'] == $this->session->userid) || userIsAdminOrManager($this->session->userid) )  {
 			$format = $this->_getParam("format");
 			if ( $format === "json" ) $format = "xml";
-			trackPage('/apps', $this->_getParam("format"));
 			$this->_helper->layout->disableLayout();
 			$this->view->subindex = "myappsindex";
 			if ( $this->session->userid !== null ) {
@@ -86,7 +85,6 @@ class Api02actionController extends Zend_Controller_Action
 		if ( $this->view->isAdmin || ($this->view->Authenticated && $this->_getParam['id'] == $_GET['id'] ) || ($this->session->userid !== null && $this->_getParam['id'] == $this->session->userid) || userIsAdminOrManager($this->session->userid) )  {
 			$format = $this->_getParam("format");
 			if ( $format === "json" ) $format = "xml";
-			trackPage('/apps', $this->_getParam("format"));
 			$this->_helper->layout->disableLayout();
 			$this->view->subindex = "myownindex";
 			if ( $this->session->userid !== null ) {
@@ -105,7 +103,6 @@ class Api02actionController extends Zend_Controller_Action
 		if ( $this->view->isAdmin || ($this->view->Authenticated && $this->_getParam['id'] == $_GET['id'] ) || ($this->session->userid !== null && $this->_getParam['id'] == $this->session->userid) || userIsAdminOrManager($this->session->userid) )  {
 			$format = $this->_getParam("format");
 			if ( $format === "json" ) $format = "xml";
-			trackPage('/apps', $this->_getParam("format"));
 			$this->_helper->layout->disableLayout();
 			$this->view->subindex = "myeditindex";
 			if ( $this->session->userid !== null ) {
@@ -124,7 +121,6 @@ class Api02actionController extends Zend_Controller_Action
 		if ( $this->view->isAdmin || userIsAdminOrManager($this->session->userid) ) {
 			$format = $this->_getParam("format");
 			if ( $format === "json" ) $format = "xml";
-			trackPage('/apps', $this->_getParam("format"));
 			$this->_helper->layout->disableLayout();
 			$this->view->subindex = "modindex";
 			if ( $this->session->userid !== null ) {
@@ -142,7 +138,6 @@ class Api02actionController extends Zend_Controller_Action
 		if ( $this->view->isAdmin || userIsAdminOrManager($this->session->userid) ) {
 			$format = $this->_getParam("format");
 			if ( $format === "json" ) $format = "xml";
-			trackPage('/apps', $this->_getParam("format"));
 			$this->_helper->layout->disableLayout();
 			$this->view->subindex = "delindex";
 			if ( $this->session->userid !== null ) {
@@ -160,7 +155,6 @@ class Api02actionController extends Zend_Controller_Action
 		if ( $this->view->isAdmin || ($this->view->Authenticated && $this->_getParam['id'] == $_GET['id'] ) || ($this->session->userid !== null && $this->_getParam['id'] == $this->session->userid) || userIsAdminOrManager($this->session->userid) )  {
 			$format = $this->_getParam("format");
 			if ( $format === "json" ) $format = "xml";
-			trackPage('/apps', $this->_getParam("format"));
 			$this->_helper->layout->disableLayout();
 			$this->view->subindex = "bmindex";
 			if ( $this->session->userid !== null ) {
@@ -288,7 +282,6 @@ class Api02actionController extends Zend_Controller_Action
 
     public function appindexAction()
     {
-		trackPage('/apps', $this->_getParam("format"));
 		$this->_helper->layout->disableLayout();
 		$this->appindex(0);
     }
@@ -331,7 +324,6 @@ class Api02actionController extends Zend_Controller_Action
 		$appID = $this->_getParam("id");
 		$format = $this->_getParam("format");
 		if ( $format === "json" ) $format = "xml";
-        trackPage('/apps/details/'.$appID, $format);
 		if ( ($appID == '') ) $appID = $this->session->lastAppID;
 		if ( $appID == "0" ) {
 			$this->view->entry = new Default_Model_Application();
@@ -406,7 +398,6 @@ class Api02actionController extends Zend_Controller_Action
 	}
 	
 	public function pplindexAction() {
-        trackPage('/people',$this->_getParam("format"));
 		$this->_helper->layout->disableLayout();
 		$this->pplindex();
 	}
@@ -474,7 +465,6 @@ class Api02actionController extends Zend_Controller_Action
     public function ppldetailsAction()
     {
         $pplID = $this->_getParam("id");
-        trackPage('/people/details?id='.$pplID,$this->_getParam("format"));
         if ( $pplID == '' ) $pplID = $this->session->lastPplID;
         $this->_helper->layout->disableLayout();
         $apps = new Default_Model_Researchers();

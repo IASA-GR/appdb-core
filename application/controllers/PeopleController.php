@@ -126,7 +126,6 @@ class PeopleController extends Zend_Controller_Action
 	}
 	
 	public function indexAction() {
-        trackPage('/people',$this->_getParam("format"));
 		$this->_helper->layout->disableLayout();
 	}
 
@@ -224,7 +223,6 @@ class PeopleController extends Zend_Controller_Action
     public function detailsAction()
     {
         $pplID = $this->_getParam("id");
-        trackPage('/people/details?id='.$pplID,$this->_getParam("format"));
         if ( $pplID == '' ) $pplID = $this->session->lastPplID;
         $this->_helper->layout->disableLayout();
 		$ppl = new Default_Model_Researchers();
@@ -412,7 +410,6 @@ class PeopleController extends Zend_Controller_Action
     
     public function leavemessageAction()
     {
-        trackPage('/people/leavemessage',$this->_getParam("format"));
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
 		

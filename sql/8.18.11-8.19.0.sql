@@ -21,10 +21,10 @@ New version: 8.19.0
 Author: wvkarag@lovecraft.priv.iasa.gr
 */
 
-START TRANSACTION;
-
 ALTER TYPE e_entity ADD VALUE 'software_release';
 ALTER TYPE e_entity ADD VALUE 'vappliance_version';
+
+START TRANSACTION;
 
 CREATE TABLE public.pidhandles
 (

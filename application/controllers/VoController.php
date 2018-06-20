@@ -867,7 +867,6 @@ class VoController extends Zend_Controller_Action
     }
     private function getContactsOld($id)
     {
-		trackPage('vo/contact');
 		$this->_helper->layout->disableLayout();
 		$voname = $id;
 		if ( $voname != null ) {
@@ -904,7 +903,6 @@ class VoController extends Zend_Controller_Action
 	
     public function detailsAction()
     {
-        trackPage('vo/details');
         $this->_helper->layout->disableLayout();
 		$this->view->canEdit = false;
         if ( $this->xml !== null ) {
@@ -950,13 +948,11 @@ class VoController extends Zend_Controller_Action
     }
 
     public function listAction(){
-        //trackPage('/vo');
         $this->_helper->layout->disableLayout();
     }
 
     public function indexAction()
     {
-        trackPage('/vo');
         $this->_helper->layout->disableLayout();
     }
 
