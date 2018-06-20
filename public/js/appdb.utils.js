@@ -750,6 +750,16 @@ appdb.utils.rest.authorization = {
 		query : {
 			setCredentials : function(o){
 				var u = o.url;
+                                if(u.indexOf("userid="+userID+"&passwd="+$.cookie("scookpass"))>=0){
+                                    return o;
+                                }
+				//append credentials
+				if(u.indexOf("?")<0){
+					u+="?";
+				}else{
+					u+="&";
+				}
+				u += "userid="+userID+"&passwd="+$.cookie("scookpass");
 				if(u.substr(0,5)==="http:"){
 					u = "https" + u.substr(4,u.length);
 				}
@@ -771,7 +781,7 @@ appdb.utils.rest.authorization = {
 		},
 		authonly : {
 			canUseAuthorization : function(o){
-				return (userID!==null);
+				return (userID!==null && $.cookie && $.cookie("scookpass")!==null);
 			}
 		}
 	}

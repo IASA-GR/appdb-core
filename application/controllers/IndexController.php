@@ -83,7 +83,8 @@ class IndexController extends Zend_Controller_Action
 
     public function indexAction()
     {
-        if ( ($this->session->userid === null) ) {
+		trackPage('/');
+        if ( (isset($_COOKIE['rememberme'])) && ($this->session->userid === null) ) {
 			//save permaLink in order to handle it after login
 		    if ( array_key_exists('p',$_GET) ) { $this->session->permaLink = $_GET['p']; }
 			if ( APPLICATION_ENV == "production" ) {

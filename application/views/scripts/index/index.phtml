@@ -721,6 +721,8 @@ if( $browserSupported == false ){
 		echo 'var APPLICATION_ENV = "'.APPLICATION_ENV.'";';
 	} else echo 'var APPLICATION_ENV = null;';
 	?>
+	$.cookie("cookpass", null);
+	$.cookie("cookname", null);
 	var reqsrc = '<?php 
 		if (isset($_SERVER['HTTP_X_FORWARD_FOR'])) {
 		$ip = $_SERVER['HTTP_X_FORWARD_FOR'];
@@ -775,6 +777,7 @@ if( $browserSupported == false ){
 	var detailsStyle=0;
 	var detailsStyleAuto = true;
 	var detailsListHtml = null;
+	var remembernewsfeed = false;
 	var newsTimer = null;
 	var newsfilter = null;
 	var newsfilterbox = undefined;

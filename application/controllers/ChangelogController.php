@@ -26,6 +26,8 @@ class ChangelogController extends Zend_Controller_Action
     public function indexAction()
 	{
 		$this->_helper->layout->disableLayout();
+        trackPage('/changelog');
+		
 		$wiki = ApplicationConfiguration::app('wiki');
 		$haswiki = ($wiki==="")?false:true;
 		$currentwiki = "/pages/about/changelog"; 
