@@ -681,7 +681,7 @@ appdb.components.Dataset = appdb.ExtendClass(appdb.Component, "appdb.components.
 		if( d.id ){
 			var name = $.trim(d.firstname+" "+d.lastname)?d.firstname+" "+d.lastname:"";
 			name = name || (d.val)?d.val():d.cname;
-			$(this.dom).find("span.dataset-addedby").html('<a href="'+((d.cname)?("/store/person/"+d.cname):'#')+'" onclick="appdb.views.Main.showPerson({id: '+d.id+',cname:\''+d.cname+'\'},{mainTitle: \''+name+'\'});" target="_blank">'+name+'</a>');	
+			$(this.dom).find("span.dataset-addedby").html('<a href="'+((d.cname)?("/store/person/"+d.cname):'#')+'" onclick="return appdb.views.Main.showPerson({id: '+d.id+',cname:\''+d.cname+'\'},{mainTitle: \''+name+'\'});" target="_blank">'+name+'</a>');
 		}
 		var d1 = ((this.options.data || {}).addedon || "").split("T");
 		if(d1.length>0 && typeof d1[0] === "string"){

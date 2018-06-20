@@ -5616,7 +5616,7 @@ appdb.components.MailSubscription = appdb.ExtendClass(appdb.Component,"appdb.com
             deliveryTypes = NewsDeliveryType.split(this._subscription.delivery);
 		$(res).addClass("customsubscribe");
 		$(desc).addClass("description");
-        $(desc).append("Subscriptions will be send to <i><b>"+appdb.model.PrimaryContact.userPrimaryContact+"</b></i>. To change your primary e-mail contact visit the preferences section of your <a href='/store/person/"+userCName+"' onclick='appdb.views.Main.showPerson({id:userID,cname:userCName});'>profile</a>.");
+        $(desc).append("Subscriptions will be send to <i><b>"+appdb.model.PrimaryContact.userPrimaryContact+"</b></i>. To change your primary e-mail contact visit the preferences section of your <a href='/store/person/"+userCName+"' onclick='return appdb.views.Main.showPerson({id:userID,cname:userCName});'>profile</a>.");
 
         //Title rendering
 		$(title).append("<span class='title'>Title:</span>").
@@ -5845,7 +5845,7 @@ appdb.components.MailSubscription = appdb.ExtendClass(appdb.Component,"appdb.com
             return function(){
                 if(userID!==null){
                     if( $.trim(appdb.model.PrimaryContact.userPrimaryContactId) === ""){
-                        _this._renderMessage("<div style='width:415px;'><div style='padding:3px;'><b>No e-mail contact found in your profile.</b></div><div style='padding:3px;'>At least one e-mail contact is needed in order to subscribe to the e-mail notification service. Visit your profile by clicking  <a href='/store/person/"+userCName+"' onclick='appdb.views.Main.showPerson({id:userID,cname:userCName});'>here</a> to add or edit your contacts.</div><div style='padding:3px;'>In case you wish to add more than one e-mail contacts the system will set as the primary one the first one added.To set a different primary e-mail contact visit the preferences section of your profile.</div></div>");
+                        _this._renderMessage("<div style='width:415px;'><div style='padding:3px;'><b>No e-mail contact found in your profile.</b></div><div style='padding:3px;'>At least one e-mail contact is needed in order to subscribe to the e-mail notification service. Visit your profile by clicking  <a href='/store/person/"+userCName+"' onclick='return appdb.views.Main.showPerson({id:userID,cname:userCName});'>here</a> to add or edit your contacts.</div><div style='padding:3px;'>In case you wish to add more than one e-mail contacts the system will set as the primary one the first one added.To set a different primary e-mail contact visit the preferences section of your profile.</div></div>");
                     }else{
                         _this.render();
                     }
@@ -6039,7 +6039,7 @@ appdb.components.EntrySubscription = appdb.ExtendClass(appdb.Component,"appdb.co
   if(userID!==null){
    if( $.trim(appdb.model.PrimaryContact.userPrimaryContactId) === ""){
     if( showDialogs === true ){
-     this._renderMessage("<div style='width:415px;'><div style='padding:3px;'><b>No e-mail contact found in your profile.</b></div><div style='padding:3px;'>At least one e-mail contact is needed in order to subscribe to the e-mail notification service. Visit your profile by clicking  <a href='/store/person/"+userCName+"' onclick='appdb.views.Main.showPerson({id:userID,cname:userCName});'>here</a> to add or edit your contacts.</div><div style='padding:3px;'>In case you wish to add more than one e-mail contacts the system will set as the primary one the first one added.To set a different primary e-mail contact visit the preferences section of your profile.</div></div>");
+     this._renderMessage("<div style='width:415px;'><div style='padding:3px;'><b>No e-mail contact found in your profile.</b></div><div style='padding:3px;'>At least one e-mail contact is needed in order to subscribe to the e-mail notification service. Visit your profile by clicking  <a href='/store/person/"+userCName+"' onclick='return appdb.views.Main.showPerson({id:userID,cname:userCName});'>here</a> to add or edit your contacts.</div><div style='padding:3px;'>In case you wish to add more than one e-mail contacts the system will set as the primary one the first one added.To set a different primary e-mail contact visit the preferences section of your profile.</div></div>");
      return false;
     }
        
@@ -12399,6 +12399,7 @@ appdb.views.Main = (function(){
 
 			    if (_unwatchedItems.indexOf(fname) > -1) {
 				    f.apply(null,argv);
+				    appdb.pages.override.events($("#main"));
 				    return false;
 			    }
 
@@ -12418,6 +12419,9 @@ appdb.views.Main = (function(){
 				    appdb.pages.index.requests.cancel('logistics');
 				    f.apply(null,argv);
 				    window.scroll(0,0);
+				    setTimeout(function() {
+					    appdb.pages.override.events($("#main"));
+				    }, 1);
 
 				    if( metadata ){
 					    appdb.Navigator.handlePermalink(metadata, (argv.length > 0)?argv:[_currentState.query,_currentState.ext]);

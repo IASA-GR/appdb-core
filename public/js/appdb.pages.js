@@ -397,7 +397,7 @@ appdb.pages.index = (function(){
 				var senderImage;
 				if ( ($(this).find("senderID")[0] !== undefined) && ($(this).find("senderID").text() !== 'NULL') ) {
 					senderName = $(this).find("senderName").text(); 
-					senderImage = '/people/getimage?id=' + $(this).find("senderID").text() + '" onclick="appdb.views.Main.showPerson({id: ' + $(this).find("senderID").text() + ',cname: \''+$(this).find("senderCName").text()+'\'}, {mainTitle: \'' + $(this).find("senderName").text().replace(/'/g,"\\'") + '\'})';
+					senderImage = '/people/getimage?id=' + $(this).find("senderID").text() + '" onclick="return appdb.views.Main.showPerson({id: ' + $(this).find("senderID").text() + ',cname: \''+$(this).find("senderCName").text()+'\'}, {mainTitle: \'' + $(this).find("senderName").text().replace(/'/g,"\\'") + '\'})';
 				} else {
 					senderName = 'System Notification';
 					senderImage = '/images/warn50.png';
@@ -412,7 +412,7 @@ appdb.pages.index = (function(){
 					senton = senton.split(".")[0];
 				}
 				dlgContent = dlgContent + '</td><td><span style="white-space:nowrap"><b>'+senderName+', '+senton+'</b></span><br/><div style="max-width:450px; overflow-y:auto; overflow-x:auto;position:relative;"><p>'+msgText+'</p>';
-				dlgContent = dlgContent + '<div class="inboxreply"><a href="/store/person/'+$(this).find("senderCName").text()+'" title="Click to reply" onclick="appdb.views.Main.showPerson({id: ' + $(this).find("senderID").text() + ',cname: \''+$(this).find("senderCName").text()+'\'}, {mainTitle: \'' + $(this).find("senderName").text().replace(/'/g,"\\'") + '\', tab:\'replymessage\'});">reply</a></div>';
+				dlgContent = dlgContent + '<div class="inboxreply"><a href="/store/person/'+$(this).find("senderCName").text()+'" title="Click to reply" onclick="return appdb.views.Main.showPerson({id: ' + $(this).find("senderID").text() + ',cname: \''+$(this).find("senderCName").text()+'\'}, {mainTitle: \'' + $(this).find("senderName").text().replace(/'/g,"\\'") + '\', tab:\'replymessage\'});">reply</a></div>';
 				dlgContent = dlgContent + '</div></td></tr>';
 			});	
 			dlgContent = dlgContent + '</table><table width="100%"><tr><td style="text-align:right" colspan="2"><!--<button onclick="hideInbox();" dojotype="dijit.form.Button">Close</button>--></td></tr></table></div></form>';
@@ -981,7 +981,7 @@ appdb.pages.index = (function(){
 					}
 					contents =  "<div class='profilenotification'>";
 					contents += "<span class='title'><span class='count'>"+reqcount+"</span> pending request"+((reqcount===1)?"":"s")+"</span>";
-					contents += "<span class='instructions'>You can view the requests from your <a href='/store/person/"+userCName+"' onclick='appdb.views.Main.showPerson({id: " + userID + ", cname: \"" + userCName + "\"}, {mainTitle: \""+userFullname+"\"});' title='View your profile'>profile</a> by selecting the tab <a href='/store/person/"+userCName+"' onclick='appdb.views.Main.showPerson({id: " + userID + ", cname: \""+userCName+"\"}, {mainTitle: \""+userFullname+"\", tab:\"pending requests\"});' title='View your profile'>Pending Requests</a></span>";
+					contents += "<span class='instructions'>You can view the requests from your <a href='/store/person/"+userCName+"' onclick='return appdb.views.Main.showPerson({id: " + userID + ", cname: \"" + userCName + "\"}, {mainTitle: \""+userFullname+"\"});' title='View your profile'>profile</a> by selecting the tab <a href='/store/person/"+userCName+"' onclick='return appdb.views.Main.showPerson({id: " + userID + ", cname: \""+userCName+"\"}, {mainTitle: \""+userFullname+"\", tab:\"pending requests\"});' title='View your profile'>Pending Requests</a></span>";
 					contents += "</div>";
 
 					prdlg = new dijit.TooltipDialog({content:contents});
@@ -1153,7 +1153,7 @@ appdb.pages.home = (function(){
 		if( page.currentBanner_newest() === null ){
 			page.currentBanner_newest(new appdb.components.Banner({container: $("#banner_newest"),autoload:false, popup:'<div class="countrypopup banner">' +
 					'<a data-click="#vappsLastUpdatedLink"><img src="/images/category34.png" border="0"><span>View vappliances</span></a>' +
-					((appdb.config.features.swappliance)?'<a onClick="appdb.views.Main.showOrderedSWAppliances(\'lastupdated\');"><img src="/images/swapp.png" border="0"><span>View swappliances</span></a>':'') +
+					((appdb.config.features.swappliance)?'<a onClick="return appdb.views.Main.showOrderedSWAppliances(\'lastupdated\');"><img src="/images/swapp.png" border="0"><span>View swappliances</span></a>':'') +
 					'</div>'}));
 			page.currentBanner_newest().subscribe({event: "select", callback: function(){
 				$(this.dom).parent().parent().removeClass("hidden");
@@ -1165,7 +1165,7 @@ appdb.pages.home = (function(){
 			page.currentBanner_toprated(new appdb.components.Banner({container: $("#banner_toprated"),autoload:false, popup:'<div class="countrypopup banner">' +
 					'<a data-click="#appsMostVisitedLink"><img src="/images/category1.png" border="0"><span>View software</span></a>' +
 					'<a data-click="#vappsMostVisitedLink"><img src="/images/category34.png" border="0"><span>View vappliances</span></a>' +
-					((appdb.config.features.swappliance)?'<a onClick="appdb.views.Main.showOrderedSWAppliances(\'hitcount\');"><img src="/images/swapp.png" border="0"><span>View swappliances</span></a>':'') +
+					((appdb.config.features.swappliance)?'<a onClick="return appdb.views.Main.showOrderedSWAppliances(\'hitcount\');"><img src="/images/swapp.png" border="0"><span>View swappliances</span></a>':'') +
 					'</div>'}));
 			page.currentBanner_toprated().subscribe({event: "select", callback: function(){
 				$(this.dom).parent().parent().removeClass("hidden");

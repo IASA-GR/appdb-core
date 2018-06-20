@@ -241,7 +241,7 @@
 		roles = eval('(' + roles + ')');
 		if ( roles.ids.length>0 ) {
 			for (var i=roles.ids.length-1; i>=0; i--) {
-				$('<li><a href="#" onclick="appdb.views.Main.showPeopleByRole(' + String(roles.ids[i]) + ');" data-href="/browse/people/role/'+String(roles.ids[i])+'">' + roles.vals[i] + '</a></li>').insertAfter(li);
+				$('<li><a href="#" onclick="return appdb.views.Main.showPeopleByRole(' + String(roles.ids[i]) + ');" data-href="/browse/people/role/'+String(roles.ids[i])+'">' + roles.vals[i] + '</a></li>').insertAfter(li);
 			}
 		} else appdb.debug('WARNING: no person role data');
 		
@@ -251,7 +251,7 @@
 		if( groups ){
 			for (var j=0; j<groups.length; j+=1) {
 				if( $.inArray( parseInt(groups[j].id), allowedgroups) > -1  ){
-					$(ul).append($('<li><a href="#" onclick="appdb.views.Main.showPeopleByGroup(' + groups[j].id + ');" data-href="/browse/people/accessgroup/'+groups[j].id+'">' + groups[j].val() + '</a></li>'));
+					$(ul).append($('<li><a href="#" onclick="return appdb.views.Main.showPeopleByGroup(' + groups[j].id + ');" data-href="/browse/people/accessgroup/'+groups[j].id+'">' + groups[j].val() + '</a></li>'));
 				}
 			}
 		}
@@ -262,7 +262,7 @@
 		domains = eval('(' + domainData + ')');
 		if ( domains.ids.length>0 ) {
 			for (var i=domains.ids.length-1; i>=0; i--) {
-				$('<li><a href="#" onclick="appdb.views.Main.showVOs({flt: \'+=&discipline.id:' + domains.ids[i] + '\'},{mainTitle: \'' + domains.vals[i] + '\',isBaseQuery:true,filterDisplay: \'Search in ' + domains.vals[i] + '...\'});">' + domains.vals[i] + '</a></li>').insertAfter(li);
+				$('<li><a href="#" onclick="return appdb.views.Main.showVOs({flt: \'+=&discipline.id:' + domains.ids[i] + '\'},{mainTitle: \'' + domains.vals[i] + '\',isBaseQuery:true,filterDisplay: \'Search in ' + domains.vals[i] + '...\'});">' + domains.vals[i] + '</a></li>').insertAfter(li);
 			}
 		} else appdb.debug('WARNING: no discipline data');
 	}
@@ -1124,7 +1124,7 @@
 		});
 		if ( edit ) {
 			$(".newrating").empty().remove();
-			submitter = '<div class="dijitDialogTitleBar" style="width:99%">'+ratingspan.html()+'<span> Entry added by <a href="/store/person/'+userCName+'" onclick="appdb.views.Main.showPerson({id: '+userID+', cname:\"'+userCName+'\"}, {mainTitle: \''+subname+'\'});">'+subname+'</a>, on '+appdb.utils.FormatISODate(subdate)+'</span>'+reportCommentAbuseHtml+'</div>';
+			submitter = '<div class="dijitDialogTitleBar" style="width:99%">'+ratingspan.html()+'<span> Entry added by <a href="/store/person/'+userCName+'" onclick="return appdb.views.Main.showPerson({id: '+userID+', cname:\"'+userCName+'\"}, {mainTitle: \''+subname+'\'});">'+subname+'</a>, on '+appdb.utils.FormatISODate(subdate)+'</span>'+reportCommentAbuseHtml+'</div>';
  			comment = '<textarea maxlength="512" dojoType="dijit.form.Textarea" name="comment"></textarea>';
  			rating = $('<div style="padding-bottom: 20px" class="newrating"><div class="dijitDialogTitleBar">'+submitter+'</div><div style="height:20px"></div><div style="padding-left:10px; padding-right:10px; padding-top:10px; padding-bottom: 10px; margin-left: auto; margin-right:auto;border:1px solid grey; width: 90%">'+comment+'</div><div style="height:20px"></div><div style="float:right; margin-right:50px"><a class="submitrating" href="#"><b>Submit</b></a> <a class="cancelrating" href="#"><b>Cancel</b></a></div></div>');
 			if ( parseInt(r) != 0 ) rating.attr("data-temprating",r);
@@ -1433,7 +1433,7 @@
 						}
 						if ( ratings[i].submitter.type === "internal" ) {
 							subname = ratings[i].submitter.person.firstname+' '+ratings[i].submitter.person.lastname;
-							submitter = '<div class="dijitDialogTitleBar" style="width:99%">'+ratingspan.html()+'<span> Entry added by <a href="/store/person/'+ratings[i].submitter.person.cname+'" onclick="appdb.views.Main.showPerson({id: '+ratings[i].submitter.person.id+',cname:\''+ratings[i].submitter.person.cname+'\'}, {mainTitle: \''+subname+'\'});">'+subname+'</a>, on '+appdb.utils.FormatISODate(subdate)+'</span>'+reportCommentAbuseHtml+'</div>';
+							submitter = '<div class="dijitDialogTitleBar" style="width:99%">'+ratingspan.html()+'<span> Entry added by <a href="/store/person/'+ratings[i].submitter.person.cname+'" onclick="return appdb.views.Main.showPerson({id: '+ratings[i].submitter.person.id+',cname:\''+ratings[i].submitter.person.cname+'\'}, {mainTitle: \''+subname+'\'});">'+subname+'</a>, on '+appdb.utils.FormatISODate(subdate)+'</span>'+reportCommentAbuseHtml+'</div>';
 						} else {
 							try {
 								subname = ratings[i].submitter.val();
@@ -1898,7 +1898,7 @@
 
 	function showModerationDetails(d) {
 		var moddername = '';
-		if (d.moderator) moddername = ' by <a href="/store/person/'+d.moderator.cname+'" style="color:#D96B00;text-decoration:none;" onclick="appdb.views.Main.showPerson({id: '+d.moderator.id+', cname:\''+d.moderator.cname+'\'},{mainTitle: \''+d.moderator.firstname+" "+d.moderator.lastname+'\'});">'+d.moderator.firstname + ' '+ d.moderator.lastname+'</a>';
+		if (d.moderator) moddername = ' by <a href="/store/person/'+d.moderator.cname+'" style="color:#D96B00;text-decoration:none;" onclick="return appdb.views.Main.showPerson({id: '+d.moderator.id+', cname:\''+d.moderator.cname+'\'},{mainTitle: \''+d.moderator.firstname+" "+d.moderator.lastname+'\'});">'+d.moderator.firstname + ' '+ d.moderator.lastname+'</a>';
 		var modDlg = $('<div title="Moderation Information"><p><span class="ui-icon ui-icon-info" style="float:left; margin:0 7px 20px 0;"></span>Software '+d.name+' has been moderated '+moddername+' for the following reason:</p><div style="padding:10px; border: 1px solid grey"><p>'+(d.moderationReason || '<i>No reason specified</i>')+'</p></div></div>');
 		modDlg.dialog({
 			dialogClass: 'info',
@@ -1929,7 +1929,7 @@
 		var moderatedOn = d.application.moderatedOn || '';
 		var modreason = d.application.moderationReason || '';
 		var modtext = '<br/><b>Moderated';
-		if ($.trim(moderator) !== '') modtext += ' by <a href="/store/person/'+moderator.cname+'" onclick="appdb.views.Main.showPerson({id: '+moderator.id+',cname:\''+moderator.cname+'\'},{mainTitle: \''+moderator.firstname+" "+moderator.lastname+'\'});">'+moderator.firstname+' '+moderator.lastname+'</a>';
+		if ($.trim(moderator) !== '') modtext += ' by <a href="/store/person/'+moderator.cname+'" onclick="return appdb.views.Main.showPerson({id: '+moderator.id+',cname:\''+moderator.cname+'\'},{mainTitle: \''+moderator.firstname+" "+moderator.lastname+'\'});">'+moderator.firstname+' '+moderator.lastname+'</a>';
 		if ($.trim(moderatedOn) !== '') {
 			var moddate = moderatedOn.split("T");
 			if(moddate.length>0 && typeof moddate[0] === "string"){
@@ -2008,14 +2008,14 @@ String.prototype.replaceAll = function(search, replacement) {
 				if ( d.history && d.history.id) {
                     h = d.history;if ( ! $.isArray(h) ) h = [h];
                     for(var i=0; i<h.length; i++) {
-                        if ( h[i].userid ) by = ' by <a target="_blank" href="/store/person/'+h[i].username+'" onclick="appdb.views.Main.showPerson({id: '+h[i].userid+', cname:\''+h[i].usercname+'\'},{mainTitle: \''+h[i].username+'\'});">' + h[i].username + (h[i].usercontact != '' ? ' ('+h[i].usercontact+')' : '') + '</a>'; else by = h[i].username + (h[i].usercontact != '' ? ' ('+h[i].usercontact+')' : '');
+                        if ( h[i].userid ) by = ' by <a target="_blank" href="/store/person/'+h[i].username+'" onclick="return appdb.views.Main.showPerson({id: '+h[i].userid+', cname:\''+h[i].usercname+'\'},{mainTitle: \''+h[i].username+'\'});">' + h[i].username + (h[i].usercontact != '' ? ' ('+h[i].usercontact+')' : '') + '</a>'; else by = h[i].username + (h[i].usercontact != '' ? ' ('+h[i].usercontact+')' : '');
 						evt = h[i].event;
 						if ( evt == "update" && h[i].disposition === "rollback" ) evt = "rollback";
 						var diff = '<a href="#" onclick="appHistoryDiff(' + id + ', \'' + h[i].id + '\');">[DIFF]</a>';
-						s = s + '<li><a href="#" onclick="appdb.views.Main.showApplication({id: '+id+', cname: appdb.pages.application.currentCName() + \'/history/' + h[i].id + '\', histid: \''+h[i].id+'\', histtype: 0});">'+appdb.utils.formatDate(h[i].timestamp) + "</a>: "+ evt + by + ' ' + diff + 
+						s = s + '<li><a href="#" onclick="return appdb.views.Main.showApplication({id: '+id+', cname: appdb.pages.application.currentCName() + \'/history/' + h[i].id + '\', histid: \''+h[i].id+'\', histtype: 0});">'+appdb.utils.formatDate(h[i].timestamp) + "</a>: "+ evt + by + ' ' + diff + 
 						'</li>';
                     }
-					s = '<div><h3><a style="font-size: 110%; margin-left: -24px;" href="#" onclick="appdb.views.Main.showApplication({id: '+id+', cname: appdb.pages.application.currentCName(), name: appdb.pages.application.currentName()});">View current state</a></h3></div>' + s;
+					s = '<div><h3><a style="font-size: 110%; margin-left: -24px;" href="#" onclick="return appdb.views.Main.showApplication({id: '+id+', cname: appdb.pages.application.currentCName(), name: appdb.pages.application.currentName()});">View current state</a></h3></div>' + s;
                 }
                 if ( s === '' ) {
                     s = '<span><b>No history available</b></span>';
@@ -2158,7 +2158,7 @@ String.prototype.replaceAll = function(search, replacement) {
 		var deletedOn = d.application.deletedOn || '';
 		var deltext = '<br/><b>Deleted';
 		if (deleter != '') {
-			deltext += ' by <a href="/store/person/'+deleter.cname+'" onclick="appdb.views.Main.showPerson({id: '+deleter.id+', cname:\''+deleter.cname+'\'},{mainTitle: \''+deleter.firstname+" "+deleter.lastname+'\'});">'+deleter.firstname+' '+deleter.lastname+'</a>';
+			deltext += ' by <a href="/store/person/'+deleter.cname+'" onclick="return appdb.views.Main.showPerson({id: '+deleter.id+', cname:\''+deleter.cname+'\'},{mainTitle: \''+deleter.firstname+" "+deleter.lastname+'\'});">'+deleter.firstname+' '+deleter.lastname+'</a>';
 		} else {
 			deltext += ' by an unknown user ';
 		}
@@ -2470,17 +2470,17 @@ String.prototype.replaceAll = function(search, replacement) {
 			$(e).find("span.app-addedon").html(appdb.utils.FormatISODate(d1));
 			if ( d.application.addedby ) {
 				if ( d.application.addedby.id !== undefined ) {
-					$(e).find("span.app-addedby").html('<a href="'+((d.application.addedby.cname)?("/store/person/"+d.application.addedby.cname):'#')+'" onclick="appdb.views.Main.showPerson({id: '+d.application.addedby.id+',cname:\''+d.application.addedby.cname+'\'},{mainTitle: \''+d.application.addedby.firstname+" "+d.application.addedby.lastname+'\'});" target="_blank">'+d.application.addedby.firstname+" "+d.application.addedby.lastname+'</a>');
+					$(e).find("span.app-addedby").html('<a href="'+((d.application.addedby.cname)?("/store/person/"+d.application.addedby.cname):'#')+'" onclick="return appdb.views.Main.showPerson({id: '+d.application.addedby.id+',cname:\''+d.application.addedby.cname+'\'},{mainTitle: \''+d.application.addedby.firstname+" "+d.application.addedby.lastname+'\'});" target="_blank">'+d.application.addedby.firstname+" "+d.application.addedby.lastname+'</a>');
 				}
 			}
 			if ( d.application.owner ) {
 				if ( ! d.application.addedby || d.application.owner.id != d.application.addedby.id ) {
 					$(e).find(".app-owner-container").removeClass("hidden");
 					if ( d.application.owner.id !== undefined ) {
-						$(e).find("span.app-owner").html('<a href="'+((d.application.owner.cname)?("/store/person/"+d.application.owner.cname):'#')+'" onclick="appdb.views.Main.showPerson({id: '+d.application.owner.id+',cname:\''+d.application.owner.cname+'\'},{mainTitle: \''+d.application.owner.firstname+" "+d.application.owner.lastname+'\'});" target="_blank">'+d.application.owner.firstname+" "+d.application.owner.lastname+'</a>');
+						$(e).find("span.app-owner").html('<a href="'+((d.application.owner.cname)?("/store/person/"+d.application.owner.cname):'#')+'" onclick="return appdb.views.Main.showPerson({id: '+d.application.owner.id+',cname:\''+d.application.owner.cname+'\'},{mainTitle: \''+d.application.owner.firstname+" "+d.application.owner.lastname+'\'});" target="_blank">'+d.application.owner.firstname+" "+d.application.owner.lastname+'</a>');
 					}
 				} else {
-					$(e).find("span.app-owner").html('<a href="'+((d.application.addedby.cname)?("/store/person/"+d.application.addedby.cname):'#')+'" onclick="appdb.views.Main.showPerson({id: '+d.application.addedby.id+',cname:\''+d.application.addedby.cname+'\'},{mainTitle: \''+d.application.addedby.firstname+" "+d.application.addedby.lastname+'\'});" target="_blank">'+d.application.addedby.firstname+" "+d.application.addedby.lastname+'</a>');
+					$(e).find("span.app-owner").html('<a href="'+((d.application.addedby.cname)?("/store/person/"+d.application.addedby.cname):'#')+'" onclick="return appdb.views.Main.showPerson({id: '+d.application.addedby.id+',cname:\''+d.application.addedby.cname+'\'},{mainTitle: \''+d.application.addedby.firstname+" "+d.application.addedby.lastname+'\'});" target="_blank">'+d.application.addedby.firstname+" "+d.application.addedby.lastname+'</a>');
 				}
 				$(e).find("span.app-owner-view").html($(e).find("span.app-owner").html());
 			} else {
@@ -3507,7 +3507,7 @@ String.prototype.replaceAll = function(search, replacement) {
 									authorstr += " <span data-authorMain=\""+author.main+"\" data-authorname=\""+author.extAuthor.replace(/'/g,"\\'")+"\">"+author.extAuthor.replace(/'/g,"\\'")+"</span>";
 								}
 							} else {
-								authorstr += " <a data-authorMain=\""+author.main+"\" data-authorid=\""+author.person.id+"\" href=\"/store/person/"+author.person.cname+"\" onclick=\"appdb.views.Main.showPerson({id: "+author.person.id+", cname:'"+author.person.cname+"'},{mainTitle: '"+author.person.firstname.replace(/'/g,"\\'")+' '+author.person.lastname.replace(/'/g,"\\'")+"'})\">"+author.person.firstname.replace(/'/g,"\\'")+' '+author.person.lastname.replace(/'/g,"\\'")+"</a>";
+								authorstr += " <a data-authorMain=\""+author.main+"\" data-authorid=\""+author.person.id+"\" href=\"/store/person/"+author.person.cname+"\" onclick=\"return appdb.views.Main.showPerson({id: "+author.person.id+", cname:'"+author.person.cname+"'},{mainTitle: '"+author.person.firstname.replace(/'/g,"\\'")+' '+author.person.lastname.replace(/'/g,"\\'")+"'})\">"+author.person.firstname.replace(/'/g,"\\'")+' '+author.person.lastname.replace(/'/g,"\\'")+"</a>";
 							}
 							if (authorstr !== '') authors.push(authorstr);
 						}
@@ -4533,7 +4533,7 @@ var setupApplicationVOs = (function(){
 					{image: 'category1.png', title: 'View associated software', content:'software'},
 					{image: 'category34.png', title: 'View associated vappliances', content:'vappliance'},
 					{image: 'swapp.png', title: 'View associated swappliances', content:'swappliance', hidden: !!!appdb.config.features.swappliance},
-					{image: 'homepage.png', title: 'View Virtual Organization details', onClick: "appdb.views.Main.showVO('"+id+"',{mainTitle: '"+id+"'});"}
+					{image: 'homepage.png', title: 'View Virtual Organization details', onClick: "return appdb.views.Main.showVO('"+id+"',{mainTitle: '"+id+"'});"}
 				];
 				$.each(items, function(i,e){
 					if( e.hidden === true ) return;

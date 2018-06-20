@@ -2362,7 +2362,7 @@ appdb.views.RelatedContactListItem = appdb.ExtendClass(appdb.views.ListItem, "ap
 				}
 				details += "</div>";
 			}
-			details += "<div class='contactpointprofile'>Click <a href='/store/person/" + this._itemData.cname + "' title='Go to " + this._itemData.firstname + " " + this._itemData.lastname + " profile' onclick='appdb.views.Main.showPerson({id: " + this._itemData.id + ", cname:\"" + this._itemData.cname + "\"},{mainTitle: \"" + this._itemData.firstname + " " + this._itemData.lastname + "\"});'>here</a> to see " + this._itemData.firstname + " " + this._itemData.lastname + " profile</div>";
+			details += "<div class='contactpointprofile'>Click <a href='/store/person/" + this._itemData.cname + "' title='Go to " + this._itemData.firstname + " " + this._itemData.lastname + " profile' onclick='return appdb.views.Main.showPerson({id: " + this._itemData.id + ", cname:\"" + this._itemData.cname + "\"},{mainTitle: \"" + this._itemData.firstname + " " + this._itemData.lastname + "\"});'>here</a> to see " + this._itemData.firstname + " " + this._itemData.lastname + " profile</div>";
 			details += "</div>";
 			var detailslink = document.createElement("a");
 			$(detailslink).attr("href", "#").attr("title", "Click to view contact points").text("details").on("click", (function(__this, msg) {
@@ -3617,7 +3617,7 @@ appdb.views.AppsList = appdb.ExtendClass(appdb.View, "appdb.views.AppsList", fun
 				}
 				$(ca).attr("href", "#").
 						attr("title", "Click to view software in category " + cval).
-						attr("onClick", "appdb.views.Main." + typefunc + "({flt:'+=category.id:" + d.category[c].id + "'},{isBaseQuery:true,mainTitle:'" + cval + "',filterDisplay:'Search in " + cval + "...'});");
+						attr("onClick", "return appdb.views.Main." + typefunc + "({flt:'+=category.id:" + d.category[c].id + "'},{isBaseQuery:true,mainTitle:'" + cval + "',filterDisplay:'Search in " + cval + "...'});");
 				$(cli).append(ca);
 
 				$(ca).append("<img src='" + cimg + "' border='0' />");
@@ -4112,7 +4112,7 @@ appdb.views.Publications = function(o) {
 						authorstr += " " + author.extauthor.replace(/'/g, "\\'");
 					}
 				} else {
-					authorstr += " <a href=\"/store/person/" + author.person.cname + "\" onclick=\"appdb.views.Main.showPerson({id:'" + author.person.id + "', cname:'" + author.person.cname + "'},{mainTitle:'" + author.person.firstname + " " + author.person.lastname + "'})\">" + author.person.firstname.replace(/'/g, "\\'") + ' ' + author.person.lastname.replace(/'/g, "\\'") + "</a>";
+					authorstr += " <a href=\"/store/person/" + author.person.cname + "\" onclick=\"return appdb.views.Main.showPerson({id:'" + author.person.id + "', cname:'" + author.person.cname + "'},{mainTitle:'" + author.person.firstname + " " + author.person.lastname + "'})\">" + author.person.firstname.replace(/'/g, "\\'") + ' ' + author.person.lastname.replace(/'/g, "\\'") + "</a>";
 				}
 				if (author.main)
 					authorstr += "</b>";
@@ -5240,7 +5240,7 @@ appdb.views.TagCloud = appdb.ExtendClass(appdb.View, "appdb.views.TagCloud", fun
 				continue;
 			}
 			v = t[i].val();
-			$(h).append("<li value='" + t[i].count + "'><a href='#' onmouseover='$(this).data(\"bckcolor\",$(this).css(\"color\"));$(this).css({color:\"#D96B00\"});' onmouseout='$(this).css({color:\"\"+$(this).data(\"bckcolor\")});' title='click to search for " + v + "' onclick='appdb.views.Main.showApplications({flt:\"=tag:\\\"" + v + "\\\"\"},{isBaseQuery:true,filterDisplay:\"Search with tag " + v + "...\",mainTitle : \"tag: " + v + "\"});' >" + v + " </a></li>");
+			$(h).append("<li value='" + t[i].count + "'><a href='#' onmouseover='$(this).data(\"bckcolor\",$(this).css(\"color\"));$(this).css({color:\"#D96B00\"});' onmouseout='$(this).css({color:\"\"+$(this).data(\"bckcolor\")});' title='click to search for " + v + "' onclick='return appdb.views.Main.showApplications({flt:\"=tag:\\\"" + v + "\\\"\"},{isBaseQuery:true,filterDisplay:\"Search with tag " + v + "...\",mainTitle : \"tag: " + v + "\"});' >" + v + " </a></li>");
 		}
 		$(this.dom).append($(h));
 		var c = $($(this.dom).find("ul").get(0));
@@ -6463,8 +6463,8 @@ appdb.views.UserRequests = appdb.ExtendClass(appdb.View, "appdb.views.UserReques
 		var div = document.createElement("div"), header = document.createElement("div"), main = document.createElement("div"), footer = document.createElement("div"),
 				ul = document.createElement("ul"), img = document.createElement("img"), title = document.createElement("div"), imgtitle = document.createElement("img"),
 				message = document.createElement("div"), actions = document.createElement("div"), accept = document.createElement("div"), reject = document.createElement("div"),
-				user = document.createElement("div"), created = document.createElement("span"), country = document.createElement("img"), li, userclick = "appdb.views.Main.showPerson({id:" + d.user.id + ", cname:\"" + d.user.cname + "\"},{mainTitle : \"" + d.user.name + "\"});",
-				status = document.createElement("div"), appclick = "appdb.views.Main.showApplication({id:" + d.application.id + ",cname:\"" + d.application.cname + "\"},{mainTitle : \"" + d.application.name + "\"});",
+				user = document.createElement("div"), created = document.createElement("span"), country = document.createElement("img"), li, userclick = "return appdb.views.Main.showPerson({id:" + d.user.id + ", cname:\"" + d.user.cname + "\"},{mainTitle : \"" + d.user.name + "\"});",
+				status = document.createElement("div"), appclick = "return appdb.views.Main.showApplication({id:" + d.application.id + ",cname:\"" + d.application.cname + "\"},{mainTitle : \"" + d.application.name + "\"});",
 				msg = '', prevmsg = '', prevlink = document.createElement("a");
 		var entityType = (($.trim(d.application.isvirtualappliance) === "true") ? "vappliance" : "software");
 		var entityName = (($.trim(d.application.isvirtualappliance) === "true") ? "virtual appliance" : "software");
@@ -6546,8 +6546,8 @@ appdb.views.UserRequests = appdb.ExtendClass(appdb.View, "appdb.views.UserReques
 		var div = document.createElement("div"), header = document.createElement("div"), main = document.createElement("div"), footer = document.createElement("div"),
 				ul = document.createElement("ul"), img = document.createElement("img"), title = document.createElement("div"), imgtitle = document.createElement("img"),
 				message = document.createElement("div"), actions = document.createElement("div"), accept = document.createElement("div"), reject = document.createElement("div"),
-				user = document.createElement("div"), created = document.createElement("span"), country = document.createElement("img"), li, userclick = "appdb.views.Main.showPerson({id:" + d.user.id + ",cname:\"" + d.user.cname + "\"},{mainTitle : \"" + d.user.name + "\"});",
-				status = document.createElement("div"), appclick = "appdb.views.Main.showApplication({id:" + d.application.id + ", cname:\"" + d.application.cname + "\"},{mainTitle : \"" + d.application.name + "\"});",
+				user = document.createElement("div"), created = document.createElement("span"), country = document.createElement("img"), li, userclick = "return appdb.views.Main.showPerson({id:" + d.user.id + ",cname:\"" + d.user.cname + "\"},{mainTitle : \"" + d.user.name + "\"});",
+				status = document.createElement("div"), appclick = "return appdb.views.Main.showApplication({id:" + d.application.id + ", cname:\"" + d.application.cname + "\"},{mainTitle : \"" + d.application.name + "\"});",
 				msg = '', prevmsg = '', prevlink = document.createElement("a");
 		var entityType = (($.trim(d.application.isvirtualappliance) === "true") ? "vappliance" : "software");
 		var entityName = (($.trim(d.application.isvirtualappliance) === "true") ? "virtual appliance" : "software");
@@ -6628,7 +6628,7 @@ appdb.views.UserRequests = appdb.ExtendClass(appdb.View, "appdb.views.UserReques
 		var div = document.createElement("div"), header = document.createElement("div"), main = document.createElement("div"), footer = document.createElement("div"),
 				ul = document.createElement("ul"), img = document.createElement("img"), title = document.createElement("div"), imgtitle = document.createElement("img"),
 				message = document.createElement("div"), actions = document.createElement("div"), accept = document.createElement("div"), reject = document.createElement("div"),
-				user = document.createElement("div"), created = document.createElement("span"), country = document.createElement("img"), li, userclick = "appdb.views.Main.showPerson({id:" + d.user.id + ",cname:\"" + d.user.cname + "\"},{mainTitle : \"" + d.user.name + "\"});",
+				user = document.createElement("div"), created = document.createElement("span"), country = document.createElement("img"), li, userclick = "return appdb.views.Main.showPerson({id:" + d.user.id + ",cname:\"" + d.user.cname + "\"},{mainTitle : \"" + d.user.name + "\"});",
 				status = document.createElement("div");
 		msg = '', prevmsg = '', prevlink = document.createElement("a");
 		var userUrl = appdb.config.endpoint.base + "store/person/" + d.user.cname;
@@ -9996,7 +9996,7 @@ appdb.views.CategoriesTreeView = appdb.ExtendClass(appdb.views.SimpleTree, "appd
 					this.getRow().expand();
 				}, onRenderCell: function(d, elem) {
 					var r = ((this.getRow() || {}).options || {} ).content || "software";					
-					$(elem).attr("onClick", "appdb.views.Main.showCategories(" + d.id + ",{isBaseQuery : true, mainTitle: '" + d.value + "',filterDisplay : 'Search in " + d.value + "...', content: '" + r + "'});");
+					$(elem).attr("onClick", "return appdb.views.Main.showCategories(" + d.id + ",{isBaseQuery : true, mainTitle: '" + d.value + "',filterDisplay : 'Search in " + d.value + "...', content: '" + r + "'});");
 					$(elem).attr("data-href", "/browse/software/category/" + d.id);
 					return elem;
 				}}
@@ -10037,7 +10037,7 @@ appdb.views.VApplianceCategoriesTreeView = appdb.ExtendClass(appdb.views.SimpleT
 					this.getRow().expand();
 				}, onRenderCell: function(d, elem) {
 					var r = ((this.getRow() || {}).options || {} ).content || "vappliance";
-					$(elem).attr("onClick", "appdb.views.Main.showVAppCategories(" + d.id + ",{isBaseQuery : true, mainTitle: '" + d.value + "',filterDisplay : 'Search in " + d.value + "...', content: '"+r+"'});");
+					$(elem).attr("onClick", "return appdb.views.Main.showVAppCategories(" + d.id + ",{isBaseQuery : true, mainTitle: '" + d.value + "',filterDisplay : 'Search in " + d.value + "...', content: '"+r+"'});");
 					$(elem).attr("data-href", "/browse/cloud/vappliances/category/" + d.id);
 					return elem;
 				}}
@@ -10081,7 +10081,7 @@ appdb.views.DisciplinesTreeView = appdb.ExtendClass(appdb.views.SimpleTree, "app
 				}, dataType: "link", onClick: function(d, elem) {
 					this.getRow().expand();
 				}, onRenderCell: function(d, elem) {
-					$(elem).attr("onClick", "appdb.views.Main.showDiscipline(" + d.id + ",{isBaseQuery : true, mainTitle: '" + d.value + "',filterDisplay : 'Search in " + d.value + "...'});");
+					$(elem).attr("onClick", "return appdb.views.Main.showDiscipline(" + d.id + ",{isBaseQuery : true, mainTitle: '" + d.value + "',filterDisplay : 'Search in " + d.value + "...'});");
 					return elem;
 				}}
 		],
@@ -14672,7 +14672,7 @@ appdb.views.VOMembershipList = appdb.ExtendClass(appdb.View, "appdb.views.VOMemb
 				var popup = $("<div class='vopopup'></div>");
 				var related = $('<a href="#" onclick="appQuickLink(\'' + voname + '\',6,{mainTitle:\'' + voname + '\',isList:false, content:\'software\'});" class="vorelated"><img src="/images/category1.png" border="0"></img><span>View associated software</span></a>');
 				var related2 = $('<a href="#" onclick="appQuickLink(\'' + voname + '\',6,{mainTitle:\'' + voname + '\',isList:false, content:\'vappliance\'});" class="vorelated"><img src="/images/category34.png" border="0"></img><span>View associated vappliances</span></a>');
-				var details = $('<a href="#" onclick="appdb.views.Main.showVO(\'' + voname + '\',{mainTitle: \'' + voname + '\'});" target="_blank" title="View ' + (voname).htmlEscape() + ' details" class="vodetails"></a>');
+				var details = $('<a href="#" onclick="return appdb.views.Main.showVO(\'' + voname + '\',{mainTitle: \'' + voname + '\'});" target="_blank" title="View ' + (voname).htmlEscape() + ' details" class="vodetails"></a>');
 				$(related).html("<img src='/images/search.png' border='0'></img><span>View associated software</span>");
 				$(details).html("<img src='" + img + "' border='0'></img><span>View Virtual Organization details</span>");
 				$(popup).append(related).append(related2);
