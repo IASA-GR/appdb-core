@@ -81,7 +81,8 @@ class IndexController extends Zend_Controller_Action
 		$this->view->username = $this->session->username;
 	}
 
-    public function indexAction() {
+    public function indexAction()
+	{
 		/*
 		 * Check if user is signed in from a different service or browser tab.
 		 */

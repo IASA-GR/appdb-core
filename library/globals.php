@@ -864,10 +864,6 @@ function is_url2($url){
     return true;
 }
 
-function trackPage($url,$format = null) {
-    return false;
-}
-
 function cloneXMLNode($node,$doc){
     $nd=$doc->createElement($node->nodeName);
            
