@@ -673,7 +673,7 @@ appdb.components.Dataset = appdb.ExtendClass(appdb.Component, "appdb.components.
 	};
 	this.renderMainData = function(){
 		var d = this.options.data;
-		this.on($(this.dom).find(".dataset-main-contents,.derived-datasets-list-container"));
+		this.bind($(this.dom).find(".dataset-main-contents,.derived-datasets-list-container"));
 		$(this.dom).find(".dataset-permalink").attr("href", appdb.config.endpoint.base + "store/dataset/" + d.guid);
 	};
 	this.renderAdditionalInfo = function(){
@@ -894,7 +894,7 @@ appdb.components.Dataset = appdb.ExtendClass(appdb.Component, "appdb.components.
 		
 		$.each(this.options.viewers, (function(self){
 			return function(i,e){
-				e.on(self.options.data);	
+				e.bind(self.options.data);	
 			};
 		})(this));
 	};
@@ -947,7 +947,7 @@ appdb.components.Dataset = appdb.ExtendClass(appdb.Component, "appdb.components.
 					this.onValidation(v.isValid() || v.getError());
 				}, caller: self});
 			
-				e.on(self.options.data);	
+				e.bind(self.options.data);	
 			};
 		})(this));
 		if( this.views.licenselist ){
