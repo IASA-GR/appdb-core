@@ -12398,8 +12398,8 @@ appdb.views.Main = (function(){
 			    }
 
 			    if (_unwatchedItems.indexOf(fname) > -1) {
-				f.apply(null,argv);
-				return false;
+				    f.apply(null,argv);
+				    return false;
 			    }
 
 			    var argv = arguments;
@@ -12426,6 +12426,7 @@ appdb.views.Main = (function(){
 
 				    return false;
 			    }});
+			    return false;
 		    };
 	    })(retobject[i],i);
     }

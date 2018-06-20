@@ -262,6 +262,17 @@ function preventDefaultEvent(e){
 
 appdb.pages = {};
 appdb.pages.loadingStatus = "";
+appdb.pages.override = {};
+appdb.pages.override.events = function(dom) {
+	dom = dom || $('body');
+	$(dom).find("a[onclick^='appdb.views.Main.show'], button[onclick^='appdb.views.Main.show']").each(function(index, el) {
+		var onclick = $(el).attr('onclick');
+		if ($.trim(onclick)) {
+			onclick = 'return ' + onclick;
+			$(el).attr('onclick', onclick);
+		}
+	});
+}
 appdb.pages.reset = function(){
 	for(var i in appdb.pages){
 		if( appdb.pages.hasOwnProperty(i)){
@@ -271,6 +282,7 @@ appdb.pages.reset = function(){
 		}
 	}
 	appdb.pages.index.requests.reset();
+	appdb.pages.override.events();
 };
 appdb.pages.index = (function(){
 	var page = {};
