@@ -1470,7 +1470,7 @@ class RepositoryFS{
 		$res = false;
 		$os = $target->getOs();
 		$artifacts = $os->artifactType;
-		$artifacts = split(";", $artifacts);
+		$artifacts = explode(";", $artifacts);
 		if( $ftype == "gzip"){
 			if( in_array("tgz", $artifacts) || 
 				in_array("tar.gz", $artifacts) ||

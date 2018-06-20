@@ -2673,7 +2673,7 @@ appdb.repository.ui.views.TargetItem = appdb.ExtendClass(appdb.View, "appdb.repo
 		$(sfiles).find(".selectedfiles > ul").addClass("hidden");
 		
 		
-		$.each(this.options.progressbars.length, function(i,e){
+		$.each(this.options.progressbars, function(i,e){
 			if( e.destroy ) e.destroy();
 		});
 		this.options.progressbars = [];
@@ -5173,7 +5173,7 @@ appdb.repository.ui.views.files.ArchItem = appdb.ExtendClass(appdb.repository.ui
 				tb.render(true);
 				return elem;
 			},
-			cellCss: {"width":"17px","":"17px;"}, 
+			cellCss: {"width":"17px"},
 			cellClass: "cellaction delete"
 		},{name: "archname", dataPath:"displayname", onRenderCell: function(elem, data){
 				var src = "artifact_generic.png";
@@ -5411,7 +5411,7 @@ appdb.repository.ui.views.files.PoaPackage = appdb.ExtendClass(appdb.repository.
 				this.getRow().addAction("delete",tb);
 				return elem;
 			}, 
-			cellCss: {"width":"17px","":"17px;"}, 
+			cellCss: {"width":"17px"},
 			cellClass: "cellaction delete"
 		},{
 			name:"filename", 
@@ -6472,7 +6472,7 @@ appdb.repository.ui.views.MainContent = appdb.ExtendClass(appdb.View, "appdb.rep
 				$(this).addClass("selected");
 				
 				$(self.dom).find(".contents > .sectioncontainer > div").removeClass("selected");
-				$(self.dom).find(".contents > .sectioncontainer > div." + $.trim($(this).attr("class").replace("selected","")) + ":last").addClass("selected");
+				$(self.dom).find(".contents > .sectioncontainer > div." + $.trim($(this).prop("class").replace("selected","")) + ":last").addClass("selected");
 				self.setupReleaseRoute($(this).data("section"));
 				return false;
 			});

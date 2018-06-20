@@ -1465,11 +1465,11 @@
 	vertical-align: bottom;
 	display: inline-block;
 	width:auto;
-	margin-top: 5px;
-	margin-right: 3px;
+	margin-top: 8px;
+	margin-right: 8px;
 }
 .maincontent > .contents > .sectioncontainer > .files > .toolbar > .action.selected > .contents > .actions > .action > button{
-	max-width: 90px;
+	max-width: 120px;
 	max-height: 28px;
 	vertical-align: middle;
 }
@@ -3189,6 +3189,7 @@ button.inactive > span {
 	padding:2px 5px;
 	margin: 0px;
 	text-align: left;
+        margin-top: 3px;
 }
 .repositoriescontainer .repositorylist > li > .repositoryitem > .repositorylinks > .urlfield > a{
 	color: #666;
@@ -4444,12 +4445,13 @@ border-color: #999;
     color: #444;
     display: inline-box;
     text-align: center;
+    line-height: 18px;
     height: 18px;
     width: 115px;
     background-color: #EFEFEE;
     border: 1px solid #d0d0d0;
     border-radius: 2px;
-	margin-left: 4px;
+    margin-left: 4px;
     background: #f6f8f9; /* Old browsers */
     background: -moz-linear-gradient(top,  #f6f8f9 0%, #e5ebee 50%, #d7dee3 51%, #f5f7f9 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f6f8f9), color-stop(50%,#e5ebee), color-stop(51%,#d7dee3), color-stop(100%,#f5f7f9)); /* Chrome,Safari4+ */
