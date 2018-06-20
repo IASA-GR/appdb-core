@@ -1956,8 +1956,11 @@ String.prototype.replaceAll = function(search, replacement) {
 };
 
 	function appHistoryDiff(id, hid) {
+        if ( userID != null ) {
+			u = "?userid="+userID+"&passwd="+$.cookie('scookpass');
+		}
         dat = new appdb.utils.rest({
-            endpoint: appdb.config.endpoint.proxyapi+"?version=" + appdb.config.apiversion + "&resource=applications/"+id+"/history/" + hid + "/diff",
+            endpoint: appdb.config.endpoint.proxyapi+"?version=" + appdb.config.apiversion + "&resource=applications/"+id+"/history/" + hid + "/diff" +encodeURIComponent(u),
             async: true
         }).create({},{
             success: function(d) {
@@ -1983,7 +1986,7 @@ String.prototype.replaceAll = function(search, replacement) {
 	}
 
     function appHistory(id) {
-		var dat;
+		var u = '', dat;
         var notification;
 		var _endpoint = appdb.config.endpoint.baseapi;
         setTimeout(function(){
@@ -1993,8 +1996,11 @@ String.prototype.replaceAll = function(search, replacement) {
             delay: 60000,
             style: "min-width: 240px; text-aling: center"
         });},0);
+        if ( userID != null ) {
+			u = "?userid="+userID+"&passwd="+$.cookie('scookpass');
+		}
         dat = new appdb.utils.rest({
-            endpoint: appdb.config.endpoint.proxyapi+"?version=" + appdb.config.apiversion + "&resource=applications/"+id+"/history",
+            endpoint: appdb.config.endpoint.proxyapi+"?version=" + appdb.config.apiversion + "&resource=applications/"+id+"/history"+encodeURIComponent(u),//_endpoint+"applications/"+id+"/history"+u,
             async: true
         }).create({},{
             success: function(d) {
@@ -2061,12 +2067,14 @@ String.prototype.replaceAll = function(search, replacement) {
 	}
 
 	function __appHistoryRollback(appid,histid,histtype) {
-		var cid = 0;
+		var u = '', cid = 0;
 		if ( userID != null ) {
+			u = "?userid="+userID+"&passwd="+$.cookie('scookpass');
+			u += "&cid="+cid+"&src="+reqsrc;
 			$("#details").hide();
 			showAjaxLoading();
 			var dat = new appdb.utils.rest({
-				endpoint: appdb.config.endpoint.proxyapi+"?version=" + appdb.config.apiversion + "&resource=applications/" + appid + "/history/" + histid + "/rollback",
+				endpoint: appdb.config.endpoint.proxyapi+"?version=" + appdb.config.apiversion + "&resource=applications/" + appid + "/history/" + histid + "/rollback" + encodeURIComponent(u),
 				async: true
 			}).create({},{
 				success: function(d) {
@@ -2822,13 +2830,18 @@ String.prototype.replaceAll = function(search, replacement) {
 	}
 	function populateAppDetails(e,id, histid, histtype,data) {
 		var _endpoint = "";
+		var u = '', cid = 0;
 		$(e).hide();
 		$($.find("a.app-mod")).hide();
 		$($.find("a.app-del")).hide();
 		$($.find("a.app-edit")).hide();
 		$($.find("a.app-history")).hide();
-		if ( userID === null ) {
+		if ( userID != null ) {
+			u = "?userid="+userID+"&passwd="+$.cookie('scookpass');
+			u += "&cid="+cid+"&src="+reqsrc;
+		} else {
 			$($.find("a.app-bm")).hide();
+			u = "?cid="+cid+"&src="+reqsrc;
 		}
 		var dat;
 		if ( $.inArray($.trim(id),["","0"]) === -1 ) {	// show existing app

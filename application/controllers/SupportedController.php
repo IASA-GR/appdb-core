@@ -27,6 +27,7 @@ class SupportedController extends Zend_Controller_Action
     public function indexAction()
     {
         // action body
+        trackPage('/supported');
         $this->view->session = $this->session;        
     }
 

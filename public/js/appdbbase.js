@@ -5024,8 +5024,11 @@ appdb.components.DisseminationTool = appdb.ExtendClass(appdb.Component, "appdb.c
 		if ( typeof flt === "undefined" ) {
 			flt = this.getFilter();
 		}
+		if ( userID !== null ) {
+			u = "&userid="+userID+"&passwd="+$.cookie('scookpass');
+		}
 		var d = new appdb.utils.rest({
-			endpoint: appdb.config.endpoint.proxyapi+"?version=" + appdb.config.apiversion + "&resource=people"+encodeURIComponent("?flt="+encodeURIComponent(flt.replace(/”/g, '"'))),
+			endpoint: appdb.config.endpoint.proxyapi+"?version=" + appdb.config.apiversion + "&resource=people"+encodeURIComponent("?flt="+encodeURIComponent(flt.replace(/”/g, '"'))+u),
 			async: false
 		}).create().call();
 		if ( d ) {			
