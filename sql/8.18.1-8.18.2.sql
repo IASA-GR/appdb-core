@@ -23,7 +23,7 @@ Author: wvkarag@lovecraft.priv.iasa.gr
 
 START TRANSACTION;
 
-CREATE EXTENSION plxslt;
+CREATE EXTENSION IF NOT EXISTS plxslt;
 
 CREATE OR REPLACE FUNCTION oai_dc_xslt(x xml) RETURNS XML AS
 $$
