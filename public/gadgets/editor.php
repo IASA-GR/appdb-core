@@ -422,7 +422,7 @@ function getHierarchyValues($data){
 		  
 		  </script>
         <script type="text/javascript">
-          var domain="<?php echo "https://".$_SERVER['APPLICATION_UI_HOSTNAME']."/"; ?>";
+          var domain="<?php echo "http://".$_SERVER['APPLICATION_UI_HOSTNAME']."/"; ?>";
           var time = null;
           function sortlists(elems) {
             var selects = [], elem = null, tmp = null, op=null, i, e, s;
@@ -759,7 +759,7 @@ periods of the AppDB service.</p>
                                                          <td >
                                                             <label >Dimensions (W x H):</label>
                                                         </td>
-                                                        <td >
+                                                        <td colspan="3">
                                                             <input id="txtWidth" type="text" value="650" style="width:66px;" />
                                                              <span ><b> X </b></span>
                                                               <input id="txtHeight" type="text" value="500" style="width:66px"/>
