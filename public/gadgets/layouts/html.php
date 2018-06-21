@@ -14,8 +14,8 @@ ob_flush();
         <title></title>
 		<link link type="text/css" rel="stylesheet" media="screen" href="<?php echo GADGET_BASE_URI; ?>resources/css/jquery-ui.css" >
         <?php $this->renderSkin(); ?>
-		<script type="text/javascript" src="<?php echo GADGET_BASE_URI; ?>resources/scripts/jquery-1.5.2.min.js"></script>
-		<script type="text/javascript" src="<?php echo GADGET_BASE_URI; ?>resources/scripts/jquery-ui.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
         <script type="text/javascript" src="<?php echo GADGET_BASE_URI; ?>resources/scripts/gadgets.js" ></script>
         <?php $this->renderScripts(); ?>
         <script type="text/javascript">
@@ -88,7 +88,7 @@ ob_flush();
 					})
 					.addClass( "ui-widget ui-widget-content ui-corner-left" );
 
-				input.data( "autocomplete" )._renderItem = function( ul, item ) {
+				input.data( "uiAutocomplete" )._renderItem = function( ul, item ) {
 						  var label = item.label || "";
 						  var txt = label.replace(/\?/g,"");
 						  var len = label.match(/\?/g);

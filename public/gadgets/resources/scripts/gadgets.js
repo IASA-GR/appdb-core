@@ -318,7 +318,7 @@ gadgets.utils.ui.hidelistitem = function(id){
 gadgets.utils.ui.selecttab = function(name,id){
 
 $("#itemfooter_"+id + " > td.itemselected").removeClass("itemselected");
-$("#itemfooter_"+id).children("td.#tab_"+name).addClass("itemselected");
+$("#itemfooter_"+id).children("td#tab_"+name).addClass("itemselected");
 };
 gadgets.utils.ui.showmain=function(id){
     gadgets.utils.ui.loadApplication(id);
