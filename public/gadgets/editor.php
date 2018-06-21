@@ -104,8 +104,9 @@ function getHierarchyValues($data){
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title></title>
 		<meta http-equiv="X-UA-Compatible" content="IE=8" />
-        <link rel="stylesheet" type="text/css" href="resources/css/default.css"  media="screen" />
-        <link rel="stylesheet" type="text/css" href="resources/css/screen.css?v=<?php echo exec("cat ". APPLICATION_PATH . "/../VERSION");?>" media="screen"/>
+                <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+                <link rel="stylesheet" type="text/css" href="resources/css/default.css"  media="screen" />
+                <link rel="stylesheet" type="text/css" href="resources/css/screen.css?v=<?php echo exec("cat ". APPLICATION_PATH . "/../VERSION");?>" media="screen"/>
 		<style type="text/css">
 			html, body{width: 100%;
 				height: 100%;
@@ -254,10 +255,10 @@ function getHierarchyValues($data){
 			#mainTable tbody{
 			}
 		</style>
-		<script type="text/javascript" src="resources/scripts/jquery-1.5.2.min.js"></script>
-		<script type="text/javascript" src="resources/scripts/jquery-ui.min.js"></script>
-         <script type="text/javascript" src="resources/scripts/ui.spinner.min.js"></script>
-		 <script type="text/javascript">
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+                <script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js"></script>
+                <script src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>              
+		<script type="text/javascript">
 		  (function( $ ) {
 			  $.widget( "ui.combobox", {
 				  _create: function() {
@@ -321,7 +322,7 @@ function getHierarchyValues($data){
 						  })
 						  .addClass( "ui-widget ui-widget-content ui-corner-left" );
 
-					  input.data( "autocomplete" )._renderItem = function( ul, item ) {
+					  input.data( "uiAutocomplete" )._renderItem = function( ul, item ) {
 						  var label = item.label || "";
 						  var txt = label.replace(/\?/g,"");
 						  var len = label.match(/\?/g);
@@ -421,7 +422,7 @@ function getHierarchyValues($data){
 		  
 		  </script>
         <script type="text/javascript">
-          var domain="<?php echo "http://".$_SERVER['APPLICATION_UI_HOSTNAME']."/"; ?>";
+          var domain="<?php echo "https://".$_SERVER['APPLICATION_UI_HOSTNAME']."/"; ?>";
           var time = null;
           function sortlists(elems) {
             var selects = [], elem = null, tmp = null, op=null, i, e, s;
@@ -464,12 +465,23 @@ function getHierarchyValues($data){
                 }
             }
           }
+          function spinnerRange(min, max) {
+            return function(event, ui) {
+                if ( ui.value > max ) {
+                    $( this ).spinner( "value", max );
+                    return false;
+                } else if ( ui.value < min ) {
+                    $( this ).spinner( "value", min );
+                    return false;
+                }
+            };
+          }
           $(function() {
                 sortlists(["listVos","listCountries","listMiddlewares","listTags"]);
                 $("#mainTable").show();
-                $("#txtWidth").spinner({min:2,max:5000 });
-                $("#txtHeight").spinner({min:2,max:5000 });
-                $("#txtLength").spinner({min:2,max:300 });
+                $("#txtWidth").spinner({spin: spinnerRange(2, 5000) });
+                $("#txtHeight").spinner({spin: spinnerRange(2, 5000) });
+                $("#txtLength").spinner({spin: spinnerRange(2, 300) });
 				$("select.searchdroplist").parent().addClass("ui-widget");
 				$("select.searchdroplist").combobox();
                 
@@ -700,7 +712,7 @@ function getHierarchyValues($data){
                                         <div id="tabAbout"  style="padding-right:20px;">
                                             <h2><p>Welcome to the AppDB Gadget editor</p></h2><br />
                                             <p>This is an online configuration tool, developed to assist the creation of custom instances of the
-<a href="http://appdb.egi.eu/" target="_blank" title="Applications Database">Applications Database</a> embeddable Web-Gadget.
+<a href="https://appdb.egi.eu/" target="_blank" title="Applications Database">Applications Database</a> embeddable Web-Gadget.
 Please follow the steps bellow to create a custom instance, or click directly on the <i style="color:#000000">Preview & generate</i> tab on the left of the page, in order to view or use the default instance of the gadget.</p>
 <br />
 <ul style="padding-left:20px;">
