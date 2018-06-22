@@ -664,8 +664,7 @@
 	<resource>RestTagList</resource>
 	<comment>A list of all the tags that have been used in one or more software entries</comment>
 </route>
-<route type="proxy" name="contacttypes" url="/:version/people/contacttypes">
-	<format xslt="persons">xml</format>
+<route type="rest" name="contacttypes" url="/:version/people/contacttypes">
 	<resource>RestContactTypeList</resource>
 	<comment>A list of contact types that a user may specify in his or her profile</comment>
 </route>
