@@ -118,8 +118,7 @@ echo $this->doctype(); fl();?>
 	}
 ?>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<?php loadJS($this, '/js/jquery.browser.min.js'); ?>
-
+	<script src="/js/jquery.browser.min.js"></script>
 <?php
 	if ( substr($_SERVER['APPLICATION_ENV'],0,5) === 'devel' ) { 
 ?>
@@ -131,7 +130,6 @@ echo $this->doctype(); fl();?>
 <?php 
 	} 
 ?>
-
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<style type="text/css">
@@ -155,7 +153,6 @@ echo $this->doctype(); fl();?>
 		loadJS($this,'/js/appdbbase.js');
 		loadJS($this,'/js/appdb.template.js');
 		loadJS($this,'/js/jquery.cookie.js');
-//		loadJS($this,'/js/jquery-ui.js');
 		loadJS($this,'/js/jquery.form.js');
 		loadJS($this,'/js/jquery.center.js');
 		loadJS($this,'/js/editForm.js');
@@ -170,7 +167,7 @@ echo $this->doctype(); fl();?>
 		loadJS($this,'/js/itemview.js');
 		loadJS($this,'/js/appdbgui.js');
 		loadJS($this,'/js/jquery.google_menu.js');
-                loadJS($this,'/js/moment.min.js');
+		loadJS($this,'/js/moment.min.js');
 		loadJS($this,'/js/appdb.pages.js');
 		loadJS($this,'/js/appdb.views.ui.js');
 		loadJS($this,'/js/appdb.datasets.js');
