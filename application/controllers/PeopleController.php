@@ -133,23 +133,6 @@ class PeopleController extends Zend_Controller_Action
                     return;
                 }
 
-                if (isset($payload['email'])) {
-                        $cs = new Default_Model_Contacts();
-                        $f1 = new Default_Model_ContactsFilter();
-                        $f2 = new Default_Model_ContactsFilter();
-                        $f1->contacttypeid->equals(7);
-                        $f2->data->ilike($payload['email']);
-                        $cs->filter->chain($f1, "AND");
-                        $cs->filter->chain($f2, "AND");
-                        if ( count($cs->items) > 0) {
-                                $j = '"id": "'.$cs->items[0]->researcherID.'"';
-                                $rs = new Default_Model_Researchers();
-                                $rs->filter->id->equals($cs->items[0]->researcherID);
-                                $j .= ', "fullname": "'.str_replace('"','\"',$rs->items[0]->fullName).'"';
-                                $emailResponse = '{'.$j.'}';
-                        }
-                }
-
                 $fname = isset($payload['fname']) ? trim($payload['fname']) : '';
                 $lname = isset($payload['lname']) ? trim($payload['lname']) : '';
 
@@ -192,6 +175,31 @@ class PeopleController extends Zend_Controller_Action
                     } else {
                         $cnameResponse = '"cname": "' . $res . '"';
                     }
+                }
+
+                if (isset($payload['email']) && ($nameResponse || $cnameResponse)) {
+                        console.log($payload['email']);
+                        $emails = explode(';', trim($payload['email']));
+                        $i = 0;
+                        foreach($emails as $email) {
+                            $cs = new Default_Model_Contacts();
+                            $f1 = new Default_Model_ContactsFilter();
+                            $f2 = new Default_Model_ContactsFilter();
+                            $f1->contacttypeid->equals(7);
+                            $f2->data->ilike($email);
+                            $cs->filter->chain($f1, "AND");
+                            $cs->filter->chain($f2, "AND");
+                            if ( count($cs->items) > 0) {
+                                    $j = '"id": "'.$cs->items[0]->researcherID.'"';
+                                    $rs = new Default_Model_Researchers();
+                                    $rs->filter->id->equals($cs->items[0]->researcherID);
+                                    $j .= ', "fullname": "'.str_replace('"','\"',$rs->items[0]->fullName).'"';
+                                    $j .= ', "value": ' . $i;
+                                    $emailResponse = '{'.$j.'}';
+                                    break;
+                            }
+                            $i += 1;
+                        }
                 }
 
                 $response = array();
