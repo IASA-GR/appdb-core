@@ -108,6 +108,106 @@ class PeopleController extends Zend_Controller_Action
 		}
 	}
 
+        public function validateprofileAction() {
+                $this->_helper->layout->disableLayout();
+                $this->_helper->viewRenderer->setNoRender();
+                header('Content-type: application/json');
+
+                $nameResponse = '';
+                $emailResponse = '';
+                $cnameResponse = '';
+                $payload = null;
+
+                if ($this->session->userid == null || $_SERVER["REQUEST_METHOD"] !== 'GET' || isset($_GET['p']) === false || trim($_GET['p']) === '') {
+                    return;
+                }
+
+                try {
+                    $payload = base64_decode($_GET['p']);
+                    $payload = json_decode($payload, true);
+                } catch(Exception $e) {
+                    return;
+                }
+
+                if (is_null($payload)) {
+                    return;
+                }
+
+                if (isset($payload['email'])) {
+                        $cs = new Default_Model_Contacts();
+                        $f1 = new Default_Model_ContactsFilter();
+                        $f2 = new Default_Model_ContactsFilter();
+                        $f1->contacttypeid->equals(7);
+                        $f2->data->ilike($payload['email']);
+                        $cs->filter->chain($f1, "AND");
+                        $cs->filter->chain($f2, "AND");
+                        if ( count($cs->items) > 0) {
+                                $j = '"id": "'.$cs->items[0]->researcherID.'"';
+                                $rs = new Default_Model_Researchers();
+                                $rs->filter->id->equals($cs->items[0]->researcherID);
+                                $j .= ', "fullname": "'.str_replace('"','\"',$rs->items[0]->fullName).'"';
+                                $emailResponse = '{'.$j.'}';
+                        }
+                }
+
+                $fname = isset($payload['fname']) ? trim($payload['fname']) : '';
+                $lname = isset($payload['lname']) ? trim($payload['lname']) : '';
+
+                if ($fname !== '' || $lname !== '') {
+                        //Get most certain profile
+			$rs = new Default_Model_Researchers();
+			$f1 = new Default_Model_ResearchersFilter();
+			$f2 = new Default_Model_ResearchersFilter();
+			$fn1 = $fname . " " . $lname;
+			$fn2 = $lname . " " . $fname;
+			$f1->firstname->soundslike($fname);
+			$f2->lastname->soundslike($lname);
+			$rs->filter->chain($f1, "AND");
+			$rs->filter->chain($f2, "AND");
+			if( count($rs->items) > 0 ){
+				$item = $rs->items[0];
+				$nameResponse = '{"id": "'.$item->id.'", "fullname": "'.$item->fullName.'"}';
+			} else {
+                                //get possible profiles
+                                $rs = new Default_Model_Researchers();
+                                $f = $rs->filter;
+                                $f->name->soundsLike($fn1)->or($f->name->soundsLike($fn2));
+                                $res = array();
+                                foreach ($rs->items as $item) {
+                                        array_push($res, '{"id": "'.$item->id.'", "fullname": "'.$item->fullName.'"}');
+                                }
+
+                                $nameResponse = '[' . implode(",", $res) . ']';
+                        }
+                }
+
+                $cname = (isset($payload['cname'])) ? trim($payload['cname']) : '';
+                $cnameid = (isset($payload['cnameid'])) ? trim($payload['cnameid']) : '';
+                if (!$cnameid) $cnameid = null;
+
+                if ($cname) {
+                    $res = validatePplCName($cname, $cnameid);
+                    if ($res === true) {
+                        $cnameResponse = '"cname": true';
+                    } else {
+                        $cnameResponse = '"cname": "' . $res . '"';
+                    }
+                }
+
+                $response = array();
+                if ($emailResponse) {
+                    array_push($response, '"email": ' . $emailResponse);
+                }
+                if ($nameResponse) {
+                    array_push($response, '"name": ' . $nameResponse);
+                }
+                if ($cnameResponse) {
+                    array_push($response, $cnameResponse);
+                }
+                $response = '{' . implode($response, ',') . '}';
+                echo $response;
+        }
+
 	private function getFltStr() {
 		$f = trim( $this->_getParam('flt') );
 		return $f;
