@@ -1146,6 +1146,8 @@ appdb.routing.resources.Software = new appdb.routing.Resource({
 
 appdb.routing.resources.Person = new appdb.routing.Resource({
 	details: function(d, force){
+		d.parameters = d.parameters || {};
+		d.parameters.name = d.parameters.name || "";
 		var sname = (d.parameters && typeof d.parameters.name === "string")?d.parameters.name:"";
 		var m = appdb.routing.currentMatch, isLoaded = m.route && m.route.resource && (m.route.resource == this) && m.parameters.name.toLowerCase() === appdb.pages.Person.currentCName().toLowerCase();
 		cname = ""+sname.replace(/\./g," ");
