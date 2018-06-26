@@ -141,6 +141,8 @@ class Default_Model_ResearchersMapper extends Default_Model_ResearchersMapperBas
 			$from = 'FROM researchers';
 			$where = '';
 		}
+		$where = str_replace("CAST(vos.any.any AS TEXT)", "CAST('' AS TEXT)", $where);
+		$where = str_replace("CAST(contacts.any.any AS TEXT)", "CAST('' AS TEXT)", $where);
 		$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
 		noDBSeqScan(db());
 
@@ -221,11 +223,15 @@ class Default_Model_ResearchersMapper extends Default_Model_ResearchersMapperBas
 					$sss->where($x);
 					getZendSelectParts($sss, $f, $w, $orderby, $limit);
 					$f = fixuZenduBuguru($f);
-					$where[] = $w;
+					$w = str_replace("CAST(vos.any.any AS TEXT)", "CAST('' AS TEXT)", $w);
+					$w = str_replace("CAST(contacts.any.any AS TEXT)", "CAST('' AS TEXT)", $w);
+					$where[] = $w;					
 					$from[] = $f;
 				}
 			} else {
 				getZendSelectParts($select, $from, $where, $orderby, $limit);
+				$where = str_replace("CAST(vos.any.any AS TEXT)", "CAST('' AS TEXT)", $where);
+				$where = str_replace("CAST(contacts.any.any AS TEXT)", "CAST('' AS TEXT)", $where);
 				$from = fixuZenduBuguru($from);
 			}
 			if ( isset($_orderby) ) $orderby = 'ORDER BY ' . $_orderby;	# TODO: FIX NULLS FIRST/LAST bypass
