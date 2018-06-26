@@ -1169,7 +1169,7 @@ appdb.routing.resources.Person = new appdb.routing.Resource({
 		return false;
 	},
 	registernew: function(){
-		if( userID == null || !userIsAdminOrManager ) {
+		if( userID == null || !userIsAdmin ) {
 			appdb.views.Main.showHome();
 			return true;
 		}
