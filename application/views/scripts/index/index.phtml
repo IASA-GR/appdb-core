@@ -78,7 +78,7 @@ if( $browserSupported == false ){
 					<?php if ( Supports::datasets() && $canManageDatasets) { ?>
 					<li><a href="/store/register/dataset/" onclick="appdb.views.Main.showDataset({id: 0},{mainTitle: 'Register New Dataset', content: 'dataset'});">New Dataset</a></li>
 					<?php } ?>
-					<?php if( $isAdminOrManager ) { ?><li><a href="/store/person/" onclick="appdb.views.Main.showPerson({id: 0}, {mainTitle: 'Register New User', content: 'person'});">New person profile</a></li><?php } ?>
+					<?php if( $isAdmin ) { ?><li><a href="/store/person/" onclick="return appdb.views.Main.showPerson({id: 0}, {mainTitle: 'Register New User', content: 'person'});">New person profile</a></li><?php } ?>
 				</ul>
 			</li>
 			<?php } ?>

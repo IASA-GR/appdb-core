@@ -3019,7 +3019,8 @@ String.prototype.replaceAll = function(search, replacement) {
 		 return allData;
 	 } else return 'UNCHANGED';
 	}
-	function validateApp() {
+	function validateApp(cb) {
+		cb = cb || function() {};
 		var i, found = false, invalid = [], mandatory = {
 			"name" : "name",
 			"description" : "description",
@@ -3034,7 +3035,7 @@ String.prototype.replaceAll = function(search, replacement) {
 			"subdomainID" : {name: "subdiscipline"},
 			"owner" : {name : "owner"}
 		};
-		
+
 		for(i in mandatory){
 			if ( $(':input[name="'+i+'"]:last').length !== 0 ) {
 				if ($.trim($(':input[name="'+i+'"]:last').val()) === '' ) {
@@ -3056,7 +3057,7 @@ String.prototype.replaceAll = function(search, replacement) {
 		  invalid[invalid.length] = "Category values";
 		 }
 		}
-		
+
 		if(managedDisciplinesEditor !== null){
 		 if(managedDisciplinesEditor.isValid() !== true){
 		  invalid[invalid.length] = "Discipline values";
@@ -3068,7 +3069,7 @@ String.prototype.replaceAll = function(search, replacement) {
 				invalid[invalid.length] = "License values";
 			}
 		}		
-		
+
 		if(invalid.length>0){
 			var html = '<div title="Error"><div><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>Please fill the mandatory field'+((invalid.length>1)?'s':'')+'  displayed bellow:</p></div><ul style="padding:0px;margin:0px;margin-left:35px;">';
 			for(i=0; i<invalid.length; i+=1){
@@ -3085,7 +3086,8 @@ String.prototype.replaceAll = function(search, replacement) {
 						$(this).dialog('close');
 					}
 				}
-			});	
+			});
+			cb(false);
 			return false;
 		}
 		$(':input[name="documents"]:last').val(serializeAppDocs());
@@ -3093,6 +3095,7 @@ String.prototype.replaceAll = function(search, replacement) {
 		$(".app-mw").each(function(){
 			$(this).find(":input:last").val($("<span>"+$(this).find(":input:last").val()+"</span>").text());
 		});
+		cb(true);
 		return true;
 	}
 

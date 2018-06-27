@@ -59,10 +59,7 @@
     </p>
 </div>
 <div style="display:none" id="dialog-ask-ppl<?php echo $this->dialogCount;?>" title="Warning">
-    <p>
-        <span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-        <span id="dialog-ask-ppl-msg<?php echo $this->dialogCount;?>"></span>
-    </p>
+    <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><span id="dialog-ask-ppl-msg<?php echo $this->dialogCount;?>"></span></p>
 </div>
 <?php if ($this->session->userid !== null ) if ( $canEditProfile ) {?>
 <div class="pplviewtoolbar" style="display:none;">
@@ -248,7 +245,7 @@
 								</table>
 							</td>
 
-<?php if ($this->session->userid === $this->entry->id) { // if user is viewing own profile ?>
+<?php if (is_null($this->entry->id) || $this->session->userid === $this->entry->id) { // if user is viewing own profile ?>
 							<td style="min-width:280px; vertical-align:top; border-left:1px dashed;padding-top: 5px;" align="right" class="viewmode">
 								<div class="person-group small-group groupcontainer">
 									<ul class="hideonedit">
@@ -700,44 +697,46 @@
 		}
 	});
 
-    var askResult='no';
+        var askResult='no';
 
-	var $askDlg= $("#dialog-ask-ppl<?php echo $this->dialogCount;?>").dialog({
+	var showErr = function(msg) {
+            //if(typeof msg === "string"){
+		//$("#dialog-err-ppl-msg<?php echo $this->dialogCount;?>").html(msg.replace(/\</g,"&lt;").replace(/\>/g,"&gt;").replace(/\n/g,"<br />"));
+            //}else{
+		$("#dialog-err-ppl-msg<?php echo $this->dialogCount;?>").html("").html(msg);
+            //}
+            $errDlg.dialog('open');
+	};
+
+	var showAsk = function(msg, cb) {
+            cb = cb || function(){};
+            var $askDlg= $("#dialog-ask-ppl<?php echo $this->dialogCount;?>").dialog({
 		dialogClass: 'alert',
 		autoOpen: false,
 		resizable: false,
-		height:160,
 		modal: true,
 		buttons: {
-			Yes: function() {
-                askResult='yes';
-				$askDlg.dialog('close');
-				$("#savedetails").trigger("click");
-			},
-            No: function() {
-                askResult='no';
-				$askDlg.dialog('close');
-            }
+                    Yes: function() {
+                        askResult='yes';
+                        $askDlg.dialog('close');
+                        cb(true);
+                        $("#savedetails").trigger("click");
+                    },
+                    No: function() {
+                        askResult='no';
+                        $askDlg.dialog('close');
+                        cb(false);
+                    }
 		}
-	});
+            });
 
-	var showErr = function(msg) {
-        if(typeof msg === "string"){
-			$("#dialog-err-ppl-msg<?php echo $this->dialogCount;?>").html(msg.replace(/\</g,"&lt;").replace(/\>/g,"&gt;").replace(/\n/g,"<br />"));
-		}else{
-			$("#dialog-err-ppl-msg<?php echo $this->dialogCount;?>").html("").append($(msg));
-		}
-		
-		$errDlg.dialog('open');
-	};
-	
-	var showAsk = function(msg) {
-        $("#dialog-ask-ppl-msg<?php echo $this->dialogCount;?>").html(msg);
-		$askDlg.dialog('open');
+            $("#dialog-ask-ppl-msg<?php echo $this->dialogCount;?>").html("").append($(msg));
+
+            $askDlg.dialog('open');
 	};
 
 
-	var onValidate<?php echo $this->dialogCount;?> = function() {
+	var onValidate<?php echo $this->dialogCount;?> = function(cb) {
 		var valid = true;
 		var invalidMessages = [];
    		var sub=$('#editperson<?php echo $this->dialogCount;?>')[0].getElementsByTagName("input");
@@ -770,13 +769,14 @@
 			}
 			err += "</ul></div>";
 			showErr($(err));
-			return;
+			return cb(valid);
 		}
 		if(isRobot==false){
 			//check for at least one e-mail address
 			if ($("input[name^='contactType']").filter('[value=7]').length == 0) {
 				showErr("Please enter at least one valid e-mail address in the Contact Information section");
 				valid = false;
+                                return cb(valid)
 			} else {
 				//check that e-mail addresses are valid
 				$("input[name^='contactType']").filter('[value=7]').each(function() {
@@ -784,7 +784,7 @@
 
 					re = new RegExp(/^[-!#$%&'*+/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z{|}~])*@[a-zA-Z0-9](-?[a-zA-Z0-9])*(\.[a-zA-Z](-?[a-zA-Z0-9])*)+$/);
 					if (! re.test($("input[name='contact"+n+"']").val())) {
-						showErr("e-mail address \n`"+$("input[name='contact"+n+"']").val()+"` \nis invalid");
+						showErr("e-mail address `" + $('<span></span>').text($("input[name='contact"+n+"']").val()).text() + "`  is invalid");
 						valid = false;
 						return;
 					} else {
@@ -792,51 +792,50 @@
 						var mailexists = 0;
 						var mailname = '';
 						$.ajax({
-							url: '/people/emailexists?email='+encodeURIComponent($.trim($("input[name='contact"+n+"']").val())),
+                                                        url: '/people/validateprofile?p=' + appdb.utils.base64.encode('{"email": "' + $.trim($("input[name='contact"+n+"']").val()) + '", "fname": "' + $.trim($("input[name='firstName']").val())+ '", "lname" : "' + $.trim($("input[name='lastName']").val()) + '"}'),
 							success: function(data,txtStatus) {
-								if (data != '') {
-									data = eval("("+data+")");
-									mailexists = data.id;
-									mailname = data.fullname;
-								}
-							},
-							async: false
+                                                                if (data && data.email && data.email.id) {
+                                                                    mailexists = data.email.id;
+                                                                    mailname = data.email.fullname;
+                                                                }
+
+                                                                if (mailexists !== 0) if (mailexists != '<?php echo $this->entry->id;?>') {
+                                                                        mailname = $('<a style="color: #D96B00" href="/?p='+appdb.utils.base64.encode('/people/details?id='+mailexists)+'" target="_blank"></a>').text(mailname);
+                                                                        showErr($("<span>e-mail address `" + $('<span></span>').text($("input[name='contact"+n+"']").val()).text() + "` is already in use by</span>").append(mailname).html());
+                                                                        valid = false;
+                                                                        return cb(valid);
+                                                                }
+                                                                 <?php if ( (!checkRegister($this)) && ($this->entry->id !== $this->session->userid)) { ?>
+                                                                //check that the same name does not exist, if entry is created by someone else (e.g. a manager)
+                                                                var nameexists = 0;
+                                                                var fullname = '';
+                                                                data = data || {};
+                                                                data.name = data.name || [];
+                                                                data.name = $.isArray(data.name) ? data.name : [data.name];
+                                                                if (data.name.length > 0) {
+                                                                    nameexists = data.name[0].id;
+                                                                    fullname = data.name[0].fullname;
+                                                                    if (nameexists !== 0) if (nameexists != '<?php echo $this->entry->id;?>') {
+                                                                        fullname = $('<a style="color: #D96B00" href="/?p='+appdb.utils.base64.encode('/people/details?id='+nameexists)+'" target="_blank"></a>').text(fullname);
+                                                                        if (askResult === 'no') {
+                                                                            var askHtml = $('<span>There already exists a person with a similar name: </span>').append(fullname).append('<br/>').append('Are you sure you want to create the record?');
+                                                                            showAsk($(askHtml), cb);
+                                                                            valid=false;
+                                                                            return;
+                                                                        }
+                                                                    }
+                                                                }
+                                                                <?php } ?>
+                                                                return cb(true);
+							}
 						});
-						if (mailexists !== 0) if (mailexists != '<?php echo $this->entry->id;?>') {
-							mailname = '<a style="color: #D96B00" href="/?p='+appdb.utils.base64.encode('/people/details?id='+mailexists)+'" target="_blank">'+mailname+'</a>';
-							showErr("e-mail address `"+$("input[name='contact"+n+"']").val()+"` is already in use by "+mailname);
-							valid = false;
-							return;
-						}
 					}
 				});
 			}
-		}
-        //check that the same name does not exist, if entry is created by someone else (e.g. a manager)
-        <?php if ( (!checkRegister($this)) && ($this->entry->id !== $this->session->userid)) { ?>
-        var nameexists = 0;
-        var fullname = '';
-        $.ajax({
-            url: '/people/nameexists?fname='+encodeURIComponent($.trim($("input[name='firstName']").val()))+'&'+'lname='+encodeURIComponent($.trim($("input[name='lastName']").val())),
-            success: function(data,txtStatus) {
-                if (data != '') {
-                    data = eval("("+data+")");
-                    nameexists = data.id;
-                    fullname = data.fullname;
+		} else {
+                    if (valid) $("#details").fadeOut();
+                    return cd(valid);
                 }
-            },
-            async: false
-        });
-        if (nameexists !== 0) if (nameexists != '<?php echo $this->entry->id;?>') {
-            fullname = '<a style="color: #D96B00" href="/?p='+appdb.utils.base64.encode('/people/details?id='+nameexists)+'" target="_blank">'+fullname+'</a>';
-			if (askResult === 'no') {
-				showAsk("There already exists a person with a similar name: "+fullname+"<br/>Are you sure you want to create the record?");
-            	valid=false;
-			}
-        }
-		<?php } ?>
-		if (valid) $("#details").fadeOut();
-		return valid;
 	};
 	
 	var onUpdate<?php echo $this->dialogCount;?> = function(response) {

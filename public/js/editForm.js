@@ -426,18 +426,18 @@ function editForm(formName) {
 	//Handles the save action. Validates data if there is a validation callback
 	//and calls appropriate functions according to the editing type (application or person)
 	var onSave = function () {
-		var res = true;
-		
 		if( (f.getAttribute("onvalidate") != '') && ($('#'+formName)[0].getAttribute("onvalidate") !== null) ) {
-			res = eval(f.getAttribute("onvalidate"));
-		}
-		
-		if ( res ) {
-			if(formName.indexOf('editapp')>-1){
-				onSaveApplication($('#'+formName)[0]);
-			} else if( formName.indexOf('editperson')>-1){
-				onSavePerson($('#'+formName)[0]);
-			}
+			var validatorName = $.trim(f.getAttribute("onvalidate")).replace(/\(\)\;{0,1}/, '');
+			var validatorDelegate = window[validatorName] || function(cb) {cb(false);};
+			validatorDelegate(function(result) {
+			    if ( result ) {
+				    if(formName.indexOf('editapp')>-1){
+					    onSaveApplication($('#'+formName)[0]);
+				    } else if( formName.indexOf('editperson')>-1){
+					    onSavePerson($('#'+formName)[0]);
+				    }
+			    }
+			});
 		}
 	};
 

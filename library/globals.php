@@ -12249,3 +12249,42 @@ class ExternalDataNotification {
 		return true;
 	}
 }
+
+class openAIRE {
+	public static function search($archiveid, $search, $limit = null) {
+		db()->setFetchMode(Zend_Db::FETCH_NUM);
+		$sql = "SELECT openaire.xml_search_results(x) FROM openaire.";
+		switch ($archiveid) {
+			case 1:
+				$sql .= "projects AS x WHERE";
+				$sql .= " title ILIKE '%" . pg_escape_string($search) . "%'";
+				$sql .= " OR acronym ILIKE '%" . pg_escape_string($search) . "%'";
+				$sql .= " OR code ILIKE '%" . pg_escape_string($search) . "%'";
+				break;
+			case 3:
+				$sql .= "organizations AS x WHERE";
+				$sql .= " name ILIKE '%" . pg_escape_string($search) . "%'";
+				$sql .= " OR shortname ILIKE '%" . pg_escape_string($search) . "%'";
+				break;
+			default:
+				return array();
+		}
+		if ( !is_null($limit) ) {
+			if (is_numeric($limit)) {
+				$sql .= " LIMIT $limit";
+			} else {
+				$sql .= " LIMIT 50";
+			}
+		} else {
+			$sql .= " LIMIT 50";
+		}
+		$res = array();
+		$rows = db()->query($sql)->fetchAll();
+		if( count($rows) > 0 ){
+			foreach($rows as $r){
+				$res[] = $r[0];
+			}
+		}
+		return $res;
+	}
+}

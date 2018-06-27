@@ -3787,16 +3787,28 @@ appdb.pages.Person = (function(){
 				_prevFname = _fname;
 				_prevLname = _lname;
 			}
-			
-			var _url = "/people/nameavailable?cname=" + _cname;
+			var payload = {"cname": _cname};
 			if( page.currentId() != -1 && page.currentId() != 0){
-				_url += "&id=" + page.currentId();
+				payload.cnameid = page.currentId();
 			}
+			var _url = "/people/validateprofile?p=" + appdb.utils.base64.encode(JSON.stringify(payload));
 			$(_namechecking).removeClass("hidden");
 			$.ajax({
 				url: _url,
 				success: function(d){
-					var res = appdb.utils.convert.toObject(d);
+					if (d) {
+					    if (d.cname === true) {
+						$(saveProfile).removeClass("hidden");
+						$(_nameReport).removeClass("error");
+						suffix.set("value","");
+					    } else if (typeof d.cname === "string") {
+						$(_prefix).text( (d.cname)?(d.cname + "."):$(_prefix).text() );
+						$(saveProfile).addClass("hidden");
+						$(_nameReport).addClass("error");
+						$(_sufixReport).removeClass("hidden");
+					    }
+					}
+					/*var res = appdb.utils.convert.toObject(d);
 					if(res.error){
 						$(_prefix).text( (res.cname)?(res.cname + "."):$(_prefix).text() );
 						$(saveProfile).addClass("hidden");
@@ -3807,7 +3819,7 @@ appdb.pages.Person = (function(){
 						$(saveProfile).removeClass("hidden");
 						$(_nameReport).removeClass("error");
 						suffix.set("value","");
-					}
+					}*/
 					$(_namechecking).addClass("hidden");
 				},
 				error: function(s,t){
@@ -3832,21 +3844,23 @@ appdb.pages.Person = (function(){
 			}
 			
 			p = p + val;
-			var _url = "/people/nameavailable?cname=" + encodeURI(p);
+			var payload = {"cname": p};
 			if( page.currentId() != -1 && page.currentId() != 0){
-				_url += "&id=" + page.currentId();
+				payload.cnameid = page.currentId();
 			}
+			var _url = "/people/validateprofile?p=" + appdb.utils.base64.encode(JSON.stringify(payload));
 			$(_suffixchecking).removeClass("hidden");
 			$.ajax({
 				url: _url,
 				success: function(d){
-					var res = appdb.utils.convert.toObject(d);
-					if(res.error){
-						$(saveProfile).addClass("hidden");
-						$(err).text("This suffix is already taken");
-					}else{
+					if (d) {
+					    if (d.cname === true) {
 						$(saveProfile).removeClass("hidden");
 						$(err).text("");
+					    } else if (typeof d.cname === "string") {
+						$(saveProfile).addClass("hidden");
+						$(err).text("This suffix is already taken");
+					    }
 					}
 					$(_suffixchecking).addClass("hidden");
 				},
@@ -4803,13 +4817,19 @@ appdb.pages.newprofile = (function(){
 			return function(ev) {
 				ev.preventDefault();
 				if( $(this).hasClass("disabled") ) return;
-				if ( eval($("#editperson" + p.currentIndex()).attr("onvalidate")) ) {
+				var validationFuncName = $.trim($("#editperson" + p.currentIndex()).attr("onvalidate")).replace(/\(.*\)\;$/, '');
+				var validationFunc = appdb.FindNS(validationFuncName) || null;
+				if (!validationFunc) return;
+
+				validationFunc(true, function(success) {
+				    if (success === true) {
 					showAjaxLoading();
 					$("#savedetails").addClass("disabled saving");
 					$("#savedetails").closest(".contents.newprofile").addClass("saving");
 					appdb.pages.newaccount.enableFeatures(false);
 					$.post("/saml/createnewprofile", $("#editperson" + p.currentIndex()).serialize(),p.onCreateProfile);
-				}
+				    }
+				});
 				return false;
 			};
 		})(page));
@@ -4932,13 +4952,14 @@ appdb.pages.newprofile = (function(){
 		});
 	};
 	page.doValidation = function(){
-		var errs = page.onValidate(false);
-		page.displayErrors(errs);
-		if( $.isArray(errs) && errs.length > 0 ){
-			page.enableSave(false);
-		}else{
-			page.enableSave(true);
-		}
+		page.onValidate(false, function(errs) {
+		    page.displayErrors(errs);
+		    if( $.isArray(errs) && errs.length > 0 ){
+			    page.enableSave(false);
+		    }else{
+			    page.enableSave(true);
+		    }
+		});
 	};
 	page.enableSave = function(enable){
 		enable = (typeof enable === "boolean")?enable:true;
@@ -4947,40 +4968,6 @@ appdb.pages.newprofile = (function(){
 		}else{
 			$("#maincontent.newprofile .feature.createnewprofile #savedetails").addClass("disabled");
 		}
-	};
-	page.checkExistingNameOld = function(index){
-		index = index || page.currentIndex();
-		var fname = $("#editperson" + index + " input[name='firstName']").val();
-		var lname = $("#editperson" + index + " input[name='lastName']").val();
-		var dom = $(".profileitem .similarname");
-		$(dom).empty();
-		
-		//check that the same name does not exist, if entry is created by someone else (e.g. a manager)
-		var nameexists = 0;
-		var fullname = '';
-		if( page.checkExistingName.xhr && page.checkExistingName.xhr.abort ) {
-			page.checkExistingName.xhr.abort();
-		}
-		page.checkExistingName.xhr = $.ajax({
-			url: '/people/nameexists?fname='+encodeURIComponent($.trim(fname))+'&'+'lname='+encodeURIComponent($.trim(lname)),
-			success: function(data,txtStatus) {
-				var res = [];
-				if ($.trim(data) !== '') {
-					data = eval("("+data+")");
-					nameexists = $.trim(data.id);
-					fullname = data.fullname;
-					if (nameexists !== '0' && nameexists !== '-1') {
-						fullname = '<a style="color: #D96B00" href="/?p='+appdb.utils.base64.encode('/people/details?id='+nameexists)+'" target="_blank">'+fullname+'</a>';
-						res.push("There already exists a person with a similar name: "+fullname+"<br/>We recommend trying to connect with that profile instead of creating a new one.");
-					}
-				}
-				if( res.length > 0 ){
-					$(dom).removeClass("hidden").append("<img src='/images/vappliance/warning.png' alt=''/>").append("<span>" + res[0] + "</span>");
-				}else{
-					$(dom).addClass("hidden");
-				}
-			}
-		});
 	};
 	page.checkExistingName = function(index){
 		index = index || page.currentIndex();
@@ -5005,8 +4992,9 @@ appdb.pages.newprofile = (function(){
 				$(".profileitem .similarname").addClass("hidden");
 				appdb.pages.connectprofile.clearSearch();
 				if( $.trim(v.count) !== "" && $.trim(v.count) !== "0" ){
-					appdb.pages.connectprofile.searchProfiles(fname + " " + lname);
-					var result = "There are similar profiles found in our system with the name <a href='#' title='View similar profiles' onclick='appdb.pages.newaccount.showRegistrationFeature(\"connecttoprofile\",\"search\");return false;'>" + fname + " " + lname + "</a>.<br/>";
+					var fullname = $('<span></span>').text(fname + " " + lname).text();
+					//appdb.pages.connectprofile.searchProfiles(fname + " " + lname);
+					var result = "There are similar profiles found in our system with the name <a href='#' title='View similar profiles' onclick='appdb.pages.connectprofile.searchProfiles(\"" + fullname + "\");appdb.pages.newaccount.showRegistrationFeature(\"connecttoprofile\",\"search\");return false;'>" + fname + " " + lname + "</a>.<br/>";
 					result += "In case you already have a profile in our system, we recommend connecting you current account with it instead of creating a new one. ";
 					$(".profileitem .similarname").removeClass("hidden").append("<img src='/images/vappliance/warning.png' alt=''/>").append("<span>" + result + "</span>");
 					$(".profileitem .similarname").removeClass("hidden");
@@ -5047,14 +5035,16 @@ appdb.pages.newprofile = (function(){
 				
 		}, caller: page});
 	};
-	page.onValidate = function(showdialog) {
+	page.onValidate = function(showdialog, cb) {
+		cb =  cb || function() {};
 		showdialog = ( ( typeof showdialog === "boolean" )?showdialog:true );
 		var index = page.currentIndex();
 		var valid = true;
 		var invalidMessages = [];
 		var sub=$('#editperson' + index)[0].getElementsByTagName("input");
 		var subname,subvalue, err;
-		
+		var currentFirstname = null, currentLastname = null;
+
 		for (var i in sub) {
 			if (typeof sub[i] === "undefined") continue;
 			subname = $.trim(sub[i].name);
@@ -5064,12 +5054,16 @@ appdb.pages.newprofile = (function(){
 					if( subvalue === '' || subname.toLowerCase() === subvalue.toLowerCase()){
 						invalidMessages.push( "first name" );
 						valid = false;
+					} else {
+					    currentFirstname = subvalue;
 					}
 					break;
 				case 'lastName':
 					if( subvalue === '' || subname.toLowerCase() === subvalue.toLowerCase()){
 						invalidMessages.push( "last name" );
 						valid = false;
+					} else {
+					    currentLastname = subvalue;
 					}
 					break;
 				case "countryID":
@@ -5096,7 +5090,7 @@ appdb.pages.newprofile = (function(){
 				err += "</ul></div>";
 				page.errorDialog($(err)).show();
 			}
-			return invalidMessages;
+			return cb(invalidMessages);
 		}
 		
 		//check for at least one e-mail address
@@ -5106,57 +5100,59 @@ appdb.pages.newprofile = (function(){
 				page.errorDialog($("<div>" + err + "</div>")).show();
 			}
 			valid = false;
-			return [err];
+			return cb([err]);
 		} else {
 			//check that e-mail addresses are valid
 			var errs = [];
+			var allEmails = [];
 			$("input[name^='contactType']").filter('[value=7]').each(function() {
 				var n = $(this).attr("name").substr(11);
+				var mail = $('<span></span>').text($("input[name='contact"+n+"']").val()).text();
+				allEmails.push(mail);
 				var re = new RegExp(/^[-!#$%&'*+/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z{|}~])*@[a-zA-Z0-9](-?[a-zA-Z0-9])*(\.[a-zA-Z](-?[a-zA-Z0-9])*)+$/);
-				if (! re.test($("input[name='contact"+n+"']").val())) {
-					err = "e-mail address \n`"+$("input[name='contact"+n+"']").val()+"` \nis invalid";
-					if( showdialog ){
-						page.errorDialog($("<div>" + err + "</div>")).show();
-					}
-					valid = false;
-					errs.push(err);
-				} else {
-					//check that valid e-mail addresses do not already exist
-					var mailexists = 0;
-					var mailname = '';
-					$.ajax({
-						url: '/people/emailexists?email='+encodeURIComponent($.trim($("input[name='contact"+n+"']").val())),
-						success: function(data) {
-							if (data !== '') {
-								data = eval("("+data+")");
-								mailexists = data.id;
-								mailname = data.fullname;
-							}
-						},
-						async: false
-					});
-					if (mailexists !== 0 && mailexists !== '-1') {
-						var clckev = "appdb.pages.connectprofile.searchProfiles('"+$("input[name='contact"+n+"']").val()+"');appdb.pages.newaccount.showRegistrationFeature('connecttoprofile','search');return false;";
-						mailname = '<a style="color: #D96B00" href="#" onclick="'+clckev+'" target="_blank">'+mailname+'</a>';
-						err = "e-mail address `" + $("input[name='contact"+n+"']").val() + "` is already in use by "+mailname;
-						if( showdialog ){
-							page.errorDialog($("<div>" + err + "</div>")).show();
-						}
-						valid = false;
-						errs.push(err);
-					}
+				if (! re.test(mail)) {
+				    err = "e-mail address \n`"+ mail +"` \nis invalid";
+				    if( showdialog ){
+					    page.errorDialog($("<div>" + err + "</div>")).show();
+				    }
+				    valid = false;
+				    errs.push(err);
 				}
 			});
-			if( errs.length > 0 && showdialog === false ){
-				return errs;
+
+			if (errs.length > 0) {
+			    return cd(errs);
 			}
+
+			//check that valid e-mail addresses do not already exist
+			var mailexists = 0;
+			var mailname = '';
+			var mailval = '';
+			var payload = appdb.utils.base64.encode(JSON.stringify({"fname": currentFirstname, "lname": currentLastname, "email": allEmails.join(';')}));
+			$.ajax({
+				url: '/people/validateprofile?p=' + payload,
+				success: function(data) {
+				    if (data && data.email && data.email.id) {
+					    mailexists = data.email.id;
+					    mailname = data.email.fullname;
+					    mailval = $("<span></span>").text(allEmails[parseInt(data.email.value)]).text();
+				    }
+				    if (mailexists !== 0 && mailexists !== '-1') {
+					    var clckev = "appdb.pages.connectprofile.searchProfiles('"+mailname+"');appdb.pages.newaccount.showRegistrationFeature('connecttoprofile','search');return false;";
+					    mailname = '<a style="color: #D96B00" href="#" onclick="'+clckev+'" target="_blank">'+mailname+'</a>';
+					    err = "e-mail address `" + mailval + "` is already in use by " + mailname;
+					    if( showdialog ){
+						    page.errorDialog($("<div>" + err + "</div>")).show();
+					    }
+					    valid = false;
+					    errs.push(err);
+					    return cb(errs);
+				    } else {
+					return cb(true);
+				    }
+				}
+			});
 		}
-		
-		
-		if( errs.length > 0 && showdialog === false ){
-			return errs;
-		}
-		return valid;
 	};
 	page.reset = function(){
 		page.currentIndex(null);
