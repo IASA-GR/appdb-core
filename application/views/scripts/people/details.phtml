@@ -793,7 +793,6 @@
 						var mailname = '';
 						$.ajax({
                                                         url: '/people/validateprofile?p=' + appdb.utils.base64.encode('{"email": "' + $.trim($("input[name='contact"+n+"']").val()) + '", "fname": "' + $.trim($("input[name='firstName']").val())+ '", "lname" : "' + $.trim($("input[name='lastName']").val()) + '"}'),
-							//url: '/people/emailexists?email='+encodeURIComponent($.trim($("input[name='contact"+n+"']").val())),
 							success: function(data,txtStatus) {
                                                                 if (data && data.email && data.email.id) {
                                                                     mailexists = data.email.id;

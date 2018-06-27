@@ -31,7 +31,7 @@ class PeopleController extends Zend_Controller_Action
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
       	header("Content-Type:text/xml");
-        echo "<?xml version='1.0'?>";
+        echo "<" . "?xml version='1.0'?" . ">";
         if ($this->session->userid !== null) {
             $rs = new Default_Model_Researchers();
             $rs->filter->id->equals($this->session->userid);
@@ -45,68 +45,6 @@ class PeopleController extends Zend_Controller_Action
 			echo "<response error='Must be logged in'>unauthorized</response>";
         }
     }
-
-	public function nameexistsAction()
-	{
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
-		if ($this->session->userid !== null) {
-			$res = array();
-            $lname=$_GET['lname'];
-            $fname=$_GET['fname'];
-			if(is_null($fname)) $fname = "";
-			if(is_null($lname)) $lname = "";
-			
-			//Get most certain profile
-			$rs = new Default_Model_Researchers();
-			$f1 = new Default_Model_ResearchersFilter();
-			$f2 = new Default_Model_ResearchersFilter();
-			$fn1 = $fname . " " . $lname;
-			$fn2 = $lname . " " . $fname;
-			$f1->firstname->soundslike($fname);
-			$f2->lastname->soundslike($lname);
-			$rs->filter->chain($f1, "AND");
-			$rs->filter->chain($f2, "AND");
-			if( count($rs->items) > 0 ){
-				$item = $rs->items[0];
-				echo '{id: "'.$item->id.'", fullname: "'.$item->fullName.'"}';
-				return;
-			}
-			
-			//get possible profiles
-			$rs = new Default_Model_Researchers();
-			$f = $rs->filter;
-			$f->name->soundsLike($fn1)->or($f->name->soundsLike($fn2));
-			
-			foreach ($rs->items as $item) {
-				array_push($res, '{id: "'.$item->id.'", fullname: "'.$item->fullName.'"}');
-			}
-			
-			echo  implode(",", $res);
-		}
-	}
-
-	public function emailexistsAction()
-	{
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
-		if ($this->session->userid !== null) {
-			$cs = new Default_Model_Contacts();
-			$f1 = new Default_Model_ContactsFilter();
-			$f2 = new Default_Model_ContactsFilter();
-			$f1->contacttypeid->equals(7);
-			$f2->data->ilike($_GET['email']);
-			$cs->filter->chain($f1, "AND");
-			$cs->filter->chain($f2, "AND");
-			if ( count($cs->items) > 0) {
-				$j = 'id: "'.$cs->items[0]->researcherID.'"';
-				$rs = new Default_Model_Researchers();
-				$rs->filter->id->equals($cs->items[0]->researcherID);
-				$j .= ', fullname: "'.str_replace('"','\"',$rs->items[0]->fullName).'"';
-				echo '{'.$j.'}';
-			}
-		}
-	}
 
         public function validateprofileAction() {
                 $this->_helper->layout->disableLayout();
@@ -178,7 +116,6 @@ class PeopleController extends Zend_Controller_Action
                 }
 
                 if (isset($payload['email']) && ($nameResponse || $cnameResponse)) {
-                        console.log($payload['email']);
                         $emails = explode(';', trim($payload['email']));
                         $i = 0;
                         foreach($emails as $email) {
@@ -765,7 +702,7 @@ class PeopleController extends Zend_Controller_Action
 		$uid = $this->session->userid;
 		
 		header("Content-Type:text/xml");
-		echo "<?xml version='1.0'?".">";
+		echo "<" . "?xml version='1.0'?".">";
 		if( is_null($guid) ){
 			echo "<response error='Must be logged in'>unauthorized</response>";
 			return;
@@ -985,7 +922,7 @@ class PeopleController extends Zend_Controller_Action
         $this->_helper->viewRenderer->setNoRender();
 		$uid = $this->session->userid;
 		header("Content-Type:text/xml");
-		echo "<?xml version='1.0'?" . ">";
+		echo "<" . "?xml version='1.0'?" . ">";
 		//Check if user is logged in
 		if($_SERVER['HTTPS'] != "on"){
 			header("HTTP/1.0 403 Forbidden");
