@@ -114,13 +114,13 @@ class harvest {
 	 * Search in available harvested archives for given text
 	 */
 	public static function search($archiveid, $search = "", $limit = 50){
-		if (($archiveid == 1) || ($archiveid == 3)) {
-			return openAIRE::search($archiveid, $search, $limit);
-		} else {
+//		if (($archiveid == 1) || ($archiveid == 3)) {
+//			return openAIRE::search($archiveid, $search, $limit);
+//		} else {
 			$props = array_values( self::getSearchProperties($archiveid) );
 			$keys = self::textToKeywords($search);
 			return self::doSearch($archiveid, $keys, $props, $limit);
-		}
+//		}
 	}
 	
 	public static function getRecord($recordid){
