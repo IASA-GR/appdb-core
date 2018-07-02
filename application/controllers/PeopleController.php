@@ -296,13 +296,22 @@ class PeopleController extends Zend_Controller_Action
 			// BEGIN: API logging hack
 			$cid = 0; // clientID: 0 --> appDB portal
 			if ( isset($_SERVER['REMOTE_ADDR']) && ($_SERVER['REMOTE_ADDR'] != '') ) {
-				$src = "'" . $_SERVER['REMOTE_ADDR'] . "'";
+				$src = $_SERVER['REMOTE_ADDR'];
 			} else {
-				$src = '';
+				$src = NULL;
 			}
-			if (is_numeric($this->session->userid) && $this->view->entry) { // only log if we have a valid userid
-				$sql = "INSERT INTO ppl_api_log (pplid, timestamp, researcherid, source, ip) VALUES (" . $pplID . ", NOW(), " . $this->session->userid . ", " . $cid .", " . $src . ");";
-				db()->query($sql)->fetchAll();
+			if (is_numeric($this->session->userid) && $this->view->entry) { 
+				// only log if we have a valid userid, i.e. user logged-in. Non logged-in calls are handled inside the API
+				try {
+					$sql = "NOTIFY api_log, '" . pg_escape_string(json_encode(array(
+						"tbl" => 'ppl',
+						"pplid" => $pplID,
+						"researcherid" => $this->session->userid,
+						"source" => $cid,
+						"ip" => $src
+					))) . "';";
+					db()->query($sql)->fetchAll();
+				} catch (Exception $e) { /*ignore logging errors in case id or cname not found*/ }
 			}
 			// END: API logging hack
 			if( isnull($this->view->entry->image) === false ){

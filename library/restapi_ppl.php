@@ -442,15 +442,22 @@ class RestPplItem extends RestResourceItem {
 			if ( ! isset($id) ) {
 				$id = "(SELECT id FROM researchers WHERE cname = '" . substr($this->getParam("name"), 2) . "')";
 			}
-			$cid = $this->getParam("cid"); if ( $cid == '' ) $cid = "NULL";
-			$src = base64_decode($this->getParam("src")); if ( $src == '' ) $src = "NULL"; else $src = "'" . $src . "'";
-			$userid = isset($this->_userid) ? $this->_userid : "NULL";
-			if ( $userid == 0 ) $userid = "NULL";
-			$sql = "INSERT INTO ppl_api_log (pplid, timestamp, researcherid, source, ip) VALUES (" . $id . ", NOW(), " . $userid . ", " . $cid . ", " . $src . ");";
-			debug_log("$sql");
-			try {
-				db()->query($sql)->fetchAll();
-			} catch (Exception $e) { /*ignore logging errors in case id or cname not found*/ }
+			$cid = $this->getParam("cid"); if ( $cid == '' ) $cid = NULL;
+			$src = base64_decode($this->getParam("src")); if ( $src == '' ) $src = NULL; //else $src = "'" . $src . "'";
+			$userid = isset($this->_userid) ? $this->_userid : NULL;
+			if ( $userid == 0 ) $userid = NULL;
+			if ( ($id != '') && (! isnull($id)) ) {
+				try {
+					$sql = "NOTIFY api_log, '" . pg_escape_string(json_encode(array(
+						"tbl" => 'ppl',
+						"pplid" => $id,
+						"researcherid" => $userid,
+						"source" => $cid,
+						"ip" => $src
+					))) . "';";
+					db()->query($sql)->fetchAll();
+				} catch (Exception $e) { /*ignore logging errors in case id or cname not found*/ }
+			}
 			$this->_logged = true;
 		}
 		return $this->_resParent;

@@ -2113,13 +2113,19 @@ class RestAppItem extends RestResourceItem {
     protected function getModel() {
 		if ( ($this->getMethod() == RestMethodEnum::RM_GET) && (! $this->_logged) ) {
 			$id = normalizeAppID($this);
-			$cid = $this->getParam("cid"); if ( $cid == '' ) $cid = "NULL";
-			$src = base64_decode($this->getParam("src")); if ( $src == '' ) $src = "NULL"; else $src = "'" . $src . "'";
-			$userid = isset($this->_userid) ? $this->_userid : "NULL";
-			if ( $userid == 0 ) $userid = "NULL";
+			$cid = $this->getParam("cid"); if ( $cid == '' ) $cid = NULL;
+			$src = base64_decode($this->getParam("src")); if ( $src == '' ) $src = NULL; //else $src = "'" . $src . "'";
+			$userid = isset($this->_userid) ? $this->_userid : NULL;
+			if ( $userid == 0 ) $userid = NULL;
 			if ( ($id != '') && (! isnull($id)) ) {
 				try {
-					$sql = "INSERT INTO app_api_log (appid, timestamp, researcherid, source, ip) VALUES (" . $id . ", NOW(), " . $userid . ", " . $cid . ", " . $src . ");";
+					$sql = "NOTIFY api_log, '" . pg_escape_string(json_encode(array(
+						"tbl" => 'app',
+						"appid" => $id,
+						"researcherid" => $userid,
+						"source" => $cid,
+						"ip" => $src
+					))) . "';";
 					db()->query($sql)->fetchAll();
 				} catch (Exception $e) { /*ignore logging errors in case id or name not found*/ }
 			}
