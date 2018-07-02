@@ -53,7 +53,7 @@ class Default_Model_Application extends Default_Model_ApplicationBase
 		if ( ! isnull($this->id) ) {
 			if ( isnull($this->_hitcount) ) {
 				db()->setFetchMode(Zend_Db::FETCH_OBJ);
-				$res = db()->query("SELECT COUNT(*) AS hitcount FROM app_api_log WHERE appid = " . $this->id)->fetchAll();
+				$res = db()->query("SELECT count AS hitcount FROM hitcounts WHERE appid = " . $this->id)->fetchAll();
 				if ( count($res) > 0 ) {
 					$this->_hitcount = $res[0]->hitcount;
 				}

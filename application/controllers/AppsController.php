@@ -1607,6 +1607,20 @@ class AppsController extends Zend_Controller_Action
 			echo "<response>success</response>";
 		}
 	}
+
+	public function refreshapppopAction(){
+		$this->_helper->layout->disableLayout();
+		$this->_helper->viewRenderer->setNoRender();
+		// Prevent malicious calls
+		if ( localRequest() ) {
+			db()->exec("REFRESH MATERIALIZED VIEW CONCURRENTLY app_popularities");
+		} else {
+			header('HTTP/1.0 404 Not Found');
+			header("Status: 404 Not Found");
+			return;
+		}
+	}
+
 	public function dispatchoutdatedmailsAction(){
 
 		// DISABLED

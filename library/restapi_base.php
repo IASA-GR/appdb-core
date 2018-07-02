@@ -2361,10 +2361,14 @@ abstract class RestResourceItem extends RestResource {
 		} else {
 			if ( ! is_null($this->_model) && ! ($this->_model === false) ) {
 				if (get_class($this) == "RestAppItem") {
-					$_res = $this->_model->items[0];
-					if ( is_numeric($_res->id) ) {
-						$this->_model->filter->id->numequals($_res->id);
-					} 
+					if (is_array($this->_model->items)) {
+						if (count($this->_model->items) > 0) {
+							$_res = $this->_model->items[0];
+							if ( is_numeric($_res->id) ) {
+								$this->_model->filter->id->numequals($_res->id);
+							}
+						}
+					}
 				}
 				$this->_model->refresh("xml", true);
 				if ( count($this->_model->items) > 0 ) {
