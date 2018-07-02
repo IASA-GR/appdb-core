@@ -23,6 +23,62 @@ Author: wvkarag@lovecraft.priv.iasa.gr
 
 START TRANSACTION;
 
+CREATE SCHEMA IF NOT EXISTS openaire;
+
+CREATE TABLE IF NOT EXISTS openaire.organizations
+(
+  id SERIAL NOT NULL PRIMARY KEY,
+  name text,
+  shortname text,
+  websiteurl text,
+  country text,
+  original_identifier text,
+  ext_identifier text
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE openaire.organizations
+  OWNER TO appdb;
+
+CREATE TABLE IF NOT EXISTS openaire.projects
+(
+  id SERIAL NOT NULL PRIMARY KEY,
+  code TEXT,
+  acronym TEXT,
+  title TEXT,
+  startdate TEXT,
+  enddate TEXT,
+  callidentifier TEXT,
+  websiteurl TEXT,
+  keywords TEXT,
+  duration TEXT,
+  contractgroup TEXT,
+  contractname TEXT,
+  contracttype TEXT,
+  ext_identifier TEXT,
+  fundingid0 TEXT,
+  fundingname0 TEXT,
+  fundingdesc0 TEXT,
+  fundingid1 TEXT,
+  fundingname1 TEXT,
+  fundingdesc1 TEXT,
+  fundingid2 TEXT,
+  fundingname2 TEXT,
+  fundingdesc2 TEXT,
+  fundingid3 TEXT,
+  fundingname3 TEXT,
+  fundingdesc3 TEXT
+);
+ALTER TABLE openaire.projects OWNER TO appdb;
+
+CREATE TABLE IF NOT EXISTS openaire.projectorgs (
+  id SERIAL NOT NULL PRIMARY KEY,
+  projid TEXT,
+  orgid TEXT
+);
+ALTER TABLE openaire.projectorgs OWNER TO appdb;
+
 CREATE OR REPLACE FUNCTION openaire.xml_search_results(openaire.projects)
 RETURNS XML AS
 $$
@@ -74,7 +130,7 @@ $$ LANGUAGE SQL STABLE;
 ALTER FUNCTION openaire.xml_search_results(openaire.organizations) OWNER TO appdb;
 
 INSERT INTO version (major,minor,revision,notes) 
-	SELECT 8, 20, 0, E'create openaire schema functions to mimic old harvest schema'
+	SELECT 8, 20, 0, E'create openaire schema and functions to mimic old harvest schema'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=20 AND revision=0);
 
 COMMIT;	
