@@ -33,6 +33,10 @@ REQUIREMENTS
 		./build.sh profile=appdb action=release cssOptimize=comments mini=true
 	  from /opt/zend/externals/dojo/util/buildscripts
 
+- SimpleSAMLphp, for user authentication
+	- patch lib/SimpleSAML/Store/SQL.php to simulate UPSERT for PostgreSQL, instead of INSERT'ing, catching errors and UPDATE'ing
+
+
 - Javascript Libraries (public/js)
 	- tipsy (SVG compatible fork from https://github.com/bigmlcom/tipsy)
 	- plupload v.1.5.5 (.swf and .xap files must be in public and public/js folders)
