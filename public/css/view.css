@@ -23495,6 +23495,23 @@ a.helperlink.wikilink:hover{
 	min-width: 560px;
 	max-width: 560px;
 }
+.entityrelations.tabcontent .relationlist.editmode > ul.relations > li > .relationtype.hasfunding > .currentrelation {
+        width: 490px;
+        min-width: 490px;
+        max-width: 490px;
+}
+.entityrelations.tabcontent .relationlist.editmode > ul.relations > li > .relationtype.hasfunding > .relationfund,
+.entityrelations.tabcontent .relationlist.editmode > ul.relations > li > .relationtype.hasfunding > .relationfund > * {
+        vertical-align: middle;
+        line-height: 14px;
+}
+.entityrelations.tabcontent .relationlist.editmode > ul.relations > li > .relationtype.hasfunding > .relationfund {
+        display: inline-block;
+        padding: 0;
+        position: relative;
+        width: 62px;
+        top: 2px;
+}
 .entityrelations.tabcontent .relationlist.editmode > ul.relations > li > .relationtype > .relationverb{
 	min-width: 125px;
 	max-width: 125px;

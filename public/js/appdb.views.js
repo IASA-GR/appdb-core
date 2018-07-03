@@ -20662,7 +20662,8 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 			targets: null,
 			verbs: null
 		},
-		isvalid: false
+		isvalid: false,
+		children: o.children || {}
 	};
 	
 	this.reset = function(){
@@ -20686,6 +20687,7 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 		var sd = editortype.getSelectedData();
 		
 		var vid = this.options.editors.verbs.get('value'); //this is the relation type id and NOT the verb id
+		var currentVerb = this.getVerbById(vid);
 		if( !sd ){
 			valid = false;
 		}
@@ -20700,12 +20702,17 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 			this.options.data = {
 				id: vid
 			};
+			if (currentVerb) {
+			    this.options.data.verbname = currentVerb.verb;
+			}
 			if( this.isReversed() ){
 				delete this.options.data.targetguid;
 				this.options.data.subjectguid = ( (sd.guid)?sd.guid:(sd.id || null) );
+				this.options.data.entity = { guid: this.options.data.subjectguid };
 			}else{
 				delete this.options.data.subjectguid;
 				this.options.data.targetguid = ( (sd.guid)?sd.guid:(sd.id || null) );
+				this.options.data.entity = { guid: this.options.data.targetguid };
 			}
 		}else{
 			this.options.data = null;
@@ -20732,7 +20739,16 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 	};
 	
 	this.getData = function(){
-		return this.options.data;
+		var data = [this.options.data];
+
+		if (this.options.children) {
+			$.each(this.options.children, function(name, value) {
+				if (this.options.children[name] !== null) {
+				        data.push(this.options.children[name]);
+				}
+			}.bind(this));
+		}
+		return data;
 	};
 	
 	this.render = function(d){
@@ -20741,14 +20757,14 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 		this.reset();
 		this._initContainer();
 		$(this.dom).removeClass("reversed").find(".relationtarget,.relationsubject").removeClass("currentrelation");
-		
+
 		if( this.isReversed() ){
 			$(this.dom).addClass("reversed");
 			$(this.dom).find(".relationsubject").addClass("currentrelation");
 		}else{
 			$(this.dom).find(".relationtarget").addClass("currentrelation");
 		}
-		
+
 		if( this.isEditMode() && this.canEdit() ){
 			if( this.isReversed() ){
 				this.renderTarget();
@@ -20760,12 +20776,12 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 			this.editVerb();
 			this.renderActions();
 			this.validate();
+			this.postEdit();
 		}else{
 			this.renderSubject();
 			this.renderVerb();
 			this.renderTarget();
 		}
-		
 	};
 	this.getTargetType = function(){
 		return $.trim(this.options.targettype).toLowerCase();
@@ -20773,15 +20789,43 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 	this.getSubjectType = function(){
 		return $.trim(this.options.subjecttype).toLowerCase();
 	};
+	this.getVerbsBySubjectTargetPairs = function(subjectType, targetType) {
+	    subjectType = subjectType || this.options.subjecttype;
+	    targetType = targetType ||  this.options.targettype;
+
+	    return appdb.utils.RelationsRegistry.getVerbsBySubjectTargetPairs(subjectType, targetType);
+	};
 	this.getVerbOfRelation = function(rel){
 		return (this.options.reverse)?rel.reverseverb:rel.directverb;
+	};
+	this.getVerbByName = function(v) {
+	    var verbs = appdb.utils.RelationsRegistry.getVerbsBySubjectTargetPairs(this.options.subjecttype, this.options.targettype);
+	    var foundVerb = null;
+	    $.each(verbs, function(index, verb) {
+		    if (foundVerb === null && verb.verb === v) {
+			    foundVerb = verb;
+		    }
+	    });
+
+	    return foundVerb;
+	};
+	this.getVerbById = function(v) {
+	    var verbs = appdb.utils.RelationsRegistry.getVerbsBySubjectTargetPairs(this.options.subjecttype, this.options.targettype);
+	    var foundVerb = null;
+	    $.each(verbs, function(index, verb) {
+		    if (foundVerb === null && verb.id === v) {
+			    foundVerb = verb;
+		    }
+	    });
+
+	    return foundVerb;
 	};
 	this.renderCurrentEntity = function(){
 		//to be overriden
 	};
 	this.renderVerb = function(){
-		var verbs = appdb.utils.RelationsRegistry.getVerbsBySubjectTargetPairs(this.options.subjecttype,this.options.targettype);
-		var selverb = $.grep(appdb.utils.RelationsRegistry.getVerbsBySubjectTargetPairs(this.options.subjecttype,this.options.targettype), (function(v){
+		var verbs = this.getVerbsBySubjectTargetPairs(this.options.subjecttype, this.options.targettype);
+		var selverb = $.grep(this.getVerbsBySubjectTargetPairs(this.options.subjecttype, this.options.targettype), (function(v){
 			return function(e){
 				return $.trim(e.verb).toLowerCase() === v;
 			};
@@ -20826,10 +20870,12 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 		this.options.editors.subjects.subscribe({event: "change", callback: function(v){
 				this.validate();
 				this.publish({event: "change", value: this});
+				this.postEdit();
 		}, caller: this});
+		this.postEdit();
 	};
 	this.editVerb = function(){
-		var verbs = appdb.utils.RelationsRegistry.getVerbsBySubjectTargetPairs(this.options.subjecttype,this.options.targettype);
+		var verbs = this.getVerbsBySubjectTargetPairs(this.options.subjecttype,this.options.targettype);
 		var selverb = $.trim((this.options.data || {}).verbname) || this.options.verbname;
 		var html = "<select>";
 		$.each(verbs, (function(self){
@@ -20844,12 +20890,14 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 				return function(v){
 					self.validate();
 					self.publish({event: "change", value: self});
+					self.postEdit();
 				};
 			})(this)
 		},$(this.dom).find(".relationverb > select")[0]);
 		if( verbs.length === 1 ){
 			this.options.editors.verbs.set('disabled', true);
 		}
+		this.postEdit();
 	};
 	this.editTarget = function(){
 		var s = this.getTargetType();
@@ -20866,9 +20914,11 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 		});
 		this.options.editors.targets._init();
 		this.options.editors.targets.subscribe({event: "change", callback: function(v){
-				this.validate();
-				this.publish({event: "change", value: this});
+			this.validate();
+			this.publish({event: "change", value: this});
+			this.postEdit();
 		}, caller: this});
+		this.postEdit();
 	};
 	this.renderActions = function(){
 		$(this.dom).find(".actions").remove();
@@ -20896,6 +20946,10 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 		this.editVerb();
 		this.editTarget();
 		this._initEvents();
+		this.postEdit();
+	};
+	this.postEdit = function() {
+	    //override
 	};
 	this.showPopupDialog = function(enable){
 		enable = (typeof enable === 'boolean')?enable:true;
@@ -21157,6 +21211,97 @@ appdb.views.RelationListItemProject = appdb.ExtendClass(appdb.views.RelationList
 		}
 		return $(dom)[0];
 	};
+
+	this.getVerbsBySubjectTargetPairs = function(subjectType, targetType) {
+		subjectType = subjectType || this.options.subjecttype;
+		targetType = targetType ||  this.options.targetType;
+
+		var verbs = appdb.utils.RelationsRegistry.getVerbsBySubjectTargetPairs(subjectType, targetType);
+		var results = [];
+
+		$.each(verbs, function(_, verb) {
+			if (verb && verb.verb !== 'funding') {
+				results.push(verb);
+			}
+		});
+
+		return results;
+	};
+
+	this.setFunding = function(updateForm) {
+		var checked = $(this.dom).find('.relationtype .relationfund input[type="checkbox"]').prop('checked');
+		this.options.data = this.options.data || {};
+		this.options.children = this.options.children || {};
+		this.options.children.funding = this.options.children.funding || null;
+
+		if (checked === true) {
+			var verb = this.getVerbByName('funding');
+			this.options.children.funding = {
+				id: verb.id
+			};
+			if (this.isReversed()) {
+				this.options.children.funding.subjectguid = this.options.data.subjectguid;
+			} else {
+				this.options.children.funding.targetguid = this.options.targetguid;
+			}
+		} else {
+			this.options.children.funding = null;
+		}
+		if (updateForm === false) {
+		    return;
+		}
+		this.validate();
+		this.publish({event: "change", value: this});
+		this.postEdit();
+	};
+
+	this.renderFunding = function(enable) {
+		enable = (typeof enable === 'boolean') ? enable : false;
+		if (enable === false) {
+			this.options.children.funding = null;
+			$(this.dom).find('.relationtype').removeClass('hasfunding');
+			$(this.dom).find('.relationtype').find('.relationfund').remove();
+		} else {
+			$(this.dom).find('.relationtype').addClass('hasfunding').find('.relationfund').remove();
+			var chkbox = $('<div class="relationfund"><input type="checkbox" value="0"><label>funded</label></div>');
+			var enabledCheckbox = (this.options.data && this.options.data.entity && this.options.data.entity.guid) ? true : false;
+			var checkedBox = (this.options.children && this.options.children.funding);
+
+			if (enabledCheckbox) {
+				$(chkbox).find('input').prop('disabled', false);
+			} else {
+				$(chkbox).find('input').prop('disabled', true);
+			}
+
+			$(chkbox).find('input').prop('checked', checkedBox);
+			$(chkbox).on('click', function(ev) {
+				if (ev.target.tagName.toLowerCase() !== 'input') {
+				    var inp = $(chkbox).find('input');
+				    $(inp).prop('checked', !$(inp).prop('checked'));
+				    this.setFunding(false);
+				}
+			}.bind(this));
+			$(chkbox).find('input').on('change', function(ev) {
+			    setTimeout(function() {
+				    this.setFunding(false);
+			    }.bind(this), 1);
+			}.bind(this));
+			$(this.dom).find('.relationtype .relationsubject').after(chkbox);
+			this.setFunding(false);
+		}
+	};
+
+	this.postEdit = function() {
+		this.options.data = this.options.data  || {};
+		this.options.children = this.options.children  || { funding : null};
+		var verb = this.getVerbByName('development') || {};
+		var currentVerb = this.getVerbByName(this.options.data.verbname);
+		if (currentVerb && currentVerb.id === verb.id) {
+			this.renderFunding(true);
+		} else {
+			this.renderFunding(false);
+		}
+	};
 });
 appdb.views.RelationListItemSoftwareProject = appdb.ExtendClass(appdb.views.RelationListItemProject, "appdb.views.RelationListItemSoftwareProject", function(o){
 	this.renderCurrentEntity = function(){
@@ -21269,14 +21414,18 @@ appdb.views.RelationList = appdb.ExtendClass(appdb.View, "appdb.views.RelationLi
 		if ($(frm).length === 0) {
 			return false;
 		}
-		var i, len = this.options.items.length, item, inp;
+		var i, len = this.options.items.length, item, inp, offset = 0;
 		$(frm).remove("input[name^='relation']");
 		for (i = 0; i < len; i += 1) {
 			item = this.options.items[i];
 			if( !item.getData() ) continue;
-			inp = document.createElement("input");
-			$(inp).attr("name", "relation" + i).attr("type", "hidden").attr("value", JSON.stringify(this.getItemData(item)));
-			$(frm).append(inp);
+			var itemRelations = this.getItemData(item);
+			$.each(itemRelations, function(index, value) {
+				offset += 1;
+				inp = document.createElement("input");
+				$(inp).attr("name", "relation" + offset).attr("type", "hidden").attr("value", JSON.stringify(value));
+				$(frm).append(inp);
+			})
 		}
 		return true;
 	};
@@ -21288,24 +21437,28 @@ appdb.views.RelationList = appdb.ExtendClass(appdb.View, "appdb.views.RelationLi
 		var hasnew = false;
 		$.each(this.options.items, function(i,e){
 			var s = e.getData();
-			if( s !== null ){
-				//if targetguid is a number then it corresponds to a record id
-				//which means that there is a new item in the list
-				if( s.targetguid === ( "" + (s.targetguid <<0) ) ){
-					hasnew = true;
-				}
-				current[s.id + ":" +s.targetguid] = s;
-			}			
+			s = s || [];
+			s = $.isArray(s) ? s : [s];
+			if( s.length > 0 ){
+				$.each(s, function(_, s) {
+				    //if targetguid is a number then it corresponds to a record id
+				    //which means that there is a new item in the list
+				    if( s.targetguid === ( "" + (s.targetguid <<0) ) ){
+					    hasnew = true;
+				    }
+				    current[s.id + ":" +s.targetguid] = s;
+				});
+			}
 		});
-		
+
 		if( hasnew === true ){
 			return true;
 		}
-		
+
 		var newitems = $.grep(this.options.data, function(e){
 			return ( e && e.target && e.target.guid && !current[e.relationtypeid + ":" + e.target.guid] );
 		});
-		
+
 		return ( newitems.length > 0 )?true:false;
 	};
 	this.extractType = function(typename, data){
@@ -21334,7 +21487,8 @@ appdb.views.RelationList = appdb.ExtendClass(appdb.View, "appdb.views.RelationLi
 			targettype: this.options.targettype || this.extractType("target",data) ,
 			subjecttype: this.options.subjecttype || this.extractType("subject",data) ,
 			verbname: this.options.verbname,
-			reverse: this.options.reverse
+			reverse: this.options.reverse,
+			children: data.children || {}
 		});
 		item.subscribe({event: "remove", callback: function(v){
 				this.removeItem(v);
@@ -21380,7 +21534,15 @@ appdb.views.RelationList = appdb.ExtendClass(appdb.View, "appdb.views.RelationLi
 			$(this.dom).removeClass("isempty");
 		}
 	};
-	
+	this.preProcessData = function(d) {
+		d = d || this.options.data || [];
+		d = $.isArray(d)?d:[d];
+
+		if ($.isFunction(this.options.preProcessData)) {
+			return this.options.preProcessData.apply(this, [d]);
+		}
+		return d;
+	};
 	this.render = function(d){
 		d = d || this.options.data || [];
 		d = $.isArray(d)?d:[d];
@@ -21507,6 +21669,8 @@ appdb.views.RelationList = appdb.ExtendClass(appdb.View, "appdb.views.RelationLi
 		
 		$(this.dom).empty();
 		this.options.data = this.filterTargetData(o.data);
+		this.options.data = this.preProcessData(this.options.data);
+
 		this._initItemTypeClass();
 		
 		if( !this.options.dom.list ){
@@ -21532,22 +21696,78 @@ appdb.views.RelationListOrganization = appdb.ExtendClass(appdb.views.RelationLis
 });
 appdb.views.RelationListProject = appdb.ExtendClass(appdb.views.RelationList, "appdb.views.RelationListProject", function(o){
 	this.options = $.extend(true, this.options, {messages:{emptylist: "No related projects"}});
+}, {
+    preProcessData: function(data) {
+	    data = data || this.options.data || [];
+	    data = $.isArray(data) ? data : [data];
+	    var indexes = {};
+	    var removeIndexes = [];
+
+	    $.each(data, function(index, item) {
+		    var guid = (item && item.entity && item.entity.guid && ['development', 'funding'].indexOf(item.verbname) > -1) ? item.entity.guid : null;
+		    if (guid) {
+			    indexes[guid] = indexes[guid] || {};
+			    indexes[guid][item.verbname] = index;
+		    }
+	    });
+
+	    $.each(indexes, function(key, value) {
+		if (value.development > -1) {
+			data[value.development].children = {
+				'funding': value.funding > -1 ? Object.assign({}, data[value.funding]) : null
+			};
+			if (value.funding > -1) {
+				removeIndexes.push(value.funding);
+			}
+		}
+	    });
+
+	    removeIndexes.sort().reverse();
+
+	    $.each(removeIndexes, function(i,v) {
+		    data.splice(v, 1);
+	    });
+
+	    return data;
+    }
 });
 appdb.views.RelationListSoftwareProject = appdb.ExtendClass(appdb.views.RelationListProject, "appdb.views.RelationListSoftwareProject", function(o){
-	this.options = $.extend(true, this.options, {subjecttype: (o.subjecttype || "project"),targettype:(o.targettype || "software"),reverse:true, itemtype: appdb.views.RelationListItemSoftwareProject});
+	this.options = $.extend(true, this.options, {
+	    subjecttype: (o.subjecttype || "project"),
+	    targettype:(o.targettype || "software"),
+	    reverse:true,
+	    itemtype: appdb.views.RelationListItemSoftwareProject,
+	    preProcessData: appdb.views.RelationListProject.preProcessData
+	});
 });
 appdb.views.RelationListSoftwareOrganization = appdb.ExtendClass(appdb.views.RelationListOrganization, "appdb.views.RelationListSoftwareOrganization", function(o){
-	this.options = $.extend(true, this.options, {subjecttype: (o.subjecttype || "organization"),targettype:(o.targettype || "software"),reverse:true, itemtype: appdb.views.RelationListItemSoftwareOrganization});
+	this.options = $.extend(true, this.options, {
+	    subjecttype: (o.subjecttype || "organization"),
+	    targettype:(o.targettype || "software"),
+	    reverse:true,
+	    itemtype: appdb.views.RelationListItemSoftwareOrganization
+	});
 });
 appdb.views.RelationListVApplianceProject = appdb.ExtendClass(appdb.views.RelationListProject, "appdb.views.RelationListVApplianceProject", function(o){
-	this.options = $.extend(true, this.options, {subjecttype: (o.subjecttype || "project"),targettype:(o.targettype || "vappliance"),reverse:true, itemtype: appdb.views.RelationListItemVApplianceProject});
+	this.options = $.extend(true, this.options, {
+	    subjecttype: (o.subjecttype || "project"),
+	    targettype:(o.targettype || "vappliance"),
+	    reverse:true,
+	    itemtype: appdb.views.RelationListItemVApplianceProject,
+	    preProcessData: appdb.views.RelationListProject.preProcessData
+	});
 });
 appdb.views.RelationListVApplianceOrganization = appdb.ExtendClass(appdb.views.RelationListOrganization, "appdb.views.RelationListVApplianceOrganization", function(o){
 	this.options = $.extend(true, this.options, {subjecttype: (o.subjecttype || "organization"),targettype:(o.targettype || "vappliance"),reverse:true, itemtype: appdb.views.RelationListItemVApplianceOrganization});
 });
-
 appdb.views.RelationListSWApplianceProject = appdb.ExtendClass(appdb.views.RelationListProject, "appdb.views.RelationListSWApplianceProject", function(o){
-	this.options = $.extend(true, this.options, {subjecttype: (o.subjecttype || "project"),targettype:(o.targettype || "swappliance"),reverse:true, itemtype: appdb.views.RelationListItemSWApplianceProject});
+	this.options = $.extend(true, this.options, {
+	    subjecttype: (o.subjecttype || "project"),
+	    targettype:(o.targettype || "swappliance"),
+	    reverse:true,
+	    itemtype: appdb.views.RelationListItemSWApplianceProject,
+	    preProcessData: appdb.views.RelationListProject.preProcessData
+	});
 });
 appdb.views.RelationListSWApplianceOrganization = appdb.ExtendClass(appdb.views.RelationListOrganization, "appdb.views.RelationListSWApplianceOrganization", function(o){
 	this.options = $.extend(true, this.options, {subjecttype: (o.subjecttype || "organization"),targettype:(o.targettype || "swappliance"),reverse:true, itemtype: appdb.views.RelationListItemSWApplianceOrganization});
