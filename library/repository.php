@@ -128,9 +128,6 @@ class Repository{
 		return self::$db;
 	}
 	
-	private static function getRepositoryApi(){
-		return $_SERVER["Repository_Api"];
-	}
 	static function __initClass(){
 		$registry   = Zend_Registry::getInstance();
 		self::$db = $registry['repository'];
