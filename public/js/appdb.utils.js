@@ -4934,10 +4934,10 @@ appdb.utils.EntityEditMapper.Application = function(entity){
 		for(i=0; i<len; i+=1){
 			if( $.trim(v) !== $.trim(d[i].id) ) continue;
 			if(d[i].id=="5"){
-				return {val: "Other"};
+				return {id:"5", val: "Other"};
 			}
 			if(val === $.trim((d[i].val()).toLowerCase()) || val == d[i].id){
-				return {val: d[i].val()};
+				return {id: d[i].id, val: d[i].val()};
 			}
 		}
 		
@@ -5010,7 +5010,7 @@ appdb.utils.EntityEditMapper.Application = function(entity){
 			len = v.length;
 			for(i=0; i<len; i+=1){
 				if($.isPlainObject(v[i])){
-					fixed = {val: v[i].name , link: v[i].link};
+					fixed = {id: "5", val: v[i].name , link: v[i].link};
 				}else{
 					fixed = this.fixMiddleware(v[i],i);
 				}
@@ -5019,6 +5019,7 @@ appdb.utils.EntityEditMapper.Application = function(entity){
 					if(fixed.link){
 						v[i].link = fixed.link;
 					}
+					v[i].id = fixed.id;
 				}
 			}
 		}
