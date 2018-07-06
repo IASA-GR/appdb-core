@@ -23620,7 +23620,11 @@ a.helperlink.wikilink:hover{
 .entityrelations.tabcontent .relationlist.viewmode .relationentitylistitem .website{
 	padding: 2px 10px;
 }
-
+.entityrelations.tabcontent .relationlist.viewmode .relationentitylistitem.project .website,
+.entityrelations.tabcontent .relationlist.viewmode .relationentitylistitem.project .duration {
+    display: inline-block;
+    padding: 0;
+}
 .relationlist > ul.relations.external > li > .relationtype > .relationsubject,
 .relationlist > ul.relations.external > li > .relationtype > .relationtarget,
 .relationlist > ul.relations.external > li > .relationtype > .relationverb{
