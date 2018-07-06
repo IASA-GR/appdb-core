@@ -21263,7 +21263,7 @@ appdb.views.RelationListItemProject = appdb.ExtendClass(appdb.views.RelationList
 			$(this.dom).find('.relationtype').find('.relationfund').remove();
 		} else {
 			$(this.dom).find('.relationtype').addClass('hasfunding').find('.relationfund').remove();
-			var chkbox = $('<div class="relationfund"><input type="checkbox" value="0"><label>funded</label></div>');
+			var chkbox = $('<div class="relationfund"><input type="checkbox" value="0"><label>funded by</label></div>');
 			var enabledCheckbox = (this.options.data && this.options.data.entity && this.options.data.entity.guid) ? true : false;
 			var checkedBox = (this.options.children && this.options.children.funding);
 

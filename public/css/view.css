@@ -23491,9 +23491,9 @@ a.helperlink.wikilink:hover{
 	margin-left: 10px;
 }
 .entityrelations.tabcontent .relationlist.editmode > ul.relations > li > .relationtype > .currentrelation{
-	width: 560px;
-	min-width: 560px;
-	max-width: 560px;
+	width: 572px;
+	min-width: 572px;
+	max-width: 572px;
 }
 .entityrelations.tabcontent .relationlist.editmode > ul.relations > li > .relationtype.hasfunding > .currentrelation {
         width: 490px;
@@ -23509,7 +23509,7 @@ a.helperlink.wikilink:hover{
         display: inline-block;
         padding: 0;
         position: relative;
-        width: 62px;
+        width: 78px;
         top: 2px;
 }
 .entityrelations.tabcontent .relationlist.editmode > ul.relations > li > .relationtype > .relationverb{
