@@ -33,9 +33,9 @@ class Repository_ContactsController extends Zend_Controller_Action {
 	
 	public function contactimageAction(){
 		$this->_helper->layout->disableLayout();
-        $this->_helper->viewRenderer->setNoRender();
+                $this->_helper->viewRenderer->setNoRender();
 		header('PRAGMA: NO-CACHE');
-        header('CACHE-CONTROL: NO-CACHE');
+                header('CACHE-CONTROL: NO-CACHE');
 		header('Content-type: image/png');
 		ob_start();
 		$text = new textPNG;
@@ -50,7 +50,6 @@ class Repository_ContactsController extends Zend_Controller_Action {
 			if( count($r->items) > 0 ){
 				$msg = $r->items[0]->email;
 			}
-
 		} else if( trim($pseudoid)!=="" && preg_match("/^[0-9a-zA-Z]+$/", $pseudoid) >0 ) {
 			$r = new Repository_Model_VMetaProductRepoAreaContacts();
 			$r->filter->id->equals($pseudoid);
@@ -70,7 +69,6 @@ class Repository_ContactsController extends Zend_Controller_Action {
 	
 	public function removeAction(){
 		$id = $this->_getParam("id");
-		error_log("entered remove...");
 		if( $_SERVER['REQUEST_METHOD'] !== "POST" || 
 			$_SERVER["Repository_Enabled"] !== 'true' ||
 			(is_numeric($id) === false ) ||
@@ -81,13 +79,15 @@ class Repository_ContactsController extends Zend_Controller_Action {
 		}
 		
 		header("Content-Type: text/xml");
-		$res = RepositoryContacts::remove($id, $this->session->userid);
-		error_log("removing " . $id . " for user " . $this->session->userid);
+                debug_log("[Repository::Contacts::Remove]: Removing " . $id . " for user " . $this->session->userid);
+                $swid = Repository::getSoftwareIdByContactId($id);
+                $res = RepositoryContacts::remove($id, $this->session->userid);
 		if( $res !== true ){
 			echo "<response error='" . $res . "'></response>";
 			return;
 		}
 		echo "<response success='true'>OK</response>";
+                Repository::markSoftwareAsUpdated($swid);
 	}
 	
 	public function addAction(){
@@ -113,13 +113,27 @@ class Repository_ContactsController extends Zend_Controller_Action {
 			header("Status: 404 Not Found");
 			return;
 		}
-		
+		$assocId = $data["assocId"];
+                $assocEntity = $data["assocEntity"];
 		header("Content-Type: text/xml");
 		$res = RepositoryContacts::add($data, $this->session->userid);
 		if( $res !== true ){
 			echo "<response error='" . $res . "'></response>";
 			return;
-		}
+		} else {
+                        switch($assocEntity) {
+                            case "release":
+                                Repository::markSoftwareAsUpdatedByReleaseId($assocId, $this->session->userid);
+                                break;
+                            case "repoarea":
+                            case "repo":
+                            case "area":
+                                Repository::markSoftwareAsUpdatedByRepoAreaId($assocId, $this->session->userid);
+                                break;
+                            default:
+                                break;
+                        }
+                }
 		echo "<response success='true' id='".$data->id."'>OK</response>";
 	}
 	

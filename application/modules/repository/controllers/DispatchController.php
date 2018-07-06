@@ -57,6 +57,7 @@ class Repository_DispatchController extends Zend_Controller_Action {
 		$result = true;
 		$result = RepositoryBackend::publish($id, $typename, $output);
 		echo $output;
+                Repository::markSoftwareAsUpdatedByReleaseId($id, $this->session->userid);
 	}
 	public function unpublishAction(){
 		$id = ( ( isset($_POST["id"]) )?$_POST["id"]:null );
@@ -87,7 +88,7 @@ class Repository_DispatchController extends Zend_Controller_Action {
 		$result = true;
 		$result = RepositoryBackend::unpublish($id, $typename, $output);
 		echo $output;
-		
+		Repository::markSoftwareAsUpdatedByReleaseId($id, $this->session->userid);
 	}
 	
 	public function buildrepositoriesAction(){
@@ -106,6 +107,7 @@ class Repository_DispatchController extends Zend_Controller_Action {
 		$result = true;
 		$result = RepositoryBackend::buildRepositories($id, $output);
 		echo $output;
+                Repository::markSoftwareAsUpdatedByReleaseId($id, $this->session->userid);
 	}
 	public function buildrepofilesAction(){
 		$id = ( ( isset($_POST["id"]) )?$_POST["id"]:null );
@@ -124,7 +126,8 @@ class Repository_DispatchController extends Zend_Controller_Action {
 		$output = "";
 		$result = true;
 		$result = RepositoryBackend::buildRepofiles($id, $output);
-		echo $output;
+                echo $output;
+                Repository::markSoftwareAsUpdatedByReleaseId($id, $this->session->userid);
 	}
 	
 	public function renameAction(){
@@ -162,8 +165,10 @@ class Repository_DispatchController extends Zend_Controller_Action {
 		header("Content-Type: text/xml");
 		if( $type == "release"){
 			$result = RepositoryBackend::renameReleaseVersion($id, $to, $output);
+                        Repository::markSoftwareAsUpdatedByReleaseId($id, $this->session->userid);
 		} else{
 			$result = RepositoryBackend::renameSeriesName($id, $to, $output);
+                        Repository::markSoftwareAsUpdatedByRepoAreaId($id, $this->session->userid);
 		}
 		echo $output;
 	}
@@ -202,9 +207,15 @@ class Repository_DispatchController extends Zend_Controller_Action {
 		$output = "";
 		header("Content-Type: text/xml");
 		if( $type == "release"){
+                        $swid = Repository::getSoftwareIdByProductReleaseId($id);
 			$result = RepositoryBackend::removeRelease($id, $userid, $output);
+                        debug_log('[Repository:Dispatch::remove] Update sw ' . $swid . ' after release ' . $id . ' removal');
+                        Repository::markSoftwareAsUpdated($swid, $userid);
 		} else{
+                        $swid = Repository::getSoftwareIdByRepoAreaId($id);
 			$result = RepositoryBackend::removeSeries($id, $userid, $output);
+                        debug_log('[Repository:Dispatch::remove] Update sw ' . $swid . ' after repo area ' . $id . ' removal');
+                        Repository::markSoftwareAsUpdated($swid, $userid);
 		}
 		echo $output;
 	}
@@ -216,7 +227,7 @@ class Repository_DispatchController extends Zend_Controller_Action {
 		$swid = ( ( isset($_POST["swid"]) )?$_POST["swid"]:"");
 		if( $ids !== null && is_array($ids)==false && is_numeric($ids)==true){
 			$ids = array($ids);
-		}debug_log("ACTION: " . $action);
+		}debug_log("[Repository::Dispatch::packages]: Action " . $action);
 		$userid = $this->session->userid;
 		if(in_array($action, array("mark","unmark","remove")) == false ){
 			$action = "";
@@ -249,6 +260,7 @@ class Repository_DispatchController extends Zend_Controller_Action {
 		header("Content-Type: text/xml");
 		if( $res === true ){
 			echo "<response success='true'>OK</response>";
+                        Repository::markSoftwareAsUpdated($swid, $userid);
 			return;
 		}else{
 			echo "<response>";
@@ -290,6 +302,7 @@ class Repository_DispatchController extends Zend_Controller_Action {
 		header("Content-Type: text/xml");
 		if( $res === true ){
 			echo "<response success='true'>OK</response>";
+                        Repository::markSoftwareAsUpdated($swid, $userid);
 			return;
 		}else{
 			echo "<response success='false'>";
@@ -308,7 +321,7 @@ class Repository_DispatchController extends Zend_Controller_Action {
 		if( $ids !== null && is_array($ids)==false && is_numeric($ids)==true){
 			$ids = array($ids);
 		}
-		debug_log($ids);
+		debug_log("[Repository::Dispatch::markpackages]: IDs " . $ids);
 		if( $_SERVER['REQUEST_METHOD'] != "POST" || 
 				$_SERVER["Repository_Enabled"] !== 'true' ||
 				is_numeric($userid) == false ||
@@ -325,6 +338,7 @@ class Repository_DispatchController extends Zend_Controller_Action {
 		header("Content-Type: text/xml");
 		if( $res === true ){
 			echo "<response success='true'>OK</response>";
+                        Repository::markSoftwareAsUpdated($swid, $userid);
 			return;
 		}else{
 			echo "<response success='false'>";
@@ -360,7 +374,8 @@ class Repository_DispatchController extends Zend_Controller_Action {
 		header("Content-Type: text/xml");
 		if( $res === true ){
 			echo "<response success='true'>OK</response>";
-			return;
+                        Repository::markSoftwareAsUpdated($swid, $userid);
+                        return;
 		}else{
 			echo "<response success='false'>";
 			for($i=0; $i<count($res); $i+=1){

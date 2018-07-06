@@ -187,7 +187,119 @@ class Repository{
 		}
 		return self::canManageRelease($swid,$userid);
 	}
-	
+        public static function getSoftwareIdByProductReleaseId($releaseid) {
+            $release_id = (is_numeric($releaseid)) ? intval($releaseid) : -1;
+
+            if ($release_id <= 0) {
+                    return;
+            }
+            try {
+                $releases = new Repository_Model_MetaProductReleases();
+                $releases->filter->id->numequals($release_id);
+                if (count($releases->items)) {
+                    $release = $releases->items[0];
+                    return $release->getSoftwareId();
+                }
+            } catch (Exception $ex) {
+
+            }
+
+            return null;
+        }
+        public static function getSoftwareIdByRepoAreaId($id) {
+            $repo = self::getRepositoryAreaById($id);
+            if ($repo) {
+                return $repo->SwId;
+            }
+            return null;
+        }
+        public static function markSoftwareAsUpdatedByRepoAreaId($id, $userid) {
+            $repo = self::getRepositoryAreaById($id);
+            if ($repo) {
+                return self::markSoftwareAsUpdated($repo->SwId, $userid);
+            }
+            return null;
+        }
+        public static function getSoftwareIdByContactId($id) {
+                $c = new Repository_Model_MetaContacts();
+                $c->filter->id->equals($id);
+
+                if( count($c->items) == 0 ){
+                        return null;
+                }
+
+                $contact = $c->items[0];
+                $assocEntity = $contact->assocentity;
+
+                switch($assocEntity){
+                        case "poa":
+                                return null;
+                        case "repoarea":
+                        case "repo":
+                        case "area":
+                                $repoArea = self::getRepositoryAreaById($contact->assocId);
+                                if($repoArea) {
+                                    return $repoArea->SwId;
+                                }
+                                return null;
+                        default:
+                                return self::getSoftwareIdByProductReleaseId($contact->assocId);
+                }
+        }
+        public static function markSoftwareAsUpdatedByContactId($id, $userid) {
+                $c = new Repository_Model_MetaContacts();
+                $c->filter->id->equals($id);
+
+                if( count($c->items) == 0 ){
+                        debug_log('[Repository::markSoftwareAsUpdatedByContactId]: Could not mark software update by contact id ' . $id);
+                        return null;
+                }
+
+                $contact = $c->items[0];
+                $assocEntity = $contact->assocentity;
+
+                switch($assocEntity){
+                        case "poa":
+                                return null;
+                        case "repoarea":
+                                $repoArea = self::getRepositoryAreaById($c->assocId);
+                                if($repoArea) {
+                                    return self::markSoftwareAsUpdated($repoArea->SwId, $userid);
+                                }
+                                return null;
+                        default:
+                                return self::markSoftwareAsUpdatedByReleaseId($c->assocId, $userid);
+                }
+        }
+        public static function markSoftwareAsUpdatedByReleaseId($releaseid) {
+            $swid = self::getSoftwareIdByProductReleaseId($releaseid);
+            self::markSoftwareAsUpdated($swid);
+        }
+	public static function markSoftwareAsUpdated($swid, $userid = null) {
+                $sw_id = (is_numeric($swid)) ? intval($swid) : -1;
+
+                if ($sw_id <= 0) {
+                        return;
+                }
+
+                try {
+                        $sws = new Default_Model_Applications();
+                        $f1 = new Default_Model_ApplicationsFilter();
+                        $f1->id->numequals($swid);
+                        $sws->filter->chain($f1, "AND");
+
+                        if (count($sws->items) > 0) {
+                                $sw = $sws->items[0];
+                                $sw->LastUpdated = 'NOW()';
+                                $sw->save();
+                                debug_log('[Repository::markSoftwareAsUpdated] Software ' . $sw_id . ' is marked as updated');
+                        } else {
+                                debug_log('[Repository::markSoftwareAsUpdated] Could not mark as updated Software ' . $sw_id . '. Reason: Not found');
+                        }
+                } catch (Exception $ex) {
+                    debug_log('[Repository::markSoftwareAsUpdated] Could not mark as updated Software ' . $sw_id . '. Reason: ' . $ex->getMessage());
+                }
+        }
 	public static function getProductBaseReleases($swid , $state = null){
 		$db = self::$db;
 		$q = "SELECT rl.id id, 
@@ -869,17 +981,17 @@ class Repository{
                 if( in_array($pckg->poaId, $poastocheck) == false ){
                     $poastocheck[] = $pckg->poaId;
                 }
-				$poa = Repository::getPoaById($pckg->poaId);
-				$filepath = "";
-				if( $poa ){
-					$error = "";
-					$filepath = RepositoryFS::getStoragePath($error) .  $poa->poaPath . $pckg->pkgFilename;
-				}
-				self::call_delete_package($pckg->id, $userid);
-				
-				if( trim($filepath) !== "" && file_exists($filepath)){
-					@rename($filepath, $filepath.".deleted." . $ids[$i]);
-				}
+                $poa = Repository::getPoaById($pckg->poaId);
+                $filepath = "";
+                if( $poa ){
+                        $error = "";
+                        $filepath = RepositoryFS::getStoragePath($error) .  $poa->poaPath . $pckg->pkgFilename;
+                }
+                self::call_delete_package($pckg->id, $userid);
+
+                if( trim($filepath) !== "" && file_exists($filepath)){
+                        @rename($filepath, $filepath.".deleted." . $ids[$i]);
+                }
             }
             //Clear poas
             if( count($poastocheck) > 0 ){
@@ -890,7 +1002,7 @@ class Repository{
                         $poa = $poas->items[0];
                         $pckgs = $poa->getPackages();
                         if(count($pckgs) == 0 ){
-							self::call_delete_poa($poa->id, $userid);
+                            self::call_delete_poa($poa->id, $userid);
                             //$poas->remove($poa);
                         }
                     }
