@@ -138,6 +138,7 @@ class Repository_RepositoryareaController extends Zend_Controller_Action {
 			echo RepositoryError::toXML($rl);
 		}else{
 			echo $res;
+                        Repository::markSoftwareAsUpdatedByRepoAreaId($id, $this->session->userid);
 		}
 	}
 }

@@ -221,10 +221,12 @@ class Repository_StorageController extends Zend_Controller_Action {
 			$pck = $pcks->items[0];
 			$xml = $pck->toXML(true);
 			$xml = RepositoryXSLT::transform($xml, "poapackage");
-			debug_log($xml);
+			debug_log("[Repository::Storage::upload]: XML " . $xml);
 			echo $xml;
 		}
 		echo '</upload></repository>';
+
+                Repository::markSoftwareAsUpdated($swid, $userid);
 		return;		
 	}
 	

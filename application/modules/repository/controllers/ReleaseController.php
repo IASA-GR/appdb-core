@@ -236,10 +236,10 @@ class Repository_ReleaseController extends Zend_Controller_Action {
 				if( count($rel->items) > 0 ){
 					$r = $rel->items[0];
 					$newrel = new RestRepositoryAreaItem(array("id" => $r->repoareaid));
-					
 					echo "<response id='".$id."'>";
 					echo $newrel->get();
 					echo "</response>";
+                                        Repository::markSoftwareAsUpdated($swid, $userid);
 				} else {
 					echo "<response error='Could not retrieve new product release information.'></response>";
 				}
@@ -320,7 +320,8 @@ class Repository_ReleaseController extends Zend_Controller_Action {
 			
 			$id = Repository::createRelease($swid, $displayVersion, $repoarea, $parentid);
 			if( is_numeric($id) == true ){
-				echo "<response id='".$id."'>success</response>";
+                                echo "<response id='".$id."'>success</response>";
+                                Repository::markSoftwareAsUpdated($swid, $this->session->userid);
 			} else if( trim($id) == "" ) {
 				echo "<response error='" . $id . "'></response>";
 			} else {
@@ -398,6 +399,7 @@ class Repository_ReleaseController extends Zend_Controller_Action {
 			echo RepositoryError::toXML($rl);
 		}else{
 			echo $res;
+                        Repository::markSoftwareAsUpdatedByReleaseId($id, $this->session->userid);
 		}
 	}
 	
