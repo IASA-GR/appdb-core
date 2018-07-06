@@ -955,7 +955,7 @@ BEGIN
 		_metatype := COALESCE((((xpath('/@metatype', xapp, appdb_xpathns()))[1])::TEXT)::INT, 0);
 	END IF;
 
-	IF ($2 = RM_PUT AND ((NOT xpath_exists('./application:discipline', xapp, appdb_xpathns())) OR (NOT xpath_exists('application:category', xapp, appdb_xpathns())))) THEN
+	IF ($2 = RM_PUT AND ((NOT xpath_exists('./discipline:discipline', xapp, appdb_xpathns())) OR (NOT xpath_exists('application:category', xapp, appdb_xpathns())))) THEN
 		RAISE EXCEPTION 'APPDB_REST_API_ERROR %', RE_INVALID_REPRESENTATION;
 	END IF;
 
