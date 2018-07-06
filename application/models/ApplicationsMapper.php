@@ -24,8 +24,8 @@ class Default_Model_ApplicationsMapper extends Default_Model_ApplicationsMapperB
 	public function populate(&$entry, $row) {
 		parent::populate($entry,$row);
 		$entry->setKeywords(pg_to_php_array($row->keywords));
-		$entry->setDisciplineID(pg_to_php_array($row->disciplineid));
-		$entry->setCategoryID(pg_to_php_array($row->categoryid));
+//		$entry->setDisciplineID(pg_to_php_array($row->disciplineid));
+//		$entry->setCategoryID(pg_to_php_array($row->categoryid));
 	}
 
 	public function save(Default_Model_Application $value) {

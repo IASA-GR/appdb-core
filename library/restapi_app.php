@@ -532,9 +532,9 @@ class RestAppXMLParser extends RestXMLParser {
      * @return Default_Model_Application
      *
      */
-    public function parse($xml) {
+	public function parse($xml) {
 		global $application;
-
+		error_log("START APP XML PARSING"); $TTT1 = microtime(true);
         if ( ! is_null($this->_user) ) {
 			$app = new Default_Model_Application();
 			try {
@@ -551,6 +551,53 @@ class RestAppXMLParser extends RestXMLParser {
 				return $app;
 			}
 			$xml = $xmli[0];
+
+			$TTTx1 = microtime(true);
+			try {
+				db()->setFetchMode(Zend_Db::FETCH_BOTH);
+				$dbres = db()->query("SELECT consume_app(?, ?, ?)", array(
+					RestAPIHelper::wrapResponse($xml->saveXML(), null, null, null, null, null, null, null, true),
+					$this->_parent->getMethod(),
+					$this->_parent->getUser()->id
+				))->fetchAll();
+			} catch (Exception $e) {
+				if (strpos($e->getMessage(), "APPDB_REST_API_ERROR") === false) {
+					$this->_error = RestErrorEnum::RE_BACKEND_ERROR;
+					$this->_extError = "DEBUG DATA: ".base64_encode(encrypt($e->getMessage(), substr(ApplicationConfiguration::api('key',''), 0, 8)));
+				} else {
+					error_log($e->getMessage());
+					$errmsg = preg_replace('/.*APPDB_REST_API_ERROR /', '', $e->getMessage());
+					$pos1 = strpos($errmsg, ',');
+					if ($pos1 === false) {
+						$errnum = $errmsg;
+						$errmsg = null;
+					} else {
+						$errnum = substr($errmsg, 0, $pos1);
+						$errmsg = substr($errmsg, $pos1 + 1);
+					}
+					$this->_error = $errnum;
+					if (! is_null($errmsg)) {
+						$this->_extError = $errmsg;
+					}
+				}
+				return $app;
+			}
+			$ok = false;
+			if (is_array($dbres) && count($dbres) > 0) {
+				$dbres = json_decode($dbres[0]->consume_app, true);
+				if (array_key_exists("id", $dbres) && array_key_exists("guid", $dbres)) {
+					$app->id = $dbres["id"];
+					$app->guid = $dbres["guid"];
+					$ok = true;
+				}
+			}
+			if (! $ok) {
+				$this->_error = RestErrorEnum::RE_BACKEND_ERROR;
+				return $app;
+			}
+			$TTTx2 = microtime(true);
+
+/*###			
 			if ( $this->_parent->getMethod() === RestMethodEnum::RM_POST ) {
 				if ( $xml->attributes()->id ) {
 					$app->id = strval($xml->attributes()->id);
@@ -689,6 +736,8 @@ class RestAppXMLParser extends RestXMLParser {
 //            if ( $sync ) {
 //                TODO: add extra sync code
 //            }
+###*/
+
 			if ( $this->_user->privs->canModifyApplicationLogo($app) ) {
 				$logo = $this->el($xml, "application:logo");
 				$removeLogoCache = false;
@@ -753,7 +802,8 @@ class RestAppXMLParser extends RestXMLParser {
 
 				}
 			}                    
-			
+
+/*###
 			//Set metatype of application (0: software 1: vappliance 2:swappliance )
 			if ( $this->_parent->getMethod() === RestMethodEnum::RM_PUT || $this->_parent->getMethod() === RestMethodEnum::RM_POST){
 				if( is_numeric(strval($xml->attributes()->metatype)) && 
@@ -848,8 +898,11 @@ class RestAppXMLParser extends RestXMLParser {
 				$data = $this->buildCollection($xml, "//application:category", "categoryID");
 				$this->syncDBCollection("appid", $app->id, "categoryid", "AppCategories", "AppCategory", $data);
 			}
+
+###*/			
 			/* set primary category */
-			if ( count($xml->xpath('//application:category[@primary="true"]')) > 0 ) {
+/*###
+ 			if ( count($xml->xpath('//application:category[@primary="true"]')) > 0 ) {
 				$catid = $xml->xpath('//application:category[@primary="true"]');
 				$catid = strval($catid[0]->attributes()->id);
 				// This is MUCH faster than using the model
@@ -861,9 +914,11 @@ class RestAppXMLParser extends RestXMLParser {
 //					$cat->isPrimary = true;
 //					$cat->save();
 //				}
-			}
+			} 
+###*/
 
 			/* */
+/*###			
 			if ( $this->_user->privs->canModifyApplicationLanguage($app) ) {
 				$data = $this->buildCollection($xml, "//application:language", "proglangID");
 				$this->syncDBCollection("appid", $app->id, "proglangid", "AppProgLangs", "AppProgLang", $data);
@@ -916,7 +971,7 @@ class RestAppXMLParser extends RestXMLParser {
 				if ( is_null($data) ) $data = array();
 				$this->syncDBCollection("appid", $app->id, "licenseid", "AppLicenses", "AppLicense", $data, "license");
 			}
-
+###*/
 			if ( $this->_user->privs->canModifyApplicationDocuments($app) ) {
 				$xmli = $xml->xpath("publication:publication");
                 $docdata = null;
@@ -1095,6 +1150,8 @@ class RestAppXMLParser extends RestXMLParser {
 				}
 			}
 		}
+		$TTT2 = microtime(true); error_log("PARSE APP XML END"); error_log("took " . ($TTT2 - $TTT1) . "s"); 
+		error_log((($TTT2 - $TTT1) - ($TTTx2 - $TTTx1)) . "s in PHP for publications, relations, and logo, " . ($TTTx2 - $TTTx1) . "s in PL/pgSQL for everything else");
 		$this->_error = RestErrorEnum::RE_OK;
 		return $app;	
 	}

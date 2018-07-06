@@ -2001,7 +2001,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
         if ( $this->_logfile != '' ) {
 			if ( strval($old) != strval($new) ) {
                 $now = new DateTime();
-                $f = fopen($this->_logfile, "a");
+                $f = @fopen($this->_logfile, "a");
 				if ($f !== false) {
 					error_log('Acquiring exclusive lock on logfile "' . $this->_logfile . '"');
 					if ( flock($f, LOCK_EX) ) {
