@@ -972,7 +972,7 @@ class RestAppXMLParser extends RestXMLParser {
 				$this->syncDBCollection("appid", $app->id, "licenseid", "AppLicenses", "AppLicense", $data, "license");
 			}
 ###*/
-			if ( $this->_user->privs->canModifyApplicationDocuments($app) ) {
+/*###		if ( $this->_user->privs->canModifyApplicationDocuments($app) ) {
 				$xmli = $xml->xpath("publication:publication");
                 $docdata = null;
                 if ( count($xmli) != 0 ) {
@@ -1067,7 +1067,7 @@ class RestAppXMLParser extends RestXMLParser {
                     }	
                 }
 			}
-			
+###*/			
 			if ( $this->_parent->getMethod() === RestMethodEnum::RM_POST) {
 				$xrels = $xml->xpath("application:relation");
 				$ps = new Default_Model_Applications();
