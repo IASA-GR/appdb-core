@@ -5475,7 +5475,6 @@ class RestAppVAXMLParser extends RestXMLParser {
 			return false;
 		}
 		return $m;
-		
 	}
 	public function parse($xml) {
 		$vapp = null;
@@ -5489,8 +5488,8 @@ class RestAppVAXMLParser extends RestXMLParser {
 				$this->_error = RestErrorEnum::RE_INVALID_REPRESENTATION;
 				$this->_extError = 'Could not parse XML: ' . $e->getMessage();
 				return new Default_Model_VA();
-            }
-            $this->_xml = $xml;
+                        }
+                        $this->_xml = $xml;
 			if( count($xml->xpath("//vmc2appdb")) > 0 ){
 				$xml = VMCaster::transformXml($originalxml);
 				try {
@@ -5520,6 +5519,22 @@ class RestAppVAXMLParser extends RestXMLParser {
 				$this->_setErrorMessage($result);
 				return false;
 			}
+                        try {
+                                $apps = new Default_Model_Applications();
+                                $f1 = new Default_Model_ApplicationsFilter();
+                                $f1->id->numequals($this->appid);
+                                $apps->filter->chain($f1, "AND");
+
+                                if (count($apps->items) > 0) {
+                                        $app = $apps->items[0];
+                                        $app->LastUpdated = 'NOW()';
+                                        $app->save();
+                                } else {
+                                    error_log('[RestAppVAXMLParser::parse]: Could not set lastUpdated field of application ' . $this->appid . '. Reason: No application found with this id.');
+                                }
+                        } catch (Exception $ex) {
+                                error_log('[RestAppVAXMLParser::parse]: Could not set lastUpdated field of application ' . $this->appid . '. Reason: ' . $ex->getMessage());
+                        }
 			return $vapp;
 		} else {
 			$this->_error = RestErrorEnum::RE_ACCESS_DENIED;
