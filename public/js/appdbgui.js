@@ -1999,15 +1999,17 @@ String.prototype.replaceAll = function(search, replacement) {
         }).create({},{
             success: function(d) {
                 var s = '', by, evt;
-				if ( d.history && d.history.id) {
+				if ( d.history ) {
                     h = d.history;if ( ! $.isArray(h) ) h = [h];
                     for(var i=0; i<h.length; i++) {
-                        if ( h[i].userid ) by = ' by <a target="_blank" href="/store/person/'+h[i].username+'" onclick="return appdb.views.Main.showPerson({id: '+h[i].userid+', cname:\''+h[i].usercname+'\'},{mainTitle: \''+h[i].username+'\'});">' + h[i].username + (h[i].usercontact != '' ? ' ('+h[i].usercontact+')' : '') + '</a>'; else by = h[i].username + (h[i].usercontact != '' ? ' ('+h[i].usercontact+')' : '');
-						evt = h[i].event;
-						if ( evt == "update" && h[i].disposition === "rollback" ) evt = "rollback";
-						var diff = '<a href="#" onclick="appHistoryDiff(' + id + ', \'' + h[i].id + '\');">[DIFF]</a>';
-						s = s + '<li><a href="#" onclick="return appdb.views.Main.showApplication({id: '+id+', cname: appdb.pages.application.currentCName() + \'/history/' + h[i].id + '\', histid: \''+h[i].id+'\', histtype: 0});">'+appdb.utils.formatDate(h[i].timestamp) + "</a>: "+ evt + by + ' ' + diff + 
-						'</li>';
+						if (h[i].id) {
+							if ( h[i].userid ) by = ' by <a target="_blank" href="/store/person/'+h[i].usercname+'" onclick="return appdb.views.Main.showPerson({id: '+h[i].userid+', cname:\''+h[i].usercname+'\'},{mainTitle: \''+h[i].username+'\'});">' + h[i].username + '</a>'; else by = h[i].username + (h[i].usercontact != '' ? ' ('+h[i].usercontact+')' : '');
+							evt = h[i].event;
+							if ( evt == "update" && h[i].disposition === "rollback" ) evt = "rollback";
+							var diff = '<a href="#" onclick="appHistoryDiff(' + id + ', \'' + h[i].id + '\');">[DIFF]</a>';
+							s = s + '<li><a href="#" onclick="return appdb.views.Main.showApplication({id: '+id+', cname: appdb.pages.application.currentCName() + \'/history/' + h[i].id + '\', histid: \''+h[i].id+'\', histtype: 0});">'+appdb.utils.formatDate(h[i].timestamp) + "</a>: "+ evt + by + ' ' + diff + 
+							'</li>';
+						}
                     }
 					s = '<div><h3><a style="font-size: 110%; margin-left: -24px;" href="#" onclick="return appdb.views.Main.showApplication({id: '+id+', cname: appdb.pages.application.currentCName(), name: appdb.pages.application.currentName()});">View current state</a></h3></div>' + s;
                 }
