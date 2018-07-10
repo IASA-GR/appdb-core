@@ -139,151 +139,156 @@ CREATE OR REPLACE FUNCTION public.consume_doc(
   RETURNS text AS
 $BODY$
 DECLARE
-	_docid INT;
-	_appid INT;
-	xtmp XML[];
-	xdoc XML;
+        _docid INT;
+        _appid INT;
+        xtmp XML[];
+        xdoc XML;
 BEGIN
-	xdoc := $1::XML;
-	_appid := $2;
-	_docid := (((xpath('./@id', xdoc, appdb_xpathns()))[1])::TEXT)::INT AS xid;
+        xdoc := $1::XML;
+        _appid := $2;
+        _docid := (((xpath('./@id', xdoc, appdb_xpathns()))[1])::TEXT)::INT AS xid;
 
-	-- prevent overwriting other app's publications data
-	IF EXISTS (SELECT 1 FROM appdocuments WHERE id = _docid AND appid <> _appid) THEN
-		RETURN NULL;
-	END IF;
+        -- prevent overwriting other app's publications data
+        IF EXISTS (SELECT 1 FROM appdocuments WHERE id = _docid AND appid <> _appid) THEN
+                RETURN NULL;
+        END IF;
 
-	IF NOT _docid IS NULL THEN
-		WITH x AS (
+        IF NOT _docid IS NULL THEN
+                WITH x AS (
+                        SELECT
+                                unescapexml(((xpath('./publication:title/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xtitle,
+                                unescapexml(((xpath('./publication:url/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xurl,
+                                unescapexml(((xpath('./publication:conference/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xconference,
+                                unescapexml(((xpath('./publication:proceedings/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xproceedings,
+                                unescapexml(((xpath('./publication:isbn/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xisbn,
+                                (((xpath('./publication:startPage/text()', xdoc, appdb_xpathns()))[1])::TEXT)::INT AS xstartpage,
+                                (((xpath('./publication:endPage/text()', xdoc, appdb_xpathns()))[1])::TEXT)::INT AS xendpage,
+                                unescapexml(((xpath('./publication:volume/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xvolume,
+                                unescapexml(((xpath('./publication:publisher/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xpublisher,
+                                unescapexml(((xpath('./publication:journal/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xjournal,
+                                (((xpath('./publication:year/text()', xdoc, appdb_xpathns()))[1])::TEXT)::INT AS xyear,
+                                (((xpath('./publication:type/@id', xdoc, appdb_xpathns()))[1])::TEXT)::INT AS xtype,
+                                CASE
+                                        WHEN NOT (xpath('./publication:author[@main="true" and @type="internal"]', xdoc, appdb_xpathns()))[1] IS NULL THEN
+                                                (SELECT name FROM researchers WHERE id = (((xpath('./publication:author[@main="true" and @type="internal"]/person:person/@id', xdoc, appdb_xpathns()))[1])::TEXT)::INT)
+                                        ELSE
+                                                unescapexml(((xpath('./publication:author[@main="true" and @type="external"]/publication:extAuthor/text()', xdoc, appdb_xpathns()))[1])::TEXT)
+                                END AS xmainauthor
+                )
+                UPDATE appdocuments
+                        SET
+                                title = xtitle,
+                                url = xurl,
+                                conference = xconference,
+                                proceedings = xproceedings,
+                                isbn = xisbn,
+                                pagestart = xstartpage,
+                                pageend = xendpage,
+                                volume = xvolume,
+                                publisher = xpublisher,
+                                "year" = xyear,
+                                doctypeid = xtype,
+                                journal = xjournal,
+                                mainauthor = xmainauthor
+                FROM x
+                WHERE (id = _docid) AND (appid = _appid);
+        ELSE
+                WITH x AS (
+                SELECT
+                        unescapexml(((xpath('./publication:title/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xtitle,
+                        unescapexml(((xpath('./publication:url/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xurl,
+                        unescapexml(((xpath('./publication:conference/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xconference,
+                        unescapexml(((xpath('./publication:proceedings/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xproceedings,
+                        unescapexml(((xpath('./publication:isbn/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xisbn,
+                        (((xpath('./publication:startPage/text()', xdoc, appdb_xpathns()))[1])::TEXT)::INT AS xstartpage,
+                        (((xpath('./publication:endPage/text()', xdoc, appdb_xpathns()))[1])::TEXT)::INT AS xendpage,
+                        unescapexml(((xpath('./publication:volume/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xvolume,
+                        unescapexml(((xpath('./publication:publisher/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xpublisher,
+                        unescapexml(((xpath('./publication:journal/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xjournal,
+                        (((xpath('./publication:year/text()', xdoc, appdb_xpathns()))[1])::TEXT)::INT AS xyear,
+                        (((xpath('./publication:type/@id', xdoc, appdb_xpathns()))[1])::TEXT)::INT AS xtype,
+                        CASE
+                                WHEN NOT (xpath('./publication:author[@main="true" and @type="internal"]', xdoc, appdb_xpathns()))[1] IS NULL THEN
+                                        (SELECT name FROM researchers WHERE id = (((xpath('./publication:author[@main="true" and @type="internal"]/person:person/@id', xdoc, appdb_xpathns()))[1])::TEXT)::INT)
+                                ELSE
+                                        unescapexml(((xpath('./publication:author[@main="true" and @type="external"]/publication:extAuthor/text()', xdoc, appdb_xpathns()))[1])::TEXT)
+                         END AS xmainauthor
+                ) INSERT INTO appdocuments (appid, title, url, conference, proceedings, isbn, pagestart, pageend, volume, publisher, "year", mainauthor, doctypeid, journal)
+                SELECT
+                        _appid,
+                        xtitle,
+                        xurl,
+                        xconference,
+                        xproceedings,
+                        xisbn,
+                        xstartpage,
+                        xendpage,
+                        xvolume,
+                        xpublisher,
+                        xyear,
+                        xmainauthor,
+                        xtype,
+                        xjournal
+                FROM x
+                RETURNING id INTO _docid;
+        END IF;
+
+        -- sync external authors
+        IF xpath_exists('./publication:author[@type="external"]', xdoc, appdb_xpathns()) THEN
+                xtmp := xpath('./publication:author[@type="external"]', xdoc, appdb_xpathns());
+                WITH xext AS (
 			SELECT
-				unescapexml(((xpath('./publication:title/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xtitle,
-				unescapexml(((xpath('./publication:url/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xurl,
-				unescapexml(((xpath('./publication:conference/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xconference,
-				unescapexml(((xpath('./publication:proceedings/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xproceedings,
-				unescapexml(((xpath('./publication:isbn/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xisbn,
-				(((xpath('./publication:startPage/text()', xdoc, appdb_xpathns()))[1])::TEXT)::INT AS xstartpage,
-				(((xpath('./publication:endPage/text()', xdoc, appdb_xpathns()))[1])::TEXT)::INT AS xendpage,
-				unescapexml(((xpath('./publication:volume/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xvolume,
-				unescapexml(((xpath('./publication:publisher/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xpublisher,
-				unescapexml(((xpath('./publication:journal/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xjournal,
-				(((xpath('./publication:year/text()', xdoc, appdb_xpathns()))[1])::TEXT)::INT AS xyear,
-				(((xpath('./publication:type/@id', xdoc, appdb_xpathns()))[1])::TEXT)::INT AS xtype,
-				CASE
-					WHEN NOT (xpath('./publication:author[@main="true" and @type="internal"]', xdoc, appdb_xpathns()))[1] IS NULL THEN
-						(SELECT name FROM researchers WHERE id = (((xpath('./publication:author[@main="true" and @type="internal"]/person:person/@id', xdoc, appdb_xpathns()))[1])::TEXT)::INT)
-					ELSE
-						unescapexml(((xpath('./publication:author[@main="true" and @type="external"]/publication:extAuthor/text()', xdoc, appdb_xpathns()))[1])::TEXT)
-				END AS xmainauthor
-		)
-		UPDATE appdocuments
-			SET
-				title = xtitle,
-				url = xurl,
-				conference = xconference,
-				proceedings = xproceedings,
-				isbn = xisbn,
-				pagestart = xstartpage,
-				pageend = xendpage,
-				volume = xvolume,
-				publisher = xpublisher,
-				"year" = xyear,
-				doctypeid = xtype,
-				journal = xjournal,
-				mainauthor = xmainauthor
-		FROM x
-		WHERE (id = _docid) AND (appid = _appid);
-	ELSE
-		WITH x AS (
-		SELECT
-			unescapexml(((xpath('./publication:title/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xtitle,
-			unescapexml(((xpath('./publication:url/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xurl,
-			unescapexml(((xpath('./publication:conference/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xconference,
-			unescapexml(((xpath('./publication:proceedings/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xproceedings,
-			unescapexml(((xpath('./publication:isbn/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xisbn,
-			(((xpath('./publication:startPage/text()', xdoc, appdb_xpathns()))[1])::TEXT)::INT AS xstartpage,
-			(((xpath('./publication:endPage/text()', xdoc, appdb_xpathns()))[1])::TEXT)::INT AS xendpage,
-			unescapexml(((xpath('./publication:volume/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xvolume,
-			unescapexml(((xpath('./publication:publisher/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xpublisher,
-			unescapexml(((xpath('./publication:journal/text()', xdoc, appdb_xpathns()))[1])::TEXT) AS xjournal,
-			(((xpath('./publication:year/text()', xdoc, appdb_xpathns()))[1])::TEXT)::INT AS xyear,
-			(((xpath('./publication:type/@id', xdoc, appdb_xpathns()))[1])::TEXT)::INT AS xtype,
-			CASE
-				WHEN NOT (xpath('./publication:author[@main="true" and @type="internal"]', xdoc, appdb_xpathns()))[1] IS NULL THEN
-					(SELECT name FROM researchers WHERE id = (((xpath('./publication:author[@main="true" and @type="internal"]/person:person/@id', xdoc, appdb_xpathns()))[1])::TEXT)::INT)
-				ELSE
-					unescapexml(((xpath('./publication:author[@main="true" and @type="external"]/publication:extAuthor/text()', xdoc, appdb_xpathns()))[1])::TEXT)
-			 END AS xmainauthor
-		) INSERT INTO appdocuments (appid, title, url, conference, proceedings, isbn, pagestart, pageend, volume, publisher, "year", mainauthor, doctypeid, journal)
-		SELECT
-			_appid,
-			xtitle,
-			xurl,
-			xconference,
-			xproceedings,
-			xisbn,
-			xstartpage,
-			xendpage,
-			xvolume,
-			xpublisher,
-			xyear,
-			xmainauthor,
-			xtype,
-			xjournal
-		FROM x
-		RETURNING id INTO _docid;
-	END IF;
-
-	-- sync external authors
-	IF xpath_exists('./publication:author[@type="external"]', xdoc, appdb_xpathns()) THEN
-		xtmp := xpath('./publication:author[@type="external"]', xdoc, appdb_xpathns());
-		DELETE FROM extauthors
-		WHERE (docid = _docid) AND NOT (author = ANY(unescapexml(xpath('./publication:extAuthor/text()', xtmp, appdb_xpathns())::TEXT[])));
-		 --FIXME: author = ANY ... should be case-insensitive
-
-		WITH xauth AS (
-			SELECT
-				(((xpath('./@main', x, appdb_xpathns()))[1])::TEXT)::BOOLEAN AS xmain,
-				unescapexml(((xpath('./publication:extAuthor/text()', x, appdb_xpathns()))[1])::TEXT) AS xauthor
-			FROM UNNEST(xtmp::TEXT[]) AS x
-		) INSERT INTO extauthors (docid, author, main)
-		SELECT
-			_docid,
-			xauthor,
-			COALESCE(xmain, FALSE)
-		FROM xauth
-		WHERE NOT (xauthor IS NULL) AND NOT EXISTS (SELECT 1 FROM extauthors WHERE (docid = _docid) AND LOWER(author) = LOWER(xauthor));
-	END IF;
-
-
-	-- sync internal authors
-	IF xpath_exists('./publication:author[@type="internal"]', xdoc, appdb_xpathns()) THEN
-		DELETE FROM intauthors
-		WHERE (docid = _docid) AND NOT (
-			authorid = ANY(
-				((xpath(
-					'./publication:author[@type="internal"]/person:person/@id'::TEXT,
-					xdoc,
-					appdb_xpathns()
-				))::TEXT[])::INT[]
-			)
-		);
-
-		xtmp := xpath('./publication:author[@type="internal"]', xdoc, appdb_xpathns());
-		WITH xauth AS (
-			SELECT
-				(((xpath('./@main', x, appdb_xpathns()))[1])::TEXT)::BOOLEAN AS xmain,
-				(((xpath('./person:person/@id', x, appdb_xpathns()))[1])::TEXT)::INT AS xauthorid
+				unescapexml((xpath('./publication:extAuthor/text()', x, appdb_xpathns()))[1]::TEXT) AS x
 			FROM UNNEST(xtmp) AS x
-		) INSERT INTO intauthors (docid, authorid, main)
-		SELECT
-			_docid,
-			xauthorid,
-			COALESCE(xmain, FALSE)
-		FROM xauth
-		WHERE NOT (xauthorid IS NULL) AND NOT EXISTS (SELECT 1 FROM intauthors WHERE (docid = _docid) AND (authorid = xauthorid));
-	END IF;
+                )
+		DELETE FROM extauthors
+                WHERE (docid = _docid) AND NOT (LOWER(author) IN (SELECT LOWER(x) FROM xext));
+                 --FIXME: author = ANY ... should be case-insensitive
 
-	RETURN '{"id": ' || _docid::TEXT || ', "guid": "' || (SELECT guid::TEXT FROM appdocuments WHERE id = _docid) || '"}';
+                WITH xauth AS (
+                        SELECT
+                                (((xpath('./@main', x, appdb_xpathns()))[1])::TEXT)::BOOLEAN AS xmain,
+                                unescapexml(((xpath('./publication:extAuthor/text()', x, appdb_xpathns()))[1])::TEXT) AS xauthor
+                        FROM UNNEST(xtmp) AS x
+                ) INSERT INTO extauthors (docid, author, main)
+                SELECT
+                        _docid,
+                        xauthor,
+                        COALESCE(xmain, FALSE)
+                FROM xauth
+                WHERE NOT (xauthor IS NULL) AND NOT EXISTS (SELECT 1 FROM extauthors WHERE (docid = _docid) AND LOWER(author) = LOWER(xauthor));
+        END IF;
+
+
+        -- sync internal authors
+        IF xpath_exists('./publication:author[@type="internal"]', xdoc, appdb_xpathns()) THEN
+                DELETE FROM intauthors
+                WHERE (docid = _docid) AND NOT (
+                        authorid = ANY(
+                                ((xpath(
+                                        './publication:author[@type="internal"]/person:person/@id'::TEXT,
+                                        xdoc,
+                                        appdb_xpathns()
+                                ))::TEXT[])::INT[]
+                        )
+                );
+
+                xtmp := xpath('./publication:author[@type="internal"]', xdoc, appdb_xpathns());
+                WITH xauth AS (
+                        SELECT
+                                (((xpath('./@main', x, appdb_xpathns()))[1])::TEXT)::BOOLEAN AS xmain,
+                                (((xpath('./person:person/@id', x, appdb_xpathns()))[1])::TEXT)::INT AS xauthorid
+                        FROM UNNEST(xtmp) AS x
+                ) INSERT INTO intauthors (docid, authorid, main)
+                SELECT
+                        _docid,
+                        xauthorid,
+                        COALESCE(xmain, FALSE)
+                FROM xauth
+                WHERE NOT (xauthorid IS NULL) AND NOT EXISTS (SELECT 1 FROM intauthors WHERE (docid = _docid) AND (authorid = xauthorid));
+        END IF;
+
+        RETURN '{"id": ' || _docid::TEXT || ', "guid": "' || (SELECT guid::TEXT FROM appdocuments WHERE id = _docid) || '"}';
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
