@@ -41,15 +41,20 @@ DECLARE
 	ttmp TEXT[];
 	doc appdocuments;
 	auth extauthors;
+	intauth intauthors;
 	dt TEXT;
 	ret TEXT;
 	auths extauthors[];
+	intauths intauthors[];
+	atype TEXT;
 BEGIN
 	ret := '[';
 	xin := REPLACE(xin, 'xmlns="http://www.loc.gov/mods/v3"', '');
 	IF xpath_exists('//modsCollection/mods', xin::XML) THEN
 		xmods := xpath('//modsCollection/mods', xin::XML);
 		FOR i in 1..ARRAY_LENGTH(xmods, 1) LOOP
+			auths := NULL::extauthors[];
+			intauths := NULL::intauthors[];
 			doc.appid := $2;
 			doc.title := unescapexml(XTRIM((xpath('./titleInfo/title/text()', xmods[i]))[1]::TEXT));
 			doc.year := unescapexml(XTRIM((xpath('./originInfo/dateIssued/text()', xmods[i]))[1]::TEXT));
@@ -84,11 +89,18 @@ BEGIN
 						IF (xpath('./role/roleTerm[@type="text"]/text()', xauths[j]))[1]::TEXT = 'author' THEN
 							IF xpath_exists('./namePart[@type="given"]', xauths[j]) THEN
 								xtmp := xpath('./namePart[@type="given"]/text()', xauths[j]);
+								atype := 'external';
+								auth.main := FALSE;
+								intauth.main := FALSE;
 								auth.author := '';
 								FOR k in 1..ARRAY_LENGTH(xtmp, 1) LOOP
 									auth.author := auth.author || unescapexml(XTRIM(COALESCE(xtmp[k]::TEXT))) || ' ';
 								END LOOP;
 								auth.author := XTRIM(auth.author || unescapexml(XTRIM(COALESCE((xpath('./namePart[@type="family"]/text()', xauths[j]))[1]::TEXT))));
+								IF (NOT ($2 IS NULL)) AND EXISTS (SELECT 1 FROM researchers_apps ra INNER JOIN researchers r ON r.id = ra.researcherid WHERE (ra.appid = $2) AND (r.name = auth.author)) THEN
+									atype := 'internal';
+									intauth.authorid = (SELECT ra.researcherid FROM researchers_apps ra INNER JOIN researchers r ON r.id = ra.researcherid WHERE (ra.appid = $2) AND (r.name = auth.author));
+								END IF;
 							END IF;
 						-- ELSE
 							-- RAISE NOTICE 'not an author';
@@ -97,16 +109,19 @@ BEGIN
 						-- RAISE NOTICE 'no ./namePart';
 					END IF;
 					IF j = 1 THEN
-						auth.main := TRUE;
-						doc.mainauthor := auth.author;
-					ELSE
-						auth.main := FALSE;
+						IF atype = 'external' THEN
+							auth.main := TRUE;
+							doc.mainauthor := auth.author;
+							auths := auths || ARRAY[auth];
+						ELSE
+							intauth.main := TRUE;
+							doc.mainauthor := (SELECT name FROM researchers WHERE id = intauth.authorid);
+							intauths := intauths || ARRAY[intauth];
+						END IF;
 					END IF;
-					-- RAISE NOTICE 'auth: %', auth;
-					auths := auths || ARRAY[auth];
 				END LOOP; -- authors
 			END IF;
-			ret := ret || jsonb_insert(to_json(doc)::JSONB, '{authors}', to_json(auths)::JSONB)::JSON::TEXT || ',';
+			ret := ret || jsonb_insert(jsonb_insert(to_json(doc)::JSONB, '{extauthors}', COALESCE(to_json(auths)::JSONB, '[]'::JSONB)), '{intauthors}', COALESCE(to_json(intauths)::JSONB, '[]'::JSONB))::JSON::TEXT || ',';
 		END LOOP; -- documents;
 	-- ELSE
 		-- RAISE NOTICE 'No modsCollection/mods found!';
@@ -115,10 +130,9 @@ BEGIN
 	IF ret = '[]' THEN
 		ret := NULL;
 	END IF;
-	RETURN REGEXP_REPLACE(ret, ',]$', ']');
+	RETURN REPLACE(REGEXP_REPLACE(ret, ',]$', ']'), '": []', '": null');
 END;
 $$ LANGUAGE plpgsql;
-ALTER FUNCTION mods2doc(text,int) OWNER TO appdb;
 COMMIT;
 
 INSERT INTO version (major,minor,revision,notes) 
