@@ -2476,7 +2476,68 @@ class AppsController extends Zend_Controller_Action
 		echo json_encode( array("result" => array("success" => true, "versions"=> $versions) ) );
 	}
 	
-        
+	public function importdocAction() {
+		$this->_helper->layout->disableLayout();
+		$this->_helper->viewRenderer->setNoRender();
+		$t = $this->getParam("t");
+		$d = $this->getParam("d");
+		if (isset($t) && isset($d)) {
+			switch ($t) {
+				case "bibtex":
+					$fbib = tmpfile();
+					$fbibname = stream_get_meta_data($fbib)['uri'];
+					$fmods = tmpfile();
+					$fmodsname = stream_get_meta_data($fmods)['uri'];
+					fwrite($fbib, $d);
+					error_log("$fbibname --> $fmodsname");
+					error_log(APPLICATION_PATH . "/../bibutils/bib2xml $fbibname > $fmodsname");
+					exec(APPLICATION_PATH . "/../bibutils/bib2xml $fbibname > $fmodsname");
+					$mods = str_replace('<' . '?xml version="1.0" encoding="UTF-8"?' . '>', "", file_get_contents($fmodsname));
+					break;
+				case "mods":
+					$mods = $d;
+					break;
+				default:
+					error_log("bad type: $t");
+					$this->getResponse()->clearAllHeaders();
+					$this->getResponse()->setRawHeader("HTTP/1.0 400 Bad request");
+					$this->getResponse()->setHeader("Status","400 Bad request");
+					return;
+			}
+			db()->setFetchMode(Zend_Db::FETCH_NUM);
+			error_log("mods: " . var_export($mods, true));
+			$res = db()->query(
+				"SELECT mods2doc(?, ?)",
+				array(
+					$mods,
+					isset($_GET["appid"]) ? $_GET["appid"] : NULL
+				)
+			)->fetchAll();
+		} else {
+			error_log("bad args");
+			$this->getResponse()->clearAllHeaders();
+			$this->getResponse()->setRawHeader("HTTP/1.0 400 Bad request");
+			$this->getResponse()->setHeader("Status","400 Bad request");
+			return;
+		}
+		$ok = false;
+		if (is_array($res)) {
+			if (count($res) > 0) {
+				$res = $res[0];
+				$res = $res[0];
+				$ok = true;
+			}
+		}
+		if ($ok) {
+			echo $res; 
+		} else {
+			error_log("not ok");
+			$this->getResponse()->clearAllHeaders();
+			$this->getResponse()->setRawHeader("HTTP/1.0 400 Bad request");
+			$this->getResponse()->setHeader("Status","400 Bad request");
+		}
+	}
+
         public function cdAction() {
             $this->_helper->layout->disableLayout();
             $this->_helper->viewRenderer->setNoRender();
