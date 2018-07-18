@@ -22,6 +22,7 @@ Author: wvkarag@lovecraft.priv.iasa.gr
 */
 
 START TRANSACTION;
+
 CREATE OR REPLACE FUNCTION XTRIM(TEXT) RETURNS TEXT AS
 $$
 	SELECT TRIM(REGEXP_REPLACE(REGEXP_REPLACE(TRIM($1), E'\n*$', ''), E'^\n*', ''));
@@ -29,8 +30,11 @@ $$ LANGUAGE SQL;
 ALTER FUNCTION XTRIM(TEXT) OWNER TO appdb;
 COMMENT ON FUNCTION XTRIM(TEXT) IS 'Trims newlines from the start and end of text, as well as white spaces (like TRIM does)';
 
-CREATE OR REPLACE FUNCTION mods2doc(xin TEXT, _appid INT DEFAULT NULL) RETURNS TEXT AS
-$$
+CREATE OR REPLACE FUNCTION public.mods2doc(
+    xin text,
+    _appid integer DEFAULT NULL::integer)
+  RETURNS text AS
+$BODY$
 DECLARE
 	i INT;
 	j INT;
@@ -46,6 +50,8 @@ DECLARE
 	ret TEXT;
 	auths extauthors[];
 	intauths intauthors[];
+	_auths authors[];
+	_auth authors;
 	atype TEXT;
 BEGIN
 	ret := '[';
@@ -85,6 +91,9 @@ BEGIN
 			IF xpath_exists('./name[@type="personal"]/role/roleTerm[@type="text" and text()="author"]', xmods[i]) THEN
 				xauths := xpath('./name[@type="personal"]', xmods[i]);
 				FOR j IN 1..ARRAY_LENGTH(xauths, 1) LOOP
+					_auth := NULL::authors;
+					auth := NULL::extauthors;
+					intauth := NULL::intauthors;
 					IF xpath_exists('./namePart', xauths[j]) THEN
 						IF (xpath('./role/roleTerm[@type="text"]/text()', xauths[j]))[1]::TEXT = 'author' THEN
 							IF xpath_exists('./namePart[@type="given"]', xauths[j]) THEN
@@ -108,20 +117,37 @@ BEGIN
 					-- ELSE
 						-- RAISE NOTICE 'no ./namePart';
 					END IF;
-					IF j = 1 THEN
-						IF atype = 'external' THEN
-							auth.main := TRUE;
-							doc.mainauthor := auth.author;
-							auths := auths || ARRAY[auth];
-						ELSE
-							intauth.main := TRUE;
-							doc.mainauthor := (SELECT name FROM researchers WHERE id = intauth.authorid);
-							intauths := intauths || ARRAY[intauth];
-						END IF;
+
+					IF atype = 'external' THEN
+						IF j = 1 THEN auth.main := TRUE; END IF;
+						auths := auths || ARRAY[auth];
+						_auth.fullname := auth.author;
+						_auth.main := auth.main;
+						_auths := _auths || ARRAY[_auth];
+					ELSE
+						IF j = 1 THEN intauth.main := TRUE; END IF;
+						intauths := intauths || ARRAY[intauth];
+
+						_auth.fullname := (SELECT name FROM researchers WHERE id = intauth.authorid);
+						_auth.authorid := intauth.authorid;
+						_auth.main := intauth.main;
+						_auths := _auths || ARRAY[_auth];
+					END IF;
+
+					IF j = 1 THEN -- set main doc author
+						doc.mainauthor := _auth.fullname;
 					END IF;
 				END LOOP; -- authors
 			END IF;
-			ret := ret || jsonb_insert(jsonb_insert(to_json(doc)::JSONB, '{extauthors}', COALESCE(to_json(auths)::JSONB, '[]'::JSONB)), '{intauthors}', COALESCE(to_json(intauths)::JSONB, '[]'::JSONB))::JSON::TEXT || ',';
+			ret := ret || jsonb_insert(
+			jsonb_insert(
+				jsonb_insert(
+					jsonb_insert(
+						to_json(doc)::JSONB, '{extauthors}', COALESCE(to_json(auths)::JSONB, '[]'::JSONB)
+					), '{intauthors}', COALESCE(to_json(intauths)::JSONB, '[]'::JSONB)
+				), '{authors}', COALESCE(to_json(_auths)::JSONB, '[]'::JSONB)
+			), '{doctype}', COALESCE(to_json((SELECT description FROM doctypes WHERE id = doc.doctypeid))::JSONB, NULL::JSONB)
+			)::JSON::TEXT || ',';
 		END LOOP; -- documents;
 	-- ELSE
 		-- RAISE NOTICE 'No modsCollection/mods found!';
@@ -132,9 +158,14 @@ BEGIN
 	END IF;
 	RETURN REPLACE(REGEXP_REPLACE(ret, ',]$', ']'), '": []', '": null');
 END;
-$$ LANGUAGE plpgsql;
-COMMIT;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.mods2doc(text, integer)
+  OWNER TO appdb;
 
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 21, 2, E'Added function to parse Metadata Object Description Schema (MODS) XML and populate app documents'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=21 AND revision=2);
+
+COMMIT;

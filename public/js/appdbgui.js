@@ -3101,6 +3101,99 @@ String.prototype.replaceAll = function(search, replacement) {
 		return true;
 	}
 
+	function importDocs() {
+		var mtype = '<span>Format: <select name="bibtype">' + 
+			'<option value="bib">BibTeX</option>' + 
+			'<option value="biblatex">BibLaTeX</option>' +
+			'<option value="endx">EndNote</option>' +
+			'<option value="mods">MODS</option>' +
+			'</select></span>';
+		var mtext = '<div title="Import Publication"><p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>Please copy &amp; paste publication data in a supported format (bibTeX, etc.)</p>' + mtype + '<p></p><textarea id="importdoc" cols="90" rows="10"></textarea></div>';
+		var importDialog = $(mtext).dialog({
+			dialogClass: 'info',
+			autoOpen: false,
+			resizable: false,
+			height:'auto',
+			width:500,
+			modal: true,
+			buttons: {
+				OK: function() {
+					var t = $("select[name=bibtype] option:checked").val();
+					var d = $("textarea[id=importdoc]").val();
+					$("textarea[id=importdoc]").remove();
+					$("select[name=bibtype]").remove();
+					$(mtext).empty;
+					$(this).closest('.ui-dialog-content').dialog('close'); 
+					importDoc(t, d);
+				},
+				Cancel: function() {
+					$("textarea[id=importdoc]").remove();
+					$("select[name=bibtype]").remove();
+					$(mtext).empty;
+					$(this).closest('.ui-dialog-content').dialog('close'); 
+				}
+			}
+		});
+		importDialog.dialog('open');
+	}
+
+	function importDoc(btype, bibtext) {
+		var sleep = function (ms) {
+		  return new Promise(resolve => setTimeout(resolve, ms));
+		}
+		var appid = appdb.pages.application.currentId();
+		if (isNaN(appid)) {
+			appid = "";
+		} else if (appid <= 0) {
+			appid = "";
+		} else {
+			appid = "appid=" + encodeURIComponent(appid) + "&";			
+		}
+		$.post("/apps/importdoc", 
+			appid + "t=" + encodeURIComponent(btype) +  "&d=" + encodeURIComponent(bibtext), 
+			function(d) {}, 
+			"json"
+		).done(async function(d) {
+			if (!$.isArray(d)) {
+				dd = new Array();
+				dd.push(d);
+			} else {
+				dd = d;
+			}
+			for (di = 0; di < dd.length; ++di) {
+				while ($("#editDocDialog").length > 0) {
+					console.log($("#editDocDialog").length);
+					await sleep(1000);
+				};
+				d = dd[di];
+				addDoc(docgrid.model.getRow(docgrid.selection.getFirstSelected()));
+				setTimeout(function() {
+					$("input[id=name]").val(d.title);
+					$("input[name=url]").val(d.url);
+					$("input[name=pageStart").val(d.pagestart);
+					$("input[name=type]").prev().val(d.doctype);
+	
+					var j = 0;
+					for (i = 0; i < d.authors.length; ++i) {
+						a = d.authors[i];
+						if (a.fullname) {
+							addAuthor();
+							if (a.authorid) {
+								$($("span.app-docs > span.app-doc").find("input.dijitInputInner")[j]).val(a.fullname + ' (ID: ' + a.authorid + ')');
+							} else {
+								$($("span.app-docs > span.app-doc").find("input.dijitInputInner")[j]).val(a.fullname);
+							}
+							++j;
+						}
+					}
+					addAuthor();
+				}, 500);
+			}
+		}).fail(function(d) {
+			setTimeout(function(){(new appdb.views.ErrorHandler()).handle({"status": "Failed to parse publication data", "description": "Unsupported publication data format, or unexpected parsing error"});},0);
+		});
+	}
+
 	function addDoc(data) {
 		delete editDocDlg;
 		editDocDlg = new dojox.Dialog({

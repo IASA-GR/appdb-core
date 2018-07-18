@@ -2037,17 +2037,23 @@ class AppsController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender();
 		$t = $this->getParam("t");
 		$d = $this->getParam("d");
+		$appid = $this->getParam("appid");
+		if (! isset($appid)) {
+			$appid = null;
+		}
 		if (isset($t) && isset($d)) {
 			switch ($t) {
-				case "bibtex":
+				case "bib":
+				case "endx":
+				case "biblatex":
 					$fbib = tmpfile();
 					$fbibname = stream_get_meta_data($fbib)['uri'];
 					$fmods = tmpfile();
 					$fmodsname = stream_get_meta_data($fmods)['uri'];
 					fwrite($fbib, $d);
 					error_log("$fbibname --> $fmodsname");
-					error_log(APPLICATION_PATH . "/../bibutils/bib2xml $fbibname > $fmodsname");
-					exec(APPLICATION_PATH . "/../bibutils/bib2xml $fbibname > $fmodsname");
+					error_log(APPLICATION_PATH . "/../bibutils/" . $t . "2xml $fbibname > $fmodsname");
+					exec(APPLICATION_PATH . "/../bibutils/" . $t . "2xml $fbibname > $fmodsname");
 					$mods = str_replace('<' . '?xml version="1.0" encoding="UTF-8"?' . '>', "", file_get_contents($fmodsname));
 					break;
 				case "mods":
@@ -2066,7 +2072,7 @@ class AppsController extends Zend_Controller_Action
 				"SELECT mods2doc(?, ?)",
 				array(
 					$mods,
-					isset($_GET["appid"]) ? $_GET["appid"] : NULL
+					$appid
 				)
 			)->fetchAll();
 		} else {
