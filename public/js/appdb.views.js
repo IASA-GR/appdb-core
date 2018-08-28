@@ -16271,21 +16271,36 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 		var tbody = $(table).find('tbody');
 		$.each(logs || [], function(i, log) {
 		   var imgSrc = '';
+		   var exceptionOutcome = null;
 		   switch(log.OUTCOME) {
-		       case "NA":
-		       case "WARNING":
+		        case "NA":
+		        case "WARNING":
 			   imgSrc = '/images/vappliance/warning.png';
 			   break;
-		       case "OK":
+		        case "OK":
 			   imgSrc = '/images/tick.png';
 			   break;
-		       default:
+		        case "SKIP":
+			    exceptionOutcome = 'Check skipped';
+			    imgSrc = '/images/vappliance/redwarning.png';
+			    break;
+			case "INTERNAL_FAILURE":
+			    exceptionOutcome = 'Check failed to complete';
+			    imgSrc = '/images/vappliance/redwarning.png';
+			    break;
+		        default:
 			   imgSrc = '/images/vappliance/redwarning.png';
 			   break;
 		   }
+		   if (exceptionOutcome) {
+		       exceptionOutcome = $('<span class="outcome"><span>').text(exceptionOutcome);
+		   }
 		   var td1 = $('<td></td>').append($('<img></img>').attr('src', imgSrc).attr('title', log.OUTCOME));
-		   var td2 = $('<td></td>').append($('<div class="test_id"></div>').append(log.TEST_ID).append('<span class="version">v'+log.VERSION+'</span>'))
+		   var td2 = $('<td></td>').append($('<div class="test_id"></div>').append(log.TEST_ID).append(exceptionOutcome).append('<span class="version">v'+log.VERSION+'</span>'))
 			   .append($('<div class="description"></div>').append(log.DESCRIPTION));
+		   if ($.trim(log.SUMMARY)) {
+		       $(td2).append($('<div class="summary"></div>').append(log.SUMMARY));
+		   }
 		   if ($.trim(log.DETAILS)) {
 		       $(td2).append($('<div class="details"></div>').append(log.DETAILS));
 		   }
@@ -16388,25 +16403,40 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 	    var table = $('<table class="report-data"><tbody></tbody></table>');
 	    var tbody = $(table).find('tbody');
 	    $.each(logs || [], function(i, log) {
-	       var imgSrc = '';
-	       switch(log.OUTCOME) {
-		   case "NA":
-		   case "WARNING":
-		       imgSrc = '/images/vappliance/warning.png';
-		       break;
-		   case "OK":
-		       imgSrc = '/images/tick.png';
-		       break;
-		   default:
-		       imgSrc = '/images/vappliance/redwarning.png';
-		       break;
-	       }
-	       var td1 = $('<td></td>').append($('<img></img>').attr('src', imgSrc).attr('title', log.OUTCOME));
-	       var td2 = $('<td></td>').append($('<div class="test_id"></div>').append(log.TEST_ID).append('<span class="version">v'+log.VERSION+'</span>'))
-		       .append($('<div class="description"></div>').append(log.DESCRIPTION));
-	       if ($.trim(log.DETAILS)) {
-		   $(td2).append($('<div class="details"></div>').append(log.DETAILS));
-	       }
+		var imgSrc = '';
+		var exceptionOutcome = null;
+		switch(log.OUTCOME) {
+		    case "NA":
+		    case "WARNING":
+			imgSrc = '/images/vappliance/warning.png';
+			break;
+		    case "OK":
+			imgSrc = '/images/tick.png';
+			break;
+		    case "SKIP":
+			exceptionOutcome = 'Check skipped';
+			imgSrc = '/images/vappliance/redwarning.png';
+			break;
+		     case "INTERNAL_FAILURE":
+			exceptionOutcome = 'Check failed to complete';
+			imgSrc = '/images/vappliance/redwarning.png';
+			break;
+		     default:
+			imgSrc = '/images/vappliance/redwarning.png';
+			break;
+		}
+		if (exceptionOutcome) {
+		    exceptionOutcome = $('<span class="outcome"><span>').text(exceptionOutcome);
+		}
+		var td1 = $('<td></td>').append($('<img></img>').attr('src', imgSrc).attr('title', log.OUTCOME));
+		var td2 = $('<td></td>').append($('<div class="test_id"></div>').append(log.TEST_ID).append(exceptionOutcome).append('<span class="version">v'+log.VERSION+'</span>'))
+			.append($('<div class="description"></div>').append(log.DESCRIPTION));
+		if ($.trim(log.SUMMARY)) {
+		   $(td2).append($('<div class="summary"></div>').append(log.SUMMARY));
+		}
+		if ($.trim(log.DETAILS)) {
+		    $(td2).append($('<div class="details"></div>').append(log.DETAILS));
+		}
 
 	       $(tbody).append($('<tr></tr>').append(td1).append(td2));
 	    });

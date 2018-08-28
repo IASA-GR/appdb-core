@@ -25083,6 +25083,13 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
     font-weight: bold;
     padding: 0px 0 3px 0px;
 }
+.secant_status > table > tbody > tr >td > div.test_id .outcome {
+    color: #945050;
+    padding-left: 5px;
+    font-size: 12px;
+    font-weight: normal;
+    opacity: 0.8;
+}
 .secant_status > table > tbody > tr >td > div.test_id .version {
     color: #bbb;
     font-size: 10px;
@@ -25090,6 +25097,11 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
 }
 .secant_status > table > tbody > tr >td > div.description {
     color: #777;
+}
+.secant_status > table > tbody > tr >td > div.summary {
+    color: #555;
+    font-weight: bold;
+    padding: 5px 0;
 }
 .secant_status > table > tbody > tr >td > div.details {
     color: red;
