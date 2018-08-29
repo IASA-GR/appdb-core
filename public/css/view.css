@@ -20056,11 +20056,18 @@ body[data-content='software'] *[data-forentity='vappliance'] {
 }
 .voimagelistmanager table tbody tr td,
 .voimagelistmanager table thead tr th{
-	border: thin solid #aaa;
-	border-bottom: 1px solid #aaa;
-	border-right: 1px solid #aaa;
-	padding: 0px 5px;
-	vertical-align: middle;
+	order: thin solid #aaa;
+        border-bottom: 1px solid #ccc;
+        border-right: 1px solid #e6e6e6;
+        padding: 0px 5px;
+        vertical-align: middle;
+        border-left: 1px solid transparent;
+}
+.voimagelistmanager table tbody tr td:first-child,
+.voimagelistmanager table thead tr th:first-child,
+.voimagelistmanager table tbody tr td:last-child,
+.voimagelistmanager table thead tr th:last-child{
+    border-right: 1px solid #cacaca;
 }
 .voimagelistmanager table thead tr th {
 	border-top: 1px solid #aaa;
@@ -20143,7 +20150,10 @@ body[data-content='software'] *[data-forentity='vappliance'] {
 .voimagelistcontainer .body table tbody > tr.isexpired{
 	display: none;
 }
-.voimagelistcontainer .body table tbody > tr.isexpired[data-published]{
+.voimagelistcontainer .body table tbody > tr.isexpired[data-published],
+.voimagelistcontainer .body table tbody > tr.isexpired.action-updated[data-hasobsolete],
+.voimagelistcontainer .body table tbody > tr.isexpired.action-removed
+{
 	display: table-row;
 }
 .voimagelistcontainer .body table tbody > tr.action-added{
@@ -20180,13 +20190,16 @@ body[data-content='software'] *[data-forentity='vappliance'] {
 	height: 20px;
 }
 .voimagelistcontainer .body table tbody > tr > td .publishedviewer.icontext > img.isexpired{ 
-	position: absolute;
 	display: none;
+        /*position: absolute;
 	top: 20px;
 	left: 40px;
 	width: 14px;
-	height: 14px;
+	height: 14px;*/
 	border: none;
+        text-align: center;
+        margin: 0 auto;
+        margin-top: 10px;
 }
 .voimagelistcontainer .body table tbody > tr.isexpired > td .publishedviewer.icontext > img.isexpired{ 
 	display: block;
@@ -20552,7 +20565,11 @@ html.dj_ie .voimagelistcontainer td.customcell > .customcellwrap > .expandable:h
 	padding-top: 5px;
 	border-top: 1px solid #888;
 }
-
+.voimagelistcontainer .liststate .footer .wiki {
+        position: absolute;
+        left: 8px;
+        bottom: 5px;
+}
 .voimagelistcontainer .liststate .footer .actions button{
 	margin: 1px 3px;
 	display: inline-block;
@@ -20826,6 +20843,66 @@ html.dj_ie .voimagelistcontainer td.customcell > .customcellwrap > .expandable:h
 	font-size: 11px;
 	vertical-align: middle;
 	line-height: 12px;
+        font-weight: bold;
+        color: #666;
+}
+.voimagelistcontainer .customcellwrap .vappinfo  {
+    min-height: 90px;
+}
+.voimagelistcontainer .vappinfo .fieldvalue {
+    margin-bottom: 2px;
+}
+.voimagelistcontainer .vappinfo .fieldvalue > .field,
+.voimagelistcontainer .vappinfo .fieldvalue > .value,
+.voimagelistcontainer .vappinfo .fieldvalue > .seperator {
+    vertical-align: middle;
+}
+.voimagelistcontainer .vappinfo .fieldvalue > .field {
+    padding-right: 3px;
+}
+.voimagelistcontainer .vappinfo .fieldvalue > .seperator {
+    margin-right: 3px;
+}
+.voimagelistcontainer .vappinfo .fieldvalue > .field {
+    min-width: 30px;
+    max-width: 90px;
+    color: #444;
+}
+.voimagelistcontainer .vappinfo.newversion .fieldvalue > .field {
+    min-width: 65px;
+    width: 65px;
+    max-width: 65px;
+    color: #444;
+}
+.voimagelistcontainer .vappinfo.newversion .fieldvalue.version > .value {
+    color: #222;
+}
+.voimagelistcontainer .vappinfo.newversion .fieldvalue.version > .value  {
+    font-weight: bold;
+    padding: 0;
+    margin: 0;
+}
+.voimagelistcontainer .vappinfo.newversion .fieldvalue > .value .secant.badge {
+    position: absolute;
+    bottom: 0px;
+}
+.voimagelistcontainer .vappinfo .fieldvalue.hasexpired > * {
+    color: red !important;
+}
+.voimagelistcontainer .vappinfo .fieldvalue.name {
+    margin-bottom: 5px;
+}
+.voimagelistcontainer .vappinfo .fieldvalue.name > .value > a > img {
+    vertical-align: top;
+}
+.voimagelistcontainer .vappinfo .fieldvalue.name > .value > a > span {
+    display: inline-block;
+    max-width: 195px;
+    vertical-align: middle;
+    max-height: 24px;
+    overflow-y: hidden;
+    font-weight: bold;
+    color: #777;
 }
 .voimagelistcontainer .deletedvas-container{
 	display: none;
@@ -24638,16 +24715,26 @@ a.helperlink.wikilink:hover{
     min-width:224px;
     max-width: 224px;
 }
+.voimagelistcontainer thead > tr > th.header[data-name='newversion'],
+.voimagelistcontainer td.customcell[data-name='newversion'],
+.voimagelistcontainer td.customcell[data-name='newversion'] > .customcellwrap,
+.voimagelistcontainer td.customcell[data-name='newversion'] > .customcellwrap > .expandable {
+    width: 224px;
+    min-width:224px;
+    max-width: 224px;
+}
 .voimagelistcontainer td.customcell[data-name='name'] > .customcellwrap > .secant.badge {
     position: absolute;
     margin: 0 -5px 0 -5px;
     bottom: 5px;
+}
+.voimagelistcontainer td.customcell > .customcellwrap .secant.badge {
     opacity: 0.7;
 }
-.voimagelistcontainer tr:hover td.customcell[data-name='name'] > .customcellwrap > .secant.badge {
-    opacity: 0.9;
+.voimagelistcontainer tr:hover td.customcell > .customcellwrap .secant.badge {
+    opacity: 0.8;
 }
-.voimagelistcontainer tr td.customcell[data-name='name']:hover > .customcellwrap > .secant.badge {
+.voimagelistcontainer tr td.customcell:hover > .customcellwrap .secant.badge {
     opacity: 1;
 }
 .voimagelistcontainer thead > tr > th.header[data-name='oses'],
@@ -24682,23 +24769,16 @@ a.helperlink.wikilink:hover{
     border: 1px solid #d6d3c6;
     color: #8A6D3B;
     padding-bottom: 2px;
-    width: 213px;
-    min-width: 213px;
-    max-width: 213px;
+    width: 290px;
+    min-width: 290px;
+    max-width: 290px;
     text-align: left;
     font-size: 12px;
     box-sizing: border-box;
 }
-@-moz-document url-prefix() {
-    .voimagelistcontainer table > tbody > tr > td[data-name="warnings"] .icontext.warningmessage {
-        width: 215px;
-        min-width: 215px;
-        max-width: 215px;
-    }
-}
 .voimagelistcontainer table > tbody > tr > td[data-name="warnings"] .icontext.warningmessage > span {
     display: inline-block;
-    width: 159px;
+    width: 240px;
 }
 .voimagelistcontainer table > tbody > tr > td[data-name="warnings"] .secant.badge { 
     width: 220px;
@@ -24707,6 +24787,7 @@ a.helperlink.wikilink:hover{
     box-sizing: border-box;
 }
 .voimagelistcontainer table > tbody > tr > td[data-name="warnings"] .icontext.warningmessage > * {
+    vertical-align: top;
     font-size: 12px;
     margin: 0;
     padding-left: 5px;
@@ -24727,9 +24808,25 @@ a.helperlink.wikilink:hover{
 }
 .voimagelistcontainer table > tbody > tr > td[data-name="warnings"] .icontext:hover {
     cursor: pointer;
-    box-shadow: 2px 2px 0px 1px #ccc;
+    /*box-shadow: 2px 2px 0px 1px #ccc;*/
     display: inline-block;
     margin-bottom: 3px;
+}
+.voimagelistcontainer table > tbody > tr > td[data-name="warnings"] .icontext:hover > span {
+    text-decoration: underline;
+}
+@-moz-document url-prefix() {
+    .voimagelistcontainer table > tbody > tr > td[data-name="warnings"] .icontext.warningmessage {
+        width: 290px;
+        min-width: 290px;
+        max-width: 290px;
+    }
+    .voimagelistcontainer table > tbody > tr > td[data-name="warnings"] .icontext.warningmessage > * {
+        padding-left: 2px;
+    }
+    .voimagelistcontainer table > tbody > tr > td[data-name="warnings"] .icontext.warningmessage > span {
+        width: 250px;
+    }
 }
 .voimagelistcontainer td.customcell > .customcellwrap {
     padding-top: 5px;
@@ -24737,8 +24834,9 @@ a.helperlink.wikilink:hover{
 .voimagelistcontainer td.customcell {
     vertical-align: top;
 }
-.voimagelistcontainer td.customcell[data-name="name"] > .customcellwrap {
-    padding-bottom: 45px;
+.voimagelistcontainer td.customcell[data-name="name"] > .customcellwrap,
+.voimagelistcontainer td.customcell[data-name="newversion"] > .customcellwrap{
+    padding-bottom: 5px;
 }
 .voimagelistcontainer table > tbody > tr.has-latestreport.action-removed > td[data-name="warnings"] .icontext {
     margin-bottom: 3px;
@@ -24747,7 +24845,7 @@ a.helperlink.wikilink:hover{
     margin-bottom: 3px;
 }
 .voimagelistcontainer table > tbody > tr.has-latestreport.has-latestreport:not(.action-removed) > td[data-name="warnings"] .icontext {
-    border-bottom: none;
+    /*border-bottom: none;*/
 }
 .voimagelistcontainer table > tbody > tr.has-latestreport.has-latestreport:not(.action-removed) > td[data-name="warnings"] .secant.badge {
     border-top: none;
@@ -24781,6 +24879,11 @@ a.helperlink.wikilink:hover{
     border: none;
     box-sizing: content-box;
 }
+.secant.badge > *,
+.secant.badge:hover > *,
+.secant.badge > *:hover{
+    text-decoration: none !important;
+}
 .secant.badge > img {
     border: 0;
 }
@@ -24789,7 +24892,7 @@ a.helperlink.wikilink:hover{
     font-size: 10px;
     line-height: 18px;
     background-color: #f5f5f5;
-    color: #555;
+    color: #555 !important;
     border: 1px solid #c5c5c5;
     border-right: none;
 }
@@ -24810,7 +24913,7 @@ a.helperlink.wikilink:hover{
 }
 .secant.badge.pending > * {
     background-color: #0d9ecf;
-    color: white;
+    color: white ;
     border: 1px solid #0d9ecf;
     border-right: none;
 }
@@ -24840,6 +24943,7 @@ a.helperlink.wikilink:hover{
 .secant.badge > .status{
     max-width: 68px;
     min-width: 68px;
+    color: white !important;
 }
 
 .secant.badge.small > * {
@@ -24979,6 +25083,13 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
     font-weight: bold;
     padding: 0px 0 3px 0px;
 }
+.secant_status > table > tbody > tr >td > div.test_id .outcome {
+    color: #945050;
+    padding-left: 5px;
+    font-size: 12px;
+    font-weight: normal;
+    opacity: 0.8;
+}
 .secant_status > table > tbody > tr >td > div.test_id .version {
     color: #bbb;
     font-size: 10px;
@@ -24986,6 +25097,11 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
 }
 .secant_status > table > tbody > tr >td > div.description {
     color: #777;
+}
+.secant_status > table > tbody > tr >td > div.summary {
+    color: #555;
+    font-weight: bold;
+    padding: 5px 0;
 }
 .secant_status > table > tbody > tr >td > div.details {
     color: red;

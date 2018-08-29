@@ -9397,7 +9397,8 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 				"guid": e.guid,
 				"va_versionid": e.va_versionid,
 				"va_version": e.va_version,
-				"vmiinstanceid": e.vmiinstanceid
+				"vmiinstanceid": e.vmiinstanceid,
+				"expireson": e.expireson
 			});
 		});
 		
