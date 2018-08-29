@@ -25128,7 +25128,7 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
     width: 100%;
     right: 10px;
     text-align: right;
-    top: -18px;
+    top: 15px;
 }
 .loggedin .entityvirtualappliance .action.cd_select > .header {
     border: 1px solid transparent;

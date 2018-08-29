@@ -16281,6 +16281,7 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 			   imgSrc = '/images/tick.png';
 			   break;
 		        case "SKIP":
+                        case "SKIPPED":
 			    exceptionOutcome = 'Check skipped';
 			    imgSrc = '/images/vappliance/redwarning.png';
 			    break;
@@ -16302,7 +16303,7 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 		       $(td2).append($('<div class="summary"></div>').append(log.SUMMARY));
 		   }
 		   if ($.trim(log.DETAILS)) {
-		       $(td2).append($('<div class="details"></div>').append(log.DETAILS));
+		       $(td2).append($('<div class="details"></div>').append(log.DETAILS.replace(/\n/g,'<br/>')));
 		   }
 
 		   $(tbody).append($('<tr></tr>').append(td1).append(td2));
@@ -16414,6 +16415,7 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 			imgSrc = '/images/tick.png';
 			break;
 		    case "SKIP":
+                    case "SKIPPED":
 			exceptionOutcome = 'Check skipped';
 			imgSrc = '/images/vappliance/redwarning.png';
 			break;
@@ -16435,7 +16437,7 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 		   $(td2).append($('<div class="summary"></div>').append(log.SUMMARY));
 		}
 		if ($.trim(log.DETAILS)) {
-		    $(td2).append($('<div class="details"></div>').append(log.DETAILS));
+		    $(td2).append($('<div class="details"></div>').append(log.DETAILS.replace(/\n/g, '<br/>')));
 		}
 
 	       $(tbody).append($('<tr></tr>').append(td1).append(td2));
@@ -17662,7 +17664,7 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 				archs: [],
 				secant: (e.secant || []),
 				newversion: false,
-				newversiondata: null,
+				newversiondata: null
 			};
 			e.voimagelist = e.voimagelist || {};
 			e.voimagelist.images = e.voimagelist.images || {};
