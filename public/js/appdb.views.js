@@ -16271,21 +16271,36 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 		var tbody = $(table).find('tbody');
 		$.each(logs || [], function(i, log) {
 		   var imgSrc = '';
+		   var exceptionOutcome = null;
 		   switch(log.OUTCOME) {
-		       case "NA":
-		       case "WARNING":
+		        case "NA":
+		        case "WARNING":
 			   imgSrc = '/images/vappliance/warning.png';
 			   break;
-		       case "OK":
+		        case "OK":
 			   imgSrc = '/images/tick.png';
 			   break;
-		       default:
+		        case "SKIP":
+			    exceptionOutcome = 'Check skipped';
+			    imgSrc = '/images/vappliance/redwarning.png';
+			    break;
+			case "INTERNAL_FAILURE":
+			    exceptionOutcome = 'Check failed to complete';
+			    imgSrc = '/images/vappliance/redwarning.png';
+			    break;
+		        default:
 			   imgSrc = '/images/vappliance/redwarning.png';
 			   break;
 		   }
+		   if (exceptionOutcome) {
+		       exceptionOutcome = $('<span class="outcome"><span>').text(exceptionOutcome);
+		   }
 		   var td1 = $('<td></td>').append($('<img></img>').attr('src', imgSrc).attr('title', log.OUTCOME));
-		   var td2 = $('<td></td>').append($('<div class="test_id"></div>').append(log.TEST_ID).append('<span class="version">v'+log.VERSION+'</span>'))
+		   var td2 = $('<td></td>').append($('<div class="test_id"></div>').append(log.TEST_ID).append(exceptionOutcome).append('<span class="version">v'+log.VERSION+'</span>'))
 			   .append($('<div class="description"></div>').append(log.DESCRIPTION));
+		   if ($.trim(log.SUMMARY)) {
+		       $(td2).append($('<div class="summary"></div>').append(log.SUMMARY));
+		   }
 		   if ($.trim(log.DETAILS)) {
 		       $(td2).append($('<div class="details"></div>').append(log.DETAILS));
 		   }
@@ -16364,13 +16379,13 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 		if (config.displayVersion === true) {
 			$(dom).append($('<span class="version"></span>').text(report.vaversion_type || report.vaversion));
 		}
-
-		$(dom).append($('<span class="status"></span>').text(state.status));
+		var displayStatus = (['error', 'fail', 'failed'].indexOf(state.status) > -1) ? 'failed' : state.status;
+		$(dom).append($('<span class="status"></span>').text(displayStatus));
 		$(dom).prepend($('<img></img>').attr('src', state.img));
 		var title = state.content || state.text;
 		if (title) {
 			title = appdb.views.SecantReport.databindHtmlReportData(report, $('<span></span>').append(title )).text();
-			$(dom).attr('title', title);
+			$(dom).attr('title', title + '. Click to view details.');
 		}
 
 		if (config.displayHeader === false && config.displayVersion === false) {
@@ -16388,25 +16403,40 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 	    var table = $('<table class="report-data"><tbody></tbody></table>');
 	    var tbody = $(table).find('tbody');
 	    $.each(logs || [], function(i, log) {
-	       var imgSrc = '';
-	       switch(log.OUTCOME) {
-		   case "NA":
-		   case "WARNING":
-		       imgSrc = '/images/vappliance/warning.png';
-		       break;
-		   case "OK":
-		       imgSrc = '/images/tick.png';
-		       break;
-		   default:
-		       imgSrc = '/images/vappliance/redwarning.png';
-		       break;
-	       }
-	       var td1 = $('<td></td>').append($('<img></img>').attr('src', imgSrc).attr('title', log.OUTCOME));
-	       var td2 = $('<td></td>').append($('<div class="test_id"></div>').append(log.TEST_ID).append('<span class="version">v'+log.VERSION+'</span>'))
-		       .append($('<div class="description"></div>').append(log.DESCRIPTION));
-	       if ($.trim(log.DETAILS)) {
-		   $(td2).append($('<div class="details"></div>').append(log.DETAILS));
-	       }
+		var imgSrc = '';
+		var exceptionOutcome = null;
+		switch(log.OUTCOME) {
+		    case "NA":
+		    case "WARNING":
+			imgSrc = '/images/vappliance/warning.png';
+			break;
+		    case "OK":
+			imgSrc = '/images/tick.png';
+			break;
+		    case "SKIP":
+			exceptionOutcome = 'Check skipped';
+			imgSrc = '/images/vappliance/redwarning.png';
+			break;
+		     case "INTERNAL_FAILURE":
+			exceptionOutcome = 'Check failed to complete';
+			imgSrc = '/images/vappliance/redwarning.png';
+			break;
+		     default:
+			imgSrc = '/images/vappliance/redwarning.png';
+			break;
+		}
+		if (exceptionOutcome) {
+		    exceptionOutcome = $('<span class="outcome"><span>').text(exceptionOutcome);
+		}
+		var td1 = $('<td></td>').append($('<img></img>').attr('src', imgSrc).attr('title', log.OUTCOME));
+		var td2 = $('<td></td>').append($('<div class="test_id"></div>').append(log.TEST_ID).append(exceptionOutcome).append('<span class="version">v'+log.VERSION+'</span>'))
+			.append($('<div class="description"></div>').append(log.DESCRIPTION));
+		if ($.trim(log.SUMMARY)) {
+		   $(td2).append($('<div class="summary"></div>').append(log.SUMMARY));
+		}
+		if ($.trim(log.DETAILS)) {
+		    $(td2).append($('<div class="details"></div>').append(log.DETAILS));
+		}
 
 	       $(tbody).append($('<tr></tr>').append(td1).append(td2));
 	    });
@@ -16587,7 +16617,7 @@ appdb.views.VoSecantReport = appdb.ExtendClass(appdb.View, "appdb.views.VoSecant
 			if (this.options.vaversionTypes && this.options.vaversionTypes.length > 0 && this.options.vaversionTypes.indexOf(s.vaversion_type) === -1) {
 			    return;
 			}
-			var badge = appdb.views.SecantReport.createBadge(s, {headerText: 'LATEST VERSION CHECK', displayVersion: this.shouldDisplayVersions(data)});
+			var badge = appdb.views.SecantReport.createBadge(s, {headerText: 'SECURITY CHECK', displayVersion: this.shouldDisplayVersions(data)});
 			if (badge) {
 				$(badge).off('click').on('click', (function(self, content) {
 				    return function(ev) {
@@ -16714,15 +16744,15 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 				$(self.dom).append(td);
 			};
 		})(this, this.options.data));
-
-		if (this.options.data.isExpired === true) {
+		this.options.data.isExpired = this.isExpired();
+		if (this.options.data.isExpired === true || this.isExpired(true)) {
 			$(this.dom).addClass("isexpired");
 			if (vodata.isPublished === true) {
 				if (vodata.isOutdated === true) {
 					var verlink = "<a title='View newer version in new window' class='icontext newversion' href='" + appdb.config.endpoint.base + "store/vappliance/" + this.options.data.data.cname + "/vaversion/latest' target='_blank'>" + this.options.data.version + "</a>";
-					this.renderWarning(true, "Outdated and expired", "A newer version, ver:" + verlink + " was published, but it has already <b>expired</b>. <br/>It is recommended to remove it from the VO wide image list.");
+					this.renderWarning(true, "Used virtual appliance version is outdated and expired", "The virtual appliance version included in this VO wide image list and the latest newer version (ver: " + verlink + ") have both been <b>expired</b>. <br/><br/>It is recommended to <b>remove</b> the virtual appliance from the VO wide image list until a new version is published.");
 				} else {
-					this.renderWarning(true, "Virtual Appliance has expired", "This virtual appliance has expired. <br/>It is recommended to remove it from the VO wide image list.");
+					this.renderWarning(true, "Used virtual appliance version has expired", "The virtual appliance version included in this VO wide image list has expired. <br/>It is recommended to remove it from the VO wide image list.");
 				}
 			} else {
 				$(this.dom).addClass("hidden");
@@ -16731,25 +16761,45 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 			$(this.dom).removeClass("isexpired");
 		}
 		if ($(this.dom).hasClass("action-removed")) {
-			this.renderWarning(true, "Marked to be removed", "The images of this virtual appliance are marked to be removed from this image list, <b>upon publishing</b>.");
+			this.renderWarning(true, "Virtual appliance is marked to be removed from the VO wide image list", "The virtual appliance  is marked to be removed from this image list, <b>upon publishing</b>.");
 		} else if ($(this.dom).hasClass("action-updated")) {
-			this.renderWarning(true, "Marked to be updated", "The image list will be updated with the latest version of this virtual appliance, <b>upon publishing</b>.");
+			var verlink = "<a title='View new version in new window' class='icontext newversion' href='" + appdb.config.endpoint.base + "store/vappliance/" + this.options.data.data.cname + "/vaversion/latest' target='_blank'>latest</a>";
+			var prevId = Object.keys(this.options.data.data.voimagelist.previousVersions)[0];
+			var verprevlink = "<a title='View previous version in new window' class='icontext newversion' href='" + appdb.config.endpoint.base + "store/vappliance/" + this.options.data.data.cname + "/vaversion/previous/"+prevId+"' target='_blank'>currently used</a>";
+			this.renderWarning(true, "Virtual Appliance is marked to be updated with a newer version.", "The VO image list will be updated <b>upon publishing</b> with the " + verlink + " version of this virtual appliance, instead of the " + verprevlink + " one.");
 		} else if ($(this.dom).hasClass("action-added")) {
-			this.renderWarning(true, "Marked to be added", "The images of this virtual appliance will be added in the vo wide image list, <b>upon publishing</b>");
+			var verlink = "<a title='View new version in new window' class='icontext newversion' href='" + appdb.config.endpoint.base + "store/vappliance/" + this.options.data.data.cname + "/vaversion/latest' target='_blank'>latest (" + this.options.data.version + ")</a>";
+			this.renderWarning(true, "Virtual Appliance is marked to be added to the VO wide image list", "The " + verlink + " virtual appliance version will be included in the vo wide image list, <b>upon publishing</b>");
 		} else if (vodata.isOutdated === true && this.options.data.isExpired === false) {
-			var verlink = "<a title='View new version in new window' class='icontext newversion' href='" + appdb.config.endpoint.base + "store/vappliance/" + this.options.data.data.cname + "/vaversion/latest' target='_blank'>" + this.options.data.version + "</a>";
-			$(this.dom).addClass('has-newimage');
-			this.renderWarning(true, "New image version available"/*"Outdated images"*/, "A new version, ver:" + verlink + ", is available. It is recomended to update. <br/>In such case, the action will take affect <b>upon publishing</b>.");
+			if (this.isExpired(true)) {
+				var expirationDate = this.getUsedImageExpirationDate();
+				expirationDate = ((expirationDate) ? ' since ' + expirationDate : '');
+				var verlink = "<a title='View new version in new window' class='icontext newversion' href='" + appdb.config.endpoint.base + "store/vappliance/" + this.options.data.data.cname + "/vaversion/latest' target='_blank'>" + this.options.data.version + "</a>";
+				$(this.dom).addClass('has-newimage');
+				this.renderWarning(true, "Used virtual appliance version has expired but a new version is available", "The virtual appliance version included in the VO wide image list expired " + expirationDate + ". <br/><br/> You can either <b>remove</b> it from the VO wide image list or <b>update</b> it with the newer available version (" + verlink + "). <br/><br/>In both cases, the action will take affect <b>upon publishing</b>.");
+			} else {
+				var verlink = "<a title='View new version in new window' class='icontext newversion' href='" + appdb.config.endpoint.base + "store/vappliance/" + this.options.data.data.cname + "/vaversion/latest' target='_blank'>" + this.options.data.version + "</a>";
+				$(this.dom).addClass('has-newimage');
+				this.renderWarning(true, "A new virtual appliance version is available"/*"Outdated images"*/, "A new version, ver:" + verlink + ", is available. It is recomended to update. <br/><br/>In such case, the action will take affect <b>upon publishing</b>.");
+			}
+			
 		}
 
 		if (this.options.data.secant && this.options.data.secant.length > 0) {
 		    this.renderSecant(this.options.data);
 		}
 	};
+	this.getUsedImageExpirationDate = function() {
+		if (this.options && this.options.data && this.options.data.data && this.options.data.data.voimagelist && this.options.data.data.voimagelist.images && this.options.data.data.voimagelist.images.length > 0 && this.options.data.data.voimagelist.images[0] && $.trim(this.options.data.data.voimagelist.images[0].expireson)) {
+		    return $.trim(this.options.data.data.voimagelist.images[0].expireson).split('T')[0];
+		}
+		
+		return '';
+	};
 	this.createWarningLink = function(text, errortext) {
 		text = $.trim(text) || "An error occured";
 		errortext = $.trim(errortext) || "Unknown error occured";
-		var a = $("<a href='#' title='' class='icontext warningmessage'><img src='/images/vappliance/warning.png' alt=''/><span></span></a>");
+		var a = $("<a href='#' title='Click to view details' class='icontext warningmessage'><img src='/images/vappliance/warning.png' alt=''/><span></span></a>");
 		$(a).find("span").text(text);
 		var content = $("<div class='voimagelistaction warning'></div>");
 		$(content).html(errortext);
@@ -16796,7 +16846,7 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 		    return;
 		}
 
-		var badge = appdb.views.SecantReport.createBadge(currentSecant, {displayHeader: true, headerText: 'CURRENT VERSION CHECK', size: ''});
+		var badge = appdb.views.SecantReport.createBadge(currentSecant, {displayHeader: true, headerText: 'SECURITY CHECK', size: ''});
 		if (badge) {
 			$(badge).off('click').on('click', (function(self, content) {
 			    return function(ev) {
@@ -16842,7 +16892,7 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 	this.renderSecant = function(data) {
 		data = data || {};
 		if (this.shouldRenderSecantLatestVersion(data)) {
-			var dom = $(this.dom).find("td[data-name='warnings'] .value");
+			var dom = $(this.dom).find("td[data-name='newversion'] .securitycheck .value");
 			var secant = new appdb.views.VoSecantReport({
 				container: $(dom),
 				parent: this,
@@ -16870,8 +16920,31 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 	this.isUpdated = function() {
 		return (this.getStateData().wasOutdated === true) && (this.getStateData().isOutdated === false) && (this.getStateData().isRemoved === false);
 	};
-	this.isExpired = function() {
-		return (this.options.data && this.options.data.isExpired === true);
+	this.isExpired = function(onlyusedversion) {
+		onlyusedversion = (typeof onlyusedversion === 'boolean') ? onlyusedversion : false;
+		if (this.options.data) {
+			if (this.options.data.isExpired === true) {
+				return true;
+			}
+			
+			if (onlyusedversion && this.options.data.data && this.options.data.data.voimagelist && this.options.data.data.voimagelist.images && this.options.data.data.voimagelist.images.length > 0) {
+				if  (this.options.data.data.voimagelist.images[0] && $.trim(this.options.data.data.voimagelist.images[0].expireson)) {
+					var dt = new Date($.trim(this.options.data.data.voimagelist.images[0].expireson));
+					var dn = new Date();
+
+					return (dt.getTime() < dn.getTime());
+				}
+			}
+			
+			if ($.trim(this.options.data.expiresOn)) {
+				var dt = new Date($.trim(this.options.data.expiresOn));
+				var dn = new Date();
+
+				return (dt.getTime() < dn.getTime());
+			}
+		}
+		
+		return false;
 	};
 	this._initContainer = function() {
 
@@ -16989,8 +17062,10 @@ appdb.views.VoImageListItemCell.VapplianceInfo = function(dom, row, col, data) {
 
 		var html = $("<div class='vappinfo'></div>");
 		var name = $("<div class='name fieldvalue'><div class='value'></div></div>");
-		var version = $("<div class='version fieldvalue'><div class='field'>ver.</div><div class='seperator'>:</div><div class='value'></div></div>");
-
+		var versionTxt = (data.published) ? 'Used version' : 'Version';
+		var version = $("<div class='version fieldvalue'><div class='field'>" + versionTxt + "</div><div class='seperator'>:</div><div class='value'></div></div>");
+		var currentVersionExpirationDate = null;
+		var expiration = $("<div class='expireson fieldvalue'><div class='field'>Expires in</div><div class='seperator'>:</div><div class='value'></div></div>");
 		var imagecount = $("<div class='imagecount fieldvalue'><div class='field'>Images</div><div class='seperator'>:</div><div class='value'></div></div>");
 		var link = $("<a href='' title='Open virtual appliance in new window' target='_blank' class='icontext'><img src='' alt=''/><span></span></a>");
 		var verlink = $("<a href='' title='View virtual appliance latest version in new window' target='_blank' class='icontext'><span></span></a>");
@@ -17011,8 +17086,17 @@ appdb.views.VoImageListItemCell.VapplianceInfo = function(dom, row, col, data) {
 		$(html).append(name);
 		if ($.isEmptyObject((d.voimagelist.previousVersions || {}))) {
 			$(html).append(version);
+			if (data.published) {
+				$.each(d.voimagelist.images,  function(index, value) {
+					if(d.appliance && value.va_versionid === d.appliance.versionid) {
+						currentVersionExpirationDate = value.expireson;
+					}
+				});
+			} else {
+				currentVersionExpirationDate = d.appliance.expiresOn;
+			}
 		} else {
-			var prevversion = $("<div class='prevversion fieldvalue'><div class='field'>ver.</div><div class='seperator'>:</div><div class='value'></div></div>");
+			var prevversion = $("<div class='prevversion fieldvalue'><div class='field'>Used version</div><div class='seperator'>:</div><div class='value'></div></div>");
 
 			var prevval = [];
 			for (var o in d.voimagelist.previousVersions) {
@@ -17022,7 +17106,29 @@ appdb.views.VoImageListItemCell.VapplianceInfo = function(dom, row, col, data) {
 			}
 			$(prevversion).find(".value").html(prevval.join("<span class='seperator'>,</span>"));
 			$(html).append(prevversion);
+			
+			$.each(d.voimagelist.images,  function(index, value) {
+				if (d.voimagelist.previousVersions.hasOwnProperty(parseInt(value.va_versionid))) {
+					currentVersionExpirationDate = value.expireson;
+				}
+			});
 		}
+		
+		if (currentVersionExpirationDate) {
+			currentVersionExpirationDate = currentVersionExpirationDate.split('T')[0];
+			var dt = new Date(currentVersionExpirationDate);
+			var now = new Date();
+			$(expiration).find('.field').remove();
+			$(expiration).find('.seperator').remove();
+				
+			if (dt.getTime() < now.getTime()) {
+			        $(expiration).addClass('hasexpired').find('.value').text('Expired since ' + currentVersionExpirationDate);
+			} else {
+				$(expiration).find('.value').append('Expires in ' + appdb.vappliance.utils.getLexicalDateDiff(currentVersionExpirationDate) + ' ('  + currentVersionExpirationDate + ')');
+			}
+			$(html).append(expiration);
+		}
+		
 		$(imagecount).find(".value").text(d.voimagelist.images.length);
 		$(html).append(imagecount);
 
@@ -17185,17 +17291,20 @@ appdb.views.VoImageListItemCell.ActionList = function(dom, row, col, data) {
 		switch (act.action) {
 			case "remove":
 				$(button).addClass("btn-danger");
+				$(button).prop('title', 'Remove the currently used virtual appliance version from the VO wide image list. The action will take affect upon publishing.');
 				break;
 			case "add":
 				$(button).addClass("btn-primary");
+				$(button).prop('title', 'Include the current virtual appliance version in the VO wide image list. The action will take affect upon publishing.');
 				break;
 			case "update":
 				$(button).addClass("btn-warning");
+				$(button).prop('title', 'Replace the currently used virtual appliance version in the VO wide image list with its latest version. The action will take affect upon publishing.');
 				break;
 			default:
 				break;
 		}
-		$(button).attr("data-action", act.action);
+		$(button).attr("data-action", act.action);  
 		$(e).append(button);
 		return button;
 	};
@@ -17215,6 +17324,37 @@ appdb.views.VoImageListItemCell.ActionList = function(dom, row, col, data) {
 			return false;
 		};
 	})(row));
+	return $(html);
+};
+appdb.views.VoImageListItemCell.NewVersionInfo = function(dom, row, col, data) {
+	var html = $("<div class='newversion vappinfo'></div>");
+	var newversion = data.newversiondata || null;
+	if (newversion) {
+	    var version = $("<div class='version fieldvalue'><div class='field'>New version</div><div class='seperator'>:</div><div class='value icontext warningmessage'></div></div>");
+	    var verlink = $("<a href='' title='View virtual appliance latest version in new window' target='_blank' class='icontext'><span></span></a>");
+	    var created =$("<div class='createdon fieldvalue'><div class='field'>Created on</div><div class='seperator'>:</div><div class='value'></div></div>");
+	    var expiration = $("<div class='expireson fieldvalue'><div class='field'>Expires in</div><div class='seperator'>:</div><div class='value'></div></div>");
+	    var securityCheck = $("<div class='securitycheck fieldvalue'><div class='value'></div></div>");
+	    
+	    $(verlink).attr('href', newversion.url);
+	    $(verlink).children('span').text(newversion.version);
+	    $(version).find('.value').append(verlink);
+	    
+	    if (newversion.expired === true) {
+		$(expiration).find('.field').remove();
+		$(expiration).find('.seperator').remove();
+		$(expiration).find('.value').append('<div class="expireson fieldvalue hasexpired"><div class="field">Expired since</div><div class="seperator">:</div><div class="value">' + newversion.expireson + '</div></div>');
+	    } else {
+		$(expiration).find('.value').append(appdb.vappliance.utils.getLexicalDateDiff(newversion.expireson) + ' ('  + newversion.expireson + ')');
+	    }
+	    
+	    $(created).find('.value').text(newversion.createdon);
+	    
+	    $(html).append(version);
+	    $(html).append(created);
+	    $(html).append(expiration);
+	    $(html).append(securityCheck);
+	}
 	return $(html);
 };
 appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList", function(o) {
@@ -17253,11 +17393,11 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 						$(this).parent().find("input").trigger("keyup");
 					});
 					return $(html);
-				}, renderer: appdb.views.VoImageListItemCell.BooleanValue, onFalseHtml: "<div class='publishedviewer icontext'><img src='/images/yes_grey.png' alt'/></div>", onTrueHtml: "<div class='publishedviewer published icontext'><img src='/images/yes.png' alt'/><img class='isexpired' src='/images/history.png' alt='' title='This virtual appliance has expired'/></div>"},
+				}, renderer: appdb.views.VoImageListItemCell.BooleanValue, onFalseHtml: "<div class='publishedviewer icontext' title='This Virtual Appliance is not included in the published VO wide image list'><img src='/images/yes_grey.png' alt'/></div>", onTrueHtml: "<div class='publishedviewer published icontext' title='This Virtual Appliance is included in the published VO wide image list'><img src='/images/yes.png' alt'/><img class='isexpired' src='/images/history.png' alt='' title='The virtual appliance version used in the VO wide image list has expired'/></div>"},
 			{name: "id", columnName: "ID", display: false},
-			{name: "name", columnName: "Name", searchTip: "Search...", renderer: appdb.views.VoImageListItemCell.VapplianceInfo},
+			{name: "name", columnName: "Available/Used VAppliances", searchTip: "Search...", renderer: appdb.views.VoImageListItemCell.VapplianceInfo},
 			{name: "version", columnName: "Version", display: false},
-			{name: "swappliance",display: (appdb.config.features.swappliance), columnName: "Required by <br>Software Appliances<a href='https://wiki.appdb.egi.eu/main:faq:supported_software_appliances' target='_blank'  title='Read more about software appliances'><img src='/images/question_mark.gif' alt=''></a>", searchTip: "Search...", getValues: function(obj){
+			/*{name: "swappliance",display: (appdb.config.features.swappliance), columnName: "Required by <br>Software Appliances<a href='https://wiki.appdb.egi.eu/main:faq:supported_software_appliances' target='_blank'  title='Read more about software appliances'><img src='/images/question_mark.gif' alt=''></a>", searchTip: "Search...", getValues: function(obj){
 					var res = [];
 					$.each(obj.options.data.swappliance, function(i,e){
 						res.push(e.name);
@@ -17277,10 +17417,46 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 						$(this).parent().find("input").trigger("keyup");
 					});
 					return $(html);
-				}},
+				}},*/
+			{name: "newversion", columnName: "VAppliance version updates",  searchRender: function() {
+					var html = $("<select><option value=''></option></select>");
+					var states = {
+						"true": "Version update available",
+						"false": "No version updates"
+					};
+					for (var i in states) {
+						if (states.hasOwnProperty(i) === false)
+							continue;
+						$(html).append("<option value='" + i + "'>" + states[i] + "</option>");
+					}
+					$(html).on("change", function() {
+						var v = $(this).val();
+						$(this).parent().find("input").attr("value", v);
+						$(this).parent().find("input").val(v);
+						$(this).parent().find("input").trigger("keyup");
+					});
+					return $(html);
+				}, renderer: appdb.views.VoImageListItemCell.NewVersionInfo},
 			{name: "hypervisors", columnName: "Hypervisors", display: (!appdb.config.features.swappliance), searchTip: "Search...", renderer: appdb.views.VoImageListItemCell.Expandable},
-			{name: "oses", columnName: "Oses", searchTip: "Search (eg ubuntu, windows ) ...", renderer: appdb.views.VoImageListItemCell.Expandable, maxheight: "25"},
+			/*{name: "oses", columnName: "Oses", searchTip: "Search (eg ubuntu, windows ) ...", renderer: appdb.views.VoImageListItemCell.Expandable, maxheight: "25"},
 			{name: "archs", columnName: "Achitectures", display: (!appdb.config.features.swappliance), searchTip: "Search (eg x86_64, Alpha, RISK ) ...", renderer: appdb.views.VoImageListItemCell.Expandable, maxheight: "25"},
+			*/
+			{name: "warnings", columnName: "Messages", searchTip: "Search (eg marked to be added)...", renderCell: function(obj, col) {
+					return "<div class='warningviewer icontext'><span class='value'>" + obj.options.data[col.name] + "</span></div>";
+				}},
+			{name: "states", columnName: "States", display: false, getValues: function(obj) {
+					var dom = obj.dom;
+					var states = [];
+					if ($(dom).hasClass("action-added")) {
+						states.push("added");
+					}
+					if ($(dom).hasClass("action-removed")) {
+						states.push("removed");
+					} else if ($(dom).hasClass("action-updated")) {
+						states.push("updated");
+					}
+					return states;
+				}},
 			{name: "actions", columnName: "Allowed<br/>Actions", searchRender: function() {
 					var html = $("<select><option value=''></option></select>");
 					var states = {
@@ -17307,22 +17483,6 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 						res.push(e.action);
 					});
 					return res;
-				}},
-			{name: "warnings", columnName: "Messages", searchTip: "Search (eg marked to be added)...", renderCell: function(obj, col) {
-					return "<div class='warningviewer icontext'><span class='value'>" + obj.options.data[col.name] + "</span></div>";
-				}},
-			{name: "states", columnName: "States", display: false, getValues: function(obj) {
-					var dom = obj.dom;
-					var states = [];
-					if ($(dom).hasClass("action-added")) {
-						states.push("added");
-					}
-					if ($(dom).hasClass("action-removed")) {
-						states.push("removed");
-					} else if ($(dom).hasClass("action-updated")) {
-						states.push("updated");
-					}
-					return states;
 				}}
 		]
 	};
@@ -17496,11 +17656,13 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 				id: e.id,
 				name: e.name,
 				isExpired: (e.appliance && $.trim(e.appliance.expired) === "true") ? true : false,
-				expiresOn: (e.appliance && $.trim(e.appliance.expireson) !== "") ? e.appliance.expireson : "",
+				expiresOn: (e.appliance && $.trim(e.appliance.expiresOn) !== "") ? e.appliance.expiresOn : "",
 				hypervisors: [],
 				oses: [],
 				archs: [],
-				secant: (e.secant || [])
+				secant: (e.secant || []),
+				newversion: false,
+				newversiondata: null,
 			};
 			e.voimagelist = e.voimagelist || {};
 			e.voimagelist.images = e.voimagelist.images || {};
@@ -17552,13 +17714,31 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 				row.actions.push({action: "add", displayName: "add"});
 			}
 			e.isExpired = false;
-			if ($.trim(e.expireson) !== "") {
-				var exp = new Date(e.expireson);
+			if ($.trim(row.expiresOn) !== "") {
+				var exp = new Date(row.expiresOn);
 				if (Date.now() > exp) {
 					e.isExpired = true;
 				}
 			}
 			row.swappliance = e.swappliance;
+			if (e.voimagelist && (e.voimagelist.isOutdated || e.voimagelist.wasOutdated)) {
+				row.newversion = true;
+				row.newversiondata = {
+					name: e.name,
+					cname: e.cname,
+					version: e.appliance.version,
+					versionid: e.appliance.versionid,
+					os: (e.appliance.os.length > 0) ? e.appliance.os[0].val() : null,
+					hypervisor: (e.appliance.hypervisor.length > 0) ? e.appliance.hypervisor[0].val() : null,
+					expired: ['true', true].indexOf(e.appliance.expired) > -1,
+					expireson: (e.appliance.expiresOn || '').split('T')[0] || '',
+					createdon: (e.appliance.createdOn || '').split('T')[0] || '',
+					url: appdb.config.endpoint.base + 'store/vappliance/' + e.cname + '/vaversion/latest'
+				};
+			} else {
+				row.newversion = false;
+				row.newversiondata = null;
+			}
 			row.data = e;
 			res.push(row);
 		});
@@ -18134,6 +18314,7 @@ appdb.views.VoImageListState = appdb.ExtendClass(appdb.View, "appdb.views.VoImag
 			main: $("<div class='main'></div>"),
 			footer: $("<div class='footer'></div>"),
 			actions: $("<div class='actions'></div>"),
+			wiki: $('<a href="' + appdb.config.endpoint.wiki + 'main:guides:manage_vo-wide_image_lists" class="wiki" target="_blank" title="Read more about editing the VO wide image list"><img src="/images/question_mark.gif" alt=""></a>'),
 			runningmessage: $("<div class='message icontext'><img src='/images/history.png' alt=''/><span>Processing requests...</span></div>"),
 			states: $("<ul></ul>")
 		}
@@ -18266,6 +18447,14 @@ appdb.views.VoImageListState = appdb.ExtendClass(appdb.View, "appdb.views.VoImag
 		}
 		this.checkPublish();
 	};
+	this.renderWiki = function() {
+	    if ($(this.options.dom.footer).find('.wiki').length > 0) {
+		return;
+	    }
+	    
+	    $(this.options.dom.footer).prepend(this.options.dom.wiki);
+	    
+	};
 	this.reset = function() {
 		this.unsubscribeAll();
 		$(this.dom).empty();
@@ -18327,6 +18516,7 @@ appdb.views.VoImageListState = appdb.ExtendClass(appdb.View, "appdb.views.VoImag
 		this.updateValues();
 		this.renderActions();
 		this.checkPublish();
+		this.renderWiki();
 	};
 	this._initContainer = function() {
 		$(this.dom).empty();
@@ -18463,7 +18653,7 @@ appdb.views.VoImageListLegend = appdb.ExtendClass(appdb.View, "appdb.views.VoIma
 		$(html).append(chk).append(color).append(label);
 		$(chk).off("click").on("click", (function(self, stateobj) {
 			return function(ev) {
-				var ischecked = $(this).attr("checked");
+				var ischecked = $(this).is(":checked");
 				$(self.dom).find(":input").prop("checked", false);
 				setTimeout((function(el, checked) {
 					if (checked === true) {
@@ -20662,7 +20852,8 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 			targets: null,
 			verbs: null
 		},
-		isvalid: false
+		isvalid: false,
+		children: o.children || {}
 	};
 	
 	this.reset = function(){
@@ -20686,6 +20877,7 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 		var sd = editortype.getSelectedData();
 		
 		var vid = this.options.editors.verbs.get('value'); //this is the relation type id and NOT the verb id
+		var currentVerb = this.getVerbById(vid);
 		if( !sd ){
 			valid = false;
 		}
@@ -20700,12 +20892,17 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 			this.options.data = {
 				id: vid
 			};
+			if (currentVerb) {
+			    this.options.data.verbname = currentVerb.verb;
+			}
 			if( this.isReversed() ){
 				delete this.options.data.targetguid;
 				this.options.data.subjectguid = ( (sd.guid)?sd.guid:(sd.id || null) );
+				this.options.data.entity = { guid: this.options.data.subjectguid };
 			}else{
 				delete this.options.data.subjectguid;
 				this.options.data.targetguid = ( (sd.guid)?sd.guid:(sd.id || null) );
+				this.options.data.entity = { guid: this.options.data.targetguid };
 			}
 		}else{
 			this.options.data = null;
@@ -20732,7 +20929,16 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 	};
 	
 	this.getData = function(){
-		return this.options.data;
+		var data = [this.options.data];
+
+		if (this.options.children) {
+			$.each(this.options.children, function(name, value) {
+				if (this.options.children[name] !== null) {
+				        data.push(this.options.children[name]);
+				}
+			}.bind(this));
+		}
+		return data;
 	};
 	
 	this.render = function(d){
@@ -20741,14 +20947,14 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 		this.reset();
 		this._initContainer();
 		$(this.dom).removeClass("reversed").find(".relationtarget,.relationsubject").removeClass("currentrelation");
-		
+
 		if( this.isReversed() ){
 			$(this.dom).addClass("reversed");
 			$(this.dom).find(".relationsubject").addClass("currentrelation");
 		}else{
 			$(this.dom).find(".relationtarget").addClass("currentrelation");
 		}
-		
+
 		if( this.isEditMode() && this.canEdit() ){
 			if( this.isReversed() ){
 				this.renderTarget();
@@ -20760,12 +20966,12 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 			this.editVerb();
 			this.renderActions();
 			this.validate();
+			this.postEdit();
 		}else{
 			this.renderSubject();
 			this.renderVerb();
 			this.renderTarget();
 		}
-		
 	};
 	this.getTargetType = function(){
 		return $.trim(this.options.targettype).toLowerCase();
@@ -20773,15 +20979,43 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 	this.getSubjectType = function(){
 		return $.trim(this.options.subjecttype).toLowerCase();
 	};
+	this.getVerbsBySubjectTargetPairs = function(subjectType, targetType) {
+	    subjectType = subjectType || this.options.subjecttype;
+	    targetType = targetType ||  this.options.targettype;
+
+	    return appdb.utils.RelationsRegistry.getVerbsBySubjectTargetPairs(subjectType, targetType);
+	};
 	this.getVerbOfRelation = function(rel){
 		return (this.options.reverse)?rel.reverseverb:rel.directverb;
+	};
+	this.getVerbByName = function(v) {
+	    var verbs = appdb.utils.RelationsRegistry.getVerbsBySubjectTargetPairs(this.options.subjecttype, this.options.targettype);
+	    var foundVerb = null;
+	    $.each(verbs, function(index, verb) {
+		    if (foundVerb === null && verb.verb === v) {
+			    foundVerb = verb;
+		    }
+	    });
+
+	    return foundVerb;
+	};
+	this.getVerbById = function(v) {
+	    var verbs = appdb.utils.RelationsRegistry.getVerbsBySubjectTargetPairs(this.options.subjecttype, this.options.targettype);
+	    var foundVerb = null;
+	    $.each(verbs, function(index, verb) {
+		    if (foundVerb === null && verb.id === v) {
+			    foundVerb = verb;
+		    }
+	    });
+
+	    return foundVerb;
 	};
 	this.renderCurrentEntity = function(){
 		//to be overriden
 	};
 	this.renderVerb = function(){
-		var verbs = appdb.utils.RelationsRegistry.getVerbsBySubjectTargetPairs(this.options.subjecttype,this.options.targettype);
-		var selverb = $.grep(appdb.utils.RelationsRegistry.getVerbsBySubjectTargetPairs(this.options.subjecttype,this.options.targettype), (function(v){
+		var verbs = this.getVerbsBySubjectTargetPairs(this.options.subjecttype, this.options.targettype);
+		var selverb = $.grep(this.getVerbsBySubjectTargetPairs(this.options.subjecttype, this.options.targettype), (function(v){
 			return function(e){
 				return $.trim(e.verb).toLowerCase() === v;
 			};
@@ -20826,10 +21060,12 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 		this.options.editors.subjects.subscribe({event: "change", callback: function(v){
 				this.validate();
 				this.publish({event: "change", value: this});
+				this.postEdit();
 		}, caller: this});
+		this.postEdit();
 	};
 	this.editVerb = function(){
-		var verbs = appdb.utils.RelationsRegistry.getVerbsBySubjectTargetPairs(this.options.subjecttype,this.options.targettype);
+		var verbs = this.getVerbsBySubjectTargetPairs(this.options.subjecttype,this.options.targettype);
 		var selverb = $.trim((this.options.data || {}).verbname) || this.options.verbname;
 		var html = "<select>";
 		$.each(verbs, (function(self){
@@ -20844,12 +21080,14 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 				return function(v){
 					self.validate();
 					self.publish({event: "change", value: self});
+					self.postEdit();
 				};
 			})(this)
 		},$(this.dom).find(".relationverb > select")[0]);
 		if( verbs.length === 1 ){
 			this.options.editors.verbs.set('disabled', true);
 		}
+		this.postEdit();
 	};
 	this.editTarget = function(){
 		var s = this.getTargetType();
@@ -20866,9 +21104,11 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 		});
 		this.options.editors.targets._init();
 		this.options.editors.targets.subscribe({event: "change", callback: function(v){
-				this.validate();
-				this.publish({event: "change", value: this});
+			this.validate();
+			this.publish({event: "change", value: this});
+			this.postEdit();
 		}, caller: this});
+		this.postEdit();
 	};
 	this.renderActions = function(){
 		$(this.dom).find(".actions").remove();
@@ -20896,6 +21136,10 @@ appdb.views.RelationListItem = appdb.ExtendClass(appdb.View, "appdb.views.Relati
 		this.editVerb();
 		this.editTarget();
 		this._initEvents();
+		this.postEdit();
+	};
+	this.postEdit = function() {
+	    //override
 	};
 	this.showPopupDialog = function(enable){
 		enable = (typeof enable === 'boolean')?enable:true;
@@ -21157,6 +21401,97 @@ appdb.views.RelationListItemProject = appdb.ExtendClass(appdb.views.RelationList
 		}
 		return $(dom)[0];
 	};
+
+	this.getVerbsBySubjectTargetPairs = function(subjectType, targetType) {
+		subjectType = subjectType || this.options.subjecttype;
+		targetType = targetType ||  this.options.targetType;
+
+		var verbs = appdb.utils.RelationsRegistry.getVerbsBySubjectTargetPairs(subjectType, targetType);
+		var results = [];
+
+		$.each(verbs, function(_, verb) {
+			if (verb && verb.verb !== 'funding') {
+				results.push(verb);
+			}
+		});
+
+		return results;
+	};
+
+	this.setFunding = function(updateForm) {
+		var checked = $(this.dom).find('.relationtype .relationfund input[type="checkbox"]').prop('checked');
+		this.options.data = this.options.data || {};
+		this.options.children = this.options.children || {};
+		this.options.children.funding = this.options.children.funding || null;
+
+		if (checked === true) {
+			var verb = this.getVerbByName('funding');
+			this.options.children.funding = {
+				id: verb.id
+			};
+			if (this.isReversed()) {
+				this.options.children.funding.subjectguid = this.options.data.subjectguid;
+			} else {
+				this.options.children.funding.targetguid = this.options.targetguid;
+			}
+		} else {
+			this.options.children.funding = null;
+		}
+		if (updateForm === false) {
+		    return;
+		}
+		this.validate();
+		this.publish({event: "change", value: this});
+		this.postEdit();
+	};
+
+	this.renderFunding = function(enable) {
+		enable = (typeof enable === 'boolean') ? enable : false;
+		if (enable === false) {
+			this.options.children.funding = null;
+			$(this.dom).find('.relationtype').removeClass('hasfunding');
+			$(this.dom).find('.relationtype').find('.relationfund').remove();
+		} else {
+			$(this.dom).find('.relationtype').addClass('hasfunding').find('.relationfund').remove();
+			var chkbox = $('<div class="relationfund"><input type="checkbox" value="0"><label>funded by</label></div>');
+			var enabledCheckbox = (this.options.data && this.options.data.entity && this.options.data.entity.guid) ? true : false;
+			var checkedBox = (this.options.children && this.options.children.funding);
+
+			if (enabledCheckbox) {
+				$(chkbox).find('input').prop('disabled', false);
+			} else {
+				$(chkbox).find('input').prop('disabled', true);
+			}
+
+			$(chkbox).find('input').prop('checked', checkedBox);
+			$(chkbox).on('click', function(ev) {
+				if (ev.target.tagName.toLowerCase() !== 'input') {
+				    var inp = $(chkbox).find('input');
+				    $(inp).prop('checked', !$(inp).prop('checked'));
+				    this.setFunding(false);
+				}
+			}.bind(this));
+			$(chkbox).find('input').on('change', function(ev) {
+			    setTimeout(function() {
+				    this.setFunding(false);
+			    }.bind(this), 1);
+			}.bind(this));
+			$(this.dom).find('.relationtype .relationsubject').after(chkbox);
+			this.setFunding(false);
+		}
+	};
+
+	this.postEdit = function() {
+		this.options.data = this.options.data  || {};
+		this.options.children = this.options.children  || { funding : null};
+		var verb = this.getVerbByName('development') || {};
+		var currentVerb = this.getVerbByName(this.options.data.verbname);
+		if (currentVerb && currentVerb.id === verb.id) {
+			this.renderFunding(true);
+		} else {
+			this.renderFunding(false);
+		}
+	};
 });
 appdb.views.RelationListItemSoftwareProject = appdb.ExtendClass(appdb.views.RelationListItemProject, "appdb.views.RelationListItemSoftwareProject", function(o){
 	this.renderCurrentEntity = function(){
@@ -21269,14 +21604,18 @@ appdb.views.RelationList = appdb.ExtendClass(appdb.View, "appdb.views.RelationLi
 		if ($(frm).length === 0) {
 			return false;
 		}
-		var i, len = this.options.items.length, item, inp;
+		var i, len = this.options.items.length, item, inp, offset = 0;
 		$(frm).remove("input[name^='relation']");
 		for (i = 0; i < len; i += 1) {
 			item = this.options.items[i];
 			if( !item.getData() ) continue;
-			inp = document.createElement("input");
-			$(inp).attr("name", "relation" + i).attr("type", "hidden").attr("value", JSON.stringify(this.getItemData(item)));
-			$(frm).append(inp);
+			var itemRelations = this.getItemData(item);
+			$.each(itemRelations, function(index, value) {
+				offset += 1;
+				inp = document.createElement("input");
+				$(inp).attr("name", "relation" + offset).attr("type", "hidden").attr("value", JSON.stringify(value));
+				$(frm).append(inp);
+			})
 		}
 		return true;
 	};
@@ -21288,24 +21627,28 @@ appdb.views.RelationList = appdb.ExtendClass(appdb.View, "appdb.views.RelationLi
 		var hasnew = false;
 		$.each(this.options.items, function(i,e){
 			var s = e.getData();
-			if( s !== null ){
-				//if targetguid is a number then it corresponds to a record id
-				//which means that there is a new item in the list
-				if( s.targetguid === ( "" + (s.targetguid <<0) ) ){
-					hasnew = true;
-				}
-				current[s.id + ":" +s.targetguid] = s;
-			}			
+			s = s || [];
+			s = $.isArray(s) ? s : [s];
+			if( s.length > 0 ){
+				$.each(s, function(_, s) {
+				    //if targetguid is a number then it corresponds to a record id
+				    //which means that there is a new item in the list
+				    if( s.targetguid === ( "" + (s.targetguid <<0) ) ){
+					    hasnew = true;
+				    }
+				    current[s.id + ":" +s.targetguid] = s;
+				});
+			}
 		});
-		
+
 		if( hasnew === true ){
 			return true;
 		}
-		
+
 		var newitems = $.grep(this.options.data, function(e){
 			return ( e && e.target && e.target.guid && !current[e.relationtypeid + ":" + e.target.guid] );
 		});
-		
+
 		return ( newitems.length > 0 )?true:false;
 	};
 	this.extractType = function(typename, data){
@@ -21334,7 +21677,8 @@ appdb.views.RelationList = appdb.ExtendClass(appdb.View, "appdb.views.RelationLi
 			targettype: this.options.targettype || this.extractType("target",data) ,
 			subjecttype: this.options.subjecttype || this.extractType("subject",data) ,
 			verbname: this.options.verbname,
-			reverse: this.options.reverse
+			reverse: this.options.reverse,
+			children: data.children || {}
 		});
 		item.subscribe({event: "remove", callback: function(v){
 				this.removeItem(v);
@@ -21380,7 +21724,15 @@ appdb.views.RelationList = appdb.ExtendClass(appdb.View, "appdb.views.RelationLi
 			$(this.dom).removeClass("isempty");
 		}
 	};
-	
+	this.preProcessData = function(d) {
+		d = d || this.options.data || [];
+		d = $.isArray(d)?d:[d];
+
+		if ($.isFunction(this.options.preProcessData)) {
+			return this.options.preProcessData.apply(this, [d]);
+		}
+		return d;
+	};
 	this.render = function(d){
 		d = d || this.options.data || [];
 		d = $.isArray(d)?d:[d];
@@ -21507,6 +21859,8 @@ appdb.views.RelationList = appdb.ExtendClass(appdb.View, "appdb.views.RelationLi
 		
 		$(this.dom).empty();
 		this.options.data = this.filterTargetData(o.data);
+		this.options.data = this.preProcessData(this.options.data);
+
 		this._initItemTypeClass();
 		
 		if( !this.options.dom.list ){
@@ -21532,22 +21886,78 @@ appdb.views.RelationListOrganization = appdb.ExtendClass(appdb.views.RelationLis
 });
 appdb.views.RelationListProject = appdb.ExtendClass(appdb.views.RelationList, "appdb.views.RelationListProject", function(o){
 	this.options = $.extend(true, this.options, {messages:{emptylist: "No related projects"}});
+}, {
+    preProcessData: function(data) {
+	    data = data || this.options.data || [];
+	    data = $.isArray(data) ? data : [data];
+	    var indexes = {};
+	    var removeIndexes = [];
+
+	    $.each(data, function(index, item) {
+		    var guid = (item && item.entity && item.entity.guid && ['development', 'funding'].indexOf(item.verbname) > -1) ? item.entity.guid : null;
+		    if (guid) {
+			    indexes[guid] = indexes[guid] || {};
+			    indexes[guid][item.verbname] = index;
+		    }
+	    });
+
+	    $.each(indexes, function(key, value) {
+		if (value.development > -1) {
+			data[value.development].children = {
+				'funding': value.funding > -1 ? Object.assign({}, data[value.funding]) : null
+			};
+			if (value.funding > -1) {
+				removeIndexes.push(value.funding);
+			}
+		}
+	    });
+
+	    removeIndexes.sort().reverse();
+
+	    $.each(removeIndexes, function(i,v) {
+		    data.splice(v, 1);
+	    });
+
+	    return data;
+    }
 });
 appdb.views.RelationListSoftwareProject = appdb.ExtendClass(appdb.views.RelationListProject, "appdb.views.RelationListSoftwareProject", function(o){
-	this.options = $.extend(true, this.options, {subjecttype: (o.subjecttype || "project"),targettype:(o.targettype || "software"),reverse:true, itemtype: appdb.views.RelationListItemSoftwareProject});
+	this.options = $.extend(true, this.options, {
+	    subjecttype: (o.subjecttype || "project"),
+	    targettype:(o.targettype || "software"),
+	    reverse:true,
+	    itemtype: appdb.views.RelationListItemSoftwareProject,
+	    preProcessData: appdb.views.RelationListProject.preProcessData
+	});
 });
 appdb.views.RelationListSoftwareOrganization = appdb.ExtendClass(appdb.views.RelationListOrganization, "appdb.views.RelationListSoftwareOrganization", function(o){
-	this.options = $.extend(true, this.options, {subjecttype: (o.subjecttype || "organization"),targettype:(o.targettype || "software"),reverse:true, itemtype: appdb.views.RelationListItemSoftwareOrganization});
+	this.options = $.extend(true, this.options, {
+	    subjecttype: (o.subjecttype || "organization"),
+	    targettype:(o.targettype || "software"),
+	    reverse:true,
+	    itemtype: appdb.views.RelationListItemSoftwareOrganization
+	});
 });
 appdb.views.RelationListVApplianceProject = appdb.ExtendClass(appdb.views.RelationListProject, "appdb.views.RelationListVApplianceProject", function(o){
-	this.options = $.extend(true, this.options, {subjecttype: (o.subjecttype || "project"),targettype:(o.targettype || "vappliance"),reverse:true, itemtype: appdb.views.RelationListItemVApplianceProject});
+	this.options = $.extend(true, this.options, {
+	    subjecttype: (o.subjecttype || "project"),
+	    targettype:(o.targettype || "vappliance"),
+	    reverse:true,
+	    itemtype: appdb.views.RelationListItemVApplianceProject,
+	    preProcessData: appdb.views.RelationListProject.preProcessData
+	});
 });
 appdb.views.RelationListVApplianceOrganization = appdb.ExtendClass(appdb.views.RelationListOrganization, "appdb.views.RelationListVApplianceOrganization", function(o){
 	this.options = $.extend(true, this.options, {subjecttype: (o.subjecttype || "organization"),targettype:(o.targettype || "vappliance"),reverse:true, itemtype: appdb.views.RelationListItemVApplianceOrganization});
 });
-
 appdb.views.RelationListSWApplianceProject = appdb.ExtendClass(appdb.views.RelationListProject, "appdb.views.RelationListSWApplianceProject", function(o){
-	this.options = $.extend(true, this.options, {subjecttype: (o.subjecttype || "project"),targettype:(o.targettype || "swappliance"),reverse:true, itemtype: appdb.views.RelationListItemSWApplianceProject});
+	this.options = $.extend(true, this.options, {
+	    subjecttype: (o.subjecttype || "project"),
+	    targettype:(o.targettype || "swappliance"),
+	    reverse:true,
+	    itemtype: appdb.views.RelationListItemSWApplianceProject,
+	    preProcessData: appdb.views.RelationListProject.preProcessData
+	});
 });
 appdb.views.RelationListSWApplianceOrganization = appdb.ExtendClass(appdb.views.RelationListOrganization, "appdb.views.RelationListSWApplianceOrganization", function(o){
 	this.options = $.extend(true, this.options, {subjecttype: (o.subjecttype || "organization"),targettype:(o.targettype || "swappliance"),reverse:true, itemtype: appdb.views.RelationListItemSWApplianceOrganization});

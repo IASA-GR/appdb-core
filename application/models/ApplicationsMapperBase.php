@@ -67,12 +67,12 @@ class Default_Model_ApplicationsMapperBase
 		if ( ! isnull($value->getTagPolicy()) ) $data['tagpolicy'] = $value->getTagPolicy();
 		if ( ! isnull($value->getDeleted()) ) $data['deleted'] = $this->pgBool($value->getDeleted());
 		if ( ! isnull($value->getMetatype()) ) $data['metatype'] = $value->getMetatype();
-		if ( ! isnull($value->getDisciplineID()) ) $data['disciplineid'] = $value->getDisciplineID();
+//		if ( ! isnull($value->getDisciplineID()) ) $data['disciplineid'] = $value->getDisciplineID();
 		if ( ! isnull($value->getOwnerID()) ) $data['owner'] = $value->getOwnerID();
-		if ( ! isnull($value->getCategoryID()) ) $data['categoryid'] = $value->getCategoryID();
+//		if ( ! isnull($value->getCategoryID()) ) $data['categoryid'] = $value->getCategoryID();
 		if ( ! isnull($value->getHitcount()) ) $data['hitcount'] = $value->getHitcount();
 		if ( ! isnull($value->getCname()) ) $data['cname'] = $value->getCname();
-		if ( ! isnull($value->getLinks()) ) $data['links'] = $value->getLinks();
+//		if ( ! isnull($value->getLinks()) ) $data['links'] = $value->getLinks();
 
 
 		$q1 = 'id = ?';
@@ -114,12 +114,12 @@ class Default_Model_ApplicationsMapperBase
 		$entry->setTagPolicy($row->tagpolicy);
 		$entry->setDeleted($row->deleted);
 		$entry->setMetatype($row->metatype);
-		$entry->setDisciplineID($row->disciplineid);
+//		$entry->setDisciplineID($row->disciplineid);
 		$entry->setOwnerID($row->owner);
-		$entry->setCategoryID($row->categoryid);
+//		$entry->setCategoryID($row->categoryid);
 		$entry->setHitcount($row->hitcount);
 		$entry->setCname($row->cname);
-		$entry->setLinks($row->links);
+//		$entry->setLinks($row->links);
 	}
 
 	public function find($id, Default_Model_Applications &$value)

@@ -1999,15 +1999,17 @@ String.prototype.replaceAll = function(search, replacement) {
         }).create({},{
             success: function(d) {
                 var s = '', by, evt;
-				if ( d.history && d.history.id) {
+				if ( d.history ) {
                     h = d.history;if ( ! $.isArray(h) ) h = [h];
                     for(var i=0; i<h.length; i++) {
-                        if ( h[i].userid ) by = ' by <a target="_blank" href="/store/person/'+h[i].username+'" onclick="return appdb.views.Main.showPerson({id: '+h[i].userid+', cname:\''+h[i].usercname+'\'},{mainTitle: \''+h[i].username+'\'});">' + h[i].username + (h[i].usercontact != '' ? ' ('+h[i].usercontact+')' : '') + '</a>'; else by = h[i].username + (h[i].usercontact != '' ? ' ('+h[i].usercontact+')' : '');
-						evt = h[i].event;
-						if ( evt == "update" && h[i].disposition === "rollback" ) evt = "rollback";
-						var diff = '<a href="#" onclick="appHistoryDiff(' + id + ', \'' + h[i].id + '\');">[DIFF]</a>';
-						s = s + '<li><a href="#" onclick="return appdb.views.Main.showApplication({id: '+id+', cname: appdb.pages.application.currentCName() + \'/history/' + h[i].id + '\', histid: \''+h[i].id+'\', histtype: 0});">'+appdb.utils.formatDate(h[i].timestamp) + "</a>: "+ evt + by + ' ' + diff + 
-						'</li>';
+						if (h[i].id) {
+							if ( h[i].userid ) by = ' by <a target="_blank" href="/store/person/'+h[i].usercname+'" onclick="return appdb.views.Main.showPerson({id: '+h[i].userid+', cname:\''+h[i].usercname+'\'},{mainTitle: \''+h[i].username+'\'});">' + h[i].username + '</a>'; else by = h[i].username + (h[i].usercontact != '' ? ' ('+h[i].usercontact+')' : '');
+							evt = h[i].event;
+							if ( evt == "update" && h[i].disposition === "rollback" ) evt = "rollback";
+							var diff = '<a href="#" onclick="appHistoryDiff(' + id + ', \'' + h[i].id + '\');">[DIFF]</a>';
+							s = s + '<li><a href="#" onclick="return appdb.views.Main.showApplication({id: '+id+', cname: appdb.pages.application.currentCName() + \'/history/' + h[i].id + '\', histid: \''+h[i].id+'\', histtype: 0});">'+appdb.utils.formatDate(h[i].timestamp) + "</a>: "+ evt + by + ' ' + diff + 
+							'</li>';
+						}
                     }
 					s = '<div><h3><a style="font-size: 110%; margin-left: -24px;" href="#" onclick="return appdb.views.Main.showApplication({id: '+id+', cname: appdb.pages.application.currentCName(), name: appdb.pages.application.currentName()});">View current state</a></h3></div>' + s;
                 }
@@ -3097,6 +3099,99 @@ String.prototype.replaceAll = function(search, replacement) {
 		});
 		cb(true);
 		return true;
+	}
+
+	function importDocs() {
+		var mtype = '<span>Format: <select name="bibtype">' + 
+			'<option value="bib">BibTeX</option>' + 
+			'<option value="biblatex">BibLaTeX</option>' +
+			'<option value="endx">EndNote</option>' +
+			'<option value="mods">MODS</option>' +
+			'</select></span>';
+		var mtext = '<div title="Import Publication"><p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>Please copy &amp; paste publication data in a supported format (bibTeX, etc.)</p>' + mtype + '<p></p><textarea id="importdoc" cols="90" rows="10"></textarea></div>';
+		var importDialog = $(mtext).dialog({
+			dialogClass: 'info',
+			autoOpen: false,
+			resizable: false,
+			height:'auto',
+			width:500,
+			modal: true,
+			buttons: {
+				OK: function() {
+					var t = $("select[name=bibtype] option:checked").val();
+					var d = $("textarea[id=importdoc]").val();
+					$("textarea[id=importdoc]").remove();
+					$("select[name=bibtype]").remove();
+					$(mtext).empty;
+					$(this).closest('.ui-dialog-content').dialog('close'); 
+					importDoc(t, d);
+				},
+				Cancel: function() {
+					$("textarea[id=importdoc]").remove();
+					$("select[name=bibtype]").remove();
+					$(mtext).empty;
+					$(this).closest('.ui-dialog-content').dialog('close'); 
+				}
+			}
+		});
+		importDialog.dialog('open');
+	}
+
+	function importDoc(btype, bibtext) {
+		var sleep = function (ms) {
+		  return new Promise(resolve => setTimeout(resolve, ms));
+		}
+		var appid = appdb.pages.application.currentId();
+		if (isNaN(appid)) {
+			appid = "";
+		} else if (appid <= 0) {
+			appid = "";
+		} else {
+			appid = "appid=" + encodeURIComponent(appid) + "&";			
+		}
+		$.post("/apps/importdoc", 
+			appid + "t=" + encodeURIComponent(btype) +  "&d=" + encodeURIComponent(bibtext), 
+			function(d) {}, 
+			"json"
+		).done(async function(d) {
+			if (!$.isArray(d)) {
+				dd = new Array();
+				dd.push(d);
+			} else {
+				dd = d;
+			}
+			for (di = 0; di < dd.length; ++di) {
+				while ($("#editDocDialog").length > 0) {
+					console.log($("#editDocDialog").length);
+					await sleep(1000);
+				};
+				d = dd[di];
+				addDoc(docgrid.model.getRow(docgrid.selection.getFirstSelected()));
+				setTimeout(function() {
+					$("input[id=name]").val(d.title);
+					$("input[name=url]").val(d.url);
+					$("input[name=pageStart").val(d.pagestart);
+					$("input[name=type]").prev().val(d.doctype);
+	
+					var j = 0;
+					for (i = 0; i < d.authors.length; ++i) {
+						a = d.authors[i];
+						if (a.fullname) {
+							addAuthor();
+							if (a.authorid) {
+								$($("span.app-docs > span.app-doc").find("input.dijitInputInner")[j]).val(a.fullname + ' (ID: ' + a.authorid + ')');
+							} else {
+								$($("span.app-docs > span.app-doc").find("input.dijitInputInner")[j]).val(a.fullname);
+							}
+							++j;
+						}
+					}
+					addAuthor();
+				}, 500);
+			}
+		}).fail(function(d) {
+			setTimeout(function(){(new appdb.views.ErrorHandler()).handle({"status": "Failed to parse publication data", "description": "Unsupported publication data format, or unexpected parsing error"});},0);
+		});
 	}
 
 	function addDoc(data) {

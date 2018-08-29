@@ -3878,7 +3878,8 @@ appdb.entity.Subdiscipline = appdb.EntityTypes.define("subdiscipline",[
 ], {});
 appdb.entity.Middleware = appdb.EntityTypes.define("middleware",[
 	{name: "id", canRef: true},
-	{name: "link", canRef: true}
+	{name: "link", canRef: true},
+	{name: "comment", canRef: true}
 ], {});
 appdb.entity.ApplicationStatus = appdb.EntityTypes.define("status",[
 	{name: "id", canRef: true}
@@ -4301,7 +4302,7 @@ appdb.utils.EntitySerializer = (function(defaultApiVersion){
 			},
 			"middleware": {
 				namespace: "http://appdb.egi.eu/api/{:version}/middleware",
-				attributes: ["id","link"]
+				attributes: ["id","link", "comment"]
 			},
 			"proglang": {
 				namespace: "http://appdb.egi.eu/api/{:version}/application", 
@@ -4933,11 +4934,11 @@ appdb.utils.EntityEditMapper.Application = function(entity){
 		}
 		for(i=0; i<len; i+=1){
 			if( $.trim(v) !== $.trim(d[i].id) ) continue;
-			if(d[i].id=="5"){
-				return {val: "Other"};
+			if($.trim(d[i].id)=="5"){
+				return {id:"5", comment: val, link: d[i].link, val: "Other"};
 			}
 			if(val === $.trim((d[i].val()).toLowerCase()) || val == d[i].id){
-				return {val: d[i].val()};
+				return {id: d[i].id, val: d[i].val()};
 			}
 		}
 		
@@ -5010,14 +5011,25 @@ appdb.utils.EntityEditMapper.Application = function(entity){
 			len = v.length;
 			for(i=0; i<len; i+=1){
 				if($.isPlainObject(v[i])){
-					fixed = {val: v[i].name , link: v[i].link};
+					fixed = {id: "5", comment: v[i].name, link: v[i].link, val: "Other"};
 				}else{
 					fixed = this.fixMiddleware(v[i],i);
 				}
 				if(fixed !== false){
-					v[i] = {"val": (function(val){return function(){return val;};})(fixed.val)};
-					if(fixed.link){
-						v[i].link = fixed.link;
+					if (fixed.id == '5') {
+						v[i] = {'id':'5', "val": function(){return 'Other';}};
+						if (fixed.link) {
+							v[i].link = fixed.link;
+						}
+						if (fixed.comment) {
+							v[i].comment = fixed.comment;
+						}
+					} else {
+						v[i] = {"val": (function(val){return function(){return val;};})(fixed.val)};
+						if(fixed.link){
+							v[i].link = fixed.link;
+						}
+						v[i].id = fixed.id;
 					}
 				}
 			}

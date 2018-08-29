@@ -27,9 +27,9 @@ INSERT INTO relationverbs(name, dname, rname) VALUES ('funding', 'fund', 'funded
 INSERT INTO relationtypes (target_type, verbid, subject_type, description, actionid)
 	VALUES ('software', (SELECT id FROM relationverbs WHERE name = 'funding'), 'project', 'A project funded a software', 40);
 INSERT INTO relationtypes (target_type, verbid, subject_type, description, actionid)
-	VALUES ('vappliance', (SELECT id FROM relationverbs WHERE name = 'funding'), 'project', 'A project funded a software', 40);
+	VALUES ('vappliance', (SELECT id FROM relationverbs WHERE name = 'funding'), 'project', 'A project funded a virtual appliance', 40);
 INSERT INTO relationtypes (target_type, verbid, subject_type, description, actionid)
-	VALUES ('swappliance', (SELECT id FROM relationverbs WHERE name = 'funding'), 'project', 'A project funded a software', 40);
+	VALUES ('swappliance', (SELECT id FROM relationverbs WHERE name = 'funding'), 'project', 'A project funded a software appliance', 40);
 
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 20, 2, E'Add project funding verbs and relation types'

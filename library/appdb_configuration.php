@@ -150,7 +150,7 @@ class ApplicationConfigurationIni
 	
 	/**
 	 * Retrieve values for the given namespace by the given key
-	 * rom the application ini file. Eg app.repositoryApi='https://...'
+	 * rom the application ini file. Eg app.wiki='https://...'
 	 * 
 	 * @param String $namespace - Namespace to query
 	 * @param String $key - The key to search app namespace
@@ -210,7 +210,7 @@ class ApplicationConfiguration
 {
 	/**
 	 * Retrieve values by key under the 'app' namespace. 
-	 * Eg app.repositoryApi='https://....'
+	 * Eg app.wiki='https://....'
 	 * 
 	 * @param String $key - The key to search app namespace
 	 * @param Any $default - Default value when key does not exist

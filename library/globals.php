@@ -54,7 +54,6 @@ Zend_Registry::set('vouser_sync',$vouser_sync);
 $_SERVER["validation_period"] = $app["invalid"];
 $_SERVER['APILatestVersion'] = $api["latestVersion"];
 $_SERVER['Repository_Enabled'] = ( ( isset($app["enableRepository"]) && $app["enableRepository"] == 'true' )?"true":"false");
-$_SERVER['Repository_Api'] = ( ( isset($app["repositoryApi"]) )?$app["repositoryApi"]:"" );
 
 list($php_major, $php_minor, $php_bug) = explode(".", phpversion(), 3);
 

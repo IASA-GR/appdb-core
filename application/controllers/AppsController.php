@@ -35,196 +35,6 @@ class AppsController extends Zend_Controller_Action
 		}
 	}
 
-	private function syncAppContactItems($appid, $data) {
-		$collection = new Default_Model_AppContactItems();
-		$collection->filter->appid->equals($appid);
-		for ($i = $collection->count()-1; $i >=0; $i--) {			
-			$found = false;
-			foreach ($data as $key => $value) {
-				if (substr($key,0,6) === "cntpnt") {
-					$datum = json_decode($value,true);
-					if ( ($datum['itemtype'] === $collection->items[$i]->itemType) && 
-						 ($datum['researcherid'] == $collection->items[$i]->researcherID) && 
-						 ($datum['item'] == $collection->items[$i]->item) &&
-						 ($datum['itemid'] == $collection->items[$i]->itemID)
-					) {
-						$found = true;
-						break;
-					}
-				}
-			}
-			if (! $found) {
-				$col2 = null;
-				switch($collection->items[$i]->itemType) {
-					case "vo":
-						$col2 = new Default_Model_AppContactVOs();
-						$col2->filter->appid->equals($appid)->and($col2->filter->void->equals($collection->items[$i]->itemID))->and($col2->filter->researcherid->equals($collection->items[$i]->researcherID));
-						if (count($col2->items) > 0) $col2->remove(0);
-						break;
-					case "middleware":
-						$col2 = new Default_Model_AppContactMiddlewares();
-						$col2->filter->appid->equals($appid)->and($col2->filter->appmiddlewareid->equals($collection->items[$i]->itemID))->and($col2->filter->researcherid->equals($collection->items[$i]->researcherID));
-						if (count($col2->items) > 0) $col2->remove(0);
-						break;
-					case "other":
-						$col2 = new Default_Model_AppContactOtherItems();
-						$col2->filter->appid->equals($appid)->and($col2->filter->item->equals($collection->items[$i]->item))->and($col2->filter->researcherid->equals($collection->items[$i]->researcherID));
-						if (count($col2->items) > 0) $col2->remove(0);
-						break;
-				}
-			}
-		}
-		$collection->refresh();
-		foreach ($data as $key => $value) {
-			if (substr($key,0,6) === "cntpnt") {
-				$datum = json_decode($value,true);
-				$found = false;
-				for ($i = $collection->count()-1; $i >= 0; $i--) {
-					if ( ($datum['itemtype'] === $collection->items[$i]->itemType) && 
-						 ($datum['researcherid'] == $collection->items[$i]->researcherID) && 
-						 ($datum['item'] == $collection->items[$i]->item) &&
-						 ($datum['itemid'] == $collection->items[$i]->itemID)
-					) {
-						$found = true;
-						break;
-					}
-				}
-				if (! $found) {
-					$item = null;
-					switch ($datum['itemtype']) {
-						case "vo":
-							$item = new Default_Model_AppContactVO();
-							$item->void = $datum['itemid'];
-							break;
-						case "middleware":
-							$mws = new Default_Model_AppMiddlewares();
-							$mws->filter->appid->equals($appid);
-							$mwid = null;
-							for ($j=0; $j <= count($mws->items); $j++) {
-								if ($datum['itemid'] == 5) { // custom middleware, check comment
-									if ($mws->items[$j]->comment == $datum['item']) {
-										$mwid = $mws->items[$j]->id;
-										break;
-									}
-								} else { // predefined middleware
-									if ($mws->items[$j]->middlewareID == $datum['itemid']) {
-										$mwid = $mws->items[$j]->id;
-										break;
-									}
-								}
-							}
-							if ($mwid !== null) {
-								$item = new Default_Model_AppContactMiddleware();
-								$item->appmiddlewareid = $mwid;
-							}
-							break;
-						case "other":
-							$item = new Default_Model_AppContactOtherItem();
-							$item->item = $datum['item'];
-							break;
-					}
-					if ( $item !== null ) {
-						$item->appid = $appid;
-						$item->researcherid = $datum['researcherid'];
-						$item->save();
-					} else {
-						error_log('warning: could not match to-be-inserted posted appContactItem to appropriate DB item. Possible data loss');
-						error_log('posted appContactItem data: '.var_export($datum,true));
-					}
-				}
-			}
-		}
-	}
-
-	private function syncDBCollection($masterName, $masterID, $slaveName, $collectionName, $collectionItemName, &$data, $dataSlaveName = "") {
-		if ( $dataSlaveName === "" ) $dataSlaveName = $slaveName;
-		$collectionName = "Default_Model_".$collectionName;
-		$collectionItemName = "Default_Model_".$collectionItemName;
-		$collection = new $collectionName();
-		$collection->filter->$masterName->equals($masterID);
-		for ( $i = $collection->count()-1; $i >= 0; $i-- ) {
-			$found = false;
-			foreach ( $data as $key => $value ) {
-				if ( strtolower(substr($key, 0, strlen($dataSlaveName))) === strtolower($dataSlaveName) ) {
-					if ( $dataSlaveName == "url" ) {
-						$urlData = json_decode($value, true);
-                        $slaveID = $urlData['id'];
-                    } elseif ( $dataSlaveName == "mw" ) {
-                        $mws = new Default_Model_Middlewares();
-                        $mws->filter->name->equals($value);
-                        if ( count($mws->items) > 0 ) {
-                            $slaveID = $mws->items[0]->id;
-                        } else $slaveID = $value;
-					} else {
-						$slaveID = $value;
-					}
-					if ( $slaveID == $collection->items[$i]->$slaveName ) {
-						$found = true;
-						break;
-					}    
-				}    
-			}    
-			if ( ! $found ) $collection->remove($i);
-		}    
-		$collection->refresh();
-        $j = 0;		// have a counter handy, needed in some cases
-        $firstCategory = true;
-		foreach ($data as $key => $value) {
-			if ( strtolower(substr($key,0,strlen($dataSlaveName))) === strtolower($dataSlaveName) ) {
-				$found = false;
-				$slaveID = null;
-				if ( $dataSlaveName == "url" ) {
-					$urlData = json_decode($value, true);
-					$slaveID = $urlData['id'];
-					// default to http:// if relative url is given
-					if (parse_url($urlData['url'], PHP_URL_SCHEME) == '') {
-						$urlData['url'] = 'http://'.$urlData['url'];
-					}
-				} elseif ( $dataSlaveName == "mw" ) {
-					$mws2 = new Default_Model_Middlewares();
-					$mws2->filter->name->equals($value);
-					if ($mws2->count()>0) {
-							$mwid = $mws2->items[0]->id;
-							$mwcomment = null;
-					} else {
-							$mwid = 5;
-							$mwcomment = $value;
-                    }
-                    $slaveID = $mwid;
-				} else {
-					$slaveID = $value;
-				}
-				for ($i=$collection->count()-1; $i>=0; $i--) {
-					if ( $slaveID == $collection->items[$i]->$slaveName) {
-						if ( $collectionItemName != "Default_Model_AppUrl" ) $found = true;
-						break;
-					}    
-				}    
-				if ( ! $found ) {
-					$collectionItem = new $collectionItemName();
-					$collectionItem->$masterName = $masterID;
-					$collectionItem->$slaveName = $slaveID;
-					if ( $collectionItemName == "Default_Model_AppUrl" ) {
-						if ( $collectionItem->$slaveName == "" ) $collectionItem->$slaveName = null;
-						$collectionItem->url = $urlData['url'];
-						$collectionItem->description = $urlData['type'];
-						$collectionItem->title = $urlData['title'];
-						$collectionItem->ord = (string)$j;					
-					} elseif ( $collectionItemName == "Default_Model_AppMiddleware" ) {
-						$collectionItem->middlewareID = $mwid;
-						$collectionItem->comment = $mwcomment;
-                    } elseif ( $collectionItemName == "Default_Model_AppCategory") {
-                        if ( $firstCategory ) {
-                            $collectionItem->isPrimary = true;
-                            $firstCategory = false;
-                        }
-                    }
-					$collectionItem->save();
-					$j++;
-				}    
-			}    
-		}   		
-	}
 
     public function init()
     {
@@ -599,270 +409,16 @@ class AppsController extends Zend_Controller_Action
 		echo "</map>\n";
     }
     
-    private function &populateAppDoc(&$existing,&$docdatum) {
-		if (array_key_exists("url",$docdatum)) $existing->url = $docdatum['url']; else $existing->url = null;
-                $existing->title = $docdatum['title'];
-		// Default to http:// if relative URL is given
-		if (parse_url($existing->url, PHP_URL_SCHEME) == '') {
-			$existing->url = 'http://'.$existing->url;
-		}
-		if (trim($existing->url) == 'http://') $existing->url = '';
-		$existing->conference = $docdatum['conference'];
-		$existing->proceedings = $docdatum['proceedings'];
-		if (array_key_exists('journal',$docdatum)) $existing->journal = $docdatum['journal']; else $existing->journal = null;
-		$existing->isbn = $docdatum['isbn'];
-		$existing->volume = $docdatum['volume'];
-		$existing->pageStart = $docdatum['pageStart'];
-		if (array_key_exists('pageEnd',$docdatum)) $existing->pageEnd = $docdatum['pageEnd']; else $existing->pageEnd = null;
-		if ( isnull($existing->pageStart) || ($existing->pageStart == '') ) $existing->pageStart = null;
-		if ( isnull($existing->pageEnd) || ($existing->pageEnd == '') ) $existing->pageEnd = null;
-		$existing->year = $docdatum['year'];
-		if ( isnull($existing->year) || ($existing->year == '') ) $existing->year = null;
-		$existing->publisher = $docdatum['publisher'];
-		$existing->docTypeID =  $docdatum['typeID'];
-		if ( $existing->Id !== null ) {
-			$intAuthors = new Default_Model_IntAuthors();
-			$intAuthors->refresh();
-			$extAuthors = new Default_Model_ExtAuthors();
-			$extAuthors->refresh();
-			//remove all existing authors
-			for ($j=count($existing->authors)-1; $j>=0; $j--) {
-				if ( ! isnull($existing->authors[$j]->AuthorId) ) {
-					$intAuthors->remove($intAuthors->item($existing->authors[$j]->Id));
-				} else {
-					$extAuthors->remove($extAuthors->item($existing->authors[$j]->Id));
-				}
-			}
-			//add authors from scratch
-			foreach($docdatum['intAuthors'] as $xauthor) {
-				$author = new Default_Model_IntAuthor();
-				$author->authorID = $xauthor[0];
-				if ( $xauthor[1] == "true" ) $author->main = true; else $author->main = false;
-				$author->docID = (string)($existing->Id);
-				$intAuthors->add($author);
-			}
-			foreach($docdatum['extAuthors'] as $xauthor) {
-				$author = new Default_Model_ExtAuthor();
-				$author->author = $xauthor[0];
-				if ( $xauthor[1] == "true" ) $author->main = true; else $author->main = false;
-				$author->docID = (string)($existing->Id);
-				$extAuthors->add($author);
-			}
-		}
-		return $existing;
-    }
 
-    private function noDupes($data) {
-        $r = array();
-        $d = array();
-        foreach ($data as $k => $v) {
-            $t = '';
-            if ( substr(strtolower($k),0,8) == "disciplineid" ) $t = "discipline";
-            if ( substr(strtolower($k),0,10) == "categoryid" ) $t = 'category';
-            if ( substr(strtolower($k),0,2) == "vo" ) $t = 'vo';
-            if ( substr(strtolower($k),0,2) == "mw" ) $t = 'mw';
-            if ( substr(strtolower($k),0,6) == "scicon" ) $t = 'scicon';
-            if ( substr(strtolower($k),0,9) == "countryid" ) $t = 'country';
-            if ( $t != '' ) {
-                if ( ! in_array("$t ---> $v", $r) ) {
-                    $r[] = "$t ---> $v";
-                    $d[$k] = $v;
-                }
-            } else {
-                $d[$k] = $v;
-            }
-        }
-        return $d;
-    }
-
-	public function updateAction() {
-        $data = &$_POST;
-        $data = $this->noDupes($data);
-    	$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
-		db()->beginTransaction();
-		try {
-		if ( $data['id'] == '0' ) $data['id'] = '';
-		if ( isset($data['name']) == true ) { $data['name'] = ltrim(rtrim($data['name'])); }
-		if ( isset($data['description']) == true ) { $data['description'] = ltrim(rtrim($data['description'])); }
-		if ( isset($data['abstract']) == true ) { $data['abstract'] = rtrim($data['abstract']); }
-		if ( $this->session->userid !== null ) {
-			$users = new Default_Model_Researchers();
-			$users->filter->id->equals($this->session->userid);
-			$user = $users->items[0];
-			$apps = new Default_Model_Applications();
-			if ( $data['id'] != '' ) { // UPDATE
-				$apps->filter->id->equals($data['id']);
-				$app = $apps->items[0];
-				if ( $user->privs->canModifyApplicationName($app) ) $app->name = $data['name'];
-				if ( $user->privs->canModifyApplicationDescription($app) ) $app->description = $data['description'];
-				if ( $user->privs->canModifyApplicationAbstract($app) ) $app->abstract = $data['abstract'];
-				if ( $user->privs->canModifyApplicationStatus($app) ) if ( $data['statusID'] != '' ) $app->statusID = $data['statusID'];
-				if ($_POST['newimage'] !== "") {
-					if ( $user->privs->canModifyApplicationLogo($app) ) {
-						$imgfile = APPLICATION_PATH."/../public/".$_POST['newimage'];
-						if ( file_exists(APPLICATION_PATH . "/../cache/app-logo-".$data["id"].".png") ) unlink(APPLICATION_PATH . "/../cache/app-logo-".$data["id"].".png");
-						if ( file_exists(APPLICATION_PATH . "/../cache/55x55/app-logo-".$data["id"].".png") ) unlink(APPLICATION_PATH . "/../cache/55x55/app-logo-".$data["id"].".png");
-						if ( file_exists(APPLICATION_PATH . "/../cache/100x100/app-logo-".$data["id"].".png") ) unlink(APPLICATION_PATH . "/../cache/55x55/app-logo-".$data["id"].".png");
-						$app->logo = pg_escape_bytea(base64_encode(@file_get_contents($imgfile)));
-					};
-				};
-				if ( isset($_POST['addedBy']) ) {
-					if ($_POST['addedBy'] !== '') {
-						if ($user->privs->canGrantOwnership($app) ) {
-							$app->addedBy = $_POST['addedBy'];
-							$app->ownerID = $_POST['addedBy'];
-						}
-					}
-				}
-				$app->lastUpdated = date('Y-m-d');
-				$app->keywords = null;
-				$app->save();
-				
-				if ( $user->privs->canModifyApplicationCategory($app) ) $this->syncDBCollection ("appid", $data['id'], "categoryid", "AppCategories", "AppCategory", $data);
-				/* set primary category */
-				$newapps = new Default_Model_Applications();
-				$newapps->filter->id->equals($app->id);
-				if ( count($newapps->items) > 0 ) {
-					if ( count($newapps->items[0]->categories) > 0 ) {
-						foreach($newapps->items[0]->categories as $cat) {
-							if ( isset($data["categoryID0"]) && $cat->categoryid == $data["categoryID0"] ) {
-								if ( ! $cat->isPrimary ) {
-									$cat->isPrimary = true;
-									$cat->save();
-									break;
-								}
-							}
-						}
-					}
-				}
-
-				if ( $user->privs->canModifyApplicationDiscipline($app) ) $this->syncDBCollection("appid", $data['id'], "disciplineid", "AppDisciplines", "AppDiscipline", $data);
-				
-				$this->session->privs = null;
-				if ( $user->privs->canModifyApplicationVO($app) ) $this->syncDBCollection("appid", $data['id'], "void", "AppVOs", "AppVO", $data, "vo");
-				if ( $user->privs->canModifyApplicationMiddleware($app) ) $this->syncDBCollection("appid", $data['id'], "middlewareid", "AppMiddlewares", "AppMiddleware", $data, "mw");
-				if ( $user->privs->canAssociatePersonToApplication($app) ) {
-					$this->syncDBCollection("appid", $data['id'], "researcherid", "ResearchersApps", "ResearchersApp", $data, "scicon");
-					$this->syncAppContactItems($data['id'], $data);
-				}
-				if ( $user->privs->canModifyApplicationCountry($app) ) $this->syncDBCollection("appid", $data['id'], "countryid", "AppManualCountries", "AppManualCountry", $data); 
-				if ( $user->privs->canModifyApplicationURLs($app) ) $this->syncDBCollection("appid", $data['id'], "id", "AppUrls", "AppUrl", $data, "url");
-				if ( $user->privs->canModifyApplicationDocuments($app) ) { // this is rather too complicated to be included in syncDBCollection...
-					if ( $data['documents'] != "UNCHANGED" ) {
-						$xdocs = new SimpleXMLElement($data['documents']);
-						$docdata=array();
-						foreach ($xdocs->document as $doc) {
-							$ddd = "".$doc;
-							$ddd = base64_decode($ddd);
-							$ddd = urldecode($ddd);
-							$ddd = json_decode($ddd,true);
-							$docdata[] = $ddd;						
-						}
-						$docs = new Default_Model_AppDocuments();
-						$docs->filter->appid->equals($data['id']);
-						$docs->refresh();                                                
-						$docCount = count($docs->items);
-						//handle existing and deleted entries
-						for ($i=$docCount-1; $i>=0; $i--) {
-							$existing=null;
-							foreach($docdata as $docdatum) {
-								$doc = $docs->items[$i];
-								if ( $doc->id == $docdatum['id'] ) {
-									$existing = $this->populateAppDoc($doc,$docdatum);
-									break;
-								}
-							}
-							if ($existing === null) {
-								$docs->remove($docs->items[$i]);
-							} else {
-								$existing->save();
-							}
-						}
-						//handle new entries
-						foreach($docdata as $docdatum) {
-							if ( $docdatum['id'] == '' || strtolower($docdatum['id']) == 'null') {
-								$doc = new Default_Model_AppDocument();
-								//first time only main data is saved
-								$doc->appID = $data['id'];
-								$doc = $this->populateAppDoc($doc,$docdatum);
-								$docs->add($doc);
-								//second time referenced data is saved
-								$doc = $this->populateAppDoc($doc,$docdatum);
-								$doc->save();
-							}
-						}
-					}
-				}
-			} else { // INSERT
-				if ( $user->privs->canInsertApplication() ) {
-					if (($data['tool'] == "true")) {                                    
-						$data['tool'] = true;
-					} else {
-						$data['tool'] = false;
-					}
-					$app = new Default_Model_Application();
-					$app->name = $data['name'];
-					$app->description = $data['description'];
-					$app->abstract = $data['abstract'];
-					if ( $data['statusID'] != '' ) $app->statusID = $data['statusID'];
-					//EGI RT #1820: Remove RESPECT				
-					//$app->respect = $data['respect'];
-					$app->respect = false;
-					if ($data['tool']) {
-						$app->tool = true; 
-					} else {
-						$app->tool = false;
-					};
-					$app->dateAdded = date('Y-m-d');
-					$app->lastUpdated = date('Y-m-d');
-					if (array_key_exists('addedBy',$_POST)) {
-						if ($user->privs->canGrantOwnership($app) ) {
-							$app->addedBy = $_POST['addedBy'];
-							$app->ownerID = $_POST['addedBy'];
-                        } else {
-                            $app->addedBy = $this->session->userid;
-                            $app->ownerID = $this->session->userid;
-                        }
-                    } else {
-                        $app->addedBy = $this->session->userid;
-                        $app->ownerID = $this->session->userid;
-                    }
-					if ($_POST['newimage'] !== "") {
-						$imgfile = APPLICATION_PATH."/../public/".$_POST['newimage'];
-						$app->logo = pg_escape_bytea(base64_encode(@file_get_contents($imgfile)));
-					}
-					$app->keywords = null;
-					$apps->add($app);
-					
-					$this->syncDBCollection ("appid", $app->id, "categoryid", "AppCategories", "AppCategory", $data);
-					$this->syncDBCollection("appid", $app->id, "disciplineid", "AppDisciplines", "AppDiscipline", $data);
-					
-					$this->session->lastAppID = $app->id;
-					$this->session->privs = null;
-				}
-			}
-		}
-		db()->commit();
-		} catch (Exception $e) {
-			db()->rollBack();
-			$this->getResponse()->clearAllHeaders();
-			$this->getResponse()->setRawHeader("HTTP/1.0 500 Internal server error");
-			$this->getResponse()->setHeader("Status","500 Internal server error");
-			echo base64_encode(encrypt($e, substr(ApplicationConfiguration::api('key',''), 0, 8)));
-			error_log("Transaction ROLLBACKed: $e");
-		}
-    }
-
-    public function editdocAction() {
-        $this->_helper->layout->disableLayout();
-		if (array_key_exists('data',$_GET)) $this->view->data = $_GET['data']; else $this->view->data = "''";
-		$dt = new Default_Model_DocTypes();
-		$this->view->docTypes = $dt->refresh();
-		$this->view->people = new Default_Model_Researchers();
-		$this->view->people->filter->orderBy(array('lastname','firstname'));
-		$this->view->people->refresh();
-    }
+	public function editdocAction() {
+		$this->_helper->layout->disableLayout();
+			   if (array_key_exists('data',$_GET)) $this->view->data = $_GET['data']; else $this->view->data = "''";
+			   $dt = new Default_Model_DocTypes();
+			   $this->view->docTypes = $dt->refresh();
+			   $this->view->people = new Default_Model_Researchers();
+			   $this->view->people->filter->orderBy(array('lastname','firstname'));
+			   $this->view->people->refresh();
+	}
 
     public function uploadframeAction() {
 		$this->_helper->layout->disableLayout();
@@ -2481,17 +2037,23 @@ class AppsController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender();
 		$t = $this->getParam("t");
 		$d = $this->getParam("d");
+		$appid = $this->getParam("appid");
+		if (! isset($appid)) {
+			$appid = null;
+		}
 		if (isset($t) && isset($d)) {
 			switch ($t) {
-				case "bibtex":
+				case "bib":
+				case "endx":
+				case "biblatex":
 					$fbib = tmpfile();
 					$fbibname = stream_get_meta_data($fbib)['uri'];
 					$fmods = tmpfile();
 					$fmodsname = stream_get_meta_data($fmods)['uri'];
 					fwrite($fbib, $d);
 					error_log("$fbibname --> $fmodsname");
-					error_log(APPLICATION_PATH . "/../bibutils/bib2xml $fbibname > $fmodsname");
-					exec(APPLICATION_PATH . "/../bibutils/bib2xml $fbibname > $fmodsname");
+					error_log(APPLICATION_PATH . "/../bibutils/" . $t . "2xml $fbibname > $fmodsname");
+					exec(APPLICATION_PATH . "/../bibutils/" . $t . "2xml $fbibname > $fmodsname");
 					$mods = str_replace('<' . '?xml version="1.0" encoding="UTF-8"?' . '>', "", file_get_contents($fmodsname));
 					break;
 				case "mods":
@@ -2510,7 +2072,7 @@ class AppsController extends Zend_Controller_Action
 				"SELECT mods2doc(?, ?)",
 				array(
 					$mods,
-					isset($_GET["appid"]) ? $_GET["appid"] : NULL
+					$appid
 				)
 			)->fetchAll();
 		} else {
