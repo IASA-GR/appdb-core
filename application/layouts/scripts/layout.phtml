@@ -19,6 +19,8 @@ check_for_appdbcached();
 
 if ( isset($_GET['cb']) && $_GET['cb'] == "0"  ) {
 	$this->customBuild = false;
+} elseif (isset($_GET['cb']) && $_GET['cb'] == "1") {
+        $this->customBuild = true;
 } elseif ( substr($_SERVER['APPLICATION_ENV'],0,5) === 'devel' ) {
 	$this->customBuild = false;
 } else {
@@ -192,7 +194,7 @@ echo $this->doctype(); fl();?>
 	echo $this->headScript();
 ?>
 </head> 
-	<body class="tundra display1024<?php if ($this->session->userid !== null){ echo ' loggedin'; } ?>" data-content='init'>
+	<body class="tundra display1024<?php if ($this->session->userid !== null){ echo ' loggedin'; } ?>" data-content='init' data-cb='<?php echo ($this->customBuild === true ? 'true' : 'false'); ?>'>
 	<?php 
 	fl();
 	echo $this->layout()->content;
