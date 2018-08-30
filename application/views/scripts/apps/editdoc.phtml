@@ -71,23 +71,23 @@
 		return true;
 	};
 	
-	var addAuthor = function() {
+	var addAuthor = function(onlyCreate) {
 		if(validateAuthors()==false){ return false; }
-			var atd=$(':input[name="authors"]:last').parent();
-		var s=makeAuthors();
+		var atd=$(':input[name="authors"]:last').parent();
+		var s = makeAuthors();
 		var a = s.replace(/, *{/g,"").split(',');
-		var h='<input style="display:none" type="text" name="authors"/>';
+		var h= '<input style="display:none" type="text" name="authors"/>';
 		var hasAuthor = false;
 		for (var i in a) {
 			if (a[i] != "" ){
 				hasAuthor = true;
 			}
 		};
-		h=h+makeAuthCombo();
+                var mkCmb = $(makeAuthCombo());
 		if(hasAuthor==false){
-			atd.empty().append(h);
+			atd.empty().append(h).append(mkCmb);
 		}else{
-			atd.append(h);
+			atd.append(h).append(mkCmb);
 		}
 
 		dojo.parser.parse(atd[0]);
@@ -101,8 +101,12 @@
 				}
 			});
 		});
-		renderLists($(".app-docs:last"),remAuthor,function(e){ validateDocSave();return ($(e).find(".listremove").length===0?false:true)});
-		$(".editdoc .tip").show();
+                if (onlyCreate !== true) {
+                    renderLists($(".app-docs:last"),remAuthor,function(e){ validateDocSave();return ($(e).find(".listremove").length===0?false:true)});
+                }
+                $(".editdoc .tip").show();
+
+                return mkCmb;
 	};
 	
 	var remAuthor = function() {
@@ -196,8 +200,8 @@
 	dojo.parser.parse($('div.editdoc:last')[0]);
 	
 	var makeAuthCombo = function(n, isInternal,par) {
-    var wasundef=false;
-    if ( n == undefined ) wasundef = true;
+                var wasundef=false;
+                if ( n == undefined ) wasundef = true;
 		var s='<select '+((typeof n == 'undefined')?'displayedValue=""':'')+' onchange="setAuthor()" class="authorselect"  dojoType="dijit.form.ComboBox" autocomplete="true">';
 		var authors = [<?php $pc = $this->people->count();$pcc = $pc-1;
 		for ($i=0; $i<$pc; $i++) {
@@ -244,15 +248,15 @@
 					s=$(s).find("select").append('<option selected="selected" value="'+n[0]+'">'+n[0]+'</option>').outerHTML();
 				}
 			}
-        } else {
-			
-		}
-		$(document).on('click', ".editdoc .app-doc .dijitReset.dijitRight.dijitButtonNode.dijitArrowButton.dijitDownArrowButton.dijitArrowButtonContainer", function(){
-			setTimeout(function(){
-				$("div.dijitPopup.dijitComboBoxMenuPopup").css({"z-index": "999999999"});
-			},10);
-		});
-        return s;
+                } else {
+
+                }
+                $(document).on('click', ".editdoc .app-doc .dijitReset.dijitRight.dijitButtonNode.dijitArrowButton.dijitDownArrowButton.dijitArrowButtonContainer", function(){
+                        setTimeout(function(){
+                                $("div.dijitPopup.dijitComboBoxMenuPopup").css({"z-index": "999999999"});
+                        },10);
+                });
+                return s;
 	};
 
 	var loadDocData = function(data) {
@@ -328,19 +332,19 @@
 		}
 		dijit.byId("docSave").set("disabled",disabled);
 	};
-    $(document).ready(function() {
+        $(document).ready(function() {
    		var atd=$(':input[name="authors"]:last').parent();
-        dojo.parser.parse(atd[0]);
-        atd.find(".dijitComboBox").each(function(){
+                dojo.parser.parse(atd[0]);
+                atd.find(".dijitComboBox").each(function(){
 			$(this).on("click", function() {
-                setFocusedItem($(this));
-            });
-        });
-        renderLists($(".app-docs:last"),remAuthor);
-        validateDocSave();
-        dojo.connect(dijit.byId("name"),"onKeyUp",function(v){
-         validateDocSave();
-        });
+                            setFocusedItem($(this));
+                        });
+                });
+                renderLists($(".app-docs:last"),remAuthor);
+                validateDocSave();
+                dojo.connect(dijit.byId("name"),"onKeyUp",function(v){
+                    validateDocSave();
+                });
 		$(".editdoc.editmode").keyup(validateDocSave);
-    });
+        });
 </script>

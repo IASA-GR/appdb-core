@@ -6664,8 +6664,9 @@ div.listremove a > span > img {
  text-align: left;
 }
 .editmode .app-docs{
- display: inline-block;
- 
+        display: inline-block;
+        max-height: 150px;
+        overflow-y: auto;
 }
 .editdoc .tip{
 	display: inline-block;

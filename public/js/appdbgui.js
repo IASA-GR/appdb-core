@@ -3104,103 +3104,88 @@ String.prototype.replaceAll = function(search, replacement) {
 	function importDocs() {
 		return;
 	}
-//	function importDocs() {
-//		var mtype = '<span>Format: <select name="bibtype">' + 
-//			'<option value="bib">BibTeX</option>' + 
-//			'<option value="biblatex">BibLaTeX</option>' +
-//			'<option value="endx">EndNote</option>' +
-//			'<option value="mods">MODS</option>' +
-//			'</select></span>';
-//		var mtext = '<div title="Import Publication"><p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>Please copy &amp; paste publication data in a supported format (bibTeX, etc.)</p>' + mtype + '<p></p><textarea id="importdoc" cols="90" rows="10"></textarea></div>';
-//		var importDialog = $(mtext).dialog({
-//			dialogClass: 'info',
-//			autoOpen: false,
-//			resizable: false,
-//			height:'auto',
-//			width:500,
-//			modal: true,
-//			buttons: {
-//				OK: function() {
-//					var t = $("select[name=bibtype] option:checked").val();
-//					var d = $("textarea[id=importdoc]").val();
-//					$("textarea[id=importdoc]").remove();
-//					$("select[name=bibtype]").remove();
-//					$(mtext).empty;
-//					$(this).closest('.ui-dialog-content').dialog('close'); 
-//					importDoc(t, d);
-//				},
-//				Cancel: function() {
-//					$("textarea[id=importdoc]").remove();
-//					$("select[name=bibtype]").remove();
-//					$(mtext).empty;
-//					$(this).closest('.ui-dialog-content').dialog('close'); 
-//				}
-//			}
-//		});
-//		importDialog.dialog('open');
-//	}
+	function importDocs() {
+		var mtype = '<span>Format: <select name="bibtype">' + 
+			'<option value="bib">BibTeX</option>' + 
+			'<option value="biblatex">BibLaTeX</option>' +
+			'<option value="endx">EndNote</option>' +
+			'<option value="mods">MODS</option>' +
+			'</select></span>';
+		var mtext = '<div title="Import Publication"><p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>Please copy &amp; paste publication data in a supported format (bibTeX, etc.)</p>' + mtype + '<p></p><textarea id="importdoc" rows="10" style="width:100%;"></textarea></div>';
+		var importDialog = $(mtext).dialog({
+			dialogClass: 'info',
+			autoOpen: false,
+			resizable: false,
+			height:'auto',
+			width: 500,
+			modal: true,
+			buttons: {
+				OK: function() {
+					var t = $("select[name=bibtype] option:checked").val();
+					var d = $("textarea[id=importdoc]").val();
+					$("textarea[id=importdoc]").remove();
+					$("select[name=bibtype]").remove();
+					$(mtext).empty();
+					$(this).closest('.ui-dialog-content').dialog('close'); 
+					importDoc(t, d);
+				},
+				Cancel: function() {
+					$("textarea[id=importdoc]").remove();
+					$("select[name=bibtype]").remove();
+					$(mtext).empty();
+					$(this).closest('.ui-dialog-content').dialog('close'); 
+				}
+			}
+		});
+		importDialog.dialog('open');
+	}
 
 	function importDoc(btype, bibtext) {
-		return;
-	}
-//	function importDoc(btype, bibtext) {
-//		var sleep = function (ms) {
-//		  return new Promise(resolve => setTimeout(resolve, ms));
-//		}
-//		var appid = appdb.pages.application.currentId();
-//		if (isNaN(appid)) {
-//			appid = "";
-//		} else if (appid <= 0) {
-//			appid = "";
-//		} else {
-//			appid = "appid=" + encodeURIComponent(appid) + "&";			
-//		}
-//		$.post("/apps/importdoc", 
-//			appid + "t=" + encodeURIComponent(btype) +  "&d=" + encodeURIComponent(bibtext), 
-//			function(d) {}, 
-//			"json"
-//		).done(async function(d) {
-//			if (!$.isArray(d)) {
-//				dd = new Array();
-//				dd.push(d);
-//			} else {
-//				dd = d;
-//			}
-//			for (di = 0; di < dd.length; ++di) {
-//				while ($("#editDocDialog").length > 0) {
-//					console.log($("#editDocDialog").length);
-//					await sleep(1000);
-//				};
-//				d = dd[di];
-//				addDoc(docgrid.model.getRow(docgrid.selection.getFirstSelected()));
-//				setTimeout(function() {
-//					$("input[id=name]").val(d.title);
-//					$("input[name=url]").val(d.url);
-//					$("input[name=pageStart").val(d.pagestart);
-//					$("input[name=type]").prev().val(d.doctype);
-//	
-//					var j = 0;
-//					for (i = 0; i < d.authors.length; ++i) {
-//						a = d.authors[i];
-//						if (a.fullname) {
-//							addAuthor();
-//							if (a.authorid) {
-//								$($("span.app-docs > span.app-doc").find("input.dijitInputInner")[j]).val(a.fullname + ' (ID: ' + a.authorid + ')');
-//							} else {
-//								$($("span.app-docs > span.app-doc").find("input.dijitInputInner")[j]).val(a.fullname);
-//							}
-//							++j;
-//						}
-//					}
-//					addAuthor();
-//				}, 500);
-//			}
-//		}).fail(function(d) {
-//			setTimeout(function(){(new appdb.views.ErrorHandler()).handle({"status": "Failed to parse publication data", "description": "Unsupported publication data format, or unexpected parsing error"});},0);
-//		});
-//	}
+		var appid = appdb.pages.application.currentId();
 
-	function addDoc(data) {
+		if (isNaN(appid)) {
+			appid = "";
+		} else if (appid <= 0) {
+			appid = "";
+		} else {
+			appid = "appid=" + encodeURIComponent(appid) + "&";
+		}
+
+		$.post("/apps/importdoc",
+			appid + "t=" + encodeURIComponent(btype) +  "&d=" + encodeURIComponent(bibtext), 
+			function(d) {},
+			"json"
+		).done(function(dd) {
+			dd = dd || [];
+			dd = $.isArray(dd) ? dd : [dd];
+			for (var di = 0; di < dd.length; ++di) {
+				var d = dd[di];
+				addDoc(docgrid.model.getRow(docgrid.selection.getFirstSelected()), function(err, data) {
+					$("input[id=name]").val(d.title);
+					$("input[name=url]").val(d.url);
+					$("input[name=pageStart").val(d.pagestart);
+					$("input[name=type]").prev().val(d.doctype);
+
+					for (var i = 0; i < d.authors.length; ++i) {
+						var a = d.authors[i];
+						if (a.fullname) {
+							var authorCombo = addAuthor(a, true);
+							if (a.authorid) {
+								$(authorCombo).find("input.dijitInputInner").val(a.fullname + ' (ID: ' + a.authorid + ')');
+							} else {
+								$(authorCombo).find("input.dijitInputInner").val(a.fullname);
+							}
+						}
+					}
+					addAuthor();
+				});
+			}
+		}).fail(function(d) {
+			setTimeout(function(){(new appdb.views.ErrorHandler()).handle({"status": "Failed to parse publication data", "description": "Unsupported publication data format, or unexpected parsing error"});},0);
+		});
+	}
+
+	function addDoc(data, cb) {
 		delete editDocDlg;
 		editDocDlg = new dojox.Dialog({
 			"id" : "editDocDialog",
@@ -3208,25 +3193,37 @@ String.prototype.replaceAll = function(search, replacement) {
 			"style": "width: 60%",
 			onCancel : function(){
 				this.destroyRecursive(false);
+			},
+			onLoad: function() {
+			    if ($.isFunction(cb)) {
+				setTimeout(function() { cb(null, data); }, 10);
+			    }
 			}
 		});
+
 		if ( data !== undefined ) {
 			var data2=appDocDataToJSON(data);
 			editDocDlg.setHref("/apps/editdoc?data="+encodeURIComponent(JSON.stringify(data2)));
-		} else editDocDlg.setHref("/apps/editdoc");
+		} else {
+			editDocDlg.setHref("/apps/editdoc");
+		}
+
 		editDocDlg.show();
+
 		try {
 			dojo.disconnect(dijit.byId("detailsdlg"+dialogCount)._modalconnects.pop());
 		} catch(e) {}
 	}
 
 	function remDoc() {
-        if (docgrid.selection.getFirstSelected() >=0 ) docgrid.removeSelectedRows();
+		if (docgrid.selection.getFirstSelected() >=0 ) docgrid.removeSelectedRows();
 	}
 	
 	function editDoc() {
-        var r=docgrid.selection.getFirstSelected();
-        if (Number(r) >= 0 ) addDoc(docgrid.model.getRow(r));
+	    var r = docgrid.selection.getFirstSelected();
+	    if (Number(r) >= 0 ) {
+		addDoc(docgrid.model.getRow(r));
+	    }
 	}
 
 	function toggleBookmark(appID){
@@ -4150,46 +4147,45 @@ String.prototype.replaceAll = function(search, replacement) {
 		$(cats).parent().prepend("<span class='primaryCategoryText'><span>Primary</span></span>");
 	};
 	var renderLists = function(el,rem,except){
-         var sel = (el)?$(el):$("#navdiv" + dialogCount);
-         //In case of init
-         if(typeof el === "undefined"){
-          setTimeout(function(){
-           renderLists($(".app-domains:last"),remDomain);
-           renderLists($(".app-countries:last"),remCountry);
-           renderLists($(".app-mws:last"),remMW,"other");
-           renderLists($(".app-vos:last"),remVO);
+	    var sel = (el)?$(el):$("#navdiv" + dialogCount);
+	    //In case of init
+	    if(typeof el === "undefined"){
+	     setTimeout(function(){
+		   renderLists($(".app-domains:last"),remDomain);
+		   renderLists($(".app-countries:last"),remCountry);
+		   renderLists($(".app-mws:last"),remMW,"other");
+		   renderLists($(".app-vos:last"),remVO);
 		   renderLists($(".app-proglangs:last"), remProgLang);
-          },1);
-          
-          return;
-         }
-         
-		$(sel).find("span[edit_type='combo'][edit_group='true']").each(function(index,elem){
-          if(typeof except === "string" && $(elem).hasClass(except)){
-           return;
-          }else if($.isFunction(except) && except(elem)){
-           return;
-          }
-          var div = document.createElement("div"), a = document.createElement("a"), span = document.createElement("span");
-          $(div).addClass("dijitButtonNode").addClass("listremove").append(a);
-          $(span).append("<img alt='remove' border='0' src='/images/cancelicon.png' title='Remove list item'></img>");
-          $(a).append(span).attr("href","#").attr("title","Remove item").on("click", function(e){
+	     },1);
 
-            if( rem ){
-             focusedDijitItem = $(elem);
-             rem();
-            }
-            e.preventDefault();
-            return false;
-          });
-          $(elem).append(div).mouseover(function(){
-           $(div).addClass("hover");
-           $(div).addClass("dijitDownArrowButtonHover");
-          }).mouseleave(function(){
-           $(div).removeClass("hover");
-           $(div).removeClass("dijitDownArrowButtonHover");
-          });
-	 });
+	     return;
+	    }
+
+	    $(sel).find("span[edit_type='combo'][edit_group='true']").each(function(index,elem){
+		if(typeof except === "string" && $(elem).hasClass(except)){
+		    return;
+		}else if($.isFunction(except) && except(elem)){
+		    return;
+		}
+		var div = document.createElement("div"), a = document.createElement("a"), span = document.createElement("span");
+		$(div).addClass("dijitButtonNode").addClass("listremove").append(a);
+		$(span).append("<img alt='remove' border='0' src='/images/cancelicon.png' title='Remove list item'></img>");
+		$(a).append(span).attr("href","#").attr("title","Remove item").on("click", function(e){
+		    if( rem ){
+			focusedDijitItem = $(elem);
+			rem();
+		    }
+		    e.preventDefault();
+		    return false;
+		});
+		$(elem).append(div).mouseover(function(){
+		    $(div).addClass("hover");
+		    $(div).addClass("dijitDownArrowButtonHover");
+		}).mouseleave(function(){
+		    $(div).removeClass("hover");
+		    $(div).removeClass("dijitDownArrowButtonHover");
+		});
+	    });
 	};
 	var addCategory = function(){
 		if(canAddListItem("categoryID",$(".app-categories").find(".app-category")) === false) return;
