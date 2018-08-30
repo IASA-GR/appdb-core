@@ -25102,6 +25102,7 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
     color: #555;
     font-weight: bold;
     padding: 5px 0;
+    margin-bottom: -10px;
 }
 .secant_status > table > tbody > tr >td > div.details {
     color: red;

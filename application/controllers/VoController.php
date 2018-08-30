@@ -1743,6 +1743,33 @@ class VoController extends Zend_Controller_Action
 		}
 	}
 
+        /**
+         * Replace new lines in details element of Secant report to html br tags
+         *
+         * @param  string $report Secant report data xml text
+         * @return string
+         */
+        private function escapeSecantReport($report) {
+            $res = $report;
+            $matches = null;
+
+            try {
+                if (preg_match_all("/\<DETAILS\>(.*?)\<\/DETAILS\>/sm", $report, $matches)) {
+                    if ($matches) {
+                        foreach($matches[1] as $m) {
+                            if (trim($m)) {
+                                $res = str_replace("<DETAILS>" . $m . "</DETAILS>", "<DETAILS>" .  trim(preg_replace('/\n/s', '&lt;br &gt;', trim($m))) . "</DETAILS>", $res);
+                            }
+                        }
+                    }
+                }
+            } catch(Exception $e) {
+                return $report;
+            }
+
+            return trim($res);
+        }
+
         public function secantreportAction() {
             $this->_helper->layout->disableLayout();
             $this->_helper->viewRenderer->setNoRender();
@@ -1832,25 +1859,29 @@ class VoController extends Zend_Controller_Action
             $res .= "\n<result count='" . count($rs) . "'>\n";
             if (count($rs) > 0) {
                 foreach ($rs as $r) {
-                    $res .= "<report>\n";
-                    $res .= "  <report_id>" . $r["report_id"] . "</report_id>\n";
-                    $res .= "  <app_id>" . $r["app_id"] . "</app_id>\n";
-                    $res .= "  <app_name>" . $r["app_name"] . "</app_name>\n";
-                    $res .= "  <app_cname>" . $r["app_cname"] . "</app_cname>\n";
-                    $res .= "  <vapplist_id>" . $r["vapplist_id"] . "</vapplist_id>\n";
-                    $res .= "  <vaversion>" . $r["vaversion"] . "</vaversion>\n";
-                    $res .= "  <vaversion_id>" . $r["vaversion_id"] . "</vaversion_id>\n";
-                    $res .= "  <vaversion_type>" . $r["vaversion_type"] . "</vaversion_type>\n";
-                    $res .= "  <vmiinstance_id>" . $r["vmiinstance_id"] . "</vmiinstance_id>\n";
-                    $res .= "  <vmiinstance_guid>" . $r["vmiinstance_guid"] . "</vmiinstance_guid>\n";
-                    $res .= "  <vmiinstance_archived>" . ($r["vmiinstance_archived"] == 1 ? 'true' : 'false') . "</vmiinstance_archived>\n";
-                    $res .= "  <vowideimagelist_id>" . $r["vowideimagelist_id"] . "</vowideimagelist_id>\n";
-                    $res .= "  <queuedon>" . $r["queuedon"] . "</queuedon>\n";
-                    $res .= "  <senton>" . $r["senton"] . "</senton>\n";
-                    $res .= "  <closedon>" . $r["closedon"] . "</closedon>\n";
-                    $res .= "  <state>" . $r["state"] . "</state>\n";
-                    $res .= "  <report_outcome>" . $r["report_outcome"] . "</report_outcome>\n";
-                    $res .= "  <report_data>\n" . str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', trim($r["report_data"])) . "\n</report_data>\n";
+                    $reportdata = trim(str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', trim($r["report_data"])));
+                    if ($reportdata !== '') {
+                        $reportdata = $this->escapeSecantReport($reportdata);
+                    }
+                    $res .= "  <report>\n";
+                    $res .= "    <report_id>" . $r["report_id"] . "</report_id>\n";
+                    $res .= "    <app_id>" . $r["app_id"] . "</app_id>\n";
+                    $res .= "    <app_name>" . $r["app_name"] . "</app_name>\n";
+                    $res .= "    <app_cname>" . $r["app_cname"] . "</app_cname>\n";
+                    $res .= "    <vapplist_id>" . $r["vapplist_id"] . "</vapplist_id>\n";
+                    $res .= "    <vaversion>" . $r["vaversion"] . "</vaversion>\n";
+                    $res .= "    <vaversion_id>" . $r["vaversion_id"] . "</vaversion_id>\n";
+                    $res .= "    <vaversion_type>" . $r["vaversion_type"] . "</vaversion_type>\n";
+                    $res .= "    <vmiinstance_id>" . $r["vmiinstance_id"] . "</vmiinstance_id>\n";
+                    $res .= "    <vmiinstance_guid>" . $r["vmiinstance_guid"] . "</vmiinstance_guid>\n";
+                    $res .= "    <vmiinstance_archived>" . ($r["vmiinstance_archived"] == 1 ? 'true' : 'false') . "</vmiinstance_archived>\n";
+                    $res .= "    <vowideimagelist_id>" . $r["vowideimagelist_id"] . "</vowideimagelist_id>\n";
+                    $res .= "    <queuedon>" . $r["queuedon"] . "</queuedon>\n";
+                    $res .= "    <senton>" . $r["senton"] . "</senton>\n";
+                    $res .= "    <closedon>" . $r["closedon"] . "</closedon>\n";
+                    $res .= "    <state>" . $r["state"] . "</state>\n";
+                    $res .= "    <report_outcome>" . $r["report_outcome"] . "</report_outcome>\n";
+                    $res .= "    <report_data>" . $reportdata . "</report_data>\n";
                     $res .= "</report>\n";
                 }
             }
@@ -1859,7 +1890,7 @@ class VoController extends Zend_Controller_Action
                 header('Content-type: application/xml');
             } else {
                 header('Content-type: application/json');
-                $res = RestAPIHelper::transformXMLtoJSON($res);
+                $res = RestAPIHelper::transformXMLtoJSON(trim($res));
             }
 
             echo $res;
