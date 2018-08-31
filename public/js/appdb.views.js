@@ -16272,10 +16272,12 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 		$.each(logs || [], function(i, log) {
 		   var imgSrc = '';
 		   var exceptionOutcome = null;
+		   var cls = 'status_ok';
 		   switch(log.OUTCOME) {
 		        case "NA":
 		        case "WARNING":
 			   imgSrc = '/images/vappliance/warning.png';
+			   cls = 'status_warning';
 			   break;
 		        case "OK":
 			   imgSrc = '/images/tick.png';
@@ -16284,13 +16286,16 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
                         case "SKIPPED":
 			    exceptionOutcome = 'Check skipped';
 			    imgSrc = '/images/vappliance/redwarning.png';
+			    cls = 'status_skipped';
 			    break;
 			case "INTERNAL_FAILURE":
 			    exceptionOutcome = 'Check failed to complete';
 			    imgSrc = '/images/vappliance/redwarning.png';
+			    cls = 'status_internal_failure';
 			    break;
 		        default:
 			   imgSrc = '/images/vappliance/redwarning.png';
+			   cls = 'status_fail';
 			   break;
 		   }
 		   if (exceptionOutcome) {
@@ -16306,7 +16311,7 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 		       $(td2).append($('<div class="details"></div>').append(log.DETAILS.replace(/\n/g,'<br/>')));
 		   }
 
-		   $(tbody).append($('<tr></tr>').append(td1).append(td2));
+		   $(tbody).append($('<tr></tr>').addClass(cls).append(td1).append(td2));
 		});
 	};
 
@@ -16406,10 +16411,12 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 	    $.each(logs || [], function(i, log) {
 		var imgSrc = '';
 		var exceptionOutcome = null;
+		var cls = 'status_ok';
 		switch(log.OUTCOME) {
 		    case "NA":
 		    case "WARNING":
 			imgSrc = '/images/vappliance/warning.png';
+			cls = 'status_warning';
 			break;
 		    case "OK":
 			imgSrc = '/images/tick.png';
@@ -16418,13 +16425,16 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
                     case "SKIPPED":
 			exceptionOutcome = 'Check skipped';
 			imgSrc = '/images/vappliance/redwarning.png';
+			cls = 'status_skipped';
 			break;
 		     case "INTERNAL_FAILURE":
 			exceptionOutcome = 'Check failed to complete';
 			imgSrc = '/images/vappliance/redwarning.png';
+			cls = 'status_internal_failure';
 			break;
 		     default:
 			imgSrc = '/images/vappliance/redwarning.png';
+			cls = 'status_fail';
 			break;
 		}
 		if (exceptionOutcome) {
@@ -16440,7 +16450,7 @@ appdb.views.SecantReport = appdb.ExtendClass(appdb.View, "appdb.views.SecantRepo
 		    $(td2).append($('<div class="details"></div>').append(log.DETAILS.replace(/\n/g, '<br/>')));
 		}
 
-	       $(tbody).append($('<tr></tr>').append(td1).append(td2));
+	       $(tbody).append($('<tr></tr>').addClass(cls).append(td1).append(td2));
 	    });
 	    return table;
     },

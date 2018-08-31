@@ -25103,11 +25103,32 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
     color: #555;
     font-weight: bold;
     padding: 5px 0;
-    margin-bottom: -10px;
+    margin-bottom: -8px;
 }
 .secant_status > table > tbody > tr >td > div.details {
-    color: red;
-    padding: 10px 0;
+    color: #ca3f3f;
+    padding: 0;
+    margin-top: 10px;
+    overflow-y: hidden;
+    max-height: 60px;
+}
+.secant_status > table > tbody > tr >td > div.details:hover {
+    overflow-y: auto;
+}
+
+.secant_status > table > tbody > tr.status_ok >td > div.details {
+    color: #556955;
+}
+.secant_status > table > tbody > tr.status_warning >td > div.details {
+    color: #7f8002;
+}
+.secant_status > table > tbody > tr.status_skipped,
+.secant_status > table > tbody > tr.status_internal_failure {
+    opacity: 0.7;
+}
+.secant_status > table > tbody > tr.status_skipped:hover,
+.secant_status > table > tbody > tr.status_internal_failure:hover {
+    opacity: 0.9;
 }
 .secant_status > table > tbody > tr >td > img {
     width: 20px;
