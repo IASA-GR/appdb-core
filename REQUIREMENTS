@@ -55,6 +55,7 @@ REQUIREMENTS
 	- ImageMagick
 	- OpenLDAP
 	- Apache
+	- bibutils, for publication import functionality
 
 - Configuration
 	- add the PHP PEAR path to the "include_path" variable in php.ini

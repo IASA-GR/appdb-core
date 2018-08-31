@@ -3160,24 +3160,35 @@ String.prototype.replaceAll = function(search, replacement) {
 			dd = $.isArray(dd) ? dd : [dd];
 			for (var di = 0; di < dd.length; ++di) {
 				var d = dd[di];
+				console.log(d);
 				addDoc(docgrid.model.getRow(docgrid.selection.getFirstSelected()), function(err, data) {
 					$("input[id=name]").val(d.title);
 					$("input[name=url]").val(d.url);
+					$("input[name=year").val(d.year);
+					$("input[name=volume").val(d.volume);
 					$("input[name=pageStart").val(d.pagestart);
+					$("input[name=pageEnd").val(d.pageend);
+					$("input[name=publisher]").prev().val(d.publisher);
+					$("input[name=conference]").prev().val(d.conference);
+					$("input[name=proceedings]").prev().val(d.proceedings);
+					$("input[name=journal]").prev().val(d.journal);
+					$("input[name=isbn]").prev().val(d.isbn);
 					$("input[name=type]").prev().val(d.doctype);
 
-					for (var i = 0; i < d.authors.length; ++i) {
-						var a = d.authors[i];
-						if (a.fullname) {
-							var authorCombo = addAuthor(a, true);
-							if (a.authorid) {
-								$(authorCombo).find("input.dijitInputInner").val(a.fullname + ' (ID: ' + a.authorid + ')');
-							} else {
-								$(authorCombo).find("input.dijitInputInner").val(a.fullname);
+					if (d.authors) {
+						for (var i = 0; i < d.authors.length; ++i) {
+							var a = d.authors[i];
+							if (a.fullname) {
+								var authorCombo = addAuthor(a, true);
+								if (a.authorid) {
+									$(authorCombo).find("input.dijitInputInner").val(a.fullname + ' (ID: ' + a.authorid + ')');
+								} else {
+									$(authorCombo).find("input.dijitInputInner").val(a.fullname);
+								}
 							}
 						}
+						addAuthor();
 					}
-					addAuthor();
 				});
 			}
 		}).fail(function(d) {
