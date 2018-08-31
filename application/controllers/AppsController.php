@@ -2035,9 +2035,9 @@ class AppsController extends Zend_Controller_Action
 	public function importdocAction() {
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
-		$t = $this->getParam("t");
-		$d = $this->getParam("d");
-		$appid = $this->getParam("appid");
+		$t = $this->_getParam("t");
+		$d = $this->_getParam("d");
+		$appid = $this->_getParam("appid");
 		if (! isset($appid)) {
 			$appid = null;
 		}
