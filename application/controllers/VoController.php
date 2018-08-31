@@ -1750,10 +1750,25 @@ class VoController extends Zend_Controller_Action
          * @return string
          */
         private function escapeSecantReport($report) {
-            $res = $report;
+            $res = trim($report);
             $matches = null;
 
             try {
+                if ($res !== '') {
+                    if (substr($res, 0, 1) !== '<') {
+                        $result = base64_decode($res);
+                        if ($result !== false) {
+                            $res = trim($result);
+                        }
+                    }
+                }
+
+                if ($res !== '') {
+                    $res = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $res);
+                    $res = trim($res);
+                }
+
+
                 if (preg_match_all("/\<DETAILS\>(.*?)\<\/DETAILS\>/sm", $report, $matches)) {
                     if ($matches) {
                         foreach($matches[1] as $m) {
@@ -1764,7 +1779,7 @@ class VoController extends Zend_Controller_Action
                     }
                 }
             } catch(Exception $e) {
-                return $report;
+                return trim($res);
             }
 
             return trim($res);
@@ -1859,7 +1874,7 @@ class VoController extends Zend_Controller_Action
             $res .= "\n<result count='" . count($rs) . "'>\n";
             if (count($rs) > 0) {
                 foreach ($rs as $r) {
-                    $reportdata = trim(str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', trim($r["report_data"])));
+                    $reportdata = trim($r["report_data"]);
                     if ($reportdata !== '') {
                         $reportdata = $this->escapeSecantReport($reportdata);
                     }
