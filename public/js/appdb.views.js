@@ -16835,14 +16835,28 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 	};
 	this.renderCurrentSecant = function(data) {
 		$(this.dom).find("td[data-name='name'] > .customcellwrap").remove('.secant.badge');
-		var secants = (data || {}).secant || [];
+		data = data || {};
+		var secants = data.secant || [];
 		secants = $.isArray(secants) ? secants : [secants];
 		var currentSecant = null;
 		$.each(secants, function(i,s) {
-		    if (s.vaversion_type === 'current') {
-			currentSecant = s;
-		    }
+			if (s.vaversion_type === 'current') {
+				currentSecant = s;
+			}
 		});
+
+		if (!currentSecant) {
+		    var vowideimagelist = (data.data || {}).voimagelist || {};
+		    var voimagelistimages = vowideimagelist.images || [];
+		    var vappliance = (data.data || {}).appliance || {};
+		    if (vowideimagelist.isPublished === false && voimagelistimages.length === 0) {
+			    $.each(secants, function(i, s) {
+				    if (vappliance.versionid === s.vaversion_id) {
+					    currentSecant = s;
+				    }
+			    });
+		    }
+		}
 
 		if (!currentSecant) {
 		    return;
