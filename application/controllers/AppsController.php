@@ -2045,6 +2045,12 @@ class AppsController extends Zend_Controller_Action
 			switch ($t) {
 				case "bib":
 				case "endx":
+					$d = str_replace("\n", "", $d);
+					if (! preg_match("/<title>[[:space:]]*<style>/i", $d)) {
+						$d = str_replace("<title>", "<title><style>", $d);
+						$d = str_replace("</title>", "</style></title>", $d);
+					}
+//					debug_log("D: " . var_export($d, true));
 				case "biblatex":
 					$fbib = tmpfile();
 					$fbibname = stream_get_meta_data($fbib)['uri'];
@@ -2067,7 +2073,7 @@ class AppsController extends Zend_Controller_Action
 					return;
 			}
 			db()->setFetchMode(Zend_Db::FETCH_NUM);
-			error_log("mods: " . var_export($mods, true));
+			debug_log("mods: " . var_export($mods, true));
 			$res = db()->query(
 				"SELECT mods2doc(?, ?)",
 				array(
@@ -2075,6 +2081,7 @@ class AppsController extends Zend_Controller_Action
 					$appid
 				)
 			)->fetchAll();
+//			debug_log("PHASE 1: " . var_export($res, true));
 		} else {
 			error_log("bad args");
 			$this->getResponse()->clearAllHeaders();
@@ -2090,6 +2097,7 @@ class AppsController extends Zend_Controller_Action
 				$ok = true;
 			}
 		}
+//		debug_log("PHASE 2: " . var_export($res, true));
 		if ($ok) {
 			echo $res; 
 		} else {
