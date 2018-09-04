@@ -24,8 +24,8 @@ class Default_Model_ApplicationsMapper extends Default_Model_ApplicationsMapperB
 	public function populate(&$entry, $row) {
 		parent::populate($entry,$row);
 		$entry->setKeywords(pg_to_php_array($row->keywords));
-//		$entry->setDisciplineID(pg_to_php_array($row->disciplineid));
-//		$entry->setCategoryID(pg_to_php_array($row->categoryid));
+		$entry->setDisciplineID(pg_to_php_array($row->disciplineid));
+		$entry->setCategoryID(pg_to_php_array($row->categoryid));
 	}
 
 	public function save(Default_Model_Application $value) {
@@ -176,6 +176,8 @@ class Default_Model_ApplicationsMapper extends Default_Model_ApplicationsMapperB
 	{
 		$select = $this->getDbTable()->select()->from('applications');
 		$select->columns('applications.keywords');
+		$select->columns('applications.categoryid');
+		$select->columns('applications.disciplineid');
 		$executor = $this->getDbTable();
 		if ( $filter !== null ) {
 			$orderby = $filter->orderBy;
@@ -190,6 +192,8 @@ class Default_Model_ApplicationsMapper extends Default_Model_ApplicationsMapperB
 		) {
 			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('applications');
 			$select->columns('applications.keywords');
+			$select->columns('applications.categoryid');
+			$select->columns('applications.disciplineid');
 			if (substr($orderby,0,27) === "applications.app_popularity") {
 				$select->columns('app_popularity(applications.id)');
 			}
