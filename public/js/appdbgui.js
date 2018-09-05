@@ -3106,10 +3106,19 @@ String.prototype.replaceAll = function(search, replacement) {
 	}
 	function importDocs() {
 		var mtype = '<span>Format: <select name="bibtype">' + 
-			'<option value="bib">BibTeX</option>' + 
+			'<option value="auto">[Auto-Detect]</option>' +
 			'<option value="biblatex">BibLaTeX</option>' +
-			'<option value="endx">EndNote</option>' +
-			'<option value="mods">MODS</option>' +
+			'<option value="bib">BibTeX</option>' + 
+			'<option value="nbib">NCBI NBIB</option>' + 
+			'<option value="end">EndNote</option>' +
+			'<option value="endx">EndNote XML</option>' +
+			'<option value="isi">ISI</option>' +
+			'<option value="ris">RIS</option>' +
+			'<option value="ebi">EBI</option>' +
+			'<option value="med">Medline</option>' +
+			'<option value="copac">Copac</option>' +
+			'<option value="wordbib">Word2007</option>' +
+			'<option value="mods">MODS XML</option>' +
 			'</select></span>';
 		var mtext = '<div title="Import Publication"><p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>Please copy &amp; paste publication data in a supported format (bibTeX, etc.)</p>' + mtype + '<p></p><textarea id="importdoc" rows="10" style="width:100%;"></textarea></div>';
 		var importDialog = $(mtext).dialog({

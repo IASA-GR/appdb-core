@@ -2032,58 +2032,105 @@ class AppsController extends Zend_Controller_Action
 		echo json_encode( array("result" => array("success" => true, "versions"=> $versions) ) );
 	}
 	
+	private function bib2mods($bibtype, $bibdata) {
+		switch ($bibtype) {
+			case "endx":
+				$bibdata = str_replace("\n", "", $bibdata);
+				if (! preg_match("/<title>[[:space:]]*<style>/i", $bibdata)) {
+					$bibdata = str_replace("<title>", "<title><style>", $bibdata);
+					$bibdata = str_replace("</title>", "</style></title>", $bibdata);
+				}
+			case "nbib":
+			case "bib":
+			case "isi":
+			case "ris":
+			case "med":
+			case "wordbib":
+			case "copac":
+			case "ebi":
+			case "end":
+			case "biblatex":
+				$fbib = tmpfile();
+				$fbibname = stream_get_meta_data($fbib)['uri'];
+				$fmods = tmpfile();
+				$fmodsname = stream_get_meta_data($fmods)['uri'];
+				fwrite($fbib, $bibdata);
+		//		error_log("$fbibname --> $fmodsname");
+		//		error_log(APPLICATION_PATH . "/../bibutils/" . $t . "2xml $fbibname > $fmodsname");
+				exec(APPLICATION_PATH . "/../bibutils/" . $bibtype . "2xml $fbibname > $fmodsname");
+				$mods = str_replace('<' . '?xml version="1.0" encoding="UTF-8"?' . '>', "", file_get_contents($fmodsname));
+				break;
+			case "mods":
+				$mods = $bibdata;
+				break;
+			default:
+				return false;
+		}
+		// error_log("MODS: " . var_export($mods, true));
+		$refs = array();
+		try {
+			$xmods = new SimpleXMLElement($mods);
+			$xmods->registerXPathNamespace("a", "http://www.loc.gov/mods/v3");
+			$refs = $xmods->xpath("//a:modsCollection/*");
+		} catch (Exception $e) {
+			//error_log("ERROR: " . var_export($e->getMessage(), true));
+			$refs = array();
+		}
+		if (is_array($refs) && (count($refs) > 0)) {
+			return $mods;
+		} else {
+			return null;
+		}
+	}
+
 	public function importdocAction() {
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
 		$t = $this->_getParam("t");
 		$d = $this->_getParam("d");
 		$appid = $this->_getParam("appid");
+		$res = null;
 		if (! isset($appid)) {
 			$appid = null;
 		}
 		if (isset($t) && isset($d)) {
-			switch ($t) {
-				case "bib":
-				case "endx":
-					$d = str_replace("\n", "", $d);
-					if (! preg_match("/<title>[[:space:]]*<style>/i", $d)) {
-						$d = str_replace("<title>", "<title><style>", $d);
-						$d = str_replace("</title>", "</style></title>", $d);
+			if ($t == "auto") {
+				$mods = null;
+				$fmts = array('biblatex', 'bib', 'copac', 'ebi', 'end', 'endx', 'isi', 'med', 'nbib', 'ris', 'wordbib');
+				foreach ($fmts as $tt) {
+					$tmp_mods = $this->bib2mods($tt, $d);
+					if ((! is_null($tmp_mods)) && ($tmp_mods !== false)) {
+						$mods = $tmp_mods;
+						break;
 					}
-//					debug_log("D: " . var_export($d, true));
-				case "biblatex":
-					$fbib = tmpfile();
-					$fbibname = stream_get_meta_data($fbib)['uri'];
-					$fmods = tmpfile();
-					$fmodsname = stream_get_meta_data($fmods)['uri'];
-					fwrite($fbib, $d);
-					error_log("$fbibname --> $fmodsname");
-					error_log(APPLICATION_PATH . "/../bibutils/" . $t . "2xml $fbibname > $fmodsname");
-					exec(APPLICATION_PATH . "/../bibutils/" . $t . "2xml $fbibname > $fmodsname");
-					$mods = str_replace('<' . '?xml version="1.0" encoding="UTF-8"?' . '>', "", file_get_contents($fmodsname));
-					break;
-				case "mods":
-					$mods = $d;
-					break;
-				default:
-					error_log("bad type: $t");
+				}
+			} else {
+				$mods = $this->bib2mods($t, $d); 
+			}
+			if ($mods === false) {
+					// error_log("bad type: $t");
 					$this->getResponse()->clearAllHeaders();
 					$this->getResponse()->setRawHeader("HTTP/1.0 400 Bad request");
 					$this->getResponse()->setHeader("Status","400 Bad request");
 					return;
 			}
-			db()->setFetchMode(Zend_Db::FETCH_NUM);
-			debug_log("mods: " . var_export($mods, true));
-			$res = db()->query(
-				"SELECT mods2doc(?, ?)",
-				array(
-					$mods,
-					$appid
-				)
-			)->fetchAll();
-//			debug_log("PHASE 1: " . var_export($res, true));
+			if (($mods === false) || (is_null($mods))) {
+				// error_log("no data match");
+				$this->getResponse()->clearAllHeaders();
+				$this->getResponse()->setRawHeader("HTTP/1.0 400 Bad request");
+				$this->getResponse()->setHeader("Status","400 Bad request");
+			} else {
+				db()->setFetchMode(Zend_Db::FETCH_NUM);
+				$res = db()->query(
+					"SELECT mods2doc(?, ?)",
+					array(
+						$mods,
+						$appid
+					)
+				)->fetchAll();
+			}
 		} else {
-			error_log("bad args");
+			// error_log("bad args");
 			$this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 400 Bad request");
 			$this->getResponse()->setHeader("Status","400 Bad request");
@@ -2097,11 +2144,10 @@ class AppsController extends Zend_Controller_Action
 				$ok = true;
 			}
 		}
-//		debug_log("PHASE 2: " . var_export($res, true));
 		if ($ok) {
 			echo $res; 
 		} else {
-			error_log("not ok");
+			// error_log("not ok");
 			$this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 400 Bad request");
 			$this->getResponse()->setHeader("Status","400 Bad request");
