@@ -908,6 +908,8 @@ class SamlController extends Zend_Controller_Action
 							if ($researcher) {
                                                                 $currentHostName = 'https://'.$_SERVER['HTTP_HOST'];
                                                                 $attrs['appdb:cname'] = $researcher->cname;
+                                                                $attrs['appdb:firstName'] = $researcher->firstname;
+                                                                $attrs['appdb:lastName'] = $researcher->lastname;
                                                                 $attrs['appdb:refs'] = array(
                                                                   "profile" => $currentHostName .'/store/person/' . $researcher->cname,
                                                                   "image" => $currentHostName .'/people/getimage?id=' . $researcher->id
