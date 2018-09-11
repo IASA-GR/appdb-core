@@ -29,9 +29,15 @@ REQUIREMENTS
 	- apply zend patches
 	- copy Dialog.js into /opt/zend/externals/dojo/dojox/
 	- extract /opt/zend/externals/dojo/dojox/grid/compatGrid.tar.gz
+	- add our custom PlotKit them under externals/dojo/dojox/charting/themes/PlotKit/iasa.js
 	- create a DoJo custom build by calling
 		./build.sh profile=appdb action=release cssOptimize=comments mini=true
 	  from /opt/zend/externals/dojo/util/buildscripts
+	- edit externals/dojo/release/dojo/dojo.js and replace
+		dojo.version={major:0,minor:0,patch:0,flag:"dev",
+	  with
+		dojo.version={major:1,minor:5,patch:0,flag:"dev",
+	  in order to properly reflect the version of dojo that we've used as a base
 
 - SimpleSAMLphp, for user authentication
 	- patch lib/SimpleSAML/Store/SQL.php to simulate UPSERT for PostgreSQL, instead of INSERT'ing, catching errors and UPDATE'ing
