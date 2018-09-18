@@ -627,7 +627,7 @@ class RestDSVerXMLParser extends RestXMLParser {
 						}
 					}
 					foreach($xmlloc as $x) {
-						$data = RestAPIHelper::responseHead("dataset", null, null, null, null, null, null, ! is_null($this->getUser())) . $x->asXML() . RestAPIHelper::responseTail();
+						$data = RestAPIHelper::responseHead("dataset", null, null, null, null, null, null, ! is_null($this->_parent->getUser())) . $x->asXML() . RestAPIHelper::responseTail();
 						$locres = new RestDatasetLocationList(array_merge($this->_parent->getParams(), array('data' => $data, 'vid' => $ds->id)));
 						
 						if (isset($x->attributes()->id)) {
