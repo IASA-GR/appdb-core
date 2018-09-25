@@ -4174,9 +4174,9 @@ function getPrimaryCategoryLogo($data = null){
 	} else {
 		$app = $data;
 	}
-	
+
 	if (  !is_null($app) ){
-		if( trim($app->metatype) === "2" ){
+		if( trim($app->metatype) == "2" ){
 			return "/images/swapp.png";
 		}
 		$cats = $app->categories;
