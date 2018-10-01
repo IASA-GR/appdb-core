@@ -703,16 +703,19 @@ class AppsController extends Zend_Controller_Action
 		$reason = '';
 		$name = $this->_getParam("n");
 		$id = $this->_getParam("id");
-		$res = validateAppName($name, $error, $reason,$id);
+		if (trim($id) == "") {
+			$id = null;
+		}
+		$res = validateAppName($name, $error, $reason, $id);
 				
 		if ( $res === true ) {
             if ( $reason !== '' ) {
-                echo "<response warning='" . htmlentities($reason). "'>OK</response>";
+                echo "<response warning='" . htmlentities($reason) . "'>OK</response>";
             } else {
                 echo "<response>OK</response>";
             }
 		} else {
-			echo "<response error='".htmlentities($error)."' reason='".htmlentities($reason)."'></response>";
+			echo "<response error='" . htmlentities($error) . "' reason='" . htmlentities($reason) . "'></response>";
 		}
 	}
 

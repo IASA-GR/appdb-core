@@ -1450,87 +1450,133 @@ function validatePplCName($cname, $id = null) {
 	if (count($rs) > 0) $valid = $rs[0]["value"];
 	return $valid;
 }
-function validateAppCName($cname, $id=null){
-	$cname = str_replace("'", "\\'", $cname);
+function validateAppCName($cname, $id = null) {
 	$valid = true;
-	global $application;
-	$db = $application->getBootstrap()->getResource('db');
-	$db->setFetchMode(Zend_Db::FETCH_BOTH);
-	$rs = db()->query("SELECT app_cnames.value FROM app_cnames INNER JOIN applications ON applications.id = app_cnames.appid WHERE applications.deleted <> TRUE AND app_cnames.value = normalize_cname(E'$cname')" . (isset($id) ? " AND app_cnames.appid <> $id" : ""))->fetchAll();
-	if (count($rs) > 0) $valid = $rs[0]["value"];
+	$db->setFetchMode(Zend_Db::FETCH_NUM);
+	$res = db()->query("SELECT validate_app_cname(?)", array($cname, $id))->fetchAll();
+	if (is_array($res) && (count($res) > 0)) {
+		$res = $res[0];
+		if (count($res) > 0) {
+			$res = $res[0];
+			if (is_null($res)) {
+				$valid = true;
+			} else {
+				$valid = json_decode($res, true);
+			}
+		} else {
+			$valid = true;
+		}
+	} else {
+		$valid = true;
+	}
 	return $valid;
 }
-function validateAppName($name, &$error, &$reason, $id=null) {
+
+function validateAppName($name, &$error, &$reason, $id = null) {
 	$valid = false;
+	$warn = false;
+	$error = null;
 	$name = trim($name);
-        $wikiUrl = ApplicationConfiguration::app("wiki") . 'main:faq:i_want_to_register_a_new_software_solution_entry_but_the_name_is_already_in_use_or_a_warning_comes_up';
-        //check min length
-        if(strlen($name)<3 || strlen($name)>50){
-                $error = "Invalid length";
-                $reason = "The length of the name must be from 3 to 50 characters long.The current length is <b>" . strlen($name). "</b>." ;
-                return false;
-        }
+	$reason = null;
+	$wikiUrl = ApplicationConfiguration::app("wiki") . 'main:faq:i_want_to_register_a_new_software_solution_entry_but_the_name_is_already_in_use_or_a_warning_comes_up';
+	$wikiUrl2 = ApplicationConfiguration::app("wiki") . 'main:faq:i_want_to_be_included_as_a_contact_in_an_existing_software_solution_contact_list._what_should_i_do';
 
-        //check validity
-	if (!preg_match('/^[A-Za-z0-9 *.+,&!#@=_^(){}\[\]-]+$/',$name)) {
-		$error = 'Error : Invalid character.';
-                $reason = 'The name contains invalid characters. Valid characters are alphanumeric characters, spaces, and the following sumbols: +(){}[],*&amp;!#@=^._-';
-		return false;
-	}
+	db()->setFetchMode(Zend_Db::FETCH_NUM);
+	$res = db()->query("SELECT validate_app_name(?, ?)", array($name, $id))->fetchAll();
+	if (is_array($res) && (count($res) > 0)) {
+		$res = $res[0];
+		if (count($res) > 0) {
+			$res = $res[0];
+			if (is_null($res)) {
+				$valid = false;
+			} else {
+				$j = json_decode($res, true);
+				if (array_key_exists("valid", $j)) {
+					$valid = $j["valid"];
+				}
+				if (array_key_exists("warning", $j)) {
+					$warn = $j["warning"];
+				}
+				if (array_key_exists("error", $j)) {
+					$error = $j["error"];
+				}
+				if (array_key_exists("reason", $j)) {
+					$reason = $j["reason"];
+				}
 
-        //Check similarity
-        $res = Default_Model_Applications::nameAvailable($name, $id);
-        if($res !== true){
-                $error = "Error : Invalid name";
-                $reason = 'Name already taken by <a href="http://'.$_SERVER['HTTP_HOST'].'/?p='.base64_encode('/apps/details?id='.$res->id).'" target="_blank">'.$res->name.'</a>.<p></p>';
-                $reason .= "<div>Please have a look at the ".$res->name." software to understand if it is different from the one you want to register.<br/>If it is <b>not</b> different, please join ".$res->name." as a scientific contact (for more information visit the ";
-                $reason .= '<a href="#" onclick="appdb.utils.ToggleFaq(12);" >FAQ</a>).<p></p>If it is different, please modify your applcation name. In order to avoid confusion from similarly named software, you should use a modifier in you software name in order to differentiate it from other related entries. Good examples would be :</div>';
-                $reason .= "<div><span>  </span>".$name. "-&lt;Country&gt;</div>";
-                $reason .= "<div><span>  </span>".$name. "-&lt;Project&gt;</div>";
-                $reason .= "<div><span>  </span>".$name. "-&lt;Virtual Organization&gt;</div>";
-                $reason .= "<div><span>  </span>".$name. "-&lt;Consortium&gt;</div>";
-                $reason .= "<div>etc...</div>";
-                $reason .= '<p></p><div>For further information please refer to the <a href="' . $wikiUrl . '" target="_blank">FAQ</a></div>';
-                return false;
-        }
-
-        if(strlen($name)>=3){
-                $apps = new Default_Model_Applications();
-
-                if ( $id != '' ) {
-                        $apps->filter->name->ilike("%".pg_escape_string($name)."%")->and($apps->filter->deleted->equals(false))->and($apps->filter->id->notequals($id));
-                } else {
-                        $apps->filter->name->ilike("%".pg_escape_string($name)."%")->and($apps->filter->deleted->equals(false));
-                }
-
-                if(count($apps->items) > 0){
+				if ($valid && $warn) {
+						// WARNING MESSAGE
                         $p = base64_encode('{"url":"/apps","query":{"flt":"name:'.$name.'"},"ext":{"mainTitle":"Software","prepend":[],"append":false,"componentType":"appdb.components.Applications","filterDisplay":"Search...","isList":true,"componentArgs":[{"flt":"name:'.$name.'"}]}}');
                         $reason = 'There are software items containing &#39;<i><b>' . $name . '</b></i>&#39;. Click <a href="http://' . $_SERVER["APPLICATION_UI_HOSTNAME"] . '?p='.$p.'" target="_blank">here</a> to view them in a new window.<p></p>';
-                        $reason .= "<div>In order to avoid confusion from similarly named software, we suggest you use a modifier in your software name in order to differentiate it from other related entries if this applies. <p></p>Good examples would be :</div>";
-                        $reason .= "<div  ><span>  </span>".$name. "-&lt;Country&gt;</div>";
-                        $reason .= "<div ><span>  </span>".$name. "-&lt;Project&gt;</div>";
-                        $reason .= "<div ><span>  </span>".$name. "-&lt;Virtual Organization&gt;</div>";
-                        $reason .= "<div ><span>  </span>".$name. "-&lt;Consortium&gt;</div>";
+                        $reason .= "<div>In order to avoid confusion from similarly named software, we suggest you use a modifier in your software name in order to differentiate it from other related entries, if applicable. <p></p>Some good examples would be:</div>";
+                        $reason .= "<div  ><span>  </span>" . $name. "-&lt;Country&gt;</div>";
+                        $reason .= "<div ><span>  </span>" . $name. "-&lt;Project&gt;</div>";
+                        $reason .= "<div ><span>  </span>" . $name. "-&lt;Virtual Organization&gt;</div>";
+                        $reason .= "<div ><span>  </span>" . $name. "-&lt;Consortium&gt;</div>";
                         $reason .= "<div>etc...</div>";
                         $reason .= '<p></p><div>For further information please refer to the <a href="' . $wikiUrl . '" target="_blank">FAQ</a></div>';
-                }
 
-                //This code should never be reached.
-		$res = validateAppCName($name); 
-		if( $res !== true ){
-			$error = "Error : Invalid cname";
-			$reason = 'Name already taken by <a href="http://'.$_SERVER['HTTP_HOST'].'/?p='.base64_encode('/apps/details?id=s:'.$res).'" target="_blank">'. $res . '</a>.<p></p>';
-			$reason .= 'Please modify your applcation name. In order to avoid confusion from similarly named software, you should use a modifier in you software name in order to differentiate it from other related entries. Good examples would be :</div>';
-			$reason .= "<div><span></span>".$name. "-&lt;Country&gt;</div>";
-			$reason .= "<div><span></span>".$name. "-&lt;Project&gt;</div>";
-			$reason .= "<div><span></span>".$name. "-&lt;Virtual Organization&gt;</div>";
-			$reason .= "<div><span></span>".$name. "-&lt;Consortium&gt;</div>";
-			$reason .= "<div>etc...</div>";
-			$reason .= '<p></p><div>For further information please refer to the <a href="' . $wikiUrl . '" target="_blank">FAQ</a></div>';
+				} elseif (! is_null($error)) {
+					switch($error) {
+						case 'Invalid length':
+							$min = 3;
+							$max = 50;
+							if (! is_null($reson)) {
+								if (array_key_exists("min", $reason)) { $min = $reason["min"]; }
+								if (array_key_exists("max", $reason)) { $max = $reason["max"]; }
+							}
+							$reason = "The length of the name must fall between $min to $max characters long. The current length is <b>" . strlen($name). "</b>." ;
+							break;
+						case 'Invalid character':
+							$reason = "This name contains invalid characters. Valid characters are alphanumeric characters, spaces, and the following symbols: $reason";
+							break;
+						case 'Invalid name':
+							// INVALID NAME MESSAGE (ALREADY TAKEN)
+							error_log("REASON:" . var_export($reason, true));
+
+							$resid = $reason["ids"][0];
+							$resname = $reason["names"][0];
+							$resmeta= $reason["names"][0];
+
+							error_log("RESID:" . var_export($resid, true));
+							error_log("RESNAME:" . var_export($resname, true));
+
+							$reason = 'This name has already been taken by <a href="http://' . $_SERVER['HTTP_HOST'] . '/?p=' . base64_encode('/apps/details?id=' . $resid) . '" target="_blank">' . $resname . '</a>.<p></p>';
+							$reason .= '<div>Please have a look at ' . $resname . ' to ensure it is different from the one you want to register.<br/>If it is <b>not</b> different, please join ' . $resname . ' as a scientific contact (for more information refer to the <a href="' . $wikiUrl2 . '" target="_blank">FAQ</a>)<p></p>';
+							$reason .= 'If it is indeed different, please modify your applcation name. In order to avoid confusion from similarly named software, we suggest you use a modifier in you software name, in order to differentiate it from other related entries. Some good examples would be:</div>';
+							$reason .= "<div><span>  </span>" . $name . "-&lt;Country&gt;</div>";
+							$reason .= "<div><span>  </span>" . $name . "-&lt;Project&gt;</div>";
+							$reason .= "<div><span>  </span>" . $name . "-&lt;Virtual Organization&gt;</div>";
+							$reason .= "<div><span>  </span>" . $name . "-&lt;Consortium&gt;</div>";
+							$reason .= "<div>etc...</div>";
+							$reason .= '<p></p><div>For further information please refer to the <a href="' . $wikiUrl . '" target="_blank">FAQ</a></div>';
+							break;
+						case 'Invalid cname':
+							$res = $reason["value"];
+							$resmeta = $reason["metatype"];
+							// INVALID CNAME MESSAGE (ALREADY TAKEN)
+							$reason = 'This name has already been taken by <a href="http://' . $_SERVER['HTTP_HOST'] . '/?p=' . base64_encode('/apps/details?id=s:' . $res) . '" target="_blank">' . $res . '</a>.<p></p>';
+							$reason .= 'Please modify your applcation name; in order to avoid confusion from similarly named software, we suggest you use a modifier in your software name, in order to differentiate it from other related entries. Good examples would be :</div>';
+							$reason .= "<div><span></span>".$name. "-&lt;Country&gt;</div>";
+							$reason .= "<div><span></span>".$name. "-&lt;Project&gt;</div>";
+							$reason .= "<div><span></span>".$name. "-&lt;Virtual Organization&gt;</div>";
+							$reason .= "<div><span></span>".$name. "-&lt;Consortium&gt;</div>";
+							$reason .= "<div>etc...</div>";
+							$reason .= '<p></p><div>For further information please refer to the <a href="' . $wikiUrl . '" target="_blank">FAQ</a></div>';
+							break;
+						default:
+							//FIXME: make this more reasonable
+							$reason = "Unexpected error";
+					}
+				}
+			}
+		} else {
+			$valid = false;
 		}
-        }
-
-	return true;
+	} else {
+		$valid = false;
+	}
+	return $valid;
 }
 
 function num_to_string($v){
