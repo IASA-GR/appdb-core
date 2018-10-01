@@ -1456,59 +1456,66 @@ function validateAppCName($cname, $id=null){
 	global $application;
 	$db = $application->getBootstrap()->getResource('db');
 	$db->setFetchMode(Zend_Db::FETCH_BOTH);
-	$rs = db()->query("SELECT value FROM app_cnames WHERE value = normalize_cname(E'$cname')" . (isset($id) ? " AND appid <> $id" : ""))->fetchAll();
+	$rs = db()->query("SELECT app_cnames.value FROM app_cnames INNER JOIN applications ON applications.id = app_cnames.appid WHERE applications.deleted <> TRUE AND app_cnames.value = normalize_cname(E'$cname')" . (isset($id) ? " AND app_cnames.appid <> $id" : ""))->fetchAll();
 	if (count($rs) > 0) $valid = $rs[0]["value"];
 	return $valid;
 }
 function validateAppName($name, &$error, &$reason, $id=null) {
 	$valid = false;
 	$name = trim($name);
-    //check min length
-    if(strlen($name)<3 || strlen($name)>50){
-        $error = "Invalid length";
-        $reason = "The length of the name must be from 3 to 50 characters long.The current length is <b>" . strlen($name). "</b>." ;
-        return false;
-    }
-    //check validity
+
+        //check min length
+        if(strlen($name)<3 || strlen($name)>50){
+                $error = "Invalid length";
+                $reason = "The length of the name must be from 3 to 50 characters long.The current length is <b>" . strlen($name). "</b>." ;
+                return false;
+        }
+
+        //check validity
 	if (!preg_match('/^[A-Za-z0-9 *.+,&!#@=_^(){}\[\]-]+$/',$name)) {
 		$error = 'Error : Invalid character.';
-        $reason = 'The name contains invalid characters. Valid characters are alphanumeric characters, spaces, and the following sumbols: +(){}[],*&amp;!#@=^._-';
+                $reason = 'The name contains invalid characters. Valid characters are alphanumeric characters, spaces, and the following sumbols: +(){}[],*&amp;!#@=^._-';
 		return false;
 	}
-    //Check similarity
-    $res = Default_Model_Applications::nameAvailable($name, $id);
-    if($res !== true){
-        $error = "Error : Invalid name";
-        $reason = 'Name already taken by <a href="http://'.$_SERVER['HTTP_HOST'].'/?p='.base64_encode('/apps/details?id='.$res->id).'" target="_blank">'.$res->name.'</a>.<p></p>';
-		$reason .= "<div>Please have a look at the ".$res->name." software to understand if it is different from the one you want to register.<br/>If it is <b>not</b> different, please join ".$res->name." as a scientific contact (for more information visit the ";
-		$reason .= '<a href="#" onclick="appdb.utils.ToggleFaq(12);" >FAQ</a>).<p></p>If it is different, please modify your applcation name. In order to avoid confusion from similarly named software, you should use a modifier in you software name in order to differentiate it from other related entries. Good examples would be :</div>';
-		$reason .= "<div><span>  </span>".$name. "-&lt;Country&gt;</div>";
-		$reason .= "<div><span>  </span>".$name. "-&lt;Project&gt;</div>";
-		$reason .= "<div><span>  </span>".$name. "-&lt;Virtual Organization&gt;</div>";
-		$reason .= "<div><span>  </span>".$name. "-&lt;Consortium&gt;</div>";
-		$reason .= "<div>etc...</div>";
-		$reason .= '<p></p><div>For further information please refer to the <a href="#" onclick="appdb.utils.ToggleFaq(11);" >FAQ</a></div>';
-		return false;
-    }
-    if(strlen($name)>=3){
-        $apps = new Default_Model_Applications();
-        if ( $id != '' ) {
-            $apps->filter->name->ilike("%".pg_escape_string($name)."%")->and($apps->filter->deleted->equals(false))->and($apps->filter->id->notequals($id));
-        } else {
-            $apps->filter->name->ilike("%".pg_escape_string($name)."%")->and($apps->filter->deleted->equals(false));
+
+        //Check similarity
+        $res = Default_Model_Applications::nameAvailable($name, $id);
+        if($res !== true){
+                $error = "Error : Invalid name";
+                $reason = 'Name already taken by <a href="http://'.$_SERVER['HTTP_HOST'].'/?p='.base64_encode('/apps/details?id='.$res->id).'" target="_blank">'.$res->name.'</a>.<p></p>';
+                $reason .= "<div>Please have a look at the ".$res->name." software to understand if it is different from the one you want to register.<br/>If it is <b>not</b> different, please join ".$res->name." as a scientific contact (for more information visit the ";
+                $reason .= '<a href="#" onclick="appdb.utils.ToggleFaq(12);" >FAQ</a>).<p></p>If it is different, please modify your applcation name. In order to avoid confusion from similarly named software, you should use a modifier in you software name in order to differentiate it from other related entries. Good examples would be :</div>';
+                $reason .= "<div><span>  </span>".$name. "-&lt;Country&gt;</div>";
+                $reason .= "<div><span>  </span>".$name. "-&lt;Project&gt;</div>";
+                $reason .= "<div><span>  </span>".$name. "-&lt;Virtual Organization&gt;</div>";
+                $reason .= "<div><span>  </span>".$name. "-&lt;Consortium&gt;</div>";
+                $reason .= "<div>etc...</div>";
+                $reason .= '<p></p><div>For further information please refer to the <a href="#" onclick="appdb.utils.ToggleFaq(11);" >FAQ</a></div>';
+                return false;
         }
-        if($apps->count()>0){
-            $p = base64_encode('{"url":"/apps","query":{"flt":"name:'.$name.'"},"ext":{"mainTitle":"Software","prepend":[],"append":false,"componentType":"appdb.components.Applications","filterDisplay":"Search...","isList":true,"componentArgs":[{"flt":"name:'.$name.'"}]}}');
-            $reason = 'There are software items containing &#39;<i><b>' . $name . '</b></i>&#39;. Click <a href="http://' . $_SERVER["APPLICATION_UI_HOSTNAME"] . '?p='.$p.'" target="_blank">here</a> to view them in a new window.<p></p>';
-			$reason .= "<div>In order to avoid confusion from similarly named software, we suggest you use a modifier in your software name in order to differentiate it from other related entries if this applies. <p></p>Good examples would be :</div>";
-			$reason .= "<div  ><span>  </span>".$name. "-&lt;Country&gt;</div>";
-			$reason .= "<div ><span>  </span>".$name. "-&lt;Project&gt;</div>";
-			$reason .= "<div ><span>  </span>".$name. "-&lt;Virtual Organization&gt;</div>";
-			$reason .= "<div ><span>  </span>".$name. "-&lt;Consortium&gt;</div>";
-			$reason .= "<div>etc...</div>";
-			$reason .= '<p></p><div>For further information please refer to the <a href="#" onclick="appdb.utils.ToggleFaq(11);" >FAQ</a></div>';
-        }
-		//This code should never be reached.
+
+        if(strlen($name)>=3){
+                $apps = new Default_Model_Applications();
+
+                if ( $id != '' ) {
+                        $apps->filter->name->ilike("%".pg_escape_string($name)."%")->and($apps->filter->deleted->equals(false))->and($apps->filter->id->notequals($id));
+                } else {
+                        $apps->filter->name->ilike("%".pg_escape_string($name)."%")->and($apps->filter->deleted->equals(false));
+                }
+
+                if(count($apps->items) > 0){
+                        $p = base64_encode('{"url":"/apps","query":{"flt":"name:'.$name.'"},"ext":{"mainTitle":"Software","prepend":[],"append":false,"componentType":"appdb.components.Applications","filterDisplay":"Search...","isList":true,"componentArgs":[{"flt":"name:'.$name.'"}]}}');
+                        $reason = 'There are software items containing &#39;<i><b>' . $name . '</b></i>&#39;. Click <a href="http://' . $_SERVER["APPLICATION_UI_HOSTNAME"] . '?p='.$p.'" target="_blank">here</a> to view them in a new window.<p></p>';
+                        $reason .= "<div>In order to avoid confusion from similarly named software, we suggest you use a modifier in your software name in order to differentiate it from other related entries if this applies. <p></p>Good examples would be :</div>";
+                        $reason .= "<div  ><span>  </span>".$name. "-&lt;Country&gt;</div>";
+                        $reason .= "<div ><span>  </span>".$name. "-&lt;Project&gt;</div>";
+                        $reason .= "<div ><span>  </span>".$name. "-&lt;Virtual Organization&gt;</div>";
+                        $reason .= "<div ><span>  </span>".$name. "-&lt;Consortium&gt;</div>";
+                        $reason .= "<div>etc...</div>";
+                        $reason .= '<p></p><div>For further information please refer to the <a href="#" onclick="appdb.utils.ToggleFaq(11);" >FAQ</a></div>';
+                }
+
+                //This code should never be reached.
 		$res = validateAppCName($name); 
 		if( $res !== true ){
 			$error = "Error : Invalid cname";
@@ -1521,7 +1528,7 @@ function validateAppName($name, &$error, &$reason, $id=null) {
 			$reason .= "<div>etc...</div>";
 			$reason .= '<p></p><div>For further information please refer to the <a href="#" onclick="appdb.utils.ToggleFaq(11);" >FAQ</a></div>';
 		}
-    }
+        }
 	return true;
 }
 
