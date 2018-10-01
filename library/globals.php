@@ -1463,7 +1463,7 @@ function validateAppCName($cname, $id=null){
 function validateAppName($name, &$error, &$reason, $id=null) {
 	$valid = false;
 	$name = trim($name);
-
+        $wikiUrl = ApplicationConfiguration::app("wiki") . 'main:faq:i_want_to_register_a_new_software_solution_entry_but_the_name_is_already_in_use_or_a_warning_comes_up';
         //check min length
         if(strlen($name)<3 || strlen($name)>50){
                 $error = "Invalid length";
@@ -1490,7 +1490,7 @@ function validateAppName($name, &$error, &$reason, $id=null) {
                 $reason .= "<div><span>  </span>".$name. "-&lt;Virtual Organization&gt;</div>";
                 $reason .= "<div><span>  </span>".$name. "-&lt;Consortium&gt;</div>";
                 $reason .= "<div>etc...</div>";
-                $reason .= '<p></p><div>For further information please refer to the <a href="#" onclick="appdb.utils.ToggleFaq(11);" >FAQ</a></div>';
+                $reason .= '<p></p><div>For further information please refer to the <a href="' . $wikiUrl . '" target="_blank">FAQ</a></div>';
                 return false;
         }
 
@@ -1512,7 +1512,7 @@ function validateAppName($name, &$error, &$reason, $id=null) {
                         $reason .= "<div ><span>  </span>".$name. "-&lt;Virtual Organization&gt;</div>";
                         $reason .= "<div ><span>  </span>".$name. "-&lt;Consortium&gt;</div>";
                         $reason .= "<div>etc...</div>";
-                        $reason .= '<p></p><div>For further information please refer to the <a href="#" onclick="appdb.utils.ToggleFaq(11);" >FAQ</a></div>';
+                        $reason .= '<p></p><div>For further information please refer to the <a href="' . $wikiUrl . '" target="_blank">FAQ</a></div>';
                 }
 
                 //This code should never be reached.
@@ -1526,9 +1526,10 @@ function validateAppName($name, &$error, &$reason, $id=null) {
 			$reason .= "<div><span></span>".$name. "-&lt;Virtual Organization&gt;</div>";
 			$reason .= "<div><span></span>".$name. "-&lt;Consortium&gt;</div>";
 			$reason .= "<div>etc...</div>";
-			$reason .= '<p></p><div>For further information please refer to the <a href="#" onclick="appdb.utils.ToggleFaq(11);" >FAQ</a></div>';
+			$reason .= '<p></p><div>For further information please refer to the <a href="' . $wikiUrl . '" target="_blank">FAQ</a></div>';
 		}
         }
+
 	return true;
 }
 
