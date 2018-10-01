@@ -1798,6 +1798,7 @@ appdb.views.ui.editors.combobox = appdb.ExtendClass(appdb.views.ui.editors.Gener
 	this.getListItemDisplayValue = function(d){
 		if( d ){
 			if( this.getProp("editor-displayvalue") ) return d[this.getProp("editor-displayvalue")];
+			if( this.getProp("editorDisplayvalue") ) return d[this.getProp("editorDisplayvalue")];
 			if( d.val && d.val()) return d.val();
 			if( d.name ) return d.name;
 			if( d.id ) return d.id;
