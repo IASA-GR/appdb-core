@@ -7962,7 +7962,7 @@ class SamlAuth{
 		$session->username = $attrs["idp:uid"][0];
 		$session->usercname = "";
 		$session->userFirstName = ( ( isset($attrs["idp:givenName"]) === true && count($attrs["idp:givenName"]) > 0 )?$attrs["idp:givenName"][0]:"" );
-		$session->userLastName = ( ( isset($attrs["idp:sn"]) === true && count($attrs["idp:givenName"]) > 0 )?$attrs["idp:sn"][0]:"" );
+		$session->userLastName = ( ( isset($attrs["idp:sn"]) === true && count($attrs["idp:sn"]) > 0 )?$attrs["idp:sn"][0]:"" );
 		$session->userFullName = $session->userFirstName . " " . $session->userLastName;
 		$session->fullName = $session->userFullName;
 		$session->userRole = 4;
