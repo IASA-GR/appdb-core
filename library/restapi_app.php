@@ -122,7 +122,7 @@ class RestAppXMLParser extends RestXMLParser {
 			} catch (Exception $e) {
 				if (strpos($e->getMessage(), "APPDB_REST_API_ERROR") === false) {
 					$this->_error = RestErrorEnum::RE_BACKEND_ERROR;
-					$this->_extError = "DEBUG DATA: ".base64_encode(encrypt($e->getMessage(), substr(ApplicationConfiguration::api('key',''), 0, 8)));
+					$this->_extError = "An unexpected error has occured. If you choose to submit a bug report, please include the above string by copying and pasting it into the report, in order to help us resolve the issue.\n\nDEBUG DATA:\n" . base64_encode(encrypt($e->getMessage(), substr(ApplicationConfiguration::api('key',''), 0, 8)));
 				} else {
 					error_log($e->getMessage());
 					$errmsg = preg_replace('/.*APPDB_REST_API_ERROR /', '', $e->getMessage());

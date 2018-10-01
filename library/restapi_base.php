@@ -1759,7 +1759,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
 		$this->_error = $e;
 		if ( ! is_null($ext) ) {
 			if ( $enc ) {
-				$this->_extError = "DEBUG DATA: ".base64_encode(encrypt($ext, substr(ApplicationConfiguration::api('key',''), 0, 8)));
+				$this->_extError = "An unexpected error has occured. If you choose to submit a bug report, please include the above string by copying and pasting it into the report, in order to help us resolve the issue.\n\nDEBUG DATA:\n" . base64_encode(encrypt($ext, substr(ApplicationConfiguration::api('key',''), 0, 8)));
 			} else {
 				$this->_extError = $ext;
 			}
