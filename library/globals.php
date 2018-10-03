@@ -1472,6 +1472,87 @@ function validateAppCName($cname, $id = null) {
 	return $valid;
 }
 
+/**
+ * Retrieve textual representation of an item's metatype
+ *
+ * @param  int    $metatype
+ * @return string
+ */
+function getApplicationMetatypeName($metatype = 0) {
+    switch(intval($metatype)) {
+        case 0:
+            return 'software';
+        case 1:
+            return 'virtual appliance';
+        case 2:
+            return 'software appliance';
+        default:
+            return 'application item';
+    }
+}
+
+/**
+ * Generate HTML links for filtering an item name for various metatype values.
+ * This is used for the validation process of an item name during registration.
+ *
+ * @param  string $name      The name value to filter
+ * @param  int[]  $metatypes Array of metatype values to generate links for
+ * @return string            HTML with filter links
+ */
+function generateValidationAppFilterLink($name, $metatypes = array()) {
+    $hasSw = in_array(0, $metatypes);
+    $hasVApp = in_array(1, $metatypes);
+    $hasSWapp = in_array(2, $metatypes);
+    $url = '//' . $_SERVER["APPLICATION_UI_HOSTNAME"] . '?p=';
+    $res = array();
+
+    if ($hasSw) {
+       $p = base64_encode('{"url":"/apps","query":{"flt":"application.name:' . $name . ' +*&application.metatype:0"},"ext":{"isBaseQuery":true,"mainTitle":"Software Marketplace","filterDisplay":"Search software...","content":"software","append":false,"componentType":"appdb.components.Applications","prepend":[],"baseQuery":{"flt":"+*&application.metatype:0", "applicationtype":"applications"},"isList":true,"componentArgs":[{"flt":"+*&application.metatype:0","applicationtype":"applications"}],"userQuery":{"flt":"application.name:'.$name.'"}}}');
+       $res[] = '<a href="' . $url . $p .'" target="_blank" title="Click to view software in new tab" >software</a>';
+    }
+
+    if ($hasVApp) {
+        $p = base64_encode('{"url":"/apps","query":{"flt":"application.name:' . $name . ' +*&application.metatype:1"},"ext":{"isBaseQuery":true,"mainTitle":"Cloud Marketplace","filterDisplay":"Search virtual appliances...","content":"vappliance","append":false,"componentType":"appdb.components.Applications","prepend":[],"baseQuery":{"flt":"+*&application.metatype:1","applicationtype":"applications"},"isList":true,"componentArgs":[{"flt":"+*&application.metatype:1","applicationtype":"applications"}],"userQuery":{"flt":"application.name:'.$name.'"}}}');
+        $res[] = '<a href="' . $url . $p . '" target="_blank" title="Click to view virtual appliance in new tab">virtual appliance</a>';
+    }
+
+    if ($hasSWapp) {
+        $p = base64_encode('{"url":"/apps","query":{"flt":"application.name:' . $name . ' +*&application.metatype:2"},"ext":{"filterDisplay":"Search software appliances...","mainTitle":"Software Appliances","content":"swappliance","prepend":[{"componentType":"appdb.components.Applications","mainTitle":"Cloud Marketplace","isBaseQuery":false,"filterDisplay":"Search software appliances...","isList":true,"content":"swappliance","componentArgs":[{"flt":""}],"href":"/browse/cloud"}],"callerName":"CloudSoftwareAppliances","href":"/browse/swappliances/cloud","isBaseQuery":true,"isList":true,"append":false,"componentType":"appdb.components.Applications","baseQuery":{"flt":"+*&application.metatype:2","applicationtype":"applications"},"componentArgs":[{"flt":"+*&application.metatype:2","applicationtype":"applications"}],"userQuery":{"flt":"application.name:' . $name . '"}}}');
+        $res[] = '<a href="' . $url . $p . '" target="_blank" title="Click to view software appliance in new tab">software appliance</a>';
+    }
+
+    return join(",", $res);
+}
+
+/**
+ * Generate a HTML link to a specific item
+ *
+ * @param  string $name     The name of the item
+ * @param  string $cname    The canonical name of the item
+ * @param  int    $metatype The metatype value of the item (0: software, 1: vappliance, 2: swappliance)
+ * @return string           A HTML link to the details page of the item
+ */
+function generateValidationAppLink($name, $cname, $metatype = 0) {
+    $href = '//' . $_SERVER["APPLICATION_UI_HOSTNAME"] . '/store/';
+    $typename = getApplicationMetatypeName($metatype);
+
+    switch(intval($metatype)) {
+        case 0:
+            $href .= 'software/' . $cname;
+            break;
+        case 1:
+            $href .= 'vappliance/' . $cname;
+            break;
+        case 2:
+            $href .= 'swappliances/' . $cname;
+            break;
+        default:
+            return '';
+    }
+
+    return '<a href="' . $href . '" title="Click to view ' . $typename . '" target="_blank">' . htmlspecialchars($name) . '</a>';
+}
+
 function validateAppName($name, &$error, &$reason, $id = null) {
 	$valid = false;
 	$warn = false;
@@ -1505,19 +1586,15 @@ function validateAppName($name, &$error, &$reason, $id = null) {
 				}
 
 				if ($valid && $warn) {
-					// WARNING MESSAGE
-					$resid = $reason["ids"][0];
-					$resname = $reason["names"][0];
-					$resmeta = $reason["metatypes"][0];
-					$p = base64_encode('{"url":"/apps","query":{"flt":"name:'.$name.'"},"ext":{"mainTitle":"Software","prepend":[],"append":false,"componentType":"appdb.components.Applications","filterDisplay":"Search...","isList":true,"componentArgs":[{"flt":"name:'.$name.'"}]}}');
-					$reason = 'There are software items containing &#39;<i><b>' . $name . '</b></i>&#39;. Click <a href="http://' . $_SERVER["APPLICATION_UI_HOSTNAME"] . '?p='.$p.'" target="_blank">here</a> to view them in a new window.<p></p>';
-					$reason .= "<div>In order to avoid confusion from similarly named software, we suggest you use a modifier in your software name in order to differentiate it from other related entries, if applicable. <p></p>Some good examples would be:</div>";
-					$reason .= "<div  ><span>  </span>" . $name . "-&lt;Country&gt;</div>";
-					$reason .= "<div ><span>  </span>" . $name . "-&lt;Project&gt;</div>";
-					$reason .= "<div ><span>  </span>" . $name . "-&lt;Virtual Organization&gt;</div>";
-					$reason .= "<div ><span>  </span>" . $name . "-&lt;Consortium&gt;</div>";
-					$reason .= "<div>etc...</div>";
-					$reason .= '<p></p><div>For further information please refer to the <a href="' . $wikiUrl . '" target="_blank">FAQ</a></div>';
+                                        // WARNING MESSAGE
+                                        $reason = 'There are ' . generateValidationAppFilterLink($name, $reason['metatypes']) . ' containing &#39;<i><b>' . $name . '</b></i>&#39;.<p></p>';
+                                        $reason .= "<div>In order to avoid confusion from similarly named items, we suggest you use a modifier in your item name in order to differentiate it from other related entries, if applicable. <p></p>Some good examples would be:</div>";
+                                        $reason .= "<div  ><span>  </span>" . $name . "-&lt;Country&gt;</div>";
+                                        $reason .= "<div ><span>  </span>" . $name . "-&lt;Project&gt;</div>";
+                                        $reason .= "<div ><span>  </span>" . $name . "-&lt;Virtual Organization&gt;</div>";
+                                        $reason .= "<div ><span>  </span>" . $name . "-&lt;Consortium&gt;</div>";
+                                        $reason .= "<div>etc...</div>";
+                                        $reason .= '<p></p><div>For further information please refer to the <a href="' . $wikiUrl . '" target="_blank">FAQ</a></div>';
 				} elseif (! is_null($error)) {
 					switch($error) {
 						case 'Invalid length':
@@ -1538,9 +1615,10 @@ function validateAppName($name, &$error, &$reason, $id = null) {
 							$resname = $reason["names"][0];
 							$rescname = $reason["cnames"][0];
 							$resmeta = $reason["metatypes"][0];
-							$reason = 'This name has already been taken by <a href="http://' . $_SERVER['HTTP_HOST'] . '/?p=' . base64_encode('/apps/details?id=' . $resid) . '" target="_blank">' . $resname . '</a>.<p></p>';
+
+                                                        $reason = 'This name has already been taken by ' . generateValidationAppLink($resname, $rescname, $resmeta) . '.<p></p>';
 							$reason .= '<div>Please have a look at ' . $resname . ' to ensure it is different from the one you want to register.<br/>If it is <b>not</b> different, please join ' . $resname . ' as a scientific contact (for more information refer to the <a href="' . $wikiUrl2 . '" target="_blank">FAQ</a>)<p></p>';
-							$reason .= 'If it is indeed different, please modify your applcation name. In order to avoid confusion from similarly named software, we suggest you use a modifier in you software name, in order to differentiate it from other related entries. Some good examples would be:</div>';
+							$reason .= 'If it is indeed different, please modify the name field. In order to avoid confusion from similarly named items, we suggest you use a modifier in your item name, in order to differentiate it from other related entries. Some good examples would be:</div>';
 							$reason .= "<div><span>  </span>" . $name . "-&lt;Country&gt;</div>";
 							$reason .= "<div><span>  </span>" . $name . "-&lt;Project&gt;</div>";
 							$reason .= "<div><span>  </span>" . $name . "-&lt;Virtual Organization&gt;</div>";
@@ -1551,9 +1629,10 @@ function validateAppName($name, &$error, &$reason, $id = null) {
 						case 'Invalid cname':
 							$res = $reason["value"];
 							$resmeta = $reason["metatype"];
-							// INVALID CNAME MESSAGE (ALREADY TAKEN)
-							$reason = 'This name has already been taken by <a href="http://' . $_SERVER['HTTP_HOST'] . '/?p=' . base64_encode('/apps/details?id=s:' . $res) . '" target="_blank">' . $res . '</a>.<p></p>';
-							$reason .= 'Please modify your applcation name; in order to avoid confusion from similarly named software, we suggest you use a modifier in your software name, in order to differentiate it from other related entries. Good examples would be :</div>';
+
+                                                        // INVALID CNAME MESSAGE (ALREADY TAKEN)
+							$reason = 'This name has already been taken by ' . generateValidationAppLink($res, $res, $resmeta) . '.<p></p>';
+							$reason .= 'Please modify the name field; in order to avoid confusion from similarly named items, we suggest you use a modifier in your software name, in order to differentiate it from other related entries. Good examples would be :</div>';
 							$reason .= "<div><span></span>".$name. "-&lt;Country&gt;</div>";
 							$reason .= "<div><span></span>".$name. "-&lt;Project&gt;</div>";
 							$reason .= "<div><span></span>".$name. "-&lt;Virtual Organization&gt;</div>";
