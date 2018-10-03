@@ -46,7 +46,7 @@ BEGIN
         -- check validity
         IF NOT $1 ~ '^[A-Za-z0-9 *.+,&!#@=_^(){}\[\]-]+$' THEN
                 err := 'Invalid character';
-                RETURN '{"valid": false, "error": ' || to_json(err) || ', "reason": ' || to_json('*.+,&!#@=_^(){}[]-') || '}';
+                RETURN '{"valid": false, "error": ' || to_json(err) || ', "reason": ' || to_json('*.+,&!#@=_^(){}[]-'::text) || '}';
         END IF;
 
         -- check similarity
