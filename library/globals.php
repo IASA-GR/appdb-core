@@ -1505,17 +1505,19 @@ function validateAppName($name, &$error, &$reason, $id = null) {
 				}
 
 				if ($valid && $warn) {
-						// WARNING MESSAGE
-                        $p = base64_encode('{"url":"/apps","query":{"flt":"name:'.$name.'"},"ext":{"mainTitle":"Software","prepend":[],"append":false,"componentType":"appdb.components.Applications","filterDisplay":"Search...","isList":true,"componentArgs":[{"flt":"name:'.$name.'"}]}}');
-                        $reason = 'There are software items containing &#39;<i><b>' . $name . '</b></i>&#39;. Click <a href="http://' . $_SERVER["APPLICATION_UI_HOSTNAME"] . '?p='.$p.'" target="_blank">here</a> to view them in a new window.<p></p>';
-                        $reason .= "<div>In order to avoid confusion from similarly named software, we suggest you use a modifier in your software name in order to differentiate it from other related entries, if applicable. <p></p>Some good examples would be:</div>";
-                        $reason .= "<div  ><span>  </span>" . $name. "-&lt;Country&gt;</div>";
-                        $reason .= "<div ><span>  </span>" . $name. "-&lt;Project&gt;</div>";
-                        $reason .= "<div ><span>  </span>" . $name. "-&lt;Virtual Organization&gt;</div>";
-                        $reason .= "<div ><span>  </span>" . $name. "-&lt;Consortium&gt;</div>";
-                        $reason .= "<div>etc...</div>";
-                        $reason .= '<p></p><div>For further information please refer to the <a href="' . $wikiUrl . '" target="_blank">FAQ</a></div>';
-
+					// WARNING MESSAGE
+					$resid = $reason["ids"][0];
+					$resname = $reason["names"][0];
+					$resmeta = $reason["metatypes"][0];
+					$p = base64_encode('{"url":"/apps","query":{"flt":"name:'.$name.'"},"ext":{"mainTitle":"Software","prepend":[],"append":false,"componentType":"appdb.components.Applications","filterDisplay":"Search...","isList":true,"componentArgs":[{"flt":"name:'.$name.'"}]}}');
+					$reason = 'There are software items containing &#39;<i><b>' . $name . '</b></i>&#39;. Click <a href="http://' . $_SERVER["APPLICATION_UI_HOSTNAME"] . '?p='.$p.'" target="_blank">here</a> to view them in a new window.<p></p>';
+					$reason .= "<div>In order to avoid confusion from similarly named software, we suggest you use a modifier in your software name in order to differentiate it from other related entries, if applicable. <p></p>Some good examples would be:</div>";
+					$reason .= "<div  ><span>  </span>" . $name . "-&lt;Country&gt;</div>";
+					$reason .= "<div ><span>  </span>" . $name . "-&lt;Project&gt;</div>";
+					$reason .= "<div ><span>  </span>" . $name . "-&lt;Virtual Organization&gt;</div>";
+					$reason .= "<div ><span>  </span>" . $name . "-&lt;Consortium&gt;</div>";
+					$reason .= "<div>etc...</div>";
+					$reason .= '<p></p><div>For further information please refer to the <a href="' . $wikiUrl . '" target="_blank">FAQ</a></div>';
 				} elseif (! is_null($error)) {
 					switch($error) {
 						case 'Invalid length':
@@ -1532,15 +1534,10 @@ function validateAppName($name, &$error, &$reason, $id = null) {
 							break;
 						case 'Invalid name':
 							// INVALID NAME MESSAGE (ALREADY TAKEN)
-							error_log("REASON:" . var_export($reason, true));
-
 							$resid = $reason["ids"][0];
 							$resname = $reason["names"][0];
-							$resmeta= $reason["names"][0];
-
-							error_log("RESID:" . var_export($resid, true));
-							error_log("RESNAME:" . var_export($resname, true));
-
+							$rescname = $reason["cnames"][0];
+							$resmeta = $reason["metatypes"][0];
 							$reason = 'This name has already been taken by <a href="http://' . $_SERVER['HTTP_HOST'] . '/?p=' . base64_encode('/apps/details?id=' . $resid) . '" target="_blank">' . $resname . '</a>.<p></p>';
 							$reason .= '<div>Please have a look at ' . $resname . ' to ensure it is different from the one you want to register.<br/>If it is <b>not</b> different, please join ' . $resname . ' as a scientific contact (for more information refer to the <a href="' . $wikiUrl2 . '" target="_blank">FAQ</a>)<p></p>';
 							$reason .= 'If it is indeed different, please modify your applcation name. In order to avoid confusion from similarly named software, we suggest you use a modifier in you software name, in order to differentiate it from other related entries. Some good examples would be:</div>';
