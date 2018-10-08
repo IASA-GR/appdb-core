@@ -20662,6 +20662,7 @@ appdb.views.AutoCompleteListOrganization = appdb.ExtendClass(appdb.views.AutoCom
 					$(el).find(".country_iso").attr("src","/images/flags/" + $.trim(e.val()).toLowerCase() + ".png");
 					break;
 				case "legashortlname":
+				case "legalshortname":
 					sname = e.val();
 					break;
 				case "legalname":
@@ -20687,7 +20688,7 @@ appdb.views.AutoCompleteListOrganization = appdb.ExtendClass(appdb.views.AutoCom
 			if( e.val ){
 				if( e.name === 'legalname' ){
 					title = e.val();
-				} else if (e.name === 'legashortlname' && e.val && $.trim(e.val()) !== ""){
+				} else if ((e.name === 'legashortlname' || e.name === 'legalshortname') && e.val && $.trim(e.val()) !== ""){
 					stitle = e.val() + " | ";
 				}
 			}
