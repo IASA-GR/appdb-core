@@ -12394,19 +12394,20 @@ class ExternalDataNotification {
 
 class openAIRE {
 	public static function search($archiveid, $search, $limit = null) {
+		db()->exec("START TRANSACTION;");
 		db()->setFetchMode(Zend_Db::FETCH_NUM);
 		$sql = "SELECT openaire.xml_search_results(x) FROM openaire.";
 		switch ($archiveid) {
 			case 1:
 				$sql .= "projects AS x WHERE";
-				$sql .= " title ILIKE '%" . pg_escape_string($search) . "%'";
-				$sql .= " OR acronym ILIKE '%" . pg_escape_string($search) . "%'";
-				$sql .= " OR code ILIKE '%" . pg_escape_string($search) . "%'";
+				$sql .= " LOWER(title) LIKE LOWER('%" . pg_escape_string($search) . "%')";
+				$sql .= " OR LOWER(acronym) LIKE LOWER('%" . pg_escape_string($search) . "%')";
+				$sql .= " OR LOWER(code) LIKE LOWER('%" . pg_escape_string($search) . "%')";
 				break;
 			case 3:
 				$sql .= "organizations AS x WHERE";
-				$sql .= " name ILIKE '%" . pg_escape_string($search) . "%'";
-				$sql .= " OR shortname ILIKE '%" . pg_escape_string($search) . "%'";
+				$sql .= " LOWER(name) LIKE LOWER('%" . pg_escape_string($search) . "%')";
+				$sql .= " OR LOWER(shortname) LIKE LOWER('%" . pg_escape_string($search) . "%')";
 				break;
 			default:
 				return array();
@@ -12427,6 +12428,7 @@ class openAIRE {
 				$res[] = $r[0];
 			}
 		}
+		db()->exec("ROLLBACK;");
 		return $res;
 	}
 }
