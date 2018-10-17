@@ -5762,6 +5762,18 @@ appdb.utils.RestApiErrorHandler = function(d,errObj,itemname){
 		"status": "An error occured",
 		"description": d.description || "Unknown error" 
 	};
+	var transformErrorDescription = function(errordesc) {
+	    errordesc = $.trim(errordesc || '');
+
+	    if (errordesc && errordesc.indexOf('DEBUG DATA:') > -1) {
+		    errordesc = errordesc.split('DEBUG DATA:');
+		    if (errordesc.length > 1) {
+			    return errordesc[0] + '<div class="debug-data"><span>Report Data:</span><div class="value">' + errordesc[1] + '</div></div>';
+		    }
+	    }
+
+	    return errordesc;
+	};
 	var _init = function(){
 		var err = {
 			"status": errObj.status,
@@ -5807,7 +5819,7 @@ appdb.utils.RestApiErrorHandler = function(d,errObj,itemname){
 		}
 		
 		errObj["status"] = err["status"];
-		errObj["description"] = err["description"];
+		errObj["description"] = transformErrorDescription(err["description"]);
 	};
 	var _dialog = new appdb.views.ErrorHandler();
 	

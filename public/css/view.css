@@ -25810,3 +25810,23 @@ table.cdtaskinstance-list tr > .img > img {
 }
 
 .ui-dialog { z-index: 1001 !important ;}
+
+.dijitDialog .debug-data {
+    text-align: left;
+}
+
+.dijitDialog .debug-data > span {
+    font-weight: bold;
+    color: #555;
+    line-height: 16px;
+}
+
+.dijitDialog .debug-data > .value {
+    font-weight: normal;
+    padding-top: 4px;
+    display: inline-block;
+    word-break: break-all;
+    width: 100%;
+    max-height: 190px;
+    overflow: auto;
+}
