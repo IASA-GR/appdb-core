@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 - Pass extended account information to authorized sub services (vmops dashboard) 
 - Replace php file_get_contents with cURL
+- Improved support for OpenAIRE project and organization metadata synchronization
 ### Fixed
 - Invalid dojo versioning report due to custom build
 - Fixed bug causing empty category and discipline collections when creating new software and vappliance entries
