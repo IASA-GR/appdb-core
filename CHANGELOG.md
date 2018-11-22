@@ -3,7 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-
+## [6.1.11] - 2018-11-22
+### Changed
+- Improved internal server errors display
+- Improved performance of openAIRE searching
+### Fixed
+- Properly handle unicode characters in user input when creating a new user account
+- Display short name for all organizations retrieved from openAIRE
 
 ## [6.1.10] - 2018-09-11
 ### Added
