@@ -16,8 +16,8 @@
 
 /* 
 EGI AppDB incremental SQL script
-Previous version: 8.20.0
-New version: 8.20.1
+Previous version: 8.20.3
+New version: 8.20.4
 Author: wvkarag@lovecraft.priv.iasa.gr
 */
 
@@ -185,7 +185,7 @@ ALTER FUNCTION public.researcher_to_xml(integer[], text, integer)
   OWNER TO appdb;
 
 INSERT INTO version (major,minor,revision,notes) 
-	SELECT 8, 20, 1, E'Add xmlns:xsi to elements using xsi:nil in order to avoid XML errors inside the database (researcher_to_xml)'
-	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=20 AND revision=1);
+	SELECT 8, 20, 4, E'Add xmlns:xsi to elements using xsi:nil in order to avoid XML errors inside the database (researcher_to_xml)'
+	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=20 AND revision=4);
 
 COMMIT;	
