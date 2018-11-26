@@ -7754,7 +7754,7 @@ appdb.components.Banner = appdb.ExtendClass(appdb.Component, "appdb.components.B
 				if( $.trim(this.subtype) === "" ){
 					this._model = new appdb.model.VOs(q,{action:"GET",async: true});
 				}else{
-					q.membership = this.subtype;
+					q.vomembership = this.subtype;
 					this._model = new appdb.model.PeopleVOs(q,{action:"GET",async:true});
 				}
 				break;
@@ -7789,6 +7789,7 @@ appdb.components.Banner = appdb.ExtendClass(appdb.Component, "appdb.components.B
 		this.views.pager = this._model.getPager().subscribe({event:'pageload',callback:function(d){
 				var dd ={};
 				dd[this.modelType] = d.data;
+				this.renderLoading(false);
 				this.render(dd,d.pager);
 		},caller:this});
 		if(typeof d === "undefined" ){
