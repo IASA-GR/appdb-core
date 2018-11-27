@@ -18,9 +18,20 @@
 <?php
 class Default_Model_VOMembersMapper extends Default_Model_VOMembersMapperBase
 {
-	public function count($filter = null) {
-		return count($this->fetchAll($filter, "xml"));
-	}
+//	public function count($filter = null) {
+//		//$ores = parent::fetchAll(null);
+//		//$ids = array();
+//		//foreach ($ores as $i) {
+//		//	$ids[] = $i->void;
+//		//}
+//		//$res = new Default_Model_VOs();
+//		//$res->filter->id->in($ids);
+//		//if ($filter !== null) {
+//		//	$res->filter->chain($filter, "AND");
+//		//}
+//		//$c = $res->count($filter);
+//		//return $c;
+//	}
 
 	public function fetchAll($filter = null, $format = '', $xmldetailed = false) {
 		if ( $format === "xml" ) {
@@ -33,6 +44,8 @@ class Default_Model_VOMembersMapper extends Default_Model_VOMembersMapperBase
 			$res->filter->id->in($ids);
 			if ($filter !== null) {
 				$res->filter->chain($filter, "AND");
+				$res->filter->limit = $filter->limit;
+				$res->filter->offset = $filter->offset;
 			}
 			$res->filter->orderBy("name");
 			$res->refresh("xml", $xmldetailed);

@@ -327,6 +327,7 @@ class RestPplVOList extends RestROSelfAuthResourceList {
 		$res2 = new RestVOContactList($this->getParams());
 		$ret2 = $res2->get();
 		$data = array_merge($ret1->getData(), $ret2->getData());
+		$this->total = $res1->total + $res2->total;
 		return new XMLFragmentRestResponse($data, $this);
 	}
 }

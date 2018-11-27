@@ -18,9 +18,9 @@
 <?php
 class Default_Model_VOContactsMapper extends Default_Model_VOContactsMapperBase
 {
-	public function count($filter = null) {
-		return count($this->fetchAll($filter, "xml"));
-	}
+//	public function count($filter = null) {
+//		return count($this->fetchAll($filter, "xml"));
+//	}
 
 	public function fetchAll($filter = null, $format = '', $xmldetailed = false) {
 		if ( $format === "xml" ) {
@@ -33,6 +33,8 @@ class Default_Model_VOContactsMapper extends Default_Model_VOContactsMapperBase
 			$res->filter->id->in($ids);
 			if ($filter !== null) {
 				$res->filter->chain($filter, "AND");
+				$res->filter->limit = $filter->limit;
+				$res->filter->offset = $filter->offset;
 			}
 			$res->filter->orderBy("name");
 			$res->refresh("xml", $xmldetailed);
