@@ -1518,7 +1518,7 @@
                     appdb.model.MailSubscription.inboxNotification = null;
                 }
             };
-            $(function() {
+            window.initializePersonProfileTabs = function() {
 				$( "#navdiv<?php echo $this->dialogCount;?>" ).tabs();
 				<?php if($this->entry->accounttype==1){ ?>
 					$("#navdiv<?php echo $this->dialogCount;?>" ).tabs("remove",1);
@@ -1577,7 +1577,8 @@
 					window.userRequests = new appdb.components.UserRequests({container: $( "#pendingdiv<?php echo $this->dialogCount;?>").find(".pendingrequests")[0]});
 					window.userRequests.load();
 				<?php } ?>
-			});
+			};
+                        appdb.pages.Person.onPersonLoad();
     });
 	if( appdb.config.routing && appdb.config.routing.useCanonical === true){
 	  $("#relatedappsdiv<?php echo $this->dialogCount; ?> .itemcontainer > .item > a.itemlink").each(function(index,elem){
@@ -1620,7 +1621,6 @@
 			relations: '<?php echo base64_encode('<?xml version="1.0"?><entity:relations xmlns:regional="http://appdb.egi.eu/api/regional" xmlns:entity="http://appdb.egi.eu/api/1.0/entity" xmlns:organization="http://appdb.egi.eu/api/1.0/organization" xmlns:project="http://appdb.egi.eu/api/1.0/project" xmlns:person="http://appdb.egi.eu/api/1.0/person" xmlns:application="http://appdb.egi.eu/api/1.0/application" xmlns:site="http://appdb.egi.eu/api/1.0/site" xmlns:vo="http://appdb.egi.eu/api/1.0/vo">' . str_replace('\'', '&apos;',$this->entryRelationsXml) . '</entity:relations>'); ?>'
 		});
 	}
-	appdb.pages.Person.onPersonLoad();
 </script>
  <?php } else {?>
 <div class="recordnotfound emptycontent">

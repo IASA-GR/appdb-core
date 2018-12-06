@@ -3497,13 +3497,18 @@ appdb.pages.Person = (function(){
 					break;
 			}
 		}
-		if( $("#ppl_details").length > 0 ){
+
+		if (window.initializePersonProfileTabs) {
+		    window.initializePersonProfileTabs();
+		    if( $("#ppl_details").length > 0 ){
 			$("#ppl_details").tabs();
 			$("#ppl_details").tabs("option", "active",tab_index);
-		} else {
-			$( "#navdiv" + dialogCount ).tabs();
-			$( "#navdiv" + dialogCount ).tabs("option", "active",tab_index);
+		    } else {
+			    $( "#navdiv" + dialogCount ).tabs();
+			    $( "#navdiv" + dialogCount ).tabs("option", "active",tab_index);
+		    }
 		}
+
 		page.setupNilsCountryItems();
 		page.SetupNavigationPane();
 		page.initVoMembershipPanel();
