@@ -3509,6 +3509,11 @@ appdb.pages.Person = (function(){
 		    }
 		}
 
+		if( $("#ppl_details").length > 0 ){
+			$("#ppl_details").tabs();
+			$("#ppl_details").tabs("option", "active",tab_index);
+		}
+
 		page.setupNilsCountryItems();
 		page.SetupNavigationPane();
 		page.initVoMembershipPanel();
@@ -3976,6 +3981,7 @@ appdb.pages.Person = (function(){
 		},150);
 	};
 	page.reload = function(){
+		delete window.initializePersonProfileTabs;
 		appdb.routing.Dispatch( (($.browser.msie)?window.location.hash:window.location.pathname), true);
 		return false;
 	};
