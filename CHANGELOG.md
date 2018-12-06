@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.1.12] - 2018-12-06
+### Fixed
+- Fixed issues regarding base64 encoding of unicode and object types
+- Fixed paging in RESTful API VO member/contact, etc resources
+- Fixed invalid edit button on non editable person profile tabs
+
 ## [6.1.11] - 2018-11-22
 ### Changed
 - Improved internal server errors display
