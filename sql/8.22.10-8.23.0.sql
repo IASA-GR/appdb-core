@@ -181,16 +181,25 @@ CREATE OR REPLACE FUNCTION public.group_hash(
     STABLE 
 AS $BODY$
 SELECT md5(
-COALESCE(v.memsize, '') || '_' || 
-COALESCE(v.logical_cpus, '') || '_' || 
-COALESCE(v.physical_cpus,'') || '_' || 
-COALESCE(v.cpu_multiplicity, '') || '_' || 
-COALESCE(v.os_family, '') || '_' || 
-COALESCE(v.connectivity_in, '') || '_' || 
-COALESCE(v.connectivity_out, '') || '_' || 
-COALESCE(v.cpu_model, '') || '_' || 
-COALESCE(v.disc_size, '')
-);
+	COALESCE(v.memsize, '') || '_' || 
+	COALESCE(v.logical_cpus, '') || '_' || 
+	COALESCE(v.physical_cpus,'') || '_' || 
+	COALESCE(v.cpu_multiplicity, '') || '_' || 
+	COALESCE(v.os_family, '') || '_' || 
+	COALESCE(v.connectivity_in, '') || '_' || 
+	COALESCE(v.connectivity_out, '') || '_' || 
+	COALESCE(v.cpu_model, '') || '_' || 
+	COALESCE(v.disc_size, '') || '_' ||
+	COALESCE(v.tmp_storage_size, '') || '_' ||
+	COALESCE(v.connectivity_ports_in, '') || '_' ||
+	COALESCE(v.connectivity_ports_out, '') || '_' ||
+	COALESCE(v.managerid, 0) || '_' ||
+	COALESCE(v.shareid, 0) || '_' ||
+	COALESCE(e.deployment_type, '')
+)	
+FROM va_provider_endpoints e 
+WHERE e.va_provider_id = v.va_provider_id
+LIMIT 1;
 $BODY$;
 
 ALTER FUNCTION public.group_hash(va_provider_templates)
