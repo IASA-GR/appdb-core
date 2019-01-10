@@ -2429,7 +2429,7 @@ appdb.components.Site = appdb.ExtendClass(appdb.Component, "appdb.components.Sit
 	};
 	this.getOcciImages = function(){
 		var servs = this.getServices("occi");
-		return appdb.utils.GroupSiteImages(servs);
+		return appdb.utils.GroupSiteImages(servs, true);
 	};
 	this.renderLoading = function(enabled){
 		enabled = (typeof enabled === "boolean")?enabled:false;

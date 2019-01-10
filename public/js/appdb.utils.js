@@ -7966,7 +7966,7 @@ appdb.utils.extendArray = function(arr){
 	});
 	return res;
 };
-appdb.utils.GroupSiteImages = function(occiservices){
+appdb.utils.GroupSiteImages = function(occiservices, flattenVOs){
 	occiservices = occiservices || [];
 	occiservices = $.isArray(occiservices)?occiservices:[occiservices];
 	
@@ -8025,7 +8025,35 @@ appdb.utils.GroupSiteImages = function(occiservices){
 			if( goodids.hasOwnProperty(i) === false ) continue;
 			res.push(goodids[i]);
 		}
-		
+
+		if (flattenVOs === true) {
+		    res = flattenPerVO(res);
+		}
+
+		return res;
+	}
+
+	function flattenPerVO(groups) {
+		var instancevos = {};
+		var res = [];
+
+		$.each(groups, function(gi, g) {
+			$.each(g.instances, function(ii, inst) {
+				var uid = g.id  + '_' + inst.vo.id;
+				if (!instancevos[uid]) {
+					instancevos[uid] = Object.assign({}, g);
+					instancevos[uid].instances = [Object.assign({}, inst)];
+				} else {
+					instancevos[uid].instances.push(inst);
+				}
+			});
+		});
+
+		for(var i in instancevos) {
+			if (instancevos.hasOwnProperty(i) === false) continue;
+			res.push(instancevos[i]);
+		}
+
 		return res;
 	}
 	
@@ -8057,6 +8085,10 @@ appdb.utils.GroupSiteImages = function(occiservices){
 		
 		$.each(images, function(i, e){
 			if( !e.goodid ) return;
+			var uuid = e.goodid;
+			if (flattenVOs === true && e.occi && e.occi.vo) {
+			    uuid = uuid + '_' + e.occi.vo.id;
+			}
 			e.template = e.template || [];
 			e.template = $.isArray(e.template)?e.template:[e.template];
 			e.occi = e.occi || [];
@@ -8073,13 +8105,13 @@ appdb.utils.GroupSiteImages = function(occiservices){
 			if( appdb.config.features.groupvaprovidertemplates ){
 				e.occi = groupOccis(e.occi);
 			}
-			if( !res[e.goodid] ){
+			if( !res[uuid] ){
 				e.instances = e.instances.concat( extendArray(e.occi) );
 				delete e.occi;
-				res[e.goodid] = e;
+				res[uuid] = e;
 			} else {
 				if( appdb.config.features.groupvaprovidertemplates ){
-					res[e.goodid].instances = appendOccisToInstancesPerVO(res[e.goodid].instances, e.occi);
+					res[uuid].instances = appendOccisToInstancesPerVO(res[uuid].instances, e.occi);
 					//res[e.goodid].instances[0].items = res[e.goodid].instances[0].items.concat( extendArray(e.occi[0].items) );
 					$.each(e.template, (function(eurl){ return function(i,t) {
 						t.occi_endpoint_url = t.occi_endpoint_url || [];
@@ -8090,12 +8122,12 @@ appdb.utils.GroupSiteImages = function(occiservices){
 						t.occi_endpoint_url = eurl;
 						e.template[i] = t;
 					};})(e.occi_endpoint_url));
-					$.each(res[e.goodid].instances, function(instanceIndex, instance) {
-						res[e.goodid].instances[instanceIndex].template = instance.template.concat(extendArray(e.template));
+					$.each(res[uuid].instances, function(instanceIndex, instance) {
+						res[uuid].instances[instanceIndex].template = instance.template.concat(extendArray(e.template));
 					});
 					//res[e.goodid].instances[0].template = res[e.goodid].instances[0].template.concat(extendArray(e.template));
 				}else {
-					res[e.goodid].instances = res[e.goodid].instances.concat( extendArray(e.occi) );
+					res[uuid].instances = res[uuid].instances.concat( extendArray(e.occi) );
 				}
 			}
 		});
@@ -8148,6 +8180,9 @@ appdb.utils.GroupSiteImages = function(occiservices){
 		}
 		return res;
 	}
+
+	flattenVOs = (typeof flattenVOs === 'boolean') ? flattenVOs : false;
+
 	return group(occiservices);
 };
 appdb.utils.GroupSiteTemplates = function(data){

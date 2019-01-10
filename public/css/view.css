@@ -21294,6 +21294,31 @@ html.dj_ie .voimagelistcontainer td.customcell > .customcellwrap > .expandable:h
 	line-height: 22px;
 	height: 23px;
 }
+.sitecontents .vmitemsfilter > div.resourceproviders {
+    display: block;
+    margin: 0;
+    margin-bottom: 10px;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header {
+    padding: 0;
+    height: auto;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name {
+    border: none;
+    padding: 5px;
+    margin: 0;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector,
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect,
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect .dijitButtonContents {
+    width: 730px;
+    min-width: 730px;
+    max-width: 730px;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .vodetailslink {
+    position: relative;
+    right: -30px;
+}
 .resourceproviders .va-image > ul > li.va-template-data  .template-empty {
 	width: 520px;
 	min-width: 520px;
@@ -22910,13 +22935,14 @@ a.helperlink.wikilink:hover{
 }
 .sitecontents .vmitemsfilter{
 	border-top: none;
-	padding: 10px 5px;
+	padding: 10px 0px;
 	margin: 0px 0px;
 	text-align: left;
 	margin-bottom: 10px;
 }
 .sitecontents .vmitemsfilter > .title{
 	color: #666;
+        margin-left: 5px;
 }
 .sitecontents .vmitemsfilter > .filters > ul{
 	list-style: none;

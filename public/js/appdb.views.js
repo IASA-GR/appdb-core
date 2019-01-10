@@ -19689,7 +19689,103 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 		data: o.data || [],
 		siteData: o.siteData || {},
 		filters: [
-			{name: "Endorsed by VOs",
+			{
+				name: "Endorsed by VOs",
+				persist: true,
+				clear: function(filter) {
+				    return;
+				},
+				getContainer: function(dom) {
+					return $(dom).find(".resourceproviders > .header > .voselector");
+				},
+				update: function(filter, data) {
+					var selprovs = [];
+					var preselect = 'fedcloud.egi.eu';
+					var sel = $(this.dom).find(".resourceproviders .voselector");
+					var avos = filter.getValueObjects(this.options.data);
+					avos.sort(function(a,b){
+						var an = a.val;
+						var bn = b.val;
+
+						if( an < bn) return -1;
+						if( an > bn) return 1;
+
+						return 0;
+					});
+					avos.sort(function(a, b) {
+					    var an = a.val;
+
+					    if (an === preselect) return -1;
+					    return 1;
+					})
+					var listdom = $("<select></select>");
+					$.each(avos, function(i, e) {
+						var opt = $("<option value=''></option>");
+						$(opt).text(e.val).val(e.id);
+						$(listdom).append(opt);
+					});
+					filter.itemCount = avos.length;
+
+					$(filter.dom).find(".value").append(listdom);
+					filter.currentValue = filter.userValue;
+
+
+					$(filter.dom).removeClass("single").removeClass("empty");
+
+					$(sel).empty();
+					var html = $("<select></select>");
+
+					$.each(avos, function(i, e){
+						var opt = $("<option value=''></option>");
+						$(opt).attr("value",e.id);
+						if( $.trim(e.id) === preselect ){
+							$(opt).attr("selected");
+						}
+						var inner = $("<div class='vooption icontext'><img src='' alt=''/><span class='name'></span><span class='details'></span></div>");
+						$(inner).find("span.name").text(e.name);
+						$(inner).find("img").attr("src", "/vo/getlogo?name="+encodeURI(e.name)+"&vid="+ (e.id<<0) +"&id=" + e.discipline);
+						$(inner).find("span.details").text(e.count + " image" + ((e.count>1)?"s":"") +" available");
+						$(opt).append(inner);
+						$(html).append(opt);
+					});
+					$(sel).append(html);
+
+					//clear previous dojo comboboxes
+					if (filter.combobox) {
+						filter.combobox.destroyRecursive(false);
+						filter.combobox = null;
+					}
+
+					filter.combobox = new dijit.form.Select({
+						name: "availablevos",
+						value: preselect,
+						onChange: (function(self, flt, data) {
+							return function(v) {
+								if( data.length <= 1) return;
+								if ($.trim(v) === "") {
+									delete filter.userValue;
+									$(flt.dom).removeClass("hasselection");
+								} else {
+									filter.userValue = v;
+									$(flt.dom).addClass("hasselection");
+								}
+								$(self.dom).find('.resourceproviders .vodetailslink a').attr('href', '/store/vo/' + v);
+								$.each(self.options.filters, function(i, filter) {
+									if (filter!== flt) {
+										self.clearFilters(filter, false);
+									}
+								});
+
+								self.filter(flt);
+							};
+						})(this, filter, avos)
+					},$(html)[0]);
+
+					if (!filter.userValue && avos.length > 0) {
+					    filter.userValue = avos[0].val;
+					    $(this.dom).find('.resourceproviders .vodetailslink a').attr('href', '/store/vo/' + filter.userValue);
+					}
+				},
 				getValueObjects: function(d) {
 					var vos = {};
 					$.each(d, function(i, e) {
@@ -19699,20 +19795,37 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 							return (ee.voimageid) ? true : false;
 						});
 						$.each(occis, function(ii, ee) {
-							vos[ee.vo.id] = $.extend(true, {}, ee.vo);
+						    if (vos[ee.vo.id]) {
+							vos[ee.vo.id].count = vos[ee.vo.id].count + 1;
+							return;
+						    }
+						    vos[ee.vo.id] = $.extend(true, {}, ee.vo);
+						    vos[ee.vo.id].count = 1;
 						});
 						var noneoccis = $.grep(e.instances, function(ee) {
 							return (ee.voimageid) ? false : true;
 						});
 						if( noneoccis.length > 0 ) {
-							vos["<none>"] = {name:"<none>"};
+							vos["<none>"] = {name:"<none>", id: "<none>"};
 						}
 					});
 					var res = [];
 					for (var i in vos) {
-						if (vos.hasOwnProperty(i) === false)
-							continue;
-						res.push({id: vos[i].name, val: vos[i].name});
+						if (vos.hasOwnProperty(i) === false) continue;
+						res.push({
+						    id: vos[i].name,
+						    val: vos[i].name,
+						    name: vos[i].name,
+						    voId: vos[i].id,
+						    alias: vos[i].alias,
+						    logoid: vos[i].logoid,
+						    discipline: vos[i].discipline,
+						    scope: vos[i].scope,
+						    sourceid: vos[i].sourceid,
+						    status: vos[i].status,
+						    validatedOn: vos[i].validatedOn,
+						    count: vos[i].count
+						});
 					}
 					return res;
 				},
@@ -19726,7 +19839,7 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 						return (occis.length > 0) ? true : false;
 					});
 				}
-			}, {
+			},{
 				name: "OSes",
 				getValueObjects: function(d) {
 					var oses = {};
@@ -19794,6 +19907,57 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 						return (e.application && e.application.name && e.application.name === id) ? true : false;
 					});
 				}
+			},
+			{
+				name: "Marked as",
+				getValueObjects: function(d) {
+					var deleted = {
+						id: "deleted",
+						val: "deleted",
+						count: this.filterOut("deleted", d).length
+					};
+					var moderated = {
+						id: "moderated",
+						val: "moderated",
+						count: this.filterOut("moderated", d).length
+					};
+					var expired = {
+						id: "expired",
+						val: "expired",
+						count: this.filterOut("expired", d).length
+					};
+					var valid = {
+						id: "valid",
+						val: "valid",
+						count: d.length - (deleted.count + moderated.count + expired.count)
+					}
+					var marks = [valid, expired, deleted, moderated];
+
+					return $.grep(marks, function(mark) {
+						return (mark.count > 0);
+					});
+				},
+				filterOut: function(id, d) {
+				    return $.grep(d, function(e) {
+					var app = (e || {}).application || {deleted: "false", moderated: false};
+					switch(id) {
+						case "moderated":
+							return $.trim(app.moderated).toLowerCase() === "true";
+						case "deleted":
+							return $.trim(app.deleted).toLowerCase() === "true";
+						case "expired":
+							return $.trim(e.isexpired).toLowerCase() === "true";
+						case "valid":
+							return ([
+								$.trim(app.moderated).toLowerCase(),
+								$.trim(app.deleted).toLowerCase(),
+								$.trim(e.isexpired).toLowerCase()
+							].indexOf('true') === -1)
+						default:
+							return true;
+					}
+				    });
+				}
 			}
 		]
 	};
@@ -19831,16 +19995,27 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 		});
 		return this.getFilteredData(flts);
 	};
-	this.clearFilters = function(flt) {
+	this.clearFilters = function(flt, autofilter) {
 		if( !flt ){
 			this.render();
 			this.filter();
 		}else{
-			delete flt.userValue;
-			this.filter(flt);
+			if ($.isFunction(flt.clear)) {
+				flt.clear();
+			} else {
+				delete flt.userValue;
+			}
+
+			if (autofilter !== false) {
+			    this.filter(flt);
+			}
 		}
 	};
 	this.updateFilter = function(filter, data) {
+		if (filter.update) {
+		    filter.update.bind(this)(filter, data);
+		    return;
+		}
 		var fd = filter.getValueObjects(this.getFilterValues(filter));
 		fd.sort(function(a,b){
 			var an = a.val;
@@ -19909,20 +20084,24 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 		if (typeof filter.userValue !== "undefined") {
 			delete filter.userValue;
 		}
-		
-		filter.dom = $("<li><div class='filter'><div class='field'></div><div class='value'></div><a href='#' class='action clear' title='Clear current filter'>x</a></div></li>");
-		$(filter.dom).find(".field").text(filter.name + ":");
-		$(filter.dom).find(".action.clear").off("click").on("click", (function(self, flt) {
-			return function(ev) {
-				ev.preventDefault();
-				delete flt.userValue;
-				self.clearFilters(flt);
-				if( flt.combobox ){
-					flt.combobox.focus();
-				}
-				return false;
-			};
-		})(this, filter));
+		if (filter.getContainer) {
+		    filter.dom = filter.getContainer(this.dom);
+		} else {
+		    filter.dom = $("<li><div class='filter'><div class='field'></div><div class='value'></div><a href='#' class='action clear' title='Clear current filter'>x</a></div></li>");
+		    $(filter.dom).find(".field").text(filter.name + ":");
+		    $(filter.dom).find(".action.clear").off("click").on("click", (function(self, flt) {
+			    return function(ev) {
+				    ev.preventDefault();
+				    delete flt.userValue;
+				    self.clearFilters(flt);
+				    if( flt.combobox ){
+					    flt.combobox.focus();
+				    }
+				    return false;
+			    };
+		    })(this, filter));
+		}
+
 		this.updateFilter(filter, this.options.data);
 	};
 	this.validateFilters = function(filter){
@@ -19943,8 +20122,10 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 		$(this.dom).find(".filters > ul").empty();
 		$.each(this.options.filters, (function(self) {
 			return function(i, e) {
-				self.addFilter(e);
-				$(self.dom).find(".filters > ul").append(e.dom);
+				if (!(e.combobox && e.persist === true)) {
+				    self.addFilter(e);
+				    $(self.dom).find(".filters > ul").append(e.dom);
+				}
 			};
 		})(this));
 	};
@@ -19972,6 +20153,7 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 	};
 	this._initContainer = function() {
 		$(this.dom).empty();
+		$(this.dom).append('<div class="resourceproviders"><div class="header"><div class="field-name"><div>Endorsed by VO: </div><div class="voselector"></div><div class="vodetailslink">(<a href="" title="View VO details in new window" target="_blank">view VO details</a>)</div></div></div></div>');
 		$(this.dom).append("<div class='title'>Filter By:</div>");
 		$(this.dom).append("<div class='filters'><ul></ul></div>");
 		$(this.dom).append("<a href='#' class='clearall action' title='clear all filters'>clear all</a>");
@@ -20052,8 +20234,19 @@ appdb.views.SiteVMImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.Sit
 				}
 			};
 		})(this, d));
-		$(details).attr("href", d.mpuri).off("click");
-		
+
+		var mpuri = d.mpuri;
+		if (d.id !== d.goodid && $.trim(d.isexpired) === "true") {
+		    //The goodid is based only on the image checksum and does not take into account the expiration date.
+		    //Due to the fact that all images may expire at some point, many authors update the image versions
+		    //just to refresh the expiration date, which will also have the same goodid (same image file checksum)
+		    //as the previous expired versions. In these cases the end user will get confused since the url of the
+		    //provided mpuri(goodid based) will lead to a more recent not-expired version than the one showned in
+		    //the UI image list as expired.
+		    //For the above reasons, we must replace the goodid with the actual vmi instance id in the mpuri.
+		    mpuri = mpuri.replace(/\:\d+\/{0,1}$/i, ':' + d.id + '/?strict');
+		}
+		$(details).attr("href", mpuri).off("click");
 		$(download).attr("href", ($.trim(d["private"]) === 'true') ? d.mpuri : d.url);
 		$(actions).append(download).append(usage);
 		$(this.dom).find(".actions").remove();
