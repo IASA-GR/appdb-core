@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.1.13] - 2018-01-10
+### Fixed
+- Fixed invalid report of expired VM versions in site details page
+
 ## [6.1.12] - 2018-12-06
 ### Fixed
 - Fixed issues regarding base64 encoding of unicode and object types
