@@ -19761,20 +19761,24 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 						value: preselect,
 						onChange: (function(self, flt, data) {
 							return function(v) {
+								var shouldUpdate = false;
 								if( data.length <= 1) return;
 								if ($.trim(v) === "") {
 									delete filter.userValue;
 									$(flt.dom).removeClass("hasselection");
 								} else {
+									shouldUpdate = (filter.userValue !== v);
 									filter.userValue = v;
 									$(flt.dom).addClass("hasselection");
 								}
 								$(self.dom).find('.resourceproviders .vodetailslink a').attr('href', '/store/vo/' + v);
-								$.each(self.options.filters, function(i, filter) {
-									if (filter!== flt) {
-										self.clearFilters(filter, false);
-									}
-								});
+								if(shouldUpdate) {
+								    $.each(self.options.filters, function(i, filter) {
+									    if (filter!== flt) {
+										    self.clearFilters(filter, false);
+									    }
+								    });
+								}
 
 								self.filter(flt);
 							};
@@ -19909,26 +19913,26 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 				}
 			},
 			{
-				name: "Marked as",
+				name: "image state",
 				getValueObjects: function(d) {
 					var deleted = {
 						id: "deleted",
-						val: "deleted",
+						val: "deleted images",
 						count: this.filterOut("deleted", d).length
 					};
 					var moderated = {
 						id: "moderated",
-						val: "moderated",
+						val: "moderated images",
 						count: this.filterOut("moderated", d).length
 					};
 					var expired = {
 						id: "expired",
-						val: "expired",
+						val: "expired images",
 						count: this.filterOut("expired", d).length
 					};
 					var valid = {
 						id: "valid",
-						val: "valid",
+						val: "valid images",
 						count: d.length - (deleted.count + moderated.count + expired.count)
 					}
 					var marks = [valid, expired, deleted, moderated];
@@ -20004,7 +20008,10 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 				flt.clear();
 			} else {
 				delete flt.userValue;
+				flt.currentValue = '';
 			}
+
+			$(flt.dom).removeClass("hasselection");
 
 			if (autofilter !== false) {
 			    this.filter(flt);
