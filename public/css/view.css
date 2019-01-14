@@ -21319,6 +21319,101 @@ html.dj_ie .voimagelistcontainer td.customcell > .customcellwrap > .expandable:h
     position: relative;
     right: -30px;
 }
+/*********************************************
+START: Overide resourceproviders generic layout
+**********************************************/
+.sitecontents .vmitemsfilter > div.resourceproviders {
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header {
+    padding: 0;
+    height: auto;
+    background-color: transparent;
+    border: none;
+    margin: 0 auto;
+    text-align: center;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name {
+    border: none;
+    padding: 5px;
+    margin: 0;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > div:nth-child(1),
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > div:nth-child(3) {
+    display: none;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector,
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect,
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect .dijitButtonContents {
+    width: 400px;
+    min-width: 400px;
+    max-width: 400px;
+    height: 30px;
+    min-height: 30px;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect.dijitActive .dijitButtonContents,
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect.dijitSelectHover.dijitHover .dijitButtonContents,
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect.dijitSelectOpened .dijitButtonContents,
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect .dijitButtonContents {
+    color: white;
+    background-color: #E48014;
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    line-height: 18px;
+    vertical-align: top;
+    height: 30px;
+    border: 1px solid #945007;
+}
+
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect .dijitButtonNode {
+    color: white;
+    background: none;
+    background-color: #E48014;
+    border: 1px solid #945007;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect.dijitActive .dijitButtonContents {
+    height: 30px;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect .dijitButtonText,
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect .dijitSelectLabel {
+    padding: 0
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector .vooption {
+    height: 30px;
+    padding: 0;
+    display: inline-block;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector .vooption,
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector .vooption * {
+    font-size: 18px;
+    line-height: 20px;
+    vertical-align: middle;
+    color: white;
+    background-color: #E48014;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector .vooption img {
+    padding: 5px;
+    padding-left: 10px;
+    padding-top: 7px;
+    width: 16px;
+    height: 16px;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector .vooption .details {
+    font-size: 12px;
+    line-height: 28px;
+    vertical-align: middle;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .vodetailslink {
+    position: relative;
+    right: -30px;
+}
+
+/*********************************************
+END: Overide resourceproviders generic layout
+**********************************************/
 .resourceproviders .va-image > ul > li.va-template-data  .template-empty {
 	width: 520px;
 	min-width: 520px;
