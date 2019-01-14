@@ -19759,6 +19759,7 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 					filter.combobox = new dijit.form.Select({
 						name: "availablevos",
 						value: preselect,
+						title: 'Select to view images endorsed by specific VOs',
 						onChange: (function(self, flt, data) {
 							return function(v) {
 								var shouldUpdate = false;
