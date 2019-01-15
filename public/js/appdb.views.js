@@ -19692,14 +19692,13 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 			{
 				name: "Endorsed by VOs",
 				persist: true,
-				clear: function(filter) {
+				clear: function() {
 				    return;
 				},
 				getContainer: function(dom) {
 					return $(dom).find(".resourceproviders > .header > .voselector");
 				},
 				update: function(filter, data) {
-					var selprovs = [];
 					var preselect = 'fedcloud.egi.eu';
 					var sel = $(this.dom).find(".resourceproviders .voselector");
 					var avos = filter.getValueObjects(this.options.data);
@@ -19866,7 +19865,7 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 						return (e.os && e.os.val && e.os.val() === id) ? true : false;
 					});
 				}
-			}, {
+			}, /*{
 				name: "Hypervisors",
 				getValueObjects: function(d) {
 					var hyps = {};
@@ -19889,7 +19888,7 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 						return (e.hypervisor && e.hypervisor.val() === id) ? true : false;
 					});
 				}
-			},
+			},*/
 			{
 				name: "Virtual Appliances",
 				getValueObjects: function(d) {
@@ -19931,11 +19930,16 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 						val: "expired images",
 						count: this.filterOut("expired", d).length
 					};
+					var outdated = {
+					    	id: "outdated",
+						val: "outdated images",
+						count: this.filterOut("outdated", d).length
+					};
 					var valid = {
 						id: "valid",
 						val: "valid images",
 						count: d.length - (deleted.count + moderated.count + expired.count)
-					}
+					};
 					var marks = [valid, expired, deleted, moderated];
 
 					return $.grep(marks, function(mark) {
@@ -19952,6 +19956,8 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 							return $.trim(app.deleted).toLowerCase() === "true";
 						case "expired":
 							return $.trim(e.isexpired).toLowerCase() === "true";
+						case "outdated":
+							return $.trim(e.archived).toLowerCase() === "true";
 						case "valid":
 							return ([
 								$.trim(app.moderated).toLowerCase(),

@@ -18343,6 +18343,7 @@ ul.itemlist > li.itemcontainer > div.item a.itemlink span.itemlongtext{
 	list-style: none;
 	padding: 2px 4px;
 	margin: 0px;
+        margin-right: 10px;
 }
 .filterdecorator .filter > li {
 	display: inline-block;
@@ -21410,7 +21411,10 @@ START: Overide resourceproviders generic layout
     position: relative;
     right: -30px;
 }
-
+.sitecontents .vmitemsfilter > .filters > ul > li > .filter > .value,
+.sitecontents .vmitemsfilter > .filters > ul > li > .filter > .value > .dijitComboBox {
+    width: 260px;
+}
 /*********************************************
 END: Overide resourceproviders generic layout
 **********************************************/
@@ -23038,6 +23042,10 @@ a.helperlink.wikilink:hover{
 .sitecontents .vmitemsfilter > .title{
 	color: #666;
         margin-left: 5px;
+        height: 20px;
+        vertical-align: middle;
+        line-height: 20px;
+        margin-right: 10px;
 }
 .sitecontents .vmitemsfilter > .filters > ul{
 	list-style: none;
