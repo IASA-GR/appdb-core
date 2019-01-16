@@ -3069,9 +3069,6 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		    invalid = true;
 		    error.push('Description file URL is not valid');
 		}
-		if (invalid === false && /\.(xml|json|yaml|yml)$/i.test($.trim($(input).val())) === false) {
-		    warning.push('It seems that the provided description file URL does not point to a supported file type (JSON, XML or YAML). <br/> <span style="padding-right: 30px"></span>You can ignore this message if the content of the URL is of the supported types.')
-		}
 		if (d.AvailableActorStatuses && $.isArray(d.AvailableActorStatuses) && d.AvailableActorStatuses.length > 0) {
 			var current = null;
 			$.each(d.AvailableActorStatuses, function(i, actor) {
@@ -3094,6 +3091,10 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 			warning.push('Currently the default publisher is user <a href="'+appdb.config.endpoint.base + 'store/person/' + d.DefaultActor.cname + '" target="_blank" title="Click to view user profile">'+d.DefaultActor.firstname + ' ' + d.DefaultActor.lastname +'</a>. If you update the settings you will become the default publisher. <a class="wiki-link" href="'+ appdb.config.endpoint.wiki + 'main:faq:cd_how_to_replace_default_publisher" target="_blank">Learn more.</a>');
 		}
 
+		if (invalid === false && /\.(xml|json|yaml|yml)$/i.test($.trim($(input).val())) === false) {
+		    warning.push('It seems that the provided description file URL does not point to a supported file type (JSON, XML or YAML). <br/>You can ignore this message if the content of the URL is of the supported types.')
+		}
+
 		invalid = invalid || (error.length > 0);
 
 		if (invalid !== false) {
@@ -3111,7 +3112,14 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		}
 
 		if (warning.length) {
-		    $(this.dom).find('.cdversion-setup .warning').removeClass('hidden').find('.message').html(warning.join('<br/>'));
+		    var wrnDom = $(this.dom).find('.cdversion-setup .warning');
+		    if (warning.length > 1) {
+			$(wrnDom).removeClass('single');
+		    } else {
+			$(wrnDom).addClass('single');
+		    }
+
+		    $(wrnDom).removeClass('hidden').find('.message').empty().append($('<ul></ul>').append('<li>' + warning.join('</li><li>') + '</li>'));
 		} else {
 		    $(this.dom).find('.cdversion-setup .warning').addClass('hidden').find('.message').empty();
 		}

@@ -25658,7 +25658,49 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
     margin: 10px 0;
 }
 .cdversion .panel > .warning {
-    background-color: #f9ed95;
+    background-color: #fdf5bc;
+}
+.cdversion .panel > .warning > img {
+    vertical-align: top;
+}
+.cdversion .panel > .warning > .message {
+    display: inline-block;
+    max-width: 900px;
+}
+.cdversion .panel > .warning > .message > ul {
+    list-style: none;
+    padding: 0;
+    margin: 0px;
+    margin-left: 20px;
+    display: inline-block;
+    vertical-align: top;
+}
+.cdversion .panel > .warning > .message > ul > li {
+    padding: 6px;
+    margin: 0;
+    line-height: 18px;
+    border-bottom: 1px solid #ded383;
+    list-style-type: decimal;
+    white-space: pre-wrap;
+}
+
+.cdversion .panel > .warning > .message > ul > li:first-child {
+    padding-top: 0;
+}
+.cdversion .panel > .warning > .message > ul > li:last-child {
+    border-bottom: none;
+}
+.cdversion .panel > .warning.single > .message > ul > li {
+    border-bottom: none;
+    padding: 0;
+    list-style-type: none;
+}
+.cdversion .panel > .warning.single > .message > ul,
+.cdversion .panel > .warning.single > .message > ul > li {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    list-style-type: none;
 }
 .cdversion-paused-process-warning {
     background-color: #fbf6d4;
