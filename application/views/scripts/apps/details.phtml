@@ -1150,6 +1150,7 @@
 			</div>
 			<div id="workingvadiv<?php echo $this->dialogCount;?>" class="workingversion" data-usetemplate="vappliance-version">
                                 <div class="cdversion hidden">
+                                    <a class="readmore"  href="<?php echo $wiki;?>main:guides:guide_for_managing_virtual_appliance_versions_using_continuous_delivery" target="_blank" title="View the guide for managing virtual appliance versions using the continuous delivery service"><img src="/images/question_mark.gif" alt="">Learn more</a>
                                     <div class='onloaderror hidden'></div>
                                     <div class='onstatuserror hidden'><img src='/images/vappliance/redwarning.png'/><div style="display: inline-block;color: black;"><span class="message"></span></div></div>
                                     <div class="cdversion-loading panel hidden">
@@ -1172,7 +1173,7 @@
                                                     If you click the <b>Update</b> button, you will configure the continuous delivery with the provided remote file URL <b>AND</b> automatically become the <b>default publisher</b>.</p>
                                                 </div>
                                                 <div class="fieldvalue url" >
-                                                    <div class="field">Remote file URL:</div>
+                                                    <div class="field">Description file URL:<span class="right-field-text">Only <b>json</b>, <b>xml</b> or <b>yaml</b> files allowed. Read more <a href="<?php echo $wiki; ?>main:guides:guid_continuous_delivery_file_contents" title="View details about the format and structure of the continuous delivery description file" target="_blank">here</a>.</span></div>
                                                     <div class="value"><input type="textbox" data-path="url"/></div>
                                                 </div>
                                                 <div class="fieldvalue defaultactor">

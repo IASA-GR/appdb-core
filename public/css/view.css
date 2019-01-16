@@ -25510,7 +25510,22 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
     width: 20px;
     height: 20px;
 }
-
+.cdversion > .readmore {
+    position: absolute;
+    top: 0;
+    padding: 10px;
+    right: 0;
+}
+.cdversion > .readmore > img {
+    width: 14px;
+    height: 14px;
+    opacity: 0.8;
+    padding-right: 5px;
+    margin-bottom: -2px;
+}
+.cdversion > .readmore:hover > img {
+    opacity: 1;
+}
 .cdversion .panel {
     display: block;
     max-width: 500px;
@@ -25606,6 +25621,7 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
 }
 .cdversion .cdversion-setup .field {
     font-size: 14px;
+    position: relative;
 }
 .cdversion .cdversion-setup .value {
     height: 20px;
@@ -25617,6 +25633,18 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
 }
 .cdversion .cdversion-setup .fieldvalue {
     margin: 10px 0;
+}
+.cdversion .cdversion-setup .fieldvalue .field .right-field-text,
+.cdversion .cdversion-setup .fieldvalue .field .right-field-text a {
+    font-size: 10px;
+}
+.cdversion .cdversion-setup .fieldvalue .field .right-field-text {
+    color: #666;
+    text-align: right;
+    display: inline-block;
+    right: 0;
+    position: absolute;
+    padding: 5px 0;
 }
 .cdversion .panel > .error,
 .cdversion .panel > .exterror,

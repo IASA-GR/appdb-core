@@ -3063,9 +3063,15 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 
 		if ($.trim($(input).val()) === '') {
 			invalid = true;
-			error.push('Remote file URL must not be blank');
+			error.push('Description file URL must not be blank');
 		}
-
+		if (invalid === false && /^http(s){0,1}\:\/\//i.test($.trim($(input).val())) === false) {
+		    invalid = true;
+		    error.push('Description file URL is not valid');
+		}
+		if (invalid === false && /\.(xml|json|yaml|yml)$/i.test($.trim($(input).val())) === false) {
+		    warning.push('It seems that the provided description file URL does not point to a supported file type (JSON, XML or YAML). <br/> <span style="padding-right: 30px"></span>You can ignore this message if the content of the URL is of the supported types.')
+		}
 		if (d.AvailableActorStatuses && $.isArray(d.AvailableActorStatuses) && d.AvailableActorStatuses.length > 0) {
 			var current = null;
 			$.each(d.AvailableActorStatuses, function(i, actor) {
@@ -3432,7 +3438,7 @@ appdb.vappliance.components.CDVersion = appdb.ExtendClass(appdb.vappliance.compo
 		if ($.trim(d.lastIterationOn)) {
 		    if ($.trim(d.url) === '') {
 			    $(ulErrors).append(
-				    $('<li></li>').append('Remote file URL must not be blank. Please, provide a valid URL in the <b>settings</b> section.')
+				    $('<li></li>').append('Description file URL must not be blank. Please, provide a valid URL in the <b>settings</b> section.')
 			    );
 		    }
 
