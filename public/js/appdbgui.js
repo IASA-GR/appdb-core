@@ -83,7 +83,7 @@
 		if ( Left(i, 7) == 'images/' ) i = i.substr(7);
 		if ( typeof imgarchive === "undefined" ) {
 			try {
-				imgarchive = new ZipLoader(appdb.config.endpoint.base + '/res/zip?f=images/appdbimgs.zip');
+				imgarchive = new ZipLoader(appdb.config.endpoint.base + 'res/zip?f=images/appdbimgs.zip');
 			} catch (err) {
 				appdb.debug('Could not load image archive');
 				return loadImageFailback(i, e, a);
@@ -93,9 +93,9 @@
 		if ( typeof a === "undefined" ) a = 'src';
 		try {
 			if ( typeof e === "undefined" ) {
-				return encodeURI(imgarchive.loadImage(appdb.config.endpoint.base + "/res/zip?f=images/appdbimgs.zip://" + i));
+				return encodeURI(imgarchive.loadImage(appdb.config.endpoint.base + "res/zip?f=images/appdbimgs.zip://" + i));
 			} else {
-				$(e).attr(a, encodeURI(imgarchive.loadImage(appdb.config.endpoint.base + "/res/zip?f=images/appdbimgs.zip://" + i)));
+				$(e).attr(a, encodeURI(imgarchive.loadImage(appdb.config.endpoint.base + "res/zip?f=images/appdbimgs.zip://" + i)));
 				return null;
 			}
 		} catch (err) {

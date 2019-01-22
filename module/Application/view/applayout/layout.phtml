@@ -1,0 +1,214 @@
+<?php
+/**
+ * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+
+use Zend\Session\Container;
+
+check_for_appdbcached();
+
+if ( isset($_GET['cb']) && $_GET['cb'] == "0"  ) {
+	$this->customBuild = false;
+} elseif (isset($_GET['cb']) && $_GET['cb'] == "1") {
+        $this->customBuild = true;
+} elseif ( substr($_SERVER['APPLICATION_ENV'], 0, 5) === 'devel' ) {
+	$this->customBuild = false;
+} else {
+	$this->customBuild = true;
+}
+function fl(){
+	flush();
+	ob_flush();
+	ob_end_flush();
+	ob_start();
+	flush();
+	ob_flush();
+	ob_end_flush();
+	ob_start();
+}
+
+// Appends version string to query string when loading JS files in order to avoid mishaps due to browser code caching
+function loadJS($o,$j,$compat=false) {
+	if ( $o->customBuild && (!$compat)) {
+		$o->headScript()->appendFile($j.'?v='.appdbVerInfo());
+	} else {
+		$o->headScript()->appendFile($j."?v=".appdbVerInfo());
+	}
+}
+
+function loadCSS($o,$j) {
+	if ( $o->customBuild) {
+		$o->headLink()->appendStylesheet($j."?v=".appdbVerInfo());
+	} else {
+		$o->headLink()->appendStylesheet($j."?v=".appdbVerInfo());
+	}
+}
+
+$this->session = new Zend\Session\Container('default');
+if ( ( $_SERVER['APPLICATION_ENV'] == "api") ) {
+    header('HTTP/1.0 404 Not Found');
+    exit();
+}
+$br = @get_browser(null,true);
+if (! isset($br["browser"])) {
+	$bg["browser"] = "";
+}
+$isIE10 = (strtolower(trim($br["browser"])) === "ie" && isset($br["majorver"]) && trim($br["majorver"])==="10")?true:false;
+$isGtIE10 = (getMSIEVersion()>10)?true:false;
+$isIE9 = (strtolower(trim($br["browser"])) === "ie" && isset($br["majorver"]) && trim($br["majorver"])==="9")?true:false; 
+$isIE8 = (strtolower(trim($br["browser"])) === "ie" && isset($br["majorver"]) && trim($br["majorver"])==="8")?true:false; 
+echo $this->doctype(); fl();?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:t="http://appdb.egi.eu/0.1/Template" xmlns:p="http://appdb.egi.eu/0.1/Template/Properties" xmlns:e="http://appdb.egi.eu/0.1/Template/Events" <?php echo ($isIE10 || $isGtIE10)?"class='dj_ie10'":""; ?>>
+<head>  
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<?php if ( ApplicationConfiguration::isProductionInstance() ) { ?>
+	<meta name="google-site-verification" content="z58YQC2Qs6z70RWxoYnkUtvH3fuO4_1j6-vciIR2Kww" />
+	<?php } else { ?>
+	<meta name="robots" content="noindex,nofollow">
+	<?php } ?>
+	<?php echo SEO::getHeaderTags(); ?>
+	<link rel="help" href="<?php echo ApplicationConfiguration::url('/pages/about/faq');?>" >
+	<script type="text/javascript"><?php if( strtolower(trim($br["browser"])) === "ie" ){ ?>
+		var emulateIE8=true;
+	<?php } else { ?>
+		var emulateIE8=false;
+	<?php } ?>
+	(function(){
+		<?php $useHash = (( ApplicationConfiguration::app('useHash', false) === false )?'false':'true'); ?>
+		var setHash = <?php echo $useHash;?>,canPush=((typeof history.pushState !== "undefined" && emulateIE8===false)?true:false),h=(window.location.hash || "").replace("#","").replace("!",""),href=window.location.protocol+"//"+window.location.hostname,useHash=(!canPush && !h),noHash=(canPush && h);
+		if( window.location.pathname.substr(1,5) == "users" ){}else if(noHash &&  setHash===false){window.location.href = href + ((h.substr(0,2)==="p=")?"?":"") + h;} else if(useHash || setHash===true){var pn = window.location.pathname.substr(1,5);if( pn == "store" || pn == "brows" || pn == "pages" || pn == "mp"){window.location.href=href+"#"+((window.location.pathname==="/")?"":window.location.pathname)+window.location.search;}}
+	})();
+	HTMLDivElement.prototype.isLeftToRight = function(){ return true; };
+	var userID = <?php if ($this->session->userid === null) echo 'null'; else echo $this->session->userid; ?>;
+	var djConfig = {"usePlainJson":true,"parseOnLoad":true,"parseWidgets":true};
+	</script><?php fl(); ?>
+	<?php if (ApplicationConfiguration::isProductionInstance()) { ?>
+	<link rel="shortcut icon" href="/favicon.ico" />
+	<?php } else { ?>
+	<link rel="shortcut icon" href="/favicon-dev.ico" />
+	<?php } ?>
+  <?php
+	debug_log("JS/CSS CUSTOM BUILDS: " . ($this->customBuild?"ON":"OFF"));
+	if ( $this->customBuild ) {
+		loadCSS($this,'/css/appdb.min.css');
+	} else {	
+		loadCSS($this,'/js/dojox/grid/_grid/tundraGrid.css');
+		loadCSS($this,'/css/tabbar.css');
+//		loadCSS($this,'/css/jquery-ui.css');
+		loadCSS($this,'/css/main.css');
+		loadCSS($this,'/css/view.css');
+		loadCSS($this,'/css/newsfeed.css');
+		loadCSS($this,'/js/jquery-autocomplete/jquery.autocomplete.css');
+		loadCSS($this,'/css/menu.css');
+		if( $_SERVER['Repository_Enabled'] == true ){
+			loadCSS($this,'/css/repository.css');
+		}
+		loadCSS($this,'/css/contextualization.css');
+		loadCSS($this, '/css/datasets.css');
+		loadCSS($this, '/css/highlight.css');
+	}
+?>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="/js/jquery.browser.min.js"></script>
+<?php
+	if ( substr($_SERVER['APPLICATION_ENV'], 0, 5) === 'devel' ) { 
+?>
+		<script src="https://code.jquery.com/jquery-migrate-3.0.0.js"></script>
+<?php 
+	} else { 
+?>
+	<script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js"></script>
+<?php 
+	} 
+?>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<style type="text/css">
+	<!--
+		@import "/js/dijit/themes/tundra/tundra.css";
+	-->
+	</style>
+<?php
+	loadJS($this,'/js/dojo/dojo.js');
+	loadJS($this,'/js/appdb.config.js.php');
+	if ( ! $this->customBuild ) {
+		loadJS($this,'/js/dojo/appdb.js');
+		loadJS($this,'/js/archive.js');
+		loadJS($this,'/js/brsdet.js');
+		loadJS($this,'/js/shortcut.js');
+		loadJS($this,'/js/ajaxLoading.js');
+		loadJS($this,'/js/json2.js');
+		loadJS($this,'/js/appdb.utils.js');
+		loadJS($this,'/js/appdb.models.js');
+		loadJS($this,'/js/appdb.views.js');
+		loadJS($this,'/js/appdbbase.js');
+		loadJS($this,'/js/appdb.template.js');
+		loadJS($this,'/js/jquery.cookie.js');
+		loadJS($this,'/js/jquery.form.js');
+		loadJS($this,'/js/jquery.center.js');
+		loadJS($this,'/js/editForm.js');
+		loadJS($this,'/js/jquery.escape.js');
+		loadJS($this,'/js/jquery.outerhtml.js');
+		loadJS($this,'/js/jquery.scrollTo-min.js');
+		loadJS($this,'/js/jquery.tinysort.min.js');
+		loadJS($this,'/js/jquery.tagcloud.js');
+		loadJS($this,'/js/jquery-autocomplete/jquery.autocomplete.js');
+		loadJS($this,'/js/jquery.hashchange.js');
+		loadJS($this,'/js/tinymce/jquery.tinymce.js');
+		loadJS($this,'/js/itemview.js');
+		loadJS($this,'/js/appdbgui.js');
+		loadJS($this,'/js/jquery.google_menu.js');
+		loadJS($this,'/js/moment.min.js');
+		loadJS($this,'/js/appdb.pages.js');
+		loadJS($this,'/js/appdb.views.ui.js');
+		loadJS($this,'/js/appdb.datasets.js');
+		loadJS($this,'/js/appdb.routes.js');
+		if( $_SERVER['Repository_Enabled'] == true ){
+			loadJS($this,'/js/plupload.full.js');
+			loadJS($this,'/js/appdb.repository.js');
+		}
+		loadJS($this,'/js/appdb.statistics.js');
+		loadJS($this,'/js/countdown.min.js');
+		loadJS($this,'/js/appdb.vappliance.js');
+		loadJS($this,'/js/appdb.contextualization.js');
+		loadJS($this,'/js/appdb.social.js');
+		loadJS($this,'/js/tinymce/tiny_mce.js', $compat=true);
+		loadJS($this,'/js/highlight.pack.js');
+
+	} else {
+		loadJS($this,'/js/appdb.min.js');
+	}
+	
+	echo $this->headLink();
+	echo $this->headScript();
+?>
+</head> 
+	<body class="tundra display1024<?php if ($this->session->userid !== null){ echo ' loggedin'; } ?>" data-content='init' data-cb='<?php echo ($this->customBuild === true ? 'true' : 'false'); ?>'>
+	<?php 
+	fl();
+	echo $this->layout()->content;
+	fl();
+	echo $this->inlineScript();
+	?>
+
+	<script src="/js/tinymce/tiny_mce.js"></script>
+	<script src="/js/d3.v3.min.js"></script>
+	<script src="/js/d3.v4.min.js"></script>
+	<script src="/js/tipsy/jquery.tipsy.js"></script>
+	<link rel="stylesheet" href="/css/tipsy/tipsy.css" type="text/css" />
+	<script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>

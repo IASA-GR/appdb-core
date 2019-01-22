@@ -1,0 +1,3240 @@
+'RESTAPIschemaList' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/schema',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestSchemaList',
+			'comment' => 'A list of schemata for data returned by API resources',
+		],
+	],
+],
+'RESTAPIschemaEntry' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/schema/:xsdname',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'xsdname',
+					'fmt' => '.+',
+				],
+			],
+			'resource' => 'RestSchemaItem',
+			'comment' => 'Request a schema definition for the resource specified by parameter :xsdname',
+		],
+	],
+],
+'RESTAPIprofile' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/profile',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'persons',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestProfile',
+			'comment' => 'The profile of the logged-in user',
+		],
+	],
+],
+'RESTAPIbroker' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/broker',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+			],
+			'resource' => 'RestBroker',
+			'comment' => 'A broker resource which can execute multiple requests on other resources with one call',
+		],
+	],
+],
+'RESTAPIappsList' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+				[
+					'format' => 'json',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestAppList',
+			'comment' => 'A list of software entry resources',
+		],
+	],
+],
+'RESTAPIdelappsList' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/deleted',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestDelAppList',
+		],
+	],
+],
+'RESTAPImodappsItem' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/moderated/:id',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestModAppItem',
+		],
+	],
+],
+'RESTAPImodappsList' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/moderated',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestModAppList',
+		],
+	],
+],
+'RESTAPIapplogistics' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/logistics',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestAppLogistics',
+			'comment' => 'A list of software logistics per various properties',
+		],
+	],
+],
+'RESTAPIppllogistics' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/logistics',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestPplLogistics',
+			'comment' => 'A list of people logistics per various properties',
+		],
+	],
+],
+'RESTAPIappsDetails' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+				[
+					'format' => 'json',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestAppItem',
+			'comment' => 'The software entry specified by the parameter :id',
+		],
+	],
+],
+'RESTAPIappItemPerms' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/privileges',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+				[
+					'format' => 'json',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestAppPrivList',
+			'comment' => 'A list of actors with privileges on the entry',
+		],
+	],
+],
+'RESTAPIapppubs' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/publications',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestAppPubList',
+			'comment' => 'A list of scientific publications that the software entry specified by the parameter :id has led to',
+		],
+	],
+],
+'RESTAPIapppub' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/publications/:pid',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'pid',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestAppPubItem',
+			'comment' => 'The scientific publication entry specified by the parameter :pid',
+		],
+	],
+],
+'RESTAPIapptags' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/tags',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestAppTagList',
+			'comment' => 'A list of tags that have been applied users and the system to the software entry specified by the parameter :id',
+		],
+	],
+],
+'RESTAPIapptag' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/tags/:tid',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'tid',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestAppTagItem',
+			'comment' => 'The tag entry specified by the parameter :tid',
+		],
+	],
+],
+'RESTAPIrelatedApps' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/relatedapps',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+				[
+					'format' => 'json',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestRelAppList',
+			'comment' => 'A list of software entries that related to the software entry specified by the paramter :id',
+		],
+	],
+],
+'RESTAPIrelatedAppsLogistics' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/relatedapps/logistics',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestRelAppLogistics',
+			'comment' => 'A list of related application logistics per various properties',
+		],
+	],
+],
+'RESTAPIrateReport' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/ratingsreport',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestAppRatingReport',
+			'comment' => 'A report about ratings the software entry specified by the parameter :id has received by all users',
+		],
+	],
+],
+'RESTAPIrateReport2' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/ratingsreport/:type',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'type',
+					'fmt' => '.+',
+				],
+			],
+			'resource' => 'RestAppRatingReport',
+			'comment' => 'A report about ratings the software entry specified by the parameter :id has received by registered (:type="internal") or anonymous (:type="external") users',
+		],
+	],
+],
+'RESTAPIratings' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/ratings',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestAppRatingList',
+			'comment' => 'A list of all the ratings the software entry specified by the parameter :id has received by all users',
+		],
+	],
+],
+'RESTAPIrating' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/ratings/:rid',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'rid',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestAppRatingItem',
+			'comment' => 'The rating entry specified by the parameter :rid',
+		],
+	],
+],
+'RESTAPIapphistory' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/history',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'history',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestAppHistoryList',
+			'comment' => 'A list of all previous states that the software entry specified by the parameter :id has been in, with regard to changes by authorized users',
+		],
+	],
+],
+'RESTAPIapphistoryitem' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/history/:hid',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'history',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'hid',
+					'fmt' => '.+',
+				],
+			],
+			'resource' => 'RestAppHistoryItem',
+			'comment' => 'The historical state of a software entry specified by parameter :hid',
+		],
+	],
+],
+'RESTAPIapphistorydiff' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/history/:hid/diff',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'history',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'hid',
+					'fmt' => '.+',
+				],
+			],
+			'resource' => 'RestAppHistoryDiffItem',
+			'comment' => 'The unified diff of old/new historical states of a software entry specified by parameter :hid',
+		],
+	],
+],
+'RESTAPIapphistoryrbitem' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/history/:hid/rollback',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'history',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'hid',
+					'fmt' => '.+',
+				],
+			],
+			'resource' => 'RestAppHistoryRBItem',
+			'comment' => 'Rolls-back a software entry to the state it was in as described by the parameter :hid',
+		],
+	],
+],
+'RESTAPIappvalist' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/virtualization',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'virtualization',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestAppVAList',
+			'comment' => '',
+		],
+	],
+],
+'RESTAPIappvaitem' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/virtualization/:vappid',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'virtualization',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'vappid',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestAppVAItem',
+			'comment' => '',
+		],
+	],
+],
+'RESTAPIappvaitemimages' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/virtualization/productionimages',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestVAImageList',
+			'comment' => '',
+		],
+	],
+],
+'RESTAPIappvaitemversion' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/virtualization/:vappid/:versionid',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'virtualization',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'vappid',
+					'fmt' => '\d+',
+				],
+				[
+					'name' => 'versionid',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestAppVAVersionItem',
+			'comment' => '',
+		],
+	],
+],
+'RESTAPIappvaitemintegrity' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/virtualization/integrity/:versionid',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'versionid',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestAppVAVersionIntegrityItem',
+			'comment' => '',
+		],
+	],
+],
+'RESTAPIappcontextualizationlist' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/contextualization',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestAppContextScriptList',
+			'comment' => '',
+		],
+	],
+],
+'RESTAPIappcontextualizationlistitem' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/contextualization/:scriptid',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'scriptid',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestAppContextScriptItem',
+			'comment' => '',
+		],
+	],
+],
+'RESTAPIappcontext' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/contextualization/metadata',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestAppContext',
+			'comment' => '',
+		],
+	],
+],
+'RESTAPIswappvaitemimages' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/:id/contextualization/productionimages',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestSWAppImageList',
+			'comment' => '',
+		],
+	],
+],
+'RESTAPIcontextscriptformats' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/contextualization/formats',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestContextScriptFormatList',
+			'comment' => '',
+		],
+	],
+],
+'RESTAPIpersonprivs' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/privileges',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestPplPrivList',
+			'comment' => 'A list of the person\'s privileges on other targets',
+		],
+	],
+],
+'RESTAPIpplvolist' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/vos',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'vos',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestPplVOList',
+			'comment' => 'A list of VOs the user specified by parameter :id is related to',
+		],
+	],
+],
+'RESTAPIvomemberlist' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/vos/member',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'vos',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestVOMemberList',
+			'comment' => 'A list of VOs the user specified by parameter :id is a member of',
+		],
+	],
+],
+'RESTAPIvomanagerlist' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/vos/manager',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'vos',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestVOManagerList',
+			'comment' => 'A list of VOs the user specified by parameter :id is a manager of',
+		],
+	],
+],
+'RESTAPIvodeputylist' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/vos/deputy',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'vos',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestVODeputyList',
+			'comment' => 'A list of VOs the user specified by parameter :id is a deputy of',
+		],
+	],
+],
+'RESTAPIvoexpertlist' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/vos/expert',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'vos',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestVOExpertList',
+			'comment' => 'A list of VOs the user specified by parameter :id is an expert of',
+		],
+	],
+],
+'RESTAPIvoshifterlist' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/vos/shifter',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'vos',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestVOShifterList',
+			'comment' => 'A list of VOs the user specified by parameter :id is a shifter of',
+		],
+	],
+],
+'RESTAPIappreport' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/applications/report',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestAppReport',
+			'comment' => 'A list of applications the user specified by parameter :id is related to',
+		],
+	],
+],
+'RESTAPIvoreport' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/vos/report',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestVOReport',
+			'comment' => 'A list of VOs the user by parameter :id is a member of contact of',
+		],
+	],
+],
+'RESTAPIappfollowlist' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/applications/followed',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestAppFollowedList',
+			'comment' => 'A list of applications the user specified by parameter :id follows',
+		],
+	],
+],
+'RESTAPIappfollowitem' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/applications/followed/:appid',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+				[
+					'name' => 'appid',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestAppFollowedItem',
+			'comment' => 'The software entry that the user follows, specified by the parameter :appid',
+		],
+	],
+],
+'RESTAPIappfollowLogistics' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/applications/followed/logistics',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestAppFollowedLogistics',
+			'comment' => 'A list of software logistics per various properties',
+		],
+	],
+],
+'RESTAPIbookmarks' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/applications/bookmarked',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestAppBookmarkList',
+			'comment' => 'A list of all software entries that the user specified by parameter :id has bookmarked',
+		],
+	],
+],
+'RESTAPIbookmarks2' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/applications/bookmarked/:bmid',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+				[
+					'name' => 'bmid',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestAppBookmarkItem',
+			'comment' => 'The software entry that the user has bookmarked, as specified by parameter :bmid',
+		],
+	],
+],
+'RESTAPIbookmarkLogistics' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/applications/bookmarked/logistics',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestAppBookmarkLogistics',
+			'comment' => 'A list of software logistics per various properties',
+		],
+	],
+],
+'RESTAPIeditableApps' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/applications/editable',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestEdtAppList',
+			'comment' => 'A list of all software entries that the user can edit',
+		],
+	],
+],
+'RESTAPIeditableAppLogistics' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/applications/editable/logistics',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestEdtAppLogistics',
+			'comment' => 'A list of software logistics per various properties',
+		],
+	],
+],
+'RESTAPIownedApps' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/applications/owned',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestOwnAppList',
+			'comment' => 'A list of all the software entries that the user "owns"',
+		],
+	],
+],
+'RESTAPIownedAppLogistics' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/applications/owned/logistics',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestOwnAppLogistics',
+			'comment' => 'A list of software logistics per various properties',
+		],
+	],
+],
+'RESTAPIassociatedApps' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/applications/associated',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestAscAppList',
+			'comment' => 'A list of all the software entries in whose contact list the user is in',
+		],
+	],
+],
+'RESTAPIassociatedAppLogistics' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id/applications/associated/logistics',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestAscAppLogistics',
+			'comment' => 'A list of software logistics per various properties',
+		],
+	],
+],
+'RESTAPIpeopleList' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'persons',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestPplList',
+			'comment' => 'A list of the registered users',
+		],
+	],
+],
+'RESTAPIdelpplList' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/deleted',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'persons',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestDelPplList',
+		],
+	],
+],
+'RESTAPIpeopleDetails' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:id',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'persons',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestPplItem',
+			'comment' => 'The profile entry of the user specified by the parameter :id',
+		],
+	],
+],
+'RESTAPInamedPeopleDetails' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/:name',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'persons',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'name',
+					'fmt' => 's:.+',
+				],
+			],
+			'resource' => 'RestPplItem',
+		],
+	],
+],
+'RESTAPIcountries' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/regional',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'regional',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestRegionalList',
+			'comment' => 'A list of countries that registed users are affiliated with',
+		],
+	],
+],
+'RESTAPIcategories' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/categories',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestCategoryList',
+			'comment' => 'A flat list of categories by which a user may classify software entries',
+		],
+	],
+],
+'RESTAPIhcategories' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/categories/hierarchical',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'hcat',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestCategoryList',
+			'comment' => 'A hierarchical list of categories by which a user may classify software entries',
+		],
+	],
+],
+'RESTAPIcategory' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/categories/:id',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestCategoryItem',
+			'comment' => 'The software category entry specified by parameter :id',
+		],
+	],
+],
+'RESTAPIlangs' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/languages',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestLangList',
+			'comment' => 'A list of programming languages by which a user may classify software entries',
+		],
+	],
+],
+'RESTAPIoses' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/oses',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestOSList',
+			'comment' => 'A list of computer operating systems by which a user may classify software entries',
+		],
+	],
+],
+'RESTAPIlicenses' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/licenses',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestLicenseList',
+			'comment' => 'A list of software licenses by which a user may classify software entries',
+		],
+	],
+],
+'RESTAPIhvs' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/hypervisors',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestHVList',
+			'comment' => 'A list of virtualization hypervisors by which a user may classify software entries',
+		],
+	],
+],
+'RESTAPIvmifmt' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/vmiformats',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestVMIFmtList',
+			'comment' => 'A list of virtualization image formats by which a user may classify software entries',
+		],
+	],
+],
+'RESTAPIarchs' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/archs',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestArchList',
+			'comment' => 'A list of computer architectures by which a user may classify software entries',
+		],
+	],
+],
+'RESTAPIva_providers' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/va_providers',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestVAProvidersList',
+			'comment' => 'A list of virtualization providers',
+		],
+	],
+],
+'RESTAPIva_provider' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/va_providers/:id',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '.+',
+				],
+			],
+			'resource' => 'RestVAProviderItem',
+			'comment' => 'The virtualization provider entry specified by parameter :id',
+		],
+	],
+],
+'RESTAPIsites' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/sites',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'site',
+				],
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestSiteList',
+			'comment' => 'A list of sites',
+		],
+	],
+],
+'RESTAPIsitelogistics' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/sites/logistics',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestSiteLogistics',
+			'comment' => 'A list of Site logistics per various properties',
+		],
+	],
+],
+'RESTAPIsite' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/sites/:id',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'site',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '.+',
+				],
+			],
+			'resource' => 'RestSiteItem',
+			'comment' => 'The site entry specified by the parameter :id',
+		],
+	],
+],
+'RESTAPIsitefiltercheck' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/sites/filter/normalize',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestSiteFilterNormalization',
+		],
+	],
+],
+'RESTAPIsitefilterreflection' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/sites/filter/reflect',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestSiteFilterReflection',
+			'comment' => 'Filter reflection resource for site searchers',
+		],
+	],
+],
+'RESTAPIdisciplines' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/disciplines',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestDisciplineList',
+			'comment' => 'A list of disciplines by which a user may classify software entries',
+		],
+	],
+],
+'RESTAPIdiscipline' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/disciplines/:id',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestDisciplineItem',
+			'comment' => 'The software discipline entry specified by parameter :id',
+		],
+	],
+],
+'RESTAPIhdisciplines' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/disciplines/hierarchical',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'hdisc',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestDisciplineList',
+			'comment' => 'A hierarchical list of disciplines by which a user may classify software entries',
+		],
+	],
+],
+'RESTAPImws' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/middlewares',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestMWList',
+			'comment' => 'A list of distributed computing middlewares that may be listed under a software entry',
+		],
+	],
+],
+'RESTAPIstatuses' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/statuses',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'applications',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestStatusList',
+			'comment' => 'A list of states with regard to usability that a software entry may be classified by',
+		],
+	],
+],
+'RESTAPIvos' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/vos',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'vos',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestVOList',
+			'comment' => 'A list of grid Virtual Organizations which may provide access to software',
+		],
+	],
+],
+'RESTAPIvo' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/vos/:id',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'vos',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestVOItem',
+			'comment' => 'The grid Virtual Organization entry specified by parameter :id',
+		],
+	],
+],
+'RESTAPIstorestats1' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/storestats/:from/:to',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'from',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+				[
+					'name' => 'to',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+			],
+			'resource' => 'RestStoreStatsList',
+			'comment' => 'Store statistics',
+		],
+	],
+],
+'RESTAPIstorestats2' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/storestats/:from',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'from',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+			],
+			'resource' => 'RestStoreStatsList',
+			'comment' => 'Store statistics',
+		],
+	],
+],
+'RESTAPIstorestats3' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/storestats',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+			],
+			'resource' => 'RestStoreStatsList',
+			'comment' => 'Store statistics',
+		],
+	],
+],
+'RESTAPIdisciplinevostats1' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/disciplines/:id/vostats/:from/:to',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'from',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+				[
+					'name' => 'to',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+			],
+			'resource' => 'RestDisciplineVOStatsList',
+			'comment' => 'VO statistics by discipline specified by parameter :id',
+		],
+	],
+],
+'RESTAPIdisciplinevostats2' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/disciplines/:id/vostats/:from',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'from',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+			],
+			'resource' => 'RestDisciplineVOStatsList',
+			'comment' => 'VO statistics by discipline specified by parameter :id',
+		],
+	],
+],
+'RESTAPIdisciplinevostats3' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/disciplines/:id/vostats',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestDisciplineVOStatsList',
+			'comment' => 'VO statistics by discipline specified by parameter :id',
+		],
+	],
+],
+'RESTAPIdisciplinesvostats1' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/disciplines/vostats/:from/:to',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'from',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+				[
+					'name' => 'to',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+			],
+			'resource' => 'RestDisciplineVOStatsList',
+			'comment' => 'VO statistics by discipline',
+		],
+	],
+],
+'RESTAPIdisciplinesvostats2' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/disciplines/vostats/:from',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'from',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+			],
+			'resource' => 'RestDisciplineVOStatsList',
+			'comment' => 'VO statistics by discipline',
+		],
+	],
+],
+'RESTAPIdisciplinesvostats3' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/disciplines/vostats',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+			],
+			'resource' => 'RestDisciplineVOStatsList',
+			'comment' => 'VO statistics by discipline',
+		],
+	],
+],
+'RESTAPIdisciplineappstats1' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/disciplines/:id/appstats/:from/:to',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'from',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+				[
+					'name' => 'to',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+			],
+			'resource' => 'RestDisciplineAppStatsList',
+			'comment' => 'Application statistics by discipline specified by parameter :id',
+		],
+	],
+],
+'RESTAPIdisciplineappstats2' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/disciplines/:id/appstats/:from',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'from',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+			],
+			'resource' => 'RestDisciplineAppStatsList',
+			'comment' => 'Application statistics by discipline specified by parameter :id',
+		],
+	],
+],
+'RESTAPIdisciplineappstats3' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/disciplines/:id/appstats',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestDisciplineAppStatsList',
+			'comment' => 'Application statistics by discipline specified by parameter :id',
+		],
+	],
+],
+'RESTAPIdisciplinesappstats1' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/disciplines/appstats/:from/:to',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'from',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+				[
+					'name' => 'to',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+			],
+			'resource' => 'RestDisciplineAppStatsList',
+			'comment' => 'Application statistics by discipline',
+		],
+	],
+],
+'RESTAPIdisciplinesappstats2' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/disciplines/appstats/:from',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'from',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+			],
+			'resource' => 'RestDisciplineAppStatsList',
+			'comment' => 'Application statistics by discipline',
+		],
+	],
+],
+'RESTAPIdisciplinesappstats3' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/disciplines/appstats',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+			],
+			'resource' => 'RestDisciplineAppStatsList',
+			'comment' => 'Application statistics by discipline',
+		],
+	],
+],
+'RESTAPIcategoryappstats1' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/categories/:id/appstats/:from/:to',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'from',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+				[
+					'name' => 'to',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+			],
+			'resource' => 'RestCategoryAppStatsList',
+			'comment' => 'Application statistics by category specified by parameter :id',
+		],
+	],
+],
+'RESTAPIcategoryappstats2' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/categories/:id/appstats/:from',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'from',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+			],
+			'resource' => 'RestCategoryAppStatsList',
+			'comment' => 'Application statistics by category specified by parameter :id',
+		],
+	],
+],
+'RESTAPIcategoryappstats3' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/categories/:id/appstats',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestCategoryAppStatsList',
+			'comment' => 'Application statistics by category specified by parameter :id',
+		],
+	],
+],
+'RESTAPIcategoriesappstats1' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/categories/appstats/:from/:to',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'from',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+				[
+					'name' => 'to',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+			],
+			'resource' => 'RestCategoryAppStatsList',
+			'comment' => 'Application statistics by category',
+		],
+	],
+],
+'RESTAPIcategoriesappstats2' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/categories/appstats/:from',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'from',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+			],
+			'resource' => 'RestCategoryAppStatsList',
+			'comment' => 'Application statistics by category',
+		],
+	],
+],
+'RESTAPIcategoriesappstats3' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/categories/appstats',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+			],
+			'resource' => 'RestCategoryAppStatsList',
+			'comment' => 'Application statistics by category',
+		],
+	],
+],
+'RESTAPIvoappstats1' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/vos/:id/appstats/:from/:to',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'from',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+				[
+					'name' => 'to',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+			],
+			'resource' => 'RestVOAppStatsList',
+			'comment' => 'Application statistics for the grid Virtual Organization entry specified by parameter :id',
+		],
+	],
+],
+'RESTAPIvoappstats2' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/vos/:id/appstats/:from',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+				[
+					'name' => 'from',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+			],
+			'resource' => 'RestVOAppStatsList',
+			'comment' => 'Application statistics for the grid Virtual Organization entry specified by parameter :id',
+		],
+	],
+],
+'RESTAPIvoappstats3' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/vos/:id/appstats',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestVOAppStatsList',
+			'comment' => 'Application statistics for the grid Virtual Organization entry specified by parameter :id',
+		],
+	],
+],
+'RESTAPIvosappstats1' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/vos/appstats/:from/:to',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'from',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+				[
+					'name' => 'to',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+			],
+			'resource' => 'RestVOAppStatsList',
+			'comment' => 'Application statistics for all grid Virtual Organization entries',
+		],
+	],
+],
+'RESTAPIvosappstats2' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/vos/appstats/:from',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+				[
+					'name' => 'from',
+					'fmt' => '\d\d\d\d-\d\d-\d\d',
+				],
+			],
+			'resource' => 'RestVOAppStatsList',
+			'comment' => 'Application statistics for all grid Virtual Organization entries',
+		],
+	],
+],
+'RESTAPIvosappstats3' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/stats/vos/appstats',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+			],
+			'resource' => 'RestVOAppStatsList',
+			'comment' => 'Application statistics for all grid Virtual Organization entries',
+		],
+	],
+],
+'RESTAPIroles' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/roles',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'persons',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestRoleList',
+			'comment' => 'A list of available roles for users to choose from',
+		],
+	],
+],
+'RESTAPItags' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/tags',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestTagList',
+			'comment' => 'A list of all the tags that have been used in one or more software entries',
+		],
+	],
+],
+'RESTAPIcontacttypes' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/contacttypes',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+			],
+			'resource' => 'RestContactTypeList',
+			'comment' => 'A list of contact types that a user may specify in his or her profile',
+		],
+	],
+],
+'RESTAPIappfiltercheck' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/filter/normalize',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestAppFilterNormalization',
+			'comment' => 'Filter normalization resource for application searches',
+		],
+	],
+],
+'RESTAPIappfilterreflection' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/filter/reflect',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestAppFilterReflection',
+			'comment' => 'Filter reflection resource for application searchers',
+		],
+	],
+],
+'RESTAPIpplfiltercheck' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/filter/normalize',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestPplFilterNormalization',
+			'comment' => 'Filter normalization resource for user searches',
+		],
+	],
+],
+'RESTAPIpplfilterreflection' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/people/filter/reflect',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestPplFilterReflection',
+			'comment' => 'Filter reflection resource for user searches',
+		],
+	],
+],
+'RESTAPIvofiltercheck' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/vos/filter/normalize',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestVOFilterNormalization',
+			'comment' => 'Filter normalization resource for VO searches',
+		],
+	],
+],
+'RESTAPIvofilterreflection' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/vos/filter/reflect',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestVOFilterReflection',
+			'comment' => 'Filter reflection resource for VO searches',
+		],
+	],
+],
+'RESTAPIdissemination' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/dissemination',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'dissemination',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestDisseminationList',
+		],
+	],
+],
+'RESTAPIdisseminationentry' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/dissemination/:id',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'dissemination',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '\d+',
+				],
+			],
+			'resource' => 'RestDisseminationItem',
+		],
+	],
+],
+'RESTAPIdisseminationfiltercheck' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/dissemination/filter/normalize',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestDisseminationFilterNormalization',
+		],
+	],
+],
+'RESTAPIdisseminationfilterreflection' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/dissemination/filter/reflect',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestDisseminationFilterReflection',
+		],
+	],
+],
+'RESTAPIactorgroup' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/accessgroups/:id',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '-{0,1}\d+',
+				],
+			],
+			'resource' => 'RestAccessGroupItem',
+		],
+	],
+],
+'RESTAPIactorgroups' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/accessgroups',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestAccessGroupList',
+		],
+	],
+],
+'RESTAPIresources' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/resources',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+			],
+			'params' => [
+			],
+			'resource' => 'RestAppDBResourceList',
+			'comment' => 'A list of all resource provided by the AppDB REST web-API',
+		],
+	],
+],
+'RESTAPIsciclass' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/classification/version',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+				[
+					'format' => 'json',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestSciClassList',
+			'comment' => 'EGI Scientific Discipline Classification API',
+		],
+	],
+],
+'RESTAPIsciclassalias1' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/classification/versions',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+				[
+					'format' => 'json',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestSciClassList',
+			'comment' => 'Alias for EGI Scientific Discipline Classification API',
+		],
+	],
+],
+'RESTAPIsciclassitem' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/classification/version/:id',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+				[
+					'format' => 'json',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestSciClassItem',
+			'comment' => 'EGI Scientific Discipline Classification API',
+		],
+	],
+],
+'RESTAPIsciclassitemalias1' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/classification/versions/:id',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+				[
+					'format' => 'json',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|s:.+)',
+				],
+			],
+			'resource' => 'RestSciClassItem',
+			'comment' => 'Alias for EGI Scientific Discipline Classification API',
+		],
+	],
+],
+'RESTAPIvologistics' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/vos/logistics',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'proxy',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestVOLogistics',
+			'comment' => 'A list of VO logistics per various properties',
+		],
+	],
+],
+'RESTAPIentityrelationtypes' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/entity/relationtypes',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestRelationTypeList',
+			'comment' => 'A list of possible entity relation types',
+		],
+	],
+],
+'RESTAPIswappliancereport' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/applications/swappliance/report',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => '',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestVAppSWAppList',
+			'comment' => 'A list of vappliances with their refered software appliances',
+		],
+	],
+],
+'RESTAPIdatasets' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/datasets',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'ds_datasets',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestDatasetList',
+			'comment' => 'A list of available datasets',
+		],
+	],
+],
+'RESTAPIdsexchangeformats' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/datasets/exchangeformats',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'ds_exchange_fmt',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestDSExchangeFormatList',
+			'comment' => 'A list of available exchange formats for datasets',
+		],
+	],
+],
+'RESTAPIdsconnectiontypes' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/datasets/interfaces',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'ds_connection_types',
+				],
+			],
+			'params' => [
+			],
+			'resource' => 'RestDSConnectionTypeList',
+			'comment' => 'A list of available connection types for datasets',
+		],
+	],
+],
+'RESTAPIdatasetitem' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/datasets/:id',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'ds_datasets',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|.+)',
+				],
+			],
+			'resource' => 'RestDatasetItem',
+			'comment' => 'The dataset entry specified by the parameter :id',
+		],
+	],
+],
+'RESTAPIdatasetverlist' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/datasets/:id/versions',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'ds_datasets',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|.+)',
+				],
+			],
+			'resource' => 'RestDatasetVersionList',
+			'comment' => 'The dataset version list',
+		],
+	],
+],
+'RESTAPIdatasetveritem' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/datasets/:id/versions/:vid',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'ds_datasets',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|.+)',
+				],
+				[
+					'name' => 'vid',
+					'fmt' => '(\d+|.+)',
+				],
+			],
+			'resource' => 'RestDatasetVersionItem',
+			'comment' => 'The dataset version entry specified by the parameter :vid',
+		],
+	],
+],
+'RESTAPIdatasetloclist' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/datasets/:id/versions/:vid/locations',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'ds_datasets',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|.+)',
+				],
+				[
+					'name' => 'vid',
+					'fmt' => '(\d+|.+)',
+				],
+			],
+			'resource' => 'RestDatasetLocationList',
+			'comment' => 'The dataset location list for the dataset version specified by the parameter :vid',
+		],
+	],
+],
+'RESTAPIdatasetlocitem' => [
+	'type' => Literal::class,
+	'options' => [
+		'route' => '/:version/datasets/:id/versions/:vid/locations/:lid',
+		'defaults' => [
+			'controller' => Controller\ApiController::class,
+			'action' => 'rest',
+			'formats' => [
+				[
+					'format' => 'xml',
+					'xslt' => 'ds_datasets',
+				],
+			],
+			'params' => [
+				[
+					'name' => 'id',
+					'fmt' => '(\d+|.+)',
+				],
+				[
+					'name' => 'vid',
+					'fmt' => '(\d+|.+)',
+				],
+				[
+					'name' => 'lid',
+					'fmt' => '(\d+|.+)',
+				],
+			],
+			'resource' => 'RestDatasetLocationItem',
+			'comment' => 'The dataset location entry specified by the parameter :lid',
+		],
+	],
+],

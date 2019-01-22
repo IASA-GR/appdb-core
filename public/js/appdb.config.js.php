@@ -1,10 +1,9 @@
 <?php
-include_once(__DIR__."/../../library/appdb_configuration.php");
-include_once(__DIR__."/../../library/support.php");
-$apiconf = ApplicationConfigurationIni::getNamespaceConfiguration('api');
-$appconf = ApplicationConfigurationIni::getNamespaceConfiguration('app');
-$hasRepository = ( ($appconf->enableRepository && $appconf->enableRepository=='true')?'true':'false' );
-
+set_include_path('.:/usr/share/php:/usr/share/pear:/opt/zend2/library');
+include_once(__DIR__."/../../vendor/appdb/appdb_configuration.php");
+include_once(__DIR__."/../../vendor/appdb/support.php");
+$hasRepository = ( (ApplicationConfiguration::app('enableRepository') && ApplicationConfiguration::app('enableRepository') == 'true') ? 'true' : 'false' );
+	
 header('Content-type: text/javascript');
 ?>
 /* 
@@ -16,25 +15,25 @@ header('Content-type: text/javascript');
 var appdb = {};
 appdb.config = {
 	deploy: {
-		instance: '<?php echo ((ApplicationConfiguration::isProductionInstance()===true)?"production":"development"); ?>'
+		instance: '<?php echo ((ApplicationConfiguration::isProductionInstance()===true) ? "production" : "development"); ?>'
 	},
-    appValidationPeriod: '<?php echo $appconf->invalid; ?>',
-    apiversion: '<?php echo $apiconf->latestVersion; ?>',
+    appValidationPeriod: '<?php echo ApplicationConfiguration::app('invalid'); ?>',
+    apiversion: '<?php echo ApplicationConfiguration::api('latestVersion'); ?>',
 	version: '<?php echo ApplicationConfiguration::version(); ?>',
 	api: {
-		maxkeys: '<?php echo $apiconf->maxkeys; ?>',
-		maxnetfilters: '<?php echo $apiconf->maxnetfilters; ?>'
+		maxkeys: '<?php echo ApplicationConfiguration::api('maxkeys'); ?>',
+		maxnetfilters: '<?php echo ApplicationConfiguration::api('maxnetfilters'); ?>'
 	},
     endpoint : {
 	base : '<?php echo ApplicationConfiguration::uiUrl();?>',
 		baseapi : '<?php echo ApplicationConfiguration::apiUrl(true);?>',
 		proxyapi: '<?php echo ApplicationConfiguration::url('/api/proxy');?>', 
-		vmcaster: '<?php echo $appconf->vmcasterUrl; ?>/',
+		vmcaster: '<?php echo ApplicationConfiguration::app('vmcasterUrl'); ?>/',
 		wiki: 'https://wiki.appdb.egi.eu/',
 		drafts: '<?php echo ApplicationConfiguration::url('/storage/drafts/');?>',
                 hdl: 'http://hdl.handle.net/'
     },
-	authBackend: "<?php echo ( (trim($appconf->authbackend) !== '')?strtolower(trim($appconf->authbackend)):""); ?>",
+	authBackend: "<?php echo ( (trim(ApplicationConfiguration::app('authbackend')) !== '') ? strtolower(trim(ApplicationConfiguration::app('authbackend'))) : ""); ?>",
     images : {
 		person : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAAA5ZDbSAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxMi0xMC0wNVQxNTo1NTo0MCswMzowMMq25GgAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTItMTAtMDVUMTU6NTU6NDArMDM6MDC761zUAAAQfElEQVR4nO1daXPaSBN+dHCIG2zH2MRZO0ftprL//19s1e463trEjl02JhwGgQBJ6Jp5P6RGr6xwGoGGLZ4qKnaso9Gj7unu6ekB9thjjz324BRC3AJsGoQQOu3/RVH8z3934D9EcJhISikopf7PQQiC4H8Y/quE7/yXYsRSSuF5HjzPg+u6sG0btm3D8zwQQkAphSAIEEURiUTC/8iyDFmWIYqiT/h/ieyd/SKMWM/z4DgOJpMJDMOAaZpwHAeO4/gEM21mWivLMpLJpE+yoijIZDJIp9NIJBIQRRHAf4PonfsCjFhCCCzLwng8xmg0gmEYmEwmcF13pesJgoBEIoF0Oo1sNot8Po9sNotkMsk0fueeURA7JTwj17ZtjEYj9Pt9jMdjWJYFQggEQfhpvF0FsiwjlUqhUCigXC4jm81ClmUAu6vNOyM0IYRSSmGaJnq9HlRVxWQyASEk8nvJsoxMJoNKpYJyuYxUKrWz2rwTAhNCKCEE4/EY7XYbmqbBcZyN3pOZ7oODA7x69QqKouwkydwLy8gdDodoNpvQNG0jWjsLsiyjUqmgWq0im83uHMly3AIsAqUUo9EIjUYDw+Fwq+QCgOM46Ha7oJTi9PQU2Wx2q/dfF1wTTAih4/EY379/f0buOo7US+C6Lnq9HkRRRK1WAyGE7ooWi3ELMA+WZaHZbGIwGDyLZ+OA67rodrt4enqC4zgzU6C8gVsNdhyHtlotqKq6cmy7Kdi2jU6ng1QqhcPDw53QZC4J9jyPapqGTqcDx3Fi09owBEGAaZrodDpQFAW5XI57krkk2HEc9Ho9GIbh55F5AJNjNBqh1+v5qU2ewR3BhBCqqio0TYPrutyQG4TjOBgMBiiVSiiVSnGLMxfcOVmO40DTNBiGwSW5wI88uGEYW0m4rAuuNJgQQkejEUajEbfay8BexEqlErcoc8EVwZRS6Lruay/PBBNCYJomdF2H67pUlmUuHS2uCPY8D6ZpwrbtrWesVgWlFI7jQNd1rs00VwS7rgvLsvykBu9wHAeGYcC27bhFmQmunCxWmcG79jKwogOeM1tcabDjOP7k/S5osCAIcF3Xr/viEdwQTAihT09Pvve8CwQzOXn2+Lkx0awqclfIZSCEwHXdvQYvi10jmL2Ye4IXgNUsA7tDcrBwnldwQ7AoisLT0xMVRXFnCAbwrN6aR3BDMAC/IB3YftXGS8DKdIPWhzdwRXAymUQ6nV67vnlbYKTuCV4SrPCcmWneIYoiJEl6tq6JN3BFsCRJyGQySCQSsCyLa5KZ1iqK4lsdHsEVwaIoIpfLIZPJYDwec02wJEkQBAHpdBqZTIbbWmneCBZM06TFYhGqqsKyrLhFmgm27DSVSiGVSsUtzkxwRTAAJBIJlMtltNttbs00G3NTqRSKxSK3DhbAIcGiKKJYLKJcLmM0GnE5FcfCOUVRUCgUuDXPAJ8EC67r0mq1ClVVoaoqV1osSRJkWYYkSTg+Pvbjdl7BHcHADy2uVCo4PT2FruswTZMLkoOLxUulEvf1WAC/BAsAoGkaHQ6HqNfrsU/JsdYPmUwGgiDgzZs3SCaTXJtngFOCGfL5PM7Pz2EYBjqdTmwzNizmzWazcBwH79+/R6FQiEWWVcE1waIoCo7j0Pfv38O2baiquvVqD0EQIEkSCoUCXNfFxcUFqtUqRFHkXnsBzgkGfjg1JycnIITg69ev6PV6W5t/ZanIYrEISinOzs5wcXGxE6aZgXuCRVEUCCH05OQEgiDg5uYG3W7XL63dhDYzk5xMJpHL5eB5Hmq1Gj58+IB0Or0z5AI7QDDwnGQ2FrZaLRiG4a8+jIJoNq+bSCSQTCaRz+fheR4uLi5wcXHBJkJ2hlxgB3p0BEEIoZ7nYTAYoNPpoNlsYjgcwjTNZ2Z7FbID3e0gSZKfelQUBbIs45dffkGtVmPd8HbqeQE7RjDw/6YshmGg3++j1+uh1+tB13W/Edqi4r0gqSz8SafTfnYqnU4jl8vh9evXKBQK4HVZyjLYWcEJIZQtHRkOhxgMBr42W5YFy7L82DnokDGvONzOkM1ipVIpVCoVFIvFndXaIHZaeOAH0bZt+30qdV2HpmkYj8eYTCY/LYMJamwul/PbFiqKgnw+D0VRdiYEWgY74WRNAzPVbOkIW9fEVicahvFMi4MthFl7QkmS/NSjLMsghMC2bSSTSe5bMyyLnfoCrJ2hbduYTCbQdR2sGwBbNG5ZFmzb/mlJCQt92LjLyGUeczqdRj6f92eycrkc0un0TrcxBHaIYEIINQwDo9EInU4HvV4P/X7fd66YtgL/96KDWssIZg5W2AFjfaTT6TQURUGpVMLh4SGOjo5QKBSQyWQgSdLOPC8G7gUmhFA2rjYaDb9vFtNURhQhZGp2a1mCw+cwsovFIqrVKk5PT1EqlZDNZneKaK4FNQyD9vt9PDw8oF6vQ9O0mctLZxEM/GyegcWxMjuOxcaFQgEnJyd48+YNKpUK13VYQXApoOM4dDAY4P7+Hnd3d+j1en75zixiWNpy2t/ZmMsIXjYREqyUZM5ZuVzG+fk5zs/PUalUuA+luBNM13Var9fx7ds3NBoNv1dWGGGSZm3AAeAnEz3rmFkIXptVUp6cnOD9+/c4Pz9HLpfj7jkycCEYC3k0TcPNzQ3+/fdff2pwFqaRNI3k4LqhlxbHTXuZBEFAsVjEx48f8euvv6JUKnEZP8cuDEtUtNttfPnyBbe3t89qohk5QQ0LE8m0cpFmztLSWfeYZcqD989kMnj37h0+fvyI4+Nj7iYkYhWEEEJN00S9XsfV1RUajQYmk4n/92n7GwUfevjnafsjha8VPi98n6AJD05HznrBmMd9cnKCT58+4eLigmXDuCA5tkwWi2vv7u7w+fNntFqtn+JY4LlZDZMY1uSwaQ5vpzPt3GlaPevYaWCJl3q97idY3r17x00mLBaCGbk3Nze4urpCp9N5Ri4jJfhzeDwOkjqLjKDGzhpHw9rIzglOPbLPvEVxlFJ0Oh389ddf8DwPHz584ILkWAg2DAPX19f4/Pkznp6e4HkegJ9NLiN2UWgzTeMYIUGSw9o67UUKXy+Y6gy/KGGz7Xkeut0u/v77bxBC8Ntvv73o+USJrRNsmib98uULLi8vZ5IbfnCM5GWxShg0z+RPOzbs2IXheR56vR4uLy8hCAIMw6CZTCY2Ld4qwZPJhH779g2Xl5fodDpTyZ2FVas0wg7SsmPqsvdf9BIwkhOJBCaTCU2n07GQvDWCXdel9/f3uLy8RLvdftamf1NlsISQn2LfbZXcBs21oiixNSzdGsHdbhf//PMPms3m1Oady2rIKpjngEV1n7DpD1oL13Xx9PSEq6ur2Lbj2QrBg8GA/vnnn3h4eJjbi3IT2hUevxe9SKuu1F90/mQyQb1eRy6Xg6qqtFKpbFWLN06waZr06uoK19fXGA6H/rgbxqZN57LaO8/bXvY+4RdqPB7j5uYG+Xx+607Xxglut9u4vr5Gr9dbuD3OS2Z5lj33pU5WOF5eRrbwsazU9/r6GoeHh0vfOwpslGBVVekff/yBVqu19PY4i+LdaWOeKIoghCxtHVaJqZc5Z9G5wI9Oup1OB1+/fkW326WHh4db0eKNEWxZFr26usK3b98wHo9XWks072FKkjQ14SBJ0tyqjnkaPG+MXkamafeYBl3XcXt7i4ODg62FThshmBBCm80mbm9v0e/319q5bBYZs/4/XAPNjl2UT56FeTNV8+SZBU3TcHt7i2q1upVU5kYI1nUdd3d3eHx8xGQyiSzkAX6EHss6QcuOu/O0L2rnz7IsfP/+Hbe3t1vZcylygj3Po/V6HQ8PDxvbDnaaiV5kZldxwpbFKs5XEOPxGA8PDzg7O9t4AiRygnVdx8PDA5rN5kY65CwT2qyijYtM8CbAHK77+3scHR1t9F6REux5Hn18fES9XsdoNNrqQwMWkzXv5di2rOPxGPV6Hefn5xvV4kgJNk0TjUYD7XZ76/2tglq8rIle1gnbBJgW1+v1jWpxZAR7nkfb7TYeHx+hadrWHxgwWxujnq0K3++lGI/HeHx8xNu3bzemxZERzArnWq1WbC0IwxUaDPPG3iBWlXld0842nG61WhvLcEVCMCGEapqGZrOJfr8fW7ujdWaL4rI4bEnO27dvNxIXR0Uw+v2+3zdjWw9rXhH7OsmNde69KiaTCTqdDlRVRbFYXPt6YURCMDM13W53Zj44aiybnIhDM1eB53lQVRWtVgu1Wi3y669NMCGEDodDdDodDAaDWEKjaWAavAl5og6rhsMh2u02myuP1ExHQTAGgwGenp626lwxD3ZeQfsy1whilTnfKGHbNrrdLlRVjbxF4tqdrFkVYZxtf4NLQ6flqWd9gn9fdOy0c6MCpRSDwQDdbnetiZlpWEuDWQG7qqqxmGeG4BRicBnptJBpGrYdHk3DcDhEt9v1t6qNykyvRTClFIZhoNvtQtf1WMZfQRDgOA4EQfB7coSdrGW86WUn9Jc9dlWYpuk/xygL9NYmeDgcxhb7BskJ1kKv6kXz4GkHn2WUSY91TbTfhCyuh8RIDce+6zpccWA4HELTtEiVZW2CR6MRhsNhbA+IkRtehRj8d5VrxYnRaMQPwcG2RtvMXi2LdUl+SeXmuphMJhiPx2zD6UgcrbXCpMlkgtFotLXs1Sww07xMZceia4R/3+ZUoud5MAwjsjInYA0NppT63eZ40F5CiL/dXNCTXpVkhmnx9DbAmrpFhbU02LIsGIYRlSxrYZqmrTKTNO3cOF5c27YjLZZYy8lyXfdZt7m4EVwsvooGzzomjlKeqPejiGQ2iQeCKf2xwj6qcCkOctl9o9wLcS2Ck8kkUqkUFwQD8AkGXu5FM8TxnVgH3CgJfvGVBEFAJpNBpVJBIpGITKB1EMxFs993CdlsFplMJtKoZC0NzmazODs7w9evX9FsNqOSKTLsEsFsv8ZyubxWId9P111DICGVSuHNmzd4+/YtFEWJTKh1EZcHvA6KxSKOjo5QKpWQy+UiI3ktDZYkCUdHR/j999+hqipubm648qp3AYIgIJvN4vT0FMfHxzg8PEQ+n4/s+msRLIqi4Hkevbi4wHg8huM4fpuGPRaD+TGvX79GrVZDtVpFtVqNdOu8tcMkQRCQz+fx8eNHAEAqlcL9/T10Xd94CnNe3ph3yLKMfD6PWq2GWq2G09NT1Go15PP5SDvKr00w23auXC7j06dPyGazODg4wN3dHVRV9fdS2NQ+g9Py0EHiZ00axFGcENwXolQq4eTkBEdHRzg+PsbZ2RkODg4gSVK0943qQmzbObbXb6PRQKPR8KstLcva2FLSIIKkyrKMRCLhb6PDwijWNHSbJIui6O/sUqlUUCgUUCwW8erVK1SrVZRKpY10j4/0YsFtb9iWN8GdUdiOoZtA2FyLoohMJoODgwMUCgW/kaht29A0Df1+f2tVoEHtlSQJmUzG376nVCptdDOujQxerIO74ziwbRuWZfkEb7MwXlEUlMtlf1t2psGmafr7LG1LixnBbJ8mRVGQSqXYXhIbcyI26p0wjWbNUbY99omiCFmWmQYJQZk8z9v6PDYr72UlvnG3Gt5jjz322GOPPfbYY4899thjjz322GMPfvA/PB76CjrppLkAAAAASUVORK5CYII=", //"images/person.png",
         robot : "/images/robot.gif",
@@ -78,8 +77,8 @@ appdb.config = {
 		}
 	},
 	routing: {
-		useCanonical: <?php echo ($appconf->useCanonical=='true')?'true':'false';?>,
-		useHash : (true && <?php echo ($appconf->useHash === 'false')?'false':'true'; ?>)
+		useCanonical: <?php echo (ApplicationConfiguration::app('useCanonical') == 'true') ? 'true' : 'false'; ?>,
+		useHash : (true && <?php echo (ApplicationConfiguration::app('useHash') == 'false') ? 'false':'true'; ?>)
 	},
 	wiki:{
 		"software.permissions.editmetadata": "main:guides:general:permissions_guide#edit_information_publications",
