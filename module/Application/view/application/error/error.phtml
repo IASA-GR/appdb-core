@@ -24,7 +24,7 @@
   <h1>An error occurred</h1>
   <h2><?php //echo $this->message ?></h2>
 
-  <?php if ( substr(APPLICATION_ENV,0,11) == 'development' ): ?>
+  <?php if ( substr($_SERVER['APPLICATION_ENV]'],0,11) == 'development' ): ?>
 
   <h3>Exception information:</h3>
   <p>

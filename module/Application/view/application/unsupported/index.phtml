@@ -40,7 +40,7 @@
     It appears that you are viewing this page with a Web browser that is not fully supported. This Web site works best with one of these supported browsers:
 
     <ul>
-<?php readfile(APPLICATION_PATH.'/../public/browserlist.txt');?>
+<?php readfile($_SERVER['APPLICATION_PATH'].'/../public/browserlist.txt');?>
     </ul>
 
     while experimental support exists for:
@@ -62,7 +62,7 @@
 				<a style="text-decoration:none" href="http://www.iasa.gr/" target="_blank"><font color="#455058">&copy; Institute of Accelerating Systems and Applications</font></a>, 2009-<?php echo date("Y");?><br/>Athens, Greece
 			</td>
 			<td width="10%" align="right" style="text-align: right">
-				<br/>v.<?php echo exec("cat ".APPLICATION_PATH."/../VERSION");?>
+				<br/>v.<?php echo exec("cat ".$_SERVER['APPLICATION_PATH']."/../VERSION");?>
 				<p/>
 			</td>
 		</tr>			

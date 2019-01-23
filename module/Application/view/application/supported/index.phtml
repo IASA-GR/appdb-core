@@ -57,7 +57,7 @@
 					This web site works best with one of these supported browsers:
 
 					<ul>
-				<?php readfile(APPLICATION_PATH.'/../public/browserlist.txt');?>
+				<?php readfile($_SERVER['APPLICATION_PATH'].'/../public/browserlist.txt');?>
 					</ul>
 					<div style="display:none">
 					while experimental support exists for:

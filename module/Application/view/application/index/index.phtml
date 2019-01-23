@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 ?><?php 
-$this->session = new Zend_Session_Namespace('default');
+use \Zend\Session\Container;
+
+$this->session = new \Zend\Session\Container('default');
 $canInsertApplication = false;
 $canEditFAQs = false;
 $isAdminOrManager = false;
@@ -540,7 +542,7 @@ if( $browserSupported == false ){
 				</div>
 				<?php } ?>
 				<div id="panediv" align="left" style="width: 99%; overflow: auto;">
-				<?php if ( APPLICATION_ENV == "DISABLED-production" ) { //Disable NGIs in production until they are ready ?>
+				<?php if ( $_SERVER['APPLICATION_ENV'] == "DISABLED-production" ) { //Disable NGIs in production until they are ready ?>
 				<div id="resproviderspane" dojoType="dijit.TitlePane" title="Resource Providers" open="false">
 					<ul>
 						<li><a href="#" onclick="appdb.views.Main.showNgis();">All</a></li>
@@ -717,9 +719,11 @@ if( $browserSupported == false ){
 	</div>
 <script type="text/javascript" async="async">
 	<?php
-	if ( APPLICATION_ENV == '' ) {
-		echo 'var APPLICATION_ENV = "'.APPLICATION_ENV.'";';
-	} else echo 'var APPLICATION_ENV = null;';
+	if ( $_SERVER['APPLICATION_ENV'] == '' ) {
+		echo 'var APPLICATION_ENV = "'. $_SERVER['APPLICATION_ENV'] . '";';
+	} else {
+		echo 'var APPLICATION_ENV = null;';
+	}
 	?>
 	var reqsrc = '<?php 
 		if (isset($_SERVER['HTTP_X_FORWARD_FOR'])) {

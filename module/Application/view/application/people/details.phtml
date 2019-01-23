@@ -190,7 +190,7 @@
 									<?php } ?>
 									</td>
 									</tr>
-<?php if ( APPLICATION_ENV == 'DISABLED-production' ) { ?>
+<?php if ( $_SERVER['APPLICATION_ENV]'] == 'DISABLED-production' ) { ?>
 									<tr class="ngirow"><td>Resource Provider: </td><td>
 									<span id="ngi<?php echo $this->dialogCount;?>"><?php if ( ! ($this->entry->ngis === null)) { $s=''; foreach( $this->entry->ngis as $ngi ) $s.='<a href="#" onclick="appdb.views.Main.showNgi({id: '.$ngi->id.'}, {mainTitle: \''.str_replace("'","\\'",$ngi->name).'\'});">'.$this->escape($ngi->name)."</a> <img style='display: none; vertical-align: middle;border:1px solid #BFBFBF' src='/ngi/getlogo?id=".$ngi->id."' width='22px'/> | "; echo substr($s,0,-2);} else { echo "N/A"; }; ?></span></td>
 									</tr>

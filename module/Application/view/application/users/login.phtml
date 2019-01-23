@@ -379,7 +379,7 @@ If you do not have an EGI SSO account, or you have lost your password, please vi
 <p>Redirecting you to the <a href="http://<?php echo $_SERVER['HTTP_HOST'];?>/">EGI Applications Database</a> home page <span id="countdown"></span></p>
 <br/>
 <?php } ?>
-<form name="loginform" method="POST" action="http<?php if ( APPLICATION_ENV == "production" ) echo "s";?>://<?php echo $_SERVER['HTTP_HOST'];?>/users/login<?php if ( APPLICATION_ENV != 'production') echo 'dev2';?>" onsubmit="return validateLogin();">
+<form name="loginform" method="POST" action="http<?php if ( $_SERVER['APPLICATION_ENV]'] == "production" ) echo "s";?>://<?php echo $_SERVER['HTTP_HOST'];?>/users/login<?php if ( $_SERVER['APPLICATION_ENV]'] != 'production') echo 'dev2';?>" onsubmit="return validateLogin();">
 <div style="text-align: center; width:auto; margin-left: auto; margin-right: auto">
 <table style="display: inline-block"><tbody>
 <tr><td><label style="vertical-align: middle" for="username">Username: </label></td><td><input id="username" type="text" name="username" value="<?php echo $this->username; ?>" dojoType="dijit.form.TextBox" /></td></tr>
