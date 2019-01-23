@@ -1,5 +1,5 @@
 <?php
-
+#FIXME: remove this line for production
 set_include_path('.:/usr/share/php:/usr/share/pear:/opt/zend2/library');
 
 use Zend\Mvc\Application;

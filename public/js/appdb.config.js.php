@@ -1,5 +1,7 @@
 <?php
+#FIXME: remove this line for production
 set_include_path('.:/usr/share/php:/usr/share/pear:/opt/zend2/library');
+
 include_once(__DIR__."/../../vendor/appdb/appdb_configuration.php");
 include_once(__DIR__."/../../vendor/appdb/support.php");
 $hasRepository = ( (ApplicationConfiguration::app('enableRepository') && ApplicationConfiguration::app('enableRepository') == 'true') ? 'true' : 'false' );

@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+namespace Application\Controller;
+
 /** Needed for Site / VA-provider sync'ing */
 require_once "PHPCouch/PHPOnCouch/Couch.php";
 require_once "PHPCouch/PHPOnCouch/CouchClient.php";
@@ -24,7 +26,6 @@ use PHPOnCouch\CouchClient;
 use PHPOnCouch\Exceptions;
 /***************************/
 
-namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;

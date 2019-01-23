@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
+namespace Application\Controller;
+
 if ( $_SERVER["Repository_Enabled"] === 'true') {
-	include_once('../library/repository.php');
+	include_once(__DIR__ . '/../../../../vendor/repository.php');
 }
 
-namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;

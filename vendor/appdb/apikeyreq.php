@@ -90,7 +90,7 @@ class APIKeyRequests{
 		$body = preg_replace("/\>/","&gt;", $body);
 		$body = preg_replace("/\n/", "<br/>", $body);
 		$body = preg_replace("/\t/", "<span style='padding-left:10px;'></span>", $body);
-		$body = preg_replace("/\[1\]/", "<a href='http://" .  $_SERVER[APPLICATION_UI_HOSTNAME'] . "?p=" . base64_encode("/people/details?id=".$user->id) . "' target='_blank' title='View person's entry in EGI AppDB' >" . $user->firstname . " " . $user->lastname . "</a>"   , $body);
+		$body = preg_replace("/\[1\]/", "<a href='http://" .  $_SERVER['APPLICATION_UI_HOSTNAME'] . "?p=" . base64_encode("/people/details?id=".$user->id) . "' target='_blank' title='View person's entry in EGI AppDB' >" . $user->firstname . " " . $user->lastname . "</a>"   , $body);
 		$body = preg_replace("/\[2\]/", "<b>" . $apikey->key . "</b>", $body);
 		$body = "<html><head></head><body>" . $body . "</body></html>";
 		
