@@ -4242,7 +4242,7 @@ appdb.views.Export = appdb.ExtendClass(appdb.View, "appdb.views.Export", functio
 		var _this = this;
 		this.link = $('<a title="Export results" href="#" ></a>');
 		this.imgExport = $('<img border="0" height="29px" src="/images/export.png" alt="export"/></a>');
-		this.form = $('<form id="exportapps" name="exportapps" method="GET" action="' + appdb.config.endpoint.base + this.target + '/export"></form>');
+		this.form = $('<form id="exportapps" name="exportapps" method="GET" action="' + appdb.config.endpoint.base + (trimAll(this.target)[0] === '/' ? trimAll(this.target).slice(1) : trimAll(this.target)) + '/export"></form>');
 		this.exportXml = $('<span style="white-space: nowrap;display:block;"><a title="Machine oriented, full data export" href="#">Export to XML</a> <a style="font-size:80%" target="_blank" href="files/app_xml_export.xsd">[XSD]</a></span>').on("click", function() {
 			_this.submit('xml');
 		});
@@ -14180,7 +14180,7 @@ appdb.views.ConnectedAccountTypeList = appdb.ExtendClass(appdb.View, "appdb.view
 	this.doDisconnectAccount = function(accountitem, accounttype) {
 		this.renderProcess(true);
 		var xhr = $.ajax({
-			url: appdb.config.endpoint.base.replace("http://", "https://") + "/saml/disconnectaccount",
+			url: appdb.config.endpoint.base.replace("http://", "https://") + "saml/disconnectaccount",
 			"type": "POST",
 			data: {id: accountitem.id},
 			dataType: "json",
@@ -14235,7 +14235,7 @@ appdb.views.ConnectedAccountTypeList = appdb.ExtendClass(appdb.View, "appdb.view
 	this.doConnectAccount = function(accounttype) {
 		this.renderProcess(true, "Connecting " + accounttype.name);
 		setTimeout(function() {
-		    window.location.href = accounttype.connectUrl || (appdb.config.endpoint.base + "/saml/connect?source=" + accounttype.id);
+		    window.location.href = accounttype.connectUrl || (appdb.config.endpoint.base + "saml/connect?source=" + accounttype.id);
 		}, 400);
 	};
 	this.getConnectMessage = function(accounttype) {
