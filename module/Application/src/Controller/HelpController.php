@@ -23,77 +23,69 @@ use Zend\View\Model\ViewModel;
 class HelpController extends AbstractActionController
 {
 
-    public function init()
-    {
-        /* Initialize action controller here */
-        $this->_helper->layout->disableLayout();
-        $this->session = new Zend_Session_Namespace('default');
-    }
-
-    public function indexAction()
-    {
-        // action body
-    }
-
-    public function appdetailsAction()
-    {
-
-    }
-
-    public function creditsAction()
-    {
-		$this->_helper->layout->disableLayout();
-    }
-
-	public function faqaAction()
-    {
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
-		if ( $this->_getParam("id") != "" ) {
-			$faqs = new Default_Model_FAQs();
-			$faqs->filter->id->equals($this->_getParam("id"));
-			if ( count($faqs->items) > 0 ) {
-				echo str_replace('”', '"', $faqs->items[0]->answer);
-			}
-		}
+	public function __construct() {
+		$this->view = new ViewModel();
+		$this->session = new Zend\Session\Container('default'); 
 	}
 
-    public function faqAction()
-    {
-		$this->_helper->layout->disableLayout();
-		if( isset($_SERVER["REQUEST_METHOD"]) && $_SERVER["REQUEST_METHOD"] == 'POST' ){
-			$this->_helper->viewRenderer->setNoRender();
+    public function indexAction() {
+		return DISABLE_LAYOUT($this);
+    }
+
+    public function appdetailsAction() {
+		return DISABLE_LAYOUT($this);
+    }
+
+    public function creditsAction() {
+		return DISABLE_LAYOUT($this);
+    }
+
+	public function faqaAction() {
+		$res = NULL;
+		if ($this->_getParam("id") != "") {
+			$faqs = new Default_Model_FAQs();
+			$faqs->filter->id->equals($this->_getParam("id"));
+			if (count($faqs->items) > 0) {
+				$res = str_replace('”', '"', $faqs->items[0]->answer);
+			}
+		}
+		DISABLE_LAYOUT($this);
+		return SET_NO_RENDER($this, $res);
+	}
+
+    public function faqAction() {
+		if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER["REQUEST_METHOD"] == 'POST') {
 			$invalidUser = ! (($this->session->userid !== null) && userIsAdminOrManager($this->session->userid));
-			if ( $invalidUser ) {
-				echo "<response error='access denied' />";
-				return;
+			if ($invalidUser) {
+				DISABLE_LAYOUT($this);
+				return SET_NO_RENDER($this, "<response error='access denied' />");
 			}
-			if( !(isset($_POST["question"]) && trim($_POST["question"])!=="") ){
-				echo "<response error='Title of new faq item is not given'></response>";
-				return;
+			if (!(isset($_POST["question"]) && trim($_POST["question"])!=="")) {
+				DISABLE_LAYOUT($this);
+				return SET_NO_RENDER($this, "<response error='Title of new faq item is not given'></response>");
 			}
-			if( !(isset($_POST["answer"]) && trim($_POST["answer"])!=="") ){
-				echo "<response error='Contents of new faq item is not given'></response>";
-				return; 
+			if (!(isset($_POST["answer"]) && trim($_POST["answer"])!=="")) {
+				DISABLE_LAYOUT($this);
+				return SET_NO_RENDER($this, "<response error='Contents of new faq item is not given'></response>");
 			}
 
 			$question = $_POST["question"];
 			$answer = $_POST["answer"];
-			if( isset($_POST["order"]) && is_numeric($_POST["order"])){
+			if (isset($_POST["order"]) && is_numeric($_POST["order"])) {
 				$order = $_POST["order"];
-			}else{
+			} else {
 				$order = -1;
 			}
 			$faqs = new Default_Model_FAQs();
 			$faqs->filter->orderby('ord');
 			$fcnt = count($faqs->items);
-			if($order==-1){
+			if ($order==-1) {
 				$order = $fcnt+1;
 			}
 			//Prepare items ordering. Make space for new one;
-			if($order<=$fcnt){
-				for($i=0; $i<$fcnt; $i+=1){
-					if( $faqs->items[$i]->ord >= $order){
+			if ($order<=$fcnt) {
+				for($i=0; $i<$fcnt; $i+=1) {
+					if ($faqs->items[$i]->ord >= $order) {
 						$faqs->items[$i]->ord = $faqs->items[$i]->ord+1;
 					}
 				}
@@ -108,22 +100,21 @@ class HelpController extends AbstractActionController
 			$faqs->add($faq);
 			$faqs->save();
 			
-			echo "<response></response>";
-			return;
-		} else if(isset($_SERVER["REQUEST_METHOD"]) && $_SERVER["REQUEST_METHOD"] == 'DELETE'){
-			$this->_helper->viewRenderer->setNoRender();
+			DISABLE_LAYOUT($this);
+			return SET_NO_RENDER($this, "<response></response>");
+		} else if (isset($_SERVER["REQUEST_METHOD"]) && $_SERVER["REQUEST_METHOD"] == 'DELETE') {
 			$invalidUser = ! (($this->session->userid !== null) && userIsAdminOrManager($this->session->userid));
-			if ( $invalidUser ) {
-				echo "<response error='access denied' />";
-				return;
+			if ($invalidUser) {
+				DISABLE_LAYOUT($this);
+				return SET_NO_RENDER($this, "<response error='access denied' />");
 			}
-			if( !(isset($_GET["id"]) && is_numeric($_GET["id"])) ){
-				echo "<response error='No id specified'></response>";
-				return;
+			if (!(isset($_GET["id"]) && is_numeric($_GET["id"]))) {
+				DISABLE_LAYOUT($this);
+				return SET_NO_RENDER($this,	"<response error='No id specified'></response>");
 			}
 			$faqs = new Default_Model_FAQs();
 			$faqs->filter->id->equals($_GET["id"]);
-			if(count($faqs->items) > 0){
+			if (count($faqs->items) > 0) {
 				//remove item
 				$order = $faqs->items[0]->ord;
 				$faqs->remove(0);
@@ -133,39 +124,37 @@ class HelpController extends AbstractActionController
 				$faqs = new Default_Model_FAQs();
 				$faqs->filter->orderby('ord');
 				$fcnt = count($faqs->items);
-				if($order <= $fcnt){
-					for($ii=0; $i<$fcnt; $i+=1){
-						if($faqs->items[$i]->ord >= $order){
+				if ($order <= $fcnt) {
+					for($ii=0; $i<$fcnt; $i+=1) {
+						if ($faqs->items[$i]->ord >= $order) {
 							$faqs->items[$i]->ord = $faqs->items[$i]->ord-1;
 						}
 					}
 					$faqs->save();
 				}
-				echo "<response></response>";
-				return;
+				DISABLE_LAYOUT($this);
+				return SET_NO_RENDER($this, "<response></response>");
 			}
-		}else{
+		} else {
 			$faqs = new Default_Model_FAQs();
 			$faqs->filter->orderby('ord');
 			$this->view->entries = $faqs->items;
 		}
+		return DISABLE_LAYOUT($this);
     }
 	
-	public function faqreorderAction(){
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
-		
+	public function faqreorderAction() {
 		//Check user
 		$invalidUser = ! (($this->session->userid !== null) && userIsAdminOrManager($this->session->userid));
-		if ( $invalidUser ) {
-			echo "<response error='access denied' />";
-			return;
+		if ($invalidUser) {
+			DISABLE_LAYOUT($this);
+			return SET_NO_RENDER($this, "<response error='access denied' />");
 		}
 		//Check parameters 
 		$invalidParameters = !(isset($_POST["ordering"]) && trim($_POST["ordering"]) !== "");
-		if( $invalidParameters ){
-			echo "<response error='invalid parameters' />";
-			return;
+		if ($invalidParameters) {
+			DISABLE_LAYOUT($this);
+			return SET_NO_RENDER($this, "<response error='invalid parameters' />");
 		}
 		//Start reordering
 		$ordering = split(",",$_POST["ordering"]);
@@ -173,15 +162,15 @@ class HelpController extends AbstractActionController
 		$faqs->filter->orderby('ord');
 		$cnt = count($faqs->items);
 		
-		if( $cnt == 0 ) {
-			echo "<response error='No faqs to reorder'></response>";
-			return;
+		if ($cnt == 0) {
+			DISABLE_LAYOUT($this);
+			return SET_NO_RENDER($this, "<response error='No faqs to reorder'></response>");
 		}
 		$currentOrdering = 0;
-		for($j=0; $j<count($ordering); $j+=1){
-			for($i=0; $i<$cnt; $i++){
+		for($j=0; $j<count($ordering); $j+=1) {
+			for($i=0; $i<$cnt; $i++) {
 				//Check if faq exists (if any removed before reordering)
-				if($faqs->items[$i]->id == $ordering[$j]){
+				if ($faqs->items[$i]->id == $ordering[$j]) {
 					$currentOrdering += 1;
 					$faqs->items[$i]->ord = $currentOrdering;
 					break;
@@ -189,95 +178,95 @@ class HelpController extends AbstractActionController
 			}
 		}
 		$faqs->save();	
-		echo "<response></response>";
+		DISABLE_LAYOUT($this);
+		return SET_NO_RENDER($this, "<response></response>");
 	}
-    public function usageAction()
-    {
-		$this->_helper->layout->disableLayout();
+
+    public function usageAction() {
+		return DISABLE_LAYOUT($this);
     }
 
-    public function announcementsAction()
-    {
-        $this->_helper->layout->disableLayout();
+    public function announcementsAction() {
+		return DISABLE_LAYOUT($this);
 	}
 
 	public function latestversionAction() {
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
 		$ver = exec("cat ".$_SERVER['APPLICATION_PATH']."/../VERSION");
 		$ver = explode(".", $ver);
 		$ver = pow(100,3)*$ver[0]+pow(100,2)*$ver[1]+100*$ver[2];
-		echo $ver;
+		DISABLE_LAYOUT($this);
+		return SET_NO_RENDER($this, $ver);
 	}
 
 	public function rebuildsearchcacheAction() {
-        $this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
-		if ( ($this->session->userid !== null) ) {
-			if ( userIsAdmin($this->session->userid) ) {
+		if (($this->session->userid !== null)) {
+			if (userIsAdmin($this->session->userid)) {
 				db()->exec('SELECT rebuildfiltercache();');
-				echo 'Search cache rebuilt';
+				DISABLE_LAYOUT($this, true);
+				return SET_NO_RENDER($this, 'Search cache rebuilt');
 			}
 		} else {
 			$this->getResponse()->clearAllHeaders();
 			header("HTTP/1.0 403 Forbidden");
+			DISABLE_LAYOUT($this);
+			return SET_NO_RENDER($this, "Access Denied", 403);
 		}
+		return DISABLE_LAYOUT($this, true);
 	}
 
 	public function clearsearchcacheAction() {
-        $this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
-		if ( ($this->session->userid !== null) ) {
-			if ( userIsAdmin($this->session->userid) ) {
+		if (($this->session->userid !== null)) {
+			if (userIsAdmin($this->session->userid)) {
 				db()->exec('SELECT invalidate_filtercache();');
-				echo 'Search cache cleared';
+				DISABLE_LAYOUT($this);
+				return SET_NO_RENDER($this, 'Search cache cleared');
 			}
 		} else {
 			$this->getResponse()->clearAllHeaders();
 			header("HTTP/1.0 403 Forbidden");
+			DISABLE_LAYOUT($this);
+			return SET_NO_RENDER($this, "Access Denied", 403);
 		}
+		return DISABLE_LAYOUT($this, true);
 	}
 
 	public function editfaqAction() {
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
-		
 		/*$id = $this->_getParam('id');
 		$txt = $this->_getParam('answer');
 		$question = null;
 		
-		if ( $txt == '' ) {
+		if ($txt == '') {
 			$this->getResponse()->clearAllHeaders();
 			header("HTTP/1.0 400 Bad Request");
 			echo 'Missing FAQ answer';
 			return;
 		}
 		
-		if ( isset($_POST["question"]) && trim($_POST["question"]) != "" ) {
+		if (isset($_POST["question"]) && trim($_POST["question"]) != "") {
 			$question = $this->_getParam('question');
 			$question = htmlspecialchars($question);
 		}
 		$users = new Default_Model_Researchers();
 		$users->filter->id->equals($this->session->userid);
-		if ( count($users->items) ) $user = $users->items[0]; else $user = null;
-		if ( ($user !== null) && $user->privs->canEditFAQs() ) {
+		if (count($users->items)) $user = $users->items[0]; else $user = null;
+		if (($user !== null) && $user->privs->canEditFAQs()) {
 			$faq = null;
-			if ( $id != '' ) {
+			if ($id != '') {
 				$faqs = new Default_Model_FAQs();
 				$faqs->filter->id->equals($id);
-				if ( count($faqs->items) > 0 ) {
+				if (count($faqs->items) > 0) {
 					$faq = $faqs->items[0];
 					$faq->answer = $txt;
-					if ( $question != null ) {
+					if ($question != null) {
 						$faq->question = $question;
 					}
 					$faq->submitterid = $this->session->userid;
-					if ( $this->_getParam('ord') != '' ) $faq->ord = $this->_getParam('ord');
+					if ($this->_getParam('ord') != '') $faq->ord = $this->_getParam('ord');
 				}
 			} else {
 				$faq = new Default_Model_FAQ();
 				$faq->question = $this->_getParam('question');
-				if ( $faq->question == '' ) {
+				if ($faq->question == '') {
 					$this->getResponse()->clearAllHeaders();
 					header("HTTP/1.0 400 Bad Request");
 					echo 'Missing FAQ question';
@@ -285,9 +274,9 @@ class HelpController extends AbstractActionController
 				}
 				$faq->answer = $txt;
 				$faq->submitterid = $this->session->userid;
-				if ( $this->_getParam('ord') != '' ) $faq->ord = $this->_getParam('ord');
+				if ($this->_getParam('ord') != '') $faq->ord = $this->_getParam('ord');
 			}
-			if ( $faq !== null ) {
+			if ($faq !== null) {
 				$faq->when = 'NOW()';
 				$faq->save();
 				$id = $faq->id;
@@ -307,41 +296,43 @@ class HelpController extends AbstractActionController
 		} else {*/
 			$this->getResponse()->clearAllHeaders();
 			header("HTTP/1.0 403 Forbidden");
-			echo 'Access Denied';
+			DISABLE_LAYOUT($this);
+			return SET_NO_RENDER($this, "Access Denied", 403);
 		//}
 	}
 
 	public function cachebuildcountAction() {
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
+		$res = null;
 		db()->setFetchMode(Zend_Db::FETCH_OBJ);
 		$res = db()->query("SELECT data FROM config WHERE var = 'cache_build_count'")->fetchAll();
 		try {
-			echo (int)($res[0]->data);
+			$res = (int)($res[0]->data);
 		} catch(Exception $e) {
-				echo 0;
+				$res = 0;
 		}
+		DISABLE_LAYOUT($this);
+		return SET_NO_RENDER($this, $res);
 	}
 
 	public function shortenurlAction() {
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
-		echo shortenURL($this->_getParam("url"));
+		DISABLE_LAYOUT($this);
+		return SET_NO_RENDER($this, shortenURL($this->_getParam("url")));
 	}
 
-	public function wikiAction(){
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
-		$page = ( isset($_GET["page"]) )?strval($_GET["page"]):null;
-		if( $page === null ){
+	public function wikiAction() {
+		$page = (isset($_GET["page"])) ? strval($_GET["page"]) : null;
+		if ($page === null) {
 			header("HTTP/1.0 404 Not Found");
-			return;
+			DISABLE_LAYOUT($this);
+			return SET_NO_RENDER($this, NULL, 404);
 		}
 		$data = @web_get_contents("https://wiki.appdb.egi.eu/". $page . "?do=export_xhtmlbody");
-		if( $data === false ){
+		if ($data === false) {
 			header("HTTP/1.0 404 Not Found");
-			return;
+			DISABLE_LAYOUT($this);
+			return SET_NO_RENDER($this, NULL, 404);
 		}
-		echo "<div class='wikipage'>".$data."</div>";
+		DISABLE_LAYOUT($this, true);
+		return SET_NO_RENDER($this, "<div class='wikipage'>" . $data . "</div>");
 	}
 }
