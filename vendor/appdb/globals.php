@@ -827,7 +827,7 @@ function validateFilterActionHelper($flt, $type, $ver = null) {
 }
 
 function appdbVerInfo() {
-	$v=exec("cat ".$_SERVER['APPLICATION_PATH']."/../VERSION"); 
+	$v=exec("cat ".$_SERVER['APPLICATION_PATH']."/../../VERSION"); 
 	if ( $_SERVER['APPLICATION_ENV'] != "production" ) {
 		$rev=@exec("svn info 2>&1 | grep Revision | awk '{print $2}'");
 		if ( $rev != '' ) $v="$v-r$rev";
