@@ -31,22 +31,17 @@ class AbuseController extends AbstractActionController
 	const REASON_BROKEN_LINK = 5;
 	const REASON_SPELLING = 6;
 	
-    public function init()
-    {
-    	$this->session = new \Zend\Session\Container('base');
-    }
+	public function __construct() {
+		$this->session = new \Zend\Session\Container('base');
+	}
 
-    public function indexAction()
-    {
-        // action body
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
-    }
+	public function indexAction() {
+		return DISABLE_LAYOUT($this);
+	}
 
 	public function moderatecommentAction() {
-		$this->_helper->layout->disableLayout();
-		if ( $this->session->userid !== null ) {
-			if ( userIsAdminOrManager($this->session->userid) ) {
+		if ($this->session->userid !== null) {
+			if (userIsAdminOrManager($this->session->userid)) {
 				$id = $this->getRequest()->getParam("id");
 				if ( $this->getRequest()->getParam("moderate") == 0 ) $moderate = "0"; else $moderate = "1";
 				$ratings = new Default_Model_AppRatings();
@@ -59,16 +54,15 @@ class AbuseController extends AbstractActionController
 				}
 			}
 		}
+		return DISABLE_LAYOUT($this);
 	}
 
 	public function reportAction() {
-		$this->_helper->layout->disableLayout();
+		return DISABLE_LAYOUT($this);
 	}
 
 	public function submitAction() {
-		if ( $this->session->userid !== null ) {
-			$this->_helper->layout->disableLayout();
-			$this->_helper->viewRenderer->setNoRender();
+		if ($this->session->userid !== null) {
 			$type = $this->getRequest()->getParam("type");
 			$entryID = $this->getRequest()->getParam("entryID");
 			$comment = $this->getRequest()->getParam("comment");
@@ -157,6 +151,7 @@ class AbuseController extends AbstractActionController
 			//sendMultipartMail($subject, $to, $body,"<pre>".$body."</pre>", 'appdb-reports@iasa.gr', 'enadyskolopassword');
 			EmailService::sendReport($subject, $to, $body, "<pre>".$body."</pre>");
 		}
+		return DISABLE_LAYOUT($this, true);
 	}
 
 }

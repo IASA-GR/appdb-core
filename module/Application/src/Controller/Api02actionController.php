@@ -22,8 +22,9 @@ use Zend\View\Model\ViewModel;
 
 class Api02actionController extends AbstractActionController
 {
-    public function init()
-    {
+    public function __construct()
+	{
+		$this->view = new ViewModel();
         $this->session = new \Zend\Session\Container('base');
         $this->apisession = new \Zend\Session\Container('api');
         $contextSwitch = $this->_helper->getHelper('contextSwitch');
@@ -35,14 +36,13 @@ class Api02actionController extends AbstractActionController
     }
 
 	private function accessDenied() {
-		$this->getResponse()->clearAllHeaders();
+		$this->getResponse()->getHeaders()->clearHeaders();
 		header("HTTP/1.0 403 Forbidden");
 	}
 
 	public function relatedappsAction() {
    		$format = $this->getRequest()->getParam("format");
 		if ( $format === "json" ) $format = "xml";
-		$this->_helper->layout->disableLayout();
 		$offset = $this->getRequest()->getParam('ofs');
 		$length = $this->getRequest()->getParam('len');
 		$paging = true;
@@ -66,14 +66,13 @@ class Api02actionController extends AbstractActionController
 			$this->view->currentPage=1;
 		}
 		$this->view->total = $total;
+		return DISABLE_LAYOUT($this);
 	}
     
-    public function myappsindexAction()
-    {
+    public function myappsindexAction()	{
 		if ( $this->view->isAdmin || ($this->view->Authenticated && $this->getRequest()->getParam['id'] == $_GET['id'] ) || ($this->session->userid !== null && $this->getRequest()->getParam['id'] == $this->session->userid) || userIsAdminOrManager($this->session->userid) )  {
 			$format = $this->getRequest()->getParam("format");
 			if ( $format === "json" ) $format = "xml";
-			$this->_helper->layout->disableLayout();
 			$this->view->subindex = "myappsindex";
 			if ( $this->session->userid !== null ) {
 				$this->appindex(2);
@@ -83,14 +82,18 @@ class Api02actionController extends AbstractActionController
 					$this->appindex(2, true, 'xml');
 				}
 			}
-		} else $this->accessDenied();
+		} else {
+			$this->accessDenied();
+			DISABLE_LAYOUT($this);
+			return SET_NO_RESPONSE($this, NULL, 403);
+		}
+		return DISABLE_LAYOUT($this);
     }   
      
     public function myownindexAction() {
 		if ( $this->view->isAdmin || ($this->view->Authenticated && $this->getRequest()->getParam['id'] == $_GET['id'] ) || ($this->session->userid !== null && $this->getRequest()->getParam['id'] == $this->session->userid) || userIsAdminOrManager($this->session->userid) )  {
 			$format = $this->getRequest()->getParam("format");
 			if ( $format === "json" ) $format = "xml";
-			$this->_helper->layout->disableLayout();
 			$this->view->subindex = "myownindex";
 			if ( $this->session->userid !== null ) {
 				$this->appindex(1);
@@ -100,15 +103,18 @@ class Api02actionController extends AbstractActionController
 					$this->appindex(1, true, 'xml');
 				}
 			}
-		} else $this->accessDenied();
+		} else {
+			$this->accessDenied();
+			DISABLE_LAYOUT($this);
+			return SET_NO_RESPONSE($this, NULL, 403);
+		}
+		return DISABLE_LAYOUT($this);
     }    
 
-    public function myeditindexAction()
-    {
+    public function myeditindexAction() {
 		if ( $this->view->isAdmin || ($this->view->Authenticated && $this->getRequest()->getParam['id'] == $_GET['id'] ) || ($this->session->userid !== null && $this->getRequest()->getParam['id'] == $this->session->userid) || userIsAdminOrManager($this->session->userid) )  {
 			$format = $this->getRequest()->getParam("format");
 			if ( $format === "json" ) $format = "xml";
-			$this->_helper->layout->disableLayout();
 			$this->view->subindex = "myeditindex";
 			if ( $this->session->userid !== null ) {
 				$this->appindex(4);
@@ -118,15 +124,18 @@ class Api02actionController extends AbstractActionController
 					$this->appindex(4, true, 'xml');
 				}
 			}
-		} else $this->accessDenied();
+		} else {
+			$this->accessDenied();
+			DISABLE_LAYOUT($this);
+			return SET_NO_RESPONSE($this, NULL, 403);
+		}
+		return DISABLE_LAYOUT($this);
     }
 
-    public function modindexAction()
-    {
+    public function modindexAction() {
 		if ( $this->view->isAdmin || userIsAdminOrManager($this->session->userid) ) {
 			$format = $this->getRequest()->getParam("format");
 			if ( $format === "json" ) $format = "xml";
-			$this->_helper->layout->disableLayout();
 			$this->view->subindex = "modindex";
 			if ( $this->session->userid !== null ) {
 				$this->appindex(5);
@@ -135,15 +144,18 @@ class Api02actionController extends AbstractActionController
 					$this->appindex(5, true, 'xml');
 				}
 			}
-		} else $this->accessDenied();
+		} else {
+			$this->accessDenied();
+			DISABLE_LAYOUT($this);
+			return SET_NO_RESPONSE($this, NULL, 403);
+		}
+		return DISABLE_LAYOUT($this);
     }
 
-    public function delindexAction()
-    {
+    public function delindexAction() {
 		if ( $this->view->isAdmin || userIsAdminOrManager($this->session->userid) ) {
 			$format = $this->getRequest()->getParam("format");
 			if ( $format === "json" ) $format = "xml";
-			$this->_helper->layout->disableLayout();
 			$this->view->subindex = "delindex";
 			if ( $this->session->userid !== null ) {
 				$this->appindex(6);
@@ -152,15 +164,18 @@ class Api02actionController extends AbstractActionController
 					$this->appindex(5, true, 'xml');
 				}
 			}
-		} else $this->accessDenied();
-    }
+		} else {
+			$this->accessDenied();
+   			DISABLE_LAYOUT($this);
+			return SET_NO_RESPONSE($this, NULL, 403);
+		}
+		return DISABLE_LAYOUT($this);
+	}
 
-    public function bmindexAction()
-    {
+    public function bmindexAction() {
 		if ( $this->view->isAdmin || ($this->view->Authenticated && $this->getRequest()->getParam['id'] == $_GET['id'] ) || ($this->session->userid !== null && $this->getRequest()->getParam['id'] == $this->session->userid) || userIsAdminOrManager($this->session->userid) )  {
 			$format = $this->getRequest()->getParam("format");
 			if ( $format === "json" ) $format = "xml";
-			$this->_helper->layout->disableLayout();
 			$this->view->subindex = "bmindex";
 			if ( $this->session->userid !== null ) {
 				$this->appindex(3);
@@ -172,7 +187,12 @@ class Api02actionController extends AbstractActionController
 					}
 				}
 			}
-		} else $this->accessDenied();
+		} else {
+			$this->accessDenied();
+   			DISABLE_LAYOUT($this);
+			return SET_NO_RESPONSE($this, NULL, 403);
+		}
+		return DISABLE_LAYOUT($this);
     }
 
 	private function getFltStr() {
@@ -194,13 +214,11 @@ class Api02actionController extends AbstractActionController
 		}
 	}
 
-	private function appindex($mode, $paging = true, $format = '')
-	{
+	private function appindex($mode, $paging = true, $format = '') {
 		if ( $format == '') $format = $this->getRequest()->getParam("format");
 		if ( $format == "json" ) $format="xml";
 		if ($this->session->viewMode === null) $this->session->viewMode = 1;
 		$this->view->viewMode = $this->session->viewMode;
-		$this->_helper->layout->disableLayout();
 		$offset = $this->getRequest()->getParam('ofs');
 		$length = $this->getRequest()->getParam('len');
 		if ($length == "-1") $paging = false;
@@ -285,24 +303,22 @@ class Api02actionController extends AbstractActionController
 		return $apps->items;
 	}
 
-    public function appindexAction()
-    {
-		$this->_helper->layout->disableLayout();
+    public function appindexAction() {
 		$this->appindex(0);
+		return DISABLE_LAYOUT($this);
     }
 
 	public function ratingsAction() {
    		$format = $this->getRequest()->getParam("format");
 		if ( $format === "json" ) $format = "xml";
-		$this->_helper->layout->disableLayout();
 		$ratings = new Default_Model_AppRatings();
 		$ratings->filter->appid->equals($this->getRequest()->getParam("id"));
 		$this->view->entries = $ratings->refresh($format)->items;
+		return DISABLE_LAYOUT($this);
 	}
 
-	public function ratingsreportAction(){
+	public function ratingsreportAction() {
 		global $application;
-		$this->_helper->layout->disableLayout();
 		$t = $this->getRequest()->getParam("type");
 		switch($t){
 			case "external":
@@ -321,11 +337,10 @@ class Api02actionController extends AbstractActionController
 		$db->setFetchMode(Zend_Db::FETCH_OBJ);
 		$r = $db->query('SELECT apprating_report_to_xml('.$p.');')->fetchAll();
 		$this->view->entries = $r[0]->apprating_report_to_xml;
+		return DISABLE_LAYOUT($this);
 	}
 
-    public function appdetailsAction()
-	{
-		$this->_helper->layout->disableLayout();
+    public function appdetailsAction() {
 		$appID = $this->getRequest()->getParam("id");
 		$format = $this->getRequest()->getParam("format");
 		if ( $format === "json" ) $format = "xml";
@@ -350,14 +365,17 @@ class Api02actionController extends AbstractActionController
 		if ( $this->session->username !== null ) {
 		} else $this->view->user = null;
 		$this->view->session = $this->session;
+		return DISABLE_LAYOUT($this);
     }
    
 	public function validateappfilterAction() {
 		$this->view->entries = validateFilterActionHelper($this->getRequest()->getParam("flt"), FilterParser::NORM_APP, "0.2");
+		return DISABLE_LAYOUT($this);
 	}
 
 	public function validatevosfilterAction() {
 		$this->view->entries = validateFilterActionHelper($this->getRequest()->getParam("flt"), FilterParser::NORM_VOS, "0.2");
+		return DISABLE_LAYOUT($this);
 	}
 
 	public function reflectvosfilterAction() {
@@ -365,6 +383,7 @@ class Api02actionController extends AbstractActionController
 		$s .= FilterParser::fieldsToXML("any application person country vo discipline subdiscipline middleware", "vo");
 		$s .= '</vo:filter>';
 		$this->view->entries = $s;
+		return DISABLE_LAYOUT($this);
 	}
 
 	public function reflectappfilterAction() {
@@ -372,11 +391,10 @@ class Api02actionController extends AbstractActionController
 		$s .= FilterParser::fieldsToXML("any application person country vo discipline subdiscipline middleware", "application");
 		$s .= '</application:filter>';
 		$this->view->entries = $s;
+		return DISABLE_LAYOUT($this);
 	}
 
-    public function showimageAction()
-    {
-		$this->_helper->layout->disableLayout();
+    public function showimageAction() {
 		$ppl = new Default_Model_Researchers();
 		$ppl->filter->id->equals($this->getRequest()->getParam("id"));
 		if ( count($ppl->items) > 0 ) {
@@ -386,7 +404,8 @@ class Api02actionController extends AbstractActionController
 			} else {
 				$this->view->image = "/people/getimage?id=".$person->id."&req=".urlencode($person->lastUpdated);
 			}
-		} else $this->view->image= '';
+		} else $this->view->image = '';
+		return DISABLE_LAYOUT($this);
     }
 
  	private function cacheimages($items) {
@@ -403,12 +422,11 @@ class Api02actionController extends AbstractActionController
 	}
 	
 	public function pplindexAction() {
-		$this->_helper->layout->disableLayout();
 		$this->pplindex();
+		return DISABLE_LAYOUT($this);
 	}
 
-	public function pplindex( $paging = true, $format = '' )
-    {
+	public function pplindex( $paging = true, $format = '' ) {
 		if ($format == '' ) $format = $this->getRequest()->getParam("format");
 		$offset = $this->getRequest()->getParam('ofs');
 		$length = $this->getRequest()->getParam('len');
@@ -467,11 +485,9 @@ class Api02actionController extends AbstractActionController
 		return $ppl->items;
     }
 
-    public function ppldetailsAction()
-    {
+    public function ppldetailsAction() {
         $pplID = $this->getRequest()->getParam("id");
         if ( $pplID == '' ) $pplID = $this->session->lastPplID;
-        $this->_helper->layout->disableLayout();
         $apps = new Default_Model_Researchers();
         if ( $this->getRequest()->getParam("id") == "0" ) {
                 $this->view->entry = new Default_Model_Researcher();
@@ -494,6 +510,7 @@ class Api02actionController extends AbstractActionController
             $users->filter->id->equals($this->session->userid);
             $this->view->user = $users->items[0];
         } else $this->view->user = null;
+		return DISABLE_LAYOUT($this);
     }
 	
   	public function reflectpplfilterAction() {
@@ -501,14 +518,15 @@ class Api02actionController extends AbstractActionController
 		$s .= FilterParser::fieldsToXML("any person country application vo discipline subdiscipline middleware", "person");
 		$s .= '</person:filter>';
 		$this->view->entries = $s;
+		return DISABLE_LAYOUT($this);
 	}
 
 	public function validatepplfilterAction() {
 		$this->view->entries = validateFilterActionHelper($this->getRequest()->getParam("flt"), FilterParser::NORM_PPL, "0.2");
+		return DISABLE_LAYOUT($this);
 	}
 	
 	public function disseminationlogAction() {
-        $this->_helper->layout->disableLayout();
 		if ( $this->view->isAdmin || userIsAdminOnManager($this->session->userid) ) {
 			$ds = new Default_Model_Dissemination();
 			if ( $this->getRequest()->getParam("orderby") == "" ) {
@@ -519,6 +537,11 @@ class Api02actionController extends AbstractActionController
 			if ( $this->getRequest()->getParam("id") != "" ) $ds->filter->id = $this->getRequest()->getParam("id");
 			$ds->refresh('xml');
 			$this->view->entries = $ds->items;
-		} else $this->accessDenied();
+		} else {
+			$this->accessDenied();
+   			DISABLE_LAYOUT($this);
+			return SET_NO_RESPONSE($this, NULL, 403);
+		}
+		return DISABLE_LAYOUT($this);
 	}
 }
