@@ -299,7 +299,7 @@ class ApiController extends AbstractActionController
 		if ( ! is_null($rx) ) {
 			try {
 				$resclass = strval($rx->resource);
-				$this->session = new Zend_Session_Namespace('default');
+				$this->session = new \Zend\Session\Container('base');
 				if ( isset($_SERVER['REMOTE_ADDR']) && ($_SERVER['REMOTE_ADDR'] != '') ) {
 					$src = base64_encode($_SERVER['REMOTE_ADDR']);
 				} else {

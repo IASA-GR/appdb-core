@@ -24,7 +24,7 @@ class DatasetsController extends AbstractActionController{
 	//put your code here
 	public function init(){
 		$this->_helper->layout->disableLayout();
-		$this->session = new Zend_Session_Namespace('default');
+		$this->session = new \Zend\Session\Container('base');
 	}
 	
 	public function indexAction(){

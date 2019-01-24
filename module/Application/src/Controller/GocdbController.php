@@ -31,7 +31,7 @@ class GocdbController extends AbstractActionController
 	    /* Initialize action controller here */
 	    $this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
-		$this->session = new Zend_Session_Namespace('default');
+		$this->session = new \Zend\Session\Container('base');
 // OBSOLETE
 //		$this->vaSyncScopes = Zend_Registry::get("app");
 //		$this->vaSyncScopes = $this->vaSyncScopes['va_sync_scopes'];

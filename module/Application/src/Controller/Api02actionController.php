@@ -24,8 +24,8 @@ class Api02actionController extends AbstractActionController
 {
     public function init()
     {
-        $this->session = new Zend_Session_Namespace('default');
-        $this->apisession = new Zend_Session_Namespace('api');
+        $this->session = new \Zend\Session\Container('base');
+        $this->apisession = new \Zend\Session\Container('api');
         $contextSwitch = $this->_helper->getHelper('contextSwitch');
         $contextSwitch->addActionContext('index', 'xml')
 			->addActionContext('details', 'xml')

@@ -156,7 +156,7 @@ class VoController extends AbstractActionController
         /* Initialize action controller here */
 		$this->vofile = $_SERVER['APPLICATION_PATH']."/../cache/vos.xml";
 		$this->xml = $this->fetchVOs();
-		$this->session = new Zend_Session_Namespace('default');
+		$this->session = new \Zend\Session\Container('base');
 	}
 
 	public function refreshAction() {

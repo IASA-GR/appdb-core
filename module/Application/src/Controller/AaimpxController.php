@@ -32,24 +32,23 @@ class AaimpxController extends AbstractActionController
     private $_vomsesBasePath;
     private $_expirationThreshold;
 
-    public function init()
-    {
-	$this->session = new Zend_Session_Namespace('default');
-	$aaimpConf = Zend_Registry::get("aaimp");
-	$this->_clientID= $aaimpConf["client_id"];
-	$this->_clientSecret = $aaimpConf["client_secret"];
-	$this->_idp = $aaimpConf["idp"];
-	$this->_baseURL = $aaimpConf["base_url"];
-	$this->_redirectURI = $aaimpConf["redirect_uri"];    
-	$this->_storagePath = $aaimpConf["storage_path"];
-	if ($this->_storagePath == "") {
-		$this->_storagePath = "/tmp/certs";
-	}
-	$this->_vomsesBasePath = $_SERVER['APPLICATION_PATH'] . "/../public/assets/ui/vomses/";
-	$this->_expirationThreshold = $aaimpConf["expiration_threshold"];
-	if ($this->_expirationThreshold == "") {
-		$this->_expirationThreshold = 1; // one hour
-	}
+    public function init() {
+		$this->session = new \Zend\Session\Container('base');
+		$aaimpConf = Zend_Registry::get("aaimp");
+		$this->_clientID= $aaimpConf["client_id"];
+		$this->_clientSecret = $aaimpConf["client_secret"];
+		$this->_idp = $aaimpConf["idp"];
+		$this->_baseURL = $aaimpConf["base_url"];
+		$this->_redirectURI = $aaimpConf["redirect_uri"];    
+		$this->_storagePath = $aaimpConf["storage_path"];
+		if ($this->_storagePath == "") {
+			$this->_storagePath = "/tmp/certs";
+		}
+		$this->_vomsesBasePath = $_SERVER['APPLICATION_PATH'] . "/../public/assets/ui/vomses/";
+		$this->_expirationThreshold = $aaimpConf["expiration_threshold"];
+		if ($this->_expirationThreshold == "") {
+			$this->_expirationThreshold = 1; // one hour
+		}
     }
 
     public function indexAction()

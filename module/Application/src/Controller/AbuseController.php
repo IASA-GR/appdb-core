@@ -33,7 +33,7 @@ class AbuseController extends AbstractActionController
 	
     public function init()
     {
-    	$this->session = new Zend_Session_Namespace('default');
+    	$this->session = new \Zend\Session\Container('base');
     }
 
     public function indexAction()
