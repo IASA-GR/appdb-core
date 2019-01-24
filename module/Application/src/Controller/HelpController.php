@@ -25,7 +25,7 @@ class HelpController extends AbstractActionController
 
 	public function __construct() {
 		$this->view = new ViewModel();
-		$this->session = new Zend\Session\Container('default'); 
+		$this->session = new \Zend\Session\Container('base'); 
 	}
 
     public function indexAction() {

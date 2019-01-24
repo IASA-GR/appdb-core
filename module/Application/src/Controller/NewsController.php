@@ -25,10 +25,10 @@ class NewsController extends AbstractActionController
     public function __construct()
     {
 		$this->view = new ViewModel();
-        $this->session = new Zend\Session\Container('default');
-		if(trim($_SERVER['REQUEST_METHOD']) === "GET"){
-			if ($this->session->isLocked()) {
-				$this->session->unLock();
+        $this->session = new \Zend\Session\Container('base');
+		if (strtoupper($this->getRequest()->getMethod()) == "GET") {
+			if ($this->session->getManager()->getStorage()->isLocked()) {
+				$this->session->getManager()->getStorage()->unLock();
 			}
 			session_write_close();
 		}
@@ -755,9 +755,6 @@ class NewsController extends AbstractActionController
 			$msg = file_get_contents($_SERVER['APPLICATION_PATH'] . "/notify_users_message.phtml");
 			$msg = trim($msg);
 			if (strlen($msg) == 0) {
-				$this->getResponse()->clearAllHeaders();
-				$this->getResponse()->setRawHeader("HTTP/1.0 204 No Content");
-				$this->getResponse()->setHeader("Status","204 No Content");
 				DISABLE_LAYOUT($this);
 				return SET_NO_RENDER($this, NULL, 204);
 			} else {
@@ -765,9 +762,6 @@ class NewsController extends AbstractActionController
 				return SET_NO_RENDER($this, $msg);
 			}
 		} else {
-			$this->getResponse()->clearAllHeaders();
-			$this->getResponse()->setRawHeader("HTTP/1.0 204 No Content");
-			$this->getResponse()->setHeader("Status","204 No Content");
 			DISABLE_LAYOUT($this);
 			return SET_NO_RENDER($this, NULL, 204);
 		}

@@ -178,7 +178,7 @@ class UsersController extends AbstractActionController
 						$this->session->userDeletedByCName = null;
 						$this->session->userDeletedOn = null;
 					}
-					$this->_redirect('/saml/deletedprofile');
+					$this->redirect()->toRoute('saml', ['action' => 'deletedprofile']);
 					return;
 				}else{
 					//Get first user account and initialize saml session

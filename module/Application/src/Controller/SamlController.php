@@ -27,7 +27,7 @@ class SamlController extends AbstractActionController
     {
 		$this->view = new ViewModel();
 		$this->view->setTerminal(true);
-		$this->session = new \Zend\Session\Container('default');
+		$this->session = new \Zend\Session\Container('base');
     }
 
 	
@@ -39,10 +39,10 @@ class SamlController extends AbstractActionController
 			}
 			
 			if( isset($this->session) && $this->session->developsession === true ){
-				$this->_helper->redirector('loggedout');
+				$this->redirect()->toRoute('saml', ['action' => 'loggedout']);
 				return;
 			}
-			require_once(SamlAuth::LIB_AUTOLOAD);
+			require_once(\SamlAuth::LIB_AUTOLOAD);
 			$source=$this->_getParam("source");
 			if($source == null){
 					$source="";
@@ -62,18 +62,18 @@ class SamlController extends AbstractActionController
 			}
 			//In case of external service using AppDB as a SP
 			if( isset($_GET['callbackUrl']) && trim($_GET['callbackUrl']) ) {
-				SamlAuth::logout($this->session);
+				\SamlAuth::logout($this->session);
 				$this->_helper->layout->disableLayout();
 				$this->_helper->viewRenderer->setNoRender();
 				header('Location: ' . trim($_GET['callbackUrl']));
 				return;
 			}
 			//Will reach this code after all sources are logged out
-			$this->_helper->redirector('loggedout');
+			$this->redirect()->toRoute('saml', ['action' => 'loggedout']);
 	}
 
 	public function loginAction() {
-			require_once(SamlAuth::LIB_AUTOLOAD);
+			require_once(\SamlAuth::LIB_AUTOLOAD);
 			$this->_helper->layout->disableLayout();
 			$this->_helper->viewRenderer->setNoRender();
 			$isAuth=false;
@@ -107,14 +107,13 @@ class SamlController extends AbstractActionController
 			}
 	}
 	public function loggedoutAction(){
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
-        SamlAuth::logout($this->session);
+        \SamlAuth::logout($this->session);
 		header('Location: https://'.$_SERVER['HTTP_HOST']);
+		return DISABLE_LAYOUT($this, true);
 	}
 	
 	public function samlAction() {
-			require_once(SamlAuth::LIB_AUTOLOAD);
+			require_once(\SamlAuth::LIB_AUTOLOAD);
 			$this->_helper->layout->disableLayout();
 			$this->_helper->viewRenderer->setNoRender();
 			//In case of external service using AppDB as a SP
@@ -129,7 +128,7 @@ class SamlController extends AbstractActionController
 			}
 			
 			//Check if user is already logged in
-			if( SamlAuth::isAuthenticated() !== false && $this->session->isNewUser !== true ){
+			if (\SamlAuth::isAuthenticated() !== false && $this->session->isNewUser !== true) {
 				/*if( isset($this->session->authreferer) && trim($this->session->authreferer) !== ""){
 					$this->session->authreferer = str_replace("http://", "https://", $this->session->authreferer);
 					header("Location: " . $this->session->authreferer);
@@ -137,7 +136,7 @@ class SamlController extends AbstractActionController
 					header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
 				}
 				return;*/
-			}else if( isset($this->session) && $this->session->isNewUser === true ){
+			} else if (isset($this->session) && $this->session->isNewUser === true) {
 				header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
 				return;
 			}
@@ -161,7 +160,7 @@ class SamlController extends AbstractActionController
 			$_SESSION['logouturl'] = $as->getLogoutURL();
 			$this->session->samlattrs=$attributes;
 			$this->session->samlauthsource=$source;
-			$this->_helper->redirector('postauth');
+			$this->redirect()->toRoute('saml', ['action' => 'postauth']);
 	}
 
 	public function connectAction(){
@@ -193,7 +192,7 @@ class SamlController extends AbstractActionController
 		$authsource = str_replace( "-sp", "", strtolower(trim($source)) );
 		$connectsource = str_replace("-sp", "-connect", $source);
 		
-		require_once(SamlAuth::LIB_AUTOLOAD);
+		require_once(\SamlAuth::LIB_AUTOLOAD);
 		
 		//Initialize SAML
 		$config = SimpleSAML_Configuration::getInstance();
@@ -247,7 +246,7 @@ class SamlController extends AbstractActionController
 		$authsource =  str_replace( "-sp", "", strtolower(trim($source)) );
 		$connectedsource = str_replace( "-sp", "-connect", strtolower(trim($source)) );
 		
-		require_once(SamlAuth::LIB_AUTOLOAD);
+		require_once(\SamlAuth::LIB_AUTOLOAD);
 		
 		//Initialize SAML
 		$config = SimpleSAML_Configuration::getInstance();
@@ -265,21 +264,21 @@ class SamlController extends AbstractActionController
 		$uid = $attributes['idp:uid'][0];
 		if( trim($uid) == "" ){
 			$this->session->userError = array("title" => "New Account Connection", "message"=>"Could not connect with new user account. Not enough information returned from account provider.");
-			$this->_helper->redirector('postconnected');
+			$this->redirect()->toRoute('saml', ['action' => 'postconnected']);
 			return;
 		}
 		//Check if user is already connected to the requested account
 		//If true redirect the user to the previous location (referer)
 		$uaccount = AccountConnect::isConnectedTo($this->session, $uid, $authsource);
 		if( $uaccount !== false ){
-			$this->_helper->redirector('postconnected');
+			$this->redirect()->toRoute('saml', ['action' => 'postconnected']);
 			return;
 		}else {
 			//Check if this account is already connected to another profile
-			$user = SamlAuth::getUserByAccountValues($uid, $authsource);
+			$user = \SamlAuth::getUserByAccountValues($uid, $authsource);
 			if( $user !== null && $user->id != $this->session->userid ){
 				$this->session->userError = array("title" => "Could not connect to " . str_replace("-"," ",$authsource) . " account", "message" => "The " . str_replace("-"," ",$authsource) . " account you tried to connect your profile to is already connected to another user profile.");
-				$this->_helper->redirector('postconnected');
+				$this->redirect()->toRoute('saml', ['action' => 'postconnected']);
 				return;
 			}
 		}
@@ -297,16 +296,14 @@ class SamlController extends AbstractActionController
 		AccountConnect::connectAccountToProfile($this->session->userid, $uid, $authsource, $userFullName, $idptrace);
 
 		//Update connected user accounts
-		$this->session->currentUserAccounts = SamlAuth::getUserAccountsByUser($this->session->userid, true);
+		$this->session->currentUserAccounts = \SamlAuth::getUserAccountsByUser($this->session->userid, true);
 		
 		//redirect to post connected action to logout connected account
-		$this->_helper->redirector('postconnected');
+		$this->redirect()->toRoute('saml', ['action' => 'postconnected']);
 	}
 	
 	//Called after postconnect to logout currently conected account
 	public function postconnectedAction(){
-		$this->_helper->layout->disableLayout();
-	    $this->_helper->viewRenderer->setNoRender();
 		$source = $this->session->connectdaccountsource;
 		$referer = trim($this->session->connectreferer);
 		$connectedsource = str_replace( "-sp", "-connect", strtolower(trim($source)) );
@@ -322,28 +319,29 @@ class SamlController extends AbstractActionController
 		unset($this->session->connectdaccountsource);
 		
 			
-		require_once(SamlAuth::LIB_AUTOLOAD);
+		require_once(\SamlAuth::LIB_AUTOLOAD);
 		
 		//Get SAML Authentication new user account for connection (-connect) and perform logout
 		$as = new SimpleSAML_Auth_Simple($connectedsource);
 		$as->logout($referer);
+		return DISABLE_LAYOUT($this, true);
 	}
 	
 	public function postauthAction() {
 			$this->_helper->layout->disableLayout();
 			$this->_helper->viewRenderer->setNoRender();
 				
-			$inited = SamlAuth::setupSamlAuth($this->session);
+			$inited = \SamlAuth::setupSamlAuth($this->session);
 			
 			//Check and redirect if user account is blocked
 			if( $this->session->accountStatus === "blocked" ){
-				$this->_helper->redirector('blockedaccount');
+				$this->redirect()->toRoute('saml', ['action' => 'blockedaccount']);
 				return;
 			}
 			
 			//Check and redirect if user is deleted
 			if( $this->session->userDeleted === true ){
-				$this->_helper->redirector('deletedprofile');
+				$this->redirect()->toRoute('saml', ['action' => 'deletedprofile']);
 				return;
 			}
 			
@@ -358,7 +356,7 @@ class SamlController extends AbstractActionController
 			}else if( $this->session->isNewUser === true ){
 				$this->session->authreferer = $inited;
 				// new user. First login. Redirect to new user account page
-				$this->_helper->redirector('newaccount');
+				$this->redirect()->toRoute('saml', ['action' => 'newaccount']);
 			}else if( $this->session->userid !== null &&  $this->session->userid > -1){ 
 				//Found user, but no url referer. Redirect to home page
 				$this->_helper->layout->disableLayout();
@@ -366,7 +364,7 @@ class SamlController extends AbstractActionController
 				header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
 			}else{ 
 				//No user. perform logout.
-				$this->_helper->redirector('loggedout');
+				$this->redirect()->toRoute('saml', ['action' => 'loggedout']);
 			}
 	}
 	public function deletedprofileAction(){
@@ -379,8 +377,8 @@ class SamlController extends AbstractActionController
 		$this->_helper->layout->disableLayout();
 		
 		//Store all useful session variables for displaying the view.
-		$this->view->delAccounts = SamlAuth::getUserAccountsByUser($this->session->userid);
-		$this->view->currentAccount = SamlAuth::getCurrentAccount($this->session);
+		$this->view->delAccounts = \SamlAuth::getUserAccountsByUser($this->session->userid);
+		$this->view->currentAccount = \SamlAuth::getCurrentAccount($this->session);
 		
 		$this->view->deletedById = $this->session->userDeletedById;
 		$this->view->deletedByName = $this->session->userDeletedByName;
@@ -395,7 +393,7 @@ class SamlController extends AbstractActionController
 		}
 		
 		//Clear session
-		SamlAuth::logout($this->session);
+		\SamlAuth::logout($this->session);
 	}
 	public function blockedaccountAction(){
 		if( strtolower(trim($this->session->accountStatus)) !== "blocked" ){
@@ -414,7 +412,7 @@ class SamlController extends AbstractActionController
 		$this->view->returnUrl = $this->session->authreferer;
 		$this->session->accountStatus = "";
 		//Clear session
-		SamlAuth::logout($this->session);
+		\SamlAuth::logout($this->session);
 	}
 	public function newaccountAction(){
 		$referer = $this->_getParam("r");
@@ -430,7 +428,7 @@ class SamlController extends AbstractActionController
 		if( AccountConnect::isConnected($this->session) !== false ){
 			$this->_helper->layout->disableLayout();
 			$this->_helper->viewRenderer->setNoRender();
-			SamlAuth::setupSamlAuth($this->session);
+			\SamlAuth::setupSamlAuth($this->session);
 			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
 			return;
 		}
@@ -448,7 +446,7 @@ class SamlController extends AbstractActionController
 			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
 			return;
 		}
-		$profiles = array( SamlAuth::initNewUserProfile($this->session) );
+		$profiles = array(\SamlAuth::initNewUserProfile($this->session));
 		$this->view->profiles = $profiles;
 		$this->view->session = $this->session;
 		
@@ -642,7 +640,7 @@ class SamlController extends AbstractActionController
 			unset($this->session->isNewUser);
 			$this->session->userid = $entry->id;
 			
-			SamlAuth::setupSamlAuth($this->session);
+			\SamlAuth::setupSamlAuth($this->session);
 		}
 		
 		$this->view->session = $this->session;
@@ -656,12 +654,12 @@ class SamlController extends AbstractActionController
 			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
 			return;
 		}
-		$profileids = SamlAuth::getConnectableProfileIds($this->session);
+		$profileids = \SamlAuth::getConnectableProfileIds($this->session);
 		$this->view->profileids = $profileids;
 		$this->view->session = $this->session;
 	}
 	public function cancelregistrationAction(){
-		$redirecturl = SamlAuth::cancelRegistrationProcess($this->session);
+		$redirecturl = \SamlAuth::cancelRegistrationProcess($this->session);
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
 		header("Location: " . $redirecturl);
@@ -710,7 +708,7 @@ class SamlController extends AbstractActionController
 			$this->view->error = "Your account seems to be waiting for connection approval for another profile";
 			$this->view->implicitpending = false;
 			//Update session so user will be redirected to the appropriate form
-			SamlAuth::setupSamlAuth($this->session);
+			\SamlAuth::setupSamlAuth($this->session);
 			return;
 		}
 		
@@ -720,7 +718,7 @@ class SamlController extends AbstractActionController
 			$this->view->error = "Your account is already connected";
 			$this->view->implicitconnect = true;
 			//Update session so user will auto login on page refresh
-			SamlAuth::setupSamlAuth($this->session);
+			\SamlAuth::setupSamlAuth($this->session);
 			return;
 		}
 		
@@ -765,7 +763,7 @@ class SamlController extends AbstractActionController
 		//In this case the view should inform the user and autorefresh to the portal
 		if( AccountConnect::isConnected($this->session) !== false ){
 			//Update session so user will auto login on page refresh
-			SamlAuth::setupSamlAuth($this->session);
+			\SamlAuth::setupSamlAuth($this->session);
 			$this->view->session =  $this->session;
 			return;
 		}
@@ -776,7 +774,7 @@ class SamlController extends AbstractActionController
 			$this->view->error = "Your connection  request has expired";
 			$this->view->expired = true;
 			//Update session so user will be redirected to the appropriate form
-			SamlAuth::setupSamlAuth($this->session);
+			\SamlAuth::setupSamlAuth($this->session);
 			return;
 		}
 		
@@ -804,7 +802,7 @@ class SamlController extends AbstractActionController
 		
 		$result = array();
 		$id = intval($_POST["id"]);
-		$uaccs = SamlAuth::getUserAccountsByUser($this->session->userid);
+		$uaccs = \SamlAuth::getUserAccountsByUser($this->session->userid);
 		if( count($uaccs) === 1){
 			$result = array("error" => "Cannot remove last user account");
 		}else if( count($uaccs) > 1 ){
@@ -815,7 +813,7 @@ class SamlController extends AbstractActionController
 					break;
 				}
 			}
-			$result= SamlAuth::getUserAccountsByUser($this->session->userid, true);
+			$result= \SamlAuth::getUserAccountsByUser($this->session->userid, true);
 			$this->session->currentUserAccounts = $result;
 		}
 		
@@ -855,16 +853,15 @@ class SamlController extends AbstractActionController
             }
 
             return db()->query($q, array($uid))->fetchAll();
-        }
+		}
+
 	public function isloggedinAction(){
-		if(trim($_SERVER['REQUEST_METHOD']) === "GET"){
-			if ($this->session->isLocked()) {
-				$this->session->unLock();
+		if (strtoupper($this->getRequest()->getMethod()) == "GET") {
+			if ($this->session->getManager()->getStorage()->isLocked()) {
+				$this->session->getManager()->getStorage()->unLock();
 			}
 			session_write_close();
 		}
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
 		$res = "0";
 		header('Access-Control-Allow-Origin: *');
 		if ( $this->session && isset($this->session->developsession) && $this->session->developsession === true ) {
@@ -873,7 +870,7 @@ class SamlController extends AbstractActionController
 			}
 		}
 		if( $res === "0" ) {
-			$source = SamlAuth::isAuthenticated();
+			$source = \SamlAuth::isAuthenticated();
 		}
 		if( $source !== false ){
 			$res = "1";
@@ -895,7 +892,7 @@ class SamlController extends AbstractActionController
 						}
 
 						if ($sourceIdentifier && $uid) {
-							$userAccount = SamlAuth::getUserAccount($uid, $sourceIdentifier);
+							$userAccount = \SamlAuth::getUserAccount($uid, $sourceIdentifier);
 						}
 
 						if ($userAccount) {
@@ -905,7 +902,7 @@ class SamlController extends AbstractActionController
                                                             $attrs['entitlements'] = array('vo' => array('contacts' => VoAdmin::getVOContacts($userAccount->researcherid) ,'memberships' => VoAdmin::getUserMembership($userAccount->researcherid)));
                                                         }
 							$uaccounts = array();
-							$alluseraccounts = SamlAuth::getResearcherUserAccounts($userAccount->researcherid);
+							$alluseraccounts = \SamlAuth::getResearcherUserAccounts($userAccount->researcherid);
 							foreach($alluseraccounts  as $uaccount) {
 								$uaccounts[] = array('type' => $uaccount->accountTypeID, 'uid' => $uaccount->accountID);
 							}
@@ -938,12 +935,12 @@ class SamlController extends AbstractActionController
 					}
 				}
 
-				echo json_encode($attrs);
-				return;
+				DISABLE_LAYOUT($this);	
+				return SET_NO_RENDER($this, json_encode($attrs));
 			}
 		}
-		
-		echo $res;
+		DISABLE_LAYOUT($this);	
+		return SET_NO_RENDER($this, $res);
 	}
 	
 	public function entitydescriptorAction(){

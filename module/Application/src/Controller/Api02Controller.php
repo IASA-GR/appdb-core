@@ -111,8 +111,9 @@ class Api02Controller extends AbstractActionController
                 $this->NotFound();
         }
     }
-    public function redirectAction(){
-        $this->_redirect("http://".$this->getRequest()->getParam("url"));
+	public function redirectAction() {
+		header('Location: ' . "http://".$this->getRequest()->getParam("url"));
+		return DISABLE_LAYOUT($this, true);
     }
     public function errorAction(){
         

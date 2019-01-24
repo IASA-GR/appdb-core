@@ -26,16 +26,13 @@ class IndexController extends AbstractActionController
     public function __construct()
 	{
 		$this->view = new ViewModel();
-		$this->session = new \Zend\Session\Container('default');
-		$session = new \Zend\Session\Container('default');
-		if( $session->isNewUser === true ){
-			$this->_redirect('/saml/newaccount');
-			return;
-		}else if( $session->userDeleted === true ){
-			$this->_redirect('/saml/deletedprofile');
-			return;
-		}else if( $session->accountStatus === "blocked" ) {
-			$this->_redirect('/saml/blockedaccount');
+		$this->session = new \Zend\Session\Container('base');
+		if( $this->session->isNewUser === true ){
+			return $this->redirect()->toRoute('saml', ['action' => 'newaccount']);
+		}else if( $this->session->userDeleted === true ){
+			return $this->redirect()->toRoute('saml', ['action' => 'deletedprofile']);
+		}else if( $this->session->accountStatus === "blocked" ) {
+			return $this->redirect()->toRoute('saml', ['action' => 'blockedaccount']);
 		}
     }
 
@@ -113,7 +110,6 @@ class IndexController extends AbstractActionController
 				}
 			}else if(isset($this->session) === false || isset($this->session->userid) === false || is_numeric($this->session->userid) === false ){
 				//if authenticated but not logged in setup user session
-				$this->session = new Zend_Session_Namespace('default');	
 				$attributes = $auth->getAttributes();
 				$uid = $attributes['idp:uid'][0];
 				$_SESSION['identity'] = $uid;

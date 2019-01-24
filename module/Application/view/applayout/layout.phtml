@@ -56,7 +56,7 @@ function loadCSS($o,$j) {
 	}
 }
 
-$this->session = new Zend\Session\Container('default');
+$this->session = new \Zend\Session\Container('base');
 if ( ( $_SERVER['APPLICATION_ENV'] == "api") ) {
     header('HTTP/1.0 404 Not Found');
     exit();

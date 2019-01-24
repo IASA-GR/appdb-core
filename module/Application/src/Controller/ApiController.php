@@ -31,14 +31,14 @@ class ApiController extends AbstractActionController
 
 	public function __construct() {
 		$this->view = new ViewModel();
-    	$this->session = new \Zend\Session\Container('default');
-//		if(trim($_SERVER['REQUEST_METHOD']) === "GET"){
-//			if ($this->session->isLocked()) {
-//				$this->session->unLock();
-//			}
-//			session_write_close();
-//		}
+		$this->session = new \Zend\Session\Container('base');
 		$this->verb = strtolower($this->getRequest()->getMethod());
+		if ($this->verb == "get") {
+			if ($this->session->getManager()->getStorage()->isLocked()) {
+				$this->session->getManager()->getStorage()->unLock();
+			}
+			session_write_close();
+		}
 //		if ( isset($_GET["format"]) ) {	
 //			$this->_setParam("format", $_GET["format"]);
 //		}
@@ -152,8 +152,9 @@ class ApiController extends AbstractActionController
 		return DISABLE_LAYOUT($this);
     }
 
-    public function redirectAction(){
-        $this->_redirect("http://".$this->getRequest()->getParam("url"));
+	public function redirectAction() {
+		header('Location: ' . "http://".$this->getRequest()->getParam("url"));
+		return DISABLE_LAYOUT($this, true);
     }
 
 	public function latestAction() {
@@ -218,8 +219,8 @@ class ApiController extends AbstractActionController
 		if ($method === "post") {
 			$postdata = $_POST['data'];
 			if( isset($_POST['resource']) && trim($_POST['resource']) === "broker") {
-				if ($this->session->isLocked()) {
-					$this->session->unLock();
+				if ($this->session->getManager()->getStorage()->isLocked()) {
+					$this->session->getManager()->getStorage()->unLock();
 				}
 				session_write_close();
 				$res = $_POST['resource'];
@@ -404,8 +405,8 @@ class ApiController extends AbstractActionController
 		if ($act === "POST") {
 			$data['data'] = $_POST['data'];
 			if( isset($_POST['resource']) && trim($_POST['resource']) === "broker"){
-				if ($this->session->isLocked()) {
-					$this->session->unLock();
+				if ($this->session->getManager()->getStorage()->isLocked()) {
+					$this->session->getManager()->getStorage()->unLock();
 				}
 				session_write_close();
 			}
