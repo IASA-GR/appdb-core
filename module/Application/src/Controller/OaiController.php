@@ -26,7 +26,7 @@ class OaiController extends AbstractActionController
 		header("Content-Type:text/xml");
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
-		$verb = $this->_getParam("verb");
+		$verb = $this->getRequest()->getParam("verb");
 		echo $this->handleVerb($verb);
 	}
 
@@ -34,8 +34,8 @@ class OaiController extends AbstractActionController
 		debug_log($verb);
 		switch($verb) {
 			case "GetRecord":
-				$id = $this->_getParam("identifier");
-				$prefix = $this->_getParam("metadataPrefix");
+				$id = $this->getRequest()->getParam("identifier");
+				$prefix = $this->getRequest()->getParam("metadataPrefix");
 				return $this->getRecord($id, $prefix);
 			case "Identify":
 			case "ListIdentifiers":

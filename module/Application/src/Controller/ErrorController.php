@@ -39,7 +39,7 @@ class ErrorController extends AbstractActionController
     {
 		$this->_helper->layout->disableLayout();
 
-        $errors = $this->_getParam('error_handler');
+        $errors = $this->getRequest()->getParam('error_handler');
         error_log('[ErrorController::errorAction]: ' . $errors->exception);
 		
 		switch ($errors->type) {

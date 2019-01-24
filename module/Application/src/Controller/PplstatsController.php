@@ -27,7 +27,7 @@ class PplstatsController extends AbstractActionController
     public function init()
     {
 		$this->session = new Zend_Session_Namespace('default');
-		$ct = $this->_getParam("ct");
+		$ct = $this->getRequest()->getParam("ct");
 		if ( $ct === null ) $ct = $this->session->chartType;
 		if ( $ct === null ) { $ct = "Bars"; } else { $this->session->chartType = $ct; }; 
 		$this->view->chartType = $ct;

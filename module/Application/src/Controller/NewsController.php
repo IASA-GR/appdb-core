@@ -50,41 +50,41 @@ class NewsController extends AbstractActionController
         $ppl = new Default_Model_Researchers();
         $this->view->ppl = $ppl->refresh();
 		$news = new Default_Model_AggregateNews();
-		$len = $this->_getParam('len');
-		$ofs = $this->_getParam('ofs');
+		$len = $this->getRequest()->getParam('len');
+		$ofs = $this->getRequest()->getParam('ofs');
 		if ( $ofs == '' ) $ofs=0;
 		$news->filter->limit($len);
 		$news->filter->offset($ofs);
 		$f = new Default_Model_AggregateNewsFilter();
-		if ( trim($this->_getParam('event')) != '') {
-			$f->action->equals(trim($this->_getParam('event')));
+		if ( trim($this->getRequest()->getParam('event')) != '') {
+			$f->action->equals(trim($this->getRequest()->getParam('event')));
 			$news->filter->chain($f,"AND");
 		}
-		if ( trim($this->_getParam('filter')) != '') {
-			$flt = trim($this->_getParam('filter'));
+		if ( trim($this->getRequest()->getParam('filter')) != '') {
+			$flt = trim($this->getRequest()->getParam('filter'));
 			if( $flt === "vapp" ) {
 				$flt = "app";
 			}
 
 			$f->subjecttype->equals($flt);
 			$news->filter->chain($f,"AND");
-			if( trim($this->_getParam('filter')) === "vapp" ) {
+			if( trim($this->getRequest()->getParam('filter')) === "vapp" ) {
 				$vappflt = new Application\Model\ApplicationsFilter();
 				$vappflt->metatype->numequals(1);
 				$news->filter->chain($vappflt,"AND");
-			} elseif (trim($this->_getParam('filter')) === "app") {
+			} elseif (trim($this->getRequest()->getParam('filter')) === "app") {
 				$vappflt = new Application\Model\ApplicationsFilter();
 				$vappflt->metatype->numequals(0);
 				$news->filter->chain($vappflt,"AND");
 			}
 		}
-		if ( $this->_getParam('from') != '' ) {
-			$from = "EXTRACT(EPOCH FROM '".$this->_getParam('from')."'::timestamp)";
+		if ( $this->getRequest()->getParam('from') != '' ) {
+			$from = "EXTRACT(EPOCH FROM '".$this->getRequest()->getParam('from')."'::timestamp)";
 		} else {
 			$from = '0';
 		}
-		if ( $this->_getParam('to') != '' ) {
-			$to = "EXTRACT(EPOCH FROM '".$this->_getParam('to')."'::timestamp)";
+		if ( $this->getRequest()->getParam('to') != '' ) {
+			$to = "EXTRACT(EPOCH FROM '".$this->getRequest()->getParam('to')."'::timestamp)";
 		} else {
 			$to = 'EXTRACT(EPOCH FROM NOW())';
 		}
@@ -95,10 +95,10 @@ class NewsController extends AbstractActionController
 		debug_log('[NewsController::getnews]: ' . $news->filter->expr());
 		$news->filter->orderBy('timestamp DESC');
 		$this->view->entries = $news->refresh();
-		$this->view->event = $this->_getParam('event');
-		$this->view->filter = $this->_getParam('filter');
-		$this->view->from = $this->_getParam('from');
-		$this->view->to = $this->_getParam('to');
+		$this->view->event = $this->getRequest()->getParam('event');
+		$this->view->filter = $this->getRequest()->getParam('filter');
+		$this->view->from = $this->getRequest()->getParam('from');
+		$this->view->to = $this->getRequest()->getParam('to');
 	}
 
 	private function getnews2() {
@@ -109,23 +109,23 @@ class NewsController extends AbstractActionController
         $ppl = new Default_Model_Researchers();
         $this->view->ppl = $ppl->refresh();
 		$news = new Default_Model_MyNews();
-		$len = $this->_getParam('len');
-		$ofs = $this->_getParam('ofs');
+		$len = $this->getRequest()->getParam('len');
+		$ofs = $this->getRequest()->getParam('ofs');
 		if ( $ofs == '' ) $ofs=0;
 		$news->limit = $len;
 		$news->offset = $ofs;
 		$fields = array();
 		$fields[] = 'subjecttype';
 		$news->filter->_fields = $fields;
-        if ( trim($this->_getParam('event')) != '') $news->event = trim($this->_getParam('event'));
-        if ( trim($this->_getParam('filter')) != '') $news->filter->subjecttype->equals(trim($this->_getParam('filter')));
-		if ( $this->_getParam('from') != '' ) $news->from = $this->_getParam('from');
-		if ( $this->_getParam('to') != '' ) $news->to = $this->_getParam('to');
+        if ( trim($this->getRequest()->getParam('event')) != '') $news->event = trim($this->getRequest()->getParam('event'));
+        if ( trim($this->getRequest()->getParam('filter')) != '') $news->filter->subjecttype->equals(trim($this->getRequest()->getParam('filter')));
+		if ( $this->getRequest()->getParam('from') != '' ) $news->from = $this->getRequest()->getParam('from');
+		if ( $this->getRequest()->getParam('to') != '' ) $news->to = $this->getRequest()->getParam('to');
 		$this->view->entries = $news->refresh();
-		$this->view->event = $this->_getParam('event');
-		$this->view->filter = $this->_getParam('filter');
-		$this->view->from = $this->_getParam('from');
-		$this->view->to = $this->_getParam('to');
+		$this->view->event = $this->getRequest()->getParam('event');
+		$this->view->filter = $this->getRequest()->getParam('filter');
+		$this->view->from = $this->getRequest()->getParam('from');
+		$this->view->to = $this->getRequest()->getParam('to');
 	}
 
 	public function reportAction()
@@ -199,9 +199,9 @@ class NewsController extends AbstractActionController
 
 	public function unsubscribeallAction() {
 		$this->view->result = "error";
-		$pwd = $this->_getParam('pwd');
-		$id = $this->_getParam('id');
-        $delivery = $this->_getParam('delivery');
+		$pwd = $this->getRequest()->getParam('pwd');
+		$id = $this->getRequest()->getParam('id');
+        $delivery = $this->getRequest()->getParam('delivery');
         $delivery = ($delivery=='')?-1:intval($delivery);
         $validated = false;
 		if ( ($id != '') && ($pwd != '') ) {
@@ -264,13 +264,13 @@ class NewsController extends AbstractActionController
 	}
 
 	public function unsubscribeAction() {
-		$pwd = $this->_getParam('pwd');
-        $delivery = $this->_getParam('delivery');
+		$pwd = $this->getRequest()->getParam('pwd');
+        $delivery = $this->getRequest()->getParam('delivery');
         $delivery = ($delivery=='')?-1:intval($delivery);
 		$validated = false;
         $result = "error";
 		$mail = new Default_Model_MailSubscriptions();
-		$mail->filter->id->equals($this->_getParam('id'));
+		$mail->filter->id->equals($this->getRequest()->getParam('id'));
 		if ( count($mail->items) > 0 ) {
 			$m = $mail->items[0];
 			if ( md5($m->unsubscribePassword) === $pwd) {
@@ -280,7 +280,7 @@ class NewsController extends AbstractActionController
                 if($delivery>-1 && $delivery!=$m->delivery && NewsDeliveryType::has($m->delivery, $delivery)){
                     $m->delivery = $m->delivery ^ $delivery;
                     $m->save();
-                }else if( $delivery == $m->delivery || $this->_getParam("src")=="ui"){
+                }else if( $delivery == $m->delivery || $this->getRequest()->getParam("src")=="ui"){
                     $mail->remove($m);
                 }
                 $this->view->item = $m;
@@ -295,7 +295,7 @@ class NewsController extends AbstractActionController
 			$this->getResponse()->setHeader("Status","403 Forbidden");
 			return DISABLE_LAYOUT($this, true);
 		}
-        if($this->_getParam("src")=="ui"){
+        if($this->getRequest()->getParam("src")=="ui"){
 			DISABLE_LAYOUT($this, true);
 			return SET_NO_RENDER($this, "<response></response>");
         }
@@ -318,37 +318,37 @@ class NewsController extends AbstractActionController
 	public function subscribeAction() {
 		$fhash = 0;
 		$flt = '';
-		if( trim($this->_getParam('flt')) != '' ) {
-			$flt = base64_decode($this->_getParam('flt'));
+		if( trim($this->getRequest()->getParam('flt')) != '' ) {
+			$flt = base64_decode($this->getRequest()->getParam('flt'));
 		}
 		$responseText = '';
 		if ( $this->session->userid !== null ) {
 			$m = new Default_Model_MailSubscription();
 			$mail = new Default_Model_MailSubscriptions();
-			if ($this->_getParam('id')) { //update
-				$mail->filter->id->equals($this->_getParam('id'));
+			if ($this->getRequest()->getParam('id')) { //update
+				$mail->filter->id->equals($this->getRequest()->getParam('id'));
 				$mail->refresh();
 				$m = $mail->items[0];
-				$m->name = $this->_getParam('name');
+				$m->name = $this->getRequest()->getParam('name');
 				$m->researcherid = $this->session->userid;
 				$m->flt = $flt;
 				$flt = str_replace('"', '”', $flt);
 				$m->flthash = getFltHash($flt);
-				$m->subjectType = $this->_getParam('subjecttype');
-				$m->events = $this->_getParam('events');
-				$m->delivery = $this->_getParam('delivery');
+				$m->subjectType = $this->getRequest()->getParam('subjecttype');
+				$m->events = $this->getRequest()->getParam('events');
+				$m->delivery = $this->getRequest()->getParam('delivery');
 				$m->save();
 				header ("Content-Type:text/xml");
 				$responseText = '<' . '?xml version="1.0" encoding="utf-8"?'.'>';
 				$responseText .= "<response />";
 			} else { //insert new
-				$m->name = $this->_getParam('name');
+				$m->name = $this->getRequest()->getParam('name');
 				$m->researcherID = $this->session->userid;
 				$m->flt = $flt;
 				$m->flthash = num_to_string($fhash);
-				$m->subjectType = $this->_getParam('subjecttype');
-				$m->events = $this->_getParam('events');
-				$m->delivery = $this->_getParam('delivery');
+				$m->subjectType = $this->getRequest()->getParam('subjecttype');
+				$m->events = $this->getRequest()->getParam('events');
+				$m->delivery = $this->getRequest()->getParam('delivery');
 				$mail->add($m);
 				$mail = new Default_Model_MailSubscriptions();
 				$mail->filter->researcherid->equals($this->session->userid)->and($mail->filter->flthash->equals(getFltHash($flt)));
@@ -385,7 +385,7 @@ class NewsController extends AbstractActionController
 		}
 		if ( $this->session->userid !== null && isset($_GET['flt']) ) {
 			$m = new Default_Model_MailSubscriptions();
-			$flt = trim(base64_decode($this->_getParam('flt')));
+			$flt = trim(base64_decode($this->getRequest()->getParam('flt')));
 			$flt = str_replace('"', '”', $flt);
 			$fhash = getFltHash($flt);
 			$m->filter->researcherid->equals($this->session->userid)->and($m->filter->subjecttype->equals($subjecttype))->and($m->filter->flthash->equals($fhash));
@@ -436,14 +436,14 @@ class NewsController extends AbstractActionController
 	}
 
 	public function dispatchmailAction() {
-		if ( $this->_getParam("subjecttype") != '' ) {
-			$subjecttype = $this->_getParam("subjecttype");
+		if ( $this->getRequest()->getParam("subjecttype") != '' ) {
+			$subjecttype = $this->getRequest()->getParam("subjecttype");
 		} else {
 			$subjecttype = "app";
 		}
 		// Prevent malicious calls
 		if ( localRequest() ) {
-			$type = $this->_getParam("delivery");
+			$type = $this->getRequest()->getParam("delivery");
 			if ( $type != '' ) {
 				switch($type) {
 					case NewsDeliveryType::D_DAILY_DIGEST: $digest = "Daily"; break;
@@ -493,10 +493,10 @@ class NewsController extends AbstractActionController
 
 	public function mailAction($data=null){
 		if(is_null($data)){
-			$hash = $this->_getParam("h");
-			$id = $this->_getParam("id");
-			$delivery = $this->_getParam("delivery");
-			$subjecttype = $this->_getParam("subjecttype");
+			$hash = $this->getRequest()->getParam("h");
+			$id = $this->getRequest()->getParam("id");
+			$delivery = $this->getRequest()->getParam("delivery");
+			$subjecttype = $this->getRequest()->getParam("subjecttype");
 			if( !$subjecttype) {
 				$subjecttype = "app";
 			}
@@ -531,15 +531,15 @@ class NewsController extends AbstractActionController
 				return $this->NotFound();
 			}
 
-			$news = NewsFeed::getEmailDigest($delivery,$this->_getParam("id"),$subjecttype);
+			$news = NewsFeed::getEmailDigest($delivery,$this->getRequest()->getParam("id"),$subjecttype);
 			if(count($news)==0){
 				return DISABLE_LAYOUT($this, true);
 			}
 			$this->view->delivery = $delivery;
 			$this->view->server = "http://" . $_SERVER['APPLICATION_UI_HOSTNAME'] . "/";
 			$this->view->news = $news;
-			$this->view->unsubscribeall = $this->view->server . "news/unsubscribeall?id=".$this->_getParam("id")."&pwd=".md5($u->mailUnsubscribePwd);
-			$this->view->unsubscribedigestall = $this->view->server."news/unsubscribeall?id=".$this->_getParam("id")."&delivery=" . $delivery . "&pwd=".md5($u->mailUnsubscribePwd);
+			$this->view->unsubscribeall = $this->view->server . "news/unsubscribeall?id=".$this->getRequest()->getParam("id")."&pwd=".md5($u->mailUnsubscribePwd);
+			$this->view->unsubscribedigestall = $this->view->server."news/unsubscribeall?id=".$this->getRequest()->getParam("id")."&delivery=" . $delivery . "&pwd=".md5($u->mailUnsubscribePwd);
 
 			if($this->view->delivery == NewsDeliveryType::D_DAILY_DIGEST){
 				$this->view->digest = "daily";
@@ -606,9 +606,9 @@ class NewsController extends AbstractActionController
 				$ok = true;
 				$ds = new Default_Model_DisseminationEntry();
 				$ds->composerID = $this->session->userid;
-				$ds->message = $this->_getParam("message");
-				$ds->filter = $this->_getParam("filter");
-				$ds->recipients = "{".$this->_getParam("recipients")."}";
+				$ds->message = $this->getRequest()->getParam("message");
+				$ds->filter = $this->getRequest()->getParam("filter");
+				$ds->recipients = "{".$this->getRequest()->getParam("recipients")."}";
 				$ds->save();
 				if ( $ds->id == "" ) {
 					$this->getResponse()->clearAllHeaders();
@@ -646,7 +646,7 @@ class NewsController extends AbstractActionController
 			if ( $user !== null && $user->privs->canUseDisseminationTool() ) {
 				$ok = true;
 				$d = new Default_Model_DisseminationEntry();
-				$onlyToMe = $this->_getParam("onlytome");
+				$onlyToMe = $this->getRequest()->getParam("onlytome");
 				if ( $onlyToMe === "true" || $onlyToMe === true || $onlyToMe === 1 || $onlyToMe === "1" ) {
 					$onlyToMe = true;
 				} else {
@@ -654,10 +654,10 @@ class NewsController extends AbstractActionController
 				}
 				$rs = new Default_Model_Researchers();
 				if ( ! $onlyToMe ) {
-					$d->message = $this->_getParam("message");
-					$d->subject = $this->_getParam("subject");
+					$d->message = $this->getRequest()->getParam("message");
+					$d->subject = $this->getRequest()->getParam("subject");
 					$d->composerid = $this->session->userid;
-					$d->filter = $this->_getParam("flt");
+					$d->filter = $this->getRequest()->getParam("flt");
 					$rs->filter = FilterParser::getPeople($d->filter, false);
 					$ids = array();
 					$adrs = array();
@@ -679,7 +679,7 @@ class NewsController extends AbstractActionController
 					$d->recipients = $ids;
 					$d->save();
 				}
-				$textbody = $this->_getParam("textmessage");
+				$textbody = $this->getRequest()->getParam("textmessage");
 				//Create informative text footer to append in textbody
 				$footer = "\n\n----------------------------------------------------------------------------------\n";
 				$footer .= "UNSUBSCRIBE: To unsubscribe from this notification list follow the following steps:\n";
@@ -691,13 +691,13 @@ class NewsController extends AbstractActionController
 
 				$textbody .= $footer;
 
-				$body = $this->_getParam("message");
+				$body = $this->getRequest()->getParam("message");
 				//Adjust text footer to html format to append to html message
 				$footer = preg_replace("/\n/", "<br/>", $footer);
 				$footer = preg_replace("/\t/", "<span style='padding-left:10px;'></span>",$footer);
 				$body .= $footer;
 
-				$subject = $this->_getParam("subject");
+				$subject = $this->getRequest()->getParam("subject");
 				// send the message to selected recipients
 				if ( ! $onlyToMe ) {
 					//sendMultipartMail($subject, $adrs, $textbody, $body, 'appdb-reports@iasa.gr', 'enadyskolopassword',"appdb-support@iasa.gr", null, false , array("Precedence"=>"bulk") );

@@ -40,14 +40,14 @@ class Api02actionController extends AbstractActionController
 	}
 
 	public function relatedappsAction() {
-   		$format = $this->_getParam("format");
+   		$format = $this->getRequest()->getParam("format");
 		if ( $format === "json" ) $format = "xml";
 		$this->_helper->layout->disableLayout();
-		$offset = $this->_getParam('ofs');
-		$length = $this->_getParam('len');
+		$offset = $this->getRequest()->getParam('ofs');
+		$length = $this->getRequest()->getParam('len');
 		$paging = true;
 		if ($length == "-1") $paging = false;
-		$apps = new Default_Model_RelatedApplications($this->_getParam("id"));
+		$apps = new Default_Model_RelatedApplications($this->getRequest()->getParam("id"));
 		$total = $apps->count();
 		if ( $paging ) {
 			if ($length != '') $apps->limit = $length+1;
@@ -70,8 +70,8 @@ class Api02actionController extends AbstractActionController
     
     public function myappsindexAction()
     {
-		if ( $this->view->isAdmin || ($this->view->Authenticated && $this->_getParam['id'] == $_GET['id'] ) || ($this->session->userid !== null && $this->_getParam['id'] == $this->session->userid) || userIsAdminOrManager($this->session->userid) )  {
-			$format = $this->_getParam("format");
+		if ( $this->view->isAdmin || ($this->view->Authenticated && $this->getRequest()->getParam['id'] == $_GET['id'] ) || ($this->session->userid !== null && $this->getRequest()->getParam['id'] == $this->session->userid) || userIsAdminOrManager($this->session->userid) )  {
+			$format = $this->getRequest()->getParam("format");
 			if ( $format === "json" ) $format = "xml";
 			$this->_helper->layout->disableLayout();
 			$this->view->subindex = "myappsindex";
@@ -79,7 +79,7 @@ class Api02actionController extends AbstractActionController
 				$this->appindex(2);
 			} else {
 				if ( $format == 'xml' ) {
-					$this->session->userid = $this->_getParam("id");
+					$this->session->userid = $this->getRequest()->getParam("id");
 					$this->appindex(2, true, 'xml');
 				}
 			}
@@ -87,8 +87,8 @@ class Api02actionController extends AbstractActionController
     }   
      
     public function myownindexAction() {
-		if ( $this->view->isAdmin || ($this->view->Authenticated && $this->_getParam['id'] == $_GET['id'] ) || ($this->session->userid !== null && $this->_getParam['id'] == $this->session->userid) || userIsAdminOrManager($this->session->userid) )  {
-			$format = $this->_getParam("format");
+		if ( $this->view->isAdmin || ($this->view->Authenticated && $this->getRequest()->getParam['id'] == $_GET['id'] ) || ($this->session->userid !== null && $this->getRequest()->getParam['id'] == $this->session->userid) || userIsAdminOrManager($this->session->userid) )  {
+			$format = $this->getRequest()->getParam("format");
 			if ( $format === "json" ) $format = "xml";
 			$this->_helper->layout->disableLayout();
 			$this->view->subindex = "myownindex";
@@ -96,7 +96,7 @@ class Api02actionController extends AbstractActionController
 				$this->appindex(1);
 			} else {
 				if ( $format == 'xml' ) {
-					$this->session->userid = $this->_getParam("id");
+					$this->session->userid = $this->getRequest()->getParam("id");
 					$this->appindex(1, true, 'xml');
 				}
 			}
@@ -105,8 +105,8 @@ class Api02actionController extends AbstractActionController
 
     public function myeditindexAction()
     {
-		if ( $this->view->isAdmin || ($this->view->Authenticated && $this->_getParam['id'] == $_GET['id'] ) || ($this->session->userid !== null && $this->_getParam['id'] == $this->session->userid) || userIsAdminOrManager($this->session->userid) )  {
-			$format = $this->_getParam("format");
+		if ( $this->view->isAdmin || ($this->view->Authenticated && $this->getRequest()->getParam['id'] == $_GET['id'] ) || ($this->session->userid !== null && $this->getRequest()->getParam['id'] == $this->session->userid) || userIsAdminOrManager($this->session->userid) )  {
+			$format = $this->getRequest()->getParam("format");
 			if ( $format === "json" ) $format = "xml";
 			$this->_helper->layout->disableLayout();
 			$this->view->subindex = "myeditindex";
@@ -114,7 +114,7 @@ class Api02actionController extends AbstractActionController
 				$this->appindex(4);
 			} else {
 				if ( $format == 'xml' ) {
-					$this->session->userid = $this->_getParam("id");
+					$this->session->userid = $this->getRequest()->getParam("id");
 					$this->appindex(4, true, 'xml');
 				}
 			}
@@ -124,7 +124,7 @@ class Api02actionController extends AbstractActionController
     public function modindexAction()
     {
 		if ( $this->view->isAdmin || userIsAdminOrManager($this->session->userid) ) {
-			$format = $this->_getParam("format");
+			$format = $this->getRequest()->getParam("format");
 			if ( $format === "json" ) $format = "xml";
 			$this->_helper->layout->disableLayout();
 			$this->view->subindex = "modindex";
@@ -141,7 +141,7 @@ class Api02actionController extends AbstractActionController
     public function delindexAction()
     {
 		if ( $this->view->isAdmin || userIsAdminOrManager($this->session->userid) ) {
-			$format = $this->_getParam("format");
+			$format = $this->getRequest()->getParam("format");
 			if ( $format === "json" ) $format = "xml";
 			$this->_helper->layout->disableLayout();
 			$this->view->subindex = "delindex";
@@ -157,8 +157,8 @@ class Api02actionController extends AbstractActionController
 
     public function bmindexAction()
     {
-		if ( $this->view->isAdmin || ($this->view->Authenticated && $this->_getParam['id'] == $_GET['id'] ) || ($this->session->userid !== null && $this->_getParam['id'] == $this->session->userid) || userIsAdminOrManager($this->session->userid) )  {
-			$format = $this->_getParam("format");
+		if ( $this->view->isAdmin || ($this->view->Authenticated && $this->getRequest()->getParam['id'] == $_GET['id'] ) || ($this->session->userid !== null && $this->getRequest()->getParam['id'] == $this->session->userid) || userIsAdminOrManager($this->session->userid) )  {
+			$format = $this->getRequest()->getParam("format");
 			if ( $format === "json" ) $format = "xml";
 			$this->_helper->layout->disableLayout();
 			$this->view->subindex = "bmindex";
@@ -166,8 +166,8 @@ class Api02actionController extends AbstractActionController
 				$this->appindex(3);
 			} else {
 				if ( $format == 'xml' ) {
-					if ( $this->_getParam("id") != '' ) {
-						$this->session->userid = $this->_getParam("id");
+					if ( $this->getRequest()->getParam("id") != '' ) {
+						$this->session->userid = $this->getRequest()->getParam("id");
 						$this->appindex(3, true, 'xml');
 					}
 				}
@@ -176,7 +176,7 @@ class Api02actionController extends AbstractActionController
     }
 
 	private function getFltStr() {
-		$f = $this->_getParam('flt');
+		$f = $this->getRequest()->getParam('flt');
 		/*if ( $f === null ) $f = $this->session->appFlt; else*/ $f = trim($f);
 		return $f;
 	}
@@ -196,13 +196,13 @@ class Api02actionController extends AbstractActionController
 
 	private function appindex($mode, $paging = true, $format = '')
 	{
-		if ( $format == '') $format = $this->_getParam("format");
+		if ( $format == '') $format = $this->getRequest()->getParam("format");
 		if ( $format == "json" ) $format="xml";
 		if ($this->session->viewMode === null) $this->session->viewMode = 1;
 		$this->view->viewMode = $this->session->viewMode;
 		$this->_helper->layout->disableLayout();
-		$offset = $this->_getParam('ofs');
-		$length = $this->_getParam('len');
+		$offset = $this->getRequest()->getParam('ofs');
+		$length = $this->getRequest()->getParam('len');
 		if ($length == "-1") $paging = false;
 		if ( $offset === null) $offset = 0;
 		if ( $length === null ) $length = 23;
@@ -210,7 +210,7 @@ class Api02actionController extends AbstractActionController
 		$fltstr = $this->getFltStr();
 		$apps = new Application\Model\Applications();
 		$this->session->appFlt = $fltstr;
-		$apps->filter = FilterParser::getApplications($fltstr,($this->_getParam("fuzzySearch") == '1'));
+		$apps->filter = FilterParser::getApplications($fltstr,($this->getRequest()->getParam("fuzzySearch") == '1'));
 		if ( $mode == 1 ) {
 			$f = new Application\Model\ApplicationsFilter();
 			$f->addedby->equals($this->session->userid);
@@ -241,8 +241,8 @@ class Api02actionController extends AbstractActionController
 			$f->deleted->equals(true);
 			$apps->filter->chain($f,"AND");
 		}
-		if ( $this->_getParam("orderby") != '' ) $orderby = $this->_getParam("orderby"); else $orderby = "name";
-		if ( $this->_getParam("orderbyOp") != '' ) $orderbyop = $this->_getParam("orderbyOp"); else $orderbyop = "ASC";
+		if ( $this->getRequest()->getParam("orderby") != '' ) $orderby = $this->getRequest()->getParam("orderby"); else $orderby = "name";
+		if ( $this->getRequest()->getParam("orderbyOp") != '' ) $orderbyop = $this->getRequest()->getParam("orderbyOp"); else $orderbyop = "ASC";
 		if ( $orderby != '' ) {
 			if ($orderby != "unsorted") {
 				$apps->filter->orderBy($orderby." ".$orderbyop);
@@ -256,7 +256,7 @@ class Api02actionController extends AbstractActionController
 		}
 		$t1 = microtime(true);
 		$total = $apps->count();
-		$apps->refresh($format, $this->_getParam('details'));
+		$apps->refresh($format, $this->getRequest()->getParam('details'));
 		$entries = $apps->items;
 		if ( $format == '' ) $this->cachelogos($entries);
 		if ( $paging ) {
@@ -281,7 +281,7 @@ class Api02actionController extends AbstractActionController
 		$t2 = microtime(true);
 		$dt = $t2 - $t1;
 		$this->view->searchTime = round($dt,2);
-		if ($this->_getParam("fuzzySearch") == '1') $this->view->fuzzySearch = '1';
+		if ($this->getRequest()->getParam("fuzzySearch") == '1') $this->view->fuzzySearch = '1';
 		return $apps->items;
 	}
 
@@ -292,18 +292,18 @@ class Api02actionController extends AbstractActionController
     }
 
 	public function ratingsAction() {
-   		$format = $this->_getParam("format");
+   		$format = $this->getRequest()->getParam("format");
 		if ( $format === "json" ) $format = "xml";
 		$this->_helper->layout->disableLayout();
 		$ratings = new Default_Model_AppRatings();
-		$ratings->filter->appid->equals($this->_getParam("id"));
+		$ratings->filter->appid->equals($this->getRequest()->getParam("id"));
 		$this->view->entries = $ratings->refresh($format)->items;
 	}
 
 	public function ratingsreportAction(){
 		global $application;
 		$this->_helper->layout->disableLayout();
-		$t = $this->_getParam("type");
+		$t = $this->getRequest()->getParam("type");
 		switch($t){
 			case "external":
 				$t=2;
@@ -315,7 +315,7 @@ class Api02actionController extends AbstractActionController
 				$t=0;
 				break;
 		}
-		$id = $this->_getParam("id");
+		$id = $this->getRequest()->getParam("id");
 		$p = $id.($t != ''?",$t":"");
 		$db = $application->getBootstrap()->getResource('db');
 		$db->setFetchMode(Zend_Db::FETCH_OBJ);
@@ -326,8 +326,8 @@ class Api02actionController extends AbstractActionController
     public function appdetailsAction()
 	{
 		$this->_helper->layout->disableLayout();
-		$appID = $this->_getParam("id");
-		$format = $this->_getParam("format");
+		$appID = $this->getRequest()->getParam("id");
+		$format = $this->getRequest()->getParam("format");
 		if ( $format === "json" ) $format = "xml";
 		if ( ($appID == '') ) $appID = $this->session->lastAppID;
 		if ( $appID == "0" ) {
@@ -353,11 +353,11 @@ class Api02actionController extends AbstractActionController
     }
    
 	public function validateappfilterAction() {
-		$this->view->entries = validateFilterActionHelper($this->_getParam("flt"), FilterParser::NORM_APP, "0.2");
+		$this->view->entries = validateFilterActionHelper($this->getRequest()->getParam("flt"), FilterParser::NORM_APP, "0.2");
 	}
 
 	public function validatevosfilterAction() {
-		$this->view->entries = validateFilterActionHelper($this->_getParam("flt"), FilterParser::NORM_VOS, "0.2");
+		$this->view->entries = validateFilterActionHelper($this->getRequest()->getParam("flt"), FilterParser::NORM_VOS, "0.2");
 	}
 
 	public function reflectvosfilterAction() {
@@ -378,7 +378,7 @@ class Api02actionController extends AbstractActionController
     {
 		$this->_helper->layout->disableLayout();
 		$ppl = new Default_Model_Researchers();
-		$ppl->filter->id->equals($this->_getParam("id"));
+		$ppl->filter->id->equals($this->getRequest()->getParam("id"));
 		if ( count($ppl->items) > 0 ) {
 			$person = $ppl->items[0];
 			if ( isnull($person->image) ) {
@@ -409,9 +409,9 @@ class Api02actionController extends AbstractActionController
 
 	public function pplindex( $paging = true, $format = '' )
     {
-		if ($format == '' ) $format = $this->_getParam("format");
-		$offset = $this->_getParam('ofs');
-		$length = $this->_getParam('len');
+		if ($format == '' ) $format = $this->getRequest()->getParam("format");
+		$offset = $this->getRequest()->getParam('ofs');
+		$length = $this->getRequest()->getParam('len');
 		if ( $length == "-1" ) $paging = false;
 		if ( $offset === null) $offset = 0;
 		if ( $length === null ) $length = 23;
@@ -419,9 +419,9 @@ class Api02actionController extends AbstractActionController
 		$fltstr = $this->getFltStr();
 		$ppl = new Default_Model_Researchers();
 		$this->session->pplFlt = $fltstr;
-		$ppl->filter = FilterParser::getPeople($fltstr, ($this->_getParam("fuzzySearch") == '1'));
-		if ( $this->_getParam("orderby") != '' ) $orderby = $this->_getParam("orderby"); else $orderby = "firstname";
-		if ( $this->_getParam("orderbyOp") != '' ) $orderbyop = $this->_getParam("orderbyOp"); else $orderbyop = "ASC";
+		$ppl->filter = FilterParser::getPeople($fltstr, ($this->getRequest()->getParam("fuzzySearch") == '1'));
+		if ( $this->getRequest()->getParam("orderby") != '' ) $orderby = $this->getRequest()->getParam("orderby"); else $orderby = "firstname";
+		if ( $this->getRequest()->getParam("orderbyOp") != '' ) $orderbyop = $this->getRequest()->getParam("orderbyOp"); else $orderbyop = "ASC";
 		if ( $orderby != '' ) {
 			if ($orderby != "unsorted") {
 				if ( $orderby == "firstname" ) $ppl->filter->orderBy(array("firstname ".$orderbyop,"lastname ".$orderbyop));
@@ -437,7 +437,7 @@ class Api02actionController extends AbstractActionController
 		}
 		$t1 = microtime(true);
 		$total = $ppl->count();
-		$listType = $this->_getParam("details");
+		$listType = $this->getRequest()->getParam("details");
 		$ppl->refresh($format, '', $listType);
 		$entries = $ppl->items;
 		if ( $format == '' ) $this->cacheimages($entries);
@@ -463,22 +463,22 @@ class Api02actionController extends AbstractActionController
 		$t2 = microtime(true);
 		$dt = $t2 - $t1;
 		$this->view->searchTime = round($dt,2);
-		if ($this->_getParam("fuzzySearch") == '1') $this->view->fuzzySearch = '1';
+		if ($this->getRequest()->getParam("fuzzySearch") == '1') $this->view->fuzzySearch = '1';
 		return $ppl->items;
     }
 
     public function ppldetailsAction()
     {
-        $pplID = $this->_getParam("id");
+        $pplID = $this->getRequest()->getParam("id");
         if ( $pplID == '' ) $pplID = $this->session->lastPplID;
         $this->_helper->layout->disableLayout();
         $apps = new Default_Model_Researchers();
-        if ( $this->_getParam("id") == "0" ) {
+        if ( $this->getRequest()->getParam("id") == "0" ) {
                 $this->view->entry = new Default_Model_Researcher();
                 $this->view->entry->countryID = '0';
         } else {
 				$apps->filter->id->equals($pplID);
-				$apps->refresh($this->_getParam('format'), true, $this->_getParam('userid'));
+				$apps->refresh($this->getRequest()->getParam('format'), true, $this->getRequest()->getParam('userid'));
 				$this->view->entry = $apps->items[0];
 				$this->showimageAction();
         }
@@ -504,19 +504,19 @@ class Api02actionController extends AbstractActionController
 	}
 
 	public function validatepplfilterAction() {
-		$this->view->entries = validateFilterActionHelper($this->_getParam("flt"), FilterParser::NORM_PPL, "0.2");
+		$this->view->entries = validateFilterActionHelper($this->getRequest()->getParam("flt"), FilterParser::NORM_PPL, "0.2");
 	}
 	
 	public function disseminationlogAction() {
         $this->_helper->layout->disableLayout();
 		if ( $this->view->isAdmin || userIsAdminOnManager($this->session->userid) ) {
 			$ds = new Default_Model_Dissemination();
-			if ( $this->_getParam("orderby") == "" ) {
+			if ( $this->getRequest()->getParam("orderby") == "" ) {
 				$ds->filter->orderBy("senton DESC");
 			} else {
-				$ds->filter->orderBy($this->_getParam("orderby"));
+				$ds->filter->orderBy($this->getRequest()->getParam("orderby"));
 			}
-			if ( $this->_getParam("id") != "" ) $ds->filter->id = $this->_getParam("id");
+			if ( $this->getRequest()->getParam("id") != "" ) $ds->filter->id = $this->getRequest()->getParam("id");
 			$ds->refresh('xml');
 			$this->view->entries = $ds->items;
 		} else $this->accessDenied();

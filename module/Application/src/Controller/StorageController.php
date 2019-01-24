@@ -187,9 +187,9 @@ class StorageController extends AbstractActionController{
 	}
 	
 	public function draftsAction() {
-		$filename = $this->_getParam('filename');
+		$filename = $this->getRequest()->getParam('filename');
 		$filename = Storage::escapeFileName($filename);
-		$file = Storage::locateDraftFile($this->_getParam('folder') . DIRECTORY_SEPARATOR . $filename);
+		$file = Storage::locateDraftFile($this->getRequest()->getParam('folder') . DIRECTORY_SEPARATOR . $filename);
 		if (file_exists($file)) {
 			$fp = fopen($file, 'rb');
 			header("Content-Type: text/plain");
@@ -217,10 +217,10 @@ class StorageController extends AbstractActionController{
 	}
 	
 	public function groupAction() {
-		$folder1 = trim($this->_getParam('folder'));
-		$folder2 = trim($this->_getParam('folder2'));
-		$group = trim($this->_getParam('group'));
-		$filename = Storage::escapeFileName(trim($this->_getParam('filename')));
+		$folder1 = trim($this->getRequest()->getParam('folder'));
+		$folder2 = trim($this->getRequest()->getParam('folder2'));
+		$group = trim($this->getRequest()->getParam('group'));
+		$filename = Storage::escapeFileName(trim($this->getRequest()->getParam('filename')));
 		$guid = $folder1;
 		$is_archived = false;
 		
@@ -247,7 +247,7 @@ class StorageController extends AbstractActionController{
 	 * for the given vmiinstance (based on guid)
 	*/
 	public function vmiAction() {
-		$guid = trim($this->_getParam('guid'));
+		$guid = trim($this->getRequest()->getParam('guid'));
 		$is_archived = false;
 		
 		$vmis = new Default_Model_VAviews();
@@ -303,7 +303,7 @@ class StorageController extends AbstractActionController{
 	}	
 	
 	public function swappAction(){
-		$associd = trim($this->_getParam('associationid'));
+		$associd = trim($this->getRequest()->getParam('associationid'));
 		$is_archived = false;
 		
 		$swapp_relations = new Default_Model_ContextScriptAssocs();
@@ -347,7 +347,7 @@ class StorageController extends AbstractActionController{
 			return;
 		}
 		
-		$offset = intval(trim($this->_getParam('offset')));
+		$offset = intval(trim($this->getRequest()->getParam('offset')));
 		if( $offset < 1 ){
 			$offset = 1;
 		}

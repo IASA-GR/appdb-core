@@ -45,8 +45,8 @@ class DatasetsController extends AbstractActionController{
 			$this->getResponse()->setHeader("Status","403 Forbidden");
 			return;
 		}
-      	$name = $this->_getParam("n");
-		$id = $this->_getParam("id");
+      	$name = $this->getRequest()->getParam("n");
+		$id = $this->getRequest()->getParam("id");
 		if( is_numeric($id) && intval($id)<=0 ){
 			$id = 0;
 		}

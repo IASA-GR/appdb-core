@@ -137,8 +137,8 @@ class AppsController extends AbstractActionController
 	public function getlogoAction() {
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
-		if ( !( ($this->_getParam("id") == "0") || ($this->_getParam("id") == '') ) && is_numeric($this->_getParam("id")) == true )	{
-			echo $this->getlogo($this->_getParam("id"), $this->_getParam("size"));
+		if ( !( ($this->getRequest()->getParam("id") == "0") || ($this->getRequest()->getParam("id") == '') ) && is_numeric($this->getRequest()->getParam("id")) == true )	{
+			echo $this->getlogo($this->getRequest()->getParam("id"), $this->getRequest()->getParam("size"));
 		}
 	}
 
@@ -148,7 +148,7 @@ class AppsController extends AbstractActionController
 		$this->_helper->viewRenderer->setNoRender();
 		$logo = 'NULL';
 		$tool = false;
-		$id = $this->_getParam("id");
+		$id = $this->getRequest()->getParam("id");
 		if( strpos($id, "_") > -1 ){
 			$id = split("_", $id);
 			$id = $id[0];
@@ -223,7 +223,7 @@ class AppsController extends AbstractActionController
     {
 		$this->_helper->layout->disableLayout();
 		$apps = new Application\Model\Applications();
-		$apps->filter->id->equals($this->_getParam("id"));
+		$apps->filter->id->equals($this->getRequest()->getParam("id"));
 		if ( count($apps->items) > 0 ) {
 			$app = $apps->items[0];
 			if ( $app->logo == "" ) {
@@ -254,7 +254,7 @@ class AppsController extends AbstractActionController
 
 	public function addratingAction() {
 		$this->_helper->layout->disableLayout();
-		$ratingID = $this->_getParam("ratingid");
+		$ratingID = $this->getRequest()->getParam("ratingid");
 		$rating = null;
 		if ( $ratingID != '' ) {
 			$ratings = new Default_Model_AppRatings();
@@ -264,26 +264,26 @@ class AppsController extends AbstractActionController
 		} else {
 			$rating = new Default_Model_AppRating();
 		}
-		$rating->appid = $this->_getParam("appid");
-		$rating->rating = $this->_getParam("rating");
+		$rating->appid = $this->getRequest()->getParam("appid");
+		$rating->rating = $this->getRequest()->getParam("rating");
 		if ( $rating->rating == "0" ) $rating->rating = null;
-		$rating->comment = trim($this->_getParam("comment"));
+		$rating->comment = trim($this->getRequest()->getParam("comment"));
 		if ( $rating->comment == '' || $rating->comment == "undefined" ) {
 			$rating->comment = null;
 		} else {
 			$rating->comment = substr($rating->comment,0,512);
 		}
 		$rating->submittedOn = date("Y-m-d H:i:s");
-		if ( $this->_getParam("submitterid") != "" ) {
-			$rating->submitterid = $this->_getParam("submitterid");
+		if ( $this->getRequest()->getParam("submitterid") != "" ) {
+			$rating->submitterid = $this->getRequest()->getParam("submitterid");
 		} else {
-			$rating->submittername = $this->_getParam("submittername");
-			$rating->submitteremail = $this->_getParam("submittemail");
+			$rating->submittername = $this->getRequest()->getParam("submittername");
+			$rating->submitteremail = $this->getRequest()->getParam("submittemail");
 		}
 		if ( $rating !== null ) {
 			$rating->save();
 			$apps = new Application\Model\Applications();
-			$apps->filter->id = $this->_getParam("appid");
+			$apps->filter->id = $this->getRequest()->getParam("appid");
 			echo '{"id":"'.$rating->id.'","average":"'.$apps->items[0]->rating.'"}';
 		}
 	}
@@ -293,16 +293,16 @@ class AppsController extends AbstractActionController
 		$ratings = new Default_Model_AppRatings();
 		if ( $this->session->userid === null ) {
 			$r = json_decode($_COOKIE['ratings'],true);
-			$ratingid = $r['app'.$this->_getParam("appid")];
+			$ratingid = $r['app'.$this->getRequest()->getParam("appid")];
 			$ratings->filter->id->equals($ratingid);
 		} else {
-			$ratings->filter->appid->equals($this->_getParam("appid"))->and($ratings->filter->submitterid->equals($this->session->userid));
+			$ratings->filter->appid->equals($this->getRequest()->getParam("appid"))->and($ratings->filter->submitterid->equals($this->session->userid));
 		}
 		if ( count($ratings->refresh()->items) > 0 ) {
 			$id = $ratings->items[0]->id;
 			$ratings->remove($ratings->items[0]);
 			$apps = new Application\Model\Applications();
-			$apps->filter->id = $this->_getParam("appid");
+			$apps->filter->id = $this->getRequest()->getParam("appid");
 			echo '{"id":"'.$id.'","average":"'.$apps->items[0]->rating.'"}';
 		}
 	}
@@ -310,8 +310,8 @@ class AppsController extends AbstractActionController
     public function detailsAction()
 	{
 		$this->_helper->layout->disableLayout();
-		$appID = $this->_getParam("id");
-		$format = $this->_getParam("format");
+		$appID = $this->getRequest()->getParam("id");
+		$format = $this->getRequest()->getParam("format");
 		if ( $format === "json" ) $format = "xml";
 		if ( ($appID == '') ) $appID = $this->session->lastAppID;
 		$this->view->dialogCount=$_GET['dc'];
@@ -321,10 +321,10 @@ class AppsController extends AbstractActionController
 		$this->view->entryid = $appID;
                 $this->view->session = $this->session;
 		$this->view->entitytype = 'software';
-                if ( $this->_getParam('histid') != '' ) $this->view->histid = $this->_getParam('histid');
-                if ( $this->_getParam('histtype') != '' ) $this->view->histtype= $this->_getParam('histtype');
-		if ( $this->_getParam('entitytype') != '') {
-			$this->view->entitytype= strtolower( trim( $this->_getParam('entitytype') ) );
+                if ( $this->getRequest()->getParam('histid') != '' ) $this->view->histid = $this->getRequest()->getParam('histid');
+                if ( $this->getRequest()->getParam('histtype') != '' ) $this->view->histtype= $this->getRequest()->getParam('histtype');
+		if ( $this->getRequest()->getParam('entitytype') != '') {
+			$this->view->entitytype= strtolower( trim( $this->getRequest()->getParam('entitytype') ) );
 			switch ($this->view->entitytype){
 				case "vappliance":
 				case "virtualappliance":
@@ -355,7 +355,7 @@ class AppsController extends AbstractActionController
 		$this->_helper->viewRenderer->setNoRender();
         if (array_key_exists("type",$_GET))	$type = $_GET['type']; else $type = 'xml';
 		$apps = new Application\Model\Applications();
-		$apps->filter = FilterParser::getApplications($this->_getParam("flt"));
+		$apps->filter = FilterParser::getApplications($this->getRequest()->getParam("flt"));
         if ( $type === "xml" ) {
             $apps->refresh("xmlexport");
         } else {
@@ -462,7 +462,7 @@ class AppsController extends AbstractActionController
 		if ( $this->session->userid !== null ) {
 			if ( userIsAdminOrManager($this->session->userid) ) {
 				$apps = new Application\Model\Applications();
-				$apps->filter->id->equals($this->_getParam('id'));
+				$apps->filter->id->equals($this->getRequest()->getParam('id'));
 				$apps->refresh();
 				if ( count($apps->items) > 0 ) {
 					$app = $apps->items[0];
@@ -473,7 +473,7 @@ class AppsController extends AbstractActionController
 						$modInfo = $app->modInfo;
 						$modInfo->moddedBy = $this->session->userid;
 						$modInfo->moddedOn = 'NOW()';
-						$modInfo->modReason = trim($this->_getParam('reason'));
+						$modInfo->modReason = trim($this->getRequest()->getParam('reason'));
 					}
 					$app->save();
 					echo '{"id":"'.$app->id.'","name":"'.base64_encode($app->name).'","moderated":"'.$app->moderated.'","moderatedOn":"'.date("Y-m-d H:i:s").'","reason":"'.base64_encode($app->modInfo->modReason).'","moderatorID":"'.$this->session->userid.'","moderatorFirstname":"'.base64_encode($this->session->fullName).'","moderatorLastname":""}';
@@ -707,8 +707,8 @@ class AppsController extends AbstractActionController
 		}
         $error = '';
 		$reason = '';
-		$name = $this->_getParam("n");
-		$id = $this->_getParam("id");
+		$name = $this->getRequest()->getParam("n");
+		$id = $this->getRequest()->getParam("id");
 		if (trim($id) == "") {
 			$id = null;
 		}
@@ -2031,7 +2031,7 @@ class AppsController extends AbstractActionController
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
 		header('Content-type: application/json');
-		$appid = intval( $this->_getParam('appid') );
+		$appid = intval( $this->getRequest()->getParam('appid') );
 		if( $appid === 0 )
 		{
 			echo json_encode(array("result" => array("error" => "No vappliance id given")));
@@ -2095,9 +2095,9 @@ class AppsController extends AbstractActionController
 	public function importdocAction() {
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
-		$t = $this->_getParam("t");
-		$d = $this->_getParam("d");
-		$appid = $this->_getParam("appid");
+		$t = $this->getRequest()->getParam("t");
+		$d = $this->getRequest()->getParam("d");
+		$appid = $this->getRequest()->getParam("appid");
 		$res = null;
 		if (! isset($appid)) {
 			$appid = null;

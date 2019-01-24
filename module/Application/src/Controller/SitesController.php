@@ -52,10 +52,10 @@ class SitesController extends AbstractActionController{
 
 	public function detailsAction(){
 		 $this->_helper->layout->disableLayout();
-		 if ( $this->_getParam("id") != null ) {
-			 $this->view->id = trim($this->_getParam("id"));
+		 if ( $this->getRequest()->getParam("id") != null ) {
+			 $this->view->id = trim($this->getRequest()->getParam("id"));
 		 }
-		 $this->view->dialogCount = $this->_getParam('dc');
+		 $this->view->dialogCount = $this->getRequest()->getParam('dc');
 
 		 $sites = new Default_Model_Sites();
 		 $sites->filter->id->equals($this->view->id);
@@ -72,10 +72,10 @@ class SitesController extends AbstractActionController{
 // 		$this->_helper->viewRenderer->setNoRender();
 // 		$islocal = localRequest();
 //
-// 		$update =  ( $this->_getParam("update") != null )?$this->_getParam("update"):"true";
+// 		$update =  ( $this->getRequest()->getParam("update") != null )?$this->getRequest()->getParam("update"):"true";
 // 		$update = ( strtolower(trim($update)) === "false" )?false:true;
 //
-// 		$force =  ( $this->_getParam("force") != null )?$this->_getParam("force"):"true";
+// 		$force =  ( $this->getRequest()->getParam("force") != null )?$this->getRequest()->getParam("force"):"true";
 // 		$force = ( strtolower(trim($force)) === "true" )?true:false;
 //
 // 		if( !$islocal ){

@@ -47,8 +47,8 @@ class AbuseController extends AbstractActionController
 		$this->_helper->layout->disableLayout();
 		if ( $this->session->userid !== null ) {
 			if ( userIsAdminOrManager($this->session->userid) ) {
-				$id = $this->_getParam("id");
-				if ( $this->_getParam("moderate") == 0 ) $moderate = "0"; else $moderate = "1";
+				$id = $this->getRequest()->getParam("id");
+				if ( $this->getRequest()->getParam("moderate") == 0 ) $moderate = "0"; else $moderate = "1";
 				$ratings = new Default_Model_AppRatings();
 				$ratings->filter->id->equals($id);
 				if ( count($ratings->items) > 0 ) {
@@ -69,10 +69,10 @@ class AbuseController extends AbstractActionController
 		if ( $this->session->userid !== null ) {
 			$this->_helper->layout->disableLayout();
 			$this->_helper->viewRenderer->setNoRender();
-			$type = $this->_getParam("type");
-			$entryID = $this->_getParam("entryID");
-			$comment = $this->_getParam("comment");
-			$reason = $this->_getParam("reason");
+			$type = $this->getRequest()->getParam("type");
+			$entryID = $this->getRequest()->getParam("entryID");
+			$comment = $this->getRequest()->getParam("comment");
+			$reason = $this->getRequest()->getParam("reason");
 			switch($reason) {
 				case self::REASON_OTHER:
 					$reason_str = 'Other';

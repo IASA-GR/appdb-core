@@ -132,7 +132,7 @@ class ApiController extends AbstractActionController
         $this->handleResource($this->pars["resource"]);
         if ( is_object($this->entry) && $this->entry->getFormat() === "xml" && $this->entry->isFragment() === true) $this->entry = $this->entry->finalize();
         if ( is_object($this->entry) && $this->entry->getFormat() === "xml" ) {
-			//FIXME: $routeXslt = strval($this->_getParam("routeXslt"));
+			//FIXME: $routeXslt = strval($this->getRequest()->getParam("routeXslt"));
 			if ( isset($routeXslt) ) {
 				$routeXslt = explode("/", $routeXslt);
 				foreach($routeXslt as $xslt) {
@@ -225,10 +225,10 @@ class ApiController extends AbstractActionController
 				session_write_close();
 				$res = $_POST['resource'];
 			} else {
-				$res = $this->_getParam("resource");
+				$res = $this->getRequest()->getParam("resource");
 			}
 		} else {
-			$res = $this->_getParam("resource");
+			$res = $this->getRequest()->getParam("resource");
 		}
 		$url = preg_replace('/\?.*/', '', $res);
 		$qs = explode("&", preg_replace('/.*\?/', '', $res));
@@ -397,7 +397,7 @@ class ApiController extends AbstractActionController
 	}
 
 	public function oldproxy() {
-		$ver = $this->_getParam("version");
+		$ver = $this->getRequest()->getParam("version");
 		if ((!isset($ver)) || (trim($ver) == "")) $ver = 'latest';
 		$proxy = new AppDBRESTProxy($ver);
 		$data = array();
@@ -411,6 +411,6 @@ class ApiController extends AbstractActionController
 				session_write_close();
 			}
 		}
-		$proxy->request($this->_getParam("resource"), $act, $data);
+		$proxy->request($this->getRequest()->getParam("resource"), $act, $data);
 	}
 }

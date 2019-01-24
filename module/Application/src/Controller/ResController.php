@@ -31,7 +31,7 @@ class ResController extends AbstractActionController
 
 	public function jsAction() {
 		$headers = apache_request_headers();
-		$f = $this->_getParam('f');
+		$f = $this->getRequest()->getParam('f');
 		if ( $f != '' ) {
 			if ( substr($f, -4) === '.php' ) {
 				header('Location: http' . ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on")?"s":"") . '://' . $_SERVER['HTTP_HOST'] . '/' . $f);
@@ -57,7 +57,7 @@ class ResController extends AbstractActionController
 
 	public function cssAction() {
 		$headers = apache_request_headers();
-		$f = $this->_getParam('f');
+		$f = $this->getRequest()->getParam('f');
 		if ( $f != '' ) {
 			if ( substr($f, -4) === '.php' ) {
 				header('Location: http' . ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on")?"s":"") . '://' . $_SERVER['HTTP_HOST'] . '/' . $f);

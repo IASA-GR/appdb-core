@@ -202,9 +202,9 @@ class VoController extends AbstractActionController
     {
 	$this->_helper->layout->disableLayout();
 	$this->_helper->viewRenderer->setNoRender();
-	$name = $this->_getParam('name');
-	$discipline = $this->_getParam('id');
-	$vid = $this->_getParam('vid');
+	$name = $this->getRequest()->getParam('name');
+	$discipline = $this->getRequest()->getParam('id');
+	$vid = $this->getRequest()->getParam('vid');
 	
 	if( trim($name) !== "" && strtolower( trim($name) ) === "eubrazilcc.eu" ) {
 		$img = "images/vo_eubrazilcc_eu.png";
@@ -235,7 +235,7 @@ class VoController extends AbstractActionController
     public function resourcesAction()    
     {
         $this->_helper->layout->disableLayout();
-        $voname = $this->_getParam("id");
+        $voname = $this->getRequest()->getParam("id");
         if ($voname != null) {
             $xml = new SimpleXMLElement($this->xml);
 			$volist = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper($voname)."']");
@@ -911,15 +911,15 @@ class VoController extends AbstractActionController
         $this->_helper->layout->disableLayout();
 		$this->view->canEdit = false;
         if ( $this->xml !== null ) {
-            if ( $this->_getParam("id") != null ) {
+            if ( $this->getRequest()->getParam("id") != null ) {
                 $vos = new Default_Model_VOs();
-                $vos->filter->name->ilike($this->_getParam("id"));
+                $vos->filter->name->ilike($this->getRequest()->getParam("id"));
 				if( file_exists($_SERVER['APPLICATION_PATH'] . "/../cache/aggvos.xml") ){
 					$xml = new SimpleXMLElement($_SERVER['APPLICATION_PATH'] . "/../cache/aggvos.xml", 0, true);
 				}else{
 					$xml = new SimpleXMLElement($this->xml);
 				}
-				$volist = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper($this->_getParam("id"))."']");
+				$volist = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper($this->getRequest()->getParam("id"))."']");
 				if (count($volist)>0) {
 					$voentry = $volist[0];
 					$vo = $this->populateVO($voentry);
@@ -936,7 +936,7 @@ class VoController extends AbstractActionController
 						$vo->guid = "";
 						$vo->sourceid = "";
 					}
-					if ( isset($vo) ) $vo->contacts = $this->getContacts($this->_getParam("id"));
+					if ( isset($vo) ) $vo->contacts = $this->getContacts($this->getRequest()->getParam("id"));
 					$this->view->entry = $vo;
 					$this->view->relatedItems = array();
 					$this->view->relatedItems = array_merge($this->view->relatedItems, $vo->applications);
@@ -945,7 +945,7 @@ class VoController extends AbstractActionController
 				}
             }
             $this->view->session = $this->session;
-            $this->view->dialogCount = $this->_getParam('dc');
+            $this->view->dialogCount = $this->getRequest()->getParam('dc');
 			
         } else {
             $this->printError();

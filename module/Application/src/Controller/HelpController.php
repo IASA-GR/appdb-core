@@ -42,9 +42,9 @@ class HelpController extends AbstractActionController
 
 	public function faqaAction() {
 		$res = NULL;
-		if ($this->_getParam("id") != "") {
+		if ($this->getRequest()->getParam("id") != "") {
 			$faqs = new Default_Model_FAQs();
-			$faqs->filter->id->equals($this->_getParam("id"));
+			$faqs->filter->id->equals($this->getRequest()->getParam("id"));
 			if (count($faqs->items) > 0) {
 				$res = str_replace('”', '"', $faqs->items[0]->answer);
 			}
@@ -231,8 +231,8 @@ class HelpController extends AbstractActionController
 	}
 
 	public function editfaqAction() {
-		/*$id = $this->_getParam('id');
-		$txt = $this->_getParam('answer');
+		/*$id = $this->getRequest()->getParam('id');
+		$txt = $this->getRequest()->getParam('answer');
 		$question = null;
 		
 		if ($txt == '') {
@@ -243,7 +243,7 @@ class HelpController extends AbstractActionController
 		}
 		
 		if (isset($_POST["question"]) && trim($_POST["question"]) != "") {
-			$question = $this->_getParam('question');
+			$question = $this->getRequest()->getParam('question');
 			$question = htmlspecialchars($question);
 		}
 		$users = new Default_Model_Researchers();
@@ -261,11 +261,11 @@ class HelpController extends AbstractActionController
 						$faq->question = $question;
 					}
 					$faq->submitterid = $this->session->userid;
-					if ($this->_getParam('ord') != '') $faq->ord = $this->_getParam('ord');
+					if ($this->getRequest()->getParam('ord') != '') $faq->ord = $this->getRequest()->getParam('ord');
 				}
 			} else {
 				$faq = new Default_Model_FAQ();
-				$faq->question = $this->_getParam('question');
+				$faq->question = $this->getRequest()->getParam('question');
 				if ($faq->question == '') {
 					$this->getResponse()->clearAllHeaders();
 					header("HTTP/1.0 400 Bad Request");
@@ -274,7 +274,7 @@ class HelpController extends AbstractActionController
 				}
 				$faq->answer = $txt;
 				$faq->submitterid = $this->session->userid;
-				if ($this->_getParam('ord') != '') $faq->ord = $this->_getParam('ord');
+				if ($this->getRequest()->getParam('ord') != '') $faq->ord = $this->getRequest()->getParam('ord');
 			}
 			if ($faq !== null) {
 				$faq->when = 'NOW()';
@@ -316,7 +316,7 @@ class HelpController extends AbstractActionController
 
 	public function shortenurlAction() {
 		DISABLE_LAYOUT($this);
-		return SET_NO_RENDER($this, shortenURL($this->_getParam("url")));
+		return SET_NO_RENDER($this, shortenURL($this->getRequest()->getParam("url")));
 	}
 
 	public function wikiAction() {

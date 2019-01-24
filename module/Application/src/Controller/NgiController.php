@@ -50,11 +50,11 @@ class NgiController extends AbstractActionController
 	{
 		$this->_helper->layout->disableLayout();
 		$ngis = new Default_Model_NGIs();
-		$ngis->filter->id->equals($this->_getParam('id'));
+		$ngis->filter->id->equals($this->getRequest()->getParam('id'));
 		if ( $ngis->count() >= 1 ) {			
 			$this->view->entry = $ngis->items[0];
 		}
-		$this->view->dialogCount = $this->_getParam('dc');
+		$this->view->dialogCount = $this->getRequest()->getParam('dc');
 	}
 
 	private function pgBool($v) {
@@ -66,24 +66,24 @@ class NgiController extends AbstractActionController
 	public function indexAction()
     {
 		$this->_helper->layout->disableLayout();
-		$offset = $this->_getParam('ofs');
-		$length = $this->_getParam('len');
+		$offset = $this->getRequest()->getParam('ofs');
+		$length = $this->getRequest()->getParam('len');
 		if ( $offset === null) $offset = 0;
 		if ( $length === null ) $length = 23;
 		$ngis = new Default_Model_NGIs();
 		$f1 = new Default_Model_NGIsFilter();
 		$f2 = new Default_Model_NGIsFilter();
-		if ( ($this->_getParam('eu') !== '' ) && ($this->_getParam('eu') !== null) ) {
-			if ($this->_getParam('eu') == "1") {
+		if ( ($this->getRequest()->getParam('eu') !== '' ) && ($this->getRequest()->getParam('eu') !== null) ) {
+			if ($this->getRequest()->getParam('eu') == "1") {
 				$f1->countryid->notequals(null);
 			} else {
 				$f1->countryid->equals(null);
 			}
-			$this->view->european = $this->_getParam('eu');		
+			$this->view->european = $this->getRequest()->getParam('eu');		
 		}
-		if ( $this->_getParam('filter') != '' ) {
-			$f2->any->ilike('%'.$this->_getParam('filter').'%');
-			$this->view->ngiFilter = $this->_getParam('filter');
+		if ( $this->getRequest()->getParam('filter') != '' ) {
+			$f2->any->ilike('%'.$this->getRequest()->getParam('filter').'%');
+			$this->view->ngiFilter = $this->getRequest()->getParam('filter');
 		}
 		if ($f1->expr() != "") $ngis->filter->chain($f1,'AND');
 		if ($f2->expr() != "") $ngis->filter->chain($f2,'AND');
@@ -100,7 +100,7 @@ class NgiController extends AbstractActionController
     public function getlogoAction()
     {
 		$this->_helper->layout->disableLayout();
-		$id = $this->_getParam('id');
+		$id = $this->getRequest()->getParam('id');
 		$ngis = new Default_Model_NGIs();
 		$ngis->filter->id->equals($id);
 		$ngi = $ngis->items[0];
