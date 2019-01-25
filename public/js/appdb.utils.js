@@ -7969,7 +7969,11 @@ appdb.utils.extendArray = function(arr){
 appdb.utils.GroupSiteImages = function(occiservices, flattenVOs){
 	occiservices = occiservices || [];
 	occiservices = $.isArray(occiservices)?occiservices:[occiservices];
-	
+
+	function getNoneVO() {
+		return {id: '<none>', name: '<none>'};
+	}
+
 	function collectImages(servs){
 		var res = [];
 		$.each(servs, function(i, e){
@@ -7981,6 +7985,7 @@ appdb.utils.GroupSiteImages = function(occiservices, flattenVOs){
 					ext.template = e.template;
 					ext.occi_endpoint_url = e.occi_endpoint_url;
 					ext.occi.mpuri = e.mpuri;
+					ext.occi.vo = ext.occi.vo || getNoneVO();
 					ext.instances = []; //will be used to group image instances
 					res.push(ext);
 				});
@@ -8086,6 +8091,9 @@ appdb.utils.GroupSiteImages = function(occiservices, flattenVOs){
 		$.each(images, function(i, e){
 			if( !e.goodid ) return;
 			var uuid = e.goodid;
+			if(e.occi && !e.occi.vo) {
+				e.occi.vo = getNoneVO();
+			}
 			if (flattenVOs === true && e.occi && e.occi.vo) {
 			    uuid = uuid + '_' + e.occi.vo.id;
 			}
@@ -8137,6 +8145,7 @@ appdb.utils.GroupSiteImages = function(occiservices, flattenVOs){
 			if( res.hasOwnProperty(i) === false ) continue;
 			var uniq = {};
 			$.each(res[i].instances, function(ii, e){
+				e.vo = e.vo || getNoneVO();
 				uniq[e.providerimageid] = e;
 			});
 			res[i].instances = [];

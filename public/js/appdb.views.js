@@ -19700,12 +19700,14 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 				},
 				update: function(filter, data) {
 					var preselect = 'fedcloud.egi.eu';
+					var postselect = '<none>';
 					var sel = $(this.dom).find(".resourceproviders .voselector");
 					var avos = filter.getValueObjects(this.options.data);
 					avos.sort(function(a,b){
 						var an = a.val;
 						var bn = b.val;
 
+						if( an === postselect) return 1;
 						if( an < bn) return -1;
 						if( an > bn) return 1;
 
@@ -19796,7 +19798,7 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 						e.instances = e.instances || [];
 						e.instances = $.isArray(e.instances) ? e.instances : [e.instances];
 						var occis = $.grep(e.instances, function(ee) {
-							return (ee.voimageid) ? true : false;
+							return (ee.voimageid || ee.vo) ? true : false;
 						});
 						$.each(occis, function(ii, ee) {
 						    if (vos[ee.vo.id]) {
@@ -19806,12 +19808,6 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 						    vos[ee.vo.id] = $.extend(true, {}, ee.vo);
 						    vos[ee.vo.id].count = 1;
 						});
-						var noneoccis = $.grep(e.instances, function(ee) {
-							return (ee.voimageid) ? false : true;
-						});
-						if( noneoccis.length > 0 ) {
-							vos["<none>"] = {name:"<none>", id: "<none>"};
-						}
 					});
 					var res = [];
 					for (var i in vos) {
