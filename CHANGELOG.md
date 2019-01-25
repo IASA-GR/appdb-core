@@ -3,9 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [6.1.14]
 ### Changed
-- Added more warning messages and documentation links in continuous delivery UI
+- Added more warning messages and documentation links in continuous delivery UI to prevent user mistakes
+### Fixed
+- Properly handle site images that are not provided under a VO wide image list
 
 ## [6.1.13] - 2018-01-10
 ### Fixed
