@@ -16,8 +16,9 @@
  */
 ?>
 <?php
+namespace Application\Model;
 
-class Default_Model_Filter {
+class Filter {
 	
 	public $_expr;
 	public $fltstr;
@@ -83,19 +84,19 @@ class Default_Model_Filter {
 
 	public function item($i) {
 		if ( (in_array($i,$this->_fields)) || ($i === "any" ) ) {
-			$f = new Default_Model_FilterItem($i, $this);
+			$f = new FilterItem($i, $this);
 		} else {
 			$found = false;
 			foreach ($this->_fields as $ii) {
 				//debug_log('/^' . $ii . '$/');
 				if (preg_match('/^' . $ii . '$/', $i)) {
 					$found = true;
-					$f = new Default_Model_FilterItem($i, $this);
+					$f = new FilterItem($i, $this);
 					break;
 				}
 			}
 			if (!$found) {
-				$f = new Default_Model_FilterItem($this->_fields[0], $this);
+				$f = new FilterItem($this->_fields[0], $this);
 			}			
 		}
 		$f->setDialect($this->_dialect);

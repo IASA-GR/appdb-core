@@ -1993,7 +1993,7 @@ abstract class RestResource implements iRestResource, iRestAuthModule, iRestAPIL
 				RestAPIHelper::getVersion(),
 				($old == '' ? null : $old),
 				($new == '' ? null : $new)
-			))->fetchAll();
+			))->toArray();
 		}
 	}
 

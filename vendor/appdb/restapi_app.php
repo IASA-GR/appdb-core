@@ -1340,7 +1340,7 @@ class RestAppItem extends RestResourceItem {
 						"source" => $cid,
 						"ip" => $src
 					))) . "';";
-					db()->query($sql)->fetchAll();
+					db()->query($sql);
 				} catch (Exception $e) { /*ignore logging errors in case id or name not found*/ }
 			}
 			$this->_logged = true;
@@ -1484,7 +1484,7 @@ class RestAppRatingReport extends RestROResourceItem {
 			$p = $id . ($t != '' ? ",$t" : "");
 			$db = $application->getBootstrap()->getResource('db');
 			$db->setFetchMode(Zend_Db::FETCH_OBJ);
-			$r = $db->query('SELECT apprating_report_to_xml('.$p.');')->fetchAll();
+			$r = $db->query('SELECT apprating_report_to_xml('.$p.');', array())->toArray();
 			return new XMLFragmentRestResponse($r[0]->apprating_report_to_xml, $this);
 		} else return false;
 	}

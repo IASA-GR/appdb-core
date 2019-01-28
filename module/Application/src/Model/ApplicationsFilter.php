@@ -16,11 +16,12 @@
  */
 ?>
 <?php
-class Default_Model_ApplicationsFilter extends Default_Model_ApplicationsFilterBase {
+namespace Application\Model;
+
+class ApplicationsFilter extends ApplicationsFilterBase {
 	public function __construct() {
 		parent::__construct();
-        $interval = Zend_Registry::get("app");
-        $interval = $interval["invalid"];
+		$interval = \ApplicationConfiguration::app('invalid');
 		$this->_fields[] = 'rank';
 		$this->_fields[] = 'EXTRACT(YEAR FROM dateadded)';
 		$this->_fields[] = 'EXTRACT(MONTH FROM dateadded)';

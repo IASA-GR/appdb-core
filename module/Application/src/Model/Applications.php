@@ -17,8 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Applications extends Default_Model_ApplicationsBase
-{
+namespace Application\Model;
+
+class Applications extends ApplicationsBase {
 	protected $_userid;
 	protected $_viewModerated; // defaults to false
 
@@ -37,8 +38,8 @@ class Default_Model_Applications extends Default_Model_ApplicationsBase
 		if ( count($res) == 0 ) {
 			return true;
 		} else {
-			$a = new Default_Model_Application();
-			$m = new Default_Model_ApplicationsMapper();
+			$a = new Application();
+			$m = new ApplicationsMapper();
 			$m->populate($a,$res[0]);
 			return $a;
 		}
@@ -80,7 +81,7 @@ class Default_Model_Applications extends Default_Model_ApplicationsBase
 			  ( strpos($ex, 'applications.moderated) IS FALSE') === false ) ||
 			  ( strpos($ex, 'applications.deleted) IS FALSE') === false )
 			) {
-				$f = new Default_Model_ApplicationsFilter();
+				$f = new ApplicationsFilter();
 				$f->moderated->equals(false)->and($f->deleted->equals(false));
 				$this->_filter->chain($f,"AND");
 			}
@@ -105,7 +106,7 @@ class Default_Model_Applications extends Default_Model_ApplicationsBase
 			  ( strpos($ex, 'applications.moderated) IS FALSE') === false ) ||
 			  ( strpos($ex, 'applications.deleted) IS FALSE') === false )
 		  ) {
-			$f = new Default_Model_ApplicationsFilter();
+			$f = new ApplicationsFilter();
 			$f->moderated->equals(false)->and($f->deleted->equals(false));
 
 			$this->_filter->chain($f,"AND");

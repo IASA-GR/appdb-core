@@ -16,8 +16,9 @@
  */
 ?>
 <?php
+namespace Application\Model;
 
-class Default_Model_FilterItem {
+class FilterItem {
 
 	protected $_ancestor;
 	protected $_field;
@@ -30,7 +31,7 @@ class Default_Model_FilterItem {
 	private $_charCast;
 	private $_escape_seq_overridden = false;
 
-	public function __construct($field, Default_Model_Filter $ancestor) {
+	public function __construct($field, Filter $ancestor) {
 		$this->_ancestor = $ancestor;
 		$this->_field = $field;
 		$this->setDialect(0);
@@ -113,7 +114,7 @@ class Default_Model_FilterItem {
 	private function checkAny($val, $op, $coalesce = false) {
 		if ($this->_field == "any") {
 			if ( in_array("any.any", $this->_ancestor->_fields) )  {
-				$f = new Default_Model_FilterItem("any.any", $this->_ancestor);
+				$f = new FilterItem("any.any", $this->_ancestor);
 				$f->$op($val, $coalesce);
 				$this->_expr = "(".$f->expr().")";
 			} else {
@@ -121,7 +122,7 @@ class Default_Model_FilterItem {
 				foreach ($this->_ancestor->_fields as $field) {
 					if ( (array_key_exists($field, $this->_ancestor->_fieldTypes)) && ( ($this->_ancestor->_fieldTypes[$field] == 'string') || ($this->_ancestor->_fieldTypes[$field] == 'string[]') || ($field == "id") ) ) {
 						if ( $field !== "any.any" ) {
-							$f = new Default_Model_FilterItem($field, $this->_ancestor);
+							$f = new FilterItem($field, $this->_ancestor);
 							$f->$op($val, $coalesce);
 							$s[] = $f->expr();
 						}

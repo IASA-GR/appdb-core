@@ -17,8 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Application extends Default_Model_ApplicationBase
-{
+namespace Application\Model;
+
+class Application extends ApplicationBase {
 	protected $_urls;
 	protected $_countries;
 	protected $_VOs;
