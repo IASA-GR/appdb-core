@@ -187,9 +187,9 @@ function web_get_contents($url) {
 
 function userIsAdmin($id) {
 	if (is_null($id)) return false;
-	$admins = new Default_Model_Researchers();
+	$admins = new Application\Model\Researchers();
 	$admins->filter->id->numequals($id);
-	$agmf = new Default_Model_ActorGroupMembersFilter();
+	$agmf = new Application\Model\ActorGroupMembersFilter();
 	$agmf->groupid->numequals(-1);
 	$admins->filter->chain($agmf, "AND");
 	return (count($admins->items) > 0);
@@ -197,9 +197,9 @@ function userIsAdmin($id) {
 
 function userIsManager($id) {
 	if (is_null($id)) return false;
-	$admins = new Default_Model_Researchers();
+	$admins = new Application\Model\Researchers();
 	$admins->filter->id->numequals($id);
-	$agmf = new Default_Model_ActorGroupMembersFilter();
+	$agmf = new Application\Model\ActorGroupMembersFilter();
 	$agmf->groupid->numequals(-2);
 	$admins->filter->chain($agmf, "AND");
 	return (count($admins->items) > 0);
@@ -207,9 +207,9 @@ function userIsManager($id) {
 
 function userIsNIL($id, $cid = null) {
 	if (is_null($id)) return false;
-	$admins = new Default_Model_Researchers();
+	$admins = new Application\Model\Researchers();
 	$admins->filter->id->numequals($id);
-	$agmf = new Default_Model_ActorGroupMembersFilter();
+	$agmf = new Application\Model\ActorGroupMembersFilter();
 	$agmf->groupid->numequals(-3);
 	if (is_null($cid)) {
 		$agmf->groupid->numequals(-3);
@@ -222,17 +222,17 @@ function userIsNIL($id, $cid = null) {
 
 function userIsAdminOrManager($id) {
 	if (is_null($id)) return false;
-	$admins = new Default_Model_Researchers();
+	$admins = new Application\Model\Researchers();
 	$admins->filter->id->numequals($id);
-	$agmf = new Default_Model_ActorGroupMembersFilter();
+	$agmf = new Application\Model\ActorGroupMembersFilter();
 	$agmf->groupid->in(array(-1, -2));
 	$admins->filter->chain($agmf, "AND");
 	return (count($admins->items) > 0);
 }
 
 function getAdminsAndManagers() {
-	$admins = new Default_Model_Researchers();
-	$agmf = new Default_Model_ActorGroupMembersFilter();
+	$admins = new Application\Model\Researchers();
+	$agmf = new Application\Model\ActorGroupMembersFilter();
 	$agmf->groupid->in(array(-1, -2));
 	$admins->filter->chain($agmf, "AND");
 	return $admins->items;
@@ -240,7 +240,7 @@ function getAdminsAndManagers() {
 
 function userHasPersonalAccessTokens($id) {
         if (is_null($id) === false) {
-                $users = new Default_Model_Researchers();
+                $users = new Application\Model\Researchers();
                 $users->filter->id->numequals($id);
                 if (count($users->items) === 0) {
                     return false;
@@ -249,9 +249,9 @@ function userHasPersonalAccessTokens($id) {
                 if (trim($user->guid) === '') {
                     return false;
                 }
-                $ats = new Default_Model_AccessTokens();
-                $f1 = new Default_Model_AccessTokensFilter();
-                $f2  = new Default_Model_AccessTokensFilter();
+                $ats = new Application\Model\AccessTokens();
+                $f1 = new Application\Model\AccessTokensFilter();
+                $f2  = new Application\Model\AccessTokensFilter();
                 $f1->actor->equals($user->guid);
                 $f2->type->equals('personal');
 
@@ -2266,25 +2266,25 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 	}
 
 	public static function getPeople($fltstr, $isfuzzy=false) {
-		$f = new Default_Model_ResearchersFilter();
+		$f = new Application\Model\ResearchersFilter();
 		FilterParser::buildFilter($f, $fltstr, $isfuzzy);
 		return $f;
 	}
 
 	public static function getVOs($fltstr, $isfuzzy=false) {
-		$f = new Default_Model_VOsFilter();
+		$f = new Application\Model\VOsFilter();
 		FilterParser::buildFilter($f, $fltstr, $isfuzzy);
 		return $f;
     }
 
 	public static function getDissemination($fltstr, $isfuzzy=false) {
-		$f = new Default_Model_DisseminationFilter();
+		$f = new Application\Model\DisseminationFilter();
 		FilterParser::buildFilter($f, $fltstr, $isfuzzy);
 		return $f;
 	}
 
 	public static function getSites($fltstr, $isfuzzy=false) {
-		$f = new Default_Model_SitesFilter();
+		$f = new Application\Model\SitesFilter();
 		FilterParser::buildFilter($f, $fltstr, $isfuzzy);
 		return $f;
 	}
@@ -2393,71 +2393,71 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 					$f->any->$expOp($fltstr);
 					$ff[] = $f;
 					if ( $defaultTable !== "site") {
-						$f = new Default_Model_LicensesFilter();
+						$f = new Application\Model\LicensesFilter();
 						$f->any->$expOp($fltstr);
 						$ff[] = $f;
 					}
-					$f = new Default_Model_VOsFilter();
+					$f = new Application\Model\VOsFilter();
 					$f->any->$expOp($fltstr);
 					$ff[] = $f;
-					$f = new Default_Model_MiddlewaresFilter();
+					$f = new Application\Model\MiddlewaresFilter();
 					$f->any->$expOp($fltstr);
 					$ff[] = $f;
-					$f = new Default_Model_CountriesFilter();
+					$f = new Application\Model\CountriesFilter();
 					$f->any->$expOp($fltstr);
 					$ff[] = $f;
 					if ( ! $private || $defaultTable === "application" ) {
-						$f = new Default_Model_AppCountriesFilter();
+						$f = new Application\Model\AppCountriesFilter();
 						$f->any->$expOp($fltstr);
 						$ff[] = $f;
 					}
 					if ( $defaultTable !== "site") {
-						$f = new Default_Model_StatusesFilter();
+						$f = new Application\Model\StatusesFilter();
 						$f->any->$expOp($fltstr);
 						$ff[] = $f;
 					}
-					$f = new Default_Model_ArchsFilter();
+					$f = new Application\Model\ArchsFilter();
 					$f->any->$expOp($fltstr);
 					$ff[] = $f;
-					$f = new Default_Model_OSesFilter();
+					$f = new Application\Model\OSesFilter();
 					$f->any->$expOp($fltstr);
 					$ff[] = $f;
-					$f = new Default_Model_ProgLangsFilter();
+					$f = new Application\Model\ProgLangsFilter();
 					$f->any->$expOp($fltstr);
 					$ff[] = $f;
-					$f = new Default_Model_DisciplinesFilter();
+					$f = new Application\Model\DisciplinesFilter();
 					$f->any->$expOp($fltstr);
 					$ff[] = $f;
 					if ( $defaultTable !== "site") {
-						$f = new Default_Model_ResearchersFilter();
+						$f = new Application\Model\ResearchersFilter();
 						$f->any->$expOp($fltstr);
 						$ff[] = $f;
 					}
-					$f = new Default_Model_CategoriesFilter();
+					$f = new Application\Model\CategoriesFilter();
 					$f->any->$expOp($fltstr);
 					$ff[] = $f;
 					if ( $defaultTable !== "site") {
-						$f = new Default_Model_PositionTypesFilter();
+						$f = new Application\Model\PositionTypesFilter();
 						$f->any->$expOp($fltstr);
 						$ff[] = $f;
 					}
 					if ( $defaultTable !== "site") {
-						$f = new Default_Model_ContactsFilter();
+						$f = new Application\Model\ContactsFilter();
 						$f->any->$expOp($fltstr);
 						$ff[] = $f;
 					}
 					if ( (! $private || $defaultTable === "application") && ($defaultTable !== "vo") && ($defaultTable !== "site") && ($defaultTable !== "person") ) {
-						$f = new Default_Model_HypervisorsFilter();
+						$f = new Application\Model\HypervisorsFilter();
 						$f->name->$expOp($fltstr);
 						$ff[] = $f;
 					}
 					if ( (! $private || $defaultTable === "application" ) && ($defaultTable !== "vo") && ($defaultTable !== "site") && ($defaultTable !== "person") ) {
-						$f = new Default_Model_VMIflavoursFilter();
+						$f = new Application\Model\VMIflavoursFilter();
 						$f->format->$expOp($fltstr);
 						$ff[] = $f;
 					}
 					if ( /*(! $private && $defaultTable === "application") ||*/ $defaultTable === "site" ) {
-						$f = new Default_Model_SitesFilter();
+						$f = new Application\Model\SitesFilter();
 						$f->any->$expOp($fltstr);
 						$ff[] = $f;
 					}
@@ -2519,7 +2519,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 							break;
 						case "phonebook":
 							$f1 = false;
-							$f2 = new Default_Model_SitesFilter();
+							$f2 = new Application\Model\SitesFilter();
 							if ( (strtolower($val) >= "a") && (strtolower($val) <= "z") ) {
 								$val = strtolower($val);
 								if (strtolower($val) < "z") {
@@ -2539,7 +2539,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 							break;
 						case "supports":
 							$f1 = false;
-							$f2 = new Default_Model_SitesFilter();
+							$f2 = new Application\Model\SitesFilter();
 							if (is_numeric(trim(str_replace("%", '', $val)))) {
 								$supports = trim(str_replace("%", '', $val));
 							} else {
@@ -2565,7 +2565,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 							break;
 						case "hasinstances":
 							$f1 = false;
-							$f2 = new Default_Model_SitesFilter();
+							$f2 = new Application\Model\SitesFilter();
 							if (is_numeric(trim(str_replace("%", '', $val)))) {
 								$siteinstances = trim(str_replace("%", '', $val));
 							} else {
@@ -2590,7 +2590,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 							$filter->chain($f2, $chainOp, $private);
 							break;
 						}
-						if ($f1 === null) $f1 = new Default_Model_SitesFilter();
+						if ($f1 === null) $f1 = new Application\Model\SitesFilter();
 						break;
 					case "application":
 						switch($fld) {
@@ -2601,11 +2601,11 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 							$val = str_replace("%", "", $val);
 							if (filter_var($val, FILTER_VALIDATE_BOOLEAN)) {
 								$f1 = false;
-								$f2 = new Default_Model_VAversionsFilter();
+								$f2 = new Application\Model\VAversionsFilter();
 								$f2->published->equals("true")->and($f2->archived->equals(false))->and($f2->enabled->equals(true));
 								$filter->chain($f2, $chainOp, $private);
 							} else {
-								$f1 = new Default_Model_VAversionsFilter();
+								$f1 = new Application\Model\VAversionsFilter();
 							}
 							break;
 						case "relatedto":
@@ -2646,7 +2646,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$fld = "name";
 							}
 							$tbl = "statuses";
-							$f1 = new Default_Model_StatusesFilter();
+							$f1 = new Application\Model\StatusesFilter();
 							break;
 						case "osfamily":
 							if (is_numeric(trim(str_replace("%", '', $val)))) {
@@ -2655,12 +2655,12 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$fld = "name";
 							}
 							$tbl = "os_families";
-							$f1 = new Default_Model_OSFamiliesFilter();
+							$f1 = new Application\Model\OSFamiliesFilter();
 							break;
 						case "imageformat":
 							$tbl = "vmiflavours";
 							$fld = "format";
-							$f1 = new Default_Model_VMIflavoursFilter();
+							$f1 = new Application\Model\VMIflavoursFilter();
 							break;
 						case "hypervisor":
 							if (is_numeric(trim(str_replace("%", '', $val)))) {
@@ -2669,7 +2669,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$fld = "name";
 							}
 							$tbl = "hypervisors";
-							$f1 = new Default_Model_HypervisorsFilter();
+							$f1 = new Application\Model\HypervisorsFilter();
 							break;
 						case "os":
 							if (is_numeric(trim(str_replace("%", '', $val)))) {
@@ -2678,7 +2678,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$fld = "name";
 							}
 							$tbl = "oses";
-							$f1 = new Default_Model_OSesFilter();
+							$f1 = new Application\Model\OSesFilter();
 							break;
 						case "arch":
 							if (is_numeric(trim(str_replace("%", '', $val)))) {
@@ -2687,7 +2687,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$fld = "name";
 							}
 							$tbl = "archs";
-							$f1 = new Default_Model_ArchsFilter();
+							$f1 = new Application\Model\ArchsFilter();
 							break;
 						case "language":
 							if (is_numeric(trim(str_replace("%", '', $val)))) {
@@ -2696,11 +2696,11 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$fld = "name";
 							}
 							$tbl = "proglangs";
-							$f1 = new Default_Model_ProgLangsFilter();
+							$f1 = new Application\Model\ProgLangsFilter();
 							break;
 						case "releasecount":
 							$fld="relcount";
-							$f1 = new Default_Model_AppReleaseCountFilter();
+							$f1 = new Application\Model\AppReleaseCountFilter();
 							break;
 						case "validated":
 							if (preg_match('/^[0-9]+ (month|year)s{0,1}$/', trim(str_replace('%', '', $val)))) {
@@ -2779,7 +2779,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 							break;
 						case "phonebook":
 							$f1 = false;
-							$f2 = new Default_Model_VOsFilter();
+							$f2 = new Application\Model\VOsFilter();
 							if ( (strtolower($val) >= "a") && (strtolower($val) <= "z") ) {
 								$val = strtolower($val);
 								if (strtolower($val) < "z") {
@@ -2797,51 +2797,51 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 							}							
 							$filter->chain($f2, $chainOp, $private);
 						}
-						if ($f1 === null) $f1 = new Default_Model_VOsFilter();
+						if ($f1 === null) $f1 = new Application\Model\VOsFilter();
 						break;
 					case "country":
 						if ( ! $private || $defaultTable === "application" ) {
 							$f1 = false;
-							$f2 = new Default_Model_CountriesFilter();
+							$f2 = new Application\Model\CountriesFilter();
 							$f2->$fld->$expOp($val);
-							$f3 = new Default_Model_AppCountriesFilter();
+							$f3 = new Application\Model\AppCountriesFilter();
 							$f3->$fld->$expOp($val);
 							$filter->chain($f2->chain($f3, "OR", $private), $chainOp, $private);
 						} else {
-							$f1 = new Default_Model_CountriesFilter();
+							$f1 = new Application\Model\CountriesFilter();
 						}
 					case "countryxxx":
 						if (( $defaultTable === "site" ) || ( $defaultTable === "person" )) {
 							if ( $countryHack ) {
-								$f1 = new Default_Model_CountriesFilter();
+								$f1 = new Application\Model\CountriesFilter();
 								$filter->chain($f1,$chainOp);
-								$f1 = new Default_Model_AppCountriesFilter();
+								$f1 = new Application\Model\AppCountriesFilter();
 							} else {
-								$f1 = new Default_Model_CountriesFilter();
+								$f1 = new Application\Model\CountriesFilter();
 							}
 						} else {
-							$f1 = new Default_Model_AppCountriesFilter();
+							$f1 = new Application\Model\AppCountriesFilter();
 						}
 						break;
 					case "middleware":
-						$f1 = new Default_Model_MiddlewaresFilter();
+						$f1 = new Application\Model\MiddlewaresFilter();
 						break;
 					case "discipline":
-						$f1 = new Default_Model_DisciplinesFilter();
+						$f1 = new Application\Model\DisciplinesFilter();
 						break;
 					case "category":
-						$f1 = new Default_Model_CategoriesFilter();
+						$f1 = new Application\Model\CategoriesFilter();
 						break;
 					case "accessgroup":
 						switch($fld) {
 							case "name":
 							case "id":
-								$f2 = new Default_Model_ActorGroupsFilter();
+								$f2 = new Application\Model\ActorGroupsFilter();
 								$f2->$fld->$expOp($val);
 								$filter->chain($f2, $chainOp, $private);
 								break;
 							case "payload":
-								$f2 = new Default_Model_ActorGroupMembersFilter();
+								$f2 = new Application\Model\ActorGroupMembersFilter();
 								$f2->$fld->$expOp($val);
 								$filter->chain($f2, $chainOp, $private);
 								break;
@@ -2851,12 +2851,12 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 					case "license":
 						switch ($fld) {
 							case "id":
-								$f1 = new Default_Model_LicensesFilter();
+								$f1 = new Application\Model\LicensesFilter();
 								break;
 							default:
-								$f2 = new Default_Model_LicensesFilter();
+								$f2 = new Application\Model\LicensesFilter();
 								$f2->$fld->$expOp($val);
-								$f3 = new Default_Model_AppLicensesFilter();
+								$f3 = new Application\Model\AppLicensesFilter();
 								$f3->$fld->$expOp($val);
 								$filter->chain($f2->chain($f3, "OR", $private), $chainOp, $private);
 								$f1 = false;
@@ -2867,7 +2867,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 						switch($fld) {
 						case "phonebook":
 							$f1 = false;
-							$f2 = new Default_Model_ResearchersFilter();
+							$f2 = new Application\Model\ResearchersFilter();
 							if ( (strtolower($val) >= "a") && (strtolower($val) <= "z") ) {
 								$val = strtolower($val);
 								if (strtolower($val) < "z") {
@@ -2892,7 +2892,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$fld = "name";
 							}
 							$tbl = "proglangs";
-							$f1 = new Default_Model_ProgLangsFilter();
+							$f1 = new Application\Model\ProgLangsFilter();
 							break;
 						case "os":
 							if (is_numeric(trim(str_replace("%", '', $val)))) {
@@ -2901,7 +2901,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$fld = "name";
 							}
 							$tbl = "oses";
-							$f1 = new Default_Model_OSesFilter();
+							$f1 = new Application\Model\OSesFilter();
 							break;
 						case "arch":
 							if (is_numeric(trim(str_replace("%", '', $val)))) {
@@ -2910,7 +2910,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$fld = "name";
 							}
 							$tbl = "archs";
-							$f1 = new Default_Model_ArchsFilter();
+							$f1 = new Application\Model\ArchsFilter();
 							break;
 						case "year":
 							$fld="EXTRACT(YEAR FROM dateinclusion)";
@@ -2929,19 +2929,19 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 							$fld = "institution";
 							break;
 						case "role":
-							$f1 = new Default_Model_PositionTypesFilter();
+							$f1 = new Application\Model\PositionTypesFilter();
 							$fld = "any";
 							break;
 						case "roleid":
-							$f1 = new Default_Model_PositionTypesFilter();
+							$f1 = new Application\Model\PositionTypesFilter();
 							$fld = "id";
 							break;
 						case "contact":
-							$f1 = new Default_Model_ContactsFilter();
+							$f1 = new Application\Model\ContactsFilter();
 							$fld = "data";
 							break;
 						}
-						if ($f1 === null) $f1 = new Default_Model_ResearchersFilter();
+						if ($f1 === null) $f1 = new Application\Model\ResearchersFilter();
 						break;
 					}
 					if (($f1 !== null) && ($f1 !== false)) {
@@ -3072,12 +3072,12 @@ class NewsFeed {
 				$f = FilterParser::getApplications($t->filter);
 			} 
 		}
-		$news = new Default_Model_AggregateNews();
+		$news = new Application\Model\AggregateNews();
 		
 		if ( $t->length != '' )  $news->filter->limit($t->length);
 		if ( $t->offset != '' ) $news->filter->offset($t->offset);
         
-		$nf = new Default_Model_AggregateNewsFilter();
+		$nf = new Application\Model\AggregateNewsFilter();
         if (count($t->action) >0) {
 			if( $t->type == "app" && in_array("update", $t->action) == true ){
 				$t->action[] = "updaterel";
@@ -3166,7 +3166,7 @@ class NewsFeed {
 			}
 		}
 		foreach($relfields as $k=>$v){
-			$rels = new Default_Model_AppReleases();
+			$rels = new Application\Model\AppReleases();
 			$rels->filter->releaseid->equals($k);
 			if( count($rels) > 0 ){
 				$relfields[$k]["data"] = $rels->items[0];
@@ -3211,7 +3211,7 @@ class NewsFeed {
 			}
 		}
 		foreach($relfields as $k=>$v){
-			$rels = new Default_Model_VAversions();
+			$rels = new Application\Model\VAversions();
 			$rels->filter->id->equals($k);
 			if( count($rels) > 0 ){
 				$relfields[$k]["data"] = $rels->items[0];
@@ -3392,7 +3392,7 @@ class NewsFeed {
         } else if ($delivery == NewsDeliveryType::D_WEEKLY_DIGEST) {
             $from = 7 *24 * 3600;
         }
-        $mails = new Default_Model_MailSubscriptions();
+        $mails = new Application\Model\MailSubscriptions();
         $mails->filter->researcherid->equals($userid)->and($mails->filter->delivery->hasbit($delivery))->and($mails->filter->subjecttype->equals($subjecttype));
         
         if(count($mails->items)==0){
@@ -3435,7 +3435,7 @@ class NewsFeed {
         } else if($delivery == NewsDeliveryType::D_MONTHLY_DIGEST){
             $mailData["digest"] = "monthly";
         }
-        $us = new Default_Model_Researchers();
+        $us = new Application\Model\Researchers();
         $us->filter->id->equals($userid);
         if(count($us->items)>0){
             $u = $us->items[0];
@@ -3497,7 +3497,7 @@ class NewsFeed {
 	public static function sendSubscriptionVerificationTextMail($subscription){
 		$actions = array();
 		$delivery = array();
-		$users = new Default_Model_Researchers();
+		$users = new Application\Model\Researchers();
 		$subject = "EGI AppDB: Email subscription verification";
 		$body = "";
 		$nl = "\r\n";
@@ -3566,7 +3566,7 @@ class NewsFeed {
 		$body .= "website: http://" . $_SERVER['APPLICATION_UI_HOSTNAME'] ."/";
 		
 		//Get primary e-mail contact of subscriber and send e-mail
-		$rs = new Default_Model_Contacts();
+		$rs = new Application\Model\Contacts();
 		$rs->filter->researcherid->equals($subscription->researcherid)->and($rs->filter->contacttypeid->equals(7))->and($rs->filter->isprimary->equals(true));
 		if ( count($rs->refresh()->items) > 0 ) {
 			$to = $rs->items[0]->data;
@@ -3583,10 +3583,10 @@ class NewsFeed {
         }
         $cls = get_class($obj);
         switch($cls){
-            case "Default_Model_Researcher":
+            case "Application\Model\Researcher":
                 $type='app';
                 break;
-            case "Default_Model_Applciation":
+            case "Application\Model\Applciation":
                 $type='ppl';
                 break;
             default :
@@ -3606,7 +3606,7 @@ class NewsFeed {
             $act[] = "insertcnt";
         }
 
-        $subs = new Default_Model_MailSubscriptions();
+        $subs = new Application\Model\MailSubscriptions();
         $subs->filter->type->equals($type)->and($subs->filter->events->hasbit($event))->and($subd->filter->delivery->hasbit($delivery));
         if($subs->count()==0){
             return array();
@@ -3624,8 +3624,8 @@ class NewsFeed {
                     $f = FilterParser::getPeople($sub->flt);
                     break;
             }
-            $news = new Default_Model_AggregateNews();
-            $nf = new Default_Model_AggregateNewsFilter();
+            $news = new Application\Model\AggregateNews();
+            $nf = new Application\Model\AggregateNewsFilter();
             if (count($act) >0) {
                 for( $i=0; $i < count( $act ) ; $i+=1){
                     if ( isset ( $a ) ) {
@@ -3668,7 +3668,7 @@ class UserRequests {
 		
 		//Fetching primary e-mail accounts
 		$emails = array();
-		$contacts = new Default_Model_Contacts();
+		$contacts = new Application\Model\Contacts();
 		$contacts->filter->isprimary->equals(true)->and($contacts->filter->researcherid->in($receivers));
 		$conts = $contacts->items;
 		foreach($conts as $i){
@@ -3683,9 +3683,9 @@ class UserRequests {
 	}
 	
 	public static function getAccessGroupRecipientsForGroup($groupid,$payload=null){
-		$actors = new Default_Model_ActorGroupMembers();
-		$f1 = new Default_Model_ActorGroupMembersFilter();
-		$f2 = new Default_Model_ActorGroupMembersFilter();
+		$actors = new Application\Model\ActorGroupMembers();
+		$f1 = new Application\Model\ActorGroupMembersFilter();
+		$f2 = new Application\Model\ActorGroupMembersFilter();
 		
 		$f1->groupid->equals($groupid);
 		$actors->filter->chain($f1, "AND");
@@ -3751,7 +3751,7 @@ class UserRequests {
 		
 		$users = array();
 		foreach($userguids as $u){
-			$researchers = new Default_Model_Researchers();
+			$researchers = new Application\Model\Researchers();
 			$researchers->filter->guid->equals($u["userguid"]);
 			if( count($researchers->items) === 0 ){
 				continue;
@@ -3761,7 +3761,7 @@ class UserRequests {
 			$user["id"] = $researcher->id;
 			$user["user"] = $researcher;
 			$user["countryname"] = $researcher->getCountry()->name;
-			$contacts = new Default_Model_Contacts();
+			$contacts = new Application\Model\Contacts();
 			$contacts->filter->isprimary->equals(true)->and($contacts->filter->researcherid->equals($researcher->id)->and($contacts->filter->contacttypeid->equals(7)));
 			if( count($contacts->items) === 0){
 				continue;
@@ -3878,7 +3878,7 @@ class UserRequests {
 	//Retrieve the primary email contact from a userid
 	public static function getUserPrimaryEmail($userid){
 		$emails = array();
-		$contacts = new Default_Model_Contacts();
+		$contacts = new Application\Model\Contacts();
 		$contacts->filter->isprimary->equals(true)->and($contacts->filter->researcherid->equals($userid));
 		$conts = $contacts->items;
 		foreach($conts as $i){
@@ -4078,7 +4078,7 @@ class ApplicationMessage {
 	}
 	public static function sendMessage($appid,$userid,$recipientid,$message){
 		//Get sender
-		$users = new Default_Model_Researchers();
+		$users = new Application\Model\Researchers();
 		$users->filter->id->equals($userid);
 		if( $users->count() == 0 ) {
 			return "Sender not found";
@@ -4086,7 +4086,7 @@ class ApplicationMessage {
 		$user = $users->items[0];
 		
 		//Get sender's primary email
-		$contacts = new Default_Model_Contacts();
+		$contacts = new Application\Model\Contacts();
 		$contacts->filter->isprimary->equals(true)->and($contacts->filter->researcherid->equals($userid));
 		if( $contacts->count() == 0 ) {
 			return "Sender has no primary e-mail set";
@@ -4094,7 +4094,7 @@ class ApplicationMessage {
 		$useremail = $contacts->items[0]->data;
 		
 		//Get recipient
-		$recipients = new Default_Model_Researchers();
+		$recipients = new Application\Model\Researchers();
 		$recipients->filter->id->equals($recipientid);
 		if( $recipients->count() == 0 ) { 
 			return "Recipient not found";
@@ -4102,7 +4102,7 @@ class ApplicationMessage {
 		$recipient = $recipients->items[0];
 		
 		//Get recipient's primary email
-		$contacts = new Default_Model_Contacts();
+		$contacts = new Application\Model\Contacts();
 		$contacts->filter->isprimary->equals(true)->and($contacts->filter->researcherid->equals($recipientid));
 		if( $contacts->count() == 0 ) {
 			return "Recipient has no primary e-mail set";
@@ -4166,7 +4166,7 @@ class APIKeyRequests{
 	
 	public static function sendPermissionsRequest($userid, $apikeyid, $msg){
 		//Get sender
-		$users = new Default_Model_Researchers();
+		$users = new Application\Model\Researchers();
 		$users->filter->id->equals($userid);
 		if( $users->count() == 0 ) {
 			return "Sender not found";
@@ -4174,7 +4174,7 @@ class APIKeyRequests{
 		$user = $users->items[0];
 		
 		//Get sender's primary email
-		$contacts = new Default_Model_Contacts();
+		$contacts = new Application\Model\Contacts();
 		$contacts->filter->isprimary->equals(true)->and($contacts->filter->researcherid->equals($userid));
 		if( $contacts->count() == 0 ) {
 			return "Sender has no primary e-mail set";
@@ -4187,7 +4187,7 @@ class APIKeyRequests{
 		}
 		
 		//Get api key
-		$apikeys = new Default_Model_APIKeys();
+		$apikeys = new Application\Model\APIKeys();
 		$apikeys->filter->id->equals($apikeyid)->and($apikeys->filter->ownerid->equals($userid));
 		if( count($apikeys) == 0 ) {
 			return "Api key not found";
@@ -4196,8 +4196,8 @@ class APIKeyRequests{
 		
 		//Get Appdb administrators
 		$recipients = array();
-		$admins = new Default_Model_Researchers();
-		$agmf = new Default_Model_ActorGroupMembersFilter();
+		$admins = new Application\Model\Researchers();
+		$agmf = new Application\Model\ActorGroupMembersFilter();
 		$agmf->groupid->numequals(-1); // admins
 		$admins->filter->chain($agmf, "AND");
 		if( count($admins->items) == 0 ) {
@@ -4206,7 +4206,7 @@ class APIKeyRequests{
 		//Get admins primary emails
 		$admins = $admins->items;
 		foreach($admins as $admin){
-			$contacts = new Default_Model_Contacts();
+			$contacts = new Application\Model\Contacts();
 			$contacts->filter->isprimary->equals(true)->and($contacts->filter->researcherid->equals($admin->id))->and($contacts->filter->contacttypeid->equals(7));
 			if( count($contacts->items) == 0 ) {
 				continue;
@@ -4367,11 +4367,11 @@ class OutdatedApplication{
 class CommunityRepository{
 	public static function syncSoftwareRelease($releasedata){
 		//"insert","delete","update"
-		$apprelease = new Default_Model_AppRelease();
+		$apprelease = new Application\Model\AppRelease();
 		$apprelease->releaseid = $releasedata["releaseid"];
 		$apprelease->appid = $releasedata["swid"];
 		
-		$appreleases = new Default_Model_AppReleases();
+		$appreleases = new Application\Model\AppReleases();
 		$appreleases->filter->releaseid->equals( $releasedata["releaseid"] );
 		if( $releasedata["action"] == "delete"){
 			if( count($appreleases->items) > 0 ){
@@ -4450,13 +4450,13 @@ function getAlphnumericReport($type = 'applications', $flt = "", $subtype = null
 	switch($type){
 		case "researchers":
 			$sel = "researchers.name";
-			$model = new Default_Model_Researchers();
+			$model = new Application\Model\Researchers();
 			$model->filter = FilterParser::getPeople($flt);
 			$subtypequery = " WHERE researchers.deleted=false ";
 			break;
 		case "vos":
 			$sel = "vos.name";
-			$model = new Default_Model_VOs();
+			$model = new Application\Model\VOs();
 			$model->filter = FilterParser::getVOs($flt);
 			break;
 		default:
@@ -4499,7 +4499,7 @@ function getPrimaryContact($userid=null){
 	if ( $userid == null ) {
 		return null;
 	}
-	$contacts = new Default_Model_Contacts();
+	$contacts = new Application\Model\Contacts();
 	$contacts->filter->isprimary->equals(true)->and($contacts->filter->researcherid->equals($userid))->and($contacts->filter->contacttypeid->equals(7));
 	if ( count($contacts->items) == 0){
 		return null;
@@ -4512,14 +4512,14 @@ function sendUserInboxNotification($receiverid=null, $sendername=""){
 		return;
 	}
 	
-	$receivers = new Default_Model_Researchers();
+	$receivers = new Application\Model\Researchers();
 	$receivers->filter->id->equals($receiverid);
 	if( count($receivers->items) == 0 ) {
 		return;
 	}
 	$receiver = $receivers->items[0];
 	
-	$mails = new Default_Model_MailSubscriptions();
+	$mails = new Application\Model\MailSubscriptions();
 	$mails->filter->researcherid->equals($receiverid)->and($mails->filter->subjecttype->equals('inbox'));
 	if ( count($mails->items) == 0 ) {
 		return;
@@ -4533,7 +4533,7 @@ function sendUserInboxNotification($receiverid=null, $sendername=""){
 	
 	$recipients = array($email);
 	
-	$ms=new Default_Model_Messages();
+	$ms=new Application\Model\Messages();
 	$ms->filter->receiverid->equals($receiverid);
 	$all = count($ms->items);
 	$unread = $ms->unreadCount();
@@ -4619,7 +4619,7 @@ class SEO{
 						case "faq":
 							$faq = null;
 							if( isset($cname[3]) && is_numeric($cname[3]) ){
-								$faqs = new Default_Model_FAQs();
+								$faqs = new Application\Model\FAQs();
 								$faqs->filter->id->equals($cname[3]);
 								if( count($faqs->items) > 0 ){
 									$faq = $faqs->items[0];
@@ -4804,7 +4804,7 @@ class SEO{
 				$classname = new \Application\Model\Applications();
 				break;
 			case "person":
-				$classname = new Default_Model_Researchers();
+				$classname = new Application\Model\Researchers();
 				break;
 			default:
 				return null;
@@ -4870,7 +4870,7 @@ class SEO{
 						}
 					}
 				}
-				$tags = new Default_Model_AppTags();
+				$tags = new Application\Model\AppTags();
 				$tags->filter->appid->equals($item->id);
 				if( count($tags->items) > 0 ){
 					foreach($tags->items as $tag){
@@ -5339,7 +5339,7 @@ class VMCaster{
 
             // Try to collect the associated VMI Instances of the given VA Version
             while($retries > 0) {
-                $valists = new Default_Model_VALists();
+                $valists = new Application\Model\VALists();
                 $valists->filter->vappversionid->numequals($vaversionid);
                 $valists->refresh();
                 if (count($valists->items) > 0) {
@@ -5554,7 +5554,7 @@ class VMCaster{
 	}
 
 	public static function clearIntegrityCheck($vaversionid){
-		$vapplists = new Default_Model_VALists();
+		$vapplists = new Application\Model\VALists();
 		$vapplists->filter->vappversionid->equals($vaversionid);
 		if( count($vapplists->items) > 0 ){
 			for($i=0; $i<count($vapplists->items); $i+=1){
@@ -5567,7 +5567,7 @@ class VMCaster{
 				self::updateVMInstanceIntegrity($instance);
 			}
 		}
-		$vaversions = new Default_Model_VAversions();
+		$vaversions = new Application\Model\VAversions();
 		$vaversions->filter->id->equals($vaversionid);
 		if( count($vaversions->items) > 0 ){
 			$vaversion = $vaversions->items[0];
@@ -5576,7 +5576,7 @@ class VMCaster{
 		}
 	}
 	public static function needsIntegrityCheck($vaversionid){
-		$valists = new Default_Model_VALists();
+		$valists = new Application\Model\VALists();
 		$valists->filter->vappversionid->equals($vaversionid);
 		if( count($valists->items) > 0 ){
 			for( $i=0; $i<count($valists->items); $i+=1 ){
@@ -5590,7 +5590,7 @@ class VMCaster{
 		return false;
 	}
 	public static function startIntegrityCheck($vaversionid){
-		$versions = new Default_Model_VAVersions();
+		$versions = new Application\Model\VAVersions();
 		$versions->filter->id->equals($vaversionid);
 		if( count($versions->items) === 0 ){
 			return false;
@@ -5629,7 +5629,7 @@ class VMCaster{
 			for($i=0; $i<count($result["images"]); $i+=1){
 				$image = $result["images"][$i];
 				if( $image["status"] === "error" ){
-					$instances = new Default_Model_VMIinstances();
+					$instances = new Application\Model\VMIinstances();
 					$instances->filter->id->equals($image["id"]);
 					if( count($instances->items) > 0 ) {
 						$instance = $instances->items[0];
@@ -5711,7 +5711,7 @@ class VMCaster{
 		}
 		$newimagelist["message"] = $newimagelist["status"];
 		
-		$vapplists = new Default_Model_VALists();
+		$vapplists = new Application\Model\VALists();
 		$vapplists->filter->vappversionid->equals($version->id);
 		if( count($vapplists->items) > 0 ){
 			$isrunning = false;
@@ -5748,7 +5748,7 @@ class VMCaster{
 	private static function syncStatusIntegrityCheck($res){
 		$tobepublished = false;
 		if( !$res || (is_array($res) && ( !isset($res["images"]) || !isset($res["status"]) || !isset($res["id"]) ) ) ) return;
-		$versions = new Default_Model_VAversions();
+		$versions = new Application\Model\VAversions();
 		$versions->filter->id->equals($res["id"]);
 		if( count($versions->items) === 0 ){
 			return $res;
@@ -5764,7 +5764,7 @@ class VMCaster{
 		for($i=0; $i<count($images); $i+=1){
 			$image = $images[$i];
 			$process = $image["process"];
-			$instances = new Default_Model_VMIinstances();
+			$instances = new Application\Model\VMIinstances();
 			$instances->filter->id->equals($image["id"]);
 			if( count($instances->items) === 0 ) continue;
 			$instance = $instances->items[0];
@@ -5856,7 +5856,7 @@ class VMCaster{
 		$version->save();
 		if( in_array($version->status, array("canceled","failed","verified") ) === true ){
 			for($i=0; $i<count($successfulimages); $i+=1){
-				$instances = new Default_Model_VMIInstances();
+				$instances = new Application\Model\VMIInstances();
 				$instances->filter->id->equals($successfulimages[$i]);
 				if( count($instances->items) > 0 ) {
 					$img = $instances->items[0];
@@ -5916,7 +5916,7 @@ class VMCaster{
 //				return $err;
 //			}
 
-			$vaversions = new Default_Model_VAversions();
+			$vaversions = new Application\Model\VAversions();
 			$f = $vaversions->filter;
 			$f->vappid->equals($version->vappid)->and($f->published->equals(true)->and($f->archived->equals(false)->and($f->id->notequals($version->id))));
 			if( count( $vaversions->items ) > 0 ) {
@@ -5951,7 +5951,7 @@ class VMCaster{
 	}
 	public static function deleteVersion($version){
 		try{
-			$vapplists = new Default_Model_VALists();
+			$vapplists = new Application\Model\VALists();
 			$vapplists->filter->vappversionid->equals($version->id);
 			if( count($vapplists->items) > 0 ){
 				for($i=0; $i<count($vapplists->items); $i+=1){
@@ -5971,7 +5971,7 @@ class VMCaster{
 		$item->delete();
 	}
 	private static function deleteVMIInstance($item){
-		$instances = new Default_Model_VMIInstances();
+		$instances = new Application\Model\VMIInstances();
 		$instances->filter->vmiflavourid->equals($item->vmiflavourid)->and($instances->filter->id->notequals($item->id));
 		if( count($instances->items) === 0 ){
 			self::deleteFlavour($item->getFlavour(),$item);
@@ -5981,7 +5981,7 @@ class VMCaster{
 	}
 	private static function deleteContextScripts($vmiinstanceid){
 		$scriptids = array();
-		$vmiscripts = new Default_Model_VMIinstanceContextScripts();
+		$vmiscripts = new Application\Model\VMIinstanceContextScripts();
 		$vmiscripts->filter->vmiinstanceid->numequals($vmiinstanceid);
 		if( count($vmiscripts->items) > 0 ){
 			foreach($vmiscripts->items as $item){
@@ -5993,10 +5993,10 @@ class VMCaster{
 		//check if the referenced scripts have relations
 		//if no relation found remove them from db.
 		foreach($scriptids as $id){
-			$vmiscripts = new Default_Model_VMIinstanceContextScripts();
+			$vmiscripts = new Application\Model\VMIinstanceContextScripts();
 			$vmiscripts->filter->contextscriptid->numequals($id);
 			if( count($vmiscripts->items) === 0 ){
-				$scripts = new Default_Model_ContextScripts();
+				$scripts = new Application\Model\ContextScripts();
 				$scripts->filter->id->numequals($id);
 				if( count($scripts->items) > 0 ){
 					$scripts->remove($scripts->items[0]);
@@ -6005,7 +6005,7 @@ class VMCaster{
 		}
 	}
 	private static function deleteFlavour($item,$parent){
-		$instances = new Default_Model_VMIflavours();
+		$instances = new Application\Model\VMIflavours();
 		$instances->filter->vmiid->equals($item->vmiid)->and($instances->filter->id->notequals($parent->id));
 		if( count($instances->items) === 0 ){
 			self::deleteVMI($item->getVMI());
@@ -6024,7 +6024,7 @@ class VMCaster{
 		return null;
 	}
 	private static function getInstanceContextScript($instance){
-		$vmiscripts = new Default_Model_VMIinstanceContextScripts();
+		$vmiscripts = new Application\Model\VMIinstanceContextScripts();
 		$vmiscripts->filter->vmiinstanceid->numequals($instance->id);
 		if( count($vmiscripts->items) > 0 ){
 			$vmiscript = $vmiscripts->items[0];
@@ -6037,7 +6037,7 @@ class VMCaster{
 		if( $identifier!==null && trim($identifier) === "") return null;
 		
 		//check if image with identifier exists
-		$vmiinstances = new Default_Model_VMIinstances();
+		$vmiinstances = new Application\Model\VMIinstances();
 		if( $identifier !== null ){
 			$vmiinstances->filter->id->equals($imageid)->and($vmiinstances->filter->guid->equals(trim($identifier)));
 		}else{
@@ -6064,7 +6064,7 @@ class VMCaster{
 			//if good instance id differs use that one
 			if ($res && is_numeric($res) && intval($res) !== intval($instance->id)) {
 				$originalimageid = $instance->id;
-				$images = new Default_Model_VMIinstances();
+				$images = new Application\Model\VMIinstances();
 				$images->filter->id->numequals(intval($res));
 				if( count($images->items) > 0 ){
 					$instance = $images->items[0];
@@ -6094,7 +6094,7 @@ class VMCaster{
 		if( trim($identifier) === "" ) return null;
 		
 		//check if image with identifier exists
-		$instances = new Default_Model_VMIinstances();
+		$instances = new Application\Model\VMIinstances();
 		$instances->filter->guid->equals($identifier);
 		if( count($instances->items) === 0 ) return null;
 		
@@ -6521,7 +6521,7 @@ class VMCaster{
 		$result = array();
 		if( count($res) > 0 ){
 			foreach($res as $r){
-				$vappversions = new Default_Model_VAversions();
+				$vappversions = new Application\Model\VAversions();
 				$vappversions->filter->id->equals($r[0]);
 				if( count($vappversions->items) > 0 ){
 					$vappversion = $vappversions->items[0];
@@ -6549,7 +6549,7 @@ class VMCasterNotifications{
 			return null;
 		} else if( is_numeric($user) ){
 			$userid = intval($user);
-			$users = new Default_Model_Researchers();
+			$users = new Application\Model\Researchers();
 			$users->filter->id->equals($userid);
 			if( count($users->items) === 0 ){
 				return null;
@@ -6557,7 +6557,7 @@ class VMCasterNotifications{
 			$user = $users->items[0];
 		} else if( is_string($user) && trim($user) !== "" ){
 			$usercname = trim($user);
-			$users = new Default_Model_Researchers();
+			$users = new Application\Model\Researchers();
 			$users->filter->cname->equals($usercname);
 			if( count($users->items) === 0 ){
 				return null;
@@ -6801,7 +6801,7 @@ class VApplianceVersionState {
 	private $instances = null;
 	private $needcheck = null;
 	
-	function __construct(Default_Model_VAversion $olddata=null, Default_Model_VAversion $newdata=null){
+	function __construct(Application\Model\VAversion $olddata=null, Application\Model\VAversion $newdata=null){
 		$this->oldData = $olddata;
 		if( $newdata !== null ){
 			$this->newData = $newdata;
@@ -6832,7 +6832,7 @@ class VApplianceVersionState {
 	public function getInstances(){
 		if( !$this->instances ){
 			$this->instances = array();
-			$lists = new Default_Model_VALists();
+			$lists = new Application\Model\VALists();
 			$lists->filter->vappversionid->equals($this->getId());
 			if( count( $lists->items ) > 0 ){
 				for($i=0; $i<count($lists->items); $i+=1){
@@ -7116,7 +7116,7 @@ class VApplianceService{
 		if( !$this->version || $force === true){
 			$id = $this->state->getId();
 			if( $id ){
-				$vers = new Default_Model_VAversions();
+				$vers = new Application\Model\VAversions();
 				$vers->filter->id->equals($id);
 				if( count($vers->items) > 0 ){
 					$this->version = $vers->items[0];
@@ -7129,7 +7129,7 @@ class VApplianceService{
 	public function getLatestVersion(){
 		if( $this->latestversion === null ){
 			$version = $this->getVAVersion();
-			$vaversions = new Default_Model_VAversions();
+			$vaversions = new Application\Model\VAversions();
 			$f = $vaversions->filter;
 			$f->vappid->equals($version->vappid)->and($f->published->equals(true)->and($f->archived->equals(false)->and($f->id->notequals($version->id))));
 			if( count( $vaversions->items ) > 0 ) {
@@ -7228,7 +7228,7 @@ class ContextualizationScripts {
 		$scripts = array();
 		//clear existing vmiinstancecontextscripts since only 
 		//one contextscript per vmiinstance is allowed
-		$vmis = new Default_Model_VMIinstanceContextScripts();
+		$vmis = new Application\Model\VMIinstanceContextScripts();
 		$vmis->filter->vmiinstanceid->numequals($vmiinstanceid);
 		if( count($vmis->items) >0 ){
 			foreach($vmis->items as $vmi){
@@ -7249,7 +7249,7 @@ class ContextualizationScripts {
 		self::clearVmiInstances($vmiinstanceid,$user->id, $usetransaction);
 		
 		//Associate context script entry with vmi instance
-		$vmiscript = new Default_Model_VMIinstanceContextScript();
+		$vmiscript = new Application\Model\VMIinstanceContextScript();
 		$vmiscript->vmiinstanceid = $vmiinstanceid;
 		$vmiscript->contextscriptid = $script->id;
 		$vmiscript->addedbyid = $user->id;
@@ -7285,7 +7285,7 @@ class ContextualizationScripts {
 	}
 	
 	private static function createPseudoScript( $data ){
-		$script = new Default_Model_ContextScript();
+		$script = new Application\Model\ContextScript();
 		$script->name = trim( $data["name"] );
 		$script->url = trim( $data["url"] );
 		$script->formatid = $data['formatid'];
@@ -7300,7 +7300,7 @@ class ContextualizationScripts {
 		try{
 			if( $usetransaction ) db()->beginTransaction();
 			//create context script entry
-			$script = new Default_Model_ContextScript();
+			$script = new Application\Model\ContextScript();
 			//$script->id = -1;
 			$script->name = trim( $data["name"] );
 			$script->url = trim( $data["url"] );
@@ -7329,7 +7329,7 @@ class ContextualizationScripts {
 		try{
 			$vmiinstanceid = 0;
 			if( $usetransaction ) db()->beginTransaction();
-			$vmis = new Default_Model_VMIinstanceContextScripts();
+			$vmis = new Application\Model\VMIinstanceContextScripts();
 			$vmis->filter->id->numequals($id);
 			if( count($vmis->items) > 0 ){
 				$vmi = $vmis->items[0];
@@ -7339,11 +7339,11 @@ class ContextualizationScripts {
 				}
 			}
 			
-			$vmis = new Default_Model_VMIinstanceContextScripts();
+			$vmis = new Application\Model\VMIinstanceContextScripts();
 			$vmis->filter->contextscriptid->numequals($script->id);
 			if( count($vmis->items) === 0 ){
 				//The script is not longer used. Remove it.
-				$scripts = new Default_Model_ContextScripts();
+				$scripts = new Application\Model\ContextScripts();
 				$scripts->filter->id->numequals($script->id);
 				if( count($scripts->items) > 0 ){
 					VapplianceStorage::remove($scripts->items[0],$vmiinstanceid, $userid);
@@ -7374,7 +7374,7 @@ class ContextualizationScripts {
 		if( $formatid <= 0 ) {
 			$formatid = 1;
 		}
-		$users = new Default_Model_Researchers();
+		$users = new Application\Model\Researchers();
 		$users->filter->id->numequals($userid);
 		if( count( $users->items ) > 0 ){
 			$user = $users->items[0];
@@ -7387,7 +7387,7 @@ class ContextualizationScripts {
 		}
 		
 		if( $vmiinstanceid !== null ){
-			$vaviews = new Default_Model_VAviews();
+			$vaviews = new Application\Model\VAviews();
 			$vaviews->filter->vmiinstanceid->numequals($vmiinstanceid);
 			if( count($vaviews->items) > 0 ){
 				$vaview = $vaviews->items[0];
@@ -7434,7 +7434,7 @@ class ContextualizationScripts {
 		
 		
 		//Find if script is already related to the current vmi instance
-		$vmis = new Default_Model_VMIinstanceContextScripts();
+		$vmis = new Application\Model\VMIinstanceContextScripts();
 		$vmis->filter->vmiinstanceid->numequals($vmiinstanceid);
 		if( count($vmis->items) > 0 ){
 			//find first association with vmiinstance that 
@@ -7454,13 +7454,13 @@ class ContextualizationScripts {
 			//Perform checks to determine if a new context script should be created
 			
 			//Find context script with same url
-			$scripts = new Default_Model_ContextScripts();
+			$scripts = new Application\Model\ContextScripts();
 			$scripts->filter->url->equals( $url );
 			if( count( $scripts->items )  > 0 ){
 				foreach($scripts->items as $script){
 					if( $script->hasContext() === false ){
 						$similarscript = $script;
-						$vmis = new Default_Model_VMIinstanceContextScripts();
+						$vmis = new Application\Model\VMIinstanceContextScripts();
 						$vmis->filter->vmiinstanceid->numequals($vmiinstanceid)->and($vmis->filter->contextscriptid->numequals($similarscript->id));
 						if( count($vmis->items) > 0 ){
 							foreach($vmis->items as $vmi){
@@ -7841,7 +7841,7 @@ class UserInbox{
 		return '</appdb:appdb>';
 	}
 	private static function getModel($uid,$flt=array()){
-		$msgs = new Default_Model_Messages();
+		$msgs = new Application\Model\Messages();
 		$length = ( (isset($flt["length"]) && is_numeric($flt["length"]) )?intval($flt["length"]):10 );
 		$offset = ( (isset($flt["offset"]) && is_numeric($flt["offset"]) )?intval($flt["offset"]):0 );
 		$order = strtolower(trim(( (isset($flt["order"]) && is_string($flt["order"]) )?strval($flt["order"]):"sendon" )));
@@ -7856,9 +7856,9 @@ class UserInbox{
 		}else{
 			switch($folder){
 				case "inbox":
-					$f1 = new Default_Model_MessagesFilter();
-					$f2 = new Default_Model_MessagesFilter();
-					$f3 = new Default_Model_MessagesFilter();
+					$f1 = new Application\Model\MessagesFilter();
+					$f2 = new Application\Model\MessagesFilter();
+					$f3 = new Application\Model\MessagesFilter();
 
 					$f1->receiverid->equals($uid);
 					$f2->senderid->equals($from);
@@ -7976,14 +7976,14 @@ class SamlAuth{
 	
 	//Create a Researcher model for new user with session data retrieved by SAML Auth
 	public static function initNewUserProfile($session){
-		$newuser = new Default_Model_Researcher();
+		$newuser = new Application\Model\Researcher();
 		$newuser->id = -1;
 		$newuser->firstname = $session->userFirstName;
 		$newuser->lastname = $session->userLastName;
 		$newuser->positionTypeID = $session->userRole;
 		$newuser->countryID = $session->userCountryID;
 		if( trim($session->userPrimaryEmail) !== "" ){
-			$contact = new Default_Model_Contact();
+			$contact = new Application\Model\Contact();
 			$contact->contacttypeid = 7;
 			$contact->data = $session->userPrimaryEmail;
 			$session->userContacts = array($contact);
@@ -7997,7 +7997,7 @@ class SamlAuth{
 		$email = $session->userPrimaryEmail;
 		if( trim($email) !== ""){
 			//Search by email for NOT-deleted users 
-			$contacts = new Default_Model_Contacts();
+			$contacts = new Application\Model\Contacts();
 			$contacts->filter->data->ilike($email);
 			if( count($contacts->items) > 0 ){
 				$contact = $contacts->items[0];
@@ -8009,9 +8009,9 @@ class SamlAuth{
 			}
 		}
 		//Search by first and last name for NOT-deleted
-		$users = new Default_Model_Researchers();
-		$f1 = new Default_Model_ResearchersFilter();
-		$f2 = new Default_Model_ResearchersFilter();
+		$users = new Application\Model\Researchers();
+		$f1 = new Application\Model\ResearchersFilter();
+		$f2 = new Application\Model\ResearchersFilter();
 		$f1->firstname->ilike($session->userFirstName);
 		$f2->lastname->ilike($session->userLastName);
 		$users->filter->chain($f1, "AND");
@@ -8024,9 +8024,9 @@ class SamlAuth{
 			}
 		}
 		//Search by last and first name
-		$users = new Default_Model_Researchers();
-		$f1 = new Default_Model_ResearchersFilter();
-		$f2 = new Default_Model_ResearchersFilter();
+		$users = new Application\Model\Researchers();
+		$f1 = new Application\Model\ResearchersFilter();
+		$f2 = new Application\Model\ResearchersFilter();
 		$f1->firstname->ilike($session->userLastName);
 		$f2->lastname->ilike($session->userFirstName);
 		$users->filter->chain($f1, "AND");
@@ -8051,9 +8051,9 @@ class SamlAuth{
 		return $res;
 	}
 	private static function _getUserAccount($uid, $accounttype, $doEscape){
-		$useraccounts = new Default_Model_UserAccounts();
-		$f1 = new Default_Model_UserAccountsFilter();
-		$f2 = new Default_Model_UserAccountsFilter();
+		$useraccounts = new Application\Model\UserAccounts();
+		$f1 = new Application\Model\UserAccountsFilter();
+		$f2 = new Application\Model\UserAccountsFilter();
 		if (! $doEscape) {
 			$f1->accountid->overrideEscapeSeq("")->equals($uid);
 		} else {
@@ -8070,9 +8070,9 @@ class SamlAuth{
 
 	//Get available user accounts for specific user
 	public static function getResearcherUserAccounts($userid, $accounttype = null){
-		$useraccounts = new Default_Model_UserAccounts();
-		$f1 = new Default_Model_UserAccountsFilter();
-		$f2 = new Default_Model_UserAccountsFilter();
+		$useraccounts = new Application\Model\UserAccounts();
+		$f1 = new Application\Model\UserAccountsFilter();
+		$f2 = new Application\Model\UserAccountsFilter();
 		$f1->researcherid->equals($userid);
 		$useraccounts->filter->chain($f1, "AND");
 		if($accounttype !== null) {
@@ -8088,7 +8088,7 @@ class SamlAuth{
 	//Get researcher entry for the given user account entry
 	public static function getUserByAccount($useraccount){
 		if( is_null($useraccount) ) return null;
-		$ppl = new Default_Model_Researchers();
+		$ppl = new Application\Model\Researchers();
 		$ppl->viewModerated = true;
 		$ppl->filter->id->equals($useraccount->researcherid);
 		if( count($ppl->items) > 0 ){
@@ -8115,7 +8115,7 @@ class SamlAuth{
 		}
 		$result = array();
 		
-		$useraccounts = new Default_Model_UserAccounts();
+		$useraccounts = new Application\Model\UserAccounts();
 		$useraccounts->filter->researcherid->equals($userid);
 		if( count($useraccounts->items) > 0 ){
 			if( $asArray === true ){ //check if requested as associative array (for client consuption)
@@ -8140,10 +8140,10 @@ class SamlAuth{
 	
 	//Get user credentials for this session
 	public static function getUserCredentials($userid){
-		$creds = new Default_Model_UserCredentials();
-		$f1 = new Default_Model_UserCredentialsFilter();
-		$f2 = new Default_Model_UserCredentialsFilter();
-		$f3 = new Default_Model_UserCredentialsFilter();
+		$creds = new Application\Model\UserCredentials();
+		$f1 = new Application\Model\UserCredentialsFilter();
+		$f2 = new Application\Model\UserCredentialsFilter();
+		$f3 = new Application\Model\UserCredentialsFilter();
 		$f1->researcherid->equals($userid);
 		$f2->sessionid->equals(session_id());
 		$f3->token->equals($_COOKIE["SimpleSAMLAuthToken"]);
@@ -8162,7 +8162,7 @@ class SamlAuth{
 		if( isset($_COOKIE["SimpleSAMLAuthToken"]) === false ) return;
 		$cred = self::getUserCredentials($session->userid);
 		if( $cred === null ) return;
-		$creds = new Default_Model_UserCredentials();
+		$creds = new Application\Model\UserCredentials();
 		$creds->filter->id->equals($cred->id);
 		if( count($creds->items) > 0 ){
 			$creds->remove($cred);
@@ -8175,7 +8175,7 @@ class SamlAuth{
 		//Remove existing user credentials
 		$oldcred = self::getUserCredentials($userid);
 		if( $oldcred !== null ) {
-			$creds = new Default_Model_UserCredentials();
+			$creds = new Application\Model\UserCredentials();
 			if( count($creds->items) > 0 ){
 				$creds->remove($oldcred);
 			}
@@ -8183,7 +8183,7 @@ class SamlAuth{
 		}
 		
 		//Create new user credentials
-		$cred = new Default_Model_UserCredential();
+		$cred = new Application\Model\UserCredential();
 		$cred->researcherid = $userid;
 		$cred->sessionid = session_id();
 		$cred->token = $_COOKIE["SimpleSAMLAuthToken"];
@@ -8342,7 +8342,7 @@ class SamlAuth{
 		if( $researcher === null ) return null;
 		
 		//Save this egi account to the found researcher profile
-		$uaccount = new Default_Model_UserAccount();
+		$uaccount = new Application\Model\UserAccount();
 		$uaccount->researcherid = $researcher->id;
 		$uaccount->accountid = $uid;
 		$uaccount->accounttypeid = "egi-sso-ldap";
@@ -8371,7 +8371,7 @@ class SamlAuth{
 		if( $researcher === null ) return null;
 		
 		//tSave this egi account to the found researchr profile
-		$uaccount = new Default_Model_UserAccount();
+		$uaccount = new Application\Model\UserAccount();
 		$uaccount->researcherid = $researcher->id;
 		$uaccount->accountid = $uid;
 		$uaccount->accounttypeid = "x509";
@@ -8409,9 +8409,9 @@ class SamlAuth{
                 }
 
                 //Collect current user's x509 registered accounts
-                $uaccounts = new Default_Model_UserAccounts();
-                $f1 = new Default_Model_UserAccountsFilter();
-                $f2 = new Default_Model_UserAccountsFilter();
+                $uaccounts = new Application\Model\UserAccounts();
+                $f1 = new Application\Model\UserAccountsFilter();
+                $f2 = new Application\Model\UserAccountsFilter();
                 $f1->account_type->equals("x509");
                 $f2->researcherid->numequals(intval($user->id));
                 $uaccounts->filter->chain($f1, "AND");
@@ -8454,7 +8454,7 @@ class SamlAuth{
                 if (count($newaccounts) > 0) {
                     foreach($newaccounts as $newaccount) {
                             try {
-                                    $uaccount = new Default_Model_UserAccount();
+                                    $uaccount = new Application\Model\UserAccount();
                                     $uaccount->researcherid = $user->id;
                                     $uaccount->accountid = $newaccount;
                                     $uaccount->accounttypeid = 'x509';
@@ -8480,10 +8480,10 @@ class SamlAuth{
 
 		//collect egi sso ldap user account (possibly from x509 user account)
 		if( trim($egiuid) !== "" ){
-			$uacs = new Default_Model_UserAccounts();
-			$f1 = new Default_Model_UserAccountsFilter();
-			$f2 = new Default_Model_UserAccountsFilter();
-			$f3 = new Default_Model_UserAccountsFilter();
+			$uacs = new Application\Model\UserAccounts();
+			$f1 = new Application\Model\UserAccountsFilter();
+			$f2 = new Application\Model\UserAccountsFilter();
+			$f3 = new Application\Model\UserAccountsFilter();
 			$f1->researcherid->equals($user->id);
 			$f2->account_type->equals("egi-sso-ldap");
 			$f3->accountid->equals($egiuid)->or($f3->accountid->overrideEscapeSeq("")->equals($egiuid));
@@ -8491,7 +8491,7 @@ class SamlAuth{
 			$uacs->filter->chain($f2, "AND");
 			$uacs->filter->chain($f3, "AND");
 			if( count($uacs->items) === 0 ){
-				$uacc = new Default_Model_UserAccount();
+				$uacc = new Application\Model\UserAccount();
 				$uacc->researcherid = $user->id;
 				$uacc->accountid = $egiuid;
 				$uacc->accounttypeid = "egi-sso-ldap";
@@ -8501,10 +8501,10 @@ class SamlAuth{
 
 		//collect x509 user account (possibly from egi sso user account)
 		if( trim($ucert) !== "" ){
-			$uacs = new Default_Model_UserAccounts();
-			$f1 = new Default_Model_UserAccountsFilter();
-			$f2 = new Default_Model_UserAccountsFilter();
-			$f3 = new Default_Model_UserAccountsFilter();
+			$uacs = new Application\Model\UserAccounts();
+			$f1 = new Application\Model\UserAccountsFilter();
+			$f2 = new Application\Model\UserAccountsFilter();
+			$f3 = new Application\Model\UserAccountsFilter();
 			$f1->researcherid->equals($user->id);
 			$f2->account_type->equals("x509");
 			$f3->accountid->equals($ucert)->or($f3->accountid->overrideEscapeSeq("")->equals($ucert));
@@ -8512,7 +8512,7 @@ class SamlAuth{
 			$uacs->filter->chain($f2, "AND");
 			$uacs->filter->chain($f3, "AND");
 			if( count($uacs->items) === 0 ){
-				$uacc = new Default_Model_UserAccount();
+				$uacc = new Application\Model\UserAccount();
 				$uacc->researcherid = $user->id;
 				$uacc->accountid = $ucert;
 				$uacc->accounttypeid = "x509";
@@ -8540,9 +8540,9 @@ class SamlAuth{
 		if( trim($uid) == "" ) return null;
 		$accounttype = str_replace("-sp","",$source);
 		
-		$useraccounts = new Default_Model_UserAccounts();
-		$f1 = new Default_Model_UserAccountsFilter();
-		$f2 = new Default_Model_UserAccountsFilter();
+		$useraccounts = new Application\Model\UserAccounts();
+		$f1 = new Application\Model\UserAccountsFilter();
+		$f2 = new Application\Model\UserAccountsFilter();
 		if (! $doEscape) {
 			$f1->accountid->overrideEscapeSeq("")->equals($uid);
 		} else {
@@ -8849,7 +8849,7 @@ class SamlAuth{
 		
 		//Create a new dunmmy user account model
 		if( $useraccount === null ){
-			$useraccount = new Default_Model_UserAccount();
+			$useraccount = new Application\Model\UserAccount();
 			$useraccount->accountid = $uid;
 			$useraccount->accounttypeid = $accounttype;
 			$useraccount->stateid = 1;
@@ -8939,9 +8939,9 @@ class AccountConnect {
 		$uid = trim($session->authUid);
 		$source = str_replace( "-sp", "", trim($session->authSource) );
 		
-		$uaccounts = new Default_Model_UserAccounts();
-		$f1 = new Default_Model_UserAccountsFilter();
-		$f2 = new Default_Model_UserAccountsFilter();
+		$uaccounts = new Application\Model\UserAccounts();
+		$f1 = new Application\Model\UserAccountsFilter();
+		$f2 = new Application\Model\UserAccountsFilter();
 		if (! $doEscape) {
 			$f1->accountid->overrideEscapeSeq("")->equals($uid);
 		} else {
@@ -8973,10 +8973,10 @@ class AccountConnect {
 		$uid = trim($uid);
 		$source = str_replace( "-sp", "", trim($accounttype) );
 		
-		$uaccounts = new Default_Model_UserAccounts();
-		$f1 = new Default_Model_UserAccountsFilter();
-		$f2 = new Default_Model_UserAccountsFilter();
-		$f3 = new Default_Model_UserAccountsFilter();
+		$uaccounts = new Application\Model\UserAccounts();
+		$f1 = new Application\Model\UserAccountsFilter();
+		$f2 = new Application\Model\UserAccountsFilter();
+		$f3 = new Application\Model\UserAccountsFilter();
 		
 		$f1->researcherid->equals($userid);
 		if (! $doEscape) {
@@ -9003,11 +9003,11 @@ class AccountConnect {
 		return $res;
 	}
 	private static function _getPendingConnection($accountuid, $accounttype, $doEscape){
-		$paccounts = new Default_Model_PendingAccounts();
-		$f1 = new Default_Model_PendingAccountsFilter();
-		$f2 = new Default_Model_PendingAccountsFilter();
-		$f3 = new Default_Model_PendingAccountsFilter();
-		$f4 = new Default_Model_PendingAccountsFilter();
+		$paccounts = new Application\Model\PendingAccounts();
+		$f1 = new Application\Model\PendingAccountsFilter();
+		$f2 = new Application\Model\PendingAccountsFilter();
+		$f3 = new Application\Model\PendingAccountsFilter();
+		$f4 = new Application\Model\PendingAccountsFilter();
 
 		if (! $doEscape) {
 			$f1->accountid->overrideEscapeSeq("")->equals($accountuid);
@@ -9044,7 +9044,7 @@ class AccountConnect {
 		$source = str_replace( "-sp", "", trim($session->authSource) );
 		$pendingaccount = self::getPendingConnection($uid, $source);
 		if( $pendingaccount !== null ){
-			$pends = new Default_Model_PendingAccounts();
+			$pends = new Application\Model\PendingAccounts();
 			if( count($pends->items) > 0 ){
 				$pends->remove($pendingaccount);
 			}
@@ -9094,7 +9094,7 @@ class AccountConnect {
 		}
 		
 		//Save pending account entry
-		$pending = new Default_Model_PendingAccount();
+		$pending = new Application\Model\PendingAccount();
 		$pending->researcherid = $profile->id;
 		$pending->accountid = $uid;
 		$pending->accountType = $source;
@@ -9104,7 +9104,7 @@ class AccountConnect {
 		//make sure you get the pending account item data from race conditions
 		$try_count = 0;
 		while( $try_count < 10 ){
-			$paccounts = new Default_Model_PendingAccounts();
+			$paccounts = new Application\Model\PendingAccounts();
 			$paccounts->filter->id->equals($pending->id);
 			if( count($paccounts->items) > 0 ){
 				$pending = $paccounts->items[0];
@@ -9169,7 +9169,7 @@ class AccountConnect {
 			return;
 		}
 		
-		$uaccount = new Default_Model_UserAccount();
+		$uaccount = new Application\Model\UserAccount();
 		$uaccount->researcherID = $profileid;
 		$uaccount->accountID = $id;
 		$uaccount->accountTypeID = $type;
@@ -9179,7 +9179,7 @@ class AccountConnect {
 		
 		$try_count = 0;
 		while($try_count < 10){
-			$uaccounts = new Default_Model_UserAccounts();
+			$uaccounts = new Application\Model\UserAccounts();
 			$uaccounts->filter->id->equals($uaccount->id);
 			if( count($uaccounts->items) > 0 ){
 				break;
@@ -9223,7 +9223,7 @@ class AccountConnect {
 	public static function disconnectAccount($session, $account){
 		if( is_null($account) ) return;
 		if( $session->userid !== $account->researcherid ) return;
-		$accs = new Default_Model_UserAccounts();
+		$accs = new Application\Model\UserAccounts();
 		$accs->filter->id->equals($account->id);
 		if( count($accs->items) > 0 ){
 			$accs->remove($accs->items[0]);
@@ -9236,15 +9236,15 @@ class AccessGroups{
 	/**
 	 * Helper function to retrieve a user's profile.
 	 * 
-	 * @param Default_Model_Researcher|integer $user Either the user's profile object or the user's profile id.
-	 * @return Default_Model_Researcher|null
+	 * @param Application\Model\Researcher|integer $user Either the user's profile object or the user's profile id.
+	 * @return Application\Model\Researcher|null
 	 */
 	private static function getUser($user){
 		if( $user === null ) {
 			return null;
 		} else if( is_numeric($user) ){
 			$userid = intval($user);
-			$users = new Default_Model_Researchers();
+			$users = new Application\Model\Researchers();
 			$users->filter->id->equals($userid);
 			if( count($users->items) === 0 ){
 				return null;
@@ -9256,12 +9256,12 @@ class AccessGroups{
 	/**
 	 * Retrieve user's access group list.
 	 * 
-	 * @param \Default_Model_Researcher|integer $user User id or instanceof Default_Model_Researcher object.
-	 * @return \Default_Model_ActorGroupMember[]|false The access group array of the given user. Returns false on error.
+	 * @param \Application\Model\Researcher|integer $user User id or instanceof Application\Model\Researcher object.
+	 * @return \Application\Model\ActorGroupMember[]|false The access group array of the given user. Returns false on error.
 	 */
 	public static function getUserAccessGroups($user=null){
 		$user = self::getUser($user);
-		if( $user instanceof Default_Model_Researcher ){
+		if( $user instanceof Application\Model\Researcher ){
 			return $user->getActorGroups();
 		}
 		return false;
@@ -9269,8 +9269,8 @@ class AccessGroups{
 	/**
 	 * Checks if two access groups are equal.
 	 * 
-	 * @param \Default_Model_ActorGroupMember $source
-	 * @param \Default_Model_ActorGroupMember $target
+	 * @param \Application\Model\ActorGroupMember $source
+	 * @param \Application\Model\ActorGroupMember $target
 	 * @retrun boolean
 	 */
 	public static function equalAccessGroups($source=null,$target=null){
@@ -9293,7 +9293,7 @@ class AccessGroups{
 	 * Check if user belongs to all given access groups.
 	 * 
 	 * @access public
-	 * @param \Default_Model_Researcher $user User id or instanceof Default_Model_Researcher object.
+	 * @param \Application\Model\Researcher $user User id or instanceof Application\Model\Researcher object.
 	 * @param integer[] $accessgroups Array of access group ids.
 	 * @return boolean True:if user belongs to all given access groups, False: if user belongs to some or none of the given access groups.
 	 */
@@ -9328,8 +9328,8 @@ class AccessGroups{
 	 * Check if user belongs at least in one of the given acccess groups.
 	 * 
 	 * @access public
-	 * @param \Default_Model_Researcher|integer $user User id or instanceof Default_Model_Researcher object.
-	 * @param \Default_Model_ActorGroupMember[]|integer[] $accessgroups Array of access group ids or instance of Default_Model_ActorGroupMembers.
+	 * @param \Application\Model\Researcher|integer $user User id or instanceof Application\Model\Researcher object.
+	 * @param \Application\Model\ActorGroupMember[]|integer[] $accessgroups Array of access group ids or instance of Application\Model\ActorGroupMembers.
 	 * @return boolean True:if user belongs to all given access groups, False: if user belongs to some or none of the given access groups.
 	 */
 	public static function inSomeAccessGroups( $user=null, $accesstgroups=array() ){
@@ -9357,13 +9357,13 @@ class AccessGroups{
 	 * Retrieves an actor group based on its guid.
 	 * 
 	 * @param string $guid
-	 * @return Default_Model_ActorGroup|null
+	 * @return Application\Model\ActorGroup|null
 	 */
 	public static function getGroupByGUID($guid){
 		if( trim($guid) === "" ) {
 			return null;
 		}
-		$groups = new Default_Model_ActorGroups();
+		$groups = new Application\Model\ActorGroups();
 		$groups->filter->guid->equals($guid);
 		if( count($groups->items) > 0 ){
 			return $groups->items[0];
@@ -9374,7 +9374,7 @@ class AccessGroups{
 		if( trim($id) === "" ) {
 			return null;
 		}
-		$groups = new Default_Model_ActorGroups();
+		$groups = new Application\Model\ActorGroups();
 		$groups->filter->id->equals($id);
 		if( count($groups->items) > 0 ){
 			return $groups->items[0];
@@ -9384,7 +9384,7 @@ class AccessGroups{
 	private static function cancelAccessGroupRequest($sourceUser, $targetUser, $id){
 		error_log("[AccessGroups::cancelAccessGroupRequest]: Canceling user request with id: " . $id);
 		
-		$userrequests = new Default_Model_UserRequests();
+		$userrequests = new Application\Model\UserRequests();
 		$userrequests->filter->id->equals($id);
 		if( count($userrequests->items) === 0 ){
 			return false;
@@ -9406,7 +9406,7 @@ class AccessGroups{
 	private static function rejectAccessGroupRequest($sourceUser, $targetUser, $id){
 		error_log("[AccessGroups::rejectAccessGroupRequest]: Rejecting user request with id: " . $id);
 		
-		$userrequests = new Default_Model_UserRequests();
+		$userrequests = new Application\Model\UserRequests();
 		$userrequests->filter->id->equals($id);
 		if( count($userrequests->items) === 0 ){
 			return false;
@@ -9431,7 +9431,7 @@ class AccessGroups{
 	private static function acceptAccessGroupRequest($sourceUser, $targetUser, $id){
 		error_log("[AccessGroups::acceptAccessGroupRequest]: Accepting user request with id: " . $id);
 		
-		$userrequests = new Default_Model_UserRequests();
+		$userrequests = new Application\Model\UserRequests();
 		$userrequests->filter->id->equals($id);
 		if( count($userrequests->items) === 0 ){
 			return false;
@@ -9457,18 +9457,18 @@ class AccessGroups{
 	/**
 	 * Returns an array with the user request id and the access group id.
 	 * 
-	 * @param \Default_Model_Researcher|integer $user The user with access groups requests.
+	 * @param \Application\Model\Researcher|integer $user The user with access groups requests.
 	 * @return array
 	 */
 	public static function getAccessGroupRequests($user,$groupid=null){
 		$result = array();
 		if( $user===null ) return $result;
 		$user = self::getUser($user);
-		$userrequests = new Default_Model_UserRequests();
-		$f1 = new Default_Model_UserRequestsFilter();
-		$f2 = new Default_Model_UserRequestsFilter();
-		$f3 = new Default_Model_UserRequestsFilter();
-		$f4 = new Default_Model_UserRequestsFilter();
+		$userrequests = new Application\Model\UserRequests();
+		$f1 = new Application\Model\UserRequestsFilter();
+		$f2 = new Application\Model\UserRequestsFilter();
+		$f3 = new Application\Model\UserRequestsFilter();
+		$f4 = new Application\Model\UserRequestsFilter();
 		
 		$f1->stateid->equals(1);//submitted
 		$f2->userguid->equals($user->guid); //from given user
@@ -9503,8 +9503,8 @@ class AccessGroups{
 	/**
 	 * Check if $sourceUser can perform an access group action for $targetUser based on $accesspermissions
 	 * 
-	 * @param Default_Model_Researcher $sourceUser User profile object.
-	 * @param Default_Model_Researcher $targetUser User profile object.
+	 * @param Application\Model\Researcher $sourceUser User profile object.
+	 * @param Application\Model\Researcher $targetUser User profile object.
 	 * @param text $action The action to check can take values of "canAdd","canRemove","canRequest","canCancel","canAcceptReject".
 	 * @param integer $groupId The id of the action access group.
 	 * @param {id, name, canAdd, canRemove, canRequest, canAcceptReject, hasRequest}[] $accesspermissions Array of $sourceUser's access groups permissions upon $targetUser.
@@ -9562,8 +9562,8 @@ class AccessGroups{
 	}
 	/**
 	 * 
-	 * @param Default_Model_Researcher|integer $sourceUser The user to check the edit access group permissions of another user.
-	 * @param Default_Model_Researcher|integer $targetUser The user whose access groups will be edited.
+	 * @param Application\Model\Researcher|integer $sourceUser The user to check the edit access group permissions of another user.
+	 * @param Application\Model\Researcher|integer $targetUser The user whose access groups will be edited.
 	 * @param {requestid,groupid}[] $userquests An array with submitted $targetUser access group requests.
 	 * @return {id, name, canAdd, canRemove, canRequest, canAcceptReject, hasRequest}[] An array of the $sourceUser permissions to edit the access groups of $targetUser.
 	 */
@@ -9654,8 +9654,8 @@ class AccessGroups{
 	/**
 	 * Handles access group actions based on $action.
 	 * 
-	 * @param Default_Model_Researcher|integer $sourceUser User profile object or id.
-	 * @param Default_Model_Researcher|integer $targetUser User profile object or id.
+	 * @param Application\Model\Researcher|integer $sourceUser User profile object or id.
+	 * @param Application\Model\Researcher|integer $targetUser User profile object or id.
 	 * @param text $action The handled action which can take values of "include","exclude","request","cancel","accept" or "reject".
 	 * @param integer[] $groupIds The ids of the access groups.
 	 * @param {id, name, canAdd, canRemove, canRequest, canAcceptReject, hasRequest}[] $accesspermissions Optional array of $sourceUser's access groups permissions.
@@ -9711,8 +9711,8 @@ class AccessGroups{
 	/**
 	 * Include $targetUser in access groups given by $groupids by the $sourceUser.
 	 * 
-	 * @param Default_Model_Researcher|integer $sourceUser User profile object or id.
-	 * @param Default_Model_Researcher|integer $targetUser User profile object or id.
+	 * @param Application\Model\Researcher|integer $sourceUser User profile object or id.
+	 * @param Application\Model\Researcher|integer $targetUser User profile object or id.
 	 * @param integer[] $groupIds The ids of the access groups.
 	 * @param {id, name, canAdd, canRemove, canRequest, canAcceptReject, hasRequest}[] $accesspermissions Optional array of $sourceUser's access groups permissions.
 	 * @return boolean|string True on success, text message on error, False on unknown error.
@@ -9729,7 +9729,7 @@ class AccessGroups{
 			if( self::inAllAccessGroups($targetUser, array($gid)) === true ){
 				continue;
 			}
-			$actormember = new Default_Model_ActorGroupMember();
+			$actormember = new Application\Model\ActorGroupMember();
 			$actormember->groupID = $gid;
 			$actormember->actorGUID = $targetUser->guid;
 			if( trim($gid) === "-3"){
@@ -9749,8 +9749,8 @@ class AccessGroups{
 	/**
 	 * Exclude $targetUser from access groups given by $groupids by the $sourceUser.
 	 * 
-	 * @param Default_Model_Researcher|integer $sourceUser User profile object or id.
-	 * @param Default_Model_Researcher|integer $targetUser User profile object or id.
+	 * @param Application\Model\Researcher|integer $sourceUser User profile object or id.
+	 * @param Application\Model\Researcher|integer $targetUser User profile object or id.
 	 * @param integer[] $groupIds The ids of the access groups.
 	 * @param {id, name, canAdd, canRemove, canRequest, canAcceptReject, hasRequest}[] $accesspermissions Optional array of $sourceUser's access groups permissions.
 	 * @return boolean|string True on success, text message on error, False on unknown error
@@ -9764,10 +9764,10 @@ class AccessGroups{
 				continue;
 			}
 			
-			$actormembers = new Default_Model_ActorGroupMembers();
-			$f1 = new Default_Model_ActorGroupMembersFilter();
-			$f2 = new Default_Model_ActorGroupMembersFilter();
-			$f3 = new Default_Model_ActorGroupMembersFilter();
+			$actormembers = new Application\Model\ActorGroupMembers();
+			$f1 = new Application\Model\ActorGroupMembersFilter();
+			$f2 = new Application\Model\ActorGroupMembersFilter();
+			$f3 = new Application\Model\ActorGroupMembersFilter();
 			$f1->groupid->equals($gid);
 			$f2->actorid->equals($targetUser->guid);
 			$actormembers->filter->chain($f1, "AND");
@@ -9786,8 +9786,8 @@ class AccessGroups{
 	/**
 	 * Requests of $targetUser to be included in the access groups given by $groupids. ($sourceUser must be $targetUser).
 	 * 
-	 * @param Default_Model_Researcher|integer $sourceUser User profile object or id.
-	 * @param Default_Model_Researcher|integer $targetUser User profile object or id.
+	 * @param Application\Model\Researcher|integer $sourceUser User profile object or id.
+	 * @param Application\Model\Researcher|integer $targetUser User profile object or id.
 	 * @param integer[] $groupIds The ids of the access groups.
 	 * @param {id, name, canAdd, canRemove, canRequest, canAcceptReject, hasRequest}[] $accesspermissions Optional array of $sourceUser's access groups permissions.
 	 * @return boolean|string True on success, text message on error, False on unknown error.
@@ -9822,7 +9822,7 @@ class AccessGroups{
 			if( $group === null ){
 				continue;
 			}
-			$userrequest = new Default_Model_UserRequest();
+			$userrequest = new Application\Model\UserRequest();
 			$userrequest->typeid = 3;
 			$userrequest->userguid = $targetUser->guid;
 			$userrequest->targetguid = $group->guid;
@@ -9838,8 +9838,8 @@ class AccessGroups{
 	/**
 	 * Cancel requests of $targetUser to be included in the access groups given by $groupids. ($sourceUser must be $targetUser)
 	 * 
-	 * @param Default_Model_Researcher|integer $sourceUser User profile object or id.
-	 * @param Default_Model_Researcher|integer $targetUser User profile object or id.
+	 * @param Application\Model\Researcher|integer $sourceUser User profile object or id.
+	 * @param Application\Model\Researcher|integer $targetUser User profile object or id.
 	 * @param integer[] $groupIds The ids of the access groups.
 	 * @param {id, name, canAdd, canRemove, canRequest, canAcceptReject, hasRequest}[] $accesspermissions Optional array of $sourceUser's access groups permissions.
 	 * @return boolean|string True on success, text message on error, False on unknown error.
@@ -9878,8 +9878,8 @@ class AccessGroups{
 	/**
 	 * Accept requests of $targetUser to be included in the access groups given by $groupids.
 	 * 
-	 * @param Default_Model_Researcher|integer $sourceUser User profile object or id.
-	 * @param Default_Model_Researcher|integer $targetUser User profile object or id.
+	 * @param Application\Model\Researcher|integer $sourceUser User profile object or id.
+	 * @param Application\Model\Researcher|integer $targetUser User profile object or id.
 	 * @param integer[] $groupIds The ids of the access groups.
 	 * @param {id, name, canAdd, canRemove, canRequest, canAcceptReject, hasRequest}[] $accesspermissions Optional array of $sourceUser's access groups permissions.
 	 * @return boolean|string True on success, text message on error, False on unknown error.
@@ -9919,8 +9919,8 @@ class AccessGroups{
 	/**
 	 * Reject requests of $targetUser to be included in the access groups given by $groupids.
 	 * 
-	 * @param Default_Model_Researcher|integer $sourceUser User profile object or id.
-	 * @param Default_Model_Researcher|integer $targetUser User profile object or id.
+	 * @param Application\Model\Researcher|integer $sourceUser User profile object or id.
+	 * @param Application\Model\Researcher|integer $targetUser User profile object or id.
 	 * @param integer[] $groupIds The ids of the access groups.
 	 * @param {id, name, canAdd, canRemove, canRequest, canAcceptReject, hasRequest}[] $accesspermissions Optional array of $sourceUser's access groups permissions.
 	 * @return boolean|string True on success, text message on error, False on unknown error.
@@ -10005,15 +10005,15 @@ class AccessTokens{
 	/**
 	 * Helper function to retrieve a user's profile.
 	 * 
-	 * @param Default_Model_Researcher|integer $user Either the user's profile object or the user's profile id.
-	 * @return Default_Model_Researcher|null
+	 * @param Application\Model\Researcher|integer $user Either the user's profile object or the user's profile id.
+	 * @return Application\Model\Researcher|null
 	 */
 	private static function getUser($user){
 		if( $user === null ) {
 			return null;
 		} else if( is_numeric($user) ){
 			$userid = intval($user);
-			$users = new Default_Model_Researchers();
+			$users = new Application\Model\Researchers();
 			$users->filter->id->equals($userid);
 			if( count($users->items) === 0 ){
 				return null;
@@ -10025,15 +10025,15 @@ class AccessTokens{
 	/**
 	 * Helper function to retrieve an AccessToken entry
 	 * 
-	 * @param integer|string|Default_Model_AccessToken $token Either accesstoken id, token uuid value or access token entry
-	 * @return Default_Model_AccessToken|null
+	 * @param integer|string|Application\Model\AccessToken $token Either accesstoken id, token uuid value or access token entry
+	 * @return Application\Model\AccessToken|null
 	 */
 	private static function getAccessToken($token){
 		if( $token === null ) {
 			return null;
 		} else if( is_numeric($token) ){
 			$tokenid = intval($token);
-			$acctokens = new Default_Model_AccessTokens();
+			$acctokens = new Application\Model\AccessTokens();
 			$acctokens->filter->id->numequals($tokenid);
 			if( count($acctokens->items) === 0 ){
 				return null;
@@ -10041,7 +10041,7 @@ class AccessTokens{
 			$token = $acctokens->items[0];
 		} else if( is_string($token) === true ){
 			$tokenval = strval($token);
-			$acctokens = new Default_Model_AccessTokens();
+			$acctokens = new Application\Model\AccessTokens();
 			$acctokens->filter->token->equals($tokenval);
 			if( count($acctokens->items) === 0 ){
 				return null;
@@ -10057,7 +10057,7 @@ class AccessTokens{
 			return array();
 		}
 		
-		$acctokens = new Default_Model_AccessTokens();
+		$acctokens = new Application\Model\AccessTokens();
 		$acctokens->filter->actor->equals($user->guid)->and($acctokens->filter->type->equals("personal"));
 		if( count($acctokens->items) > 0 ){
 			return $acctokens->items;
@@ -10067,7 +10067,7 @@ class AccessTokens{
 	}
 
 	private static function getApplicationAccessTokens($actor){
-		$acctokens = new Default_Model_AccessTokens();
+		$acctokens = new Application\Model\AccessTokens();
 		$acctokens->filter->actor->equals($actor)->and($acctokens->filter->type->equals("application"));
 		if( count($acctokens->items) > 0 ){
 			return $acctokens->items;
@@ -10079,7 +10079,7 @@ class AccessTokens{
 		if( $user === null ) {
 			return array();
 		}
-		$acctokens = new Default_Model_AccessTokens();
+		$acctokens = new Application\Model\AccessTokens();
 		$acctokens->filter->addedby->numequals($user->id)->and($acctokens->filter->type->equals("application"));
 		if( count($acctokens->items) > 0 ){
 			return $acctokens->items;
@@ -10092,8 +10092,8 @@ class AccessTokens{
 			return null;
 		} else if( is_string($actor) === true ){
 			$actorval = strval($actor);
-			//FIXME: should be Default_Model_Actors, with filter->actorid
-			$actors = new Default_Model_Researchers();
+			//FIXME: should be Application\Model\Actors, with filter->actorid
+			$actors = new Application\Model\Researchers();
 			$actors->filter->guid->equals($actorval);
 			if( count($actors->items) === 0 ){
 				return null;
@@ -10144,7 +10144,7 @@ class AccessTokens{
 		}
 		
 		try{
-			$token = new Default_Model_AccessToken();
+			$token = new Application\Model\AccessToken();
 			$token->actorid = $actor->guid;
 			$token->type = $type;
 			$token->addedbyid = $user->id;
@@ -10245,7 +10245,7 @@ class AccessTokens{
 		
 		self::removeAllNetfilters($user, $token);
 		try {
-			$tokens = new Default_Model_AccessTokens();
+			$tokens = new Application\Model\AccessTokens();
 			$tokens->filter->id->equals($token->id);
 			if( count($tokens->items) > 0 ){
 				$tokens->remove($tokens->items[0]);
@@ -10292,7 +10292,7 @@ class AccessTokens{
 		
 		//Save netfilters
 		try{
-			$nfilter = new Default_Model_AccessTokenNetfilter();
+			$nfilter = new Application\Model\AccessTokenNetfilter();
 			$nfilter->tokenid = $token->id;
 			$nfilter->netfilter = $netfilter;
 			$nfilter->save();
@@ -10319,7 +10319,7 @@ class AccessTokens{
 			return "Only user " . $user->firstname . " " . $user->lastname . " can modify netfilters for this token";
 		}
 		
-		$nflts = new Default_Model_AccessTokenNetfilters();
+		$nflts = new Application\Model\AccessTokenNetfilters();
 		$nflts->filter->tokenid->equals($token->id);
 		$nfltsitems = $nflts->items;
 		if( count($nfltsitems) > 0 ){
@@ -10348,7 +10348,7 @@ class AccessTokens{
 		}
 		
 		//get netfilters
-		$nflts = new Default_Model_AccessTokenNetfilters();
+		$nflts = new Application\Model\AccessTokenNetfilters();
 		$nflts->filter->tokenid->equals($token->id);
 		$nfltsitems = $nflts->items;
 		foreach($nfltsitems as $nf){
@@ -10406,7 +10406,7 @@ class AccessTokens{
 		if( trim($token) === "" ) {
 			return null;
 		}
-		$tokens = new Default_Model_AccessTokens();
+		$tokens = new Application\Model\AccessTokens();
 		$tokens->filter->token->equals($token);
 		if( count($tokens->items) === 0 ){
 			return null;
@@ -10426,13 +10426,13 @@ class AccessTokens{
 			if( trim($token) === "" ) {
 				return null;
 			}
-			$tokens = new Default_Model_AccessTokens();
+			$tokens = new Application\Model\AccessTokens();
 			$tokens->filter->token->equals($token);
 			if( count($tokens->items) === 0 ){
 				return false;
 			}
 			$token = $tokens->items[0];
-		} elseif ($token instanceof Default_Model_AccessToken) {
+		} elseif ($token instanceof Application\Model\AccessToken) {
 			//nothing to do
 		} else {
 			return false;
@@ -10483,7 +10483,7 @@ class VoAdmin{
 			return null;
 		} else if( is_numeric($user) ){
 			$userid = intval($user);
-			$users = new Default_Model_Researchers();
+			$users = new Application\Model\Researchers();
 			$users->filter->id->equals($userid);
 			if( count($users->items) === 0 ){
 				return null;
@@ -10491,7 +10491,7 @@ class VoAdmin{
 			$user = $users->items[0];
 		} else if( is_string($user) && trim($user) !== "" ){
 			$usercname = trim($user);
-			$users = new Default_Model_Researchers();
+			$users = new Application\Model\Researchers();
 			$users->filter->cname->equals($usercname);
 			if( count($users->items) === 0 ){
 				return null;
@@ -10506,18 +10506,18 @@ class VoAdmin{
 	public static function getVo($vo){
 		if( $vo === null || ( is_string($vo) && trim($vo) === "" ) ) {
 			return null;
-		} else if( $vo instanceof Default_Model_VO ){
+		} else if( $vo instanceof Application\Model\VO ){
 			return $vo;
 		} else if( is_numeric($vo) ){
 			$void = intval($vo);
-			$vos = new Default_Model_VOs();
+			$vos = new Application\Model\VOs();
 			$vos->filter->id->equals($void);
 			if( count($vos->items) === 0 ){
 				return null;
 			}
 			$vo = $vos->items[0];
 		} else if( is_string($vo) && trim($vo)!=="" ){
-			$vos = new Default_Model_VOs();
+			$vos = new Application\Model\VOs();
 			$vos->filter->name->equals(trim($vo));
 			if( count($vos->items) === 0 ){
 				return null;
@@ -10557,7 +10557,7 @@ class VoAdmin{
 	 * Returns the published version of the given vappliance
 	 */
 	public static function getVAppVersion($vappliance){
-		if( $vappliance instanceof Default_Model_VAversion){
+		if( $vappliance instanceof Application\Model\VAversion){
 			return $vappliance;
 		}
 		$appliance = self::getVAppliance($vappliance);
@@ -10566,17 +10566,17 @@ class VoAdmin{
 		}
 		
 		
-		$vapplications = new Default_Model_VAs();
+		$vapplications = new Application\Model\VAs();
 		$vapplications->filter->appid->equals($appliance->id);
 		if( count($vapplications->items) === 0 ){
 			return null;
 		}
 		$vapplication = $vapplications->items[0];
 		
-		$vappvers = new Default_Model_VAversions();
-		$f1 = new Default_Model_VAversionsFilter();
-		$f2 = new Default_Model_VAversionsFilter();
-		$f3 = new Default_Model_VAversionsFilter();
+		$vappvers = new Application\Model\VAversions();
+		$f1 = new Application\Model\VAversionsFilter();
+		$f2 = new Application\Model\VAversionsFilter();
+		$f3 = new Application\Model\VAversionsFilter();
 		$f1->vappid->equals($vapplication->id);
 		$f2->published->equals(true);
 		$f3->archived->equals(false);
@@ -10593,9 +10593,9 @@ class VoAdmin{
 	}
 	
 	private static function getVAImages($vappliance){
-		if( $vappliance instanceof Default_Model_VA ){
+		if( $vappliance instanceof Application\Model\VA ){
 			$vappver = self::getVAppVersion($vappliance);
-		}else if($vappliance instanceof Default_Model_VAversion) {
+		}else if($vappliance instanceof Application\Model\VAversion) {
 			$vappver = $vappliance;
 		}else{
 			$vappver = null;
@@ -10693,9 +10693,9 @@ class VoAdmin{
 		if ( $create === true ) {
 			return self::createDraftVoImageList($researcher, $vo);
 		} else {
-			$voimglists = new Default_Model_VOWideImageLists();
-			$f1 = new Default_Model_VOWideImageListsFilter();
-			$f2 = new Default_Model_VOWideImageListsFilter();
+			$voimglists = new Application\Model\VOWideImageLists();
+			$f1 = new Application\Model\VOWideImageListsFilter();
+			$f2 = new Application\Model\VOWideImageListsFilter();
 			
 			$f1->void->numequals($vo->id);
 			$f2->state->equals("draft");
@@ -10721,7 +10721,7 @@ class VoAdmin{
 		}
 		$res = $res[0];
 		$voimglistid = $res[0];
-		$voimglists = new Default_Model_VOWideImageLists();
+		$voimglists = new Application\Model\VOWideImageLists();
 		$voimglists->filter->id->numequals($voimglistid);
 		if( count($voimglists->items) === 0 ){
 			return null;
@@ -10730,9 +10730,9 @@ class VoAdmin{
 	}
 	
 	public static function getPublishedVoImageList( $vo){
-		$voimglists = new Default_Model_VOWideImageLists();
-		$f1 = new Default_Model_VOWideImageListsFilter();
-		$f2 = new Default_Model_VOWideImageListsFilter();
+		$voimglists = new Application\Model\VOWideImageLists();
+		$f1 = new Application\Model\VOWideImageListsFilter();
+		$f2 = new Application\Model\VOWideImageListsFilter();
 		
 		$f1->void->numequals($vo->id);
 		$f2->state->equals("published");
@@ -10760,8 +10760,8 @@ class VoAdmin{
 		if( $vodraft === null ){
 			return true; //nothing to do
 		}
-		$vodraftimages = new Default_Model_VOWideImageListImages();
-		$f1 = new Default_Model_VOWideImageListImagesFilter();
+		$vodraftimages = new Application\Model\VOWideImageListImages();
+		$f1 = new Application\Model\VOWideImageListImagesFilter();
 		$f1->vowide_image_list_id->numequals($vodraft->id);
 		$vodraftimages->filter->chain($f1, "AND");
 		
@@ -10775,7 +10775,7 @@ class VoAdmin{
 			foreach($vapplists as $vapplist){
 				$vapplistids[] = $vapplist->id;
 			}
-			$f2 = new Default_Model_VOWideImageListImagesFilter();
+			$f2 = new Application\Model\VOWideImageListImagesFilter();
 			$f2->vapplistid->in($vapplistids);
 			$vodraftimages->filter->chain($f2, "AND");
 		}
@@ -10873,7 +10873,7 @@ class VoAdmin{
 		}
 		
 		foreach($imagelists as $imglst){
-			$voimglstimg = new Default_Model_VOWideImageListImage();
+			$voimglstimg = new Application\Model\VOWideImageListImage();
 			$voimglstimg->vowideImageListID = $voimglist->id;
 			$voimglstimg->vapplistid = $imglst->id;
 			$voimglstimg->state = "draft";
@@ -10908,7 +10908,7 @@ class VoAdmin{
 		}
 		$res = $res[0];
 		$voimglistid = $res[0];
-		$voimglists = new Default_Model_VOWideImageLists();
+		$voimglists = new Application\Model\VOWideImageLists();
 		$voimglists->filter->id->numequals($voimglistid);
 		if( count($voimglists->items) === 0 ){
 			return "Could not publish vo image list";
@@ -10966,14 +10966,14 @@ class VoAdmin{
 		if( $voimageid !== null && !is_numeric($voimageid)) { return null; }
 		if( $identifier!==null && trim($identifier) === "") { return null; }
 		
-		$voimages = new Default_Model_VOWideImageListImages();
+		$voimages = new Application\Model\VOWideImageListImages();
 		
-		$f1 = new Default_Model_VOWideImageListImagesFilter();
+		$f1 = new Application\Model\VOWideImageListImagesFilter();
 		$f1->id->numequals($voimageid);
 		$voimages->filter->chain($f1, "AND");
 		
 		if( $identifier !== null ){
-			$f2 = new Default_Model_VOWideImageListImagesFilter();
+			$f2 = new Application\Model\VOWideImageListImagesFilter();
 			$f2->guid->equals($identifier);
 			$voimages->filter->chain($f2, "AND");
 		}
@@ -11013,7 +11013,7 @@ class VoAdmin{
 			//if good instance id differs use that one
 			if ($res && is_numeric($res) && intval($res) !== intval($vmiimage->id)) {
 				$originalimageid = $image->id;
-				$images = new Default_Model_VMIinstances();
+				$images = new Application\Model\VMIinstances();
 				$images->filter->id->numequals(intval($res));
 				if( count($images->items) > 0 ){
 					$image = $images->items[0];
@@ -11043,9 +11043,9 @@ class VoAdmin{
 		if( $identifier!==null && trim($identifier) === "") { return null; }
 		$voimagelist = null;
 		//first search published image lists
-		$publists = new Default_Model_VOWideImageLists();
-		$f1 = new Default_Model_VOWideImageListImagesFilter();
-		$f2 = new Default_Model_VOWideImageListsFilter();
+		$publists = new Application\Model\VOWideImageLists();
+		$f1 = new Application\Model\VOWideImageListImagesFilter();
+		$f2 = new Application\Model\VOWideImageListsFilter();
 		$f1->guid->equals($identifier);
 		$f2->state->equals("published");
 		$publists->filter->chain($f1, "AND");
@@ -11056,9 +11056,9 @@ class VoAdmin{
 		
 		//Then check draft
 		if( $voimagelist == null ){
-			$prevlists = new Default_Model_VOWideImageLists();
-			$f3 = new Default_Model_VOWideImageListImagesFilter();
-			$f4 = new Default_Model_VOWideImageListsFilter();
+			$prevlists = new Application\Model\VOWideImageLists();
+			$f3 = new Application\Model\VOWideImageListImagesFilter();
+			$f4 = new Application\Model\VOWideImageListsFilter();
 			$f3->guid->equals($identifier);
 			$f4->state->equals("obsolete");
 			$prevlists->filter->chain($f3, "AND");
@@ -11074,9 +11074,9 @@ class VoAdmin{
 		}
 		
 		//Retrieve vo wide image entry
-		$images = new Default_Model_VOWideImageListImages();
-		$f5 = new Default_Model_VOWideImageListImagesFilter();
-		$f6 = new Default_Model_VOWideImageListImagesFilter();
+		$images = new Application\Model\VOWideImageListImages();
+		$f5 = new Application\Model\VOWideImageListImagesFilter();
+		$f6 = new Application\Model\VOWideImageListImagesFilter();
 		
 		$f5->vowide_image_list_id->numequals($voimagelist->id);
 		$f6->guid->equals($identifier);
@@ -12060,7 +12060,7 @@ class VMCasterOsSelector {
 		}
 		if (count($oses) > 0) {
 			$os = $oses[0];
-			$oses = new Default_Model_OSes();
+			$oses = new Application\Model\OSes();
 			$oses->filter->id->equals($os[0]);
 			if( count($oses->items) > 0 ){
 				return $oses->items[0];
@@ -12077,26 +12077,26 @@ class VMCasterOsSelector {
 		return self::getOsFamily($os->os_family_id);
 	}
 	private static function getOsFamily($osfamily){
-		if( $osfamily instanceof Default_Model_OSFamily ){ //if OS Family model is given
+		if( $osfamily instanceof Application\Model\OSFamily ){ //if OS Family model is given
 			if( !is_numeric($osfamily->id) || intval($osfamily->id) <= 0 ){
 				return null;
 			} else {
 				return $osfamily;
 			}
-		} else if ( $osfamily instanceof Default_Model_OS ){ //if OS model is given
+		} else if ( $osfamily instanceof Application\Model\OS ){ //if OS model is given
 			if( !is_numeric($osfamily->id) || intval($osfamily->id) <= 0 ){
 				return null;
 			} else {
 				return $osfamily->getOSFamily();
 			}
 		} else if ( is_numeric($osfamily) && intval($osfamily) > 0 ){ //If OS Family id is given
-			$osfamilies = new Default_Model_OSFamilies();
+			$osfamilies = new Application\Model\OSFamilies();
 			$osfamilies->filter->id->equals($osfamily);
 			if( count($osfamilies->items) > 0 ){
 				return $osfamilies->items[0];
 			}
 		} else if( is_string($osfamily) && trim($osfamily) !== "" ){ //If OS Family name is given
-			$osfamilies = new Default_Model_OSFamilies();
+			$osfamilies = new Application\Model\OSFamilies();
 			$osfamilies->filter->name->ilike(trim($osfamily));
 			if( count($osfamilies->items) > 0 ){
 				return $osfamilies->items[0];
@@ -12113,16 +12113,16 @@ class VMCasterOsSelector {
 		return null;
 	}
 	private static function getOsOther($family){
-		if( $family instanceof Default_Model_OS ){
+		if( $family instanceof Application\Model\OS ){
 			if( is_numeric($family->id) && intval($family->id)>0 ){
 				return self::getOsOther($family->getOSFamily());
 			}
 			return null;
-		} else if( $family instanceof Default_Model_OSFamily ){
+		} else if( $family instanceof Application\Model\OSFamily ){
 			if( is_numeric($family->id) && intval($family->id)>0 ){
-				$res = new Default_Model_OSes();
-				$f1 = new Default_Model_OSesFilter();
-				$f2 = new Default_Model_OSesFilter();
+				$res = new Application\Model\OSes();
+				$f1 = new Application\Model\OSesFilter();
+				$f2 = new Application\Model\OSesFilter();
 				$f1->os_family_id->equals($family->id);
 				$f2->name->ilike("Other");
 				$res->filter->chain($f1->chain($f2, "AND"), "AND");
@@ -12146,14 +12146,14 @@ class VMCasterOsSelector {
 		}
 	}
 	private static function getOs($osname){
-		if( $osname instanceof Default_Model_OS ){
+		if( $osname instanceof Application\Model\OS ){
 			if( !is_numeric($osname->id) || intval($osname->id) <= 0 ){
 				return null;
 			} else {
 				return $osname;
 			}
 		} else if ( is_numeric($osname) && intval($osname) > 0 ){
-			$oses = new Default_Model_OSes();
+			$oses = new Application\Model\OSes();
 			$oses->filter->id->equals($osname);
 			if( count($oses->items) > 0 ){
 				return $oses->items[0];
