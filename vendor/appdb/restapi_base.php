@@ -146,13 +146,13 @@ class RestAPIHelper implements iRestAPIHelper {
     static public function getFolder($folder) {
         switch ($folder) {
         case RestFolderEnum::FE_CACHE_FOLDER:
-            return $_SERVER['APPLICATION_PATH']."/../cache/"; 
+            return $_SERVER['APPLICATION_PATH'] . "/../../data/cache/"; 
         case RestFolderEnum::FE_XSD_FOLDER:
-            return $_SERVER['APPLICATION_PATH']."/configs/api/".RestAPIHelper::VERSION."/schema/";
+            return $_SERVER['APPLICATION_PATH'] . "/config/api/" . RestAPIHelper::VERSION . "/schema/";
         case RestFolderEnum::FE_XSL_FOLDER:
-            return $_SERVER['APPLICATION_PATH']."/configs/api/".RestAPIHelper::VERSION."/xslt/";
+            return $_SERVER['APPLICATION_PATH'] . "/config/api/". RestAPIHelper::VERSION . "/xslt/";
         case RestFolderEnum::FE_BIN_FOLDER:
-            return $_SERVER['APPLICATION_PATH']."/../bin/";
+            return $_SERVER['APPLICATION_PATH'] . "/../../../bin/";
         default: 
             return null;
         }
