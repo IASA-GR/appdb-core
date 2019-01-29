@@ -275,7 +275,7 @@ class ApplicationsMapper extends ApplicationsMapperBase
 			$orderby = str_replace("applications.dateadded", "CASE WHEN applications.id IN (SELECT appid FROM app_order_hack) THEN '2000-01-01 00:00:00'::timestamp ELSE applications.dateadded END", $orderby);
 			/** freshness app order HACK end **/
 
-			if (trim($orderby) != "") {
+			if ((is_array($orderby) && trim(implode("", $orderby)) != "") || (! is_array($orderby) && trim($orderby) != "")) {
 				$select->order($orderby);
 				if ( is_array($orderby) ) {
 					$_orderby = implode(",", $orderby);
