@@ -132,11 +132,25 @@ class ApiController extends AbstractActionController
         $this->handleResource($this->pars["resource"]);
         if ( is_object($this->entry) && $this->entry->getFormat() === "xml" && $this->entry->isFragment() === true) $this->entry = $this->entry->finalize();
         if ( is_object($this->entry) && $this->entry->getFormat() === "xml" ) {
-			//FIXME: $routeXslt = strval($this->getRequest()->getParam("routeXslt"));
+			$routeXslt = null;
+			$routeOpts = $this->params()->fromRoute();
+			if (array_key_exists("formats", $routeOpts)) {
+				$routeFmts = $routeOpts["formats"];
+				foreach ($routeFmts as $f) {
+					if ($f["format"] == $this->entry->getFormat()) {
+						if (array_key_exists("xslt", $f)) {
+							$routeXslt = strval($f["xslt"]);
+						}
+						break;
+					}
+				}
+			}
 			if ( isset($routeXslt) ) {
 				$routeXslt = explode("/", $routeXslt);
 				foreach($routeXslt as $xslt) {
-					$this->entry = $this->entry->transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).$xslt);
+					if (trim($xslt) != "") {
+						$this->entry = $this->entry->transform(\RestAPIHelper::getFolder(\RestFolderEnum::FE_XSL_FOLDER) . $xslt);
+					}
 				}
 			}
         }
