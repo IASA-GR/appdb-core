@@ -35,9 +35,9 @@ class HarvestController  extends AbstractActionController
 	 * Search harvest archives 
 	 */
 	public function searchAction(){
-		$archiveid = $this->getRequest()->getParam("archive");
-		$search = $this->getRequest()->getParam("search");
-		$limit =  $this->getRequest()->getParam("limit");
+		$archiveid = GET_REQUEST_PARAM($this, "archive");
+		$search = GET_REQUEST_PARAM($this, "search");
+		$limit =  GET_REQUEST_PARAM($this, "limit");
 		
 		if( is_numeric($limit) === false || $limit < 1 ){
 			$limit = 100;
@@ -55,7 +55,7 @@ class HarvestController  extends AbstractActionController
 	public function initrelationsAction(){
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
-		$updateonly  = $this->getRequest()->getParam("updateonly"); 
+		$updateonly  = GET_REQUEST_PARAM($this, "updateonly"); 
 		set_time_limit(300);
 		// Prevent malicious calls
 		if ( localRequest() ) {

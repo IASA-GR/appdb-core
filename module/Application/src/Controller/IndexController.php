@@ -546,9 +546,9 @@ class IndexController extends AbstractActionController
 	}
 	
 	public function nolayoutAction(){
-		$c = trim($this->getRequest()->getParam("_c"));
-		$a = trim($this->getRequest()->getParam("_a"));
-		$qstr = trim($this->getRequest()->getParam("q"));
+		$c = trim(GET_REQUEST_PARAM($this, "_c"));
+		$a = trim(GET_REQUEST_PARAM($this, "_a"));
+		$qstr = trim(GET_REQUEST_PARAM($this, "q"));
 		$q = array();
 		
 		if( $c === "" ){

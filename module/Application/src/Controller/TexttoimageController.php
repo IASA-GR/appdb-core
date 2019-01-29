@@ -32,7 +32,7 @@ class TexttoimageController extends AbstractActionController
         $this->_helper->viewRenderer->setNoRender();
         $text = new textPNG;
         $c = new Default_Model_Contacts();
-        $c->filter->id->equals($this->getRequest()->getParam('id'));
+        $c->filter->id->equals(GET_REQUEST_PARAM($this, 'id'));
         $text->msg = $c->items[0]->data; 
         $text->size = '9';
         $this->view->text = $text;
@@ -47,8 +47,8 @@ class TexttoimageController extends AbstractActionController
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender();
         $text = new textPNG;
-		$text->msg = $this->getRequest()->getParam('msg');
-		if ( $this->getRequest()->getParam('b64') == "1" ) $text->msg = base64_decode($text->msg);
+		$text->msg = GET_REQUEST_PARAM($this, 'msg');
+		if ( GET_REQUEST_PARAM($this, 'b64') == "1" ) $text->msg = base64_decode($text->msg);
         $text->size = '9';
         $this->view->text = $text;
         $text->draw();
@@ -62,9 +62,9 @@ class TexttoimageController extends AbstractActionController
         $this->_helper->viewRenderer->setNoRender();
         $text = new textPNG;
         $c = new Default_Model_Sites();
-		$c->filter->id->equals($this->getRequest()->getParam("id"));
+		$c->filter->id->equals(GET_REQUEST_PARAM($this, "id"));
 		if( count($c->items) > 0 ){
-			$field = $this->getRequest()->getParam("type") . "email";
+			$field = GET_REQUEST_PARAM($this, "type") . "email";
 			$text->msg = $c->items[0]->$field; 
 		}else{
 			$text->msg = "n\a";

@@ -42,8 +42,8 @@ class AbuseController extends AbstractActionController
 	public function moderatecommentAction() {
 		if ($this->session->userid !== null) {
 			if (userIsAdminOrManager($this->session->userid)) {
-				$id = $this->getRequest()->getParam("id");
-				if ( $this->getRequest()->getParam("moderate") == 0 ) $moderate = "0"; else $moderate = "1";
+				$id = GET_REQUEST_PARAM($this, "id");
+				if ( GET_REQUEST_PARAM($this, "moderate") == 0 ) $moderate = "0"; else $moderate = "1";
 				$ratings = new Default_Model_AppRatings();
 				$ratings->filter->id->equals($id);
 				if ( count($ratings->items) > 0 ) {
@@ -63,10 +63,10 @@ class AbuseController extends AbstractActionController
 
 	public function submitAction() {
 		if ($this->session->userid !== null) {
-			$type = $this->getRequest()->getParam("type");
-			$entryID = $this->getRequest()->getParam("entryID");
-			$comment = $this->getRequest()->getParam("comment");
-			$reason = $this->getRequest()->getParam("reason");
+			$type = GET_REQUEST_PARAM($this, "type");
+			$entryID = GET_REQUEST_PARAM($this, "entryID");
+			$comment = GET_REQUEST_PARAM($this, "comment");
+			$reason = GET_REQUEST_PARAM($this, "reason");
 			switch($reason) {
 				case self::REASON_OTHER:
 					$reason_str = 'Other';

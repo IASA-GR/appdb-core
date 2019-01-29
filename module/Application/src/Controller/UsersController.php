@@ -198,11 +198,11 @@ class UsersController extends AbstractActionController
 
     private function handle_actions() {
 		$this->view->handled = true;
-        if ( $this->getRequest()->getParam('a') == "register" ) {
-			header('Location: https://'.$_SERVER['HTTP_HOST'].'/?p='.base64_encode('/apps/details?id=0&r='.$this->getRequest()->getParam('r')));
+        if ( GET_REQUEST_PARAM($this, 'a') == "register" ) {
+			header('Location: https://'.$_SERVER['HTTP_HOST'].'/?p='.base64_encode('/apps/details?id=0&r='.GET_REQUEST_PARAM($this, 'r')));
             return true;
-		} elseif ( $this->getRequest()->getParam("referrer") != '' ) {
-			$s = str_replace("http://","https://",'Location: '.$this->getRequest()->getParam("referrer"));
+		} elseif ( GET_REQUEST_PARAM($this, "referrer") != '' ) {
+			$s = str_replace("http://","https://",'Location: '.GET_REQUEST_PARAM($this, "referrer"));
 		    header($s);
 			error_log('redirecting to '.$s);
             return true;

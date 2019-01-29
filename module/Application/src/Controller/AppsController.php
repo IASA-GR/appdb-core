@@ -46,10 +46,10 @@ class AppsController extends AbstractActionController
 		$this->view = new ViewModel();
         $this->session = new \Zend\Session\Container('base');
         $this->apisession = new \Zend\Session\Container('api');
-        $contextSwitch = $this->_helper->getHelper('contextSwitch');
-        $contextSwitch->addActionContext('index', 'xml')
-			->addActionContext('details', 'xml')
-			->initContext();
+//        $contextSwitch = $this->_helper->getHelper('contextSwitch');
+//        $contextSwitch->addActionContext('index', 'xml')
+//			->addActionContext('details', 'xml')
+//			->initContext();
 		# this line is needed in order for moderated applications to be managed correctly by managers/admins
 		if ( ! isset($_GET['userid']) ) if ( $this->session->userid !== null ) $_GET["userid"] = $this->session->userid;
     }
@@ -137,8 +137,8 @@ class AppsController extends AbstractActionController
 	public function getlogoAction() {
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
-		if ( !( ($this->getRequest()->getParam("id") == "0") || ($this->getRequest()->getParam("id") == '') ) && is_numeric($this->getRequest()->getParam("id")) == true )	{
-			echo $this->getlogo($this->getRequest()->getParam("id"), $this->getRequest()->getParam("size"));
+		if ( !( (GET_REQUEST_PARAM($this, "id") == "0") || (GET_REQUEST_PARAM($this, "id") == '') ) && is_numeric(GET_REQUEST_PARAM($this, "id")) == true )	{
+			echo $this->getlogo(GET_REQUEST_PARAM($this, "id"), GET_REQUEST_PARAM($this, "size"));
 		}
 	}
 
@@ -148,7 +148,7 @@ class AppsController extends AbstractActionController
 		$this->_helper->viewRenderer->setNoRender();
 		$logo = 'NULL';
 		$tool = false;
-		$id = $this->getRequest()->getParam("id");
+		$id = GET_REQUEST_PARAM($this, "id");
 		if( strpos($id, "_") > -1 ){
 			$id = split("_", $id);
 			$id = $id[0];
@@ -223,7 +223,7 @@ class AppsController extends AbstractActionController
     {
 		$this->_helper->layout->disableLayout();
 		$apps = new Application\Model\Applications();
-		$apps->filter->id->equals($this->getRequest()->getParam("id"));
+		$apps->filter->id->equals(GET_REQUEST_PARAM($this, "id"));
 		if ( count($apps->items) > 0 ) {
 			$app = $apps->items[0];
 			if ( $app->logo == "" ) {
@@ -254,7 +254,7 @@ class AppsController extends AbstractActionController
 
 	public function addratingAction() {
 		$this->_helper->layout->disableLayout();
-		$ratingID = $this->getRequest()->getParam("ratingid");
+		$ratingID = GET_REQUEST_PARAM($this, "ratingid");
 		$rating = null;
 		if ( $ratingID != '' ) {
 			$ratings = new Default_Model_AppRatings();
@@ -264,26 +264,26 @@ class AppsController extends AbstractActionController
 		} else {
 			$rating = new Default_Model_AppRating();
 		}
-		$rating->appid = $this->getRequest()->getParam("appid");
-		$rating->rating = $this->getRequest()->getParam("rating");
+		$rating->appid = GET_REQUEST_PARAM($this, "appid");
+		$rating->rating = GET_REQUEST_PARAM($this, "rating");
 		if ( $rating->rating == "0" ) $rating->rating = null;
-		$rating->comment = trim($this->getRequest()->getParam("comment"));
+		$rating->comment = trim(GET_REQUEST_PARAM($this, "comment"));
 		if ( $rating->comment == '' || $rating->comment == "undefined" ) {
 			$rating->comment = null;
 		} else {
 			$rating->comment = substr($rating->comment,0,512);
 		}
 		$rating->submittedOn = date("Y-m-d H:i:s");
-		if ( $this->getRequest()->getParam("submitterid") != "" ) {
-			$rating->submitterid = $this->getRequest()->getParam("submitterid");
+		if ( GET_REQUEST_PARAM($this, "submitterid") != "" ) {
+			$rating->submitterid = GET_REQUEST_PARAM($this, "submitterid");
 		} else {
-			$rating->submittername = $this->getRequest()->getParam("submittername");
-			$rating->submitteremail = $this->getRequest()->getParam("submittemail");
+			$rating->submittername = GET_REQUEST_PARAM($this, "submittername");
+			$rating->submitteremail = GET_REQUEST_PARAM($this, "submittemail");
 		}
 		if ( $rating !== null ) {
 			$rating->save();
 			$apps = new Application\Model\Applications();
-			$apps->filter->id = $this->getRequest()->getParam("appid");
+			$apps->filter->id = GET_REQUEST_PARAM($this, "appid");
 			echo '{"id":"'.$rating->id.'","average":"'.$apps->items[0]->rating.'"}';
 		}
 	}
@@ -293,16 +293,16 @@ class AppsController extends AbstractActionController
 		$ratings = new Default_Model_AppRatings();
 		if ( $this->session->userid === null ) {
 			$r = json_decode($_COOKIE['ratings'],true);
-			$ratingid = $r['app'.$this->getRequest()->getParam("appid")];
+			$ratingid = $r['app'.GET_REQUEST_PARAM($this, "appid")];
 			$ratings->filter->id->equals($ratingid);
 		} else {
-			$ratings->filter->appid->equals($this->getRequest()->getParam("appid"))->and($ratings->filter->submitterid->equals($this->session->userid));
+			$ratings->filter->appid->equals(GET_REQUEST_PARAM($this, "appid"))->and($ratings->filter->submitterid->equals($this->session->userid));
 		}
 		if ( count($ratings->refresh()->items) > 0 ) {
 			$id = $ratings->items[0]->id;
 			$ratings->remove($ratings->items[0]);
 			$apps = new Application\Model\Applications();
-			$apps->filter->id = $this->getRequest()->getParam("appid");
+			$apps->filter->id = GET_REQUEST_PARAM($this, "appid");
 			echo '{"id":"'.$id.'","average":"'.$apps->items[0]->rating.'"}';
 		}
 	}
@@ -310,8 +310,8 @@ class AppsController extends AbstractActionController
     public function detailsAction()
 	{
 		$this->_helper->layout->disableLayout();
-		$appID = $this->getRequest()->getParam("id");
-		$format = $this->getRequest()->getParam("format");
+		$appID = GET_REQUEST_PARAM($this, "id");
+		$format = GET_REQUEST_PARAM($this, "format");
 		if ( $format === "json" ) $format = "xml";
 		if ( ($appID == '') ) $appID = $this->session->lastAppID;
 		$this->view->dialogCount=$_GET['dc'];
@@ -321,10 +321,10 @@ class AppsController extends AbstractActionController
 		$this->view->entryid = $appID;
                 $this->view->session = $this->session;
 		$this->view->entitytype = 'software';
-                if ( $this->getRequest()->getParam('histid') != '' ) $this->view->histid = $this->getRequest()->getParam('histid');
-                if ( $this->getRequest()->getParam('histtype') != '' ) $this->view->histtype= $this->getRequest()->getParam('histtype');
-		if ( $this->getRequest()->getParam('entitytype') != '') {
-			$this->view->entitytype= strtolower( trim( $this->getRequest()->getParam('entitytype') ) );
+                if ( GET_REQUEST_PARAM($this, 'histid') != '' ) $this->view->histid = GET_REQUEST_PARAM($this, 'histid');
+                if ( GET_REQUEST_PARAM($this, 'histtype') != '' ) $this->view->histtype= GET_REQUEST_PARAM($this, 'histtype');
+		if ( GET_REQUEST_PARAM($this, 'entitytype') != '') {
+			$this->view->entitytype= strtolower( trim( GET_REQUEST_PARAM($this, 'entitytype') ) );
 			switch ($this->view->entitytype){
 				case "vappliance":
 				case "virtualappliance":
@@ -355,7 +355,7 @@ class AppsController extends AbstractActionController
 		$this->_helper->viewRenderer->setNoRender();
         if (array_key_exists("type",$_GET))	$type = $_GET['type']; else $type = 'xml';
 		$apps = new Application\Model\Applications();
-		$apps->filter = FilterParser::getApplications($this->getRequest()->getParam("flt"));
+		$apps->filter = FilterParser::getApplications(GET_REQUEST_PARAM($this, "flt"));
         if ( $type === "xml" ) {
             $apps->refresh("xmlexport");
         } else {
@@ -462,7 +462,7 @@ class AppsController extends AbstractActionController
 		if ( $this->session->userid !== null ) {
 			if ( userIsAdminOrManager($this->session->userid) ) {
 				$apps = new Application\Model\Applications();
-				$apps->filter->id->equals($this->getRequest()->getParam('id'));
+				$apps->filter->id->equals(GET_REQUEST_PARAM($this, 'id'));
 				$apps->refresh();
 				if ( count($apps->items) > 0 ) {
 					$app = $apps->items[0];
@@ -473,7 +473,7 @@ class AppsController extends AbstractActionController
 						$modInfo = $app->modInfo;
 						$modInfo->moddedBy = $this->session->userid;
 						$modInfo->moddedOn = 'NOW()';
-						$modInfo->modReason = trim($this->getRequest()->getParam('reason'));
+						$modInfo->modReason = trim(GET_REQUEST_PARAM($this, 'reason'));
 					}
 					$app->save();
 					echo '{"id":"'.$app->id.'","name":"'.base64_encode($app->name).'","moderated":"'.$app->moderated.'","moderatedOn":"'.date("Y-m-d H:i:s").'","reason":"'.base64_encode($app->modInfo->modReason).'","moderatorID":"'.$this->session->userid.'","moderatorFirstname":"'.base64_encode($this->session->fullName).'","moderatorLastname":""}';
@@ -707,8 +707,8 @@ class AppsController extends AbstractActionController
 		}
         $error = '';
 		$reason = '';
-		$name = $this->getRequest()->getParam("n");
-		$id = $this->getRequest()->getParam("id");
+		$name = GET_REQUEST_PARAM($this, "n");
+		$id = GET_REQUEST_PARAM($this, "id");
 		if (trim($id) == "") {
 			$id = null;
 		}
@@ -1474,10 +1474,10 @@ class AppsController extends AbstractActionController
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
 		
-		$format =$this->getRequest()->getParam("format");
+		$format =GET_REQUEST_PARAM($this, "format");
 		$strict = ((isset($_GET["strict"]))?true:false);
 		
-		$guid = trim($this->getRequest()->getParam("guid"));
+		$guid = trim(GET_REQUEST_PARAM($this, "guid"));
 		if( $format === null || $format === "json"){
 			header('Content-type: application/json');
 		}else if( $format === "xml" ){
@@ -2031,7 +2031,7 @@ class AppsController extends AbstractActionController
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
 		header('Content-type: application/json');
-		$appid = intval( $this->getRequest()->getParam('appid') );
+		$appid = intval( GET_REQUEST_PARAM($this, 'appid') );
 		if( $appid === 0 )
 		{
 			echo json_encode(array("result" => array("error" => "No vappliance id given")));
@@ -2095,9 +2095,9 @@ class AppsController extends AbstractActionController
 	public function importdocAction() {
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
-		$t = $this->getRequest()->getParam("t");
-		$d = $this->getRequest()->getParam("d");
-		$appid = $this->getRequest()->getParam("appid");
+		$t = GET_REQUEST_PARAM($this, "t");
+		$d = GET_REQUEST_PARAM($this, "d");
+		$appid = GET_REQUEST_PARAM($this, "appid");
 		$res = null;
 		if (! isset($appid)) {
 			$appid = null;

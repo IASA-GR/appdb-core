@@ -27,12 +27,12 @@ class AppstatsController extends AbstractActionController
     public function __construct()
 	{
 		$this->session = new \Zend\Session\Container('base');
-		$ct = $this->getRequest()->getParam("ct");
+		$ct = GET_REQUEST_PARAM($this, "ct");
 		if ( $ct === null ) $ct = $this->session->chartType;
 		if ( $ct === null ) { $ct = "Pie"; } else { $this->session->chartType = $ct; }; 
 		$this->view->chartType = $ct;
 		$this->view->chartObject = "App";
-		$ctype = @($this->getRequest()->getParam("content"));
+		$ctype = @(GET_REQUEST_PARAM($this, "content"));
 		switch ($ctype) {
 		case "vappliance":
 			$this->appType = "vapp";

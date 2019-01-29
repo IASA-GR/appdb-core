@@ -45,7 +45,7 @@ class Api02Controller extends AbstractActionController
 				->setAutoJsonSerialization(false)
                ->initContext();
        $this->routeVerb = strtoupper($this->getRequest()->getMethod());
-        if($this->getRequest()->getParam("action")!="redirect"){
+        if(GET_REQUEST_PARAM($this, "action")!="redirect"){
             $this->InitAPIHelper();
         }
     }
@@ -64,7 +64,7 @@ class Api02Controller extends AbstractActionController
         $this->notFound = true;
     }
 	private function InitAPIHelper(){
-		$apiver = $this->getRequest()->getParam("version");
+		$apiver = GET_REQUEST_PARAM($this, "version");
 		if ($apiver == "0.1") {
 			$this->Gone();
 		} else {
@@ -112,7 +112,7 @@ class Api02Controller extends AbstractActionController
         }
     }
 	public function redirectAction() {
-		header('Location: ' . "http://".$this->getRequest()->getParam("url"));
+		header('Location: ' . "http://".GET_REQUEST_PARAM($this, "url"));
 		return DISABLE_LAYOUT($this, true);
     }
     public function errorAction(){
@@ -124,7 +124,7 @@ class Api02Controller extends AbstractActionController
                                                     # due to implied 'format=xml' in the query string, and this has no effect
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Request-Method: GET');
-        $x = $this->getRequest()->getParam("xsdname");
+        $x = GET_REQUEST_PARAM($this, "xsdname");
         if(isset($x)){
             $this->view->Type = "entry";
             $this->view->Entry = $this->apiHelper->GetSchemas($x);

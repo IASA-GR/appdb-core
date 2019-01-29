@@ -39,8 +39,8 @@ class RepositoryController extends AbstractActionController {
 			header("Status: 404 Not Found");
 			return;
 		}
-		$appid = $this->getRequest()->getParam("id");
-		$dtype = $this->getRequest()->getParam("datatype");
+		$appid = GET_REQUEST_PARAM($this, "id");
+		$dtype = GET_REQUEST_PARAM($this, "datatype");
 		
 		if( trim($dtype) != "" ){
 			$this->_helper->viewRenderer->setNoRender();
@@ -117,12 +117,12 @@ class RepositoryController extends AbstractActionController {
 				echo "<response error='Unkown error occured during release creation.'></response>";
 			}
 		} else if( $_SERVER['REQUEST_METHOD'] == "GET" ) {
-			$appid = $this->getRequest()->getParam("appid");
+			$appid = GET_REQUEST_PARAM($this, "appid");
 			if( is_numeric($appid) == false ){
 				$this->view->error = "No software id given";
 				return;
 			}
-			$rtype = strtolower(trim($this->getRequest()->getParam("releasetype")));
+			$rtype = strtolower(trim(GET_REQUEST_PARAM($this, "releasetype")));
 			if( $rtype == "" ) $rtype = "major";
 			switch($rtype){
 				case "update":
@@ -133,7 +133,7 @@ class RepositoryController extends AbstractActionController {
 					$this->view->error = "Invalid release type given. The release type can be either major or update.";
 					return;
 			}
-			$this->view->appName = $this->getRequest()->getParam("name");
+			$this->view->appName = GET_REQUEST_PARAM($this, "name");
 			$this->view->baselist = Repository::getProductBaseReleases($appid);
 			$this->view->type = $rtype;
 		} else {
@@ -195,12 +195,12 @@ class RepositoryController extends AbstractActionController {
 			}
 			
 		} else if( $_SERVER['REQUEST_METHOD'] == "GET" ){
-			$appid = $this->getRequest()->getParam("appid");
+			$appid = GET_REQUEST_PARAM($this, "appid");
 			if( is_numeric($appid) == false ){
 				$this->view->error = "No software id given";
 				return;
 			}
-			$rtype = strtolower(trim($this->getRequest()->getParam("releasetype")));
+			$rtype = strtolower(trim(GET_REQUEST_PARAM($this, "releasetype")));
 			if( $rtype == "" ) $rtype = "major";
 			switch($rtype){
 				case "update":
@@ -269,10 +269,10 @@ class RepositoryController extends AbstractActionController {
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
 		//Get parameters
-		$appid = $this->getRequest()->getParam("appid");
-		$parentid = $this->getRequest()->getParam("parentid");
-		$displayversion = $this->getRequest()->getParam("displayversion");
-		$repoareaname = $this->getRequest()->getParam("repoareaname");
+		$appid = GET_REQUEST_PARAM($this, "appid");
+		$parentid = GET_REQUEST_PARAM($this, "parentid");
+		$displayversion = GET_REQUEST_PARAM($this, "displayversion");
+		$repoareaname = GET_REQUEST_PARAM($this, "repoareaname");
 
 		if( //Check parameters
 			is_numeric($this->session->userid) == false ||

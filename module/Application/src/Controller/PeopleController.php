@@ -159,7 +159,7 @@ class PeopleController extends AbstractActionController
         }
 
 	private function getFltStr() {
-		$f = trim( $this->getRequest()->getParam('flt') );
+		$f = trim( GET_REQUEST_PARAM($this, 'flt') );
 		return $f;
 	}
 
@@ -181,9 +181,9 @@ class PeopleController extends AbstractActionController
 
 	public function pplindex( $paging = true, $format = '' )
     {
-		if ($format == '' ) $format = $this->getRequest()->getParam("format");
-		$offset = $this->getRequest()->getParam('ofs');
-		$length = $this->getRequest()->getParam('len');
+		if ($format == '' ) $format = GET_REQUEST_PARAM($this, "format");
+		$offset = GET_REQUEST_PARAM($this, 'ofs');
+		$length = GET_REQUEST_PARAM($this, 'len');
 		if ( $length == "-1" ) $paging = false;
 		if ( $offset === null) $offset = 0;
 		if ( $length === null ) $length = 23;
@@ -191,9 +191,9 @@ class PeopleController extends AbstractActionController
 		$fltstr = $this->getFltStr();
 		$ppl = new Default_Model_Researchers();
 		$this->session->pplFlt = $fltstr;
-		$ppl->filter = FilterParser::getPeople($fltstr, ($this->getRequest()->getParam("fuzzySearch") == '1'));
-		if ( $this->getRequest()->getParam("orderby") != '' ) $orderby = $this->getRequest()->getParam("orderby"); else $orderby = "firstname";
-		if ( $this->getRequest()->getParam("orderbyOp") != '' ) $orderbyop = $this->getRequest()->getParam("orderbyOp"); else $orderbyop = "ASC";
+		$ppl->filter = FilterParser::getPeople($fltstr, (GET_REQUEST_PARAM($this, "fuzzySearch") == '1'));
+		if ( GET_REQUEST_PARAM($this, "orderby") != '' ) $orderby = GET_REQUEST_PARAM($this, "orderby"); else $orderby = "firstname";
+		if ( GET_REQUEST_PARAM($this, "orderbyOp") != '' ) $orderbyop = GET_REQUEST_PARAM($this, "orderbyOp"); else $orderbyop = "ASC";
 		if ( $orderby != '' ) {
 			if ($orderby != "unsorted") {
 				if ( $orderby == "firstname" ) $ppl->filter->orderBy(array("firstname ".$orderbyop,"lastname ".$orderbyop));
@@ -209,7 +209,7 @@ class PeopleController extends AbstractActionController
 		}
 		$t1 = microtime(true);
 		$total = $ppl->count();
-		$listType = $this->getRequest()->getParam("details");
+		$listType = GET_REQUEST_PARAM($this, "details");
 		$ppl->refresh($format, '', $listType);
 		$entries = $ppl->items;
 		if ( $format == '' ) $this->cacheimages($entries);
@@ -235,7 +235,7 @@ class PeopleController extends AbstractActionController
 		$t2 = microtime(true);
 		$dt = $t2 - $t1;
 		$this->view->searchTime = round($dt,2);
-		if ($this->getRequest()->getParam("fuzzySearch") == '1') $this->view->fuzzySearch = '1';
+		if (GET_REQUEST_PARAM($this, "fuzzySearch") == '1') $this->view->fuzzySearch = '1';
 		return $ppl->items;
     }
 
@@ -251,14 +251,14 @@ class PeopleController extends AbstractActionController
 			return;
 		}
 
-		if ( ($this->getRequest()->getParam("id") == "0") || ($this->getRequest()->getParam("id") == '')) {
+		if ( (GET_REQUEST_PARAM($this, "id") == "0") || (GET_REQUEST_PARAM($this, "id") == '')) {
 			$image = 'NULL';
 		} else {
-			if ( file_exists($_SERVER['APPLICATION_PATH'] . "/../cache/ppl-image-".$this->getRequest()->getParam("id").".png") ) {
-                $image = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../cache/ppl-image-".$this->getRequest()->getParam("id").".png");
+			if ( file_exists($_SERVER['APPLICATION_PATH'] . "/../cache/ppl-image-".GET_REQUEST_PARAM($this, "id").".png") ) {
+                $image = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../cache/ppl-image-".GET_REQUEST_PARAM($this, "id").".png");
 			} else {
 				$ppl = new Default_Model_Researchers();
-				$ppl->filter->id->equals($this->getRequest()->getParam("id"));
+				$ppl->filter->id->equals(GET_REQUEST_PARAM($this, "id"));
                 $image = base64_decode($ppl->items[0]->image);
 				$this->cacheimages($ppl->items);
 			}
@@ -272,7 +272,7 @@ class PeopleController extends AbstractActionController
 
     public function detailsAction()
     {
-        $pplID = $this->getRequest()->getParam("id");
+        $pplID = GET_REQUEST_PARAM($this, "id");
         if ( $pplID == '' ) $pplID = $this->session->lastPplID;
         $this->_helper->layout->disableLayout();
 		$ppl = new Default_Model_Researchers();
@@ -281,7 +281,7 @@ class PeopleController extends AbstractActionController
 				$ppl->viewModerated = true;
 			}
 		}
-		if ( $this->getRequest()->getParam("id") == "0" ) {
+		if ( GET_REQUEST_PARAM($this, "id") == "0" ) {
 			$this->view->entry = new Default_Model_Researcher();
 			$this->view->entry->countryID = '0';
 		} else {
@@ -292,7 +292,7 @@ class PeopleController extends AbstractActionController
 				$ppl->filter->cname->ilike($pplCname);
 			}
 
-			$ppl->refresh($this->getRequest()->getParam('format'), $this->getRequest()->getParam('userid'));
+			$ppl->refresh(GET_REQUEST_PARAM($this, 'format'), GET_REQUEST_PARAM($this, 'userid'));
 			if ( count($ppl->items) > 0 ) {
 				$this->view->entry = $ppl->items[0];
 				$pplID = $this->view->entry->id;
@@ -329,8 +329,8 @@ class PeopleController extends AbstractActionController
 		$this->view->countries = new Default_Model_Countries();
 		$this->view->countries->filter->orderBy('name');
 		$this->view->contactTypes = new Default_Model_ContactTypes();
-		if ( isnull($this->getRequest()->getParam("tab")) == false ){
-			$this->view->selectedTab = $this->getRequest()->getParam("tab");
+		if ( isnull(GET_REQUEST_PARAM($this, "tab")) == false ){
+			$this->view->selectedTab = GET_REQUEST_PARAM($this, "tab");
 		}
 
 		$this->view->session = $this->session;
@@ -395,7 +395,7 @@ class PeopleController extends AbstractActionController
 			return;
 		}
 
-		$ppl->filter->id->equals($this->getRequest()->getParam("id"));
+		$ppl->filter->id->equals(GET_REQUEST_PARAM($this, "id"));
 		if ( count($ppl->items) > 0 ) {
 			$person = $ppl->items[0];
 			if ( isnull($person->image) ) {
@@ -414,7 +414,7 @@ class PeopleController extends AbstractActionController
 
         if (array_key_exists("type",$_GET))	$type = $_GET['type']; else $type = 'xml';
 		$ppl = new Default_Model_Researchers();
-		$ppl->filter = FilterParser::getPeople($this->getRequest()->getParam("flt"));
+		$ppl->filter = FilterParser::getPeople(GET_REQUEST_PARAM($this, "flt"));
         if ( $type == "xml" ) {
             $ppl->refresh("xmlexport", false, $this->session->userid);
         } else {
@@ -660,14 +660,14 @@ class PeopleController extends AbstractActionController
 	}
 
 	public function validatefilterAction() {
-		$this->view->entries = validateFilterActionHelper($this->getRequest()->getParam("flt"), FilterParser::NORM_PPL);
+		$this->view->entries = validateFilterActionHelper(GET_REQUEST_PARAM($this, "flt"), FilterParser::NORM_PPL);
 	}
 
     public function primarycontactAction(){
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender();
-        $id = $this->getRequest()->getParam("id");
-        $action = $this->getRequest()->getParam("act");
+        $id = GET_REQUEST_PARAM($this, "id");
+        $action = GET_REQUEST_PARAM($this, "act");
         $action = strtolower(trim($action));
         if( $action == '' ){ $action = 'get'; }
         $error = '';
@@ -1442,8 +1442,8 @@ class PeopleController extends AbstractActionController
 			$this->getResponse()->setHeader("Status","403 Forbidden");
 			return;
 		}
-		$name = $this->getRequest()->getParam("cname");
-		$id = $this->getRequest()->getParam("id");
+		$name = GET_REQUEST_PARAM($this, "cname");
+		$id = GET_REQUEST_PARAM($this, "id");
 		$res = validatePplCName($name, $id);
 
 		if ( $res === true ) {

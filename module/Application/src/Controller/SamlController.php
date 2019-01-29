@@ -43,7 +43,7 @@ class SamlController extends AbstractActionController
 				return;
 			}
 			require_once(\SamlAuth::LIB_AUTOLOAD);
-			$source=$this->getRequest()->getParam("source");
+			$source=GET_REQUEST_PARAM($this, "source");
 			if($source == null){
 					$source="";
 			}
@@ -122,7 +122,7 @@ class SamlController extends AbstractActionController
 			}else if( isset($this->session->authreferer) === false ){
 				$this->session->authreferer = $_SERVER["HTTP_REFERER"];
 			}
-			$source=$this->getRequest()->getParam("source");
+			$source=GET_REQUEST_PARAM($this, "source");
 			if($source == null){
 				$source="";
 			}
@@ -183,7 +183,7 @@ class SamlController extends AbstractActionController
 		}
 		
 		//Check if source is given
-		$source= trim($this->getRequest()->getParam("source"));
+		$source= trim(GET_REQUEST_PARAM($this, "source"));
 		if($source == ""){
 			header("Location: " . $referer);
 			unset($this->session->connectreferer);
@@ -237,7 +237,7 @@ class SamlController extends AbstractActionController
 			return;
 		}
 		//Check if source is given
-		$source= trim($this->getRequest()->getParam("source"));
+		$source= trim(GET_REQUEST_PARAM($this, "source"));
 		if($source == ""){
 			header("Location: https://" . $_SERVER["HTTP_HOST"]);
 			return;
@@ -415,7 +415,7 @@ class SamlController extends AbstractActionController
 		\SamlAuth::logout($this->session);
 	}
 	public function newaccountAction(){
-		$referer = $this->getRequest()->getParam("r");
+		$referer = GET_REQUEST_PARAM($this, "r");
 		if( trim($referer) !== "" ){
 			$this->session->authreferer = $referer;
 		}
@@ -946,7 +946,7 @@ class SamlController extends AbstractActionController
 	public function entitydescriptorAction(){
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
-		$source = trim($this->getRequest()->getParam("source"));
+		$source = trim(GET_REQUEST_PARAM($this, "source"));
 		header('Access-Control-Allow-Origin: *');
 		header("Content-type: application/samlmetadata+xml");
 		header("Content-Disposition: attachment; filename=" . $source );

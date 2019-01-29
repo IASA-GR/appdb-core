@@ -15,6 +15,24 @@
  * limitations under the License.
  */
 
+function GET_REQUEST_PARAM(\Zend\Mvc\Controller\AbstractActionController $controller, $paramname) {
+	$v = null;	
+	$v = $controller->params()->fromHeader($paramname); // From header
+	if (is_null($v)) {
+		$v = $controller->params()->fromRoute($paramname);  // From RouteMatch
+	}
+	if (is_null($v)) {
+		$v = $controller->params()->fromQuery($paramname);  // From GET
+	}
+	if (is_null($v)) {
+		$v = $controller->params()->fromPost($paramname);   // From POST
+	}
+	if (is_null($v)) {
+		$v = $controller->params()->fromFiles($paramname);  // From file being uploaded
+	}
+	return $v;
+}
+
 include('appdb_configuration.php');
 include('support.php');
 include('email_configuration.php');
