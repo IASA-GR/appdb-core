@@ -2321,19 +2321,19 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 		$fltstr_orig = $fltstr;
 		$globalPrivate = ((substr(trim($fltstr), 0, 2) === "& ") || (trim($fltstr) === "&"));
 		switch(get_class($filter)) {
-		case "\Application\Model\ApplicationsFilter":
+		case "Application\\Model\\ApplicationsFilter":
 			$defaultTable = "application";
 			break;
-		case "Default_Model_ResearchersFilter":
+		case "Application\\Model\\ResearchersFilter":
 			$defaultTable = "person";
 			break;
-		case "Default_Model_VOsFilter":
+		case "Application\\Model\\VOsFilter":
 			$defaultTable = "vo";
             break;
-        case "Default_Model_DisseminationFilter":
+        case "Application\\Model\\DisseminationFilter":
             $defaultTable = "dissemination";
             break;
-        case "Default_Model_SitesFilter":
+        case "Application\\Model\\SitesFilter":
             $defaultTable = "site";
             break;
 		default:
@@ -2505,8 +2505,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 						$fld = "name";
 						$countryHack = true;
                     }
-                    $interval = Zend_Registry::get("app");
-                    $interval = $interval["invalid"];
+                    $interval = \ApplicationConfiguration::app('invalid');
 					switch($tbl) {
 					case "site":
 						switch($fld) {
