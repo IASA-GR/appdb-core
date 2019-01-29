@@ -969,7 +969,7 @@ class RestBroker extends RestResourceList {
 				$this->_extError = "No request element provided";
 				return false;
 			}
-			$apiroutes = new SimpleXMLElement($_SERVER['APPLICATION_PATH'] . "/apiroutes.xml", 0, true);
+			$apiroutes = new SimpleXMLElement($_SERVER['APPLICATION_PATH'] . "/config/apiroutes.xml", 0, true);
 			$ret = array();
 			foreach ($xmli as $x) {
 				$routeXslt = null;
