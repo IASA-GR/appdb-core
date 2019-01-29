@@ -52,26 +52,26 @@ class IndexController extends AbstractActionController
 		$xmlnews->open("http://www.egi.eu/about/news/news.rss");
 		$parseNode = false;
 		while (  ($xmlnews->read()) && ($itemcount <= 5) ) {
-			if ( ($xmlnews->name == "item") && ($xmlnews->nodeType == XMLReader::ELEMENT) ) {
+			if ( ($xmlnews->name == "item") && ($xmlnews->nodeType == \XMLReader::ELEMENT) ) {
 				$itemcount++;
 				$new = array();
 				$parseNode = true;
-			} elseif ( ($xmlnews->name == "item") && ($xmlnews->nodeType == XMLReader::END_ELEMENT) ) {
+			} elseif ( ($xmlnews->name == "item") && ($xmlnews->nodeType == \XMLReader::END_ELEMENT) ) {
 				$news[] = $new;
 				$parseNode = false;
-			} elseif ( ($xmlnews->name == "title") && ($xmlnews->nodeType == XMLReader::ELEMENT) && $parseNode ) {
+			} elseif ( ($xmlnews->name == "title") && ($xmlnews->nodeType == \XMLReader::ELEMENT) && $parseNode ) {
 				$xmlnews->read();
 				$new["title"] = $xmlnews->value;
-			} elseif ( ($xmlnews->name == "link") && ($xmlnews->nodeType == XMLReader::ELEMENT) && $parseNode ) {
+			} elseif ( ($xmlnews->name == "link") && ($xmlnews->nodeType == \XMLReader::ELEMENT) && $parseNode ) {
 				$xmlnews->read();
 				$new["link"] = $xmlnews->value;
-			} elseif ( ($xmlnews->name == "pubDate") && ($xmlnews->nodeType == XMLReader::ELEMENT) && $parseNode ) {
+			} elseif ( ($xmlnews->name == "pubDate") && ($xmlnews->nodeType == \XMLReader::ELEMENT) && $parseNode ) {
 				$xmlnews->read();
 				$new["date"] = $xmlnews->value;
-			} elseif ( ($xmlnews->name == "description") && ($xmlnews->nodeType == XMLReader::ELEMENT) && $parseNode ) {
+			} elseif ( ($xmlnews->name == "description") && ($xmlnews->nodeType == \XMLReader::ELEMENT) && $parseNode ) {
 				$xmlnews->read();
 				$new["desc"] = $xmlnews->value;
-			}elseif ( ($xmlnews->localName == "creator") && ($xmlnews->nodeType == XMLReader::ELEMENT) && $parseNode ) {
+			}elseif ( ($xmlnews->localName == "creator") && ($xmlnews->nodeType == \XMLReader::ELEMENT) && $parseNode ) {
 				$xmlnews->read();
 				$new["creator"] = $xmlnews->value;
 			}
@@ -104,7 +104,7 @@ class IndexController extends AbstractActionController
 			if( $auth === false ){
 				//if logged in but not authdicated the clear session
 				if( isset($this->session->userid) && is_numeric($this->session->userid)  ){
-					SamlAuth::logout($this->session);
+					\SamlAuth::logout($this->session);
 					header('Location: http://' . $_SERVER["HTTP_HOST"]);
 					return SET_NO_RENDER($this);
 				}
@@ -116,7 +116,7 @@ class IndexController extends AbstractActionController
 				$_SESSION['logouturl'] = $auth->getLogoutURL();
 				$this->session->samlattrs = $attributes;
 				$this->session->samlauthsource = ( isset($attributes["idp:sourceIdentifier"])?$attributes["idp:sourceIdentifier"][0]:"");
-				SamlAuth::setupSamlAuth($this->session);
+				\SamlAuth::setupSamlAuth($this->session);
 				if( $this->session->isNewUser === true ){
 					header('Location: https://' . $_SERVER['HTTP_HOST'] .'/saml/newaccount');
 					return;
@@ -347,13 +347,13 @@ class IndexController extends AbstractActionController
 			$body = $bodyheader . $body;
 			
 			//Send email
-			$recs = array(EmailConfiguration::getSupportAddress());
+			$recs = array(\EmailConfiguration::getSupportAddress());
 			$ccemails = false;
 			if($cc == true){
 				$ccemails = $email;
 			}
 			//sendMultipartMail($subject,$recs, $body, '', 'appdb-reports@iasa.gr', 'enadyskolopassword', $email[0], null, $ccemails);
-			EmailService::sendReport($subject, $recs, $body, '', $email[0], null, $ccemails);
+			\EmailService::sendReport($subject, $recs, $body, '', $email[0], null, $ccemails);
 			
 			$to = "";
 			foreach($email as $e){
@@ -379,7 +379,7 @@ class IndexController extends AbstractActionController
 		ignore_user_abort(true);
 		set_time_limit(0);
 		if( localRequest() == true ){
-			SEO::generateSitemap();
+			\SEO::generateSitemap();
 		}
 		return SET_NO_RENDER($this);
 	}
