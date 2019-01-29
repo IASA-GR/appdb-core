@@ -176,7 +176,7 @@ class PeopleController extends AbstractActionController
 	}
 
 	public function indexAction() {
-		$this->_helper->layout->disableLayout();
+		return DISABLE_LAYOUT($this);
 	}
 
 	public function pplindex( $paging = true, $format = '' )
@@ -274,7 +274,6 @@ class PeopleController extends AbstractActionController
     {
         $pplID = GET_REQUEST_PARAM($this, "id");
         if ( $pplID == '' ) $pplID = $this->session->lastPplID;
-        $this->_helper->layout->disableLayout();
 		$ppl = new Default_Model_Researchers();
 		if ( $this->session->userid !== null ) {
 			if ( userIsAdminOrManager($this->session->userid) ) {
@@ -346,6 +345,7 @@ class PeopleController extends AbstractActionController
 		if( is_null($this->view->entry) === false && is_numeric($this->view->entry->id) && intval($this->view->entry->id) > 0 ){
 			$this->view->entryVoMemberShip = html_entity_decode(VoAdmin::getUserMembership($this->view->entry, true) );
 		}
+		return DISABLE_LAYOUT($this);
 	}
 
 	public function details2Action(){

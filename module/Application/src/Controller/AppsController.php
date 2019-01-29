@@ -309,7 +309,6 @@ class AppsController extends AbstractActionController
 
     public function detailsAction()
 	{
-		$this->_helper->layout->disableLayout();
 		$appID = GET_REQUEST_PARAM($this, "id");
 		$format = GET_REQUEST_PARAM($this, "format");
 		if ( $format === "json" ) $format = "xml";
@@ -319,10 +318,10 @@ class AppsController extends AbstractActionController
 			$appID = '';
 		}
 		$this->view->entryid = $appID;
-                $this->view->session = $this->session;
+		$this->view->session = $this->session;
 		$this->view->entitytype = 'software';
-                if ( GET_REQUEST_PARAM($this, 'histid') != '' ) $this->view->histid = GET_REQUEST_PARAM($this, 'histid');
-                if ( GET_REQUEST_PARAM($this, 'histtype') != '' ) $this->view->histtype= GET_REQUEST_PARAM($this, 'histtype');
+		if ( GET_REQUEST_PARAM($this, 'histid') != '' ) $this->view->histid = GET_REQUEST_PARAM($this, 'histid');
+		if ( GET_REQUEST_PARAM($this, 'histtype') != '' ) $this->view->histtype= GET_REQUEST_PARAM($this, 'histtype');
 		if ( GET_REQUEST_PARAM($this, 'entitytype') != '') {
 			$this->view->entitytype= strtolower( trim( GET_REQUEST_PARAM($this, 'entitytype') ) );
 			switch ($this->view->entitytype){
@@ -343,11 +342,11 @@ class AppsController extends AbstractActionController
 					break;
 			}
 		}
-                $this->view->userHasPersonalAccessTokens = false;
-                if ($this->session->userid !== null) {
-                        $this->view->userHasPersonalAccessTokens = userHasPersonalAccessTokens($this->session->userid);
-                }
-		
+		$this->view->userHasPersonalAccessTokens = false;
+		if ($this->session->userid !== null) {
+			$this->view->userHasPersonalAccessTokens = userHasPersonalAccessTokens($this->session->userid);
+		}
+		return DISABLE_LAYOUT($this);
     }
 
     public function exportAction() {
