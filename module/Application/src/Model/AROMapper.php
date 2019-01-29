@@ -168,13 +168,18 @@ class AROMapper {
 	
 	public function fetchAll($filter = null, $format = '')
 	{
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
 			$select->where($filter->expr());
 		}
-		if ($filter !== null) $select->limit($filter->limit, $filter->offset);
-		if ($filter !== null) $select->order($filter->orderBy);
-		$resultSet = $this->getDbTable()->fetchAll($select);
+		error_log(var_export($filter, true));
+		if ($filter !== null) {
+			if (! is_null($filter->limit)) $select->limit($filter->limit);
+			if (! is_null($filter->offset)) $select->offset($filter->offset);
+			if (! is_null($filter->orderBy)) $select->order($filter->orderBy);
+		}
+		$select = (new \Zend\Db\Sql\Sql($this->getDbTable()->getAdapter()))->getSqlStringForSqlObject($select);
+		$resultSet = db()->query($select, array())->toArray();
 		$entries = array();
 		foreach ($resultSet as $row) {
 			$type = "Application\\Model\\" . $this->_baseitemname;
