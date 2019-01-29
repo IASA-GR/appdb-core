@@ -116,9 +116,9 @@ class ApiController extends AbstractActionController
 			$this->offset = $r->pageOffset;
 			$this->authenticated = $r->authenticate();
 		} else {
-			$this->Error = RestErrorEnum::toString(RestErrorEnum::RE_INVALID_RESOURCE);
+			$this->Error = \RestErrorEnum::toString(\RestErrorEnum::RE_INVALID_RESOURCE);
 			$this->total = -1;
-            $this->entry = RestAPIHelper::wrapResponse("", null, null, $this->total, null, null, RestErrorEnum::RE_INVALID_RESOURCE, null);
+            $this->entry = \RestAPIHelper::wrapResponse("", null, null, $this->total, null, null, \RestErrorEnum::RE_INVALID_RESOURCE, null);
 			$this->authenticated = false;
 			header('HTTP/1.0 400 Bad Request');
 		}
@@ -158,7 +158,7 @@ class ApiController extends AbstractActionController
 
 		if (isset($_GET['format'])) {
 			if ((trim($_GET['format']) === 'js') || (trim($_GET['format']) === 'json')) {
-				echo RestAPIHelper::transformXMLtoJSON($ret);
+				echo \RestAPIHelper::transformXMLtoJSON($ret);
 				return SET_NO_RENDER($this);;
 			}
 		}
@@ -167,7 +167,7 @@ class ApiController extends AbstractActionController
     }
 
 	public function redirectAction() {
-		header('Location: ' . "http://".$this->getRequest()->getParam("url"));
+		header('Location: ' . "http://".$this->params()->fromQuery("url"));
 		return DISABLE_LAYOUT($this, true);
     }
 
@@ -209,6 +209,7 @@ class ApiController extends AbstractActionController
 
 	public function proxyAction() {
 		$this->newproxy();
+		return DISABLE_LAYOUT($this, true);
 	}
 
 	public function newproxy() {
@@ -239,14 +240,14 @@ class ApiController extends AbstractActionController
 				session_write_close();
 				$res = $_POST['resource'];
 			} else {
-				$res = $this->getRequest()->getParam("resource");
+				$res = $this->params()->fromQuery("resource");
 			}
 		} else {
-			$res = $this->getRequest()->getParam("resource");
+			$res = $this->params()->fromQuery("resource");
 		}
 		$url = preg_replace('/\?.*/', '', $res);
 		$qs = explode("&", preg_replace('/.*\?/', '', $res));
-		$rx = RestBroker::matchResource($url, $apiroutes, $pars);
+		$rx = \RestBroker::matchResource($url, $apiroutes, $pars);
 		// validate resource type forproxy use
 		if (! is_null($rx)) {
 			if (! in_array($rx->attributes()->type, array("rest", "proxy"))) {
@@ -259,7 +260,7 @@ class ApiController extends AbstractActionController
 			$res = urldecode($res);
 			$url = preg_replace('/\?.*/', '', $res);
 			$qs = explode("&", preg_replace('/.*\?/', '', $res));
-			$rx = RestBroker::matchResource($url, $apiroutes, $pars);
+			$rx = \RestBroker::matchResource($url, $apiroutes, $pars);
 			// validate resource type forproxy use
 			if (! in_array($rx->attributes()->type, array("rest", "proxy"))) {
 				$rx = null;
@@ -290,22 +291,22 @@ class ApiController extends AbstractActionController
 		$routeXslt = null;
 		switch(strtolower($method)) {
 			case "get":
-				$method = RestMethodEnum::RM_GET;
+				$method = \RestMethodEnum::RM_GET;
 				break;
 			case "put":
-				$method = RestMethodEnum::RM_PUT;
+				$method = \RestMethodEnum::RM_PUT;
 				break;
 			case "post":
-				$method = RestMethodEnum::RM_POST;
+				$method = \RestMethodEnum::RM_POST;
 				break;
 			case "delete":
-				$method = RestMethodEnum::RM_DELETE;
+				$method = \RestMethodEnum::RM_DELETE;
 				break;
 			case "options":
-				$method = RestMethodEnum::RM_OPTIONS;
+				$method = \RestMethodEnum::RM_OPTIONS;
 				break;
 			default:
-				$method = RestMethodEnum::RM_GET;
+				$method = \RestMethodEnum::RM_GET;
 				break;
 		}
 
@@ -334,8 +335,7 @@ class ApiController extends AbstractActionController
 					} else {
 						error_log("Warning: auth token cookie ('SimpleSAMLAuthToken') is undefined!");
 					}
-					$apiconf = Zend_Registry::get("api");
-					$apikey = $apiconf["key"];
+					$apikey = \ApplicationConfiguration::api("key");
 				}
 				$pars['userid'] = $userid;
 				$pars['passwd'] = $passwd;
@@ -356,37 +356,37 @@ class ApiController extends AbstractActionController
 					}
 				}
 			} catch (Exception $e) {
-				$error = RestErrorEnum::toString(RestErrorEnum::RE_INVALID_REPRESENTATION);
+				$error = \RestErrorEnum::toString(\RestErrorEnum::RE_INVALID_REPRESENTATION);
 				$extError = "Could not instantiate REST resource for request `" . $res . "'";
 				$this->getResponse()->clearAllHeaders();
 				$this->getResponse()->setRawHeader("HTTP/1.0 400 Bad Request");
 				$this->getResponse()->setHeader("Status","400 Bad Request");
 				if ($extError != "") {
 					error_log($error . '\n' . $extError);
-					echo RestAPIHelper::wrapResponse("", null, null, 0, null, null, RestErrorEnum::RE_INVALID_RESOURCE, $extError);
+					echo \RestAPIHelper::wrapResponse("", null, null, 0, null, null, \RestErrorEnum::RE_INVALID_RESOURCE, $extError);
 				} else {
 					error_log($error);
-					echo RestAPIHelper::wrapResponse("", null, null, 0, null, null, RestErrorEnum::RE_INVALID_RESOURCE, null);
+					echo \RestAPIHelper::wrapResponse("", null, null, 0, null, null, \RestErrorEnum::RE_INVALID_RESOURCE, null);
 				}
 				return;
 			}
 		} else {
-			$error = RestErrorEnum::toString(RestErrorEnum::RE_INVALID_REPRESENTATION);
+			$error = \RestErrorEnum::toString(\RestErrorEnum::RE_INVALID_REPRESENTATION);
 			$extError = "Could not resolve REST resource for request `" . $res . "'";
 			$this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 400 Bad Request");
 			$this->getResponse()->setHeader("Status","400 Bad Request");			
 			if ($extError != "") {
 				error_log($error . '\n' . $extError);
-				echo RestAPIHelper::wrapResponse("", null, null, 0, null, null, RestErrorEnum::RE_INVALID_RESOURCE, $extError);
+				echo \RestAPIHelper::wrapResponse("", null, null, 0, null, null, \RestErrorEnum::RE_INVALID_RESOURCE, $extError);
 
 			} else {
 				error_log($error);
-				echo RestAPIHelper::wrapResponse("", null, null, 0, null, null, RestErrorEnum::RE_INVALID_RESOURCE, null);
+				echo \RestAPIHelper::wrapResponse("", null, null, 0, null, null, \RestErrorEnum::RE_INVALID_RESOURCE, null);
 			}
 			return;
 		}	
-		$s_method = strtolower(RestMethodEnum::toString($method));
+		$s_method = strtolower(\RestMethodEnum::toString($method));
 		$res->startLogging($_SERVER['APPLICATION_PATH'] .'/appdbapilog.xml');
 		$_res = $res->$s_method();
 		if ( $_res !== false ) {
@@ -395,23 +395,23 @@ class ApiController extends AbstractActionController
 			} else {
 				$res = $_res;
 			}
-			if ( ! is_null($routeXslt) ) $res = $res->transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).$routeXslt);
+			if ( ! is_null($routeXslt) ) $res = $res->transform(\RestAPIHelper::getFolder(\RestFolderEnum::FE_XSL_FOLDER).$routeXslt);
 			echo $res;
 		} else {
-			$error = RestErrorEnum::toString($res->getError());
+			$error = \RestErrorEnum::toString($res->getError());
 			$extError = $res->getExtError();
 			if ($extError != "") {
 				error_log($error . '\n' . $extError);
-				echo RestAPIHelper::wrapResponse("", null, null, 0, null, null, $res->getError(), $extError);
+				echo \RestAPIHelper::wrapResponse("", null, null, 0, null, null, $res->getError(), $extError);
 			} else {
 				error_log($error);
-				echo RestAPIHelper::wrapResponse("", null, null, 0, null, null, $res->getError(), null);
+				echo \RestAPIHelper::wrapResponse("", null, null, 0, null, null, $res->getError(), null);
 			}
 		}
 	}
 
 	public function oldproxy() {
-		$ver = $this->getRequest()->getParam("version");
+		$ver = $this->params()->fromQuery("version");
 		if ((!isset($ver)) || (trim($ver) == "")) $ver = 'latest';
 		$proxy = new AppDBRESTProxy($ver);
 		$data = array();
@@ -425,6 +425,6 @@ class ApiController extends AbstractActionController
 				session_write_close();
 			}
 		}
-		$proxy->request($this->getRequest()->getParam("resource"), $act, $data);
+		$proxy->request($this->params()->fromQuery("resource"), $act, $data);
 	}
 }
