@@ -538,16 +538,16 @@ function getZendSelectParts($select, &$from, &$where, &$orderby, &$limit) {
 			if ( $orderby != '' ) $orderby = str_replace('ORDER BY ,', 'ORDER BY', 'ORDER BY ' . $orderby);
 		} catch (Exception $e) {
 		}
-/* FIXME
 
 		$limit = '';
 		try {
-			if ($select->getPart('LIMITCOUNT') != 0) {
-				$limit = 'LIMIT ' . $select->getPart('LIMITCOUNT');
-				$limit = $limit . ' OFFSET ' . $select->getPart('LIMITOFFSET');
-			}
+			$lim = trim($select->getRawState('limit'));
+			$ofs = trim($select->getRawState('offset'));
+			if ($lim != "") $limit .= "LIMIT $lim ";
+			if ($ofs != "") $limit .= "OFFSET $ofs ";
+			$limit = trim($limit);
 		} catch (Exception $e) {
-		} */
+		}
 }
 
 function getZendSelectParts2($select, &$from, &$where, &$orderby, &$limit) {
