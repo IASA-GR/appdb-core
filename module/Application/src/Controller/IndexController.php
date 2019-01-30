@@ -142,16 +142,16 @@ class IndexController extends AbstractActionController
 		$this->view->username = $this->session->username;
 
 		if ( $this->session->userid !== null ) {
-			$ppl = new Default_Model_Researchers();
+			$ppl = new \Application\Model\Researchers();
 			$ppl->filter->id->equals($this->session->userid);
 			$user = $ppl->items[0];
 			$this->view->user = $user;
 			
 			/* Get count of user requests */
-			$urs = new Default_Model_UserRequests();
-			$s2 = new Default_Model_PermissionsFilter();
+			$urs = new \Application\Model\UserRequests();
+			$s2 = new \Application\Model\PermissionsFilter();
 			$s2->actor->equals($this->session->userguid);
-			$s3 = new Default_Model_UserRequestStatesFilter();
+			$s3 = new \Application\Model\UserRequestStatesFilter();
 			$s3->name->equals("submitted");
 			$urs->filter->chain(/*$s1->chain(*/$s2->chain($s3,"AND"),"AND"/*),"AND"*/);
 			$reqsitems = $urs->items;
@@ -159,14 +159,14 @@ class IndexController extends AbstractActionController
 
 			//Fetch user requests for NILs
 			if( userIsAdminOrManager($this->session->userid) === false && userIsNIL($this->session->userid) === true ){
-				$nilusers = new Default_Model_UserRequests();
-				$s1 = new Default_Model_UserRequestTypesFilter();
+				$nilusers = new \Application\Model\UserRequests();
+				$s1 = new \Application\Model\UserRequestTypesFilter();
 				$s1->id->numequals(3);
-				$s2 = new Default_Model_ResearchersFilter();
+				$s2 = new \Application\Model\ResearchersFilter();
 				$s2->countryid->equals($this->session->userCountryID);
-				$s3 = new Default_Model_UserRequestStatesFilter();
+				$s3 = new \Application\Model\UserRequestStatesFilter();
 				$s3->name->equals("submitted");
-				$s4 = new Default_Model_ActorGroupsFilter();
+				$s4 = new \Application\Model\ActorGroupsFilter();
 				$s4->id->numequals(-3);
 				$nilusers->filter->chain($s1->chain($s2->chain($s3->chain($s4,"AND"),"AND"),"AND"),"AND");
 				if( count($nilusers->items) > 0 ){
@@ -213,6 +213,7 @@ class IndexController extends AbstractActionController
 				$this->view->permaLink=$pp;
 			}
 		}
+		return $this->view;
     }
 	
 	public function createCaptcha(){
@@ -261,7 +262,7 @@ class IndexController extends AbstractActionController
 
 			if( $this->session->userid !== null ) {
 				$this->view->username = $this->session->fullName;
-				$cnts = new Default_Model_Contacts();
+				$cnts = new \Application\Model\Contacts();
 				$cnts->filter->researcherid->equals($this->session->userid)->and($cnts->filter->contacttypeid->equals(7));
 				if( count ( $cnts->items ) > 0 ) {
 					$this->view->contacts = $cnts->items;
@@ -386,7 +387,7 @@ class IndexController extends AbstractActionController
 	
 	public function customhomeAction(){
 		if( isset($this->session->usercname) === false ){
-			$ppl = new Default_Model_Researchers();
+			$ppl = new \Application\Model\Researchers();
 			$ppl->filter->id->equals($this->session->userid);
 			if( count($ppl->items) == 0 ){
 				$this->_helper->viewRenderer->setNoRender();	

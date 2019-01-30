@@ -24,7 +24,11 @@ $isAdminOrManager = false;
 $isNIL = false;
 $isAdmin = false;
 
-if ( ($this->user || $this->session->userid !== null) && ($this->user!==null && $this->user->privs!==null) ) {
+$userCName = null;
+$canManageDatasets = false;
+error_log("LOADING INDEX/INDEX");
+if (($this->user || (! is_null($this->session->userid))) && ((! is_null($this->user)) && (! is_null($this->user->privs)))) {
+	$userCName = $this->user->cname;
 	$this->user->privs->refresh();
 	$canInsertApplication = $this->user->privs->canInsertApplication();
 	//$canEditFAQs = $this->user->privs->canEditFAQs();
@@ -227,10 +231,10 @@ if( $browserSupported == false ){
 			<?php if( $this->session->userid !== null ) { ?>
 			<li class="profileitem rightalign" ><a href="#"><div  style="display: inline-block; vertical-align: top;"><img src="/people/getimage?id=<?php echo $this->session->userid;?>" alt="" class="profileimage"/><span class="profilename hidden"><?php echo $this->session->fullName; ?></span><span class="arrow"></span></div></a>
 				<ul class="profilemenu leftalign">
-					<li><a href="/store/person/<?php echo $this->user->cname; ?>" title="View profile" onclick="appdb.views.Main.showPerson({id: <?php echo $this->session->userid; ?>, cname: '<?php echo $this->user->cname; ?>'}, {mainTitle: '<?php echo $this->session->fullName; ?>'});"><div class="icontext"><img src="/people/getimage?id=<?php echo $this->session->userid;?>" border="0" style="width:16px;height:16px;" /><span>My profile</span></div></a></li>
-					<li><a href="/store/person/<?php echo $this->user->cname; ?>/preferences" title="View Preferences" onClick="appdb.views.Main.showPerson({id: <?php echo $this->session->userid; ?>, cname: '<?php echo $this->user->cname; ?>',tab:'preferences'}, {mainTitle: '<?php echo $this->session->fullName; ?>',tab:'preferences'});"><div class="icontext"><img class="preferencesimg" src="" /><span>Preferences</span></div></a></li>
-					<li ><a href="/store/person/<?php echo $this->user->cname; ?>/pendingrequests" title="View Pending requests" onClick="appdb.views.Main.showPerson({id: <?php echo $this->session->userid; ?>, cname: '<?php echo $this->user->cname; ?>',tab:'pendingrequests'}, {mainTitle: '<?php echo $this->session->fullName; ?>',tab:'pendingrequests'});"><div class="icontext"><img class="pendingrequestsimg" src="" /><span>Pending Requests <span class="pendingrequestscount"><?php echo ( isnull($this->userRequests) || is_numeric($this->userRequests)===false || $this->userRequests==0)?"":"(".$this->userRequests.")"; ?></span></span></div></a></li>
-					<li><a href="/store/person/<?php echo $this->user->cname; ?>/manageaccounts" title="Manage your accounts" onClick="appdb.views.Main.showPerson({id: <?php echo $this->session->userid; ?>, cname: '<?php echo $this->user->cname; ?>',tab:'manageaccounts'}, {mainTitle: '<?php echo $this->session->fullName; ?>',tab:'manageaccounts'});"><div class="icontext"><img class="connectedaccountsimg" src="/images/browse_roles.png" /><span>Manage Accounts</span></div></a></li>
+					<li><a href="/store/person/<?php echo $userCName; ?>" title="View profile" onclick="appdb.views.Main.showPerson({id: <?php echo $this->session->userid; ?>, cname: '<?php echo $userCName; ?>'}, {mainTitle: '<?php echo $this->session->fullName; ?>'});"><div class="icontext"><img src="/people/getimage?id=<?php echo $this->session->userid;?>" border="0" style="width:16px;height:16px;" /><span>My profile</span></div></a></li>
+					<li><a href="/store/person/<?php echo $userCName; ?>/preferences" title="View Preferences" onClick="appdb.views.Main.showPerson({id: <?php echo $this->session->userid; ?>, cname: '<?php echo $userCName; ?>',tab:'preferences'}, {mainTitle: '<?php echo $this->session->fullName; ?>',tab:'preferences'});"><div class="icontext"><img class="preferencesimg" src="" /><span>Preferences</span></div></a></li>
+					<li ><a href="/store/person/<?php echo $userCName; ?>/pendingrequests" title="View Pending requests" onClick="appdb.views.Main.showPerson({id: <?php echo $this->session->userid; ?>, cname: '<?php echo $userCName; ?>',tab:'pendingrequests'}, {mainTitle: '<?php echo $this->session->fullName; ?>',tab:'pendingrequests'});"><div class="icontext"><img class="pendingrequestsimg" src="" /><span>Pending Requests <span class="pendingrequestscount"><?php echo ( isnull($this->userRequests) || is_numeric($this->userRequests)===false || $this->userRequests==0)?"":"(".$this->userRequests.")"; ?></span></span></div></a></li>
+					<li><a href="/store/person/<?php echo $userCName; ?>/manageaccounts" title="Manage your accounts" onClick="appdb.views.Main.showPerson({id: <?php echo $this->session->userid; ?>, cname: '<?php echo $userCName; ?>',tab:'manageaccounts'}, {mainTitle: '<?php echo $this->session->fullName; ?>',tab:'manageaccounts'});"><div class="icontext"><img class="connectedaccountsimg" src="/images/browse_roles.png" /><span>Manage Accounts</span></div></a></li>
 					<li class="seperator"></li>
 					<li><a href="#" title="Logout" onclick="logout()"><div class="icontext"><img class="logout" src="" /><span>Sign Out</span></div></a></li>
 				</ul>
@@ -737,14 +741,14 @@ if( $browserSupported == false ){
 	var apiHostname = '<?php echo $_SERVER['APPLICATION_API_HOSTNAME'];?>';
 	var canEditFAQs = <?php echo ($canEditFAQs==true)?"true":"false"; ?>;
 	var userName = <?php if ($this->session->userid === null) echo 'null'; else echo "'".$this->session->username."'"; ?>;
-	var userCName = <?php if ($this->session->userid === null) echo 'null'; else echo "'".  $this->user->cname."'"; ?>;
+	var userCName = <?php if ($this->session->userid === null) echo 'null'; else echo "'".  $userCName."'"; ?>;
 	var userFullname = <?php if ($this->session->userid === null) echo 'null'; else echo "'".$this->session->fullName."'"; ?>;
 	var userRole = <?php if ($this->session->userRole === null) echo 'null'; else echo $this->session->userRole; ?>;
 	var userRequestCount = <?php echo ( isnull($this->userRequests) || is_numeric($this->userRequests)===false )?0:$this->userRequests; ?>;
 	var userCanInsertApplication = <?php echo ($canInsertApplication == false)?'false':'true'; ?>;
 	var userIsAdminOrManager = <?php echo ($isAdminOrManager == false)?'false':'true'; ?>;
 	var userIsAdmin = <?php echo ($isAdmin == false)?'false':'true'; ?>;
-	var userVoMembership = <?php if(trim($this->session->userid)!==null){ 
+	var userVoMembership = <?php if(! is_null($this->session->userid)) { 
 		echo html_entity_decode(VoAdmin::getUserMembership(trim($this->session->userid), true));
 	} else { 
 		echo "[]";

@@ -725,8 +725,6 @@ class AppsController extends AbstractActionController
 	}
 
 	public function usedurltitlesAction(){
-	 $this->_helper->layout->disableLayout();
-	 $this->_helper->viewRenderer->setNoRender();
 	 $au = new Default_Model_AppUrls();
 	 $items = $au->getTitles(true);
 	 header('Content-type: text/xml');
@@ -737,6 +735,7 @@ class AppsController extends AbstractActionController
 	 }
 	 $res .= "</response>";
 	 echo $res;
+	 return DISABLE_LAYOUT($this, true);
 	}
 	
 	public function joinrequestAction(){

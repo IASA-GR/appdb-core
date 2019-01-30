@@ -662,8 +662,6 @@ class PeopleController extends AbstractActionController
 	}
 
     public function primarycontactAction(){
-        $this->_helper->layout->disableLayout();
-        $this->_helper->viewRenderer->setNoRender();
         $id = GET_REQUEST_PARAM($this, "id");
         $action = GET_REQUEST_PARAM($this, "act");
         $action = strtolower(trim($action));
@@ -675,9 +673,10 @@ class PeopleController extends AbstractActionController
             $this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 403 Forbidden");
 			$this->getResponse()->setHeader("Status","403 Forbidden");
-            return;
+			DISABLE_LAYOUT($this);
+            return SET_NO_RENDER($this, "Forbidden", 403);
         }
-        if( $action === 'set'){
+        if ($action === 'set') {
             $p = new Default_Model_Contacts();
             $p->filter->researcherid->equals($this->session->userid)->and($p->filter->id->equals($id));
             if($p->count()===0){
@@ -689,7 +688,7 @@ class PeopleController extends AbstractActionController
                $resid=$pi->id;
                $res=$pi->data;
             }
-        }else{
+        } else {
             $p = new Default_Model_Contacts();
             $p->filter->researcherid->equals($this->session->userid)->and($p->filter->isprimary->equals(true));
             if(count($p->items)===0){
@@ -699,12 +698,15 @@ class PeopleController extends AbstractActionController
                 $resid = $pi->id;
                 $res = $pi->data;
             }
-        }
-        if($error!==''){
-            echo "<response error='" . $error . "'></response>";
-        }else{
-            echo "<response " . (($resid!=='')?"id='".$resid."'":"")." >" . $res . "</response>";
-        }
+		}
+		$ret = '';
+        if ($error !== '') {
+			$ret = "<response error='" . $error . "'></response>";
+        } else {
+            $ret = "<response " . (($resid!=='')?"id='".$resid."'":"")." >" . $res . "</response>";
+		}
+		DISABLE_LAYOUT($this);
+		return SET_NO_RENDER($this, $ret);
     }
 
 	public function userrequestsAction(){
