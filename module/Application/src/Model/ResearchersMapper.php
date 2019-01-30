@@ -160,11 +160,12 @@ class ResearchersMapper extends ResearchersMapperBase
 
 	public function fetchAll($filter = null, $format = '', $userid = '', $xmldetailed = false)
 	{
+		$orderby = null;
 		$select = $this->getDbTable()->getSql()->select();
 		$executor = $this->getDbTable();
 		if ( $filter !== null ) {
-			$orderby = $filter->orderBy;
-			if ( is_array($orderby) ) {
+			if (! is_null($filter->orderBy)) $orderby = $filter->orderBy;
+			if (is_array($orderby)) {
 				$orderby = end($orderby);
 			}
 		} else {
@@ -176,7 +177,10 @@ class ResearchersMapper extends ResearchersMapperBase
 			if ( ! is_array($filter->expr()) ) $select->where($filter->expr());
 			$executor = $this->getDbTable()->getAdapter();
 		}
-		if ($filter !== null) $select->limit($filter->limit, $filter->offset);
+		if ($filter !== null) {
+			if (! is_null($filter->limit)) $select->limit($filter->limit);
+			if (! is_null($filter->offset)) $select->offset($filter->offset);
+		}
 		if ($filter !== null) {
 			$inv = false;
 			if ( (substr($orderby,0,16) === "researchers.rank") ) {
@@ -193,7 +197,7 @@ class ResearchersMapper extends ResearchersMapperBase
 				 */
 				$orderby = "rank DESC, name ASC";
 			}
-			$select->order($orderby);
+			if (! is_null($orderby)) $select->order($orderby);
 			if ( is_array($orderby) ) {
 				$_orderby = implode(",", $orderby);
 			} else $_orderby = $orderby;
@@ -246,12 +250,18 @@ class ResearchersMapper extends ResearchersMapperBase
 					$resultSet = db()->query("SELECT ".$func."(array_agg(id $orderby)".$simpleList.$userid.") AS researcher FROM filterppl(?,?,?) AS researchers $limit", array($filter->fltstr, $from, $where))->toArray();
 				}
 			} else {
+				$select = (new \Zend\Db\Sql\Sql($this->getDbTable()->getAdapter()))->getSqlStringForSqlObject($select);
 				$select = fixuZenduBuguru("" . $select);
-		        $resultSet = $this->getDbTable()->getAdapter()->query("SELECT ".$func."(id".$simpleList.$userid.") as researcher FROM (".$select.") AS t;", array())->toArray();
+				$select = str_replace('"researchers"."researchers".', '"researchers".', $select);
+				$select = str_replace('"researchers.any"', '"researchers"."any"', $select);
+		        $resultSet = db()->query("SELECT ".$func."(id".$simpleList.$userid.") as researcher FROM (".$select.") AS t;", array())->toArray();
 			}
 		} else {
+			$select = (new \Zend\Db\Sql\Sql($this->getDbTable()->getAdapter()))->getSqlStringForSqlObject($select);
 			$select = fixuZenduBuguru("" . $select);
-			$resultSet = $executor->fetchAll($select);
+			$select = str_replace('"researchers"."researchers".', '"researchers".', $select);
+			$select = str_replace('"researchers.any"', '"researchers"."any"', $select);
+			$resultSet = db()->query($select, array())->toArray();
 		}
 		$entries = array();
 		foreach ($resultSet as $row) {

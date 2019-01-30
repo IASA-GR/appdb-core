@@ -22,7 +22,7 @@ class UserAccountsMapper extends UserAccountsMapperBase
 {
 	public function populate(&$entry, $row) {
 		parent::populate($entry,$row);
-		$entry->setIDPTrace(pg_to_php_array($row->idptrace));
+		$entry->setIDPTrace(pg_to_php_array($row['idptrace']));
 	}
 
 	public function save(AROItem $value) {

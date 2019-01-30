@@ -27,7 +27,7 @@ class UserPrivs
 		
 	public function __construct($actor) {
 		$this->_actor = $actor;
-		$this->_session = new Zend_Session_Namespace('default');
+		$this->_session = new \Zend\Session\Container('base');
 		if ($this->_session->userid == $actor->id) {
 			$this->_items = $this->_session->privs;
 		}
@@ -38,12 +38,10 @@ class UserPrivs
 
 	public function refresh() {
 		global $application;
-		$db = $application->getBootstrap()->getResource('db');
-		$db->setFetchMode(Zend_Db::FETCH_NUM);
-		$perms = $db->query("SELECT actionid, object FROM permissions WHERE actor = '".$this->_actor->guid . "'")->fetchAll();
+		$perms = db()->query("SELECT actionid, object FROM permissions WHERE actor = '". $this->_actor->guid . "'", array())->toArray();
 		$a = array();
 		foreach($perms as $perm) {
-			$b = array("actionID" => $perm[0], "object" => $perm[1]);
+			$b = array("actionID" => $perm['actionid'], "object" => $perm['object']);
 			$a[] = $b;
 		}
 		$this->_items = $a;
