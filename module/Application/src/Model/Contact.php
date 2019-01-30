@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Contact extends Default_Model_ContactBase
+namespace Application\Model;
+
+class Contact extends ContactBase
 {
 	public function toXML($recursive=false) {
 		// We always want the following, force them now

@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VMINetworkTrafficMapper extends Default_Model_VMINetworkTrafficMapperBase
+namespace Application\Model;
+
+class VMINetworkTrafficMapper extends VMINetworkTrafficMapperBase
 {
 	public function populate(&$entry,$row)
 	{

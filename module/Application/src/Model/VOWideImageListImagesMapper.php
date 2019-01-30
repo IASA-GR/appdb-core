@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VOWideImageListImagesMapper extends Default_Model_VOWideImageListImagesMapperBase
+namespace Application\Model;
+
+class VOWideImageListImagesMapper extends VOWideImageListImagesMapperBase
 {
 
 }

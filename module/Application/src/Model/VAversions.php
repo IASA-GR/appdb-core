@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VAversions extends Default_Model_VAversionsBase
+namespace Application\Model;
+
+class VAversions extends VAversionsBase
 {
 
 }

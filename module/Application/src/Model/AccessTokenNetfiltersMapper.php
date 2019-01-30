@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AccessTokenNetfiltersMapper extends Default_Model_AccessTokenNetfiltersMapperBase
+namespace Application\Model;
+
+class AccessTokenNetfiltersMapper extends AccessTokenNetfiltersMapperBase
 {
 
 }

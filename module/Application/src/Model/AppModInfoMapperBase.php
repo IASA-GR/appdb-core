@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppModInfoMapperBase
+namespace Application\Model;
+
+class AppModInfoMapperBase
 {
 
 }

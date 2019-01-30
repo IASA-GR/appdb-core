@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_RelationVerbsMapper extends Default_Model_RelationVerbsMapperBase
+namespace Application\Model;
+
+class RelationVerbsMapper extends RelationVerbsMapperBase
 {
 
 }

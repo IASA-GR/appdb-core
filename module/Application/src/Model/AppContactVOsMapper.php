@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppContactVOsMapper extends Default_Model_AppContactVOsMapperBase
+namespace Application\Model;
+
+class AppContactVOsMapper extends AppContactVOsMapperBase
 {
 
 }

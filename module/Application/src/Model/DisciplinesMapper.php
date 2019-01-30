@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_DisciplinesMapper extends Default_Model_DisciplinesMapperBase
+namespace Application\Model;
+
+class DisciplinesMapper extends DisciplinesMapperBase
 {
 	public function fetchAll($filter = null, $format = '', $xmldetailed = false) {
 		if ($format == '') {

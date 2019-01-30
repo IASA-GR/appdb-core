@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VaProviders extends Default_Model_VaProvidersBase
+namespace Application\Model;
+
+class VaProviders extends VaProvidersBase
 {
 	public function refresh($format = '', $xmldetailed = false)
     {

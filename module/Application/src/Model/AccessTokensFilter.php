@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AccessTokensFilter extends Default_Model_AccessTokensFilterBase {
+namespace Application\Model;
+
+class AccessTokensFilter extends AccessTokensFilterBase {
 }

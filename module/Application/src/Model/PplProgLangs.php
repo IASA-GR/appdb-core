@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_PplProgLangs extends Default_Model_PplProgLangsBase
+namespace Application\Model;
+
+class PplProgLangs extends PplProgLangsBase
 {
 
 }

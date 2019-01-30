@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Region extends Default_Model_RegionBase
+namespace Application\Model;
+
+class Region extends RegionBase
 {
 
 }

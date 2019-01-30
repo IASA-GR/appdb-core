@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_License extends Default_Model_LicenseBase
+namespace Application\Model;
+
+class License extends LicenseBase
 {
 	public function toXML($recursive=false) {
 		$xml = '';

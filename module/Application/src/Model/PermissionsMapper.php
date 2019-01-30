@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_PermissionsMapper extends Default_Model_PermissionsMapperBase
+namespace Application\Model;
+
+class PermissionsMapper extends PermissionsMapperBase
 {
 	public function fetchAll($filter = null, $format = '')
 	{
@@ -31,7 +33,7 @@ class Default_Model_PermissionsMapper extends Default_Model_PermissionsMapperBas
 //		$resultSet = $this->getDbTable()->fetchAll($select);
 		$entries = array();
 		foreach ($resultSet as $row) {
-			$entry = new Default_Model_Permission();
+			$entry = new Permission();
 			$this->populate($entry,$row);
 			$entries[] = $entry;
 		}		return $entries;

@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Country extends Default_Model_CountryBase
+namespace Application\Model;
+
+class Country extends CountryBase
 {
 	protected $_applications;
 	protected $_researchers;
@@ -25,8 +27,8 @@ class Default_Model_Country extends Default_Model_CountryBase
 	public function getApplications()
 	{
 		if ( $this->_applications === null ) {
-			$apps = new Default_Model_Applications();
-			$f = new Default_Model_CountriesFilter();
+			$apps = new Applications();
+			$f = new CountriesFilter();
 			$f->id->equals($this->id);
 			$apps->filter->chain($f,"AND");
 			$this->_applications = $apps;
@@ -37,8 +39,8 @@ class Default_Model_Country extends Default_Model_CountryBase
 	public function getResearchers()
 	{
 		if ($this->_researchers === null) {
-			$rs = new Default_Model_Researchers();
-			$f = new Default_Model_CountriesFilter();
+			$rs = new Researchers();
+			$f = new CountriesFilter();
 			$f->id->equals($this->id);
 			$rs->filter->chain($f,"AND");
 			$this->_researchers = $rs;

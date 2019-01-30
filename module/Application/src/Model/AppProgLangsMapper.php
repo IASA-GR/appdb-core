@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppProgLangsMapper extends Default_Model_AppProgLangsMapperBase
+namespace Application\Model;
+
+class AppProgLangsMapper extends AppProgLangsMapperBase
 {
 
 }

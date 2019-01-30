@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VMIinstances extends Default_Model_VMIinstancesBase
+namespace Application\Model;
+
+class VMIinstances extends VMIinstancesBase
 {
 
 }

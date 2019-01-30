@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_EntitysourcesMapper extends Default_Model_EntitysourcesMapperBase
+namespace Application\Model;
+
+class EntitysourcesMapper extends EntitysourcesMapperBase
 {
 
 }

@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_DatasetConnTypesMapper extends Default_Model_DatasetConnTypesMapperBase
+namespace Application\Model;
+
+class DatasetConnTypesMapper extends DatasetConnTypesMapperBase
 {
 
 }

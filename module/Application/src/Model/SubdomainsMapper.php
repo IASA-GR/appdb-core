@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_SubdomainsMapper extends Default_Model_SubdomainsMapperBase
+namespace Application\Model;
+
+class SubdomainsMapper extends SubdomainsMapperBase
 {
 	public function fetchAll($filter = null, $format = '') {
 		if ($format == '') {

@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_PrivilegesFilter extends Default_Model_PrivilegesFilterBase {
+namespace Application\Model;
+
+class PrivilegesFilter extends PrivilegesFilterBase {
 }

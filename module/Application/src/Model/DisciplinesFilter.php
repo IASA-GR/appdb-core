@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_DisciplinesFilter extends Default_Model_DisciplinesFilterBase {
+namespace Application\Model;
+
+class DisciplinesFilter extends DisciplinesFilterBase {
 	public function __construct() {
 		parent::__construct();
 		$this->_fields[] = 'any.any';

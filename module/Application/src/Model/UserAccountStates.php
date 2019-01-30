@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_UserAccountStates extends Default_Model_UserAccountStatesBase
+namespace Application\Model;
+
+class UserAccountStates extends UserAccountStatesBase
 {
 
 }

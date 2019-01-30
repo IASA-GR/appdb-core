@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_DocTypesFilter extends Default_Model_DocTypesFilterBase {
+namespace Application\Model;
+
+class DocTypesFilter extends DocTypesFilterBase {
 }

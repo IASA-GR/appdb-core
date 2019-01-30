@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_IntAuthorsFilter extends Default_Model_IntAuthorsFilterBase {
+namespace Application\Model;
+
+class IntAuthorsFilter extends IntAuthorsFilterBase {
 }

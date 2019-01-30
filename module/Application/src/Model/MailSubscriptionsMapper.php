@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_MailSubscriptionsMapper extends Default_Model_MailSubscriptionsMapperBase
+namespace Application\Model;
+
+class MailSubscriptionsMapper extends MailSubscriptionsMapperBase
 {
 
 }

@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppAPILog extends Default_Model_AppAPILogBase
+namespace Application\Model;
+
+class AppAPILog extends AppAPILogBase
 {
 
 }

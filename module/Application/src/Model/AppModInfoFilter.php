@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppModInfoFilter extends Default_Model_AppModInfoFilterBase {
+namespace Application\Model;
+
+class AppModInfoFilter extends AppModInfoFilterBase {
 }

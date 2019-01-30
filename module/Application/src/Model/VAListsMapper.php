@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VAListsMapper extends Default_Model_VAListsMapperBase
+namespace Application\Model;
+
+class VAListsMapper extends VAListsMapperBase
 {
 
 }

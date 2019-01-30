@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_OSesMapper extends Default_Model_OSesMapperBase
+namespace Application\Model;
+
+class OSesMapper extends OSesMapperBase
 {
 
 }

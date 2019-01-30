@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_OSes extends Default_Model_OSesBase
+namespace Application\Model;
+
+class OSes extends OSesBase
 {
 
 }

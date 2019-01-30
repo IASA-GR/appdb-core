@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppBookmarksFilter extends Default_Model_AppBookmarksFilterBase {
+namespace Application\Model;
+
+class AppBookmarksFilter extends AppBookmarksFilterBase {
 }

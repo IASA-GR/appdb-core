@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppPerCountriesFilter extends Default_Model_AppPerCountriesFilterBase {
+namespace Application\Model;
+
+class AppPerCountriesFilter extends AppPerCountriesFilterBase {
 }

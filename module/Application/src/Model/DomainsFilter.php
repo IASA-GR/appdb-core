@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_DomainsFilter extends Default_Model_DomainsFilterBase {
+namespace Application\Model;
+
+class DomainsFilter extends DomainsFilterBase {
 }

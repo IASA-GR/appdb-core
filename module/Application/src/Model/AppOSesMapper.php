@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppOSesMapper extends Default_Model_AppOSesMapperBase
+namespace Application\Model;
+
+class AppOSesMapper extends AppOSesMapperBase
 {
 
 }

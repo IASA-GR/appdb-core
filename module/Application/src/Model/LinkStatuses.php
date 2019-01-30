@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_LinkStatuses extends Default_Model_LinkStatusesBase
+namespace Application\Model;
+
+class LinkStatuses extends LinkStatusesBase
 {
 
 }

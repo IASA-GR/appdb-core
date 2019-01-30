@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_PositionTypesFilter extends Default_Model_PositionTypesFilterBase {
+namespace Application\Model;
+
+class PositionTypesFilter extends PositionTypesFilterBase {
 	public function __construct() {
 		parent::__construct();
 		$this->_fields[] = 'any.any';

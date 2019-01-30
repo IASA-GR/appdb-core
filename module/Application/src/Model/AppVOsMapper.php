@@ -16,12 +16,14 @@
  */
 ?>
 <?php
-class Default_Model_AppVOsMapper extends Default_Model_AppVOsMapperBase
+namespace Application\Model;
+
+class AppVOsMapper extends AppVOsMapperBase
 {
-	public function save(Default_Model_AppVO $value)
+	public function save(AROItem $value)
 	{
 		global $application;
-		$tbl = new Default_Model_DbTable_AppVOsManual(); 
+		$tbl = new DbTable_AppVOsManual(); 
 		$data = array();
 		if ( ! isnull($value->getVoID()) ) $data['void'] = $value->getVoID();
 		if ( ! isnull($value->getAppID()) ) $data['appid'] = $value->getAppID();
@@ -45,9 +47,9 @@ class Default_Model_AppVOsMapper extends Default_Model_AppVOsMapperBase
 		}
 	}
 
-	public function delete(Default_Model_AppVO $value)
+	public function delete(AppVO $value)
 	{
-		$tbl = new Default_Model_DbTable_AppVOsManual(); 
+		$tbl = new DbTable_AppVOsManual(); 
 		$q1 = array('void = ?', 'appid = ?');
 		$q2 = array($value->void, $value->appid);
 		$s = array();

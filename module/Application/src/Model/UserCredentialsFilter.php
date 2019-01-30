@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_UserCredentialsFilter extends Default_Model_UserCredentialsFilterBase {
+namespace Application\Model;
+
+class UserCredentialsFilter extends UserCredentialsFilterBase {
 }

@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_NGIsFilter extends Default_Model_NGIsFilterBase {
+namespace Application\Model;
+
+class NGIsFilter extends NGIsFilterBase {
 }

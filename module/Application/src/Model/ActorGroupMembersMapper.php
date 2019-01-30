@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ActorGroupMembersMapper extends Default_Model_ActorGroupMembersMapperBase
+namespace Application\Model;
+
+class ActorGroupMembersMapper extends ActorGroupMembersMapperBase
 {
 	public function joins(&$select, $filter) {
 //		$select->join('researchers.any','researchers.any.id = researchers.id', array());
@@ -53,7 +55,7 @@ class Default_Model_ActorGroupMembersMapper extends Default_Model_ActorGroupMemb
 		$resultSet = $executor->fetchAll($select);
 		$entries = array();
 		foreach ($resultSet as $row) {
-			$entry = new Default_Model_ActorGroupMember();
+			$entry = new ActorGroupMember();
 			$this->populate($entry, $row);
 			$entries[] = $entry;
 		}

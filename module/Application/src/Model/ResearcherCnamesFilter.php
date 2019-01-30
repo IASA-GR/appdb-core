@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_ResearcherCnamesFilter extends Default_Model_ResearcherCnamesFilterBase {
+namespace Application\Model;
+
+class ResearcherCnamesFilter extends ResearcherCnamesFilterBase {
 }

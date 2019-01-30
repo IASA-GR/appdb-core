@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Dissemination extends Default_Model_DisseminationBase
+namespace Application\Model;
+
+class Dissemination extends DisseminationBase
 {
 	public function refresh($format = '')
 	{

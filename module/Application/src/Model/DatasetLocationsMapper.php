@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_DatasetLocationsMapper extends Default_Model_DatasetLocationsMapperBase
+namespace Application\Model;
+
+class DatasetLocationsMapper extends DatasetLocationsMapperBase
 {
 	private function pgBool($v) { if ($v) return 't'; else return 'f'; }
 
@@ -26,7 +28,7 @@ class Default_Model_DatasetLocationsMapper extends Default_Model_DatasetLocation
 		$entry->setOrganizationID(pg_to_php_array($row->organizationid));
 	}
 
-	public function save(Default_Model_DatasetLocation $value) {
+	public function save(AROItem $value) {
 		$value->siteID = null;
 		$value->organizationID = null;
 		parent::save($value);

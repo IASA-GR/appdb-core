@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppContactMiddlewares extends Default_Model_AppContactMiddlewaresBase
+namespace Application\Model;
+
+class AppContactMiddlewares extends AppContactMiddlewaresBase
 {
 
 }

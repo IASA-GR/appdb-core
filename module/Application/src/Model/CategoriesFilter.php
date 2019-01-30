@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_CategoriesFilter extends Default_Model_CategoriesFilterBase {
+namespace Application\Model;
+
+class CategoriesFilter extends CategoriesFilterBase {
 	public function __construct() {
 		parent::__construct();
 		$this->_fields[] = 'any.any';

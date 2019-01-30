@@ -17,13 +17,15 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AccessToken extends Default_Model_AccessTokenBase
+namespace Application\Model;
+
+class AccessToken extends AccessTokenBase
 {
 	protected $_netfilters;
 	
 	public function getNetfilters(){
 		if( $this->_netfilters === null ){
-			$nfs = new Default_Model_AccessTokenNetfilters();
+			$nfs = new AccessTokenNetfilters();
 			$nfs->filter->tokenid->equals($this->_id);
 			if( count($nfs->items) > 0 ){
 				$this->_netfilters = $nfs->items;

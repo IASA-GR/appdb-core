@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_UserCredentials extends Default_Model_UserCredentialsBase
+namespace Application\Model;
+
+class UserCredentials extends UserCredentialsBase
 {
 
 }

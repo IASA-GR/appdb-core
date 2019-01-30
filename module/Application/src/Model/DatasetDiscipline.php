@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_DatasetDiscipline extends Default_Model_DatasetDisciplineBase
+namespace Application\Model;
+
+class DatasetDiscipline extends DatasetDisciplineBase
 {
 
 }

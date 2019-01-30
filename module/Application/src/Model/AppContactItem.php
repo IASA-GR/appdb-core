@@ -17,14 +17,16 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppContactItem extends Default_Model_AppContactItemBase
+namespace Application\Model;
+
+class AppContactItem extends AppContactItemBase
 {
 	protected $_appcontact = null;
 	protected $_item = null;
 
 	public function getAppContact() {
 		if ( $this->_appcontact === null ) {
-			$ac = new Default_Model_ResearchersApps();
+			$ac = new ResearchersApps();
 			$ac->filter->appid->equals($this->_appid)->and($ac->filter->researcherid->equals($this->_researcherid));
 			if ( count($ac->items) > 0 ) {
 				$this->_appcontact = $ac->items[0];
@@ -36,13 +38,13 @@ class Default_Model_AppContactItem extends Default_Model_AppContactItemBase
 	public function getItem() {
 		if ( $this->_item === null ) {
 			if ( $this->_itemType === 'vo' ) {
-				$items = new Default_Model_VOs();
+				$items = new VOs();
 				$items->filter->id->equals($this->_itemID);
 				if ( count($items->items) > 0 ) {
 					$this->_item = $items->items[0];
 				}
 			} elseif ( $this->_itemType === 'middleware' ) {
-				$items = new Default_Model_Middlewares();
+				$items = new Middlewares();
 				$items->filter->id->equals($this->_itemID);
 				if ( count($items->items) > 0 ) {
 					$this->_item = $items->items[0];

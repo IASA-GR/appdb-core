@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Categories extends Default_Model_CategoriesBase
+namespace Application\Model;
+
+class Categories extends CategoriesBase
 {
 	public function refresh($format = '', $xmldetailed = false)
 	{

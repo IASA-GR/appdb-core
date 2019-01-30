@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppContactItems extends Default_Model_AppContactItemsBase
+namespace Application\Model;
+
+class AppContactItems extends AppContactItemsBase
 {
 
 }

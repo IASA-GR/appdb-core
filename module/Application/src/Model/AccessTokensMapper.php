@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AccessTokensMapper extends Default_Model_AccessTokensMapperBase
+namespace Application\Model;
+
+class AccessTokensMapper extends AccessTokensMapperBase
 {
 
 }

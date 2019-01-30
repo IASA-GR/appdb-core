@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_Privs
+namespace Application\Model;
+
+class Privs
 {
 	protected $_db;
 	protected $_actor;
@@ -338,7 +340,7 @@ FROM applications WHERE guid = '" . $target ."';
 			$ids[] = $row['id'];
 		}
 		if ( count($ids)>0 ) {
-			$apps = new Default_Model_Applications();
+			$apps = new Applications();
 			$apps->filter->orderBy('name');
 			$apps->filter->id->in($ids);
 			return $apps->refresh();

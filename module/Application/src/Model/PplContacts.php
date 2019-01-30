@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_PplContacts extends Default_Model_PplContactsBase
+namespace Application\Model;
+
+class PplContacts extends PplContactsBase
 {
 
 }

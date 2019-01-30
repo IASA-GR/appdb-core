@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_UserRequestsMapper extends Default_Model_UserRequestsMapperBase
+namespace Application\Model;
+
+class UserRequestsMapper extends UserRequestsMapperBase
 {
 	private function joins(&$select, $filter) {
 		if ( is_array($filter->joins) ) {
@@ -47,7 +49,7 @@ class Default_Model_UserRequestsMapper extends Default_Model_UserRequestsMapperB
 		$resultSet = $executor->fetchAll($select);
 		$entries = array();
 		foreach ($resultSet as $row) {
-			$entry = new Default_Model_UserRequest();
+			$entry = new UserRequest();
 			$this->populate($entry,$row);
 			$entries[] = $entry;
 		}		

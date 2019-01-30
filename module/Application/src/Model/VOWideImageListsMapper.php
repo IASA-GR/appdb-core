@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VOWideImageListsMapper extends Default_Model_VOWideImageListsMapperBase
+namespace Application\Model;
+
+class VOWideImageListsMapper extends VOWideImageListsMapperBase
 {
 	public function joins(&$select, $filter) {
 		if ( is_array($filter->joins) ) {
@@ -50,7 +52,7 @@ class Default_Model_VOWideImageListsMapper extends Default_Model_VOWideImageList
 		$resultSet = $executor->fetchAll($query);
 		$entries = array();
 		foreach ($resultSet as $row) {
-			$entry = new Default_Model_VOWideImageList();
+			$entry = new VOWideImageList();
 			$this->populate($entry,$row);
 			if ($format === 'xml') $entry = $entry->toXML(true);
 			$entries[] = $entry;

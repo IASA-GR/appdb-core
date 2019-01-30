@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Site extends Default_Model_SiteBase
+namespace Application\Model;
+
+class Site extends SiteBase
 {
 
 }

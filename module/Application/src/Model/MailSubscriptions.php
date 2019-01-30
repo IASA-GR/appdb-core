@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_MailSubscriptions extends Default_Model_MailSubscriptionsBase
+namespace Application\Model;
+
+class MailSubscriptions extends MailSubscriptionsBase
 {
 
 }

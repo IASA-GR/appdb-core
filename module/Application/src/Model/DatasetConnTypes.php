@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_DatasetConnTypes extends Default_Model_DatasetConnTypesBase
+namespace Application\Model;
+
+class DatasetConnTypes extends DatasetConnTypesBase
 {
 
 }

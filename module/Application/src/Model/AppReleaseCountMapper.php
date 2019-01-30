@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppReleaseCountMapper extends Default_Model_AppReleaseCountMapperBase
+namespace Application\Model;
+
+class AppReleaseCountMapper extends AppReleaseCountMapperBase
 {
 
 }

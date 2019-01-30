@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppDelInfosMapper extends Default_Model_AppDelInfosMapperBase
+namespace Application\Model;
+
+class AppDelInfosMapper extends AppDelInfosMapperBase
 {
 
 }

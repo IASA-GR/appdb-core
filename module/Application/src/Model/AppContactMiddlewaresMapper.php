@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppContactMiddlewaresMapper extends Default_Model_AppContactMiddlewaresMapperBase
+namespace Application\Model;
+
+class AppContactMiddlewaresMapper extends AppContactMiddlewaresMapperBase
 {
 	private function joins(&$select, $filter) {
 		if ( is_array($filter->joins) ) {
@@ -50,7 +52,7 @@ class Default_Model_AppContactMiddlewaresMapper extends Default_Model_AppContact
         $resultSet = $executor->fetchAll($select);
 		$entries = array();
 		foreach ($resultSet as $row) {
-            $entry = new Default_Model_AppContactMiddleware();
+            $entry = new AppContactMiddleware();
             $this->populate($entry,$row);
 			$entries[] = $entry;
         }

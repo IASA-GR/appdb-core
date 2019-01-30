@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppArchs extends Default_Model_AppArchsBase
+namespace Application\Model;
+
+class AppArchs extends AppArchsBase
 {
 
 }

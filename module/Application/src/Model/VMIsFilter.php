@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VMIsFilter extends Default_Model_VMIsFilterBase {
+namespace Application\Model;
+
+class VMIsFilter extends VMIsFilterBase {
 }

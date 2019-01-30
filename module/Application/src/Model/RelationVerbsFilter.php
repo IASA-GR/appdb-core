@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_RelationVerbsFilter extends Default_Model_RelationVerbsFilterBase {
+namespace Application\Model;
+
+class RelationVerbsFilter extends RelationVerbsFilterBase {
 }

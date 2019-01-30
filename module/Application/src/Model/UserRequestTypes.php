@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_UserRequestTypes extends Default_Model_UserRequestTypesBase
+namespace Application\Model;
+
+class UserRequestTypes extends UserRequestTypesBase
 {
 
 }

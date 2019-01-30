@@ -16,6 +16,8 @@
  */
 ?>
 <?php
-class Default_Model_VMISupportedContextFormatsMapper extends Default_Model_VMISupportedContextFormatsMapperBase
+namespace Application\Model;
+
+class VMISupportedContextFormatsMapper extends VMISupportedContextFormatsMapperBase
 {
 }

@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_FAQsFilter extends Default_Model_FAQsFilterBase {
+namespace Application\Model;
+
+class FAQsFilter extends FAQsFilterBase {
 }

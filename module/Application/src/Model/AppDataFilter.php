@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppDataFilter extends Default_Model_AppDataFilterBase {
+namespace Application\Model;
+
+class AppDataFilter extends AppDataFilterBase {
 }

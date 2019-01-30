@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VowideImageStatesFilter extends Default_Model_VowideImageStatesFilterBase {
+namespace Application\Model;
+
+class VowideImageStatesFilter extends VowideImageStatesFilterBase {
 }

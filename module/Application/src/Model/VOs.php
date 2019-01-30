@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VOs extends Default_Model_VOsBase
+namespace Application\Model;
+
+class VOs extends VOsBase
 {
 	protected $_userid;
 	protected $_viewModerated;
@@ -35,7 +37,7 @@ class Default_Model_VOs extends Default_Model_VOsBase
 			return false;
 
 			if ( isset($this->_userid) ) {
-                $us = new Default_Model_Researchers();
+                $us = new Researchers();
                 $us->viewModerated = false; // must be set in order to avoid infinite nesting
 				$us->filter->id->equals($this->_userid);
 				if (count($us->items) > 0) {
@@ -60,7 +62,7 @@ class Default_Model_VOs extends Default_Model_VOsBase
 				$ex = implode(" ", $ex);
 			}
 			if ( strpos($ex, 'vos.deleted) IS FALSE') === false ) {
-				$f = new Default_Model_VOsFilter();
+				$f = new VOsFilter();
 				$f->deleted->equals(false);
 				$this->_filter->chain($f,"AND");
 			}
@@ -80,7 +82,7 @@ class Default_Model_VOs extends Default_Model_VOsBase
 				$ex = implode(" ", $ex);
 			}
 			if ( strpos($ex, 'vos.deleted) IS FALSE') === false ) {
-				$f = new Default_Model_VOsFilter();
+				$f = new VOsFilter();
 				$f->deleted->equals(false);
 				$this->_filter->chain($f,"AND");
 			}
@@ -89,7 +91,7 @@ class Default_Model_VOs extends Default_Model_VOsBase
     }
 
 	public function toXML() {
-        $f = new Default_Model_VOsFilter();
+        $f = new VOsFilter();
         $f->deleted->equals(false);
         $this->_filter->chain($f,"AND");
 		$items = $this->getMapper()->fetchAll($this->filter, 'xml');

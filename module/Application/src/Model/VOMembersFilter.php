@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VOMembersFilter extends Default_Model_VOMembersFilterBase {
+namespace Application\Model;
+
+class VOMembersFilter extends VOMembersFilterBase {
 }

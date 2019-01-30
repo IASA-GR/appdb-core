@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_RelationVerbs extends Default_Model_RelationVerbsBase
+namespace Application\Model;
+
+class RelationVerbs extends RelationVerbsBase
 {
 
 }

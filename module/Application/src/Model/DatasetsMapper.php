@@ -16,14 +16,16 @@
  */
 ?>
 <?php
-class Default_Model_DatasetsMapper extends Default_Model_DatasetsMapperBase
+namespace Application\Model;
+
+class DatasetsMapper extends DatasetsMapperBase
 {
 	public function populate(&$entry, $row) {
 		parent::populate($entry,$row);
 		$entry->setTags(pg_to_php_array($row->tags));
 	}
 
-	public function save(Default_Model_Dataset $value) {
+	public function save(AROItem $value) {
 		$oldTags = $value->tags;
 		if ((! is_array($value->tags)) || (count($value->tags) == 0) || (trim($value->tags[0]) == "")) {
 			$value->setTags("NULL");

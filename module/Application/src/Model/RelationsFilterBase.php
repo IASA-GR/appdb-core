@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_RelationsFilterBase extends Default_Model_Filter {
+namespace Application\Model;
+
+class RelationsFilterBase extends Filter {
 	public function __construct() {
 		parent::__construct();
 		$this->setDialect(0);

@@ -17,6 +17,8 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Middleware extends Default_Model_MiddlewareBase
+namespace Application\Model;
+
+class Middleware extends MiddlewareBase
 {
 }

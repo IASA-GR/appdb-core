@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VOs2Mapper extends Default_Model_VOs2MapperBase
+namespace Application\Model;
+
+class VOs2Mapper extends VOs2MapperBase
 {
 
 }

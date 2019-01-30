@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VMINetworkTrafficEntry extends Default_Model_VMINetworkTrafficEntryBase
+namespace Application\Model;
+
+class VMINetworkTrafficEntry extends VMINetworkTrafficEntryBase
 {
 	protected $_netProtocols;
 	protected $_flow;

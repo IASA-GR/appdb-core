@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_OSFamilies extends Default_Model_OSFamiliesBase
+namespace Application\Model;
+
+class OSFamilies extends OSFamiliesBase
 {
 
 }

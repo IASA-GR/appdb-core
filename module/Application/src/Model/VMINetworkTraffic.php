@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VMINetworkTraffic extends Default_Model_VMINetworkTrafficBase
+namespace Application\Model;
+
+class VMINetworkTraffic extends VMINetworkTrafficBase
 {
 
 }

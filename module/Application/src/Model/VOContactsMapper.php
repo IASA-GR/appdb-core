@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VOContactsMapper extends Default_Model_VOContactsMapperBase
+namespace Application\Model;
+
+class VOContactsMapper extends VOContactsMapperBase
 {
 //	public function count($filter = null) {
 //		return count($this->fetchAll($filter, "xml"));
@@ -29,7 +31,7 @@ class Default_Model_VOContactsMapper extends Default_Model_VOContactsMapperBase
 			foreach ($ores as $i) {
 				$ids[] = $i->void;
 			}
-			$res = new Default_Model_VOs();
+			$res = new VOs();
 			$res->filter->id->in($ids);
 			if ($filter !== null) {
 				$res->filter->chain($filter, "AND");

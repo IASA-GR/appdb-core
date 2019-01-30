@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Action extends Default_Model_ActionBase
+namespace Application\Model;
+
+class Action extends ActionBase
 {
 
 }

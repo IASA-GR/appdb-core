@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_URLWhitelistFilter extends Default_Model_URLWhitelistFilterBase {
+namespace Application\Model;
+
+class URLWhitelistFilter extends URLWhitelistFilterBase {
 }

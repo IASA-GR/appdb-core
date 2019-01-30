@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Status extends Default_Model_StatusBase
+namespace Application\Model;
+
+class Status extends StatusBase
 {
 
 }

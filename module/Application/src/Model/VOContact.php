@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VOContact extends Default_Model_VOContactBase
+namespace Application\Model;
+
+class VOContact extends VOContactBase
 {
 
 }

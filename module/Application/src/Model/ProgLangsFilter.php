@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ProgLangsFilter extends Default_Model_ProgLangsFilterBase {
+namespace Application\Model;
+
+class ProgLangsFilter extends ProgLangsFilterBase {
 	public function __construct() {
 		parent::__construct();
 		$this->_fields[] = 'any.any';

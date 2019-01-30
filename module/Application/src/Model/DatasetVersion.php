@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_DatasetVersion extends Default_Model_DatasetVersionBase
+namespace Application\Model;
+
+class DatasetVersion extends DatasetVersionBase
 {
 
 }

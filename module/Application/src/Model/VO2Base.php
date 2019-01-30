@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VO2Base
+namespace Application\Model;
+
+class VO2Base
 {
 	protected $_mapper;
 	protected $_id;
@@ -243,8 +245,8 @@ class Default_Model_VO2Base
 	public function getApplications()
 	{
 		if ($this->_applications === null) {
-			$apps = new Default_Model_Applications();
-			$f = new Default_Model_VOsFilter();
+			$apps = new Applications();
+			$f = new VOsFilter();
 			$f->id->equals($this->id);
 			$apps->filter->chain($f,"AND");
 			$this->_applications = $apps->items;
@@ -300,7 +302,7 @@ class Default_Model_VO2Base
 	public function getMapper()
 	{
 		if (null === $this->_mapper) {
-			$this->setMapper(new Default_Model_VOs2Mapper());
+			$this->setMapper(new VOs2Mapper());
 		}
 		return $this->_mapper;
 	}

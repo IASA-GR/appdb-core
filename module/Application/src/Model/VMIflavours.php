@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VMIflavours extends Default_Model_VMIflavoursBase
+namespace Application\Model;
+
+class VMIflavours extends VMIflavoursBase
 {
 
 }

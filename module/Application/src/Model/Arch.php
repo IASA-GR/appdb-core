@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Arch extends Default_Model_ArchBase
+namespace Application\Model;
+
+class Arch extends ArchBase
 {
 	public function toXML($recursive=false) {
 		$xml = '';

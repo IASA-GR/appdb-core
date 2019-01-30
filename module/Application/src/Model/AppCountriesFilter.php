@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppCountriesFilter extends Default_Model_AppCountriesFilterBase {
+namespace Application\Model;
+
+class AppCountriesFilter extends AppCountriesFilterBase {
 	public function __construct() {
 		parent::__construct();
 	}

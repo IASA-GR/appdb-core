@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppDisciplinesFilter extends Default_Model_AppDisciplinesFilterBase {
+namespace Application\Model;
+
+class AppDisciplinesFilter extends AppDisciplinesFilterBase {
 }

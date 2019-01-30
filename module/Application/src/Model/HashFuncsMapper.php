@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_HashFuncsMapper extends Default_Model_HashFuncsMapperBase
+namespace Application\Model;
+
+class HashFuncsMapper extends HashFuncsMapperBase
 {
 
 }

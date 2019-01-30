@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_APIKeysMapper extends Default_Model_APIKeysMapperBase
-{
+namespace Application\Model;
 
+use \Zend\Db\Adapter\Adapter;
+
+class APIKeysMapper extends APIKeysMapperBase {
 }

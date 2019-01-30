@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_ActorGroups extends Default_Model_ActorGroupsBase
+namespace Application\Model;
+
+class ActorGroups extends ActorGroupsBase
 {
 
 }

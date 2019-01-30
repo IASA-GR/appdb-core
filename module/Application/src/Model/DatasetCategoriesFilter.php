@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_DatasetCategoriesFilter extends Default_Model_DatasetCategoriesFilterBase {
+namespace Application\Model;
+
+class DatasetCategoriesFilter extends DatasetCategoriesFilterBase {
 }

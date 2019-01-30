@@ -17,14 +17,16 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Message extends Default_Model_MessageBase
+namespace Application\Model;
+
+class Message extends MessageBase
 {
 	protected $_receiver;
 	protected $_sender;
 
 	function getReceiver() {
 		if ( $this->_receiver === null ) {
-			$users = new Default_Model_Researchers();
+			$users = new Researchers();
 			$users->filter->id->equals($this->receiverID);
 			$this->_receiver = $users->items[0];
 		}
@@ -33,7 +35,7 @@ class Default_Model_Message extends Default_Model_MessageBase
 
 	function getSender() {
 		if ( $this->_sender === null ) {
-			$users = new Default_Model_Researchers();
+			$users = new Researchers();
 			$users->filter->id->equals($this->senderID);
 			$this->_sender = $users->items[0];
 		}

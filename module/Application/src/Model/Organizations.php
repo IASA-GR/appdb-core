@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Organizations extends Default_Model_OrganizationsBase
+namespace Application\Model;
+
+class Organizations extends OrganizationsBase
 {
 
 }

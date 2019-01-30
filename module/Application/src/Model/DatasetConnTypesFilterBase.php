@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_DatasetConnTypesFilterBase extends Default_Model_Filter {
+namespace Application\Model;
+
+class DatasetConnTypesFilterBase extends Filter {
 	public function __construct() {
 		parent::__construct();
 		$this->setDialect(0);

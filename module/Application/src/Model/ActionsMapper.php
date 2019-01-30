@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ActionsMapper extends Default_Model_ActionsMapperBase
+namespace Application\Model;
+
+class ActionsMapper extends ActionsMapperBase
 {
 
 }

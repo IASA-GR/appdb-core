@@ -17,13 +17,15 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_APIKey extends Default_Model_APIKeyBase
+namespace Application\Model;
+
+class APIKey extends APIKeyBase
 {
     protected $_netfilters;
 
     public function getNetfilters() {
         if ( $this->_netfilters === null ) {
-            $fs = new Default_Model_APIKeyNetfilters();
+            $fs = new APIKeyNetfilters();
             $fs->filter->keyid->equals($this->id);
             if ( count($fs->items) > 0 ) {
                 $this->_netfilters = array();

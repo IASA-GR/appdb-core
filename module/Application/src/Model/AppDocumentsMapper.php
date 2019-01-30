@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppDocumentsMapper extends Default_Model_AppDocumentsMapperBase
+namespace Application\Model;
+
+class AppDocumentsMapper extends AppDocumentsMapperBase
 {
 	public function fetchAll($filter = null, $format = '') {
 		if ($format == '') {

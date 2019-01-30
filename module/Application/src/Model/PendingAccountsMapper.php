@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_PendingAccountsMapper extends Default_Model_PendingAccountsMapperBase
+namespace Application\Model;
+
+class PendingAccountsMapper extends PendingAccountsMapperBase
 {
 
 }

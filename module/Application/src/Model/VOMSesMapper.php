@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VOMSesMapper extends Default_Model_VOMSesMapperBase
+namespace Application\Model;
+
+class VOMSesMapper extends VOMSesMapperBase
 {
 
 }

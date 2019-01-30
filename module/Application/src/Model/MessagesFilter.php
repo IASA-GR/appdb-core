@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_MessagesFilter extends Default_Model_MessagesFilterBase {
+namespace Application\Model;
+
+class MessagesFilter extends MessagesFilterBase {
 }

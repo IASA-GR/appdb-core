@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppBookmark extends Default_Model_AppBookmarkBase
+namespace Application\Model;
+
+class AppBookmark extends AppBookmarkBase
 {
 
 }

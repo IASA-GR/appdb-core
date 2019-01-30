@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppOSesFilter extends Default_Model_AppOSesFilterBase {
+namespace Application\Model;
+
+class AppOSesFilter extends AppOSesFilterBase {
 }

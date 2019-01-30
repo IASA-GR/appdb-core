@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppCategoriesMapper extends Default_Model_AppCategoriesMapperBase
+namespace Application\Model;
+
+class AppCategoriesMapper extends AppCategoriesMapperBase
 {
 
 }

@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppCountry extends Default_Model_AppCountryBase
+namespace Application\Model;
+
+class AppCountry extends AppCountryBase
 {
   protected $_country;
   protected $_application;
@@ -25,7 +27,7 @@ class Default_Model_AppCountry extends Default_Model_AppCountryBase
   public function getCountry()
   {
 	  if ( $this->_country === null ) {
-		  $c = new Default_Model_Countries();
+		  $c = new Countries();
 		  $c->filter->id->equals($this->id);
 		  $this->_country = $c->items[0];
 	  };
@@ -35,7 +37,7 @@ class Default_Model_AppCountry extends Default_Model_AppCountryBase
   public function getApplication()
   {
 	  if ( $this->_application === null ) {
-		  $a = new Default_Model_Applications();
+		  $a = new Applications();
 		  $a->filter->id->equals($this->appID);
 		  $this->_application = $a->items[0];
 	  };

@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ResearchersFilter extends Default_Model_ResearchersFilterBase {
+namespace Application\Model;
+
+class ResearchersFilter extends ResearchersFilterBase {
 	public function __construct() {
 		parent::__construct();
 		$this->_fields[] = 'rank';

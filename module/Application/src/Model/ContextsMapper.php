@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ContextsMapper extends Default_Model_ContextsMapperBase
+namespace Application\Model;
+
+class ContextsMapper extends ContextsMapperBase
 {
 
 }

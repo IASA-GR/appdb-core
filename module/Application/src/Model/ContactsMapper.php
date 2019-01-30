@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ContactsMapper extends Default_Model_ContactsMapperBase
+namespace Application\Model;
+
+class ContactsMapper extends ContactsMapperBase
 {
 
 }

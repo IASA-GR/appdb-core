@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_CountryRegionsFilter extends Default_Model_CountryRegionsFilterBase {
+namespace Application\Model;
+
+class CountryRegionsFilter extends CountryRegionsFilterBase {
 }

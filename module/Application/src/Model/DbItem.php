@@ -16,15 +16,16 @@
  */
 ?>
 <?php
+namespace Application\Model;
 
-interface Default_Model_IDbMapper {
+interface IDbMapper {
 }
 
-class Default_Model_DbMapper implements Default_ModelIDbMapper {
+class DbMapper implements Default_ModelIDbMapper {
 
 }
 
-interface Default_Model_IDbItem {
+interface IDbItem {
     public function save();
     public function remove();
     public function serialize($recursive=false);
@@ -34,7 +35,7 @@ interface Default_Model_IDbItem {
     public function getParentObjectName();
 }
 
-abstract class Default_Model_DbItem implements Default_Model_IDbItem {
+abstract class DbItem implements IDbItem {
     protected $_parent;
 
     abstract public function serialize($recursive=false);
@@ -46,7 +47,7 @@ abstract class Default_Model_DbItem implements Default_Model_IDbItem {
         if ( !is_null($parent) ) {
             $this->_parent = $parent;
         } else {
-            $parent = "Default_Model_".$this->getParentObjectName();
+            $parent = "".$this->getParentObjectName();
             $this->_parent = new $parent();
         } 
     }
@@ -69,7 +70,7 @@ abstract class Default_Model_DbItem implements Default_Model_IDbItem {
     }
 }
 
-interface Default_Model_IDbItemCollection {
+interface IDbItemCollection {
     public function getMapper();
     public function refresh();
     public function item($id);
@@ -86,14 +87,14 @@ interface Default_Model_IDbItemCollection {
     public function getObjectName();
 }
 
-abstract class Default_Model_DbItemCollection implements Default_Model_IIDbItemCollection {
+abstract class DbItemCollection implements IIDbItemCollection {
     protected $_mapper;
     protected $_filter;
 
     abstract public function getObjectName();
 
     public function __construct() {
-        $mapper = "Default_Model_".$this->getObjectName()."Mapper" ;
+        $mapper = "".$this->getObjectName()."Mapper" ;
         $this->_mapper = new $mapper();
     }
 

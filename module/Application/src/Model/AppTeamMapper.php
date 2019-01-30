@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppTeamMapper extends Default_Model_AppTeamMapperBase
+namespace Application\Model;
+
+class AppTeamMapper extends AppTeamMapperBase
 {
 
 }

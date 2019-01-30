@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_NewsFilter extends Default_Model_NewsFilterBase {
+namespace Application\Model;
+
+class NewsFilter extends NewsFilterBase {
 }

@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VOs2Filter extends Default_Model_Filter
+namespace Application\Model;
+
+class VOs2Filter extends Filter
 {
 	protected $_id;
 	protected $_name;

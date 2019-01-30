@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppUrlsMapper extends Default_Model_AppUrlsMapperBase
+namespace Application\Model;
+
+class AppUrlsMapper extends AppUrlsMapperBase
 {
 
 }

@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ArchsFilter extends Default_Model_ArchsFilterBase {
+namespace Application\Model;
+
+class ArchsFilter extends ArchsFilterBase {
 	public function __construct() {
 		parent::__construct();
 		$this->_fields[] = 'any.any';

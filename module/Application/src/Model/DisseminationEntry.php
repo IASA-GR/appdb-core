@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_DisseminationEntry extends Default_Model_DisseminationEntryBase
+namespace Application\Model;
+
+class DisseminationEntry extends DisseminationEntryBase
 {
 
 }

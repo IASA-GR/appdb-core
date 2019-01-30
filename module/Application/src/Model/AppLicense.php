@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppLicense extends Default_Model_AppLicenseBase
+namespace Application\Model;
+
+class AppLicense extends AppLicenseBase
 {
 
 }

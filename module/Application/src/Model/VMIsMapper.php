@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VMIsMapper extends Default_Model_VMIsMapperBase
+namespace Application\Model;
+
+class VMIsMapper extends VMIsMapperBase
 {
 
 }

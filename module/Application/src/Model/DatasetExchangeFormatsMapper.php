@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_DatasetExchangeFormatsMapper extends Default_Model_DatasetExchangeFormatsMapperBase
+namespace Application\Model;
+
+class DatasetExchangeFormatsMapper extends DatasetExchangeFormatsMapperBase
 {
 
 }

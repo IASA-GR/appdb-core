@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_ContractType extends Default_Model_ContractTypeBase
+namespace Application\Model;
+
+class ContractType extends ContractTypeBase
 {
 
 }

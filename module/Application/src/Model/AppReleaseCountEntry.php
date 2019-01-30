@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppReleaseCountEntry extends Default_Model_AppReleaseCountEntryBase
+namespace Application\Model;
+
+class AppReleaseCountEntry extends AppReleaseCountEntryBase
 {
 
 }

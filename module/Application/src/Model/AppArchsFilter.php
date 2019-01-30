@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppArchsFilter extends Default_Model_AppArchsFilterBase {
+namespace Application\Model;
+
+class AppArchsFilter extends AppArchsFilterBase {
 }

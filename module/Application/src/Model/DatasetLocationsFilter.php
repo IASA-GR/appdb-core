@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_DatasetLocationsFilter extends Default_Model_DatasetLocationsFilterBase {
+namespace Application\Model;
+
+class DatasetLocationsFilter extends DatasetLocationsFilterBase {
 }

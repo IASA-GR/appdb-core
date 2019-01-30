@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppDisciplines extends Default_Model_AppDisciplinesBase
+namespace Application\Model;
+
+class AppDisciplines extends AppDisciplinesBase
 {
 
 }

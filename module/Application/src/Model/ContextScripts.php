@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_ContextScripts extends Default_Model_ContextScriptsBase
+namespace Application\Model;
+
+class ContextScripts extends ContextScriptsBase
 {
 
 }

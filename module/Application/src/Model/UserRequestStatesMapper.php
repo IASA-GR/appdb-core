@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_UserRequestStatesMapper extends Default_Model_UserRequestStatesMapperBase
+namespace Application\Model;
+
+class UserRequestStatesMapper extends UserRequestStatesMapperBase
 {
 
 }

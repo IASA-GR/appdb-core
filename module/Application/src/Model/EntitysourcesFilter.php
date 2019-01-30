@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_EntitysourcesFilter extends Default_Model_EntitysourcesFilterBase {
+namespace Application\Model;
+
+class EntitysourcesFilter extends EntitysourcesFilterBase {
 }

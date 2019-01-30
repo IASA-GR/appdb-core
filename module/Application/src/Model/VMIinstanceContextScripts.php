@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VMIinstanceContextScripts extends Default_Model_VMIinstanceContextScriptsBase
+namespace Application\Model;
+
+class VMIinstanceContextScripts extends VMIinstanceContextScriptsBase
 {
 
 }

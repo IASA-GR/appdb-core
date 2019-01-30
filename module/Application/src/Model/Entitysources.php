@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Entitysources extends Default_Model_EntitysourcesBase
+namespace Application\Model;
+
+class Entitysources extends EntitysourcesBase
 {
 
 }

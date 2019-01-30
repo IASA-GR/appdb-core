@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_IntAuthorsMapper extends Default_Model_IntAuthorsMapperBase
+namespace Application\Model;
+
+class IntAuthorsMapper extends IntAuthorsMapperBase
 {
 
 	public function joins(&$select, $filter) {
@@ -45,7 +47,7 @@ class Default_Model_IntAuthorsMapper extends Default_Model_IntAuthorsMapperBase
 		$resultSet = $executor->fetchAll($select);
 		$entries = array();
 		foreach ($resultSet as $row) {
-			$entry = new Default_Model_IntAuthor();
+			$entry = new IntAuthor();
 			$this->populate($entry,$row);
 			$entries[] = $entry;
 		}		

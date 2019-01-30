@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_RelationsFilter extends Default_Model_RelationsFilterBase {
+namespace Application\Model;
+
+class RelationsFilter extends RelationsFilterBase {
 }

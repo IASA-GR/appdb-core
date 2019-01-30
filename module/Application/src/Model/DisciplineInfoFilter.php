@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_DisciplineInfoFilter extends Default_Model_DisciplineInfoFilterBase {
+namespace Application\Model;
+
+class DisciplineInfoFilter extends DisciplineInfoFilterBase {
 }

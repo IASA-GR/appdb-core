@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ContextScriptsMapper extends Default_Model_ContextScriptsMapperBase
+namespace Application\Model;
+
+class ContextScriptsMapper extends ContextScriptsMapperBase
 {
 
 }

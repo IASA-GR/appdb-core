@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_OSFamiliesMapper extends Default_Model_OSFamiliesMapperBase
+namespace Application\Model;
+
+class OSFamiliesMapper extends OSFamiliesMapperBase
 {
 
 }

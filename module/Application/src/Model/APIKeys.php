@@ -17,7 +17,8 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_APIKeys extends Default_Model_APIKeysBase
-{
+namespace Application\Model;
+
+class APIKeys extends APIKeysBase {
 
 }

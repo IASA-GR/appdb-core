@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AggregateNewsMapper extends Default_Model_AggregateNewsMapperBase
+namespace Application\Model;
+
+class AggregateNewsMapper extends AggregateNewsMapperBase
 {
 	private function joins(&$select, $filter) {
 		if ( is_array($filter->joins) ) {
@@ -106,7 +108,7 @@ class Default_Model_AggregateNewsMapper extends Default_Model_AggregateNewsMappe
 				$resultSet = $this->getDbTable()->fetchAll($select);
 				$entries = array();
 				foreach ($resultSet as $row) {
-					$entry = new Default_Model_AggregateNewsEntry();
+					$entry = new AggregateNewsEntry();
 					$this->populate($entry,$row);
 					$entries[] = $entry;
 				}

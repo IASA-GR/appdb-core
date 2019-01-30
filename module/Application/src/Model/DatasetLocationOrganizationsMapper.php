@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_DatasetLocationOrganizationsMapper extends Default_Model_DatasetLocationOrganizationsMapperBase
+namespace Application\Model;
+
+class DatasetLocationOrganizationsMapper extends DatasetLocationOrganizationsMapperBase
 {
 
 }

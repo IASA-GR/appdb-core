@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_FAQs extends Default_Model_FAQsBase
+namespace Application\Model;
+
+class FAQs extends FAQsBase
 {
 
 }

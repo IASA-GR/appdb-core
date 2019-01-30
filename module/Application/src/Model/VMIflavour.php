@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VMIflavour extends Default_Model_VMIflavourBase
+namespace Application\Model;
+
+class VMIflavour extends VMIflavourBase
 {	
 	public function delete(){
 		$this->getMapper()->delete($this);

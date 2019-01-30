@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_PplViewsFilter extends Default_Model_PplViewsFilterBase {
+namespace Application\Model;
+
+class PplViewsFilter extends PplViewsFilterBase {
 }

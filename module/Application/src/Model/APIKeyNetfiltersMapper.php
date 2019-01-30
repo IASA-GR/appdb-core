@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_APIKeyNetfiltersMapper extends Default_Model_APIKeyNetfiltersMapperBase
+namespace Application\Model;
+
+class APIKeyNetfiltersMapper extends APIKeyNetfiltersMapperBase
 {
 
 }

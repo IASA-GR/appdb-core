@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VowideImageStatesMapper extends Default_Model_VowideImageStatesMapperBase
+namespace Application\Model;
+
+class VowideImageStatesMapper extends VowideImageStatesMapperBase
 {
 
 }

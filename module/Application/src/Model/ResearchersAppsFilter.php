@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_ResearchersAppsFilter extends Default_Model_ResearchersAppsFilterBase {
+namespace Application\Model;
+
+class ResearchersAppsFilter extends ResearchersAppsFilterBase {
 }

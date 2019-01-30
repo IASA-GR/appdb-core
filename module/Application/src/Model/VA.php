@@ -17,10 +17,12 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VA extends Default_Model_VABase
+namespace Application\Model;
+
+class VA extends VABase
 {
 	public function getVersions(){
-		$versions = new Default_Model_VAversions();
+		$versions = new VAversions();
 		$versions->filter->vappid->equals($this->id);
 		if( count( $versions->items ) > 0 ){
 			return $versions->items;
@@ -29,7 +31,7 @@ class Default_Model_VA extends Default_Model_VABase
 	}
 	
 	public function getLatestVersion(){
-		$versions = new Default_Model_VAversions();
+		$versions = new VAversions();
 		$versions->filter->vappid->equals($this->id)->and($versions->filter->published->equals(true)->and($versions->filter->archived->equals(false)->and($versions->filter->enabled->equals(true))));
 		if( count( $versions->items ) > 0 ){
 			return $versions->items[0];
@@ -38,7 +40,7 @@ class Default_Model_VA extends Default_Model_VABase
 	}
 	
 	public function getArchivedVersions(){
-		$versions = new Default_Model_VAversions();
+		$versions = new VAversions();
 		$versions->filter->vappid->equals($this->id)->and($versions->filter->published->equals(true)->and($versions->filter->archived->equals(true)));
 		$versions->filter->orderby("archivedon DESC");
 		if( count( $versions->items ) > 0 ){
@@ -48,7 +50,7 @@ class Default_Model_VA extends Default_Model_VABase
 	}
 	
 	public function getUnpublishedVersion(){
-		$versions = new Default_Model_VAversions();
+		$versions = new VAversions();
 		$versions->filter->vappid->equals($this->id)->and($versions->filter->published->equals(false)->and($versions->filter->archived->equals(false)));
 		if( count( $versions->items ) > 0 ){
 			return $versions->items[0];

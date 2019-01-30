@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Researcher extends Default_Model_ResearcherBase
+namespace Application\Model;
+
+class Researcher extends ResearcherBase
 {
 	protected $_inbox;
 	protected $_privs;
@@ -66,7 +68,7 @@ class Default_Model_Researcher extends Default_Model_ResearcherBase
 			try {
 				db()->query("INSERT INTO researcherimages (researcherid, image) VALUES (?, ?)", array($this->id, $v));
 			} catch (Exception $e) {
-				error_log('[Default_Model_Researcher::setImage]: ' . $e->getMessage());
+				error_log('[Researcher::setImage]: ' . $e->getMessage());
 			}
 		}
 		return $this;
@@ -75,7 +77,7 @@ class Default_Model_Researcher extends Default_Model_ResearcherBase
     public function getInbox()
 	{
 		if ( $this->_inbox === null ) {
-			$inbox = new Default_Model_Messages();
+			$inbox = new Messages();
 			$inbox->filter->orderBy('senton DESC');
 			$inbox->filter->receiverid->equals($this->id);
 			$this->_inbox = $inbox->refresh();
@@ -112,8 +114,8 @@ class Default_Model_Researcher extends Default_Model_ResearcherBase
 
 	public function getRegion() {
 		if ($this->_region === null) {
-			$regs = new Default_Model_Regions();
-			$rs = new Default_Model_Countries();
+			$regs = new Regions();
+			$rs = new Countries();
 			$rs->filter->id->equals($this->countryid);
 			if ( count($rs->items) > 0 ) {
 				$id = $rs->items[0]->regionID;
@@ -126,7 +128,7 @@ class Default_Model_Researcher extends Default_Model_ResearcherBase
 
 	public function getNGIs() {
 		if ( $this->_ngis === null ) {
-			$ngis = new Default_Model_NGIs();
+			$ngis = new NGIs();
 			$ngis->filter->countryid->equals($this->countryID);
 			$this->_ngis=$ngis->items;
 		}
@@ -135,7 +137,7 @@ class Default_Model_Researcher extends Default_Model_ResearcherBase
 
 	public function getVOMemberships() {
 		if ( $this->_vos === null ) {
-			$vos = new Default_Model_VOMembers();
+			$vos = new VOMembers();
 			$vos->filter->researcherid->equals($this->_id);
 			$this->_vos = $vos->items;
 		}
@@ -144,7 +146,7 @@ class Default_Model_Researcher extends Default_Model_ResearcherBase
 
 	public function getVOContacts() {
 		if( $this->_vocontacts == null ) {
-			$vos = new Default_Model_VOContacts();
+			$vos = new VOContacts();
 			$vos->filter->researcherid->equals($this->_id);
 			$this->_vocontacts = $vos->items;
 		}
@@ -154,8 +156,8 @@ class Default_Model_Researcher extends Default_Model_ResearcherBase
 	public function getPublications()
 	{
 		if ($this->_publications === null) {
-			$docs = new Default_Model_IntAuthors();
-			$fapp = new Default_Model_ApplicationsFilter();
+			$docs = new IntAuthors();
+			$fapp = new ApplicationsFilter();
 			$fapp->deleted->equals(false)->and($fapp->moderated->equals(false));
 			$docs->filter->authorid->equals($this->id);
 			$docs->filter->chain($fapp, "AND");
@@ -174,7 +176,7 @@ class Default_Model_Researcher extends Default_Model_ResearcherBase
 
     public function getPrimaryContact() {
         if ($this->_primaryContact === null) {
-            $cs = new Default_Model_Contacts();
+            $cs = new Contacts();
             $cs->filter->researcherid->equals($this->id)->and($cs->filter->isprimary->equals(true));
             if ( count($cs->items) > 0 ) {
                 $this->_primaryContact = $cs->items[0]->data;
@@ -193,7 +195,7 @@ class Default_Model_Researcher extends Default_Model_ResearcherBase
 
 	public function getCnames() {
 		if ($this->_cnames === null) {
-			$cs = new Default_Model_ResearcherCnames();
+			$cs = new ResearcherCnames();
 			$cs->filter->researcherid->equals($this->id);
 			$this->_cnames= $cs;
 		}
@@ -202,7 +204,7 @@ class Default_Model_Researcher extends Default_Model_ResearcherBase
 
 	public function getContacts() {
 		if ($this->_contacts === null) {
-			$cs = new Default_Model_Contacts();
+			$cs = new Contacts();
 			$cs->filter->researcherid->equals($this->id);
 			$this->_contacts = $cs;
 		}
@@ -212,10 +214,10 @@ class Default_Model_Researcher extends Default_Model_ResearcherBase
 	public function getApplications($type = null) {
 		if (($type === null) || ($type === 0)) {
 			if ($this->_applications === null) {
-				$rs = new Default_Model_Applications();
-				$f = new Default_Model_ResearchersFilter();
+				$rs = new Applications();
+				$f = new ResearchersFilter();
 				$f->id->numequals($this->id);
-				$ff = new Default_Model_ApplicationsFilter();
+				$ff = new ApplicationsFilter();
 				$ff->owner->numequals($this->id);
 				$rs->filter->chain($f->chain($ff, "OR"), "AND");
 				if (count($rs->items) == 0) {
@@ -231,14 +233,14 @@ class Default_Model_Researcher extends Default_Model_ResearcherBase
 	public function getApplications2($type = null) {
 		if (($type === null) || ($type === 0)) {
 			if ($this->_applications === null) {
-				$rs = new Default_Model_ResearchersApps();
+				$rs = new ResearchersApps();
 				$rs->filter->researcherid->equals($this->id);
 				$ids = array();
 				foreach($rs->items as $i) $ids[] = $i->appID;
 				if (count($ids) == 0) {
 					$this->_applications = array();
 				} else {
-					$apps = new Default_Model_Applications;
+					$apps = new Applications;
 					$apps->filter->id->in($ids)->and($apps->filter->moderated->equals(false))->and($apps->filter->deleted->equals(false));
 					$this->_applications = $apps;
 				}
@@ -249,12 +251,12 @@ class Default_Model_Researcher extends Default_Model_ResearcherBase
 
     public function getDelInfo() {
 		if ( $this->_delInfo === null ) {
-			$dis = new Default_Model_PplDelInfos();
+			$dis = new PplDelInfos();
 			$dis->filter->researcherid->equals($this->id);
 			if ( count($dis->items) > 0 ) {
 				$this->_delInfo = $dis->items[0];
 			} else {
-				$this->_delInfo = new Default_Model_PplDelInfo();
+				$this->_delInfo = new PplDelInfo();
 				$this->_delInfo->researcherid = $this->id;
 			}
 		}
@@ -266,7 +268,7 @@ class Default_Model_Researcher extends Default_Model_ResearcherBase
 		if ($this->deleted) {
 			if ( $this->_delInfo !== null ) $this->_delInfo->save();	
 		} else {
-			$dis = new Default_Model_PplDelInfos();
+			$dis = new PplDelInfos();
 			$dis->filter->id->equals($this->id);
 			if ( count($dis->items) > 0 ) {
 				$tmp = $dis->items[0];
@@ -277,15 +279,15 @@ class Default_Model_Researcher extends Default_Model_ResearcherBase
 
 	public function getPrivs() {
 		if ( $this->_privs === null ) {
-			//			$this->_privs = new Default_Model_Privs($this);
-			$this->_privs = new Default_Model_UserPrivs($this);
+			//			$this->_privs = new Privs($this);
+			$this->_privs = new UserPrivs($this);
 		}
 		return $this->_privs;
 	}	
 
 	public function getActorGroups() {
 		if ( $this->_actorGroups === null ) {
-			$ag = new Default_Model_ActorGroupMembers();
+			$ag = new ActorGroupMembers();
 			$ag->filter->actorid->numequals("'" . $this->getGUID() . "'");
 			$ag->refresh();
 			if ( count($ag->items) > 0 ) {
@@ -298,7 +300,7 @@ class Default_Model_Researcher extends Default_Model_ResearcherBase
 	}
 	public function getAccessTokens(){
 		if( $this->_accessTokens === null ){
-			$ats = new Default_Model_AccessTokens();
+			$ats = new AccessTokens();
 			$ats->filter->addedby->equals($this->_id);
 			if( count($ats->items) > 0 ){
 				$this->_accessTokens = $ats->items;

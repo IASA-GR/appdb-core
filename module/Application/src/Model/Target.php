@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Target extends Default_Model_TargetBase
+namespace Application\Model;
+
+class Target extends TargetBase
 {
 
 }

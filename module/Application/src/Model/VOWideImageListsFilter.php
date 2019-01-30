@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VOWideImageListsFilter extends Default_Model_VOWideImageListsFilterBase {
+namespace Application\Model;
+
+class VOWideImageListsFilter extends VOWideImageListsFilterBase {
 }

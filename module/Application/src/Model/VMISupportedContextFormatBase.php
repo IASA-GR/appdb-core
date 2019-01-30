@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VMISupportedContextFormatBase
+namespace Application\Model;
+
+class VMISupportedContextFormatBase
 {
 	protected $_mapper;
 	protected $_fmtID;
@@ -79,7 +81,7 @@ class Default_Model_VMISupportedContextFormatBase
 	public function getContextFormat()
 	{
 		if ( $this->_contextFormat === null ) {
-			$cfs = new Default_Model_ContextFormats();
+			$cfs = new ContextFormats();
 			$cfs->filter->id->equals($this->getFmtID());
 			if ($cfs->count() > 0) $this->_contextFormat = $cfs->items[0];
 		}
@@ -112,7 +114,7 @@ class Default_Model_VMISupportedContextFormatBase
 	public function getVMIinstance()
 	{
 		if ( $this->_vmiInstance === null ) {
-			$VMIinstances = new Default_Model_VMIinstances();
+			$VMIinstances = new VMIinstances();
 			$VMIinstances->filter->id->equals($this->getVMIinstanceID());
 			if ($VMIinstances->count() > 0) $this->_vmiInstance = $VMIinstances->items[0];
 		}
@@ -138,7 +140,7 @@ class Default_Model_VMISupportedContextFormatBase
 	public function getMapper()
 	{
 		if (null === $this->_mapper) {
-			$this->setMapper(new Default_Model_VMISupportedContextFormatsMapper());
+			$this->setMapper(new VMISupportedContextFormatsMapper());
 		}
 		return $this->_mapper;
 	}

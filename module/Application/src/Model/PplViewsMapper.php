@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_PplViewsMapper extends Default_Model_PplViewsMapperBase
+namespace Application\Model;
+
+class PplViewsMapper extends PplViewsMapperBase
 {
 
 }

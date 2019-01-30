@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_ContractTypesFilter extends Default_Model_ContractTypesFilterBase {
+namespace Application\Model;
+
+class ContractTypesFilter extends ContractTypesFilterBase {
 }

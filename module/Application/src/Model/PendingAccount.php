@@ -17,14 +17,16 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_PendingAccount extends Default_Model_PendingAccountBase
+namespace Application\Model;
+
+class PendingAccount extends PendingAccountBase
 {
 	protected $_researcher = null;
 
 	public function getResearcher()
 	{
 		if ( $this->_researcher === null ) {
-			$Researchers = new Default_Model_Researchers();
+			$Researchers = new Researchers();
 			$Researchers->filter->id->equals($this->getResearcherID());
 			if ($Researchers->count() > 0) $this->_researcher = $Researchers->items[0];
 		}

@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VOWideImageList extends Default_Model_VOWideImageListBase
+namespace Application\Model;
+
+class VOWideImageList extends VOWideImageListBase
 {
 
 }

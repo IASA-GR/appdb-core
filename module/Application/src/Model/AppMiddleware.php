@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppMiddleware extends Default_Model_AppMiddlewareBase
+namespace Application\Model;
+
+class AppMiddleware extends AppMiddlewareBase
 {
 
 }

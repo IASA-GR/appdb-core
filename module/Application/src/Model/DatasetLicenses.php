@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_DatasetLicenses extends Default_Model_DatasetLicensesBase
+namespace Application\Model;
+
+class DatasetLicenses extends DatasetLicensesBase
 {
 
 }

@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Actor extends Default_Model_ActorBase
+namespace Application\Model;
+
+class Actor extends ActorBase
 {
 
 }

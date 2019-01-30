@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppContactVOsFilter extends Default_Model_AppContactVOsFilterBase {
+namespace Application\Model;
+
+class AppContactVOsFilter extends AppContactVOsFilterBase {
 }

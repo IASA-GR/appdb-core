@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VowideImageStates extends Default_Model_VowideImageStatesBase
+namespace Application\Model;
+
+class VowideImageStates extends VowideImageStatesBase
 {
 
 }

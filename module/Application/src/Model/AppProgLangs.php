@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppProgLangs extends Default_Model_AppProgLangsBase
+namespace Application\Model;
+
+class AppProgLangs extends AppProgLangsBase
 {
 
 }

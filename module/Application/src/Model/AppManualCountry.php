@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppManualCountry extends Default_Model_AppManualCountryBase
+namespace Application\Model;
+
+class AppManualCountry extends AppManualCountryBase
 {
 
 }

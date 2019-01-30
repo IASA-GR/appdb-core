@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppModInfos extends Default_Model_AppModInfosBase
+namespace Application\Model;
+
+class AppModInfos extends AppModInfosBase
 {
 
 }

@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_ResearcherCname extends Default_Model_ResearcherCnameBase
+namespace Application\Model;
+
+class ResearcherCname extends ResearcherCnameBase
 {
 
 }

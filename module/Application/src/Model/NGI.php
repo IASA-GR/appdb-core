@@ -17,14 +17,16 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_NGI extends Default_Model_NGIBase
+namespace Application\Model;
+
+class NGI extends NGIBase
 {
 	protected $_representatives = null;
 
 	public function getRepresentatives() {
 		if ($this->_representatives === null) {
 			if ( ! isnull($this->_countryID) ) {
-				$rs = new Default_Model_Researchers();
+				$rs = new Researchers();
 				$rs->filter->countryid->equals($this->countryID)->and($rs->filter->positiontypeid->equals(6));
 				$this->_representatives = $rs;
 			}

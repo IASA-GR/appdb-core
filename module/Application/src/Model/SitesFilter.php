@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_SitesFilter extends Default_Model_SitesFilterBase {
+namespace Application\Model;
+
+class SitesFilter extends SitesFilterBase {
 }

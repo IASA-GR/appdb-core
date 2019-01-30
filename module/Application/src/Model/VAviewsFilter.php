@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VAviewsFilter extends Default_Model_VAviewsFilterBase {
+namespace Application\Model;
+
+class VAviewsFilter extends VAviewsFilterBase {
 }

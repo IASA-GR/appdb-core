@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_HypervisorsMapper extends Default_Model_HypervisorsMapperBase
+namespace Application\Model;
+
+class HypervisorsMapper extends HypervisorsMapperBase
 {
 
 }

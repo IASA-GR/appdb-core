@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VMI extends Default_Model_VMIBase
+namespace Application\Model;
+
+class VMI extends VMIBase
 {	
 	private $_vmiinstances;
 	private $_vmiinstanceids;
@@ -38,7 +40,7 @@ class Default_Model_VMI extends Default_Model_VMIBase
 	}
 	public function getVMIInstances(){
 		$this->_vmiinstances = array();
-		$flavours = new Default_Model_VMIflavoursBase();
+		$flavours = new VMIflavoursBase();
 		$flavours->filter->vmiid->equals($this->Id);
 		$flavourids = array();
 		if( count($flavours->items) > 0 ){
@@ -47,7 +49,7 @@ class Default_Model_VMI extends Default_Model_VMIBase
 				$flavourids[] = $flavour->Id;
 			}
 			$flavourids = array_unique($flavourids);
-			$instances = new Default_Model_VMIinstances();
+			$instances = new VMIinstances();
 			$instances->filter->vmiflavourid->in($flavourids);
 			if( count($instances->items) > 0 ){
 				$this->_vmiinstances = $instances->items;
@@ -68,7 +70,7 @@ class Default_Model_VMI extends Default_Model_VMIBase
 	}
 	public function getFlavours(){
 		$this->_flavours = array();
-		$flavours = new Default_Model_VMIflavours();
+		$flavours = new VMIflavours();
 		$flavours->filter->vmiid->equals($this->id);
 		if( count($flavours->items) > 0 ){
 			$this->_flavours[] = $flavours->items;
@@ -85,7 +87,7 @@ class Default_Model_VMI extends Default_Model_VMIBase
 			}
 		}
 		//delete associated vmi flavours
-		$flavours = new Default_Model_VMIflavours();
+		$flavours = new VMIflavours();
 		$flavours->filter->vmiid->equals($this->id);
 		if( count($flavours->items) >  0 ){
 			for( $i=0; $i<count($flavours->items); $i+=1 ){

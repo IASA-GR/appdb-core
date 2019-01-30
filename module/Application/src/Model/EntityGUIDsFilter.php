@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_EntityGUIDsFilter extends Default_Model_EntityGUIDsFilterBase {
+namespace Application\Model;
+
+class EntityGUIDsFilter extends EntityGUIDsFilterBase {
 }

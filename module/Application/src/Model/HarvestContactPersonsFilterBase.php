@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_HarvestContactPersonsFilterBase extends Default_Model_Filter {
+namespace Application\Model;
+
+class HarvestContactPersonsFilterBase extends Filter {
 	public function __construct() {
 		parent::__construct();
 		$this->setDialect(0);

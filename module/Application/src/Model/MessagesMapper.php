@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_MessagesMapper extends Default_Model_MessagesMapperBase
+namespace Application\Model;
+
+class MessagesMapper extends MessagesMapperBase
 {
 
 }

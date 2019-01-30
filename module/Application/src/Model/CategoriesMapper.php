@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_CategoriesMapper extends Default_Model_CategoriesMapperBase
+namespace Application\Model;
+
+class CategoriesMapper extends CategoriesMapperBase
 {
 	public function fetchAll($filter = null, $format = '', $xmldetailed = false) {
 		if ($format == '') {

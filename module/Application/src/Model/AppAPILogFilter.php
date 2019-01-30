@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppAPILogFilter extends Default_Model_AppAPILogFilterBase {
+namespace Application\Model;
+
+class AppAPILogFilter extends AppAPILogFilterBase {
 }

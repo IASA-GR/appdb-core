@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_CountryRegions extends Default_Model_CountryRegionsBase
+namespace Application\Model;
+
+class CountryRegions extends CountryRegionsBase
 {
 
 }

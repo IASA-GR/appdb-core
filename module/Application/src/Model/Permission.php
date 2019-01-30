@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Permission extends Default_Model_PermissionBase
+namespace Application\Model;
+
+class Permission extends PermissionBase
 {
 
 }

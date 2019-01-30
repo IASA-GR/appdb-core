@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Discipline extends Default_Model_DisciplineBase
+namespace Application\Model;
+
+class Discipline extends DisciplineBase
 {
 	public function getLogo() {
 		$theid = $this->id;

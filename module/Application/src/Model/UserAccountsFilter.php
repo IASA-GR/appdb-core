@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_UserAccountsFilter extends Default_Model_UserAccountsFilterBase {
+namespace Application\Model;
+
+class UserAccountsFilter extends UserAccountsFilterBase {
 	public function __construct() {
 		parent::__construct();
 		$this->_fieldTypes['idptrace'] = 'string[]';

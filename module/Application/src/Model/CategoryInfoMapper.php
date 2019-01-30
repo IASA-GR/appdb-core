@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_CategoryInfoMapper extends Default_Model_CategoryInfoMapperBase
+namespace Application\Model;
+
+class CategoryInfoMapper extends CategoryInfoMapperBase
 {
 
 }

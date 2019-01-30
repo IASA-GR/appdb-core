@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_URLWhitelistMapper extends Default_Model_URLWhitelistMapperBase
+namespace Application\Model;
+
+class URLWhitelistMapper extends URLWhitelistMapperBase
 {
 
 }

@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppTags extends Default_Model_AppTagsBase
+namespace Application\Model;
+
+class AppTags extends AppTagsBase
 {
 	protected $_format;
 

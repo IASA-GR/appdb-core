@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AggregateNewsEntryBase
+namespace Application\Model;
+
+class AggregateNewsEntryBase
 {
 	protected $_mapper;
 	protected $_id;
@@ -194,7 +196,7 @@ class Default_Model_AggregateNewsEntryBase
 	public function getMapper()
 	{
 		if (null === $this->_mapper) {
-			$this->setMapper(new Default_Model_AggregateNewsMapper());
+			$this->setMapper(new AggregateNewsMapper());
 		}
 		return $this->_mapper;
 	}

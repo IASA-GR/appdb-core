@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppMiddlewaresMapper extends Default_Model_AppMiddlewaresMapperBase
+namespace Application\Model;
+
+class AppMiddlewaresMapper extends AppMiddlewaresMapperBase
 {
 /*	public function fetchAll($filter = null, $format = '') {
 		if ($format == '') {

@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VOsFilterBase extends Default_Model_Filter {
+namespace Application\Model;
+
+class VOsFilterBase extends Filter {
 	public function __construct() {
 		parent::__construct();
 		$this->setDialect(0);

@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppContactMiddlewaresFilter extends Default_Model_AppContactMiddlewaresFilterBase {
+namespace Application\Model;
+
+class AppContactMiddlewaresFilter extends AppContactMiddlewaresFilterBase {
 }

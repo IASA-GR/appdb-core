@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AccessTokenNetfilters extends Default_Model_AccessTokenNetfiltersBase
+namespace Application\Model;
+
+class AccessTokenNetfilters extends AccessTokenNetfiltersBase
 {
 
 }

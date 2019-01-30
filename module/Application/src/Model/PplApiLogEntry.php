@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_PplApiLogEntry extends Default_Model_PplApiLogEntryBase
+namespace Application\Model;
+
+class PplApiLogEntry extends PplApiLogEntryBase
 {
 
 }

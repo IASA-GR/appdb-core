@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VMcasterRequestsMapper extends Default_Model_VMcasterRequestsMapperBase
+namespace Application\Model;
+
+class VMcasterRequestsMapper extends VMcasterRequestsMapperBase
 {
 
 }

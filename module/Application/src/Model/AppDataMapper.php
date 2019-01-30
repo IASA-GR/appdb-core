@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppDataMapper extends Default_Model_AppDataMapperBase
+namespace Application\Model;
+
+class AppDataMapper extends AppDataMapperBase
 {
 
 }

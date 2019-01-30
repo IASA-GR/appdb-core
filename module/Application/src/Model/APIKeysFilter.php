@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_APIKeysFilter extends Default_Model_APIKeysFilterBase {
+namespace Application\Model;
+
+class APIKeysFilter extends APIKeysFilterBase {
 }

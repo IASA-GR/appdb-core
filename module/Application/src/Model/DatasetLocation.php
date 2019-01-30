@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_DatasetLocation extends Default_Model_DatasetLocationBase
+namespace Application\Model;
+
+class DatasetLocation extends DatasetLocationBase
 {
 
 }

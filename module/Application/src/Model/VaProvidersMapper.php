@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VaProvidersMapper extends Default_Model_VaProvidersMapperBase
+namespace Application\Model;
+
+class VaProvidersMapper extends VaProvidersMapperBase
 {
 	public function fetchAll($filter = null, $format = '', $xmldetailed = false) {
 		if ($format == '') {

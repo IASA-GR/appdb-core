@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppTeam extends Default_Model_AppTeamBase
+namespace Application\Model;
+
+class AppTeam extends AppTeamBase
 {
 
 }

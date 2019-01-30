@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AccessTokens extends Default_Model_AccessTokensBase
+namespace Application\Model;
+
+class AccessTokens extends AccessTokensBase
 {
 
 }

@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_HashFunc extends Default_Model_HashFuncBase
+namespace Application\Model;
+
+class HashFunc extends HashFuncBase
 {
 
 }

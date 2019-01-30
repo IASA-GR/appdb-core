@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ContractTypesMapper extends Default_Model_ContractTypesMapperBase
+namespace Application\Model;
+
+class ContractTypesMapper extends ContractTypesMapperBase
 {
 
 }

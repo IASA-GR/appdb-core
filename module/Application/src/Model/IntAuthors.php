@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_IntAuthors extends Default_Model_IntAuthorsBase
+namespace Application\Model;
+
+class IntAuthors extends IntAuthorsBase
 {
 
 }

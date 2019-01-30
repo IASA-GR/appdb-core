@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VMcasterRequest extends Default_Model_VMcasterRequestBase
+namespace Application\Model;
+
+class VMcasterRequest extends VMcasterRequestBase
 {
 
 }

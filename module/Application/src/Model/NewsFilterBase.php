@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_NewsFilterBase extends Default_Model_Filter {
+namespace Application\Model;
+
+class NewsFilterBase extends Filter {
 	public function __construct() {
 		parent::__construct();
 		$this->setDialect(0);

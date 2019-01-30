@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppMiddlewaresFilter extends Default_Model_AppMiddlewaresFilterBase {
+namespace Application\Model;
+
+class AppMiddlewaresFilter extends AppMiddlewaresFilterBase {
 	public function __construct() {
 		parent::__construct();
 		$this->_fields[] = 'any.any';

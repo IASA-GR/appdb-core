@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppTagsFilter extends Default_Model_AppTagsFilterBase {
+namespace Application\Model;
+
+class AppTagsFilter extends AppTagsFilterBase {
 }

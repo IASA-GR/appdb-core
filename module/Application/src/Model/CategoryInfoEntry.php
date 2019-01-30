@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_CategoryInfoEntry extends Default_Model_CategoryInfoEntryBase
+namespace Application\Model;
+
+class CategoryInfoEntry extends CategoryInfoEntryBase
 {
 
 }

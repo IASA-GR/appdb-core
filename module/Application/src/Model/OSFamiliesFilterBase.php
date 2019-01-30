@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_OSFamiliesFilterBase extends Default_Model_Filter {
+namespace Application\Model;
+
+class OSFamiliesFilterBase extends Filter {
 	public function __construct() {
 		parent::__construct();
 		$this->setDialect(0);

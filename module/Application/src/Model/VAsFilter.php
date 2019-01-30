@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VAsFilter extends Default_Model_VAsFilterBase {
+namespace Application\Model;
+
+class VAsFilter extends VAsFilterBase {
 }

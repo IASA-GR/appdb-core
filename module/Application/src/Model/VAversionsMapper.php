@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VAversionsMapper extends Default_Model_VAversionsMapperBase
+namespace Application\Model;
+
+class VAversionsMapper extends VAversionsMapperBase
 {
 
 }

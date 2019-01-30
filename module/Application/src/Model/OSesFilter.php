@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_OSesFilter extends Default_Model_OSesFilterBase {
+namespace Application\Model;
+
+class OSesFilter extends OSesFilterBase {
 	public function __construct() {
 		parent::__construct();
 		$this->_fields[] = 'any.any';

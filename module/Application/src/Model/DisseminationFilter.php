@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_DisseminationFilter extends Default_Model_DisseminationFilterBase {
+namespace Application\Model;
+
+class DisseminationFilter extends DisseminationFilterBase {
 }

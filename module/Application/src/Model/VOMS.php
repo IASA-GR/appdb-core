@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VOMS extends Default_Model_VOMSBase
+namespace Application\Model;
+
+class VOMS extends VOMSBase
 {
 
 }

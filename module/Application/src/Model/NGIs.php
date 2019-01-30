@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_NGIs extends Default_Model_NGIsBase
+namespace Application\Model;
+
+class NGIs extends NGIsBase
 {
 	public function refresh($format = '')
 	{

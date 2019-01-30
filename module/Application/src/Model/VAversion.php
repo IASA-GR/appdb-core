@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VAversion extends Default_Model_VAversionBase
+namespace Application\Model;
+
+class VAversion extends VAversionBase
 {
 	private $_vmis;
 	private $_vmiids;
@@ -27,7 +29,7 @@ class Default_Model_VAversion extends Default_Model_VAversionBase
 		if( !is_array($this->_vmiids) ){
 			$this->_vmiids = array();
 			$wmiids = array();
-			$valists = new Default_Model_VALists();
+			$valists = new VALists();
 			$valists->filter->vappversionid->equals($this->getId());
 			if( count($valists->items) > 0 ){
 				for( $i=0; $i<count($valists->items); $i+=1 ){
@@ -35,7 +37,7 @@ class Default_Model_VAversion extends Default_Model_VAversionBase
 					$vmiinst = $item->getVMIinstance();
 					if( $vmiinst ){
 						$flavour = null;
-						$flavours = new Default_Model_VMIflavoursBase();
+						$flavours = new VMIflavoursBase();
 						$flavours->filter->id->equals($vmiinst->vmiflavourid);
 						if( count($flavours->items) > 0 ){
 							$flavour = $flavours->items[0];
@@ -58,7 +60,7 @@ class Default_Model_VAversion extends Default_Model_VAversionBase
 		if( !is_array($this->_vmis) ){
 			$this->_vmis = array();
 			$wmiids = $this->getVMIIds();
-			$vmis = new Default_Model_VMIs();
+			$vmis = new VMIs();
 			$vmis->filter->id->in($wmiids);
 			if( count($vmis->items) > 0 ){
 				$this->_vmis = $vmis->items;
@@ -71,7 +73,7 @@ class Default_Model_VAversion extends Default_Model_VAversionBase
 	}
 	
 	public function getImageByIdentifier($guid){
-		$vapplists = new Default_Model_VALists();
+		$vapplists = new VALists();
 		$vapplists->filter->vappversionid->equals($this->id);
 		if( count($vapplists->items) === 0 ) return null;
 		for($i=0; $i<count($vapplists->items); $i+=1){
@@ -93,7 +95,7 @@ class Default_Model_VAversion extends Default_Model_VAversionBase
 	
 	public function getVappLists(){
 		if( $this->_vapplists === null ){
-			$vapplists = new Default_Model_VALists();
+			$vapplists = new VALists();
 			$vapplists->filter->vappversionid->equals($this->_id);
 			if( count($vapplists->items) > 0 ){
 				$this->_vapplists = $vapplists->items;

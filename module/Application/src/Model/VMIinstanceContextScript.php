@@ -17,10 +17,12 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VMIinstanceContextScript extends Default_Model_VMIinstanceContextScriptBase
+namespace Application\Model;
+
+class VMIinstanceContextScript extends VMIinstanceContextScriptBase
 {
 	public function hasContext(){
-		$assoc = new Default_Model_ContextScriptAssocs();
+		$assoc = new ContextScriptAssocs();
 		$assoc->filter->scriptid->numequals($this->getContextScriptID());
 		if( count($assoc->items) === 0 ){
 			return false;

@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_DisciplineInfoMapper extends Default_Model_DisciplineInfoMapperBase
+namespace Application\Model;
+
+class DisciplineInfoMapper extends DisciplineInfoMapperBase
 {
 
 }

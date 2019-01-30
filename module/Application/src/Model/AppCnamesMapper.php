@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppCnamesMapper extends Default_Model_AppCnamesMapperBase
+namespace Application\Model;
+
+class AppCnamesMapper extends AppCnamesMapperBase
 {
 
 }

@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Countries extends Default_Model_CountriesBase
+namespace Application\Model;
+
+class Countries extends CountriesBase
 {
 	public function refresh($format = '')
 	{

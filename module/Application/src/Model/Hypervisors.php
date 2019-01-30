@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Hypervisors extends Default_Model_HypervisorsBase
+namespace Application\Model;
+
+class Hypervisors extends HypervisorsBase
 {
 
 }

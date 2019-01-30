@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_MyNews {
+namespace Application\Model;
+
+class MyNews {
 
  protected $_news;
  public $limit;
@@ -31,7 +33,7 @@ class Default_Model_MyNews {
         global $application;
         $this->_db = $application->getBootstrap()->getResource('db');
 		if ( $this->filter === null ) {
-			$this->filter = new Default_Model_Filter();
+			$this->filter = new Filter();
 			$this->filter->_table = 'news';
 		} else {
 			$this->filter = $filter;
@@ -76,7 +78,7 @@ class Default_Model_MyNews {
  }
 
  public function items($i) {
-     $e = new Default_Model_MyNew();
+     $e = new MyNew();
      $e->init($this->_news[$i]);
      return $e;
  }

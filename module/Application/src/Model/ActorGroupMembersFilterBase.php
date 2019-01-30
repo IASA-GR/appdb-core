@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ActorGroupMembersFilterBase extends Default_Model_Filter {
+namespace Application\Model;
+
+class ActorGroupMembersFilterBase extends Filter {
 	public function __construct() {
 		parent::__construct();
 		$this->setDialect(0);

@@ -17,14 +17,16 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VO2 extends Default_Model_VO2Base
+namespace Application\Model;
+
+class VO2 extends VO2Base
 {
 	protected $_sites;
 	public function getApplications()
 	{
 		if ($this->_applications === null) {
-			$apps = new Default_Model_Applications();
-			$f = new Default_Model_VOsFilter();
+			$apps = new Applications();
+			$f = new VOsFilter();
 			$f->id->equals($this->id);
 			$apps->filter->chain($f,"AND");
 			$apps->filter->orderBy(array("lastupdated DESC","name ASC"));
@@ -36,8 +38,8 @@ class Default_Model_VO2 extends Default_Model_VO2Base
 	public function getSites()
 	{
 		if ($this->_sites === null) {
-			$sites = new Default_Model_Sites();
-			$f = new Default_Model_VOsFilter();
+			$sites = new Sites();
+			$f = new VOsFilter();
 			$f->id->equals($this->id);
 			$sites->filter->chain($f,"AND");
 			$sites->filter->orderBy(array("name ASC"));
@@ -50,7 +52,7 @@ class Default_Model_VO2 extends Default_Model_VO2Base
 		db()->setFetchMode(Zend_Db::FETCH_OBJ);
 		$ids = db()->query("SELECT UNNEST(disciplineid) AS did FROM vos WHERE id = " . $this->id . " ORDER BY did DESC LIMIT 1")->fetchAll();
 		$id = $ids->did;
-		$discs = new Default_Model_Disciplines();
+		$discs = new Disciplines();
 		$discs->filter->id->numequals($id);
 		if (count($discs->items) > 0) {
 			$disc = $discs->items[0];

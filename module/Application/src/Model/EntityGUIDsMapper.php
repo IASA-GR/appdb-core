@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_EntityGUIDsMapper extends Default_Model_EntityGUIDsMapperBase
+namespace Application\Model;
+
+class EntityGUIDsMapper extends EntityGUIDsMapperBase
 {
 
 }

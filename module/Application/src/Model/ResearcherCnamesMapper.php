@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ResearcherCnamesMapper extends Default_Model_ResearcherCnamesMapperBase
+namespace Application\Model;
+
+class ResearcherCnamesMapper extends ResearcherCnamesMapperBase
 {
 
 }

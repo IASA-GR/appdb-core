@@ -17,13 +17,15 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VMIinstance extends Default_Model_VMIinstanceBase
+namespace Application\Model;
+
+class VMIinstance extends VMIinstanceBase
 {
 	protected $_networkTraffic;
 	protected $_supportedContextFormats;
 
 	public function delete(){
-		$valists = new Default_Model_VALists();
+		$valists = new VALists();
 		$valists->filter->vmiinstanceid->numequals($this->id);
 		if( count($valists->items) > 0 ){
 			for($i=0; $i<count($valists->items); $i+=1){
@@ -50,7 +52,7 @@ class Default_Model_VMIinstance extends Default_Model_VMIinstanceBase
 	}
 	public function getVAVersion(){
 		$version = null;
-		$vlists = new Default_Model_VALists();
+		$vlists = new VALists();
 		$vlists->filter->vmiinstanceid->numequals($this->id);
 		if( count($vlists->items) > 0 ){
 			$item = $vlists->items[0];
@@ -61,7 +63,7 @@ class Default_Model_VMIinstance extends Default_Model_VMIinstanceBase
 
 	public function getSupportedContextFormats() {
 		if ($this->_supportedContextFormats === null) {
-			$cf = new Default_Model_VMISupportedContextFormats();
+			$cf = new VMISupportedContextFormats();
 			$cf->filter->vmiinstanceid->numequals($this->id);
 			$this->_supportedContextFormats = $cf;
 		}
@@ -70,7 +72,7 @@ class Default_Model_VMIinstance extends Default_Model_VMIinstanceBase
 
 	public function getNetworkTraffic() {
 		if ($this->_networkTraffic === null) {
-			$nt = new Default_Model_VMINetworkTraffic();
+			$nt = new VMINetworkTraffic();
 			$nt->filter->vmiinstanceid->numequals($this->id);
 			$this->_networkTraffic = $nt;
 		}
@@ -78,7 +80,7 @@ class Default_Model_VMIinstance extends Default_Model_VMIinstanceBase
 	}
 
 	public function deleteNetworkTraffic() {
-		$nts = new Default_Model_VMINetworkTraffic();
+		$nts = new VMINetworkTraffic();
 		$x = $this->getNetworkTraffic();
 		foreach ($x as $nt) {
 			$nts->remove($nt);
@@ -97,8 +99,8 @@ class Default_Model_VMIinstance extends Default_Model_VMIinstanceBase
 	public function getSites()
 	{
 		if ($this->_sites === null) {
-			$sites = new Default_Model_Sites();
-			$f = new Default_Model_VOsFilter();
+			$sites = new Sites();
+			$f = new VOsFilter();
 			$f->id->equals($this->id);
 			$sites->filter->chain($f,"AND");
 			$sites->filter->orderBy(array("name ASC"));

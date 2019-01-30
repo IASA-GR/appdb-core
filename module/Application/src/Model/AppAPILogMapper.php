@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppAPILogMapper extends Default_Model_AppAPILogMapperBase
+namespace Application\Model;
+
+class AppAPILogMapper extends AppAPILogMapperBase
 {
 
 }

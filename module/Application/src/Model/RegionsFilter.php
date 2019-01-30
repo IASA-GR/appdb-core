@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_RegionsFilter extends Default_Model_RegionsFilterBase {
+namespace Application\Model;
+
+class RegionsFilter extends RegionsFilterBase {
 }

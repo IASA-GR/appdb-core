@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VOMSesFilter extends Default_Model_VOMSesFilterBase {
+namespace Application\Model;
+
+class VOMSesFilter extends VOMSesFilterBase {
 }

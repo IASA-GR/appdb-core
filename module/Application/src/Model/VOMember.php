@@ -17,14 +17,16 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VOMember extends Default_Model_VOMemberBase
+namespace Application\Model;
+
+class VOMember extends VOMemberBase
 {
 	protected $_vo = null;
 
 	public function getVO()
 	{
 		if ( $this->_vo === null ) {
-			$VOs = new Default_Model_VOs();
+			$VOs = new VOs();
 			$VOs->filter->id->equals($this->getVOID());
 			if (count($VOs->items) > 0) $this->_vo = $VOs->items[0];
 		}

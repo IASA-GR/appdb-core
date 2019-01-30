@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_EntityRelationsMapper extends Default_Model_EntityRelationsMapperBase
+namespace Application\Model;
+
+class EntityRelationsMapper extends EntityRelationsMapperBase
 {
 
 }

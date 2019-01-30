@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VALists extends Default_Model_VAListsBase
+namespace Application\Model;
+
+class VALists extends VAListsBase
 {
 
 }

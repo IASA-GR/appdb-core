@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VMIflavoursFilter extends Default_Model_VMIflavoursFilterBase {
+namespace Application\Model;
+
+class VMIflavoursFilter extends VMIflavoursFilterBase {
 }

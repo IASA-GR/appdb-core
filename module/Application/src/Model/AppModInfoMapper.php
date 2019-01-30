@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppModInfoMapper extends Default_Model_AppModInfoMapperBase
+namespace Application\Model;
+
+class AppModInfoMapper extends AppModInfoMapperBase
 {
 
 }

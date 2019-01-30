@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_MyNew {
+namespace Application\Model;
+
+class MyNew {
 
  protected $_e;
 

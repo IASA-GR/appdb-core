@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_StatusesFilter extends Default_Model_StatusesFilterBase {
+namespace Application\Model;
+
+class StatusesFilter extends StatusesFilterBase {
 }

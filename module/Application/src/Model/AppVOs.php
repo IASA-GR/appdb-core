@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppVOs extends Default_Model_AppVOsBase
+namespace Application\Model;
+
+class AppVOs extends AppVOsBase
 {
 
 }

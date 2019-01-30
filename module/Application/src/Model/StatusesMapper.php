@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_StatusesMapper extends Default_Model_StatusesMapperBase
+namespace Application\Model;
+
+class StatusesMapper extends StatusesMapperBase
 {
 	public function fetchAll($filter = null, $format = '') {
 		if ($format == '') {

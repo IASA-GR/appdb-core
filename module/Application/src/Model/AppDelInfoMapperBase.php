@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppDelInfoMapperBase
+namespace Application\Model;
+
+class AppDelInfoMapperBase
 {
 
 }

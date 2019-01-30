@@ -17,13 +17,15 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppDocument extends Default_Model_AppDocumentBase
+namespace Application\Model;
+
+class AppDocument extends AppDocumentBase
 {
 	protected $_authors;
 
 	public function getAuthors() {
 		if ($this->_authors === null) {
-			$a = new Default_Model_Authors();
+			$a = new Authors();
 			$a->filter->docid->equals($this->id);
 			$this->_authors = $a;
 		}

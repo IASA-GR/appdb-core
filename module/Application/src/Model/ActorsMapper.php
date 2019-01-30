@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ActorsMapper extends Default_Model_ActorsMapperBase
+namespace Application\Model;
+
+class ActorsMapper extends ActorsMapperBase
 {
 
 }

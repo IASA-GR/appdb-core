@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppTeamFilter extends Default_Model_AppTeamFilterBase {
+namespace Application\Model;
+
+class AppTeamFilter extends AppTeamFilterBase {
 }

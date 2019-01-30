@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppUrls extends Default_Model_AppUrlsBase
+namespace Application\Model;
+
+class AppUrls extends AppUrlsBase
 {
 	public static function getTitles($notEmpty=false) {
 		global $application;

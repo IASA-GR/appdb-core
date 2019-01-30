@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppGroups extends Default_Model_AppGroupsBase
+namespace Application\Model;
+
+class AppGroups extends AppGroupsBase
 {
 
 }

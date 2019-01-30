@@ -16,9 +16,11 @@
  */
 ?>
 <?php
-class Default_Model_RelationsMapper extends Default_Model_RelationsMapperBase
+namespace Application\Model;
+
+class RelationsMapper extends RelationsMapperBase
 {
-	public function save(Default_Model_Relation $value) {
+	public function save(AROItem $value) {
 		global $application;
 		$data = array();
 		$ishidden = false;

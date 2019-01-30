@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Contacts extends Default_Model_ContactsBase
+namespace Application\Model;
+
+class Contacts extends ContactsBase
 {
 
 }

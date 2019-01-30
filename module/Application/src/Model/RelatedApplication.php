@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_RelatedApplication extends Default_Model_Application {
+namespace Application\Model;
+
+class RelatedApplication extends Application {
 	protected $_rank;
 
 	public function getRank() {

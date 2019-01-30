@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VMIinstanceContextScriptsFilter extends Default_Model_VMIinstanceContextScriptsFilterBase {
+namespace Application\Model;
+
+class VMIinstanceContextScriptsFilter extends VMIinstanceContextScriptsFilterBase {
 }

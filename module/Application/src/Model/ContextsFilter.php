@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_ContextsFilter extends Default_Model_ContextsFilterBase {
+namespace Application\Model;
+
+class ContextsFilter extends ContextsFilterBase {
 }

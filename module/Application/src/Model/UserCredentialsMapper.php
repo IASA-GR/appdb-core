@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_UserCredentialsMapper extends Default_Model_UserCredentialsMapperBase
+namespace Application\Model;
+
+class UserCredentialsMapper extends UserCredentialsMapperBase
 {
 
 }

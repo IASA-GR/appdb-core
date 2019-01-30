@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppReleaseCountFilter extends Default_Model_AppReleaseCountFilterBase {
+namespace Application\Model;
+
+class AppReleaseCountFilter extends AppReleaseCountFilterBase {
 }

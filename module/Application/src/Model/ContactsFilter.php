@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ContactsFilter extends Default_Model_ContactsFilterBase {
+namespace Application\Model;
+
+class ContactsFilter extends ContactsFilterBase {
 	public function __construct() {
 		parent::__construct();
 		$this->_fields[] = 'any.any';

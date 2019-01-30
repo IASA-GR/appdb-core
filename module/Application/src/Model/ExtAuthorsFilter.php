@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_ExtAuthorsFilter extends Default_Model_ExtAuthorsFilterBase {
+namespace Application\Model;
+
+class ExtAuthorsFilter extends ExtAuthorsFilterBase {
 }

@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_PplApiLogFilter extends Default_Model_PplApiLogFilterBase {
+namespace Application\Model;
+
+class PplApiLogFilter extends PplApiLogFilterBase {
 }

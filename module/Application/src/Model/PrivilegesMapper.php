@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_PrivilegesMapper extends Default_Model_PrivilegesMapperBase
+namespace Application\Model;
+
+class PrivilegesMapper extends PrivilegesMapperBase
 {
 
 }

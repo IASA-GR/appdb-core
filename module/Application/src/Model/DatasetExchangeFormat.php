@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_DatasetExchangeFormat extends Default_Model_DatasetExchangeFormatBase
+namespace Application\Model;
+
+class DatasetExchangeFormat extends DatasetExchangeFormatBase
 {
 
 }

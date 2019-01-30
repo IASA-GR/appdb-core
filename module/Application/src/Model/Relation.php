@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Relation extends Default_Model_RelationBase
+namespace Application\Model;
+
+class Relation extends RelationBase
 {
 
 }

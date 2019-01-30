@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VappviewsFilter extends Default_Model_VappviewsFilterBase {
+namespace Application\Model;
+
+class VappviewsFilter extends VappviewsFilterBase {
 }

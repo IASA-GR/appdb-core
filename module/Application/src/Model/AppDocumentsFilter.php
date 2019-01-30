@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppDocumentsFilter extends Default_Model_AppDocumentsFilterBase {
+namespace Application\Model;
+
+class AppDocumentsFilter extends AppDocumentsFilterBase {
 }

@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AuthorsFilterBase extends Default_Model_Filter {
+namespace Application\Model;
+
+class AuthorsFilterBase extends Filter {
 	public function __construct() {
 		parent::__construct();
 		$this->setDialect(0);

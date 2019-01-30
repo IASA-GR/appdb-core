@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_ProjectsFilter extends Default_Model_ProjectsFilterBase {
+namespace Application\Model;
+
+class ProjectsFilter extends ProjectsFilterBase {
 }

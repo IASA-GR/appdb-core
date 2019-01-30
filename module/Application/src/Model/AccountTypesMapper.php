@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AccountTypesMapper extends Default_Model_AccountTypesMapperBase
+namespace Application\Model;
+
+class AccountTypesMapper extends AccountTypesMapperBase
 {
 
 }

@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_MailSubscriptionsFilter extends Default_Model_MailSubscriptionsFilterBase {
+namespace Application\Model;
+
+class MailSubscriptionsFilter extends MailSubscriptionsFilterBase {
 }

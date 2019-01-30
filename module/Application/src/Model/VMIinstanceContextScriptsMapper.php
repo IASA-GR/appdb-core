@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VMIinstanceContextScriptsMapper extends Default_Model_VMIinstanceContextScriptsMapperBase
+namespace Application\Model;
+
+class VMIinstanceContextScriptsMapper extends VMIinstanceContextScriptsMapperBase
 {
 
 }

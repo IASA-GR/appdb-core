@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ExtAuthorsMapper extends Default_Model_ExtAuthorsMapperBase
+namespace Application\Model;
+
+class ExtAuthorsMapper extends ExtAuthorsMapperBase
 {
 
 }

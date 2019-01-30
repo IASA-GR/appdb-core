@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppGroupsFilter extends Default_Model_AppGroupsFilterBase {
+namespace Application\Model;
+
+class AppGroupsFilter extends AppGroupsFilterBase {
 }

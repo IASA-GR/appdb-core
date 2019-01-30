@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_CategoryInfoFilter extends Default_Model_CategoryInfoFilterBase {
+namespace Application\Model;
+
+class CategoryInfoFilter extends CategoryInfoFilterBase {
 }

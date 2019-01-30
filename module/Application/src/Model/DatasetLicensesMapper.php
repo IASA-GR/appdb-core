@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_DatasetLicensesMapper extends Default_Model_DatasetLicensesMapperBase
+namespace Application\Model;
+
+class DatasetLicensesMapper extends DatasetLicensesMapperBase
 {
 
 }

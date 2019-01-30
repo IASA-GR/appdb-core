@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_DomainsMapper extends Default_Model_DomainsMapperBase
+namespace Application\Model;
+
+class DomainsMapper extends DomainsMapperBase
 {
 	public function fetchAll($filter = null, $format = '') {
 		if ($format == '') {

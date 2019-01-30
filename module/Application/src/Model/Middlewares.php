@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Middlewares extends Default_Model_MiddlewaresBase
+namespace Application\Model;
+
+class Middlewares extends MiddlewaresBase
 {
 	public function refresh($format = '')
 	{

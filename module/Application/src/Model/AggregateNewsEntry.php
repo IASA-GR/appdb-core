@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AggregateNewsEntry extends Default_Model_AggregateNewsEntryBase
+namespace Application\Model;
+
+class AggregateNewsEntry extends AggregateNewsEntryBase
 {
 
 }

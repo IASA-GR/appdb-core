@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_PendingAccountsFilter extends Default_Model_PendingAccountsFilterBase {
+namespace Application\Model;
+
+class PendingAccountsFilter extends PendingAccountsFilterBase {
 }

@@ -17,13 +17,15 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Dataset extends Default_Model_DatasetBase
+namespace Application\Model;
+
+class Dataset extends DatasetBase
 {
 	protected $_children;
 
 	public function Children() {
 		if ($this->_children === null) {
-			$datasets = new Default_Model_Datasets();
+			$datasets = new Datasets();
 			$datasets->filter->parentid->numequals($this->getID());
 			$datasets->refresh();
 			$this->_children = $datasets->items;

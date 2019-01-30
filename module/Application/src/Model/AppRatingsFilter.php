@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppRatingsFilter extends Default_Model_AppRatingsFilterBase {
+namespace Application\Model;
+
+class AppRatingsFilter extends AppRatingsFilterBase {
 }

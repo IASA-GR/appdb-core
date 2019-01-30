@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_APIKeyNetfilters extends Default_Model_APIKeyNetfiltersBase
+namespace Application\Model;
+
+class APIKeyNetfilters extends APIKeyNetfiltersBase
 {
 
 }

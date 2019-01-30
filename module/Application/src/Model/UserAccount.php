@@ -17,12 +17,14 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_UserAccount extends Default_Model_UserAccountBase
+namespace Application\Model;
+
+class UserAccount extends UserAccountBase
 {
 	protected $_state;
 	public function getState(){
 		if( $this->_state === null ){
-			$states = new Default_Model_UserAccountStates();
+			$states = new UserAccountStates();
 			$states->filter->id->equals($this->_stateID);
 			if( count($states->items) > 0 ){
 				$this->_state = $states->items[0];

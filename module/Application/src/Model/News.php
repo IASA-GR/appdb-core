@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_News extends Default_Model_NewsBase
+namespace Application\Model;
+
+class News extends NewsBase
 {
 
 }

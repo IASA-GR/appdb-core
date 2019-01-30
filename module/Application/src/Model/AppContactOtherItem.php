@@ -17,11 +17,13 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppContactOtherItem extends Default_Model_AppContactOtherItemBase
+namespace Application\Model;
+
+class AppContactOtherItem extends AppContactOtherItemBase
 {
 	public function getAppContact() {
 		if ( $this->_appcontact === null ) {
-			$ac = new Default_Model_ResearchersApps();
+			$ac = new ResearchersApps();
 			$ac->filter->appid->equals($this->_appid)->and($ac->filter->researcherid->equals($this->_researcherid));
 			if ( count($ac->items) > 0 ) {
 				$this->_appcontact = $ac->items[0];

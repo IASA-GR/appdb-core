@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VOsMapper extends Default_Model_VOsMapperBase
+namespace Application\Model;
+
+class VOsMapper extends VOsMapperBase
 {
 	public function joins(&$select, $filter) {
 		$select->joinLeft('vos.any.any','vos.any.id = vos.id', array());
@@ -257,7 +259,7 @@ class Default_Model_VOsMapper extends Default_Model_VOsMapperBase
 			if ( $format === 'xml' ) {
 				$entry = $row->vo;
 			} else {
-				$entry = new Default_Model_VO();
+				$entry = new VO();
 				$this->populate($entry,$row);
 			}
 			$entries[] = $entry;

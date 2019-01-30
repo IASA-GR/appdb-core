@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VMINetworkTrafficFilter extends Default_Model_VMINetworkTrafficFilterBase {
+namespace Application\Model;
+
+class VMINetworkTrafficFilter extends VMINetworkTrafficFilterBase {
 }

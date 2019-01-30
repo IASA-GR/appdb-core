@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Hypervisor extends Default_Model_HypervisorBase
+namespace Application\Model;
+
+class Hypervisor extends HypervisorBase
 {
 	public function toXML($recursive=false) {
 		$xml = '';

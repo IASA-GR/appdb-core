@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Subdomains extends Default_Model_SubdomainsBase
+namespace Application\Model;
+
+class Subdomains extends SubdomainsBase
 {
 	public function refresh($format = '')
 	{

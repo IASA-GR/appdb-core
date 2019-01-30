@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AggregateNewsFilter extends Default_Model_AggregateNewsFilterBase {
+namespace Application\Model;
+
+class AggregateNewsFilter extends AggregateNewsFilterBase {
 }

@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_ExtAuthors extends Default_Model_ExtAuthorsBase
+namespace Application\Model;
+
+class ExtAuthors extends ExtAuthorsBase
 {
 
 }

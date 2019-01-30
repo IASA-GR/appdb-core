@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppTeamBase
+namespace Application\Model;
+
+class AppTeamBase
 {
 	protected $_mapper;
 	protected $_appID;
@@ -86,7 +88,7 @@ class Default_Model_AppTeamBase
 	public function getApplication()
 	{
 		if ( $this->_application === null ) {
-			$Applications = new Default_Model_Applications();
+			$Applications = new Applications();
 			$Applications->filter->id->equals($this->getAppID());
 			if ($Applications->count() > 0) $this->_application = $Applications->items[0];
 		}
@@ -184,7 +186,7 @@ class Default_Model_AppTeamBase
 	public function getCountry()
 	{
 		if ( $this->_country === null ) {
-			$Countries = new Default_Model_Countries();
+			$Countries = new Countries();
 			$Countries->filter->id->equals($this->getCountryID());
 			if ($Countries->count() > 0) $this->_country = $Countries->items[0];
 		}
@@ -217,7 +219,7 @@ class Default_Model_AppTeamBase
 	public function getPositionType()
 	{
 		if ( $this->_positionType === null ) {
-			$PositionTypes = new Default_Model_PositionTypes();
+			$PositionTypes = new PositionTypes();
 			$PositionTypes->filter->id->equals($this->getPositionTypeID());
 			if ($PositionTypes->count() > 0) $this->_positionType = $PositionTypes->items[0];
 		}
@@ -243,7 +245,7 @@ class Default_Model_AppTeamBase
 	public function getMapper()
 	{
 		if (null === $this->_mapper) {
-			$this->setMapper(new Default_Model_AppTeamMapper());
+			$this->setMapper(new AppTeamMapper());
 		}
 		return $this->_mapper;
 	}

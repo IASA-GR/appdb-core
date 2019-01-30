@@ -17,10 +17,12 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_ContextScript extends Default_Model_ContextScriptBase
+namespace Application\Model;
+
+class ContextScript extends ContextScriptBase
 {
 	public function hasContext(){
-		$assoc = new Default_Model_ContextScriptAssocs();
+		$assoc = new ContextScriptAssocs();
 		$assoc->filter->scriptid->numequals($this->getId());
 		if( count($assoc->items) === 0 ){
 			return false;

@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_PplApiLogMapper extends Default_Model_PplApiLogMapperBase
+namespace Application\Model;
+
+class PplApiLogMapper extends PplApiLogMapperBase
 {
 
 }

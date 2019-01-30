@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppContactVOs extends Default_Model_AppContactVOsBase
+namespace Application\Model;
+
+class AppContactVOs extends AppContactVOsBase
 {
 
 }

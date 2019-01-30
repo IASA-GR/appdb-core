@@ -16,6 +16,8 @@
  */
 ?>
 <?php
-class Default_Model_AppDelInfoFilterBase extends Default_Model_Filter {
+namespace Application\Model;
+
+class AppDelInfoFilterBase extends Filter {
 }
 ?>

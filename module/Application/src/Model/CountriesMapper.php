@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_CountriesMapper extends Default_Model_CountriesMapperBase
+namespace Application\Model;
+
+class CountriesMapper extends CountriesMapperBase
 {
 	public function fetchAll($filter = null, $format = '') {
 		if ($format == '') {

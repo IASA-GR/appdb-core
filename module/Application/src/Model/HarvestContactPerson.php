@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_HarvestContactPerson extends Default_Model_HarvestContactPersonBase
+namespace Application\Model;
+
+class HarvestContactPerson extends HarvestContactPersonBase
 {
 
 }

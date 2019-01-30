@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_LinkStatusesFilter extends Default_Model_LinkStatusesFilterBase {
+namespace Application\Model;
+
+class LinkStatusesFilter extends LinkStatusesFilterBase {
 }

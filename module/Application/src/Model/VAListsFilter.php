@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VAListsFilter extends Default_Model_VAListsFilterBase {
+namespace Application\Model;
+
+class VAListsFilter extends VAListsFilterBase {
 }

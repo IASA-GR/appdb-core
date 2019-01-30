@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppViews extends Default_Model_AppViewsBase
+namespace Application\Model;
+
+class AppViews extends AppViewsBase
 {
 
 }

@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppDatum extends Default_Model_AppDatumBase
+namespace Application\Model;
+
+class AppDatum extends AppDatumBase
 {
 
 }

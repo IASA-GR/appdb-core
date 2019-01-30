@@ -17,14 +17,16 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Domain extends Default_Model_DomainBase
+namespace Application\Model;
+
+class Domain extends DomainBase
 {
 	protected $_applications;
 
 	function getApplications() {
 		if ( $this->_applications === null ) {
-			$apps = new Default_Model_Applications;
-			$f = new Default_Model_DomainsFilter();
+			$apps = new Applications;
+			$f = new DomainsFilter();
 			$f->id->equals($this->id);
 			$apps->filter->chain($f,"AND");
 			$this->_applications = $apps;

@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_DisciplineInfoEntry extends Default_Model_DisciplineInfoEntryBase
+namespace Application\Model;
+
+class DisciplineInfoEntry extends DisciplineInfoEntryBase
 {
 
 }

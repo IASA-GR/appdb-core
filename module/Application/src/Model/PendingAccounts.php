@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_PendingAccounts extends Default_Model_PendingAccountsBase
+namespace Application\Model;
+
+class PendingAccounts extends PendingAccountsBase
 {
 
 }

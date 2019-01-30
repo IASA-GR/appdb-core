@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppCategoriesFilter extends Default_Model_AppCategoriesFilterBase {
+namespace Application\Model;
+
+class AppCategoriesFilter extends AppCategoriesFilterBase {
 }

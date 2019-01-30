@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_HarvestProjectContactPersonsFilter extends Default_Model_HarvestProjectContactPersonsFilterBase {
+namespace Application\Model;
+
+class HarvestProjectContactPersonsFilter extends HarvestProjectContactPersonsFilterBase {
 }

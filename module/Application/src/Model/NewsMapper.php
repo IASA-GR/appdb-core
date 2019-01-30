@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_NewsMapper extends Default_Model_NewsMapperBase
+namespace Application\Model;
+
+class NewsMapper extends NewsMapperBase
 {
 
 }

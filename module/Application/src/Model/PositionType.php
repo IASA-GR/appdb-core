@@ -17,13 +17,15 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_PositionType extends Default_Model_PositionTypeBase
+namespace Application\Model;
+
+class PositionType extends PositionTypeBase
 {
 	protected $_researchers  = null;
 
 	public function getResearchers() {
 	  if ( $this->_researchers === null ) {
-		  $rs = new Default_Model_Researchers();
+		  $rs = new Researchers();
 		  $rs->filter->positiontypeiD = $this->id;
 		  $this->_researchers = $rs;
 	  };

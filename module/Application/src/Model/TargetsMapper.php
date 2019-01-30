@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_TargetsMapper extends Default_Model_TargetsMapperBase
+namespace Application\Model;
+
+class TargetsMapper extends TargetsMapperBase
 {
 
 }

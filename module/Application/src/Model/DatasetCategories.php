@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_DatasetCategories extends Default_Model_DatasetCategoriesBase
+namespace Application\Model;
+
+class DatasetCategories extends DatasetCategoriesBase
 {
 
 }

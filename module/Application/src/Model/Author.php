@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Author extends Default_Model_AuthorBase
+namespace Application\Model;
+
+class Author extends AuthorBase
 {
 	public function toXML($recursive=false)
 	{
@@ -25,7 +27,7 @@ class Default_Model_Author extends Default_Model_AuthorBase
 		$x2 = '';
 	//        if ( $recursive ) {
 			if ( ! isnull($this->_authorID) ) {
-				$rs = new Default_Model_Researchers();
+				$rs = new Researchers();
 				$rs->filter->id->equals($this->_authorID);
 				$r = $rs->items[0];
 				$x2 = $r->toXML();

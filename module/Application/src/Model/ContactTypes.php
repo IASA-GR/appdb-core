@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_ContactTypes extends Default_Model_ContactTypesBase
+namespace Application\Model;
+
+class ContactTypes extends ContactTypesBase
 {
 	public function refresh($format = '')
 	{

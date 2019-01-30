@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_EntityGUID extends Default_Model_EntityGUIDBase
+namespace Application\Model;
+
+class EntityGUID extends EntityGUIDBase
 {
 
 }

@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VMcasterRequestsFilter extends Default_Model_VMcasterRequestsFilterBase {
+namespace Application\Model;
+
+class VMcasterRequestsFilter extends VMcasterRequestsFilterBase {
 }

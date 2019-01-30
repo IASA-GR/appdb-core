@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_PositionTypesMapper extends Default_Model_PositionTypesMapperBase
+namespace Application\Model;
+
+class PositionTypesMapper extends PositionTypesMapperBase
 {
 	public function fetchAll($filter = null, $format = '') {
 		if ($format == '') {

@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_ContextScriptAssocsFilter extends Default_Model_ContextScriptAssocsFilterBase {
+namespace Application\Model;
+
+class ContextScriptAssocsFilter extends ContextScriptAssocsFilterBase {
 }

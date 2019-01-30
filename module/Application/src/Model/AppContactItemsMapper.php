@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppContactItemsMapper extends Default_Model_AppContactItemsMapperBase
+namespace Application\Model;
+
+class AppContactItemsMapper extends AppContactItemsMapperBase
 {
 
 }

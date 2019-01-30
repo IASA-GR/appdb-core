@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_LicensesFilter extends Default_Model_LicensesFilterBase {
+namespace Application\Model;
+
+class LicensesFilter extends LicensesFilterBase {
 }

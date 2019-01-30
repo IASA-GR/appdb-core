@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppRelease extends Default_Model_AppReleaseBase
+namespace Application\Model;
+
+class AppRelease extends AppReleaseBase
 {
 
 }

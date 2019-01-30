@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_RelatedApplications extends Default_Model_Applications
+namespace Application\Model;
+
+class RelatedApplications extends Applications
 {
 	protected $_appid;
 	public $limit;
@@ -32,7 +34,7 @@ class Default_Model_RelatedApplications extends Default_Model_Applications
 
 	protected function __filterItems() {
 		if ($this->filter !== null && trim($this->filter->fltstr) !== "" ) {
-			$apps = new Default_Model_Applications();
+			$apps = new Applications();
 			$apps->filter = $this->filter;
 			$apps->filter->limit = null;
 			$apps->filter->offset = null;
@@ -75,7 +77,7 @@ class Default_Model_RelatedApplications extends Default_Model_Applications
 			if ( $format == 'xml' ) {
 				$app = $row->relatedapp;
 			} else {
-				$app = new Default_Model_RelatedApplication();
+				$app = new RelatedApplication();
 				$this->getMapper()->populate($app, $row);
 				$app->rank = $row->rank;
 			}

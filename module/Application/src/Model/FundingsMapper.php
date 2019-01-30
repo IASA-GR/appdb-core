@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_FundingsMapper extends Default_Model_FundingsMapperBase
+namespace Application\Model;
+
+class FundingsMapper extends FundingsMapperBase
 {
 
 }

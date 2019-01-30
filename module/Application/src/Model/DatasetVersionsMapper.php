@@ -16,9 +16,11 @@
  */
 ?>
 <?php
-class Default_Model_DatasetVersionsMapper extends Default_Model_DatasetVersionsMapperBase
+namespace Application\Model;
+
+class DatasetVersionsMapper extends DatasetVersionsMapperBase
 {
-	public function save(Default_Model_DatasetVersion $value)
+	public function save(AROItem $value)
 	{
 		global $application;
 		$data = array();

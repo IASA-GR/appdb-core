@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppBookmarksMapper extends Default_Model_AppBookmarksMapperBase
+namespace Application\Model;
+
+class AppBookmarksMapper extends AppBookmarksMapperBase
 {
 
 }

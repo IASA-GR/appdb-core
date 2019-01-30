@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_LinkStatusesMapper extends Default_Model_LinkStatusesMapperBase
+namespace Application\Model;
+
+class LinkStatusesMapper extends LinkStatusesMapperBase
 {
 	private function joins(&$select, $filter) {
         if ( is_array($filter->joins) ) {
@@ -67,7 +69,7 @@ class Default_Model_LinkStatusesMapper extends Default_Model_LinkStatusesMapperB
 		$resultSet = $executor->fetchAll($select);
 		$entries = array();
 		foreach ($resultSet as $row) {
-			$entry = new Default_Model_LinkStatus();
+			$entry = new LinkStatus();
 			$this->populate($entry,$row);
 			$entries[] = $entry;
 		}		

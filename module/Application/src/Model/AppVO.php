@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppVO extends Default_Model_AppVOBase
+namespace Application\Model;
+
+class AppVO extends AppVOBase
 {
 
 }

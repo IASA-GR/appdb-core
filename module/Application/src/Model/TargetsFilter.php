@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_TargetsFilter extends Default_Model_TargetsFilterBase {
+namespace Application\Model;
+
+class TargetsFilter extends TargetsFilterBase {
 }

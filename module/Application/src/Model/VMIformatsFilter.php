@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VMIformatsFilter extends Default_Model_VMIformatsFilterBase {
+namespace Application\Model;
+
+class VMIformatsFilter extends VMIformatsFilterBase {
 }

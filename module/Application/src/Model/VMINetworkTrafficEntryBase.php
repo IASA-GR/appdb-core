@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VMINetworkTrafficEntryBase
+namespace Application\Model;
+
+class VMINetworkTrafficEntryBase
 {
 	protected $_mapper;
 	protected $_id;
@@ -147,7 +149,7 @@ class Default_Model_VMINetworkTrafficEntryBase
 	public function getVMIinstance()
 	{
 		if ( $this->_vmiInstance === null ) {
-			$VMIinstances = new Default_Model_VMIinstances();
+			$VMIinstances = new VMIinstances();
 			$VMIinstances->filter->id->equals($this->getVMIinstanceID());
 			if ($VMIinstances->count() > 0) $this->_vmiInstance = $VMIinstances->items[0];
 		}
@@ -172,7 +174,7 @@ class Default_Model_VMINetworkTrafficEntryBase
 	public function getMapper()
 	{
 		if (null === $this->_mapper) {
-			$this->setMapper(new Default_Model_VMINetworkTrafficMapper());
+			$this->setMapper(new VMINetworkTrafficMapper());
 		}
 		return $this->_mapper;
 	}

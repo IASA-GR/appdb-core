@@ -17,13 +17,15 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppContactVO extends Default_Model_AppContactVOBase
+namespace Application\Model;
+
+class AppContactVO extends AppContactVOBase
 {
 	protected $_appcontact = null;
 
 	public function getAppContact() {
 		if ( $this->_appcontact === null ) {
-			$ac = new Default_Model_ResearchersApps();
+			$ac = new ResearchersApps();
 			$ac->filter->appid->equals($this->_appid)->and($ac->filter->researcherid->equals($this->_researcherid));
 			if ( count($ac->items) > 0 ) {
 				$this->_appcontact = $ac->items[0];

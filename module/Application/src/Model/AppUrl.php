@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppUrl extends Default_Model_AppUrlBase
+namespace Application\Model;
+
+class AppUrl extends AppUrlBase
 {
 
 }

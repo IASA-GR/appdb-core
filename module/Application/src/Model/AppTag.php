@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppTag extends Default_Model_AppTagBase
+namespace Application\Model;
+
+class AppTag extends AppTagBase
 {
 
 }

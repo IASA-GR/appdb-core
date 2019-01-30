@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppDocuments extends Default_Model_AppDocumentsBase
+namespace Application\Model;
+
+class AppDocuments extends AppDocumentsBase
 {
     public function refresh($format = '')
     {

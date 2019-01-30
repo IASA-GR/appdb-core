@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_SitesMapper extends Default_Model_SitesMapperBase
+namespace Application\Model;
+
+class SitesMapper extends SitesMapperBase
 {
 	public function joins(&$select, $filter) {
 		$select->joinLeft("sites.any", "sites.any.id = sites.id", array());
@@ -212,7 +214,7 @@ class Default_Model_SitesMapper extends Default_Model_SitesMapperBase
 		$resultSet = $this->getDbTable()->fetchAll($select);
 		$entries = array();
 		foreach ($resultSet as $row) {
-			$entry = new Default_Model_Site();
+			$entry = new Site();
 			$this->populate($entry,$row);
 			$entries[] = $entry;
 		}		

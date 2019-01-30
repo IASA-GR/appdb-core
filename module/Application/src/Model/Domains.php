@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Domains extends Default_Model_DomainsBase
+namespace Application\Model;
+
+class Domains extends DomainsBase
 {
 	public function refresh($format = '')
 	{

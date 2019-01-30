@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppReleasesFilter extends Default_Model_AppReleasesFilterBase {
+namespace Application\Model;
+
+class AppReleasesFilter extends AppReleasesFilterBase {
 }

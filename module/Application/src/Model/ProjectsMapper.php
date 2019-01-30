@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ProjectsMapper extends Default_Model_ProjectsMapperBase
+namespace Application\Model;
+
+class ProjectsMapper extends ProjectsMapperBase
 {
 
 }

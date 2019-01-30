@@ -17,13 +17,15 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Context extends Default_Model_ContextBase
+namespace Application\Model;
+
+class Context extends ContextBase
 {
 	protected $_contextscripts;
 	
 	public function getContextScriptAssocs(){
 		if( $this->_contextscripts === null ){
-			$m = new Default_Model_ContextScriptAssocs();
+			$m = new ContextScriptAssocs();
 			$m->filter->contextID->numequals($this->id);
 			if( count($m->items) > 0 ){
 				$this->_contextscripts = $m->items;

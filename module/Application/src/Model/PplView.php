@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_PplView extends Default_Model_PplViewBase
+namespace Application\Model;
+
+class PplView extends PplViewBase
 {
 
 }

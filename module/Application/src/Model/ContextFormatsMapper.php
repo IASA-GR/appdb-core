@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ContextFormatsMapper extends Default_Model_ContextFormatsMapperBase
+namespace Application\Model;
+
+class ContextFormatsMapper extends ContextFormatsMapperBase
 {
 
 }

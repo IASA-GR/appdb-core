@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Vappview extends Default_Model_VappviewBase
+namespace Application\Model;
+
+class Vappview extends VappviewBase
 {
 
 }

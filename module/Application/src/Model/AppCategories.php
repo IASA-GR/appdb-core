@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppCategories extends Default_Model_AppCategoriesBase
+namespace Application\Model;
+
+class AppCategories extends AppCategoriesBase
 {
 
 }

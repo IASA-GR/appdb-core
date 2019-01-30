@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_PositionTypes extends Default_Model_PositionTypesBase
+namespace Application\Model;
+
+class PositionTypes extends PositionTypesBase
 {
 	public function refresh($format = '')
 	{

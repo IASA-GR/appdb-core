@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VMIflavoursMapper extends Default_Model_VMIflavoursMapperBase
+namespace Application\Model;
+
+class VMIflavoursMapper extends VMIflavoursMapperBase
 {
 	public function populate(&$entry, $row) {
 		parent::populate($entry,$row);

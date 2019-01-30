@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_NewBase
+namespace Application\Model;
+
+class NewBase
 {
 	protected $_mapper;
 	protected $_id;
@@ -138,7 +140,7 @@ class Default_Model_NewBase
 	public function getMapper()
 	{
 		if (null === $this->_mapper) {
-			$this->setMapper(new Default_Model_NewsMapper());
+			$this->setMapper(new NewsMapper());
 		}
 		return $this->_mapper;
 	}

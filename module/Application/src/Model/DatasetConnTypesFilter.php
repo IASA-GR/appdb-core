@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_DatasetConnTypesFilter extends Default_Model_DatasetConnTypesFilterBase {
+namespace Application\Model;
+
+class DatasetConnTypesFilter extends DatasetConnTypesFilterBase {
 }

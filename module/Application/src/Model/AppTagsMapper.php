@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppTagsMapper extends Default_Model_AppTagsMapperBase
+namespace Application\Model;
+
+class AppTagsMapper extends AppTagsMapperBase
 {
 	public function fetchAll($filter = null, $format = '') {
 		if ($format == '') {

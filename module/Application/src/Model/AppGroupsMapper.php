@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppGroupsMapper extends Default_Model_AppGroupsMapperBase
+namespace Application\Model;
+
+class AppGroupsMapper extends AppGroupsMapperBase
 {
 
 }

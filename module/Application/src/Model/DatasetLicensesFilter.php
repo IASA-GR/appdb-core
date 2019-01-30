@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_DatasetLicensesFilter extends Default_Model_DatasetLicensesFilterBase {
+namespace Application\Model;
+
+class DatasetLicensesFilter extends DatasetLicensesFilterBase {
 }

@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppRating extends Default_Model_AppRatingBase
+namespace Application\Model;
+
+class AppRating extends AppRatingBase
 {
 
 }

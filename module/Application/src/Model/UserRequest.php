@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_UserRequest extends Default_Model_UserRequestBase
+namespace Application\Model;
+
+class UserRequest extends UserRequestBase
 {
 
 }

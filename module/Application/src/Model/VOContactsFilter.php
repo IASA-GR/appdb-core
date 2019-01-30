@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VOContactsFilter extends Default_Model_VOContactsFilterBase {
+namespace Application\Model;
+
+class VOContactsFilter extends VOContactsFilterBase {
 }

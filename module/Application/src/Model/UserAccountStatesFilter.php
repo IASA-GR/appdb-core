@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_UserAccountStatesFilter extends Default_Model_UserAccountStatesFilterBase {
+namespace Application\Model;
+
+class UserAccountStatesFilter extends UserAccountStatesFilterBase {
 }

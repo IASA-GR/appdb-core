@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VMISupportedContextFormats extends Default_Model_VMISupportedContextFormatsBase
+namespace Application\Model;
+
+class VMISupportedContextFormats extends VMISupportedContextFormatsBase
 {
 
 }

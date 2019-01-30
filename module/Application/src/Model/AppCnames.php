@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppCnames extends Default_Model_AppCnamesBase
+namespace Application\Model;
+
+class AppCnames extends AppCnamesBase
 {
 
 }

@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VMIformats extends Default_Model_VMIformatsBase
+namespace Application\Model;
+
+class VMIformats extends VMIformatsBase
 {
 
 }

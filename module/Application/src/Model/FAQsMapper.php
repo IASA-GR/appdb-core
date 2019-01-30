@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_FAQsMapper extends Default_Model_FAQsMapperBase
+namespace Application\Model;
+
+class FAQsMapper extends FAQsMapperBase
 {
 
 }

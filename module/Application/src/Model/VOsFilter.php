@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VOsFilter extends Default_Model_VOsFilterBase {
+namespace Application\Model;
+
+class VOsFilter extends VOsFilterBase {
 	public function __construct() {
 		parent::__construct();
 		$this->_fields[] = 'any.any';

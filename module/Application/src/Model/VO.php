@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VO extends Default_Model_VOBase
+namespace Application\Model;
+
+class VO extends VOBase
 {
 	protected $_contacts;
 	protected $_members;
@@ -27,7 +29,7 @@ class Default_Model_VO extends Default_Model_VOBase
 
 	public function getContacts() {
 		if ($this->_contacts === null) {
-			$urls = new Default_Model_VOContacts();
+			$urls = new VOContacts();
 			$urls->filter->void->equals($this->id);
 			$urls->filter->orderby("role ASC");
 			$this->_contacts = $urls;
@@ -37,7 +39,7 @@ class Default_Model_VO extends Default_Model_VOBase
 
 	public function getMembers() {
 		if ($this->_members === null) {
-			$urls = new Default_Model_VOMembers();
+			$urls = new VOMembers();
 			$urls->filter->void->equals($this->id);
 			$this->_members= $urls;
 		}
@@ -46,7 +48,7 @@ class Default_Model_VO extends Default_Model_VOBase
 
 	public function getVOMSes() {
 		if ($this->_vomses === null) {
-			$urls = new Default_Model_VOMSes();
+			$urls = new VOMSes();
 			$urls->filter->void->equals($this->id);
 			$this->_vomses= $urls;
 		}
@@ -55,7 +57,7 @@ class Default_Model_VO extends Default_Model_VOBase
 
 	public function getResources() {
 		if ($this->_res === null) {
-			$urls = new Default_Model_VoResources();
+			$urls = new VoResources();
 			$urls->filter->void->equals($this->id);
 			$this->_resources = $urls;
 		}
@@ -64,7 +66,7 @@ class Default_Model_VO extends Default_Model_VOBase
 
 	public function getMiddlewares() {
 		if ($this->_mws === null) {
-			$urls = new Default_Model_VoMiddlewares();
+			$urls = new VoMiddlewares();
 			$urls->filter->void->equals($this->id);
 			$this->_mws = $urls;
 		}
@@ -75,7 +77,7 @@ class Default_Model_VO extends Default_Model_VOBase
 		db()->setFetchMode(Zend_Db::FETCH_OBJ);
 		$ids = db()->query("SELECT UNNEST(disciplineid) AS did FROM vos WHERE id = " . $this->id . " ORDER BY did DESC LIMIT 1")->fetchAll();
 		$id = $ids[0]->did;
-		$discs = new Default_Model_Disciplines();
+		$discs = new Disciplines();
 		$discs->filter->id->numequals($id);
 		if (count($discs->items) > 0) {
 			$disc = $discs->items[0];

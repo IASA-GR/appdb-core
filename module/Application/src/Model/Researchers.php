@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Researchers extends Default_Model_ResearchersBase
+namespace Application\Model;
+
+class Researchers extends ResearchersBase
 {
 	protected $_userid;
 	protected $_viewModerated;
@@ -56,7 +58,7 @@ class Default_Model_Researchers extends Default_Model_ResearchersBase
 				$ex = implode(" ", $ex);
 			}
 			if ( strpos($ex, 'researchers.deleted) IS FALSE') === false ) {
-				$f = new Default_Model_ResearchersFilter();
+				$f = new ResearchersFilter();
 				$f->deleted->equals(false);
 				$this->_filter->chain($f,"AND");
 			}
@@ -78,7 +80,7 @@ class Default_Model_Researchers extends Default_Model_ResearchersBase
 				$ex = implode(" ", $ex);
 			}
 			if ( strpos($ex, 'researchers.deleted) IS FALSE') === false ) {
-				$f = new Default_Model_ResearchersFilter();
+				$f = new ResearchersFilter();
 				$f->deleted->equals(false);
 				$this->_filter->chain($f,"AND");
 			}

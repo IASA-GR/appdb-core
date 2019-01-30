@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_UserAccounts extends Default_Model_UserAccountsBase
+namespace Application\Model;
+
+class UserAccounts extends UserAccountsBase
 {
 
 }

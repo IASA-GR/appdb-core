@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Privilege extends Default_Model_PrivilegeBase
+namespace Application\Model;
+
+class Privilege extends PrivilegeBase
 {
 
 }

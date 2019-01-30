@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_ContextScriptsFilter extends Default_Model_ContextScriptsFilterBase {
+namespace Application\Model;
+
+class ContextScriptsFilter extends ContextScriptsFilterBase {
 }

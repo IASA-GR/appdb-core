@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppRatingsMapper extends Default_Model_AppRatingsMapperBase
+namespace Application\Model;
+
+class AppRatingsMapper extends AppRatingsMapperBase
 {
 	public function fetchAll($filter = null, $format = '')
 	{
@@ -43,7 +45,7 @@ class Default_Model_AppRatingsMapper extends Default_Model_AppRatingsMapperBase
 			if ( $format === 'xml' ) {
 				$entry = $row->apprating;
 			} else {
-				$entry = new Default_Model_AppRating();
+				$entry = new AppRating();
 				$this->populate($entry,$row);
 			}
 			$entries[] = $entry;

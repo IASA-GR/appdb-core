@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_URLWhitelistEntry extends Default_Model_URLWhitelistEntryBase
+namespace Application\Model;
+
+class URLWhitelistEntry extends URLWhitelistEntryBase
 {
 
 }

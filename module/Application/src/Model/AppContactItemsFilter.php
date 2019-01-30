@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppContactItemsFilter extends Default_Model_AppContactItemsFilterBase {
+namespace Application\Model;
+
+class AppContactItemsFilter extends AppContactItemsFilterBase {
 }

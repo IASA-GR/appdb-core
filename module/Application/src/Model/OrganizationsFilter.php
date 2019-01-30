@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_OrganizationsFilter extends Default_Model_OrganizationsFilterBase {
+namespace Application\Model;
+
+class OrganizationsFilter extends OrganizationsFilterBase {
 }

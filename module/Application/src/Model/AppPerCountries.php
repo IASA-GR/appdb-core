@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppPerCountries extends Default_Model_AppPerCountriesBase
+namespace Application\Model;
+
+class AppPerCountries extends AppPerCountriesBase
 {
 
 }

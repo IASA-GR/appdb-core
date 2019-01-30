@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_ResearchersApp extends Default_Model_ResearchersAppBase
+namespace Application\Model;
+
+class ResearchersApp extends ResearchersAppBase
 {
 
 }

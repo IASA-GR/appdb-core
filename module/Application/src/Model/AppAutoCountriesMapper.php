@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppAutoCountriesMapper extends Default_Model_AppAutoCountriesMapperBase
+namespace Application\Model;
+
+class AppAutoCountriesMapper extends AppAutoCountriesMapperBase
 {
 
 }

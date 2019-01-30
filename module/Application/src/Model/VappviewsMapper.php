@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VappviewsMapper extends Default_Model_VappviewsMapperBase
+namespace Application\Model;
+
+class VappviewsMapper extends VappviewsMapperBase
 {
 
 }

@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppArchsMapper extends Default_Model_AppArchsMapperBase
+namespace Application\Model;
+
+class AppArchsMapper extends AppArchsMapperBase
 {
 
 }

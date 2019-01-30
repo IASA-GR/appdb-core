@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Messages extends Default_Model_MessagesBase
+namespace Application\Model;
+
+class Messages extends MessagesBase
 {
 	function unreadCount() {
 		$c = 0;

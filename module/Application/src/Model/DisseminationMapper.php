@@ -16,14 +16,16 @@
  */
 ?>
 <?php
-class Default_Model_DisseminationMapper extends Default_Model_DisseminationMapperBase
+namespace Application\Model;
+
+class DisseminationMapper extends DisseminationMapperBase
 {
 	public function populate(&$entry, $row) {
 		parent::populate($entry,$row);
 		$entry->setRecipients(pg_to_php_array($row->recipients));
 	}
 
-	public function save(Default_Model_DisseminationEntry $value) {
+	public function save(AROItem $value) {
 		$rec = $value->recipients;
 		$value->recipients = php_to_pg_array($value->recipients, true);
 		parent::save($value);
@@ -128,7 +130,7 @@ class Default_Model_DisseminationMapper extends Default_Model_DisseminationMappe
 			if ( $format === 'xml' ) {
 				$entry = $row->data;
 			} else {
-				$entry = new Default_Model_DisseminationEntry();
+				$entry = new DisseminationEntry();
 				$this->populate($entry,$row);
 			}
 			$entries[] = $entry;

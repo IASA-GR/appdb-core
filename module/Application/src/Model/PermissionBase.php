@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_PermissionBase
+namespace Application\Model;
+
+class PermissionBase
 {
 	protected $_mapper;
 	protected $_id;
@@ -108,7 +110,7 @@ class Default_Model_PermissionBase
 	public function getAction()
 	{
 		if ( $this->_action === null ) {
-			$Actions = new Default_Model_Actions();
+			$Actions = new Actions();
 			$Actions->filter->id->equals($this->getActionID());
 			if ($Actions->count() > 0) $this->_action = $Actions->items[0];
 		}
@@ -147,7 +149,7 @@ class Default_Model_PermissionBase
 	public function getMapper()
 	{
 		if (null === $this->_mapper) {
-			$this->setMapper(new Default_Model_PermissionsMapper());
+			$this->setMapper(new PermissionsMapper());
 		}
 		return $this->_mapper;
 	}

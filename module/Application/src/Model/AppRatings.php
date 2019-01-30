@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppRatings extends Default_Model_AppRatingsBase
+namespace Application\Model;
+
+class AppRatings extends AppRatingsBase
 {
 	public function refresh($format = '', $userid = '', $xmldetailed = false)
 	{

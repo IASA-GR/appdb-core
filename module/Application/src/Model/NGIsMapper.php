@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_NGIsMapper extends Default_Model_NGIsMapperBase
+namespace Application\Model;
+
+class NGIsMapper extends NGIsMapperBase
 {
 	public function populate(&$entry, $row) {
 		parent::populate($entry,$row);

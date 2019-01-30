@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Contexts extends Default_Model_ContextsBase
+namespace Application\Model;
+
+class Contexts extends ContextsBase
 {
 
 }

@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_OS extends Default_Model_OSBase
+namespace Application\Model;
+
+class OS extends OSBase
 {
 	public function toXML($recursive=false) {
 		$xml = '';

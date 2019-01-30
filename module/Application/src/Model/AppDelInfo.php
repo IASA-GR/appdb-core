@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AppDelInfo extends Default_Model_AppDelInfoBase
+namespace Application\Model;
+
+class AppDelInfo extends AppDelInfoBase
 {
 
 }

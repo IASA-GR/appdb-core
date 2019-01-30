@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_PplContactsFilter extends Default_Model_PplContactsFilterBase {
+namespace Application\Model;
+
+class PplContactsFilter extends PplContactsFilterBase {
 }

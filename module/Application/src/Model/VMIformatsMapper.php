@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VMIformatsMapper extends Default_Model_VMIformatsMapperBase
+namespace Application\Model;
+
+class VMIformatsMapper extends VMIformatsMapperBase
 {
 
 }

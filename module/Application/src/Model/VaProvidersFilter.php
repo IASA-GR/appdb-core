@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VaProvidersFilter extends Default_Model_VaProvidersFilterBase {
+namespace Application\Model;
+
+class VaProvidersFilter extends VaProvidersFilterBase {
 }

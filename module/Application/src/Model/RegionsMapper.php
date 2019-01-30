@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_RegionsMapper extends Default_Model_RegionsMapperBase
+namespace Application\Model;
+
+class RegionsMapper extends RegionsMapperBase
 {
 	public function fetchAll($filter = null, $format = '') {
 		if ($format == '') {

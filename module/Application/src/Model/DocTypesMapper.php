@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_DocTypesMapper extends Default_Model_DocTypesMapperBase
+namespace Application\Model;
+
+class DocTypesMapper extends DocTypesMapperBase
 {
 
 }

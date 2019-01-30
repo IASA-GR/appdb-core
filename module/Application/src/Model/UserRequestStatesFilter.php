@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_UserRequestStatesFilter extends Default_Model_UserRequestStatesFilterBase {
+namespace Application\Model;
+
+class UserRequestStatesFilter extends UserRequestStatesFilterBase {
 }

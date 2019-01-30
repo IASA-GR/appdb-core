@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ContactTypesMapper extends Default_Model_ContactTypesMapperBase
+namespace Application\Model;
+
+class ContactTypesMapper extends ContactTypesMapperBase
 {
 	public function fetchAll($filter = null, $format = '') {
 		if ($format == '') {

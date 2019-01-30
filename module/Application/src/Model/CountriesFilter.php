@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_CountriesFilter extends Default_Model_CountriesFilterBase {
+namespace Application\Model;
+
+class CountriesFilter extends CountriesFilterBase {
 	public function __construct() {
 		parent::__construct();
 		$this->_fields[] = 'any.any';

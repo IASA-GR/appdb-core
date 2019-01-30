@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VMISupportedContextFormatsFilterBase extends Default_Model_Filter {
+namespace Application\Model;
+
+class VMISupportedContextFormatsFilterBase extends Filter {
 	public function __construct() {
 		parent::__construct();
 		$this->setDialect(0);

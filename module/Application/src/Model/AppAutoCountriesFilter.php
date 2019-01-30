@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppAutoCountriesFilter extends Default_Model_AppAutoCountriesFilterBase {
+namespace Application\Model;
+
+class AppAutoCountriesFilter extends AppAutoCountriesFilterBase {
 }

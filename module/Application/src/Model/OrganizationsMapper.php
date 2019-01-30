@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_OrganizationsMapper extends Default_Model_OrganizationsMapperBase
+namespace Application\Model;
+
+class OrganizationsMapper extends OrganizationsMapperBase
 {
 
 }

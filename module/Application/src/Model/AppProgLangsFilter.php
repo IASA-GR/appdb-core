@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppProgLangsFilter extends Default_Model_AppProgLangsFilterBase {
+namespace Application\Model;
+
+class AppProgLangsFilter extends AppProgLangsFilterBase {
 }

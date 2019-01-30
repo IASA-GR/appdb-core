@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_ProgLang extends Default_Model_ProgLangBase
+namespace Application\Model;
+
+class ProgLang extends ProgLangBase
 {
 	public function toXML($recursive=false) {
 		$xml = '';

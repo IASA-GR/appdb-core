@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_FundingsFilter extends Default_Model_FundingsFilterBase {
+namespace Application\Model;
+
+class FundingsFilter extends FundingsFilterBase {
 }

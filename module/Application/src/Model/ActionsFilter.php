@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_ActionsFilter extends Default_Model_ActionsFilterBase {
+namespace Application\Model;
+
+class ActionsFilter extends ActionsFilterBase {
 }

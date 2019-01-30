@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VMIinstancesFilter extends Default_Model_VMIinstancesFilterBase {
+namespace Application\Model;
+
+class VMIinstancesFilter extends VMIinstancesFilterBase {
 }

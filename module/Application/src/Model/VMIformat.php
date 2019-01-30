@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VMIformat extends Default_Model_VMIformatBase
+namespace Application\Model;
+
+class VMIformat extends VMIformatBase
 {
 	public function toXML($recursive=false) {
 		$xml = '';

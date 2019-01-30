@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_HarvestContactPersonsMapper extends Default_Model_HarvestContactPersonsMapperBase
+namespace Application\Model;
+
+class HarvestContactPersonsMapper extends HarvestContactPersonsMapperBase
 {
 
 }

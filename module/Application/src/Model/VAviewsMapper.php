@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VAviewsMapper extends Default_Model_VAviewsMapperBase
+namespace Application\Model;
+
+class VAviewsMapper extends VAviewsMapperBase
 {
 
 }

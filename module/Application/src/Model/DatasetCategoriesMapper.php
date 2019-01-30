@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_DatasetCategoriesMapper extends Default_Model_DatasetCategoriesMapperBase
+namespace Application\Model;
+
+class DatasetCategoriesMapper extends DatasetCategoriesMapperBase
 {
 
 }

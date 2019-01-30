@@ -98,7 +98,7 @@ class Application extends ApplicationBase {
 
 	public function getNGIs() {
 		if ($this->_ngis === null) {
-			$ngis = new Default_Model_NGIs();
+			$ngis = new NGIs();
 			$ids = array();
 			foreach ($this->countries as $c) $ids[] = $c->id;
 			if (count($ids) == 0) {
@@ -113,7 +113,7 @@ class Application extends ApplicationBase {
 
 	public function getUrls() {
 		if ($this->_urls === null) {
-			$urls = new Default_Model_AppUrls();
+			$urls = new AppUrls();
 			$urls->filter->appid->equals($this->id);
 			$this->_urls = $urls;
 		}
@@ -122,7 +122,7 @@ class Application extends ApplicationBase {
 
 	public function getCountries() {
 		if ($this->_countries === null) {
-			$cs = new Default_Model_AppCountries();
+			$cs = new AppCountries();
 			$cs->filter->appid->equals($this->id);
 			$this->_countries = $cs;
 		}
@@ -131,8 +131,8 @@ class Application extends ApplicationBase {
 
 	public function getRegions() {
 		if ($this->_regions === null) {
-			$regs = new Default_Model_Regions();
-			$rs = new Default_Model_AppCountries();
+			$regs = new Regions();
+			$rs = new AppCountries();
 			$rs->filter->appid->equals($this->id);
 			$ids = array();
 			foreach ($rs->items as $r) $ids[] = $r->regionID;
@@ -148,14 +148,14 @@ class Application extends ApplicationBase {
 
 	public function getVOs() {
 		if ($this->_VOs === null) {
-			$vos = new Default_Model_AppVOs();
+			$vos = new AppVOs();
 			$vos->filter->appid->equals($this->id);
 			$ids = array();
 			foreach ($vos->items as $vo) $ids[] = $vo->voID;
 			if (count($ids) == 0) {
 				$this->_VOs = array();
 			} else {
-				$v = new Default_Model_VOs();
+				$v = new VOs();
 				$v->filter->id->in($ids);
 				$this->_VOs = $v;
 			}
@@ -165,14 +165,14 @@ class Application extends ApplicationBase {
 
 	public function getResearchers() {
 		if ($this->_researchers === null) {
-			$r = new Default_Model_ResearchersApps();
+			$r = new ResearchersApps();
 			$r->filter->appid->equals($this->id);
 			$ids = array();
 			foreach ($r->items as $i) $ids[] = $i->researcherID;
 			if (count($ids) == 0) {
 				$this->_researchers = array();
 			} else {
-				$rr = new Default_Model_Researchers();
+				$rr = new Researchers();
 				$rr->filter->id->in($ids);
 				$this->_researchers = $rr;
 			}
@@ -182,7 +182,7 @@ class Application extends ApplicationBase {
 
 	public function getDocuments() {
 		if ($this->_documents === null) {
-			$docs = new Default_Model_AppDocuments();
+			$docs = new AppDocuments();
 			$docs->filter->appid->equals($this->id);
 			$this->_documents = $docs;
 		}
@@ -191,7 +191,7 @@ class Application extends ApplicationBase {
 
 	public function getMiddlewares() {
 		if ($this->_middlewares === null) {
-				$appmws = new Default_Model_AppMiddlewares();
+				$appmws = new AppMiddlewares();
 				$appmws->filter->appid->equals($this->id);
 				$this->_middlewares = $appmws;
 		}
@@ -202,8 +202,8 @@ class Application extends ApplicationBase {
 	
 //	public function getMiddlewares() {
 //		if ($this->_middlewares === null) {
-//			$mws = new Default_Model_Middlewares();
-//			$appmws = new Default_Model_AppMiddlewares();
+//			$mws = new Middlewares();
+//			$appmws = new AppMiddlewares();
 //			$appmws->filter->appid->equals($this->id);
 //			$ids = array();
 //			foreach ($appmws->items as $mw) $ids[] = $mw->middlewareID;
@@ -219,7 +219,7 @@ class Application extends ApplicationBase {
 
 	public function getRelatedApps() {
 		if ( $this->_relatedApps === null ) {
-			if ($this->id !== null) $this->_relatedApps = new Default_Model_RelatedApplications($this->id);
+			if ($this->id !== null) $this->_relatedApps = new RelatedApplications($this->id);
 		}
 		return $this->_relatedApps;
 	}
@@ -251,7 +251,7 @@ class Application extends ApplicationBase {
 			if ( ( $this->categoryid == '' ) || ( is_array($this->categoryid) && count($this->categoryid) == 0 ) ) {
 				$this->_categories = array();		
 			} else {
-				$ds = new Default_Model_AppCategories();
+				$ds = new AppCategories();
 				$ds->filter->categoryid->in($this->categoryid)->and($ds->filter->appid->equals($this->id));
 				if ( count($ds->items) > 0 ) {
 					$this->_categories = $ds->items;
@@ -266,7 +266,7 @@ class Application extends ApplicationBase {
 			if ( ( $this->disciplineid == '' ) || ( is_array($this->disciplineid) && count($this->disciplineid) == 0 ) ) {
 				$this->_disciplines = array();		
 			} else {
-				$ds = new Default_Model_Disciplines();
+				$ds = new Disciplines();
 				$ds->filter->id->in($this->disciplineid);
 				if ( count($ds->items) > 0 ) {
 					$this->_disciplines = $ds->items;
@@ -319,7 +319,7 @@ class Application extends ApplicationBase {
 		if ($this->moderated) {
 			if ( $this->_modInfo !== null ) $this->_modInfo->save();	
 		} else {
-			$mis = new Default_Model_AppModInfos();
+			$mis = new AppModInfos();
 			$mis->filter->id->equals($this->id);
 			if ( count($mis->items) > 0 ) {
 				$tmp = $mis->items[0];
@@ -329,7 +329,7 @@ class Application extends ApplicationBase {
 		if ($this->deleted) {
 			if ( $this->_delInfo !== null ) $this->_delInfo->save();	
 		} else {
-			$dis = new Default_Model_AppDelInfos();
+			$dis = new AppDelInfos();
 			$dis->filter->id->equals($this->id);
 			if ( count($dis->items) > 0 ) {
 				$tmp = $dis->items[0];
@@ -340,12 +340,12 @@ class Application extends ApplicationBase {
 
 	public function getModInfo() {
 		if ( $this->_modInfo === null ) {
-			$mis = new Default_Model_AppModInfos();
+			$mis = new AppModInfos();
 			$mis->filter->appid->equals($this->id);
 			if ( count($mis->items) > 0 ) {
 				$this->_modInfo	= $mis->items[0];
 			} else {
-				$this->_modInfo = new Default_Model_AppModInfo();
+				$this->_modInfo = new AppModInfo();
 				$this->_modInfo->appid = $this->id;
 			}
 		}
@@ -354,12 +354,12 @@ class Application extends ApplicationBase {
 
 	public function getDelInfo() {
 		if ( $this->_delInfo === null ) {
-			$dis = new Default_Model_AppDelInfos();
+			$dis = new AppDelInfos();
 			$dis->filter->appid->equals($this->id);
 			if ( count($dis->items) > 0 ) {
 				$this->_delInfo = $dis->items[0];
 			} else {
-				$this->_delInfo = new Default_Model_AppDelInfo();
+				$this->_delInfo = new AppDelInfo();
 				$this->_delInfo->appid = $this->id;
 			}
 		}

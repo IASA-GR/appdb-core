@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_DocType extends Default_Model_DocTypeBase
+namespace Application\Model;
+
+class DocType extends DocTypeBase
 {
 
 }

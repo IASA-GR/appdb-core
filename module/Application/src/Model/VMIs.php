@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VMIs extends Default_Model_VMIsBase
+namespace Application\Model;
+
+class VMIs extends VMIsBase
 {
 
 }

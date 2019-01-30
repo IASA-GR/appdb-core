@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_CountryRegionsMapper extends Default_Model_CountryRegionsMapperBase
+namespace Application\Model;
+
+class CountryRegionsMapper extends CountryRegionsMapperBase
 {
 
 }

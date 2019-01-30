@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AccountTypesFilter extends Default_Model_AccountTypesFilterBase {
+namespace Application\Model;
+
+class AccountTypesFilter extends AccountTypesFilterBase {
 }

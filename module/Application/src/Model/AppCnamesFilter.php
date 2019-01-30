@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppCnamesFilter extends Default_Model_AppCnamesFilterBase {
+namespace Application\Model;
+
+class AppCnamesFilter extends AppCnamesFilterBase {
 }

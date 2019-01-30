@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Statuses extends Default_Model_StatusesBase
+namespace Application\Model;
+
+class Statuses extends StatusesBase
 {
 	public function refresh($format = '')
 	{

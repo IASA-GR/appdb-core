@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_UserPrivs
+namespace Application\Model;
+
+class UserPrivs
 {
 	protected $_actor;
 	protected $_items;
@@ -102,7 +104,7 @@ class Default_Model_UserPrivs
 		// refresh privs if stale for more than 600s (10m)
 		if ( ($this->_items === null) || ($this->_privStamp === null) || ((time() - $this->_privStamp)>600) ) $this->refresh();
 		if (is_object($target)) $target = $target->guid;
-		if ( ($target === null) && ( ($actionID === null) || in_array($actionID, Default_Model_UserPrivs::appActions()) ) ) return true; //GUID is NULL, meaning this is a new entry: ALLOW
+		if ( ($target === null) && ( ($actionID === null) || in_array($actionID, UserPrivs::appActions()) ) ) return true; //GUID is NULL, meaning this is a new entry: ALLOW
 		$actions = array();
 		if ($actionID === null) {
 			// any app-related permission

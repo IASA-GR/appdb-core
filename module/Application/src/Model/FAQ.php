@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_FAQ extends Default_Model_FAQBase
+namespace Application\Model;
+
+class FAQ extends FAQBase
 {
 	public function __set($name,$value)
 	{

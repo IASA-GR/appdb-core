@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_VOMembersMapper extends Default_Model_VOMembersMapperBase
+namespace Application\Model;
+
+class VOMembersMapper extends VOMembersMapperBase
 {
 //	public function count($filter = null) {
 //		//$ores = parent::fetchAll(null);
@@ -24,7 +26,7 @@ class Default_Model_VOMembersMapper extends Default_Model_VOMembersMapperBase
 //		//foreach ($ores as $i) {
 //		//	$ids[] = $i->void;
 //		//}
-//		//$res = new Default_Model_VOs();
+//		//$res = new VOs();
 //		//$res->filter->id->in($ids);
 //		//if ($filter !== null) {
 //		//	$res->filter->chain($filter, "AND");
@@ -40,7 +42,7 @@ class Default_Model_VOMembersMapper extends Default_Model_VOMembersMapperBase
 			foreach ($ores as $i) {
 				$ids[] = $i->void;
 			}
-			$res = new Default_Model_VOs();
+			$res = new VOs();
 			$res->filter->id->in($ids);
 			if ($filter !== null) {
 				$res->filter->chain($filter, "AND");

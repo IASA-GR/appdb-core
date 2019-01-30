@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_AppLicensesMapper extends Default_Model_AppLicensesMapperBase
+namespace Application\Model;
+
+class AppLicensesMapper extends AppLicensesMapperBase
 {
 
 }

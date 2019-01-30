@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_HashFuncsFilter extends Default_Model_HashFuncsFilterBase {
+namespace Application\Model;
+
+class HashFuncsFilter extends HashFuncsFilterBase {
 }

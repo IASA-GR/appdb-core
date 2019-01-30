@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_AccountTypes extends Default_Model_AccountTypesBase
+namespace Application\Model;
+
+class AccountTypes extends AccountTypesBase
 {
 
 }

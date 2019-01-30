@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_HypervisorsFilter extends Default_Model_HypervisorsFilterBase {
+namespace Application\Model;
+
+class HypervisorsFilter extends HypervisorsFilterBase {
 }

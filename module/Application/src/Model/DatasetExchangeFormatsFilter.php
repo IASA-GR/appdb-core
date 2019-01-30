@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_DatasetExchangeFormatsFilter extends Default_Model_DatasetExchangeFormatsFilterBase {
+namespace Application\Model;
+
+class DatasetExchangeFormatsFilter extends DatasetExchangeFormatsFilterBase {
 }

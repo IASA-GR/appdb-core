@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ContextScriptAssocsMapper extends Default_Model_ContextScriptAssocsMapperBase
+namespace Application\Model;
+
+class ContextScriptAssocsMapper extends ContextScriptAssocsMapperBase
 {
 
 }

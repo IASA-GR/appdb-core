@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Funding extends Default_Model_FundingBase
+namespace Application\Model;
+
+class Funding extends FundingBase
 {
 
 }

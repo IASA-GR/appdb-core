@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Datasets extends Default_Model_DatasetsBase
+namespace Application\Model;
+
+class Datasets extends DatasetsBase
 {
   public $flat = false;
 

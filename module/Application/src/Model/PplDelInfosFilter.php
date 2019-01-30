@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_PplDelInfosFilter extends Default_Model_PplDelInfosFilterBase {
+namespace Application\Model;
+
+class PplDelInfosFilter extends PplDelInfosFilterBase {
 }

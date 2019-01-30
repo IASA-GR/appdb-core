@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Projects extends Default_Model_ProjectsBase
+namespace Application\Model;
+
+class Projects extends ProjectsBase
 {
 
 }

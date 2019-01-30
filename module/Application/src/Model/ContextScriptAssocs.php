@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_ContextScriptAssocs extends Default_Model_ContextScriptAssocsBase
+namespace Application\Model;
+
+class ContextScriptAssocs extends ContextScriptAssocsBase
 {
 
 }

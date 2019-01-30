@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Subdomain extends Default_Model_SubdomainBase
+namespace Application\Model;
+
+class Subdomain extends SubdomainBase
 {
 
 }

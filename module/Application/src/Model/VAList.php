@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VAList extends Default_Model_VAListBase
+namespace Application\Model;
+
+class VAList extends VAListBase
 {
 	public function delete(){
 		$this->getMapper()->delete($this);

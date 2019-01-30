@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_VMISupportedContextFormatsFilter extends Default_Model_VMISupportedContextFormatsFilterBase {
+namespace Application\Model;
+
+class VMISupportedContextFormatsFilter extends VMISupportedContextFormatsFilterBase {
 }

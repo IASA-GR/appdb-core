@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_Disciplines extends Default_Model_DisciplinesBase
+namespace Application\Model;
+
+class Disciplines extends DisciplinesBase
 {
 	public function refresh($format = '', $xmldetailed = false) {
 		if ( $format === 'xml') {

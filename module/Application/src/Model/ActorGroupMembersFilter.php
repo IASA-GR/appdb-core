@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_ActorGroupMembersFilter extends Default_Model_ActorGroupMembersFilterBase {
+namespace Application\Model;
+
+class ActorGroupMembersFilter extends ActorGroupMembersFilterBase {
 }

@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_ContextFormats extends Default_Model_ContextFormatsBase
+namespace Application\Model;
+
+class ContextFormats extends ContextFormatsBase
 {
 
 }

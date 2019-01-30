@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_OSFamiliesFilter extends Default_Model_OSFamiliesFilterBase {
+namespace Application\Model;
+
+class OSFamiliesFilter extends OSFamiliesFilterBase {
 }

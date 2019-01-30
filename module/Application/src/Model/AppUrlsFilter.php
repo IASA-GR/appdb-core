@@ -16,5 +16,7 @@
  */
 ?>
 <?php
-class Default_Model_AppUrlsFilter extends Default_Model_AppUrlsFilterBase {
+namespace Application\Model;
+
+class AppUrlsFilter extends AppUrlsFilterBase {
 }

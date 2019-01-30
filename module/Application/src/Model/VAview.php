@@ -17,7 +17,9 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
-class Default_Model_VAview extends Default_Model_VAviewBase
+namespace Application\Model;
+
+class VAview extends VAviewBase
 {
 
 }

@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_EntitysourcesFilterBase extends Default_Model_Filter {
+namespace Application\Model;
+
+class EntitysourcesFilterBase extends Filter {
 	public function __construct() {
 		parent::__construct();
 		$this->setDialect(0);

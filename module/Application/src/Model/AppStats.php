@@ -16,7 +16,9 @@
  */
 ?>
 <?php 
-class Default_Model_AppStats
+namespace Application\Model;
+
+class AppStats
 {
 	protected $_db;
 	protected $_where = '';
@@ -44,7 +46,7 @@ class Default_Model_AppStats
 	
 	public function setFilter($criteria)
 	{
-		$apps = new Default_Model_Applications();
+		$apps = new Applications();
 		$f = null;
 		foreach ($criteria as $k => $v) {
 			if ($f === null) {

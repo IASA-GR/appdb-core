@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_PrivilegesFilterBase extends Default_Model_Filter {
+namespace Application\Model;
+
+class PrivilegesFilterBase extends Filter {
 	public function __construct() {
 		parent::__construct();
 		$this->setDialect(0);

@@ -16,7 +16,9 @@
  */
 ?>
 <?php
-class Default_Model_ProjectsFilterBase extends Default_Model_Filter {
+namespace Application\Model;
+
+class ProjectsFilterBase extends Filter {
 	public function __construct() {
 		parent::__construct();
 		$this->setDialect(0);
