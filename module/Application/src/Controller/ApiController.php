@@ -95,7 +95,6 @@ class ApiController extends AbstractActionController
     private function handleResource($res) {
 		$ok = true;
 		if ( class_exists($res) ) {
-			error_log(var_export($this->pars, true));
             $r = new $res($this->pars);
             $r->startLogging($_SERVER['APPLICATION_PATH'] .'/appdbapilog.xml');
 		} else $ok = false;
