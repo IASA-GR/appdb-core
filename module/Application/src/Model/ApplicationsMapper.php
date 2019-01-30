@@ -153,7 +153,7 @@ class ApplicationsMapper extends ApplicationsMapperBase
 						$sss->where($ex);
 						//getZendSelectParts($sss, $f, $w, $orderby, $limit);
 						if ( $f == '' ) $f= 'FROM applications';
-						//$f = fixuZenduBuguru($f);
+						$f = fixuZenduBuguru($f);
 						$where[] = $w;
 						$from[] = $f;
 					}
@@ -161,7 +161,7 @@ class ApplicationsMapper extends ApplicationsMapperBase
 			} else {
 				$select->where($filter->expr());
 				getZendSelectParts($select, $from, $where, $orderby, $limit);
-				//$from = fixuZenduBuguru($from);
+				$from = fixuZenduBuguru($from);
 				if ( $from == '' ) $from = 'FROM applications';
 			}
 		} else {
@@ -311,7 +311,7 @@ class ApplicationsMapper extends ApplicationsMapperBase
 				}
 			} else {
 				getZendSelectParts($select, $from, $where, $orderby, $limit);
-				//$from = fixuZenduBuguru($from);
+				$from = fixuZenduBuguru($from);
 			}
 
 			if ( isset($_orderby) && trim($_orderby) !== "" ) $orderby = 'ORDER BY ' . $_orderby;	# TODO: FIX NULLS FIRST/LAST bypass
