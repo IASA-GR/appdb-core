@@ -23,18 +23,17 @@ use Zend\View\Model\ViewModel;
 class PeopleController extends AbstractActionController
 {
 
-    public function init()
+    public function __construct()
     {
+		$this->view = new ViewModel();
         $this->session = new \Zend\Session\Container('base');
-        $contextSwitch = $this->_helper->getHelper('contextSwitch');
-        $contextSwitch->addActionContext('index', 'xml')
-						->addActionContext('details', 'xml')
-                      ->initContext();
+//        $contextSwitch = $this->_helper->getHelper('contextSwitch');
+//        $contextSwitch->addActionContext('index', 'xml')
+//						->addActionContext('details', 'xml')
+//                      ->initContext();
     }
 
     public function nodisseminationAction() {
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
       	header("Content-Type:text/xml");
         echo "<" . "?xml version='1.0'?" . ">";
         if ($this->session->userid !== null) {
@@ -48,7 +47,8 @@ class PeopleController extends AbstractActionController
             echo '<response value="'.($r->noDissemination?"true":"false").'"/>';
         } else {
 			echo "<response error='Must be logged in'>unauthorized</response>";
-        }
+		}
+		return DISABLE_LAYOUT($this, true);
     }
 
         public function validateprofileAction() {
@@ -167,7 +167,7 @@ class PeopleController extends AbstractActionController
 		foreach ($items as $item) {
 			$image = base64_decode(pg_unescape_bytea($item->image));
 			if (is_string($image) && ($image != '')) {
-				$f = fopen($_SERVER['APPLICATION_PATH'] . "/../cache/ppl-image-".$item->id.".png","w");
+				$f = fopen($_SERVER['APPLICATION_PATH'] . "/../../cache/ppl-image-".$item->id.".png","w");
 				$image = base64_decode(pg_unescape_bytea($item->image));
 				fwrite($f, $image);
 				fclose($f);
@@ -241,21 +241,18 @@ class PeopleController extends AbstractActionController
 
     public function getimageAction()
 	{
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
-
 		if ($this->session->userid === null || intval($this->session->userid)<=0) {
-			$image = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../public/images/" . "person.png");
+			$image = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../../public/images/" . "person.png");
 			header('Content-type: image/png');
 			echo $image;
-			return;
+			return DISABLE_LAYOUT($this, true);
 		}
 
 		if ( (GET_REQUEST_PARAM($this, "id") == "0") || (GET_REQUEST_PARAM($this, "id") == '')) {
 			$image = 'NULL';
 		} else {
 			if ( file_exists($_SERVER['APPLICATION_PATH'] . "/../cache/ppl-image-".GET_REQUEST_PARAM($this, "id").".png") ) {
-                $image = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../cache/ppl-image-".GET_REQUEST_PARAM($this, "id").".png");
+                $image = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../../data/cache/ppl-image-".GET_REQUEST_PARAM($this, "id").".png");
 			} else {
 				$ppl = new Default_Model_Researchers();
 				$ppl->filter->id->equals(GET_REQUEST_PARAM($this, "id"));
@@ -264,10 +261,11 @@ class PeopleController extends AbstractActionController
 			}
 		}
         if (empty($image) || ($image == 'NULL') ) {
-			$image = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../public/images/" . "person.png");
+			$image = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../../public/images/" . "person.png");
 		}
 		header('Content-type: image/png');
 		echo $image;
+		return DISABLE_LAYOUT($this, true);
 	}
 
     public function detailsAction()
@@ -349,7 +347,7 @@ class PeopleController extends AbstractActionController
 	}
 
 	public function details2Action(){
-        $this->_helper->layout->disableLayout();
+		return DISABLE_LAYOUT($this);
     }
 
 	public function permreqAction()
@@ -551,8 +549,8 @@ class PeopleController extends AbstractActionController
 			$oldRoleID = $entry->positionTypeID;
 			$entry->positionTypeID = $_POST['positionTypeID'];
 			if ($_POST['newimage'] !== "") {
-				$imgfile = $_SERVER['APPLICATION_PATH']."/../public/".$_POST['newimage'];
-				if ( file_exists($_SERVER['APPLICATION_PATH'] . "/../cache/ppl-image-".$entry->id.".png") ) unlink($_SERVER['APPLICATION_PATH'] . "/../cache/ppl-image-".$entry->id.".png");
+				$imgfile = $_SERVER['APPLICATION_PATH'] . "/../../public/" . $_POST['newimage'];
+				if ( file_exists($_SERVER['APPLICATION_PATH'] . "/../../data/cache/ppl-image-".$entry->id.".png") ) unlink($_SERVER['APPLICATION_PATH'] . "/../../data/cache/ppl-image-".$entry->id.".png");
 				$entry->image = pg_escape_bytea(base64_encode(file_get_contents($imgfile)));
 			}
 
@@ -615,7 +613,7 @@ class PeopleController extends AbstractActionController
     public function uploadimageAction() {
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
-		$upload_path = $_SERVER['APPLICATION_PATH']."/../public/upload/pplimage/";         //relative to this file
+		$upload_path = $_SERVER['APPLICATION_PATH'] . "/../../public/upload/pplimage/";         //relative to this file
 		$data = "";
 		$file= "";
 		foreach ($_FILES as $ufiledata) {
