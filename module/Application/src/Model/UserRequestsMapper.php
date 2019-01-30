@@ -22,35 +22,42 @@ class UserRequestsMapper extends UserRequestsMapperBase
 {
 	private function joins(&$select, $filter) {
 		if ( is_array($filter->joins) ) {
-			if (in_array("researchers", $filter->joins)) $select->joinLeft('researchers', 'researchers.guid = userrequests.userguid', array());
-			if (in_array("actor_groups", $filter->joins)) $select->joinLeft('actor_groups', 'actor_groups.guid = userrequests.targetguid', array());
-			if (in_array("userrequesttypes", $filter->joins)) $select->joinLeft('userrequesttypes','userrequesttypes.id = userrequests.typeid', array());
-			if (in_array("userrequeststates", $filter->joins)) $select->joinLeft('userrequeststates','userrequeststates.id = userrequests.stateid', array());
+			if (in_array("researchers", $filter->joins)) $select->join('researchers', 'researchers.guid = userrequests.userguid', array(), 'left');
+			if (in_array("actor_groups", $filter->joins)) $select->join('actor_groups', 'actor_groups.guid = userrequests.targetguid', array(), 'left');
+			if (in_array("userrequesttypes", $filter->joins)) $select->join('userrequesttypes','userrequesttypes.id = userrequests.typeid', array(), 'left');
+			if (in_array("userrequeststates", $filter->joins)) $select->join('userrequeststates','userrequeststates.id = userrequests.stateid', array(), 'left');
 			if (in_array("permissions", $filter->joins)) {
-				$select->joinLeft('permissions','permissions.object = userrequests.guid OR permissions.object IS NULL', array());
+				$select->join('permissions','permissions.object = userrequests.guid OR permissions.object IS NULL', array(), 'left');
 				$select->where('permissions.actionid = 25');
 			}
 		}
 	}
 	
 	public function fetchAll($filter = null, $format = '') {
-		$select = $this->getDbTable()->select();
-		$executor = $this->getDbTable();
+		$from = '';
+		$where = '';
+		$orderby = '';
+		$limit = '';
+		$select = $this->getDbTable()->getSql()->select();
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
-			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('userrequests');
+			$select->quantifier('DISTINCT');
 			$this->joins($select, $filter);
 			$select->where($filter->expr());
-			$executor = $this->getDbTable()->getAdapter();
-			$executor->setFetchMode(Zend_Db::FETCH_OBJ);
 		}
-		if ($filter !== null) $select->limit($filter->limit, $filter->offset);
-		if ($filter !== null) $select->order($filter->orderBy);
-		
-		$resultSet = $executor->fetchAll($select);
+		if ($filter !== null) {
+			if (! is_null($filter->limit)) $select->limit($filter->limit);
+			if (! is_null($filter->offset)) $select->offset($filter->offset);
+			if (! is_null($filter->orderBy)) $select->order($filter->orderBy);
+		}
+		getZendSelectParts($select, $from, $where, $orderby, $limit);
+		$from = fixuZenduBuguru($from);
+		$select = (new \Zend\Db\Sql\Sql($this->getDbTable()->getAdapter()))->getSqlStringForSqlObject($select);
+		$select = str_replace('"IS" "NULL"', 'IS NULL', $select);
+		$resultSet = db()->query($select, array())->toArray(); 
 		$entries = array();
 		foreach ($resultSet as $row) {
 			$entry = new UserRequest();
-			$this->populate($entry,$row);
+			$this->populate($entry, $row);
 			$entries[] = $entry;
 		}		
 		return $entries;
