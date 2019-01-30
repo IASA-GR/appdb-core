@@ -98,7 +98,6 @@ class AROMapper {
 
 	public function populate(&$entry, $row)
 	{
-		//error_log(var_export($row, true));
 		foreach ($entry->properties as $p) {
 			if (! $p->isFKO) {
 				$n0 = strtolower($p->dbcol);
@@ -172,7 +171,6 @@ class AROMapper {
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
 			$select->where($filter->expr());
 		}
-		error_log(var_export($filter, true));
 		if ($filter !== null) {
 			if (! is_null($filter->limit)) $select->limit($filter->limit);
 			if (! is_null($filter->offset)) $select->offset($filter->offset);
