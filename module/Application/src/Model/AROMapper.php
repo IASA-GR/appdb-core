@@ -140,7 +140,14 @@ class AROMapper {
 		} else {
 			$ids = $id;
 		}
-		$result = $this->getDbTable()->find($ids);
+//		$result = $this->getDbTable()->find($ids);
+		$select = $this->getDbTable()->getSql()->select();
+		$from = '';
+		$where = '';
+		$orderby = '';
+		$limit = '';
+		getZendSelectParts($select, $from, $where, $orderby, $limit);
+		$result = $this->getDbTable()->getAdapter()->query("SELECT * $from WHERE id = ?", array($ids))->toArray();
 		if (0 == count($result)) {
 			return;
 		}		
@@ -151,7 +158,6 @@ class AROMapper {
 	public function count($filter = null)
 	{
 		$select = $this->getDbTable()->getSql()->select();
-		//$select->from($this->getDbTable(),array('COUNT(DISTINCT (id)) AS count'));
 		$select->columns(array('COUNT(DISTINCT (id)) AS count'));
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
 			$select->where($filter->expr());
