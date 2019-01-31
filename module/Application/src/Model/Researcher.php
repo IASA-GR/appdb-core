@@ -45,11 +45,10 @@ class Researcher extends ResearcherBase
 
 	public function getImage() {
         if ( ! isnull($this->id) ) {
-			db()->setFetchMode(Zend_Db::FETCH_OBJ);
-			$res = db()->query("SELECT image FROM researcherimages WHERE researcherid = " . $this->id)->fetchAll();
+			$res = db()->query("SELECT image FROM researcherimages WHERE researcherid = ?", array($this->id))->toArray();
 			if ( count($res) > 0 ) {
-				if ($res[0]->image !== null) {
-					$image = stream_get_contents($res[0]->image);
+				if (! is_null($res[0]['image'])) {
+					$image = stream_get_contents($res[0]['image']);
 					return $image;
 				} else {
 					return null;
@@ -87,10 +86,7 @@ class Researcher extends ResearcherBase
 
 	public function setLastLogin($v) {
 		if (is_numeric($v)) { //asume UNIX timestamp
-			global $application;
-			$db = $application->getBootstrap()->getResource('db');
-			$db->setFetchMode(Zend_Db::FETCH_BOTH);
-			$res = $db->query("SELECT TIMESTAMP 'epoch' + $v * INTERVAL '1 second'")->fetchAll();
+			$res = db()->query("SELECT TIMESTAMP 'epoch' + ? * INTERVAL '1 second'", array($v))->toArray();
 			if ( count($res) > 0 ) {
 				$this->_lastLogin = $res[0][0];
 			}
@@ -182,8 +178,7 @@ class Researcher extends ResearcherBase
                 $this->_primaryContact = $cs->items[0]->data;
             } else {
                 if ( $this->getAccountType() == 1 && $this->getID() != '' ) {
-                    db()->setFetchMode(Zend_Db::FETCH_BOTH);
-                    $res = db()->query("SELECT contacts.data FROM contacts INNER JOIN researchers ON researchers.id = contacts.researcherid INNER JOIN apikeys ON apikeys.ownerid = researchers.id WHERE contacts.contacttypeid=7 AND contacts.isprimary IS TRUE AND apikeys.sysaccountid = " . $this->getID())->fetchAll();
+                    $res = db()->query("SELECT contacts.data FROM contacts INNER JOIN researchers ON researchers.id = contacts.researcherid INNER JOIN apikeys ON apikeys.ownerid = researchers.id WHERE contacts.contacttypeid=7 AND contacts.isprimary IS TRUE AND apikeys.sysaccountid = ", array($this->getID()))->toArray();
                     if ( count($res) > 0 ) {
                         $this->_primaryContact = $res[0][0];
                     }

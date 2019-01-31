@@ -55,7 +55,6 @@ class RelatedApplications extends Applications
 	}
 
 	public function refresh($format = '', $userid = '', $xmldetailed = false) {
-		global $application;
 		$limit = '';
 		if ( isset($this->limit) ) $limit .= ' LIMIT '.$this->limit;
 		if ( isset($this->offset) ) $limit .= ' OFFSET '.$this->offset;
@@ -65,21 +64,19 @@ class RelatedApplications extends Applications
 		}
 		$where = $this->__filterItems();
 		if ($where != '') $where = ' WHERE '. $where;
-		$application->getBootstrap()->getResource('db')->setFetchMode(Zend_Db::FETCH_OBJ);
 		if ( $format === 'xml') {
-			debug_log('SELECT xmlelement(name "application:relatedapp", xmlattributes(\'http://appdb.egi.eu/api/0.2/application\' as "xmlns:application", MIN(rank) as rank,'.$this->_appid.' as parentID, (SELECT name FROM applications WHERE id = '.$this->_appid.') as parentName),app_to_xml((app).id)) as relatedapp FROM related_apps('.$this->_appid.') INNER JOIN applications ON applications.id = (app).id' . $where . ' GROUP BY app '.$having.'ORDER BY MIN(rank),(app).name'.$limit);
-			$res = $application->getBootstrap()->getResource('db')->query('SELECT xmlelement(name "application:relatedapp", xmlattributes(\'http://appdb.egi.eu/api/0.2/application\' as "xmlns:application", MIN(rank) as rank,'.$this->_appid.' as parentID, (SELECT name FROM applications WHERE id = '.$this->_appid.') as parentName),app_to_xml((app).id)) as relatedapp FROM related_apps('.$this->_appid.') INNER JOIN applications ON applications.id = (app).id' . $where . ' GROUP BY app '.$having.'ORDER BY MIN(rank),(app).name'.$limit)->fetchAll();
+			$res = db()->query('SELECT xmlelement(name "application:relatedapp", xmlattributes(\'http://appdb.egi.eu/api/0.2/application\' as "xmlns:application", MIN(rank) as rank,'.$this->_appid.' as parentID, (SELECT name FROM applications WHERE id = '. $this->_appid .') as parentName),app_to_xml((app).id)) as relatedapp FROM related_apps(' . $this->_appid .') INNER JOIN applications ON applications.id = (app).id' . $where . ' GROUP BY app '. $having .'ORDER BY MIN(rank), (app).name' . $limit, array())->toArray();
 		} else {
-			$res = $application->getBootstrap()->getResource('db')->query('SELECT DISTINCT (app).*, MIN(rank) AS rank FROM related_apps('.$this->_appid.') GROUP BY app '.$having.'ORDER BY rank,name'.$limit.';')->fetchAll();
+			$res = db()->query('SELECT DISTINCT (app).*, MIN(rank) AS rank FROM related_apps(' . $this->_appid . ') GROUP BY app '. $having . 'ORDER BY rank, name' . $limit . ';', array())->toArray();
 		}
 		$a = array();
 		foreach($res as $row) {
 			if ( $format == 'xml' ) {
-				$app = $row->relatedapp;
+				$app = $row['relatedapp'];
 			} else {
 				$app = new RelatedApplication();
 				$this->getMapper()->populate($app, $row);
-				$app->rank = $row->rank;
+				$app->rank = $row['rank'];
 			}
 			$a[] = $app;
 		}
@@ -88,8 +85,6 @@ class RelatedApplications extends Applications
 	}
 
 	public function count() {
-		global $application;
-		$application->getBootstrap()->getResource('db')->setFetchMode(Zend_Db::FETCH_OBJ);
 		$where = $this->__filterItems();
 		if ( ! $this->viewModerated ) {
 			$having = 'WHERE ((app).moderated = FALSE) AND ((app).deleted = FALSE) ';
@@ -103,7 +98,7 @@ class RelatedApplications extends Applications
 				$having = '';
 			}
 		}
-		$res = $application->getBootstrap()->getResource('db')->query('SELECT COUNT(DISTINCT app) AS count FROM related_apps('.$this->_appid.') INNER JOIN applications ON applications.id = (app).id '.$having.';')->fetchAll();
-		return $res[0]->count;
+		$res = db()->query('SELECT COUNT(DISTINCT app) AS count FROM related_apps(' . $this->_appid .') INNER JOIN applications ON applications.id = (app).id ' . $having .';', array())->toArray();
+		return $res[0]['count'];
 	}
 }

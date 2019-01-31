@@ -41,9 +41,9 @@ class Application extends ApplicationBase {
 		if ( ! isnull($this->id) ) {
 			if ( isnull($this->_relcount) ) {
 				db()->setFetchMode(Zend_Db::FETCH_OBJ);
-				$res = db()->query("SELECT relcount FROM app_release_count WHERE appid = " . $this->id)->fetchAll();
+				$res = db()->query("SELECT relcount FROM app_release_count WHERE appid = ?", array($this->id))->toArray();
 				if ( count($res) > 0 ) {
-					$this->_relcount = $res[0]->hitcount;
+					$this->_relcount = $res[0]['hitcount'];
 				}
 			}
 		}
@@ -54,9 +54,9 @@ class Application extends ApplicationBase {
 		if ( ! isnull($this->id) ) {
 			if ( isnull($this->_hitcount) ) {
 				db()->setFetchMode(Zend_Db::FETCH_OBJ);
-				$res = db()->query("SELECT count AS hitcount FROM hitcounts WHERE appid = " . $this->id)->fetchAll();
+				$res = db()->query("SELECT count AS hitcount FROM hitcounts WHERE appid = ?", array($this->id))->toArray();
 				if ( count($res) > 0 ) {
-					$this->_hitcount = $res[0]->hitcount;
+					$this->_hitcount = $res[0]['hitcount'];
 				}
 			}
 		}
@@ -71,11 +71,10 @@ class Application extends ApplicationBase {
 
 	public function getLogo() {
         if ( ! isnull($this->id) ) {
-			db()->setFetchMode(Zend_Db::FETCH_OBJ);
-			$res = db()->query("SELECT logo FROM applogos WHERE appid = " . $this->id)->fetchAll();
+			$res = db()->query("SELECT logo FROM applogos WHERE appid = ?", array($this->id))->toArray();
 			if ( count($res) > 0 ) {
-				if ($res[0]->logo !== null) {
-					$logo = stream_get_contents($res[0]->logo);
+				if ($res[0]['logo'] !== null) {
+					$logo = stream_get_contents($res[0]['logo']);
 					return $logo;
 				} else {
 					return null;
