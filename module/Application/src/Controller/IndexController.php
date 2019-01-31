@@ -93,13 +93,15 @@ class IndexController extends AbstractActionController
 		/*
 		 * Check if user is signed in from a different service or browser tab.
 		 */
-//		if( $this->session->isLocked() ){
-//			$this->session->unLock();
-//		}
+		if (! is_null($this->session)) {
+			if ($this->session->getManager()->getStorage()->isLocked()) {
+				$this->session->getManager()->getStorage()->unLock();
+			}
+		}
 
-		if( $this->session !== null && $this->session->developsession === true ){
+		if (! is_null($this->session) && $this->session->developsession === true ) {
 			//do nothing. It's local development instance where no SImpleSaml installed
-		}else{
+		} else {
 			$auth = \SamlAuth::isAuthenticated();
 			if( $auth === false ){
 				//if logged in but not authdicated the clear session

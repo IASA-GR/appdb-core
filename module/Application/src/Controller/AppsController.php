@@ -56,7 +56,7 @@ class AppsController extends AbstractActionController
     
 	private function cachelogos($items) {
 		foreach ($items as $item) {
-			$fname = $_SERVER['APPLICATION_PATH'] . "/../cache/app-logo-".$item->id.".png";
+			$fname = $_SERVER['APPLICATION_PATH'] . "/../../data/cache/app-logo-".$item->id.".png";
 			$f = fopen($fname, "w");
 			if (!isnull($item->logo)) {
 				$logo = base64_decode(pg_unescape_bytea($item->logo));
@@ -97,12 +97,12 @@ class AppsController extends AbstractActionController
 		$logo = 'NULL';
 		$tool = false;
 		if ( !( ($id == "0") || ($id == '') ) && is_numeric($id) == true )	{
-			if ( file_exists($_SERVER['APPLICATION_PATH'] . "/../cache/app-logo-" . $id . "." . "png") ) {
-				$logo = @file_get_contents($_SERVER['APPLICATION_PATH'] . "/../cache/" . $size . "app-logo-". $id . "." . $type);
+			if ( file_exists($_SERVER['APPLICATION_PATH'] . "/../../data/cache/app-logo-" . $id . "." . "png") ) {
+				$logo = @file_get_contents($_SERVER['APPLICATION_PATH'] . "/../../data/cache/" . $size . "app-logo-". $id . "." . $type);
 			} 
 			if ( $logo == 'NULL' || $logo == false || isnull($logo) ) {
 				$type = "png";
-				$apps = new Application\Model\Applications();
+				$apps = new \Application\Model\Applications();
 				$apps->filter->id->equals($id);
 				if (count($apps->items) > 0) {
 					if ( (! isnull($apps->items[0]->logo) ) && $apps->items[0]->logo !== '' )
@@ -124,22 +124,21 @@ class AppsController extends AbstractActionController
 		if ( empty($logo) || ($logo == 'NULL') ) {
 			$type = "png";
 			if ($tool) {
-				$logo = file_get_contents("images/tool.png");
+				$logo = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../../public/images/tool.png");
 			} else {
-				$logo = file_get_contents("images/app.png");
+				$logo = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../../public/images/app.png");
 			}
 		} 
 		if ($type = "jpg") $type = "jpeg";
-		header('Content-type: image/' . $type);
+		header('Content-Type: image/' . $type);
 		return $logo;
     }
 
 	public function getlogoAction() {
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
 		if ( !( (GET_REQUEST_PARAM($this, "id") == "0") || (GET_REQUEST_PARAM($this, "id") == '') ) && is_numeric(GET_REQUEST_PARAM($this, "id")) == true )	{
 			echo $this->getlogo(GET_REQUEST_PARAM($this, "id"), GET_REQUEST_PARAM($this, "size"));
 		}
+		return DISABLE_LAYOUT($this, true);
 	}
 
 	public function getfblogoAction()
@@ -154,11 +153,11 @@ class AppsController extends AbstractActionController
 			$id = $id[0];
 		}
 		if ( !( ($id == "0") || ($id == '') ) && is_numeric($id) == true )	{
-			if ( file_exists($_SERVER['APPLICATION_PATH'] . "/../cache/app-logo-".$id.".png") ) {
-				$logo = @file_get_contents($_SERVER['APPLICATION_PATH'] . "/../cache/app-logo-".$id.".png");
+			if ( file_exists($_SERVER['APPLICATION_PATH'] . "/../../data/cache/app-logo-".$id.".png") ) {
+				$logo = @file_get_contents($_SERVER['APPLICATION_PATH'] . "/../../data/cache/app-logo-".$id.".png");
 			} 
 			if ( $logo == 'NULL' || $logo == false || isnull($logo) ) {
-				$apps = new Application\Model\Applications();
+				$apps = new \Application\Model\Applications();
 				$apps->filter->id->equals($id);
 				if (count($apps->items) > 0) {
 					if ( (! isnull($apps->items[0]->logo) ) && $apps->items[0]->logo !== '' )
@@ -179,9 +178,9 @@ class AppsController extends AbstractActionController
 		}
 		if ( empty($logo) || ($logo == 'NULL') ) {
 			if ($tool) {
-				$logo = file_get_contents("images/tool.png");
+				$logo = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../../public/images/tool.png");
 			} else {
-				$logo = file_get_contents("images/app.png");
+				$logo = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../../public/images/app.png");
 			}
 		} 
 		header('Content-type: image/png');
@@ -221,8 +220,7 @@ class AppsController extends AbstractActionController
     }
     public function showlogoAction()
     {
-		$this->_helper->layout->disableLayout();
-		$apps = new Application\Model\Applications();
+		$apps = new \Application\Model\Applications();
 		$apps->filter->id->equals(GET_REQUEST_PARAM($this, "id"));
 		if ( count($apps->items) > 0 ) {
 			$app = $apps->items[0];
@@ -230,7 +228,7 @@ class AppsController extends AbstractActionController
 				$logo = getPrimaryCategoryLogo($app);
 				if( is_null($logo) == false ){
 					$this->view->logo = $logo;
-					return;
+					return DISABLE_LAYOUT($this);
 				}
 				$cats = $app->categoryid;
 				if(count($cats) == 1){
@@ -246,6 +244,7 @@ class AppsController extends AbstractActionController
 				$this->view->logo = "/apps/getlogo?size=2&id=".$app->id."&req=".urlencode($app->lastUpdated);
 			}
 		} else $this->view->logo = '';
+		return DISABLE_LAYOUT($this);
 	}
 
 	public function indexAction(){
@@ -257,12 +256,12 @@ class AppsController extends AbstractActionController
 		$ratingID = GET_REQUEST_PARAM($this, "ratingid");
 		$rating = null;
 		if ( $ratingID != '' ) {
-			$ratings = new Default_Model_AppRatings();
+			$ratings = new \Application\Model\AppRatings();
 			$ratings->filter->id->equals($ratingID);
 			$ratings->refresh();
 			if ( count($ratings->items) > 0 ) $rating = $ratings->items[0];
 		} else {
-			$rating = new Default_Model_AppRating();
+			$rating = new \Application\Model\AppRating();
 		}
 		$rating->appid = GET_REQUEST_PARAM($this, "appid");
 		$rating->rating = GET_REQUEST_PARAM($this, "rating");
@@ -282,7 +281,7 @@ class AppsController extends AbstractActionController
 		}
 		if ( $rating !== null ) {
 			$rating->save();
-			$apps = new Application\Model\Applications();
+			$apps = new \Application\Model\Applications();
 			$apps->filter->id = GET_REQUEST_PARAM($this, "appid");
 			echo '{"id":"'.$rating->id.'","average":"'.$apps->items[0]->rating.'"}';
 		}
@@ -290,7 +289,7 @@ class AppsController extends AbstractActionController
 
 	public function revokeratingAction() {
 		$this->_helper->layout->disableLayout();
-		$ratings = new Default_Model_AppRatings();
+		$ratings = new \Application\Model\AppRatings();
 		if ( $this->session->userid === null ) {
 			$r = json_decode($_COOKIE['ratings'],true);
 			$ratingid = $r['app'.GET_REQUEST_PARAM($this, "appid")];
@@ -301,7 +300,7 @@ class AppsController extends AbstractActionController
 		if ( count($ratings->refresh()->items) > 0 ) {
 			$id = $ratings->items[0]->id;
 			$ratings->remove($ratings->items[0]);
-			$apps = new Application\Model\Applications();
+			$apps = new \Application\Model\Applications();
 			$apps->filter->id = GET_REQUEST_PARAM($this, "appid");
 			echo '{"id":"'.$id.'","average":"'.$apps->items[0]->rating.'"}';
 		}
@@ -353,7 +352,7 @@ class AppsController extends AbstractActionController
    		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
         if (array_key_exists("type",$_GET))	$type = $_GET['type']; else $type = 'xml';
-		$apps = new Application\Model\Applications();
+		$apps = new \Application\Model\Applications();
 		$apps->filter = FilterParser::getApplications(GET_REQUEST_PARAM($this, "flt"));
         if ( $type === "xml" ) {
             $apps->refresh("xmlexport");
@@ -384,7 +383,7 @@ class AppsController extends AbstractActionController
 		echo "<map map_file='maps/world.swf' url='#movie1' width='50%' height='50%'>\n";
 		echo "<areas>\n";
 
-		$cs = new Default_Model_AppPerCountries();
+		$cs = new \Application\Model\AppPerCountries();
 		foreach ( $cs->items as $c ) {
 			$line = array();
 			$line['id'] = $c->id;
@@ -418,9 +417,9 @@ class AppsController extends AbstractActionController
 	public function editdocAction() {
 		$this->_helper->layout->disableLayout();
 			   if (array_key_exists('data',$_GET)) $this->view->data = $_GET['data']; else $this->view->data = "''";
-			   $dt = new Default_Model_DocTypes();
+			   $dt = new \Application\Model\DocTypes();
 			   $this->view->docTypes = $dt->refresh();
-			   $this->view->people = new Default_Model_Researchers();
+			   $this->view->people = new \Application\Model\Researchers();
 			   $this->view->people->filter->orderBy(array('lastname','firstname'));
 			   $this->view->people->refresh();
 	}
@@ -460,7 +459,7 @@ class AppsController extends AbstractActionController
         $this->_helper->viewRenderer->setNoRender();    
 		if ( $this->session->userid !== null ) {
 			if ( userIsAdminOrManager($this->session->userid) ) {
-				$apps = new Application\Model\Applications();
+				$apps = new \Application\Model\Applications();
 				$apps->filter->id->equals(GET_REQUEST_PARAM($this, 'id'));
 				$apps->refresh();
 				if ( count($apps->items) > 0 ) {
@@ -485,10 +484,10 @@ class AppsController extends AbstractActionController
 		$this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender();    
 		if ( $this->session->userid !== null ) {
-			$users = new Default_Model_Researchers();
+			$users = new \Application\Model\Researchers();
 			$users->filter->id->equals($this->session->userid);
 			$user = $users->items[0];
-			$apps = new Application\Model\Applications();
+			$apps = new \Application\Model\Applications();
 			$apps->filter->id->equals($_POST['id']);
 			$apps->refresh();
 			if ( $user->privs->canDeleteApplication($apps->items[0]) ) {
@@ -496,8 +495,8 @@ class AppsController extends AbstractActionController
 				$app->deleted = true;
 				$app->name = $app->name.'-DELETED-'.$app->guid;
 				$app->save();
-				$delinfos = new Default_Model_AppDelInfos();
-				$delinfo = new Default_Model_AppDelInfo();
+				$delinfos = new \Application\Model\AppDelInfos();
+				$delinfo = new \Application\Model\AppDelInfo();
 				$delinfo->appID = $_POST['id'];
 				$delinfo->deletedBy = $this->session->userid;
 				$delinfos->add($delinfo);
@@ -517,7 +516,7 @@ class AppsController extends AbstractActionController
                 $this->view->Error = "no appid is given";
                 return;
             }else{
-                $app = new Application\Model\Applications();
+                $app = new \Application\Model\Applications();
                 $app->filter->id->equals($appid);
                 $app->refresh();
                 if($app->count()===0){
@@ -587,7 +586,7 @@ class AppsController extends AbstractActionController
 				$this->view->Error = "not logged in";
 				return;
 			}
-			$apptags = new Default_Model_AppTags();
+			$apptags = new \Application\Model\AppTags();
 			$flt1 = $apptags->filter;
 			$flt1->appid->equals($appid)->and($flt1->tag->ilike($tag));
 			if (count($apptags->items) > 0) {
@@ -595,7 +594,7 @@ class AppsController extends AbstractActionController
 					if ($apptags->items[0]->researcherid !== $uid) {
 						$isOwner = false;
 						$isAdmin = false;
-						$apps = new Application\Model\Applications();
+						$apps = new \Application\Model\Applications();
 						$apps->filter->appid->equals($appid);
 						//Check if current user is the owner of the applicaiton entry
 						if ( count($apps->items) > 0) if ($apps->items[0]->addedBy === $uid || $apps->items[0]->ownerid === $uid) $isOwner = true;
@@ -603,7 +602,7 @@ class AppsController extends AbstractActionController
 						if ( userIsAdminOrManager($uid) ) $isAdmin = true;
 						if ( ! ($isOwner || $isAdmin) ) { 
 							//check if the current user is the submitter of the tag
-							$apptags = new Default_Model_AppTags();
+							$apptags = new \Application\Model\AppTags();
 							$flt1 = $apptags->filter;
 							$flt1->appid->equals($appid)->and($flt1->tag->ilike($tag))->and($flt1->researcherid->equals($uid));
 							$apptagsitems = $apptags->items;
@@ -620,7 +619,7 @@ class AppsController extends AbstractActionController
 			return;
 		}
 
-		$p = new Default_Model_Permissions();
+		$p = new \Application\Model\Permissions();
 		$p->filter->researcherid->equals($this->session->userid)->and($p->filter->actionid->equals(24));
 		$pc = $p->count();
 		if($pc===0){
@@ -646,24 +645,24 @@ class AppsController extends AbstractActionController
 					$this->view->Error = "Tags must be less than 50 characters long.";
 					return;
 				}
-				$tags = new Default_Model_AppTags();
+				$tags = new \Application\Model\AppTags();
 				$tags->filter->appid->equals($appid)->and($tags->filter->tag->ilike($tag));
 				if($tags->count()==0){
-					$t = new Default_Model_AppTag();
+					$t = new \Application\Model\AppTag();
 					$t->appid = $appid;
 					$t->tag = $tag;
 					$t->researcherid = $uid;
 					$tags->add($t);
 				}
 			}else if($action==="remove"){
-				$tags = new Default_Model_AppTags();
+				$tags = new \Application\Model\AppTags();
 				$tags->filter->appid->equals($appid)->and($tags->filter->tag->ilike($tag));
 				$tags->refresh();
 				if($tags->count()>0){
 					$tags->remove($tags->items[0]);
 				}
 			}else{
-				$apps = new Application\Model\Applications();
+				$apps = new \Application\Model\Applications();
 				$apps->filter->id->equals($appid);
 				$c = $apps->count();
 				if($c>0){
@@ -725,7 +724,7 @@ class AppsController extends AbstractActionController
 	}
 
 	public function usedurltitlesAction(){
-	 $au = new Default_Model_AppUrls();
+	 $au = new \Application\Model\AppUrls();
 	 $items = $au->getTitles(true);
 	 header('Content-type: text/xml');
 	 $res = "<response>";
@@ -749,7 +748,7 @@ class AppsController extends AbstractActionController
 		$uid = $this->session->userid;
 		
 		//Get current user GUID
-		$ps = new Default_Model_Researchers();
+		$ps = new \Application\Model\Researchers();
 		$ps->filter->id->equals($uid);
 		$user = $ps->items[0];
 		$uguid = $user->guid;
@@ -763,7 +762,7 @@ class AppsController extends AbstractActionController
 			$err = 'Software id is not valid';
 		} else {
 			$appid = $_GET["id"];
-			$apps = new Application\Model\Applications();
+			$apps = new \Application\Model\Applications();
 			$apps->filter->appid->equals($appid);
 			if( count($apps->items) === 0 ){
 				$err = "Software not found";
@@ -794,12 +793,12 @@ class AppsController extends AbstractActionController
 			if( $err !== "" ){
 				echo "<response>joined</response>";
 			} else {
-				$urs = new Default_Model_UserRequests();
-				$s1 = new Default_Model_UserRequestTypesFilter();
+				$urs = new \Application\Model\UserRequests();
+				$s1 = new \Application\Model\UserRequestTypesFilter();
 				$s1->name->equals("joinapplication");
-				$s2 = new Default_Model_UserRequestsFilter();
+				$s2 = new \Application\Model\UserRequestsFilter();
 				$s2->targetguid->equals($app->guid)->and($s2->userguid->equals($uguid));
-				$s4 = new Default_Model_UserRequestStatesFilter();
+				$s4 = new \Application\Model\UserRequestStatesFilter();
 				$s4->id->equals(1);
 				$urs->filter->chain($s1->chain($s2->chain($s4,"AND"),"AND"),"AND");						
 				if($urs->count() > 0){
@@ -835,7 +834,7 @@ class AppsController extends AbstractActionController
 				//TODO
 			}
 			//save request
-			$ur = new Default_Model_UserRequest();
+			$ur = new \Application\Model\UserRequest();
 			$ur->typeid = 1;//joinapplication
 			$ur->userguid = $uguid;
 			$ur->userdata = $msg;
@@ -870,7 +869,7 @@ class AppsController extends AbstractActionController
 		$uid = $this->session->userid;
 		
 		//Get current user GUID
-		$ps = new Default_Model_Researchers();
+		$ps = new \Application\Model\Researchers();
 		$ps->filter->id->equals($uid);
 		$user = $ps->items[0];
 		$uguid = $user->guid;
@@ -884,7 +883,7 @@ class AppsController extends AbstractActionController
 			$err = 'Software id is not valid';
 		} else {
 			$appid = $_GET["id"];
-			$apps = new Application\Model\Applications();
+			$apps = new \Application\Model\Applications();
 			$apps->filter->appid->equals($appid);
 			if( count($apps->items) === 0 ){
 				$err = "Software not found";
@@ -894,7 +893,7 @@ class AppsController extends AbstractActionController
 		if( $err === "" ){
 			$app = $apps->items[0];
 			$appguid = $app->guid;
-			$perms = new Default_Model_Permissions();
+			$perms = new \Application\Model\Permissions();
 			$perms->filter->researcherid->equals($uid)->and($perms->filter->actionid->equals(30)->and($perms->filter->uuid->equals($appguid)));
 			if( count($perms->items) > 0 ){
 				$err = "Already have permissions to manage releases";
@@ -927,12 +926,12 @@ class AppsController extends AbstractActionController
 		
 		//User only checks the state of request
 		if( isset($_GET["state"]) ) {
-			$urs = new Default_Model_UserRequests();
-			$s1 = new Default_Model_UserRequestTypesFilter();
+			$urs = new \Application\Model\UserRequests();
+			$s1 = new \Application\Model\UserRequestTypesFilter();
 			$s1->name->equals("releasemanager");
-			$s2 = new Default_Model_UserRequestsFilter();
+			$s2 = new \Application\Model\UserRequestsFilter();
 			$s2->targetguid->equals($app->guid)->and($s2->userguid->equals($uguid));
-			$s4 = new Default_Model_UserRequestStatesFilter();
+			$s4 = new \Application\Model\UserRequestStatesFilter();
 			$s4->id->equals(1);
 			$urs->filter->chain($s1->chain($s2->chain($s4,"AND"),"AND"),"AND");						
 			if($urs->count() > 0){
@@ -961,7 +960,7 @@ class AppsController extends AbstractActionController
 				//TODO
 			}
 			//save request
-			$ur = new Default_Model_UserRequest();
+			$ur = new \Application\Model\UserRequest();
 			$ur->typeid = 2;//releasemanager
 			$ur->userguid = $uguid;
 			$ur->userdata = $msg;
@@ -1068,12 +1067,12 @@ class AppsController extends AbstractActionController
 		echo "<response>";
 		
 		
-		$apps = new Application\Model\Applications();
+		$apps = new \Application\Model\Applications();
 		$apps->filter->id->equals($appid);
 		$app = $apps->items[0];
 		
 		//Add Application owner
-		$users = new Default_Model_Researchers();
+		$users = new \Application\Model\Researchers();
 		$users->filter->id->equals($app->addedby);
 		$owner = $users->items[0];
 		echo "<group name='Software Entry Owner'>";
@@ -1091,13 +1090,13 @@ class AppsController extends AbstractActionController
 		echo "</group>";
 		
 		//adding National Representatives
-		$appcountries = new Default_Model_AppCountries();
+		$appcountries = new \Application\Model\AppCountries();
 		$appcountries->filter->appid->equals($appid);
 		$citems = $appcountries->items;
 		foreach($citems as $i){
 			$countries[] = $i->id;
 		}
-		$users = new Default_Model_Researchers();
+		$users = new \Application\Model\Researchers();
 		$users->filter->positiontypeid->equals(6)->and($users->filter->countryid->in($countries));
 		$uitems = $users->items;
 		echo "<group name='National Representatives'>";
@@ -1107,7 +1106,7 @@ class AppsController extends AbstractActionController
 		echo "</group>";
 		
 		//Add Managers
-		$users = new Default_Model_Researchers();
+		$users = new \Application\Model\Researchers();
 		$users->filter->positiontypeid->equals(7);
 		$uitems = $users->items;
 		echo "<group name='Managers'>";
@@ -1144,7 +1143,7 @@ class AppsController extends AbstractActionController
 		//If provided data are valid
 		if( $err == "" ) {
 			$appid = intval($_POST["id"]);
-			$apps = new Application\Model\Applications();
+			$apps = new \Application\Model\Applications();
 			$apps->filter->id->equals($appid);
 			$apps = $apps->items;
 			//Check if application exists
@@ -1280,11 +1279,11 @@ class AppsController extends AbstractActionController
 		//Check if user wants to unsubscribe.
 		//First check if given id is a mail subscription
 		$subsc = null;
-		$subscriptions = new Default_Model_MailSubscriptions();
+		$subscriptions = new \Application\Model\MailSubscriptions();
 		$subscriptions->filter->id->equals($id)->and($subscriptions->filter->researcherid->equals($uid));
 		if( count($subscriptions->items) == 0 ){
 			//else check if there is a subscription by application id
-			$subscriptions = new Default_Model_MailSubscriptions();
+			$subscriptions = new \Application\Model\MailSubscriptions();
 			$flt = "=application.id:" . $id . " id:SYSTAG_FOLLOW";
 			$subscriptions->filter->flt->ilike($flt)->and($subscriptions->filter->researcherid->equals($uid));
 		}
@@ -1302,7 +1301,7 @@ class AppsController extends AbstractActionController
 		
 		//User wants to subscribe an application
 		//Check if application exists
-		$apps = new Application\Model\Applications();
+		$apps = new \Application\Model\Applications();
 		$id = ( is_numeric($entryid)?$entryid:$id );
 		$apps->filter->id->equals($id);
 		if( count($apps->items) == 0 ){
@@ -1510,7 +1509,7 @@ class AppsController extends AbstractActionController
 					$vapp = $result["va"];
 					$app = $vapp->getApplication();
 					$privs = null;
-					$users = new Default_Model_Researchers();
+					$users = new \Application\Model\Researchers();
 					$users->filter->id->equals($this->session->userid);
 					if( count($users->items) > 0 ){
 						$user = $users->items[0];
@@ -1615,7 +1614,7 @@ class AppsController extends AbstractActionController
 		*/
 		
 		//Check current user's existence and privileges
-		$users = new Default_Model_Researchers();
+		$users = new \Application\Model\Researchers();
 		$users->filter->id->equals($userid);
 		if( count($users->items) === 0 ){
 			return "Access denied for not authenticated users.";
@@ -1630,7 +1629,7 @@ class AppsController extends AbstractActionController
 			case "software":
 			case "vappliance":
 			default:
-				$targets = new Application\Model\Applications();
+				$targets = new \Application\Model\Applications();
 				$targets->filter->id->equals($targetid);
 				if( count($targets->items) > 0) {
 					$target = $targets->items[0];
@@ -1672,7 +1671,7 @@ class AppsController extends AbstractActionController
 	}
 	
 	private function grantPrivs($user, $target, $actorsuid , $actionids=array()){
-		$actors = new Default_Model_Researchers();
+		$actors = new \Application\Model\Researchers();
 		$actors->filter->guid->equals($actorsuid);
 		
 		if( count($actors) === 0 ){
@@ -1694,7 +1693,7 @@ class AppsController extends AbstractActionController
 	}
 	
 	private function revokePrivs($user, $target, $actorsuid, $actionids=array()){
-		$actors = new Default_Model_Researchers();
+		$actors = new \Application\Model\Researchers();
 		$actors->filter->guid->equals($actorsuid);
 		
 		if( count($actors) === 0 ){
@@ -1738,14 +1737,14 @@ class AppsController extends AbstractActionController
 		}
 		
 		//Find item by given Id
-		$apps = new Application\Model\Applications();
+		$apps = new \Application\Model\Applications();
 		$apps->filter->id->equals($entityId);
 		if( count($apps->items) === 0 ){
 			echo "<response error='Invalid data' errormessage='Could not find item'></response>";
 			return;
 		}
 		$app = $apps->items[0];
-		$vas = new Default_Model_VAs();
+		$vas = new \Application\Model\VAs();
 		$vas->filter->appid->equals($app->id);
 		if( count($vas->items) === 0 ){
 			echo "<response error='Invalid data' errormessage='Could not find item'></response>";

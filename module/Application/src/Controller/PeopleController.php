@@ -27,17 +27,13 @@ class PeopleController extends AbstractActionController
     {
 		$this->view = new ViewModel();
         $this->session = new \Zend\Session\Container('base');
-//        $contextSwitch = $this->_helper->getHelper('contextSwitch');
-//        $contextSwitch->addActionContext('index', 'xml')
-//						->addActionContext('details', 'xml')
-//                      ->initContext();
     }
 
     public function nodisseminationAction() {
       	header("Content-Type:text/xml");
         echo "<" . "?xml version='1.0'?" . ">";
         if ($this->session->userid !== null) {
-            $rs = new Default_Model_Researchers();
+            $rs = new \Application\Model\Researchers();
             $rs->filter->id->equals($this->session->userid);
             $r = $rs->items[0];
             if (isset($_GET['value'])) {
@@ -81,9 +77,9 @@ class PeopleController extends AbstractActionController
 
                 if ($fname !== '' || $lname !== '') {
                         //Get most certain profile
-			$rs = new Default_Model_Researchers();
-			$f1 = new Default_Model_ResearchersFilter();
-			$f2 = new Default_Model_ResearchersFilter();
+			$rs = new \Application\Model\Researchers();
+			$f1 = new \Application\Model\ResearchersFilter();
+			$f2 = new \Application\Model\ResearchersFilter();
 			$fn1 = $fname . " " . $lname;
 			$fn2 = $lname . " " . $fname;
 			$f1->firstname->soundslike($fname);
@@ -95,7 +91,7 @@ class PeopleController extends AbstractActionController
 				$nameResponse = '{"id": "'.$item->id.'", "fullname": "'.$item->fullName.'"}';
 			} else {
                                 //get possible profiles
-                                $rs = new Default_Model_Researchers();
+                                $rs = new \Application\Model\Researchers();
                                 $f = $rs->filter;
                                 $f->name->soundsLike($fn1)->or($f->name->soundsLike($fn2));
                                 $res = array();
@@ -124,16 +120,16 @@ class PeopleController extends AbstractActionController
                         $emails = explode(';', trim($payload['email']));
                         $i = 0;
                         foreach($emails as $email) {
-                            $cs = new Default_Model_Contacts();
-                            $f1 = new Default_Model_ContactsFilter();
-                            $f2 = new Default_Model_ContactsFilter();
+                            $cs = new \Application\Model\Contacts();
+                            $f1 = new \Application\Model\ContactsFilter();
+                            $f2 = new \Application\Model\ContactsFilter();
                             $f1->contacttypeid->equals(7);
                             $f2->data->ilike($email);
                             $cs->filter->chain($f1, "AND");
                             $cs->filter->chain($f2, "AND");
                             if ( count($cs->items) > 0) {
                                     $j = '"id": "'.$cs->items[0]->researcherID.'"';
-                                    $rs = new Default_Model_Researchers();
+                                    $rs = new \Application\Model\Researchers();
                                     $rs->filter->id->equals($cs->items[0]->researcherID);
                                     $j .= ', "fullname": "'.str_replace('"','\"',$rs->items[0]->fullName).'"';
                                     $j .= ', "value": ' . $i;
@@ -167,7 +163,7 @@ class PeopleController extends AbstractActionController
 		foreach ($items as $item) {
 			$image = base64_decode(pg_unescape_bytea($item->image));
 			if (is_string($image) && ($image != '')) {
-				$f = fopen($_SERVER['APPLICATION_PATH'] . "/../../cache/ppl-image-".$item->id.".png","w");
+				$f = fopen($_SERVER['APPLICATION_PATH'] . "/../../data/cache/ppl-image-".$item->id.".png","w");
 				$image = base64_decode(pg_unescape_bytea($item->image));
 				fwrite($f, $image);
 				fclose($f);
@@ -189,7 +185,7 @@ class PeopleController extends AbstractActionController
 		if ( $length === null ) $length = 23;
 		if ( array_key_exists("filter", $_GET )) $this->session->pplFlt = null;
 		$fltstr = $this->getFltStr();
-		$ppl = new Default_Model_Researchers();
+		$ppl = new \Application\Model\Researchers();
 		$this->session->pplFlt = $fltstr;
 		$ppl->filter = FilterParser::getPeople($fltstr, (GET_REQUEST_PARAM($this, "fuzzySearch") == '1'));
 		if ( GET_REQUEST_PARAM($this, "orderby") != '' ) $orderby = GET_REQUEST_PARAM($this, "orderby"); else $orderby = "firstname";
@@ -241,7 +237,7 @@ class PeopleController extends AbstractActionController
 
     public function getimageAction()
 	{
-		if ($this->session->userid === null || intval($this->session->userid)<=0) {
+		if (is_null($this->session->userid) || intval($this->session->userid) <= 0) {
 			$image = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../../public/images/" . "person.png");
 			header('Content-type: image/png');
 			echo $image;
@@ -251,10 +247,10 @@ class PeopleController extends AbstractActionController
 		if ( (GET_REQUEST_PARAM($this, "id") == "0") || (GET_REQUEST_PARAM($this, "id") == '')) {
 			$image = 'NULL';
 		} else {
-			if ( file_exists($_SERVER['APPLICATION_PATH'] . "/../cache/ppl-image-".GET_REQUEST_PARAM($this, "id").".png") ) {
+			if ( file_exists($_SERVER['APPLICATION_PATH'] . "/../../data/cache/ppl-image-".GET_REQUEST_PARAM($this, "id").".png") ) {
                 $image = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../../data/cache/ppl-image-".GET_REQUEST_PARAM($this, "id").".png");
 			} else {
-				$ppl = new Default_Model_Researchers();
+				$ppl = new \Application\Model\Researchers();
 				$ppl->filter->id->equals(GET_REQUEST_PARAM($this, "id"));
                 $image = base64_decode($ppl->items[0]->image);
 				$this->cacheimages($ppl->items);
@@ -272,14 +268,14 @@ class PeopleController extends AbstractActionController
     {
         $pplID = GET_REQUEST_PARAM($this, "id");
         if ( $pplID == '' ) $pplID = $this->session->lastPplID;
-		$ppl = new Default_Model_Researchers();
+		$ppl = new \Application\Model\Researchers();
 		if ( $this->session->userid !== null ) {
 			if ( userIsAdminOrManager($this->session->userid) ) {
 				$ppl->viewModerated = true;
 			}
 		}
 		if ( GET_REQUEST_PARAM($this, "id") == "0" ) {
-			$this->view->entry = new Default_Model_Researcher();
+			$this->view->entry = new \Application\Model\Researcher();
 			$this->view->entry->countryID = '0';
 		} else {
 			if(is_numeric($pplID) === true ){
@@ -321,18 +317,18 @@ class PeopleController extends AbstractActionController
 			}
         }
         $this->view->dialogCount=$_GET['dc'];
-		$this->view->positionTypes = new Default_Model_PositionTypes();
+		$this->view->positionTypes = new \Application\Model\PositionTypes();
 		$this->view->positionTypes->filter->orderBy('ord');
-		$this->view->countries = new Default_Model_Countries();
+		$this->view->countries = new \Application\Model\Countries();
 		$this->view->countries->filter->orderBy('name');
-		$this->view->contactTypes = new Default_Model_ContactTypes();
+		$this->view->contactTypes = new \Application\Model\ContactTypes();
 		if ( isnull(GET_REQUEST_PARAM($this, "tab")) == false ){
 			$this->view->selectedTab = GET_REQUEST_PARAM($this, "tab");
 		}
 
 		$this->view->session = $this->session;
 	    if ( ($this->session->username !== null) && ($this->session->userid !== null) ) {
-            $users = new Default_Model_Researchers();
+            $users = new \Application\Model\Researchers();
             $users->filter->id->equals($this->session->userid);
 			$this->view->user = $users->items[0];
         } else $this->view->user = null;
@@ -353,22 +349,22 @@ class PeopleController extends AbstractActionController
 	public function permreqAction()
     {
 		if (count($_POST) == 0) {
-            $this->view->actions = new Default_Model_Actions();
+            $this->view->actions = new \Application\Model\Actions();
             $this->view->actions->refresh();
-            $this->view->objects = new Default_Model_ObjViews();
+            $this->view->objects = new \Application\Model\ObjViews();
             $this->view->objects->refresh();
         } else {
-            $ms=new Default_Model_Messages();
-            $m=new Default_Model_Message();
+            $ms=new \Application\Model\Messages();
+            $m=new \Application\Model\Message();
             $m->receiverID = 520;
             $m->senderID = 'NULL';
-            $acts = new Default_Model_Actions();
+            $acts = new \Application\Model\Actions();
             $acts->filter->id->equals($_POST['action']);
             $act = $acts->items[0]->description;
             if ( isnull($_POST['guid']) ) {
                 $target = '<i>(ANY)</i>';
             } else {
-                $objs = new Default_Model_ObjViews();
+                $objs = new \Application\Model\ObjViews();
                 $objs->filter->guid->equals($_POST['guid']);
                 $target = $objs->items[0]->name;
                 if ( $objs->items[0]->objType == "1" ) {
@@ -385,14 +381,13 @@ class PeopleController extends AbstractActionController
 
     public function showimageAction()
     {
-		$this->_helper->layout->disableLayout();
-		$ppl = new Default_Model_Researchers();
 
-		if ($this->session->userid === null || intval($this->session->userid)<=0) {
+		if (is_null($this->session->userid) || intval($this->session->userid) <= 0) {
 			$this->view->image = "/images/" . "person.png";
-			return;
+			return DISABLE_LAYOUT($this, true);
 		}
 
+		$ppl = new \Application\Model\Researchers();
 		$ppl->filter->id->equals(GET_REQUEST_PARAM($this, "id"));
 		if ( count($ppl->items) > 0 ) {
 			$person = $ppl->items[0];
@@ -402,6 +397,7 @@ class PeopleController extends AbstractActionController
 				$this->view->image = "/people/getimage?id=".$person->id."&req=".urlencode($person->lastUpdated);
 			}
 		} else $this->view->image= '';
+		return DISABLE_LAYOUT($this, true);
     }
 
 	public function exportAction() {
@@ -411,7 +407,7 @@ class PeopleController extends AbstractActionController
 		return;
 
         if (array_key_exists("type",$_GET))	$type = $_GET['type']; else $type = 'xml';
-		$ppl = new Default_Model_Researchers();
+		$ppl = new \Application\Model\Researchers();
 		$ppl->filter = FilterParser::getPeople(GET_REQUEST_PARAM($this, "flt"));
         if ( $type == "xml" ) {
             $ppl->refresh("xmlexport", false, $this->session->userid);
@@ -453,7 +449,7 @@ class PeopleController extends AbstractActionController
 		}
 		//Check if user can retrieve sensitive contact information
 		if($this->session->userid!==null){
-			$users = new Default_Model_Researchers();
+			$users = new \Application\Model\Researchers();
 			$users->filter->id->equals($this->session->userid);
 			$user = $users->items[0];
 			if($user->privs->canBulkReadSensitiveData()){
@@ -488,8 +484,8 @@ class PeopleController extends AbstractActionController
 		}
 
 		//Send message to user
-		$ms=new Default_Model_Messages();
-		$m=new Default_Model_Message();
+		$ms=new \Application\Model\Messages();
+		$m=new \Application\Model\Message();
 		$m->receiverID = $receiverID;
 		$m->senderID = $this->session->userid;
 		$m->msg = $data;
@@ -511,14 +507,14 @@ class PeopleController extends AbstractActionController
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
 		$hasEditRights = false;
-		$entries = new Default_Model_Researchers();
+		$entries = new \Application\Model\Researchers();
 		if ( $this->session->userid !== null ) {  // there is a user logged in
-			$users = new Default_Model_Researchers();
+			$users = new \Application\Model\Researchers();
 			$users->filter->id->equals($this->session->userid);
 			$user = $users->items[0];
 			if ( $_POST['id'] == '' ) { // logged in user registering another user (e.g. a manager registering someone else)
 					if ( userIsAdminOrManager($this->session->userid) ) {
-							$entry = new Default_Model_Researcher(); //prepare new entry
+							$entry = new \Application\Model\Researcher(); //prepare new entry
 							$entry->dateInclusion = date("Y-m-d");
 							$entry->addedBy = $this->session->userid;
 							$hasEditRights = true;
@@ -529,7 +525,7 @@ class PeopleController extends AbstractActionController
 			}
 		} else {
 			 if ($this->session->username !== null)  { // no user logged in, but new user registering own self
-				$entry = new Default_Model_Researcher(); //prepare new entry
+				$entry = new \Application\Model\Researcher(); //prepare new entry
 				$entry->dateInclusion = date("Y-m-d");
 				$entry->username = $this->session->username;
                 $entry->lastLogin = time();
@@ -579,7 +575,7 @@ class PeopleController extends AbstractActionController
 			$entry = $entries->items[0];
 			$ant = 'their';
 
-			$conts = new Default_Model_Contacts();
+			$conts = new \Application\Model\Contacts();
 			$conts->refresh();
 			for ($i = count($entry->contacts)-1; $i>=0; $i--) {
 				$conts->remove($entry->contacts[$i]);
@@ -587,7 +583,7 @@ class PeopleController extends AbstractActionController
 			foreach ($_POST as $key => $value) {
 				if ( (substr($key,0,7) === "contact") && (substr($key,0,11) !== "contactType") ) {
 					$cnum = substr($key,7);
-					$cont = new Default_Model_Contact();
+					$cont = new \Application\Model\Contact();
 					$cont->researcherID = $entry->id;
 					$cont->data = $value;
 					$cont->contactTypeID = $_POST['contactType'.$cnum];
@@ -598,7 +594,7 @@ class PeopleController extends AbstractActionController
 		if( $entry && ($this->session->userid == null || $this->session->userid == $entry->id) ){
 			$this->session->userid = $entry->id;
 			//Reload session data in case of claim or save new account
-			$ppl = new Default_Model_Researchers();
+			$ppl = new \Application\Model\Researchers();
 			$ppl->filter->id->equals($this->session->userid);
 			$user = $ppl->items[0];
 			$this->session->user = $user;
@@ -639,7 +635,7 @@ class PeopleController extends AbstractActionController
     public function ppllistAction()
     {
     	$this->_helper->layout->disableLayout();
-		$this->view->entry = new Default_Model_Researchers();
+		$this->view->entry = new \Application\Model\Researchers();
 		$this->view->entry->refresh();
     }
 
@@ -677,7 +673,7 @@ class PeopleController extends AbstractActionController
             return SET_NO_RENDER($this, "Forbidden", 403);
         }
         if ($action === 'set') {
-            $p = new Default_Model_Contacts();
+            $p = new \Application\Model\Contacts();
             $p->filter->researcherid->equals($this->session->userid)->and($p->filter->id->equals($id));
             if($p->count()===0){
                 $error = "The provided contact is not found";
@@ -689,7 +685,7 @@ class PeopleController extends AbstractActionController
                $res=$pi->data;
             }
         } else {
-            $p = new Default_Model_Contacts();
+            $p = new \Application\Model\Contacts();
             $p->filter->researcherid->equals($this->session->userid)->and($p->filter->isprimary->equals(true));
             if(count($p->items)===0){
                 $error = "The provided contact is not found";
@@ -726,12 +722,12 @@ class PeopleController extends AbstractActionController
 			$this->setUserRequestToState($_GET["id"],$_GET["state"]);
 			return;
 		}
-		$urs = new Default_Model_UserRequests();
-		$s1 = new Default_Model_UserRequestTypesFilter();
+		$urs = new \Application\Model\UserRequests();
+		$s1 = new \Application\Model\UserRequestTypesFilter();
 		//$s1->name->equals("joinapplication");
-		$s2 = new Default_Model_PermissionsFilter();
+		$s2 = new \Application\Model\PermissionsFilter();
 		$s2->actor->equals($guid);
-		$s3 = new Default_Model_UserRequestStatesFilter();
+		$s3 = new \Application\Model\UserRequestStatesFilter();
 		$s3->name->equals("submitted");
 		$urs->filter->chain($s1->chain($s2->chain($s3,"AND"),"AND"),"AND");
 
@@ -740,14 +736,14 @@ class PeopleController extends AbstractActionController
 
 		//Fetch user requests for NILs
 		if( userIsAdminOrManager($this->session->userid) === false && userIsNIL($this->session->userid) === true ){
-			$nilusers = new Default_Model_UserRequests();
-			$s1 = new Default_Model_UserRequestTypesFilter();
+			$nilusers = new \Application\Model\UserRequests();
+			$s1 = new \Application\Model\UserRequestTypesFilter();
 			$s1->id->numequals(3);
-			$s2 = new Default_Model_ResearchersFilter();
+			$s2 = new \Application\Model\ResearchersFilter();
 			$s2->countryid->equals($this->session->userCountryID);
-			$s3 = new Default_Model_UserRequestStatesFilter();
+			$s3 = new \Application\Model\UserRequestStatesFilter();
 			$s3->name->equals("submitted");
-			$s4 = new Default_Model_ActorGroupsFilter();
+			$s4 = new \Application\Model\ActorGroupsFilter();
 			$s4->id->numequals(-3);
 			$nilusers->filter->chain($s1->chain($s2->chain($s3->chain($s4,"AND"),"AND"),"AND"),"AND");
 			if( count($nilusers->items) > 0 ){
@@ -763,7 +759,7 @@ class PeopleController extends AbstractActionController
 
 		$res = "";
 		foreach($items as $r){
-			$users = new Default_Model_Researchers();
+			$users = new \Application\Model\Researchers();
 			$users->filter->guid->equals($r->userguid);
 			$u = $users->items[0];
 			if($r->typeid !== 3 ){
@@ -816,12 +812,12 @@ class PeopleController extends AbstractActionController
 		} else if ( is_numeric($stateid) === false ) {
 			$err = 'Invalid state given.';
 		} else {
-			$reqs = new Default_Model_UserRequests();
+			$reqs = new \Application\Model\UserRequests();
 			$reqs->filter->id->equals($reqid);
 			if ( $reqs->count() === 0 ) {
 				$err = 'User request not found.';
 			} else {
-				$states = new Default_Model_UserRequestStates();
+				$states = new \Application\Model\UserRequestStates();
 				$states->filter->id->equals($stateid);
 				if ( $states->count() === 0 ){
 					$err = 'User request state not found.';
@@ -837,14 +833,14 @@ class PeopleController extends AbstractActionController
 		db()->beginTransaction();
 		try{
 			$req = $reqs->items[0];
-			$user = new Default_Model_Researchers();
+			$user = new \Application\Model\Researchers();
 			$user->filter->id->equals($this->session->userid);
 			$actorguid = $user->items[0]->guid;
 	        $actorid = $user->items[0]->id;
 
 			//Get group id
 			if( $req->requestType->name === "accessgroup"){
-				$groups = new Default_Model_ActorGroups();
+				$groups = new \Application\Model\ActorGroups();
 				$groups->filter->guid->equals($req->targetguid);
 				$group = $groups->items[0];
 				$groupid = $group->id;
@@ -856,7 +852,7 @@ class PeopleController extends AbstractActionController
 			}
 
 			//Get user(requestor) id
-			$users = new Default_Model_Researchers();
+			$users = new \Application\Model\Researchers();
 			$users->filter->guid->equals($req->userguid);
 			$user = $users->items[0];
 			$userid = $user->id;
@@ -883,20 +879,20 @@ class PeopleController extends AbstractActionController
 
 				if($req->requestType->name == "joinapplication" && $stateid == 2){ //if accepted add to related contacts
 					//Set relation between researcher and application(if there is none)
-					$resapp = new Default_Model_ResearchersApps();
-					$resappfilter = new Default_Model_ResearchersAppsFilter();
+					$resapp = new \Application\Model\ResearchersApps();
+					$resappfilter = new \Application\Model\ResearchersAppsFilter();
 					$resapp->filter->appid->equals($appid)->and($resapp->filter->researcherid->equals($userid));
 					if( $resapp->count() === 0 ) {
-						$resapp = new Default_Model_ResearchersApp();
+						$resapp = new \Application\Model\ResearchersApp();
 						$resapp->appid = $appid;
 						$resapp->researcherid = $userid;
 						$resapp->save();
 					}
 				}else if($req->requestType->name == "releasemanager" && $stateid == 2){
-					$privs = new Default_Model_Privileges();
+					$privs = new \Application\Model\Privileges();
 					$privs->filter->actor->equals($user->guid)->and($privs->filter->actionid->equals(30)->and($privs->filter->object->equals($app->guid)));
 					if( count($privs->items) == 0){
-						$prv = new Default_Model_Privilege();
+						$prv = new \Application\Model\Privilege();
 						$prv->actor = $user->guid;
 						$prv->actionid = 30;
 						$prv->object = $app->guid;
@@ -953,7 +949,7 @@ class PeopleController extends AbstractActionController
 		//Check if this is a request to generate new filter
 		if($_SERVER['REQUEST_METHOD'] == 'PUT'){
 			//Check if user has already reached the maximum number of generated api keys
-			$userapikeys = new Default_Model_APIKeys();
+			$userapikeys = new \Application\Model\APIKeys();
 			$userapikeys->filter->ownerid->equals($uid)->and($userapikeys->filter->authmethods->notequals(0));
 			if(count($userapikeys->items)>=$apiconf->maxkeys){
 				header("HTTP/1.0 400 Bad Request");
@@ -981,12 +977,12 @@ class PeopleController extends AbstractActionController
 			//Check netfilters are given for new api key
 			if(count($netfs)>0){
 				//Check if given netfilters are in use by someone else
-				$fs = new Default_Model_APIKeyNetfilters();
+				$fs = new \Application\Model\APIKeyNetfilters();
 				$fsfilter = &$fs->filter;
-				$tmpfs = new Default_Model_APIKeyNetfiltersFilter();
+				$tmpfs = new \Application\Model\APIKeyNetfiltersFilter();
 				$tmpfs->keyid->equals();
 				foreach($netfs as $f){
-					$tmpfs = new Default_Model_APIKeyNetfiltersFilter();
+					$tmpfs = new \Application\Model\APIKeyNetfiltersFilter();
 					$tmpfs->netfilter->equals($f);
 					$fsfilter->chain($tmpfs,"OR");
 				}
@@ -997,12 +993,12 @@ class PeopleController extends AbstractActionController
 				}
 			}
 			//Generate new api key
-			$apik = new Default_Model_APIKey();
+			$apik = new \Application\Model\APIKey();
 			$apik->ownerid = $uid;
 			$apik->save();
 			//Check if key is generated
 			$newkeyID = $apik->id;
-			$apik = new Default_Model_APIKeys();
+			$apik = new \Application\Model\APIKeys();
 			$apik->filter->id->equals($newkeyID);
 			if(count($apik->items)==0){
 				header("HTTP/1.0 500 Internal Server Error");
@@ -1011,7 +1007,7 @@ class PeopleController extends AbstractActionController
 			}
 			//Add netfilters for the newly generated key
 			foreach($netfs as $net){
-				$apinf = new Default_Model_APIKeyNetfilter();
+				$apinf = new \Application\Model\APIKeyNetfilter();
 				$apinf->netfilter = $net;
 				$apinf->keyid = $newkeyID;
 				$apinf->save();
@@ -1024,7 +1020,7 @@ class PeopleController extends AbstractActionController
 				return;
 			}else{
 				//Check if key exists
-				$apkeys = new Default_Model_APIKeys();
+				$apkeys = new \Application\Model\APIKeys();
 				$apkeys->filter->id->equals($_GET["k"])->and($apkeys->filter->ownerid->equals($uid));
 				if(count($apkeys->items)==0){
 					header("HTTP/1.0 404 Not Found");
@@ -1040,7 +1036,7 @@ class PeopleController extends AbstractActionController
 				//if the newly posted net filters are less than the stored filters then
 				//its a deletion, so in case the maximum net filter count is reduced after
 				//the insertion it won't cause a validation error.
-				$oldnflts = new Default_Model_APIKeyNetfilters();
+				$oldnflts = new \Application\Model\APIKeyNetfilters();
 				$oldnflts->filter->keyid->equals($_GET["k"]);
 				if(count($oldnflts->items)<=count($nflts)){
 					header("HTTP/1.0 400 Bad Request");
@@ -1062,7 +1058,7 @@ class PeopleController extends AbstractActionController
 
 			//Delete old netfilters
 			$key = $apkeys->items[0];
-			$nflts = new Default_Model_APIKeyNetfilters();
+			$nflts = new \Application\Model\APIKeyNetfilters();
 			$nflts->filter->keyid->equals($key->id);
 			$nfltsitems = $nflts->items;
 			for($i=count($nfltsitems)-1; $i>=0; $i--){
@@ -1076,7 +1072,7 @@ class PeopleController extends AbstractActionController
 					if(trim(urldecode($nflts[$i])) == ""){
 						continue;
 					}
-					$nf = new Default_Model_APIKeyNetfilter();
+					$nf = new \Application\Model\APIKeyNetfilter();
 					$nf->netfilter = urldecode($nflts[$i]);
 					$nf->keyid = $key->id;
 					$nf->save();
@@ -1088,7 +1084,7 @@ class PeopleController extends AbstractActionController
 				echo "<apikeys error='No key provided' ></apikeys>";
 				return;
 			} else{
-				$apkeys = new Default_Model_APIKeys();
+				$apkeys = new \Application\Model\APIKeys();
 				$apkeys->filter->id->equals($_GET["k"])->and($apkeys->filter->ownerid->equals($uid));
 				if(count($apkeys->items)==0){
 					echo "<apikeys error='Could not retrieve key' ></apikeys>";
@@ -1101,7 +1097,7 @@ class PeopleController extends AbstractActionController
 			$key->save();
 		}
 		//Return xml representation of API keys for the current user
-		$apikeys = new Default_Model_APIKeys();
+		$apikeys = new \Application\Model\APIKeys();
 		$apikeys->filter->ownerid->equals($uid)->and($apikeys->filter->authmethods->notequals(0));
 		$apikeys = $apikeys->items;
 		echo "<apikeys count='" . count($apikeys) . "' >";
@@ -1110,14 +1106,14 @@ class PeopleController extends AbstractActionController
 				echo "<apikey id='" . $apikey->id . "' key='" . $apikey->key . "' ownerid='" . $apikey->ownerid . "' createdon='" . $apikey->createdon . "' authmethods='" . $apikey->authmethods . "' ";
 				if($apikey->sysaccountid != null){
 					echo "sysaccount='" . $apikey->sysaccountid . "' ";
-					$rscs = new Default_Model_Researchers();
+					$rscs = new \Application\Model\Researchers();
 					$rscs->filter->id->equals($apikey->sysaccountid);
 					if(count($rscs->items)>0){
 						echo "sysusername='" . $rscs->items[0]->username . "' ";
 						echo "sysdisplayname='" . $rscs->items[0]->lastname . "' ";
 					}
 				}
-				$netfilters = new Default_Model_APIKeyNetfilters();
+				$netfilters = new \Application\Model\APIKeyNetfilters();
 				$netfilters->filter->keyid->equals($apikey->id);
 				$netfilters = $netfilters->items;
 				if(count($netfilters)>0){
@@ -1186,7 +1182,7 @@ class PeopleController extends AbstractActionController
 		}
 
 		//Return xml representation of access tokens for the current user
-		$acctokenslist = new Default_Model_AccessTokens();
+		$acctokenslist = new \Application\Model\AccessTokens();
 		$acctokenslist->filter->addedby->equals($uid)->and($acctokenslist->filter->type->like('personal'));
 		$acctokens = $acctokenslist->items;
 		echo "<accesstokens count='" . count($acctokens) . "' >";
@@ -1200,7 +1196,7 @@ class PeopleController extends AbstractActionController
 
 		foreach($acctokens as $acctoken){
 			echo "<accesstoken id='" . $acctoken->id . "' token='" . $acctoken->token . "' addedby='" . $acctoken->addedbyid . "' createdon='" . $acctoken->createdon . "' tokentype='" . $acctoken->type . "' ";
-			$netfilters = new Default_Model_AccessTokenNetfilters();
+			$netfilters = new \Application\Model\AccessTokenNetfilters();
 			$netfilters->filter->tokenid->equals($acctoken->id);
 			$nfilters = $netfilters->items;
 			echo "netfilters='" . count($nfilters) . "' >";
@@ -1268,7 +1264,7 @@ class PeopleController extends AbstractActionController
 				header("HTTP/1.0 400 Bad Request");
 				return;
 			}
-			$apikeys = new Default_Model_APIKeys();
+			$apikeys = new \Application\Model\APIKeys();
 			$apikeys->filter->id->equals($keyid)->and($apikeys->filter->ownerid->equals($uid));
 			if(count($apikeys->items)==0){
 				header("HTTP/1.0 404 Not Found");
@@ -1289,7 +1285,7 @@ class PeopleController extends AbstractActionController
 				return;
 			}
 
-			$users = new Default_Model_Researchers();
+			$users = new \Application\Model\Researchers();
 			$users->filter->id->equals($uid);
 			if(count($users->items)==0){
 				header("HTTP/1.0 404 Not Found");
@@ -1299,7 +1295,7 @@ class PeopleController extends AbstractActionController
 
 			$usercountryid = $users->items[0]->countryid;
 
-			$user = new Default_Model_Researcher();
+			$user = new \Application\Model\Researcher();
 			$uname = "appdb-" . generate_uuid_v4( );
 			$user->firstname = "";
 			$user->lastname = $displayname;
@@ -1311,7 +1307,7 @@ class PeopleController extends AbstractActionController
 			$user->positionTypeId = 4;
 			$user->save();
 
-			$apikeys = new Default_Model_APIKeys();
+			$apikeys = new \Application\Model\APIKeys();
 			$apikeys->filter->id->equals($keyid);
 			$apikeys = $apikeys->items[0];
 			$apikeys->sysaccountid = $user->id;
@@ -1322,7 +1318,7 @@ class PeopleController extends AbstractActionController
 			$keyid = $data->keyid;
 
 			//Check if api key exists
-			$apikeys = new Default_Model_APIKeys();
+			$apikeys = new \Application\Model\APIKeys();
 			$apikeys->filter->id->equals($keyid)->and($apikeys->filter->ownerid->equals($uid));
 			if(count($apikeys->items)==0){
 				header("HTTP/1.0 404 Not Found");
@@ -1333,7 +1329,7 @@ class PeopleController extends AbstractActionController
 			//Check if sys account exists
 			$apikey = $apikeys->items[0];
 			$sysid = $apikey->sysaccountid;
-			$rs = new Default_Model_Researchers();
+			$rs = new \Application\Model\Researchers();
 			$rs->filter->id->equals($sysid);
 			if(count($rs->items)==0){
 				header("HTTP/1.0 404 Not Found");
@@ -1387,7 +1383,7 @@ class PeopleController extends AbstractActionController
 		}
 
 		//Return xml representation of API keys for the current user
-		$apikeys = new Default_Model_APIKeys();
+		$apikeys = new \Application\Model\APIKeys();
 		$apikeys->filter->ownerid->equals($uid)->and($apikeys->filter->authmethods->notequals(0));
 		$apikeys = $apikeys->items;
 		echo "<apikeys count='" . count($apikeys) . "' >";
@@ -1396,14 +1392,14 @@ class PeopleController extends AbstractActionController
 				echo "<apikey id='" . $apikey->id . "' key='" . $apikey->key . "' ownerid='" . $apikey->ownerid . "' createdon='" . $apikey->createdon . "' authmethods='" . $apikey->authmethods . "' ";
 				if($apikey->sysaccountid != null){
 					echo "sysaccount='" . $apikey->sysaccountid . "' ";
-					$rscs = new Default_Model_Researchers();
+					$rscs = new \Application\Model\Researchers();
 					$rscs->filter->id->equals($apikey->sysaccountid);
 					if(count($rscs->items)>0){
 						echo "sysusername='" . $rscs->items[0]->username . "' ";
 						echo "sysdisplayname='" . $rscs->items[0]->lastname . "' ";
 					}
 				}
-				$netfilters = new Default_Model_APIKeyNetfilters();
+				$netfilters = new \Application\Model\APIKeyNetfilters();
 				$netfilters->filter->keyid->equals($apikey->id);
 				$netfilters = $netfilters->items;
 				if(count($netfilters)>0){
@@ -1470,7 +1466,7 @@ class PeopleController extends AbstractActionController
 		if( $this->session->userid===null ) {
 			$notfound = true;
 		}else{
-			$researchers = new Default_Model_Researchers();
+			$researchers = new \Application\Model\Researchers();
 			$researchers->filter->id->equals($this->session->userid);
 			if( count($researchers->items) > 0 ) {
 				$currentProfile = $researchers->items[0];
@@ -1508,7 +1504,7 @@ class PeopleController extends AbstractActionController
 		}
 
 		//Fetch researcher profile
-		$researchers = new Default_Model_Researchers();
+		$researchers = new \Application\Model\Researchers();
 		$researchers->filter->id->equals($profileid);
 		if( count($researchers->items) > 0 ) {
 			$profile = $researchers->items[0];
