@@ -455,7 +455,7 @@ class RestPplItem extends RestResourceItem {
 						"source" => $cid,
 						"ip" => $src
 					))) . "';";
-					db()->query($sql)->fetchAll();
+					db()->query($sql);
 				} catch (Exception $e) { /*ignore logging errors in case id or cname not found*/ }
 			}
 			$this->_logged = true;
@@ -667,9 +667,9 @@ class RestPplLogistics extends RestROResourceItem {
 			global $application;
 			$isAdmin = $this->userIsAdmin();
 			$mapper = new \Application\Model\ResearchersMapper();
-			$db = $application->getBootstrap()->getResource('db');
 			$flt = $this->getParam("flt");
-			$select = $mapper->getDbTable()->getAdapter()->select()->distinct()->from('researchers');
+			$select = $mapper->getDbTable()->getSql()->select();
+			$select->quantifier('DISTINCT');
 			$from = '';
 			$where = '';
 			$orderby = '';
@@ -727,16 +727,15 @@ class RestPplLogistics extends RestROResourceItem {
 				getZendSelectParts($select, $from, $where, $orderby, $limit);
 			}
 
-			$db->setFetchMode(Zend_Db::FETCH_BOTH);
-			$rs = $db->query('SELECT * FROM ppl_logistics(?,?,?)', array($flt, $from, $where))->fetchAll();
+			$from = fixuZenduBuguru($from);
+
+			$rs = db()->query('SELECT * FROM ppl_logistics(?,?,?)', array($flt, $from, $where))->toArray();
 			if ( count($rs) > 0 ) {
 				$rs = $rs[0];
 				$x = $rs['ppl_logistics'];
 			} else {
 				$x = '';
 			}
-			debug_log($from);
-			debug_log($where);
 			return new XMLFragmentRestResponse($x, $this);
 		} else return false;
 	}
@@ -745,8 +744,7 @@ class RestPplLogistics extends RestROResourceItem {
 class RestPplPrivList extends RestROSelfAuthResourceList {
 	public function get() {
 		if ( parent::get() !== false ) {
-			db()->setFetchMode(Zend_Db::FETCH_NUM);
-			$res = db()->query("SELECT researcher_privs_to_xml(?, ?)", array($this->getParam("id"), $this->_userid))->fetchAll();
+			$res = db()->query("SELECT researcher_privs_to_xml(?, ?)", array($this->getParam("id"), $this->_userid))->toArray();
 			$ret = array();
 			foreach ($res as $r) {
 				$ret[] = $r[0];
