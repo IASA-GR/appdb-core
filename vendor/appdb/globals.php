@@ -8908,7 +8908,9 @@ class SamlAuth{
 	//Clears session and cookies
 	public static function logout($session = null){
 		self::clearUserCredentails($session);
-		Zend_Session::destroy(true);
+		if (! is_null($session)) {
+			$session->getManager()->getStorage()->clear();
+		}
 		clearAuthCookies();
 		@session_regenerate_id(FALSE);
 		session_unset();
