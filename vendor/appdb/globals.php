@@ -5210,7 +5210,8 @@ class SEO{
 }
 
 function fixuZenduBuguru($s) {
-	return preg_replace('/ AS "(\w+\.){0,1}\w+\.any_2"/', '', $s);
+	$ret = preg_replace('/ AS "(\w+\.){0,1}\w+\.any_2"/', '', $s);
+	return preg_replace('/\.any\.any ON/', '.any ON', $ret);
 }
 
 class VMCaster{
