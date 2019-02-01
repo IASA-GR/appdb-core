@@ -1126,12 +1126,7 @@ class VoController extends AbstractActionController
 			return false;
 		}
 		$inTransaction = false;
-		//FIXME: $mode = Zend_Registry::get("vouser_sync");
-		if (is_array($mode) && isset($mode["mode"])) {
-			$mode = $mode["mode"];
-		} else {
-			$mode = "api";
-		}
+		$mode = \ApplicationConfiguration::vouser_sync("mode");
 		switch ($mode) {
 		case "api":
 		case "zip":

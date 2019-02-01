@@ -195,6 +195,19 @@ class ApplicationConfiguration
 	}
 
 	/**
+	 * Retrieve values by key under the 'vouser_sync' namespace. 
+	 * Eg app.wiki='https://....'
+	 * 
+	 * @param String $key - The key to search app namespace
+	 * @param Any $default - Default value when key does not exist
+	 * @return String
+	 */
+	public static function vouser_sync($key, $default = NULL)
+	{
+		return ApplicationConfigurationIni::getConfigNS('vouser_sync', $key, $default);		
+	}
+
+	/**
 	 * Retrieve values by key under the 'aaimp' namespace. 
 	 * Eg app.wiki='https://....'
 	 * 
