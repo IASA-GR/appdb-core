@@ -81,14 +81,14 @@ class AppTeamMapperBase
 
 	public function populate(&$entry,$row)
 	{
-		$entry->setAppID($row->appid);
-		$entry->setId($row->id);
-		$entry->setFirstName($row->firstname);
-		$entry->setLastName($row->lastname);
-		$entry->setDateInclusion($row->dateinclusion);
-		$entry->setInstitution($row->institution);
-		$entry->setCountryID($row->countryid);
-		$entry->setPositionTypeID($row->positiontypeid);
+		$entry->setAppID($row['appid']);
+		$entry->setId($row['id']);
+		$entry->setFirstName($row['firstname']);
+		$entry->setLastName($row['lastname']);
+		$entry->setDateInclusion($row['dateinclusion']);
+		$entry->setInstitution($row['institution']);
+		$entry->setCountryID($row['countryid']);
+		$entry->setPositionTypeID($row['positiontypeid']);
 	}
 
 	public function find($id, AppTeam &$value)

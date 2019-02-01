@@ -26,11 +26,13 @@ class PositionTypesMapper extends PositionTypesMapperBase
 		} else {
 			if ($format === 'xml') {
 				$select = $this->getDbTable()->getSql()->select();
-				if ($filter !== null) $select->order($filter->orderBy);
-				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT role_to_xml(id) as role FROM (".$select.") AS T;")->fetchAll();
+				if ($filter !== null) {
+					if (! is_null($filter->orderBy)) $select->order($filter->orderBy);
+				}
+				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT role_to_xml(id) as role FROM (" . SQL2STR($this, $select) . ") AS T;", array())->toArray();
 				$entries = array();
 				foreach ($resultSet as $row) {
-					$entry = $row->role;
+					$entry = $row['role'];
 					$entries[] = $entry;
 				}
 				return $entries;

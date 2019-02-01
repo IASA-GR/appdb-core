@@ -22,7 +22,7 @@ class DisseminationMapper extends DisseminationMapperBase
 {
 	public function populate(&$entry, $row) {
 		parent::populate($entry,$row);
-		$entry->setRecipients(pg_to_php_array($row->recipients));
+		$entry->setRecipients(pg_to_php_array($row['recipients']));
 	}
 
 	public function save(AROItem $value) {
@@ -82,53 +82,44 @@ class DisseminationMapper extends DisseminationMapperBase
 	public function count($filter = null)
     {
 		$select = $this->getDbTable()->getSql()->select();
-		$executor = $this->getDbTable();
-		$select->from($this->getDbTable(),array('COUNT(DISTINCT (dissemination.id)) AS count'));
+		$select->columns(array('COUNT(DISTINCT (dissemination.id)) AS count'));
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
-			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('dissemination',array('COUNT(DISTINCT (dissemination.id)) AS count'));
+			$select->quantifier('DISTINCT');
 			$this->joins($select, $filter);
 			$select->where($filter->expr());
-			$executor = $this->getDbTable()->getAdapter();
         }
-        //debug_log("".$select);
-		$res = $executor->fetchAll($select);
-		return $res[0]->count;
+		$res = db()->query(SQL2STR($this, $select), array())->toArray();
+		return $res[0]['count'];
 	}
 
 	public function fetchAll($filter = null, $format = '')
 	{
 		$select = $this->getDbTable()->getSql()->select();
-		$executor = $this->getDbTable();
 		if ( (($filter !== null) && ($filter->expr() != '')) ) {
-			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('dissemination');
+			$select->quantifier('DISTINCT');
 			if ( $filter !== null ) {
 				if ($filter->expr() != '') {
 					$this->joins($select, $filter);
 					$select->where($filter->expr());
-					$executor = $this->getDbTable()->getAdapter();
 				}
 			}
 		}
 		if (! is_null($filter)) {
-	if (! is_null($filter->limit)) $select->limit($filter->limit);
-	if (! is_null($filter->offset)) $select->offset($filter->offset);
-}
-		if ($filter !== null) {
-			$orderby = $filter->orderBy;
-			$select->order($orderby);
+			if (! is_null($filter->limit)) $select->limit($filter->limit);
+			if (! is_null($filter->offset)) $select->offset($filter->offset);
+			if (! is_null($filter->orderBy)) $select->order($filter->orderby);
 		}
-		//debug_log("".$select);
 		if ($format === 'xml') {
 			if ( ($this->count($filter) == 1) ) {
-				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT dissemination_to_xml_ext(id) as data FROM (".$select.") AS T;")->fetchAll();
+				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT dissemination_to_xml_ext(id) as data FROM (" . SQL2STR($this, $select) . ") AS T;", array())->toArray();
 			} else {
-				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT dissemination_to_xml(id) as data FROM (".$select.") AS T;")->fetchAll();
+				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT dissemination_to_xml(id) as data FROM (" . SQL2STR($this, $select) . ") AS T;", array())->toArray();
 			}
-		} else $resultSet = $executor->fetchAll($select);
+		} else $resultSet = db()->query(SQL2STR($this, $select), array())->toArray();
 		$entries = array();
 		foreach ($resultSet as $row) {
 			if ( $format === 'xml' ) {
-				$entry = $row->data;
+				$entry = $row['data'];
 			} else {
 				$entry = new DisseminationEntry();
 				$this->populate($entry,$row);

@@ -24,8 +24,8 @@ class DatasetLocationsMapper extends DatasetLocationsMapperBase
 
 	public function populate(&$entry, $row) {
 		parent::populate($entry,$row);
-		$entry->setSiteID(pg_to_php_array($row->siteid));
-		$entry->setOrganizationID(pg_to_php_array($row->organizationid));
+		$entry->setSiteID(pg_to_php_array($row['siteid']));
+		$entry->setOrganizationID(pg_to_php_array($row['organizationid']));
 	}
 
 	public function save(AROItem $value) {
@@ -53,13 +53,11 @@ class DatasetLocationsMapper extends DatasetLocationsMapperBase
 				} else {
 					$func = "dataset_location_to_xml";
 				}
-				//error_log("".$select);
-				$query = "SELECT $func(id) as dataset FROM (".$select." $order) AS T;";
-				//debug_log($query);
-				$resultSet = $this->getDbTable()->getAdapter()->query($query)->fetchAll();
+				$query = "SELECT $func(id) as dataset FROM (" . SQL2STR($this, $select) . " $order) AS T;";
+				$resultSet = $this->getDbTable()->getAdapter()->query($query, array())->toArray();
 				$entries = array();
 				foreach ($resultSet as $row) {
-					$entry = $row->dataset;
+					$entry = $row['dataset'];
 					$entries[] = $entry;
 				}
 				return $entries;

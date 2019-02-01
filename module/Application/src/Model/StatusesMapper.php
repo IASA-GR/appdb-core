@@ -26,7 +26,7 @@ class StatusesMapper extends StatusesMapperBase
 		} else {
 			if ($format === 'xml') {
 				$select = $this->getDbTable()->getSql()->select();
-				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT status_to_xml(id) as status FROM (".$select.") AS T;")->fetchAll();
+				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT status_to_xml(id) as status FROM (".$select.") AS T;", array())->toArray();
 				$entries = array();
 				foreach ($resultSet as $row) {
 					$entry = $row->status;

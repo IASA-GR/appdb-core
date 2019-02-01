@@ -22,7 +22,7 @@ class DatasetsMapper extends DatasetsMapperBase
 {
 	public function populate(&$entry, $row) {
 		parent::populate($entry,$row);
-		$entry->setTags(pg_to_php_array($row->tags));
+		$entry->setTags(pg_to_php_array($row['tags']));
 	}
 
 	public function save(AROItem $value) {
@@ -89,12 +89,11 @@ class DatasetsMapper extends DatasetsMapperBase
 				} else {
 					$func = "dataset_to_xml";
 				}
-				$query = "SELECT $func(array_agg(id), " . ($xmlflat ? "TRUE" : "FALSE") . ") as dataset FROM (".$select." $order) AS T;";
-				//debug_log($query);
-				$resultSet = $this->getDbTable()->getAdapter()->query($query)->fetchAll();
+				$query = "SELECT $func(array_agg(id), " . ($xmlflat ? "TRUE" : "FALSE") . ") as dataset FROM (" . SQL2STR($this, $select) . " $order) AS T;";
+				$resultSet = $this->getDbTable()->getAdapter()->query($query, array())->toArray();
 				$entries = array();
 				foreach ($resultSet as $row) {
-					$entry = $row->dataset;
+					$entry = $row['dataset'];
 					$entries[] = $entry;
 				}
 				return $entries;

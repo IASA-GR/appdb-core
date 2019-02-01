@@ -84,7 +84,7 @@ class UserPrivs
 //		$actions[] = 26;
 //		$actions[] = 30;
 //		$actions[] = 31;
-		$res = db()->query("SELECT UNNEST(app_actions())")->fetchAll();
+		$res = db()->query("SELECT UNNEST(app_actions())", array())->toArray();
 		foreach($res as $r) {
 			$actions[] = $r[0];
 		}
@@ -133,7 +133,7 @@ class UserPrivs
 		} else {
 			$t = $target;
 		}
-		$res = db()->query("SELECT " . $mode . "_privilege($action, '" . $this->_actor->guid . "', '$t', " . $this->_session->userid. ")")->fetchAll();
+		$res = db()->query("SELECT " . $mode . "_privilege($action, '" . $this->_actor->guid . "', '$t', " . $this->_session->userid. ")", array())->toArray();
 		if (count($res) > 0) {
 			$res = $res[0];
 			return $res[0];
@@ -296,8 +296,8 @@ SELECT
 			TRUE
 	END
 FROM applications WHERE guid = '" . $target ."';
-"
-		)->fetchAll();
+", array()
+		)->toArray();
 		if (count($res) > 0) {
 			$res = $res[0];
 			return $res[0];
@@ -369,7 +369,7 @@ FROM applications WHERE guid = '" . $target ."';
 		if ( ($this->_actor !== null) && userIsAdminOrManager($this->_actor->id) ) return true;
 
 
-		$res = db()->query("SELECT query_vowide_img_list_view_perm(?, ?)", array($this->_actor->id, $target))->fetchAll();
+		$res = db()->query("SELECT query_vowide_img_list_view_perm(?, ?)", array($this->_actor->id, $target))->toArray();
 		if (count($res) == 0) {
 			return false;
 		} else {
@@ -385,7 +385,7 @@ FROM applications WHERE guid = '" . $target ."';
 		if ( ($this->_actor !== null) && userIsAdminOrManager($this->_actor->id) ) return true;
 
 
-		$res = db()->query("SELECT query_vowide_img_list_manage_perm(?, ?)", array($this->_actor->id, $target))->fetchAll();
+		$res = db()->query("SELECT query_vowide_img_list_manage_perm(?, ?)", array($this->_actor->id, $target))->toArray();
 		if (count($res) == 0) {
 			return false;
 		} else {

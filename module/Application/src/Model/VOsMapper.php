@@ -130,7 +130,7 @@ class VOsMapper extends VOsMapperBase
  */
 		$select = $this->getDbTable()->getSql()->select();
 		if ( (($filter !== null) && ($filter->expr() != '')) ) {
-			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('vos');
+			$select->quantifier('DISTINCT');
 			$this->joins($select, $filter);
 			if (! is_array($filter->expr())) $select->where($filter->expr());
 		} else {
@@ -155,19 +155,16 @@ class VOsMapper extends VOsMapperBase
 		}
 
 		if ( is_array($filter->expr()) ) {
-			noDBSeqScan(db());
-			$resultSet = db()->query("SELECT COUNT(DISTINCT vos.id) FROM filtervos((?)::text[],(?)::text[],(?)::text[]) AS vos", array(php_to_pg_array($filter->fltstr, false), php_to_pg_array($from, false), str_replace("''", "\'", php_to_pg_array($where, false))))->fetchAll();
+			$resultSet = db()->query("SELECT COUNT(DISTINCT vos.id) FROM filtervos((?)::text[],(?)::text[],(?)::text[]) AS vos", array(php_to_pg_array($filter->fltstr, false), php_to_pg_array($from, false), str_replace("''", "\'", php_to_pg_array($where, false))))->toArray();
 		} else {
-			noDBSeqScan(db());
-			$resultSet = db()->query("SELECT COUNT(DISTINCT vos.id) FROM filtervos(?,?,?) AS vos", array($filter->fltstr, $from, $where))->fetchAll();
+			$resultSet = db()->query("SELECT COUNT(DISTINCT vos.id) FROM filtervos(?,?,?) AS vos", array($filter->fltstr, $from, $where))->toArray();
 		}
-		return $resultSet[0]->count;
+		return $resultSet[0]['count'];
 	}
 	
 	public function fetchAll($filter = null, $format = '', $xmldetailed = false)
 	{
 		$select = $this->getDbTable()->getSql()->select();
-		$executor = $this->getDbTable();
 		if ( $filter !== null ) {
 			$orderby = $filter->orderBy;
 			if ( is_array($orderby) ) {
@@ -177,16 +174,15 @@ class VOsMapper extends VOsMapperBase
 			$orderby = null;
 		}
 		if ( (($filter !== null) && ($filter->expr() != '')) ) {
-			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('vos');
+			$select->quantifier('DISTINCT');
 			$this->joins($select, $filter);
 			if ( ! is_array($filter->expr()) ) $select->where($filter->expr());
-			$executor = $this->getDbTable()->getAdapter();
 		}
 
 		if (! is_null($filter)) {
-	if (! is_null($filter->limit)) $select->limit($filter->limit);
-	if (! is_null($filter->offset)) $select->offset($filter->offset);
-}
+			if (! is_null($filter->limit)) $select->limit($filter->limit);
+			if (! is_null($filter->offset)) $select->offset($filter->offset);
+		}
 		if ($filter !== null) {
 			$inv = false;
 			if ( (substr($orderby,0,8) === "vos.rank") ) {
@@ -203,7 +199,7 @@ class VOsMapper extends VOsMapperBase
 				 */
 				$orderby = "rank DESC, name ASC";
 			}
-			$select->order($orderby);
+			if (! is_null($orderby)) $select->order($orderby);
 			if ( is_array($orderby) ) {
 				$_orderby = implode(",", $orderby);
 			} else $_orderby = $orderby;
@@ -225,7 +221,7 @@ class VOsMapper extends VOsMapperBase
 			$from = fixuZenduBuguru($from);
 		}
 
-		if ( isset($_orderby) ) $orderby = 'ORDER BY ' . $_orderby;	# TODO: FIX NULLS FIRST/LAST bypass
+		if (! is_null($_orderby) ) $orderby = 'ORDER BY ' . $_orderby;	# TODO: FIX NULLS FIRST/LAST bypass
 		if ( $from == '' ) $from = 'FROM vos';
 
 		if ($format === 'xml') {
@@ -233,36 +229,24 @@ class VOsMapper extends VOsMapperBase
 			if ( $xmldetailed ) {
 				$func_name .= "_ext";
 			}
-//			debug_log(var_export($filter->fltstr,true));
-//			debug_log(var_export($from, true));
-//			debug_log(var_export($where,true));
-//			debug_log($orderby);
-
 			if ( is_array($filter->expr()) ) {
-				noDBSeqScan(db());
-//				$fff = fopen(APPLICATION_PATH . "/../cache/debuglog", "a+");
-//				$sss = db()->quoteInto("SELECT ".$func_name."(array_agg(id $orderby)) as vo FROM filtervos((?)::text[],", php_to_pg_array($filter->fltstr, false)) . db()->quoteInto("(?)::text[],", php_to_pg_array($from, false)) . db()->quoteInto("(?)::text[]) AS vos $limit", str_replace("''", "\'", php_to_pg_array($where, false)));
-//				fwrite($fff, $sss);
-//				fclose($fff);
-				$resultSet = db()->query("SELECT ".$func_name."(array_agg(id $orderby)) as vo FROM filtervos((?)::text[],(?)::text[],(?)::text[]) AS vos $limit", array(php_to_pg_array($filter->fltstr, false), php_to_pg_array($from, false), str_replace("''", "\'", php_to_pg_array($where, false))))->fetchAll();
+				$resultSet = db()->query("SELECT ".$func_name."(array_agg(id $orderby)) as vo FROM filtervos((?)::text[],(?)::text[],(?)::text[]) AS vos $limit", array(php_to_pg_array($filter->fltstr, false), php_to_pg_array($from, false), str_replace("''", "\'", php_to_pg_array($where, false))))->toArray();
 			} else {
-				noDBSeqScan(db());
-				$resultSet = db()->query("SELECT ".$func_name."(array_agg(id $orderby)) AS vo FROM filtervos(?,?,?) AS vos $limit", array($filter->fltstr, $from, $where))->fetchAll();
+				$resultSet = db()->query("SELECT ".$func_name."(array_agg(id $orderby)) AS vo FROM filtervos(?,?,?) AS vos $limit", array($filter->fltstr, $from, $where))->toArray();
 			}
 		} else {
-			$select = fixuZenduBuguru("" . $select);
-			noDBSeqScan($executor);
-			$resultSet = $executor->fetchAll($select);
+			$resultSet = db()->query(SQL2STR($this, $select), array())->toArray(); 
 		}
 		$entries = array();
 		foreach ($resultSet as $row) {
 			if ( $format === 'xml' ) {
-				$entry = $row->vo;
+				$entry = $row['vo'];
 			} else {
 				$entry = new VO();
 				$this->populate($entry,$row);
 			}
 			$entries[] = $entry;
-		}		return $entries;
+		}
+		return $entries;
 	}
 }

@@ -26,10 +26,10 @@ class CountriesMapper extends CountriesMapperBase
 		} else {
 			if ($format === 'xml') {
 				$select = $this->getDbTable()->getSql()->select();
-				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT country_to_xml(id) as country FROM (".$select.") AS T ORDER BY name;")->fetchAll();
+				$resultSet = db()->query("SELECT country_to_xml(id) as country FROM (" . SQL2STR($this, $select) . ") AS T ORDER BY name;", array())->toArray();
 				$entries = array();
 				foreach ($resultSet as $row) {
-					$entry = $row->country;
+					$entry = $row['country'];
 					$entries[] = $entry;
 				}
 				return $entries;

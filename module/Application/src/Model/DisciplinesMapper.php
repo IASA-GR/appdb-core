@@ -40,12 +40,11 @@ class DisciplinesMapper extends DisciplinesMapperBase
 				} else {
 					$func = "discipline_to_xml";
 				}
-				$query = "SELECT $func(id) as discipline FROM (".$select." $order) AS T;";
-				//debug_log($query);
-				$resultSet = $this->getDbTable()->getAdapter()->query($query)->fetchAll();
+				$query = "SELECT $func(id) as discipline FROM (" . SQL2STR($this, $select) . " $order) AS T;";
+				$resultSet = $this->getDbTable()->getAdapter()->query($query, array())->toArray();
 				$entries = array();
 				foreach ($resultSet as $row) {
-					$entry = $row->discipline;
+					$entry = $row['discipline'];
 					$entries[] = $entry;
 				}
 				return $entries;

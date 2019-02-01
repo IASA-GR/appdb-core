@@ -82,15 +82,15 @@ class AggregateNewsMapperBase
 
 	public function populate(&$entry,$row)
 	{
-		$entry->setId($row->id);
-		$entry->setTimestamp($row->timestamp);
-		$entry->setAction($row->action);
-		$entry->setSubjectGUID($row->subjectguid);
-		$entry->setSubjectID($row->subjectid);
-		$entry->setSubjectName($row->subjectname);
-		$entry->setSubjectType($row->subjecttype);
-		$entry->setFields($row->fields);
-		$entry->setSubjectData($row->subjectdata);
+		$entry->setId($row['id']);
+		$entry->setTimestamp($row['timestamp']);
+		$entry->setAction($row['action']);
+		$entry->setSubjectGUID($row['subjectguid']);
+		$entry->setSubjectID($row['subjectid']);
+		$entry->setSubjectName($row['subjectname']);
+		$entry->setSubjectType($row['subjecttype']);
+		$entry->setFields($row['fields']);
+		$entry->setSubjectData($row['subjectdata']);
 	}
 
 	public function find($id, AggregateNews &$value)

@@ -33,7 +33,7 @@ class VaProvidersMapper extends VaProvidersMapperBase
 				if ($filter->expr() != "") {
 					$select->where($filter->expr());
 				}
-				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT $func(id) as va_provider FROM (".$select.") AS T ORDER BY sitename;")->fetchAll();
+				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT $func(id) as va_provider FROM (".$select.") AS T ORDER BY sitename;", array())->toArray();
 				$entries = array();
 				foreach ($resultSet as $row) {
 					$entry = $row->va_provider;

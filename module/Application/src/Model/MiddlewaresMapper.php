@@ -26,10 +26,10 @@ class MiddlewaresMapper extends MiddlewaresMapperBase
 		} else {
 			if ($format === 'xml') {
 				$select = $this->getDbTable()->getSql()->select();
-				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT middleware_to_xml(id) as mw FROM (".$select.") AS T ORDER BY name;")->fetchAll();
+				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT middleware_to_xml(id) as mw FROM (" . SQL2STR($this, $select) . ") AS T ORDER BY name;", array())->toArray();
 				$entries = array();
 				foreach ($resultSet as $row) {
-					$entry = $row->mw;
+					$entry = $row['mw'];
 					$entries[] = $entry;
 				}
 				return $entries;

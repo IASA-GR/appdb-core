@@ -32,18 +32,16 @@ class IntAuthorsMapper extends IntAuthorsMapperBase
 
 	public function fetchAll($filter = null, $format = '') {
 		$select = $this->getDbTable()->getSql()->select();
-		$executor = $this->getDbTable();
 		if ( (($filter !== null) && ($filter->expr() != '')) ) {
-			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('intauthors');
+			$select->quantifier('DISTINCT');
 			if ( $filter !== null ) {
 				if ($filter->expr() != '') {
 					$this->joins($select, $filter);
 					$select->where($filter->expr());
-					$executor = $this->getDbTable()->getAdapter();
 				}
 			}
 		}
-		$resultSet = $executor->fetchAll($select);
+		$resultSet = db()->query(SQL2STR($this, $select), array())->toArray();
 		$entries = array();
 		foreach ($resultSet as $row) {
 			$entry = new IntAuthor();

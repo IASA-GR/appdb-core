@@ -26,10 +26,10 @@ class RegionsMapper extends RegionsMapperBase
 		} else {
 			if ($format === 'xml') {
 				$select = $this->getDbTable()->getSql()->select();
-				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT region_to_xml(id) as country FROM (".$select.") AS T;")->fetchAll();
+				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT region_to_xml(id) as country FROM (" . SQL2STR($this, $select) . ") AS T;", array())->toArray();
 				$entries = array();
 				foreach ($resultSet as $row) {
-					$entry = $row->country;
+					$entry = $row['country'];
 					$entries[] = $entry;
 				}
 				return $entries;

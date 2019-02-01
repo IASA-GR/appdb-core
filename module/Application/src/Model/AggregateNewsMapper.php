@@ -106,7 +106,7 @@ class AggregateNewsMapper extends AggregateNewsMapperBase
 				if (! is_null($filter->$limit)) $select->limit($filter->limit);
 				if (! is_null($filter->$offset)) $select->offset($filter->offset);
 				if (! is_null($filter->$orderBy)) $select->order($filter->orderBy);
-				$resultSet = db()->query(STR2SQL($this, $select), array())->toArray();
+				$resultSet = db()->query(SQL2STR($this, $select), array())->toArray();
 				$entries = array();
 				foreach ($resultSet as $row) {
 					$entry = new AggregateNewsEntry();

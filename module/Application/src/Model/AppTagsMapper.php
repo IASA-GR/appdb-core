@@ -26,8 +26,8 @@ class AppTagsMapper extends AppTagsMapperBase
 		} else {
 			if ($format === 'xml') {
 				$q = "SELECT tags_to_xml() as tags";
-				if ($filter !== null && $filter->limit>0) $q.=" LIMIT " . $filter->limit . " ";
-				if ($filter !== null && $filter->offset>0) $q.=" OFFSET " . $filter->offset;
+				if ($filter !== null && $filter->limit > 0) $q .= " LIMIT " . $filter->limit . " ";
+				if ($filter !== null && $filter->offset > 0) $q .= " OFFSET " . $filter->offset;
 				$q .= ";";
 				$resultSet = db()->query($q, array())->toArray();
 				$entries = array();
@@ -53,8 +53,7 @@ class AppTagsMapper extends AppTagsMapperBase
 		$limit = '';
 		getZendSelectParts($select, $from, $where, $orderby, $limit);
 		$from = fixuZenduBuguru($from);
-		$select = (new \Zend\Db\Sql\Sql($this->getDbTable()->getAdapter()))->getSqlStringForSqlObject($select);
-		$res = db()->query($select, array())->toArray();
+		$res = db()->query(SQL2STR($this, $select), array())->toArray();
 		return $res[0]['count'];
 	}
 

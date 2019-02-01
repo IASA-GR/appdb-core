@@ -32,42 +32,34 @@ class LinkStatusesMapper extends LinkStatusesMapperBase
 	public function count($filter = null)
     {
 		$select = $this->getDbTable()->getSql()->select();
-		$executor = $this->getDbTable();
-		$select->from($this->getDbTable(),array('COUNT(DISTINCT (linkid,linktype)) FROM linkstatuses AS count'));
+		$select->columns(array('COUNT(DISTINCT (linkid,linktype)) FROM linkstatuses AS count'));
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
-			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('linkstatuses',array('COUNT(DISTINCT (linkid,linktype)) AS count'));
+			$select->quantifier('DISTINCT');
 			$this->joins($select, $filter);
 			$select->where($filter->expr());
-			$executor = $this->getDbTable()->getAdapter();
         }
-        //debug_log("".$select);
-		$res = $executor->fetchAll($select);
-		return $res[0]->count;
+		$res = db()->query(SQL2STR($this, $select), array())->toArray();
+		return $res[0]['count'];
 	}
 
 	public function fetchAll($filter = null, $format = '')
 	{
 		$select = $this->getDbTable()->getSql()->select();
-		$executor = $this->getDbTable();
 		if ( (($filter !== null) && ($filter->expr() != '')) ) {
-			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('linkstatuses');
+			$select->quantifier('DISTINCT');
 			if ( $filter !== null ) {
 				if ($filter->expr() != '') {
 					$this->joins($select, $filter);
 					$select->where($filter->expr());
-					$executor = $this->getDbTable()->getAdapter();
 				}
 			}
 		}
 		if (! is_null($filter)) {
-	if (! is_null($filter->limit)) $select->limit($filter->limit);
-	if (! is_null($filter->offset)) $select->offset($filter->offset);
-}
-		if ($filter !== null) {
-			$orderby = $filter->orderBy;
-			$select->order($orderby);
+			if (! is_null($filter->limit)) $select->limit($filter->limit);
+			if (! is_null($filter->offset)) $select->offset($filter->offset);
+			if (! is_null($filter->orderBy)) $select->order($filter->orderBy);
 		}
-		$resultSet = $executor->fetchAll($select);
+		$resultSet = db()->query(SQL2STR($this, $select), array())->toArray(); 
 		$entries = array();
 		foreach ($resultSet as $row) {
 			$entry = new LinkStatus();
@@ -77,4 +69,3 @@ class LinkStatusesMapper extends LinkStatusesMapperBase
 		return $entries;
 	}
 }
-

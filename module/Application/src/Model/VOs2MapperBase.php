@@ -160,8 +160,8 @@ class VOs2MapperBase
 			}
 
 		}
-		$res = $this->getDbTable()->fetchAll($select);
-		return $res[0]->count;
+		$res = $this->getDbTable()->getAdapter()->query(SQL2STR($this, $select), array())->toArray();
+		return $res[0]['count'];
 
 	}
 
@@ -210,7 +210,7 @@ class VOs2MapperBase
 		} else {
 			$select = null;
 		}
-		$resultSet = $this->getDbTable()->fetchAll($select);
+		$resultSet = $this->getDbTable()->getAdapter()->query(SQL2STR($this, $select), array())->toArray();
 	    	$entries = array();
 	    	foreach ($resultSet as $row) {
 	        	$entry = new VOs2();

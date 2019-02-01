@@ -32,12 +32,11 @@ class PermissionsMapper extends PermissionsMapperBase
 }
 		if ($filter !== null) $select->order($filter->orderBy);
 //		$select = str_replace('* FROM "permissions"', '* FROM permissionscache() AS "permissions"', "".$select);
-		$resultSet = db()->query($select)->fetchAll();
-//		$resultSet = $this->getDbTable()->fetchAll($select);
+		$resultSet = db()->query(SQL2STR($this, $select), array())->toArray();
 		$entries = array();
 		foreach ($resultSet as $row) {
 			$entry = new Permission();
-			$this->populate($entry,$row);
+			$this->populate($entry, $row);
 			$entries[] = $entry;
 		}		return $entries;
 	}

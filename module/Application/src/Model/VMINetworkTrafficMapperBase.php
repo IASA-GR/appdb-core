@@ -91,7 +91,8 @@ class VMINetworkTrafficMapperBase
 		$result = $this->getDbTable()->find($id);
 		if (0 == count($result)) {
 			return;
-		}		$row = $result->current();
+		}
+		$row = $result->current();
 		$this->populate($value,$row);	}
 
 	public function count($filter = null)
@@ -101,8 +102,8 @@ class VMINetworkTrafficMapperBase
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
 			$select->where($filter->expr());
 		}
-		$res = $this->getDbTable()->fetchAll($select);
-		return $res[0]->count;
+		$res = $this->getDbTable()->getAdapter()->query(SQL2STR($this, $select), array())->toArray();
+		return $res[0]['count'];
 	}
 	public function fetchAll($filter = null, $format = '')
 	{
@@ -115,13 +116,14 @@ class VMINetworkTrafficMapperBase
 	if (! is_null($filter->offset)) $select->offset($filter->offset);
 }
 		if ($filter !== null) $select->order($filter->orderBy);
-		$resultSet = $this->getDbTable()->fetchAll($select);
+		$resultSet = $this->getDbTable()->getAdapter()->query(SQL2STR($this, $select), array())->toArray();
 		$entries = array();
 		foreach ($resultSet as $row) {
 			$entry = new VMINetworkTrafficEntry();
 			$this->populate($entry,$row);
 			if ($format === 'xml') $entry = $entry->toXML(true);
 			$entries[] = $entry;
-		}		return $entries;
+		}
+		return $entries;
 	}
 }

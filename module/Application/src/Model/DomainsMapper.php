@@ -26,10 +26,10 @@ class DomainsMapper extends DomainsMapperBase
 		} else {
 			if ($format === 'xml') {
 				$select = $this->getDbTable()->getSql()->select();
-				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT discipline_to_xml(id) as discipline FROM (".$select." ORDER BY name) AS T;")->fetchAll();
+				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT discipline_to_xml(id) as discipline FROM (" . SQL2STR($this, $select) . " ORDER BY name) AS T;", array())->toArray();
 				$entries = array();
 				foreach ($resultSet as $row) {
-					$entry = $row->discipline;
+					$entry = $row['discipline'];
 					$entries[] = $entry;
 				}
 				return $entries;

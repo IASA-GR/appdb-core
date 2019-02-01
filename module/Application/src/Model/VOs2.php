@@ -49,7 +49,7 @@ class VO2 extends VO2Base
 	}
 	
 	public function getLogo() {
-		$ids = db()->query("SELECT UNNEST(disciplineid) AS did FROM vos WHERE id = " . $this->id . " ORDER BY did DESC LIMIT 1")->fetchAll();
+		$ids = db()->query("SELECT UNNEST(disciplineid) AS did FROM vos WHERE id = " . $this->id . " ORDER BY did DESC LIMIT 1", array())->toArray();
 		$id = $ids->did;
 		$discs = new Disciplines();
 		$discs->filter->id->numequals($id);

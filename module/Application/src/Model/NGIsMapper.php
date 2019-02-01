@@ -22,8 +22,8 @@ class NGIsMapper extends NGIsMapperBase
 {
 	public function populate(&$entry, $row) {
 		parent::populate($entry,$row);
-		if ($row->logo !== null) {
-			$logo = stream_get_contents($row->logo);
+		if (! is_null($row['logo'])) {
+			$logo = stream_get_contents($row['logo']);
 			$entry->setLogo($logo);
 		}
 	}
@@ -34,10 +34,10 @@ class NGIsMapper extends NGIsMapperBase
 		} else {
 			if ($format === 'xml') {
 				$select = $this->getDbTable()->getSql()->select();
-				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT ngi_to_xml(id) as ngi FROM (".$select.") AS T;")->fetchAll();
+				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT ngi_to_xml(id) as ngi FROM (" . SQL2STR($select) . ") AS T;", array())->toArray();
 				$entries = array();
 				foreach ($resultSet as $row) {
-					$entry = $row->ngi;
+					$entry = $row['ngi'];
 					$entries[] = $entry;
 				}
 				return $entries;

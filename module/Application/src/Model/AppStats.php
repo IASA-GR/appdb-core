@@ -69,22 +69,22 @@ class AppStats
 	
 	public function perDiscipline()
 	{
-		$res = db()->query("SELECT CASE WHEN disciplines.name IS NULL THEN 'N/A' ELSE disciplines.name END AS Discipline, COUNT(DISTINCT applications.id) AS AppCount, disciplines.id AS STID FROM applications LEFT OUTER JOIN disciplines ON disciplines.id = ANY(applications.disciplineid) " . $this->getFilter() . " GROUP BY Discipline, STID ORDER BY Discipline DESC;", array())->toArray()();
+		$res = db()->query("SELECT CASE WHEN disciplines.name IS NULL THEN 'N/A' ELSE disciplines.name END AS Discipline, COUNT(DISTINCT applications.id) AS AppCount, disciplines.id AS STID FROM applications LEFT OUTER JOIN disciplines ON disciplines.id = ANY(applications.disciplineid) " . $this->getFilter() . " GROUP BY Discipline, STID ORDER BY Discipline DESC;", array())->toArray();
 		return $res;
 	}
 	
 	public function perCountry()
 	{
-		return db()->query("SELECT CASE WHEN countries.name IS NULL THEN 'N/A' ELSE countries.name END AS Country, COUNT(DISTINCT appviews.id) AS AppCount, countries.id as STID FROM appviews LEFT OUTER JOIN countries ON countries.id = countryid ". str_replace('applications.','appviews.',$this->getFilter())." GROUP BY Country, STID ORDER BY country DESC;", array())->toArray()();
+		return db()->query("SELECT CASE WHEN countries.name IS NULL THEN 'N/A' ELSE countries.name END AS Country, COUNT(DISTINCT appviews.id) AS AppCount, countries.id as STID FROM appviews LEFT OUTER JOIN countries ON countries.id = countryid ". str_replace('applications.','appviews.',$this->getFilter())." GROUP BY Country, STID ORDER BY country DESC;", array())->toArray();
 	}
 	
 	public function perRegion()
 	{		
-		return db()->query("SELECT CASE WHEN regions.name IS NULL THEN 'N/A' ELSE regions.name END AS Region, COUNT(DISTINCT appviews.id) AS AppCount, regions.id as STID FROM appviews LEFT OUTER JOIN regions ON regions.id = regionid ".$this->getFilter()." GROUP BY Region, STID ORDER BY Region DESC;", array())->toArray()();
+		return db()->query("SELECT CASE WHEN regions.name IS NULL THEN 'N/A' ELSE regions.name END AS Region, COUNT(DISTINCT appviews.id) AS AppCount, regions.id as STID FROM appviews LEFT OUTER JOIN regions ON regions.id = regionid ".$this->getFilter()." GROUP BY Region, STID ORDER BY Region DESC;", array())->toArray();
 	}
 	
 	public function perVo()
 	{
-		return db()->query("SELECT CASE WHEN vos.name IS NULL THEN 'N/A' ELSE vos.name END AS VO, COUNT(DISTINCT appviews.id) as AppCount, vos.name as STID FROM appviews LEFT OUTER JOIN vos ON vos.id = void AND vos.deleted IS FALSE ". str_replace('applications.', 'appviews.', $this->getFilter())." GROUP BY VO, STID ORDER BY VO DESC;", array())->toArray()();
+		return db()->query("SELECT CASE WHEN vos.name IS NULL THEN 'N/A' ELSE vos.name END AS VO, COUNT(DISTINCT appviews.id) as AppCount, vos.name as STID FROM appviews LEFT OUTER JOIN vos ON vos.id = void AND vos.deleted IS FALSE ". str_replace('applications.', 'appviews.', $this->getFilter())." GROUP BY VO, STID ORDER BY VO DESC;", array())->toArray();
 	}
 }

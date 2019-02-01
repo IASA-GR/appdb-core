@@ -20,21 +20,6 @@ namespace Application\Model;
 
 class VOMembersMapper extends VOMembersMapperBase
 {
-//	public function count($filter = null) {
-//		//$ores = parent::fetchAll(null);
-//		//$ids = array();
-//		//foreach ($ores as $i) {
-//		//	$ids[] = $i->void;
-//		//}
-//		//$res = new VOs();
-//		//$res->filter->id->in($ids);
-//		//if ($filter !== null) {
-//		//	$res->filter->chain($filter, "AND");
-//		//}
-//		//$c = $res->count($filter);
-//		//return $c;
-//	}
-
 	public function fetchAll($filter = null, $format = '', $xmldetailed = false) {
 		if ( $format === "xml" ) {
 			$ores = parent::fetchAll(null);

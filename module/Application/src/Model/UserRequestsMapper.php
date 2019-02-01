@@ -34,10 +34,6 @@ class UserRequestsMapper extends UserRequestsMapperBase
 	}
 	
 	public function fetchAll($filter = null, $format = '') {
-		$from = '';
-		$where = '';
-		$orderby = '';
-		$limit = '';
 		$select = $this->getDbTable()->getSql()->select();
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
 			$select->quantifier('DISTINCT');
@@ -49,11 +45,7 @@ class UserRequestsMapper extends UserRequestsMapperBase
 			if (! is_null($filter->offset)) $select->offset($filter->offset);
 			if (! is_null($filter->orderBy)) $select->order($filter->orderBy);
 		}
-		getZendSelectParts($select, $from, $where, $orderby, $limit);
-		$from = fixuZenduBuguru($from);
-		$select = (new \Zend\Db\Sql\Sql($this->getDbTable()->getAdapter()))->getSqlStringForSqlObject($select);
-		$select = str_replace('"IS" "NULL"', 'IS NULL', $select);
-		$resultSet = db()->query($select, array())->toArray(); 
+		$resultSet = db()->query(SQL2STR($this, $select), array())->toArray(); 
 		$entries = array();
 		foreach ($resultSet as $row) {
 			$entry = new UserRequest();
@@ -65,16 +57,13 @@ class UserRequestsMapper extends UserRequestsMapperBase
 	
 	public function count($filter = null) {
 		$select = $this->getDbTable()->getSql()->select();
-		$executor = $this->getDbTable();
-		$select->from($this->getDbTable(),array('COUNT(DISTINCT (userrequests.id)) AS count'));
+		$select->columns('COUNT(DISTINCT (userrequests.id)) AS count');
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
-			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('userrequests',array('COUNT(DISTINCT (userrequests.id)) AS count'));
+			$select->quantifier('DISTINCT');			
 			$this->joins($select, $filter);
 			$select->where($filter->expr());
-			$executor = $this->getDbTable()->getAdapter();
 		}
-		//debug_log("".$select);
-		$res = $executor->fetchAll($select);
-		return $res[0]->count;
+		$res = db()->query(SQL2STR($this, $select), array())->toArray(); 
+		return $res[0]['count'];
 	}
 }

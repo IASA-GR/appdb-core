@@ -108,8 +108,6 @@ class SitesMapper extends SitesMapperBase
 	}
 
 	public function count($filter = null) {
-		//$rs = $this->fetchAll($filter, "xml", false);
-		//return count($rs);
 		$select = $this->getDbTable()->getSql()->select();
 		if ( (($filter !== null) && ($filter->expr() != '')) ) {
 			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('sites');
@@ -140,31 +138,31 @@ class SitesMapper extends SitesMapperBase
 		}
 		noDBSeqScan(db());
 		if ( is_array($filter->expr()) ) {
-			$res = db()->query("SELECT COUNT(DISTINCT id) FROM filtersites((?)::text[], (?)::text[], (?)::text[])", array(php_to_pg_array($filter->fltstr, false), php_to_pg_array($from, false), str_replace("''", "\'", php_to_pg_array($where, false))))->fetchAll();
+			$res = db()->query("SELECT COUNT(DISTINCT id) FROM filtersites((?)::text[], (?)::text[], (?)::text[])", array(php_to_pg_array($filter->fltstr, false), php_to_pg_array($from, false), str_replace("''", "\'", php_to_pg_array($where, false))))->toArray();
 		} else {
 			//if ( ! $this->_nocache ) {
-				$res = db()->query("SELECT COUNT(DISTINCT id) FROM filtersites(?,?,?)", array($filter->fltstr, $from, $where))->fetchAll();
+				$res = db()->query("SELECT COUNT(DISTINCT id) FROM filtersites(?,?,?)", array($filter->fltstr, $from, $where))->toArray();
 			//} else {
 			//	$res = db()->query("SELECT COUNT(DISTINCT id) $from $where");
 			//}
 		}
-		return $res[0]->count;
+		return $res[0]['count'];
 	}
 	
 	public function fetchFilteredEntries($filter = null, $format = '')
 	{
+		$select = $this->getDbTable()->getSql()->select();
 		if ( $filter !== null ) {
-			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('sites');
+			$select->quantifier('DISTINCT');
 			if ( is_array($filter->expr()) || trim($filter->expr()) != '' ) {
 				$this->joins($select, $filter);
 				if ( ! is_array($filter->expr()) ) $select->where($filter->expr());
-				$executor = $this->getDbTable()->getAdapter();
 			}
 		}
 		if ($filter !== null) {
-			$ord = $filter->orderBy;
-			$select->limit($filter->limit, $filter->offset);
-			$select->order($ord);
+			if (! is_null($filter->limit)) $select->limit($filter->limit);
+			if (! is_null($filter->offset)) $select->offset($filter->offset);
+			if (! is_null($filter->orderBy)) $select->order($filter->orderBy);
 		}
 
 		if ( is_array($filter->expr()) ) {
@@ -185,15 +183,13 @@ class SitesMapper extends SitesMapperBase
 		if ( $from == '' ) $from = 'FROM sites';
 
 		if ( is_array($filter->expr()) ) {
-			noDBSeqScan(db());
-			$resultSet = db()->query("SELECT sites.guid as guid FROM filtersites((?)::text[],(?)::text[],(?)::text[]) AS sites INNER JOIN sites AS s ON s.id = sites.id $limit", array(php_to_pg_array($filter->fltstr, false), php_to_pg_array($from, false), str_replace("''", "\'", php_to_pg_array($where, false))))->fetchAll();
+			$resultSet = db()->query("SELECT sites.guid as guid FROM filtersites((?)::text[],(?)::text[],(?)::text[]) AS sites INNER JOIN sites AS s ON s.id = sites.id $limit", array(php_to_pg_array($filter->fltstr, false), php_to_pg_array($from, false), str_replace("''", "\'", php_to_pg_array($where, false))))->toArray();
 		} else {
-			noDBSeqScan(db());
-			$resultSet = db()->query("SELECT sites.guid as guid FROM filtersites(?,?,?) AS sites INNER JOIN sites AS s ON s.id = sites.id $limit", array($filter->fltstr, $from, $where))->fetchAll();
+			$resultSet = db()->query("SELECT sites.guid as guid FROM filtersites(?,?,?) AS sites INNER JOIN sites AS s ON s.id = sites.id $limit", array($filter->fltstr, $from, $where))->toArray();
 		}
 		$guids = array();
 		foreach ($resultSet as $row) {
-			 $guids[] = $row->guid;
+			 $guids[] = $row['guid'];
 		}
 		
 		$select = $this->getDbTable()->getSql()->select();
@@ -206,11 +202,11 @@ class SitesMapper extends SitesMapperBase
 			}
 		}
 		if (! is_null($filter)) {
-	if (! is_null($filter->limit)) $select->limit($filter->limit);
-	if (! is_null($filter->offset)) $select->offset($filter->offset);
-}
-		if ($filter !== null) $select->order($filter->orderBy);
-		$resultSet = $this->getDbTable()->fetchAll($select);
+			if (! is_null($filter->limit)) $select->limit($filter->limit);
+			if (! is_null($filter->offset)) $select->offset($filter->offset);
+			if (! is_null($filter->orderBy)) $select->order($filter->orderBy);
+		}
+		$resultSet = $this->getDbTable()->getAdapter()->query(SQL2STR($this, $select), array())->toArray();
 		$entries = array();
 		foreach ($resultSet as $row) {
 			$entry = new Site();
@@ -221,8 +217,7 @@ class SitesMapper extends SitesMapperBase
 	}
 	
 	public function fetchAll($filter = null, $format = '', $xmldetailed = false) {
-		$select = $this->getDbTable()->select()->from('sites');
-		$executor = $this->getDbTable();
+		$select = $this->getDbTable()->getSql()->select();
 		if ( $filter !== null ) {
 			$orderby = $filter->orderBy;
 			if ( is_array($orderby) ) {
@@ -240,18 +235,16 @@ class SitesMapper extends SitesMapperBase
 		} else {
 			if ($format === 'xml') {
 				if ( $filter !== null ) {
-					$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('sites');
+					$select->quantifier('DISTINCT');
 					if ( is_array($filter->expr()) || trim($filter->expr()) != '' ) {
 						$this->joins($select, $filter);
 						if ( ! is_array($filter->expr()) ) $select->where($filter->expr());
-						$executor = $this->getDbTable()->getAdapter();
 					}
 				}
-        		if ($filter !== null) {
-					$ord = $filter->orderBy;
-//					if ( $ord == '' ) $ord = 'name ASC';
-					$select->limit($filter->limit, $filter->offset);
-					$select->order($ord);
+        		if (! is_null($filter)) {
+					if (! is_null($filter->limit)) $select->limit($filter->limit);
+					if (! is_null($filter->offset)) $select->offset($filter->offset);
+					if (! is_null($filter->orderBy)) $select->order($filter->orderBy);
 				}
 
 				if ( is_array($filter->expr()) ) {
@@ -277,15 +270,13 @@ class SitesMapper extends SitesMapperBase
 					$func = "site_to_xml";
 				}
 				if ( is_array($filter->expr()) ) {
-					noDBSeqScan(db());
-					$resultSet = db()->query("SELECT ".$func."(array_agg(sites.guid::text $orderby)) as site FROM filtersites((?)::text[],(?)::text[],(?)::text[]) AS sites INNER JOIN sites AS s ON s.id = sites.id $limit", array(php_to_pg_array($filter->fltstr, false), php_to_pg_array($from, false), str_replace("''", "\'", php_to_pg_array($where, false))))->fetchAll();
+					$resultSet = db()->query("SELECT ".$func."(array_agg(sites.guid::text $orderby)) as site FROM filtersites((?)::text[],(?)::text[],(?)::text[]) AS sites INNER JOIN sites AS s ON s.id = sites.id $limit", array(php_to_pg_array($filter->fltstr, false), php_to_pg_array($from, false), str_replace("''", "\'", php_to_pg_array($where, false))))->toArray();
 				} else {
-					noDBSeqScan(db());
-					$resultSet = db()->query("SELECT ".$func."(array_agg(sites.guid::text $orderby)) as site FROM filtersites(?,?,?) AS sites INNER JOIN sites AS s ON s.id = sites.id $limit", array($filter->fltstr, $from, $where))->fetchAll();
+					$resultSet = db()->query("SELECT ".$func."(array_agg(sites.guid::text $orderby)) as site FROM filtersites(?,?,?) AS sites INNER JOIN sites AS s ON s.id = sites.id $limit", array($filter->fltstr, $from, $where))->toArray();
 				}
 				$entries = array();
 				foreach ($resultSet as $row) {
-					$entry = $row->site;
+					$entry = $row['site'];
 					$entries[] = $entry;
 				}
 				return $entries;

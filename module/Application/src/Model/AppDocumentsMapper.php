@@ -29,7 +29,7 @@ class AppDocumentsMapper extends AppDocumentsMapperBase
 				if ( $filter !== null && $filter->expr() != '' ) {
 					$select->where($filter->expr());
 				}
-				$resultSet = db()->query("SELECT appdocument_to_xml(id) as pub FROM (".$select.") AS T;", array())->toArray();
+				$resultSet = db()->query("SELECT appdocument_to_xml(id) as pub FROM (" . SQL2STR($this, $select) . ") AS T;", array())->toArray();
 				$entries = array();
 				foreach ($resultSet as $row) {
 					$entry = $row['pub'];

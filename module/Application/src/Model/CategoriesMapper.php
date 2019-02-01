@@ -32,7 +32,7 @@ class CategoriesMapper extends CategoriesMapperBase
         		if ($filter !== null) {
 					$ord = $filter->orderBy;
 					if ( $ord == '' ) $ord = 'name';
-					$order = "ORDER BY ".$ord;
+					$order = "ORDER BY ". $ord;
 				}
 				if ( $order == '' ) $order = "ORDER BY name";
 				if ( $xmldetailed === true ) {					
@@ -40,10 +40,10 @@ class CategoriesMapper extends CategoriesMapperBase
 				} else {
 					$func = "category_to_xml";
 				}
-				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT $func(id) as category FROM (".$select.") AS categories $order;")->fetchAll();
+				$resultSet = db()->query("SELECT $func(id) as category FROM (". SQL2STR($this, $select) . ") AS categories $order;", array())->toArray();
 				$entries = array();
 				foreach ($resultSet as $row) {
-					$entry = $row->category;
+					$entry = $row['category'];
 					$entries[] = $entry;
 				}
 				return $entries;

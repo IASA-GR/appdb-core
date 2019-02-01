@@ -39,7 +39,7 @@ class Privs
 		} else $action = " AND actionid = $actionID";		
 		if ( $target !== null ) {
 			if ( $target->guid === null ) return true;
-			$res = $this->_db->query("SELECT EXISTS (SELECT * FROM permissions WHERE actor = '".$actor->guid . "'" .$action." AND (object = '".$target->guid."' OR object IS NULL)) AS result;")->fetchAll();
+			$res = $this->_db->query("SELECT EXISTS (SELECT * FROM permissions WHERE actor = '".$actor->guid . "'" .$action." AND (object = '".$target->guid."' OR object IS NULL)) AS result;", array())->toArray();
 			$row = $res[0];
 			if ( $row['result'] == "1" ) {
 				return true;
@@ -47,7 +47,7 @@ class Privs
 				return false;
 			}
 		} else {
-			$res = $this->_db->query("SELECT EXISTS (SELECT * FROM permissions WHERE actor = '".$actor->guid. "'" .$action." AND object IS NULL) AS result;")->fetchAll();
+			$res = $this->_db->query("SELECT EXISTS (SELECT * FROM permissions WHERE actor = '".$actor->guid. "'" .$action." AND object IS NULL) AS result;", array())->toArray();
 			$row = $res[0];
 			if ( $row['result'] == "1" ) {
 				return true;
@@ -206,8 +206,8 @@ SELECT
 			TRUE
 	END
 FROM applications WHERE guid = '" . $target ."';
-"
-		)->fetchAll();
+", array()
+		)->toArray();
 		if (count($res) > 0) {
 			$res = $res[0];
 			return $res[0];
@@ -276,7 +276,7 @@ FROM applications WHERE guid = '" . $target ."';
 		if ( ($this->_actor === null) || ($this->_actor->id === null) ) return false;
 		// admin access
 		if ( ($this->_actor !== null) && userIsAdminOrManager($this->_actor->id) ) return true;
-		$res = db()->query("query_vowide_img_list_view_perm(?, ?)", array($this->_actor->id, $target))->fetchAll();
+		$res = db()->query("query_vowide_img_list_view_perm(?, ?)", array($this->_actor->id, $target))->toArray();
 		if (count($res) == 0) {
 			return false;
 		} else {
@@ -290,7 +290,7 @@ FROM applications WHERE guid = '" . $target ."';
 		if ( ($this->_actor === null) || ($this->_actor->id === null) ) return false;
 		// admin access
 		if ( ($this->_actor !== null) && userIsAdminOrManager($this->_actor->id) ) return true;
-		$res = db()->query("query_vowide_img_list_manage_perm(?, ?)", array($this->_actor->id, $target))->fetchAll();
+		$res = db()->query("query_vowide_img_list_manage_perm(?, ?)", array($this->_actor->id, $target))->toArray();
 		if (count($res) == 0) {
 			return false;
 		} else {
@@ -329,7 +329,7 @@ FROM applications WHERE guid = '" . $target ."';
 	
 	public function applications()
 	{
-		$rs = $this->_db->query("SELECT id FROM applications WHERE guid IN (SELECT object FROM permissions WHERE actor = '".$this->_actor->guid."');")->fetchAll();
+		$rs = $this->_db->query("SELECT id FROM applications WHERE guid IN (SELECT object FROM permissions WHERE actor = '".$this->_actor->guid."');", array())->toArray();
 		$ids = array();
 		foreach ($rs as $row) {
 			$ids[] = $row['id'];

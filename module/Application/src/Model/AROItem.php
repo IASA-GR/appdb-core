@@ -60,7 +60,8 @@ class AROItem {
 		if (! $found) {
 			$method = 'set' . $name;
 			if (('mapper' == $name) || !method_exists($this, $method)) {
-				throw new Exception("Invalid " . $this->_baseitemname . " property: '$name'");
+				error_log("Invalid " . $this->_baseitemname . " property: '$name'");
+				throw new \Exception("Invalid " . $this->_baseitemname . " property: '$name'");
 			}
 			if (is_string($value)) {
 				$value = str_replace("'", "’", $value);
@@ -93,7 +94,8 @@ class AROItem {
 		if (! $found) {
 			$method = 'get' . $name;
 			if (('mapper' == $name) || !method_exists($this, $method)) {
-					throw new Exception("Invalid " . $this->_baseitemname . " property: '$name'");
+					error_log("Invalid " . $this->_baseitemname . " property: '$name'");
+					throw new \Exception("Invalid " . $this->_baseitemname . " property: '$name'");
 			}
 			$ret = $this->$method();
 			if (is_string($ret)) {
@@ -129,7 +131,8 @@ class AROItem {
 					return call_user_func_array(array(&$this, "get" . $name), $args);
 				}*/
 			}
-			throw new Exception("Call to undefined method $name");
+			error_log("Call to undefined method $name");
+			throw new \Exception("Call to undefined method $name");
 		}
 	}
 

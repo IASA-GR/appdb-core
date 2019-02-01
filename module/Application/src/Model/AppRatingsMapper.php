@@ -36,11 +36,10 @@ class AppRatingsMapper extends AppRatingsMapperBase
 			if (! is_null($filter->offset)) $select->offset($filter->offset);
 			if (! is_null($filter->ordeBy)) $select->order($filter->orderBy);
 		}
-		$select = (new \Zend\Db\Sql\Sql($this->getDbTable()->getAdapter()))->getSqlStringForSqlObject($select);
 		if ($format === 'xml') {
-			$resultSet = db()->query("SELECT appratings_to_xml(id) as apprating FROM (". $select .") AS T;", array())->toArray();
+			$resultSet = db()->query("SELECT appratings_to_xml(id) as apprating FROM (". SQL2STR($this, $select) .") AS T;", array())->toArray();
 		} else {
-			$resultSet = db()->query($select, array())->toArray();
+			$resultSet = db()->query(SQL2STR($this, $select), array())->toArray();
 		}
 		$entries = array();
 		foreach ($resultSet as $row) {

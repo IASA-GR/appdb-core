@@ -66,12 +66,11 @@ class DatasetVersionsMapper extends DatasetVersionsMapperBase
 				} else {
 					$func = "dataset_version_to_xml";
 				}
-				//error_log("".$select);
-				$query = "SELECT $func(id) as dataset FROM (".$select." $order) AS T;";
-				$resultSet = $this->getDbTable()->getAdapter()->query($query)->fetchAll();
+				$query = "SELECT $func(id) as dataset FROM (" . SQL2STR($this, $select) . " $order) AS T;";
+				$resultSet = $this->getDbTable()->getAdapter()->query($query, array())->toArray();
 				$entries = array();
 				foreach ($resultSet as $row) {
-					$entry = $row->dataset;
+					$entry = $row['dataset'];
 					$entries[] = $entry;
 				}
 				return $entries;

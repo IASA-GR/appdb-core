@@ -141,7 +141,6 @@ class AROMapper {
 		} else {
 			$ids = $id;
 		}
-//		$result = $this->getDbTable()->find($ids);
 		$select = $this->getDbTable()->getSql()->select();
 		$from = '';
 		$where = '';
@@ -183,8 +182,7 @@ class AROMapper {
 			if (! is_null($filter->offset)) $select->offset($filter->offset);
 			if (! is_null($filter->orderBy)) $select->order($filter->orderBy);
 		}
-		$select = (new \Zend\Db\Sql\Sql($this->getDbTable()->getAdapter()))->getSqlStringForSqlObject($select);
-		$resultSet = db()->query($select, array())->toArray();
+		$resultSet = $this->getDbTable()->getAdapter()->query(SQL2STR($this, $select), array())->toArray();
 		$entries = array();
 		foreach ($resultSet as $row) {
 			$type = "Application\\Model\\" . $this->_baseitemname;
