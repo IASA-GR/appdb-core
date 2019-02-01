@@ -33,7 +33,7 @@ class NGIsMapper extends NGIsMapperBase
 			return parent::fetchAll($filter);
 		} else {
 			if ($format === 'xml') {
-				$select = $this->getDbTable()->select();
+				$select = $this->getDbTable()->getSql()->select();
 				$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
 				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT ngi_to_xml(id) as ngi FROM (".$select.") AS T;")->fetchAll();
 				$entries = array();

@@ -23,15 +23,15 @@ class LinkStatusesMapper extends LinkStatusesMapperBase
 	private function joins(&$select, $filter) {
         if ( is_array($filter->joins) ) {
 			if (in_array("countries", $filter->joins)) {
-					$select->joinLeft('appcountries','linkstatuses.appid = appcountries.appid', array());
-					$select->joinLeft('countries','countries.id = appcountries.id', array());
+					$select->join('appcountries','linkstatuses.appid = appcountries.appid', array(), 'left');
+					$select->join('countries','countries.id = appcountries.id', array(), 'left');
 			}
 		}
 	}
 
 	public function count($filter = null)
     {
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		$executor = $this->getDbTable();
 		$select->from($this->getDbTable(),array('COUNT(DISTINCT (linkid,linktype)) FROM linkstatuses AS count'));
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
@@ -48,7 +48,7 @@ class LinkStatusesMapper extends LinkStatusesMapperBase
 
 	public function fetchAll($filter = null, $format = '')
 	{
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		$executor = $this->getDbTable();
 		if ( (($filter !== null) && ($filter->expr() != '')) ) {
 			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('linkstatuses');
@@ -61,7 +61,10 @@ class LinkStatusesMapper extends LinkStatusesMapperBase
 				}
 			}
 		}
-		if ($filter !== null) $select->limit($filter->limit, $filter->offset);
+		if (! is_null($filter)) {
+	if (! is_null($filter->limit)) $select->limit($filter->limit);
+	if (! is_null($filter->offset)) $select->offset($filter->offset);
+}
 		if ($filter !== null) {
 			$orderby = $filter->orderBy;
 			$select->order($orderby);

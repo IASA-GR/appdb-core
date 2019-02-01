@@ -21,87 +21,87 @@ namespace Application\Model;
 class SitesMapper extends SitesMapperBase
 {
 	public function joins(&$select, $filter) {
-		$select->joinLeft("sites.any", "sites.any.id = sites.id", array());
+		$select->join("sites.any", "sites.any.id = sites.id", array(), 'left');
 		if ( is_array($filter->joins) ) {
 			
-			$select->joinLeft('va_providers','va_providers.sitename = sites.name', array());
-			$select->joinLeft('va_provider_images', 'va_provider_images.va_provider_id = va_providers.id', array() );
+			$select->join('va_providers','va_providers.sitename = sites.name', array(), 'left');
+			$select->join('va_provider_images', 'va_provider_images.va_provider_id = va_providers.id', array(), 'left');
 
 			if ( in_array("vos", $filter->joins) ) {
-				$select->joinLeft('vowide_image_list_images', 'vowide_image_list_images.id = va_provider_images.vowide_vmiinstanceid', array() );
-				$select->joinLeft('vowide_image_lists', 'vowide_image_lists.id = vowide_image_list_images.vowide_image_list_id', array() );
-				$select->joinLeft('vos', 'vos.id = vowide_image_lists.void', array() );
-				$select->joinLeft('vos.any', 'vos.any.id = vos.id', array() );
+				$select->join('vowide_image_list_images', 'vowide_image_list_images.id = va_provider_images.vowide_vmiinstanceid', array(), 'left');
+				$select->join('vowide_image_lists', 'vowide_image_lists.id = vowide_image_list_images.vowide_image_list_id', array(), 'left');
+				$select->join('vos', 'vos.id = vowide_image_lists.void', array(), 'left');
+				$select->join('vos.any', 'vos.any.id = vos.id', array(), 'left');
 			}
 			
 			if (in_array("applications", $filter->joins) || in_array("disciplines", $filter->joins) || in_array("middlewares", $filter->joins) || in_array("categories", $filter->joins) || in_array("oses", $filter->joins) || in_array("proglangs", $filter->joins) || in_array("archs", $filter->joins) || in_array("countries", $filter->joins) || in_array("hypervisors", $filter->joins) || in_array("oses", $filter->joins) || in_array("os_families", $filter->joins)) {
-				$select->joinLeft('vaviews','vaviews.vmiinstanceid = va_provider_images.vmiinstanceid', array());
-				$select->joinLeft('applications', 'applications.id = vaviews.appid', array() );
-				$select->joinLeft('applications.any', 'applications.any.id = applications.id', array() );
+				$select->join('vaviews','vaviews.vmiinstanceid = va_provider_images.vmiinstanceid', array(), 'left');
+				$select->join('applications', 'applications.id = vaviews.appid', array(), 'left');
+				$select->join('applications.any', 'applications.any.id = applications.id', array(), 'left');
 			}
 			
 			if ( ! in_array("countries", $filter->joins) && in_array("countries", $filter->privateJoins) ) {
-				$select->joinLeft('countries', 'countries.id = sites.countryid', array() );
-				$select->joinLeft('countries.any', 'countries.any.id = countries.id', array() );
+				$select->join('countries', 'countries.id = sites.countryid', array(), 'left');
+				$select->join('countries.any', 'countries.any.id = countries.id', array(), 'left');
 			} elseif ( in_array("countries", $filter->joins) ) {
-				$select->joinLeft('appcountries', 'appcountries.appid = applications.id', array() );
-				$select->joinLeft('countries', 'countries.id = sites.countryid OR appcountries.id = sites.countryid', array() );
-				$select->joinLeft('countries.any', 'countries.any.id = countries.id', array() );
+				$select->join('appcountries', 'appcountries.appid = applications.id', array(), 'left');
+				$select->join('countries', 'countries.id = sites.countryid OR appcountries.id = sites.countryid', array(), 'left');
+				$select->join('countries.any', 'countries.any.id = countries.id', array(), 'left');
 			}
 			
 			if ( in_array("disciplines", $filter->joins) ) {
-				$select->joinLeft('disciplines', 'disciplines.id = ANY(applications.disciplineid)', array());
-				$select->joinLeft('disciplines.any', 'disciplines.any.id = disciplines.id', array());
+				$select->join('disciplines', 'disciplines.id = ANY(applications.disciplineid)', array(), 'left');
+				$select->join('disciplines.any', 'disciplines.any.id = disciplines.id', array(), 'left');
 			}
 			
 			if ( in_array("middlewares", $filter->joins) ) {
-				$select->joinLeft('app_middlewares','applications.id = app_middlewares.appid', array());
-				$select->joinLeft('app_middlewares.any','app_middlewares.any.id = app_middlewares.id', array());
-				$select->joinLeft('middlewares','middlewares.id = app_middlewares.middlewareid', array());
-				$select->joinLeft('middlewares.any','middlewares.any.id = middlewares.id', array());
+				$select->join('app_middlewares','applications.id = app_middlewares.appid', array(), 'left');
+				$select->join('app_middlewares.any','app_middlewares.any.id = app_middlewares.id', array(), 'left');
+				$select->join('middlewares','middlewares.id = app_middlewares.middlewareid', array(), 'left');
+				$select->join('middlewares.any','middlewares.any.id = middlewares.id', array(), 'left');
             }
 			
             if ( in_array("categories", $filter->joins) ) {
-				$select->joinLeft("categories","categories.id = ANY(applications.categoryid)",array());
-				$select->joinLeft("categories.any.any","categories.any.id = categories.id",array());
+				$select->join("categories","categories.id = ANY(applications.categoryid)",array(), 'left');
+				$select->join("categories.any.any","categories.any.id = categories.id",array(), 'left');
 			}
 			if ( in_array("proglangs", $filter->joins) ) {
-				$select->joinLeft('appproglangs', 'appproglangs.appid = applications.id', array());
-				$select->joinLeft('proglangs', 'appproglangs.proglangid = proglangs.id', array());
-				$select->joinLeft('proglangs.any', 'proglangs.any.id = proglangs.id', array());
+				$select->join('appproglangs', 'appproglangs.appid = applications.id', array(), 'left');
+				$select->join('proglangs', 'appproglangs.proglangid = proglangs.id', array(), 'left');
+				$select->join('proglangs.any', 'proglangs.any.id = proglangs.id', array(), 'left');
 			}
 /*			if ( in_array("archs", $filter->joins) ) {
-				$select->joinLeft('app_archs', 'app_archs.appid = applications.id', array());
-				$select->joinLeft('archs', 'app_archs.archid = archs.id', array());
-				$select->joinLeft('archs.any', 'archs.any.id = archs.id', array());
+				$select->join('app_archs', 'app_archs.appid = applications.id', array(), 'left');
+				$select->join('archs', 'app_archs.archid = archs.id', array(), 'left');
+				$select->join('archs.any', 'archs.any.id = archs.id', array(), 'left');
 } */
 /*			
 			if ( in_array("oses", $filter->joins) ) {
-				$select->joinLeft('app_oses', 'app_oses.appid = applications.id', array());
-				$select->joinLeft('oses', 'app_oses.osid = oses.id', array());
-				$select->joinLeft('oses.any', 'oses.any.id = oses.id', array());
+				$select->join('app_oses', 'app_oses.appid = applications.id', array(), 'left');
+				$select->join('oses', 'app_oses.osid = oses.id', array(), 'left');
+				$select->join('oses.any', 'oses.any.id = oses.id', array(), 'left');
 			}
  */			
 			if ( in_array("vapp_versions", $filter->joins) || in_array("vmiflavours", $filter->joins) || in_array("oses", $filter->joins) || in_array("os_families", $filter->joins) || in_array("archs", $filter->joins) || in_array("hypervisors", $filter->joins) ) {
-				$select->joinLeft('vapplications', 'vapplications.appid = applications.id', array());
-				$select->joinLeft('vapp_versions', 'vapp_versions.vappid = vapplications.id AND vapp_versions.published AND vapp_versions.enabled AND NOT vapp_versions.archived', array());
+				$select->join('vapplications', 'vapplications.appid = applications.id', array(), 'left');
+				$select->join('vapp_versions', 'vapp_versions.vappid = vapplications.id AND vapp_versions.published AND vapp_versions.enabled AND NOT vapp_versions.archived', array(), 'left');
 			}
 			if ( in_array("vmiflavours", $filter->joins) || in_array("oses", $filter->joins) || in_array("os_families", $filter->joins) || in_array("archs", $filter->joins) || in_array("hypervisors", $filter->joins) ) {
-				$select->joinLeft('vmis', 'vmis.vappid = vapplications.id', array());
-				$select->joinLeft('vmiflavours', 'vmiflavours.vmiid= vmis.id', array());
+				$select->join('vmis', 'vmis.vappid = vapplications.id', array(), 'left');
+				$select->join('vmiflavours', 'vmiflavours.vmiid= vmis.id', array(), 'left');
 			}
 			if ( in_array("hypervisors", $filter->joins) ) {
-				$select->joinLeft('hypervisors', 'hypervisors.name::TEXT = ANY(vmiflavours.hypervisors::TEXT[])', array());
+				$select->join('hypervisors', 'hypervisors.name::TEXT = ANY(vmiflavours.hypervisors::TEXT[])', array(), 'left');
 			}
 			if ( in_array("archs", $filter->joins) ) {
-				$select->joinLeft('archs', 'vmiflavours.archid = archs.id', array());
-				$select->joinLeft('archs.any', 'archs.any.id = archs.id', array());
+				$select->join('archs', 'vmiflavours.archid = archs.id', array(), 'left');
+				$select->join('archs.any', 'archs.any.id = archs.id', array(), 'left');
 			}
 			if ( in_array("oses", $filter->joins) || in_array("os_families", $filter->joins) ) {
-				$select->joinLeft('oses', 'vmiflavours.osid = oses.id', array());
-				$select->joinLeft('oses.any', 'oses.any.id = oses.id', array());
+				$select->join('oses', 'vmiflavours.osid = oses.id', array(), 'left');
+				$select->join('oses.any', 'oses.any.id = oses.id', array(), 'left');
 				if ( in_array("os_families", $filter->joins) ) {
-					$select->joinLeft('os_families', 'os_families.id = oses.os_family_id', array());
+					$select->join('os_families', 'os_families.id = oses.os_family_id', array(), 'left');
 				}
 			}
 		}
@@ -110,7 +110,7 @@ class SitesMapper extends SitesMapperBase
 	public function count($filter = null) {
 		//$rs = $this->fetchAll($filter, "xml", false);
 		//return count($rs);
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		if ( (($filter !== null) && ($filter->expr() != '')) ) {
 			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('sites');
 			$this->joins($select, $filter);
@@ -200,7 +200,7 @@ class SitesMapper extends SitesMapperBase
 			 $guids[] = $row->guid;
 		}
 		
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
 			if (trim(implode("','", $guids)) != '') {
 				$select->where("sites.guid in ('" . implode("','", $guids) . "')");
@@ -209,7 +209,10 @@ class SitesMapper extends SitesMapperBase
 				$select->where("sites.guid IS NULL");
 			}
 		}
-		if ($filter !== null) $select->limit($filter->limit, $filter->offset);
+		if (! is_null($filter)) {
+	if (! is_null($filter->limit)) $select->limit($filter->limit);
+	if (! is_null($filter->offset)) $select->offset($filter->offset);
+}
 		if ($filter !== null) $select->order($filter->orderBy);
 		$resultSet = $this->getDbTable()->fetchAll($select);
 		$entries = array();

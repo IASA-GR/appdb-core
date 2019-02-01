@@ -22,11 +22,14 @@ class PermissionsMapper extends PermissionsMapperBase
 {
 	public function fetchAll($filter = null, $format = '')
 	{
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
 			$select->where($filter->expr());
 		}
-		if ($filter !== null) $select->limit($filter->limit, $filter->offset);
+		if (! is_null($filter)) {
+	if (! is_null($filter->limit)) $select->limit($filter->limit);
+	if (! is_null($filter->offset)) $select->offset($filter->offset);
+}
 		if ($filter !== null) $select->order($filter->orderBy);
 //		$select = str_replace('* FROM "permissions"', '* FROM permissionscache() AS "permissions"', "".$select);
 		$resultSet = db()->query($select)->fetchAll();

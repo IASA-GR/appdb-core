@@ -24,7 +24,7 @@ class ActorGroupMembersMapper extends ActorGroupMembersMapperBase
 //		$select->join('researchers.any','researchers.any.id = researchers.id', array());
 		if ( is_array($filter->joins) ) {
 			if (in_array("actor_groups", $filter->joins)) {
-				$select->joinLeft('actor_groups', 'actor_group_members.groupid = actor_groups.id', array());
+				$select->join('actor_groups', 'actor_group_members.groupid = actor_groups.id', array(), 'left');
 			}
 
 		}
@@ -41,18 +41,13 @@ class ActorGroupMembersMapper extends ActorGroupMembersMapperBase
 		} else {
 			$orderby = "";
 		}
-		$select = $this->getDbTable()->select();
-		$executor = $this->getDbTable();
+		$select = $this->getDbTable()->getSql()->select();
 		if ( (($filter !== null) && ($filter->expr() != '')) ) {
-			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('actor_group_members');
+			$select->quanitifier('DISTINCT');
 			$this->joins($select, $filter);
 			$select->where($filter->expr());
-			$executor = $this->getDbTable()->getAdapter();
-			$executor->setFetchMode(Zend_Db::FETCH_OBJ);
 		}
-		$select = fixuZenduBuguru("" . $select);
-		noDBSeqScan($executor);
-		$resultSet = $executor->fetchAll($select);
+		$resultSet = db()->query(SQL2STR($this, $select), array())->toArray();
 		$entries = array();
 		foreach ($resultSet as $row) {
 			$entry = new ActorGroupMember();

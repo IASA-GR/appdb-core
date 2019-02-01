@@ -25,15 +25,14 @@ class AppDocumentsMapper extends AppDocumentsMapperBase
 			return parent::fetchAll($filter);
 		} else {
 			if ($format === 'xml') {
-				$select = $this->getDbTable()->select();
+				$select = $this->getDbTable()->getSql()->select();
 				if ( $filter !== null && $filter->expr() != '' ) {
 					$select->where($filter->expr());
 				}
-				$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
-				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT appdocument_to_xml(id) as pub FROM (".$select.") AS T;")->fetchAll();
+				$resultSet = db()->query("SELECT appdocument_to_xml(id) as pub FROM (".$select.") AS T;", array())->toArray();
 				$entries = array();
 				foreach ($resultSet as $row) {
-					$entry = $row->pub;
+					$entry = $row['pub'];
 					$entries[] = $entry;
 				}
 				return $entries;

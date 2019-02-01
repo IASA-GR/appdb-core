@@ -25,7 +25,7 @@ class PositionTypesMapper extends PositionTypesMapperBase
 			return parent::fetchAll($filter);
 		} else {
 			if ($format === 'xml') {
-				$select = $this->getDbTable()->select();
+				$select = $this->getDbTable()->getSql()->select();
 				if ($filter !== null) $select->order($filter->orderBy);
 				$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
 				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT role_to_xml(id) as role FROM (".$select.") AS T;")->fetchAll();

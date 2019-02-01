@@ -20,14 +20,11 @@ namespace Application\Model;
 
 class AppStats
 {
-	protected $_db;
 	protected $_where = '';
 	protected $_appFlt = '';
 
 	public function __construct($appType = "app")
 	{
-		global $application;
-		$this->_db = $application->getBootstrap()->getResource('db');
 		switch ($appType) {
 		case "app":
 			//$this->appFlt = " AND NOT categoryid <" . "@ (SELECT array_agg(va_categories) FROM va_categories())";
@@ -72,28 +69,22 @@ class AppStats
 	
 	public function perDiscipline()
 	{
-		$this->_db->setFetchMode(Zend_Db::FETCH_BOTH);
-		$res = $this->_db->query("SELECT CASE WHEN disciplines.name IS NULL THEN 'N/A' ELSE disciplines.name END AS Discipline, COUNT(DISTINCT applications.id) AS AppCount, disciplines.id AS STID FROM applications LEFT OUTER JOIN disciplines ON disciplines.id = ANY(applications.disciplineid) " . $this->getFilter() . " GROUP BY Discipline, STID ORDER BY Discipline DESC;")->fetchAll();
+		$res = db()->query("SELECT CASE WHEN disciplines.name IS NULL THEN 'N/A' ELSE disciplines.name END AS Discipline, COUNT(DISTINCT applications.id) AS AppCount, disciplines.id AS STID FROM applications LEFT OUTER JOIN disciplines ON disciplines.id = ANY(applications.disciplineid) " . $this->getFilter() . " GROUP BY Discipline, STID ORDER BY Discipline DESC;", array())->toArray()();
 		return $res;
 	}
 	
 	public function perCountry()
 	{
-		//return $this->_db->query("SELECT COUNT(appID) AS AppCount, name AS Country FROM (SELECT DISTINCT countries.name, appID FROM researchers_apps INNER JOIN researchers ON researchers.ID = researchers_apps.researcherID INNER JOIN countries ON countries.ID = researchers.countryID) AS t1 GROUP BY country ORDER BY country DESC;")->fetchAll();
-		$this->_db->setFetchMode(Zend_Db::FETCH_BOTH);
-		return $this->_db->query("SELECT CASE WHEN countries.name IS NULL THEN 'N/A' ELSE countries.name END AS Country, COUNT(DISTINCT appviews.id) AS AppCount, countries.id as STID FROM appviews LEFT OUTER JOIN countries ON countries.id = countryid ". str_replace('applications.','appviews.',$this->getFilter())." GROUP BY Country, STID ORDER BY country DESC;")->fetchAll();
+		return db()->query("SELECT CASE WHEN countries.name IS NULL THEN 'N/A' ELSE countries.name END AS Country, COUNT(DISTINCT appviews.id) AS AppCount, countries.id as STID FROM appviews LEFT OUTER JOIN countries ON countries.id = countryid ". str_replace('applications.','appviews.',$this->getFilter())." GROUP BY Country, STID ORDER BY country DESC;", array())->toArray()();
 	}
 	
 	public function perRegion()
 	{		
-		//return $this->_db->query("SELECT COUNT(appID) AS AppCount, name AS Region FROM (SELECT DISTINCT regions.name, appID FROM researchers_apps INNER JOIN researchers ON researchers.ID = researchers_apps.researcherID INNER JOIN countries ON countries.ID = researchers.countryID INNER JOIN regions ON regions.ID = (SELECT regionID FROM countryRegions WHERE countryID = countries.ID)) AS t1 GROUP BY region ORDER BY region DESC;")->fetchAll();
-		$this->_db->setFetchMode(Zend_Db::FETCH_BOTH);
-		return $this->_db->query("SELECT CASE WHEN regions.name IS NULL THEN 'N/A' ELSE regions.name END AS Region, COUNT(DISTINCT appviews.id) AS AppCount, regions.id as STID FROM appviews LEFT OUTER JOIN regions ON regions.id = regionid ".$this->getFilter()." GROUP BY Region, STID ORDER BY Region DESC;")->fetchAll();
+		return db()->query("SELECT CASE WHEN regions.name IS NULL THEN 'N/A' ELSE regions.name END AS Region, COUNT(DISTINCT appviews.id) AS AppCount, regions.id as STID FROM appviews LEFT OUTER JOIN regions ON regions.id = regionid ".$this->getFilter()." GROUP BY Region, STID ORDER BY Region DESC;", array())->toArray()();
 	}
 	
 	public function perVo()
 	{
-		$this->_db->setFetchMode(Zend_Db::FETCH_BOTH);
-		return $this->_db->query("SELECT CASE WHEN vos.name IS NULL THEN 'N/A' ELSE vos.name END AS VO, COUNT(DISTINCT appviews.id) as AppCount, vos.name as STID FROM appviews LEFT OUTER JOIN vos ON vos.id = void AND vos.deleted IS FALSE ". str_replace('applications.', 'appviews.', $this->getFilter())." GROUP BY VO, STID ORDER BY VO DESC;")->fetchAll();
+		return db()->query("SELECT CASE WHEN vos.name IS NULL THEN 'N/A' ELSE vos.name END AS VO, COUNT(DISTINCT appviews.id) as AppCount, vos.name as STID FROM appviews LEFT OUTER JOIN vos ON vos.id = void AND vos.deleted IS FALSE ". str_replace('applications.', 'appviews.', $this->getFilter())." GROUP BY VO, STID ORDER BY VO DESC;", array())->toArray()();
 	}
 }

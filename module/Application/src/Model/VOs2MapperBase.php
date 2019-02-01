@@ -61,7 +61,7 @@ class VOs2MapperBase
 	    $q1 = 'id = ?' ;
 	    $q2 = $value->id;
 	    if ( is_array($q1) ) {
-		    $select = $this->getDbTable()->select();
+		    $select = $this->getDbTable()->getSql()->select();
 		    for ($i=0; $i < count($q1); $i++) {
 		    	$select->where($q1[$i],$q2[$i]);
 		    }
@@ -124,7 +124,7 @@ class VOs2MapperBase
 
 	public function count($filter = null)
 	{
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		$select->from($this->getDbTable(),array('COUNT(DISTINCT ID) AS count'));
 		if ( ! ($filter === null) ) {
 			for ( $i = 0; $i < $filter->count(); $i++ ) {
@@ -170,7 +170,7 @@ class VOs2MapperBase
 	public function fetchAll($filter = null)
 	{
 		if ( ! ($filter === null) ) {
-			$select = $this->getDbTable()->select();
+			$select = $this->getDbTable()->getSql()->select();
 			for ( $i = 0; $i < $filter->count(); $i++ ) {
 				if ( is_array($filter->items($i)->Id) ) {
 					if ( ! ((string)($filter->items($i)->Id) == '') ) $select->where('id IN ('.implode(',',$filter->items($i)->Id).')');

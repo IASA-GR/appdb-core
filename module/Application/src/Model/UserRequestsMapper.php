@@ -64,7 +64,7 @@ class UserRequestsMapper extends UserRequestsMapperBase
 	}
 	
 	public function count($filter = null) {
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		$executor = $this->getDbTable();
 		$select->from($this->getDbTable(),array('COUNT(DISTINCT (userrequests.id)) AS count'));
 		if ( ($filter !== null) && ($filter->expr() != '') ) {

@@ -104,29 +104,34 @@ class AggregateNewsMapperBase
 
 	public function count($filter = null)
 	{
-		$select = $this->getDbTable()->select();
-		$select->from($this->getDbTable(),array('COUNT(*) AS count'));
+		$select = $this->getDbTable()->getSql()->select();
+		$select->columns(array('COUNT(*) AS count'));
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
 			$select->where($filter->expr());
 		}
-		$res = $this->getDbTable()->fetchAll($select);
-		return $res[0]->count;
+		$res = db()->query(SQL2STR($this, $select), array())->toArray();
+		return $res[0]['count'];
 	}
+
 	public function fetchAll($filter = null, $format = '')
 	{
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
 			$select->where($filter->expr());
 		}
-		if ($filter !== null) $select->limit($filter->limit, $filter->offset);
-		if ($filter !== null) $select->order($filter->orderBy);
-		$resultSet = $this->getDbTable()->fetchAll($select);
+		if (! is_null($filter)) {
+			if (! is_null($filter->$limit)) $select->limit($filter->limit);
+			if (! is_null($filter->$offset)) $select->offset($filter->offset);
+			if (! is_null($filter->$orderBy)) $select->order($filter->orderBy);
+		}
+		$resultSet = db()->query(SQL2STR($this, $select), array())->toArray();
 		$entries = array();
 		foreach ($resultSet as $row) {
 			$entry = new AggregateNewsEntry();
 			$this->populate($entry,$row);
 			if ($format === 'xml') $entry = $entry->toXML(true);
 			$entries[] = $entry;
-		}		return $entries;
+		}
+		return $entries;
 	}
 }

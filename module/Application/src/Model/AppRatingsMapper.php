@@ -22,34 +22,37 @@ class AppRatingsMapper extends AppRatingsMapperBase
 {
 	public function fetchAll($filter = null, $format = '')
 	{
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		$executor = $this->getDbTable();
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
-			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('appratings');
+			$select->quantifier('DISTINCT');
 			if ($filter->expr() != '') {
-//				$this->joins($select, $filter);
 				$select->where($filter->expr());
 				$executor = $this->getDbTable()->getAdapter();
-				$executor->setFetchMode(Zend_Db::FETCH_OBJ);
 			}
 		}
-		if ($filter !== null) $select->limit($filter->limit, $filter->offset);
-		if ($filter !== null) $select->order($filter->orderBy);
-		$s = "".$select; 
+		if ($filter !== null) {
+			if (! is_null($filter->limit)) $select->limit($filter->limit);
+			if (! is_null($filter->offset)) $select->offset($filter->offset);
+			if (! is_null($filter->ordeBy)) $select->order($filter->orderBy);
+		}
+		$select = (new \Zend\Db\Sql\Sql($this->getDbTable()->getAdapter()))->getSqlStringForSqlObject($select);
 		if ($format === 'xml') {
-			$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
-			$resultSet = $this->getDbTable()->getAdapter()->query("SELECT appratings_to_xml(id) as apprating FROM (".$select.") AS T;")->fetchAll();
-		} else $resultSet = $executor->fetchAll($select);
+			$resultSet = db()->query("SELECT appratings_to_xml(id) as apprating FROM (". $select .") AS T;", array())->toArray();
+		} else {
+			$resultSet = db()->query($select, array())->toArray();
+		}
 		$entries = array();
 		foreach ($resultSet as $row) {
 			if ( $format === 'xml' ) {
-				$entry = $row->apprating;
+				$entry = $row['apprating'];
 			} else {
 				$entry = new AppRating();
 				$this->populate($entry,$row);
 			}
 			$entries[] = $entry;
-		}		return $entries;
+		}		
+		return $entries;
 	}
 
 }

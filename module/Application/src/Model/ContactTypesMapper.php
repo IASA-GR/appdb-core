@@ -25,7 +25,7 @@ class ContactTypesMapper extends ContactTypesMapperBase
 			return parent::fetchAll($filter);
 		} else {
 			if ($format === 'xml') {
-				$select = $this->getDbTable()->select();
+				$select = $this->getDbTable()->getSql()->select();
 				$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
 				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT contacttype_to_xml(id) as contacttype FROM (".$select.") AS T;")->fetchAll();
 				$entries = array();

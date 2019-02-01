@@ -44,44 +44,44 @@ class DisseminationMapper extends DisseminationMapperBase
                 in_array("contacts", $filter->join) ||
                 in_array("categories", $filter->join)
             ) {
-                $select->joinLeft('researchers', 'researchers.id = dissemination.composerid AND researchers.deleted IS FALSE', array());
+                $select->join('researchers', 'researchers.id = dissemination.composerid AND researchers.deleted IS FALSE', array(), 'left');
             }
-			if (in_array("positiontypes", $filter->joins)) $select->joinLeft('positiontypes','positiontypes.id = researchers.positiontypeid', array());
+			if (in_array("positiontypes", $filter->joins)) $select->join('positiontypes','positiontypes.id = researchers.positiontypeid', array(), 'left');
 			if ( ( (in_array("applications", $filter->joins)) || (in_array("vos", $filter->joins)) || (in_array("disciplines", $filter->joins)) || (in_array("middlewares", $filter->joins)) ) || (in_array("appcountries", $filter->joins)) || in_array("categories", $filter->joins) ) {
-				$select->joinLeft('researchers_apps', 'researchers_apps.researcherid = researchers.id', array());
-				$select->joinLeft('applications', 'applications.id = researchers_apps.appid AND applications.deleted IS FALSE AND applications.moderated IS FALSE', array());
+				$select->join('researchers_apps', 'researchers_apps.researcherid = researchers.id', array(), 'left');
+				$select->join('applications', 'applications.id = researchers_apps.appid AND applications.deleted IS FALSE AND applications.moderated IS FALSE', array(), 'left');
 			}
 			if (in_array("countries", $filter->joins)) {
 				// HACK: do not include application country in country context by default
 				// unless it has been explicitly specified by using a special property (application.countryname)
 				if (in_array("appcountries", $filter->joins)) {
-					$select->joinLeft('appcountries','applications.id = appcountries.appid', array());
-					$select->joinLeft('countries','countries.id = researchers.countryid OR countries.id = appcountries.id', array());
+					$select->join('appcountries','applications.id = appcountries.appid', array(), 'left');
+					$select->join('countries','countries.id = researchers.countryid OR countries.id = appcountries.id', array(), 'left');
 				} else {
-					$select->joinLeft('countries','countries.id = researchers.countryid', array());
+					$select->join('countries','countries.id = researchers.countryid', array(), 'left');
 				}
 			}
 			if (in_array("vos", $filter->joins)) {
-				$select->joinLeft('app_vos', 'app_vos.appid = researchers_apps.appid AND app_vos.appid NOT IN (SELECT id FROM applications WHERE deleted IS TRUE OR moderated IS TRUE)', array());
-				$select->joinLeft('vos', 'vos.id = app_vos.void AND vos.deleted IS FALSE', array());
+				$select->join('app_vos', 'app_vos.appid = researchers_apps.appid AND app_vos.appid NOT IN (SELECT id FROM applications WHERE deleted IS TRUE OR moderated IS TRUE)', array(), 'left');
+				$select->join('vos', 'vos.id = app_vos.void AND vos.deleted IS FALSE', array(), 'left');
 			}
 			if (in_array("disciplines", $filter->joins)) {
-				$select->joinLeft('disciplines', 'disciplines.id = ANY(applications.disciplineid)', array());
+				$select->join('disciplines', 'disciplines.id = ANY(applications.disciplineid)', array(), 'left');
 			}
 			if (in_array("middlewares", $filter->joins)) {
-				$select->joinLeft('app_middlewares','applications.id = app_middlewares.appid', array());
-				$select->joinLeft('middlewares','middlewares.id = app_middlewares.middlewareid', array());
+				$select->join('app_middlewares','applications.id = app_middlewares.appid', array(), 'left');
+				$select->join('middlewares','middlewares.id = app_middlewares.middlewareid', array(), 'left');
             }
             if (in_array("contacts", $filter->joins)) {
-                $select->joinLeft('contacts','contacts.researcherid = researchers.id AND contacts.contacttypeid=7', array());
+                $select->join('contacts','contacts.researcherid = researchers.id AND contacts.contacttypeid=7', array(), 'left');
             }
-			if (in_array("categories", $filter->joins)) $select->joinLeft("categories","categories.id = ANY(applications.categoryid)",array());
+			if (in_array("categories", $filter->joins)) $select->join("categories","categories.id = ANY(applications.categoryid)",array(), 'left');
         }
     }
 
 	public function count($filter = null)
     {
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		$executor = $this->getDbTable();
 		$select->from($this->getDbTable(),array('COUNT(DISTINCT (dissemination.id)) AS count'));
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
@@ -98,7 +98,7 @@ class DisseminationMapper extends DisseminationMapperBase
 
 	public function fetchAll($filter = null, $format = '')
 	{
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		$executor = $this->getDbTable();
 		if ( (($filter !== null) && ($filter->expr() != '')) ) {
 			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('dissemination');
@@ -111,7 +111,10 @@ class DisseminationMapper extends DisseminationMapperBase
 				}
 			}
 		}
-		if ($filter !== null) $select->limit($filter->limit, $filter->offset);
+		if (! is_null($filter)) {
+	if (! is_null($filter->limit)) $select->limit($filter->limit);
+	if (! is_null($filter->offset)) $select->offset($filter->offset);
+}
 		if ($filter !== null) {
 			$orderby = $filter->orderBy;
 			$select->order($orderby);

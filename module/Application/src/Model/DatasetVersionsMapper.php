@@ -52,7 +52,7 @@ class DatasetVersionsMapper extends DatasetVersionsMapperBase
 			return parent::fetchAll($filter);
 		} else {
 			if ($format === 'xml') {
-				$select = $this->getDbTable()->select();
+				$select = $this->getDbTable()->getSql()->select();
 				if ( $filter !== null ) {
 					if ( trim($filter->expr()) != '' ) $select->where($filter->expr());
 				}

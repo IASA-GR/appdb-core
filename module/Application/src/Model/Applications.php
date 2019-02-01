@@ -30,11 +30,12 @@ class Applications extends ApplicationsBase {
 	}
 
 	public static function nameAvailable($name, $id = null) {
-		global $application;
-		$db = $application->getBootstrap()->getResource('db');
-        $db->setFetchMode(Zend_Db::FETCH_OBJ);
-        if ( $id != '' ) $where = " WHERE id <> $id"; else $where = '';
-		$res = $db->query("SELECT * FROM app_name_available(E'".pg_escape_string($name)."')$where")->fetchAll();
+		if ( $id != '' ) {
+			$where = " WHERE id <> $id"; 
+		} else {
+			$where = '';
+		}
+		$res = db()->query("SELECT * FROM app_name_available(E'" . pg_escape_string($name) . "')$where", array())->toArray();
 		if ( count($res) == 0 ) {
 			return true;
 		} else {
@@ -83,7 +84,7 @@ class Applications extends ApplicationsBase {
 			) {
 				$f = new ApplicationsFilter();
 				$f->moderated->equals(false)->and($f->deleted->equals(false));
-				$this->_filter->chain($f,"AND");
+				$this->_filter->chain($f, "AND");
 			}
 		}
 		if ( $format === 'xml') {

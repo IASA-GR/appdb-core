@@ -25,7 +25,7 @@ class CountriesMapper extends CountriesMapperBase
 			return parent::fetchAll($filter);
 		} else {
 			if ($format === 'xml') {
-				$select = $this->getDbTable()->select();
+				$select = $this->getDbTable()->getSql()->select();
 				$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
 				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT country_to_xml(id) as country FROM (".$select.") AS T ORDER BY name;")->fetchAll();
 				$entries = array();

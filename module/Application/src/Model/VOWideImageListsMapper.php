@@ -23,7 +23,7 @@ class VOWideImageListsMapper extends VOWideImageListsMapperBase
 	public function joins(&$select, $filter) {
 		if ( is_array($filter->joins) ) {
 			if ( in_array("vowide_image_list_images", $filter->joins) ) {
-				$select->joinLeft('vowide_image_list_images', 'vowide_image_list_images.vowide_image_list_id = vowide_image_lists.id', array());
+				$select->join('vowide_image_list_images', 'vowide_image_list_images.vowide_image_list_id = vowide_image_lists.id', array(), 'left');
 			}
 		}
 	}
@@ -34,7 +34,7 @@ class VOWideImageListsMapper extends VOWideImageListsMapperBase
 
 	public function fetchAll($filter = null, $format = '')
 	{
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		$executor = $this->getDbTable();
 		if ( $filter !== null ) {
 			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('vowide_image_lists');
@@ -45,7 +45,10 @@ class VOWideImageListsMapper extends VOWideImageListsMapperBase
 				$executor->setFetchMode(Zend_Db::FETCH_OBJ);
 			}
 		}
-		if ($filter !== null) $select->limit($filter->limit, $filter->offset);
+		if (! is_null($filter)) {
+	if (! is_null($filter->limit)) $select->limit($filter->limit);
+	if (! is_null($filter->offset)) $select->offset($filter->offset);
+}
 		if ($filter !== null) $select->order($filter->orderBy);
 		noDBSeqScan($executor);
 		$query = fixuZenduBuguru("" . $select);

@@ -29,7 +29,7 @@ class VaProvidersMapper extends VaProvidersMapperBase
 				if ($xmldetailed) {
 					$func .= "_ext";
 				}
-				$select = $this->getDbTable()->select();
+				$select = $this->getDbTable()->getSql()->select();
 				if ($filter->expr() != "") {
 					$select->where($filter->expr());
 				}

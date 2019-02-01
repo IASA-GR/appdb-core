@@ -25,7 +25,7 @@ class SubdomainsMapper extends SubdomainsMapperBase
 			return parent::fetchAll($filter);
 		} else {
 			if ($format === 'xml') {
-				$select = $this->getDbTable()->select();
+				$select = $this->getDbTable()->getSql()->select();
 				$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
 				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT subdiscipline_to_xml(id) as subdiscipline FROM (".$select." ORDER BY name) AS T;")->fetchAll();
 				$entries = array();

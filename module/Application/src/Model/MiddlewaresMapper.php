@@ -25,7 +25,7 @@ class MiddlewaresMapper extends MiddlewaresMapperBase
 			return parent::fetchAll($filter);
 		} else {
 			if ($format === 'xml') {
-				$select = $this->getDbTable()->select();
+				$select = $this->getDbTable()->getSql()->select();
 				$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
 				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT middleware_to_xml(id) as mw FROM (".$select.") AS T ORDER BY name;")->fetchAll();
 				$entries = array();

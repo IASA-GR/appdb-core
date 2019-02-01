@@ -23,33 +23,33 @@ class AppContactMiddlewaresMapper extends AppContactMiddlewaresMapperBase
 	private function joins(&$select, $filter) {
 		if ( is_array($filter->joins) ) {
 			if ( in_array("middlewares",$filter->joins) ) {
-				$select->joinLeft('app_middlewares', 'appmiddlewareid = app_middlewares.id', array());
-				$select->joinLeft('middlewares','middlewares.id = app_middlewares.middlewareid', array());
+				$select->join('app_middlewares', 'appmiddlewareid = app_middlewares.id', array(), 'left');
+				$select->join('middlewares','middlewares.id = app_middlewares.middlewareid', array(), 'left');
             }
         }
     }
 
 	public function fetchAll($filter = null)
 	{
-		$select = $this->getDbTable()->select();
-		$executor = $this->getDbTable();
+		$select = $this->getDbTable()->getSql()->select();
 		if ( (($filter !== null) && ($filter->expr() != '')) ) {
 			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('appcontact_middlewares');
 			if ( $filter !== null ) {
 				if ($filter->expr() != '') {
 					$this->joins($select, $filter);
 					$select->where($filter->expr());
-					$executor = $this->getDbTable()->getAdapter();
-					$executor->setFetchMode(Zend_Db::FETCH_OBJ);
 				}
 			}
 		}
-		if ($filter !== null) $select->limit($filter->limit, $filter->offset);
+		if (! is_null($filter)) {
+	if (! is_null($filter->limit)) $select->limit($filter->limit);
+	if (! is_null($filter->offset)) $select->offset($filter->offset);
+}
 		if ($filter !== null) {
 			$orderby = $filter->orderBy;
 			$select->order($orderby);
 		}
-        $resultSet = $executor->fetchAll($select);
+        $resultSet = db()->query(SQL2STR($this, $select), array())->toArray(); 
 		$entries = array();
 		foreach ($resultSet as $row) {
             $entry = new AppContactMiddleware();

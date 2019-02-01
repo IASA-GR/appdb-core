@@ -29,11 +29,10 @@ class AppTagsMapper extends AppTagsMapperBase
 				if ($filter !== null && $filter->limit>0) $q.=" LIMIT " . $filter->limit . " ";
 				if ($filter !== null && $filter->offset>0) $q.=" OFFSET " . $filter->offset;
 				$q .= ";";
-				$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
-				$resultSet = $this->getDbTable()->getAdapter()->query($q)->fetchAll();
+				$resultSet = db()->query($q, array())->toArray();
 				$entries = array();
 				foreach ($resultSet as $row) {
-					$entry = $row->tags;
+					$entry = $row['tags'];
 					$entries[] = $entry;
 				}
 				return $entries;
@@ -43,13 +42,20 @@ class AppTagsMapper extends AppTagsMapperBase
 	
 	public function xmlcount($filter = null)
 	{
-		$select = $this->getDbTable()->select();
-		$select->from($this->getDbTable(),array('COUNT(DISTINCT (tag)) AS count'));
+		$select = $this->getDbTable()->getSql()->select();
+		$select->columns(array('COUNT(DISTINCT (tag)) AS count'));
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
 			$select->where($filter->expr());
 		}
-		$res = $this->getDbTable()->fetchAll($select);
-		return $res[0]->count;
+		$from = '';
+		$where = '';
+		$orderby = '';
+		$limit = '';
+		getZendSelectParts($select, $from, $where, $orderby, $limit);
+		$from = fixuZenduBuguru($from);
+		$select = (new \Zend\Db\Sql\Sql($this->getDbTable()->getAdapter()))->getSqlStringForSqlObject($select);
+		$res = db()->query($select, array())->toArray();
+		return $res[0]['count'];
 	}
 
 }

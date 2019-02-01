@@ -5214,6 +5214,24 @@ function fixuZenduBuguru($s) {
 	return preg_replace('/\.any\.any ON/', '.any ON', $ret);
 }
 
+function SQL2STR($obj, $select, &$parts = null) {
+	if (! is_null($parts)) {
+		$from = '';
+		$where = '';
+		$limit = '';
+		$orderby = '';
+		getZendSelectParts($select, $from, $where, $limit, $orderby);
+		$parts = array(
+			"from" => $from,
+			"where" => $where,
+			"limit" => $limit,
+			"$orderby" => $orderby
+		);
+	}
+	$s = (new \Zend\Db\Sql\Sql($obj->getDbTable()->getAdapter()))->getSqlStringForSqlObject($select);
+	return fixuZenduBuguru($s);
+}
+
 class VMCaster{
 	private static $vmcasterurl = null;
 	public static function getVMCasterUrl(){

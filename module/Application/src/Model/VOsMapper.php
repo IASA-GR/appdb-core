@@ -21,16 +21,16 @@ namespace Application\Model;
 class VOsMapper extends VOsMapperBase
 {
 	public function joins(&$select, $filter) {
-		$select->joinLeft('vos.any.any','vos.any.id = vos.id', array());
+		$select->join('vos.any.any','vos.any.id = vos.id', array(), 'left');
 		if ( is_array($filter->joins) ) {
 			if (in_array("vo_contacts", $filter->joins) ) {
-				$select->joinLeft('vo_contacts', 'vos.id = vo_contacts.void');
+				$select->join('vo_contacts', 'vos.id = vo_contacts.void', array(), 'left');
 			}
 			if (in_array("vo_members", $filter->joins) ) {
-				$select->joinLeft('vo_members', 'vos.id = vo_members.void');
+				$select->join('vo_members', 'vos.id = vo_members.void', array(), 'left');
 			}
 			if (in_array("domains", $filter->joins) ) {
-				$select->joinLeft('domains', 'domains.id = vos.domainid');
+				$select->join('domains', 'domains.id = vos.domainid', array(), 'left');
 			}
 			if (in_array("applications", $filter->joins) || 
 				in_array("licenses", $filter->joins) || 
@@ -46,76 +46,76 @@ class VOsMapper extends VOsMapperBase
 				in_array("proglangs", $filter->joins) ||
 				in_array("statuses", $filter->joins)/* ||
 				in_array("researchers", $filter->joins)*/) {
-				$select->joinLeft('app_vos', 'app_vos.void = vos.id', array());
-				$select->joinLeft('applications','applications.id = app_vos.appid AND applications.deleted IS FALSE AND applications.moderated IS FALSE', array());
-				$select->joinLeft('applications.any','applications.any.id = applications.id', array());
+				$select->join('app_vos', 'app_vos.void = vos.id', array(), 'left');
+				$select->join('applications','applications.id = app_vos.appid AND applications.deleted IS FALSE AND applications.moderated IS FALSE', array(), 'left');
+				$select->join('applications.any','applications.any.id = applications.id', array(), 'left');
 			}
 			if (in_array("disciplines", $filter->joins)) {
 				if ( in_array("disciplines", $filter->privateJoins) ) {
-					$select->joinLeft('disciplines','disciplines.id = ANY(vos.disciplineid)', array());
-					$select->joinLeft('disciplines.any','disciplines.any.id = disciplines.id', array());
+					$select->join('disciplines','disciplines.id = ANY(vos.disciplineid)', array(), 'left');
+					$select->join('disciplines.any','disciplines.any.id = disciplines.id', array(), 'left');
 				} else {
-					$select->joinLeft('disciplines','disciplines.id = ANY(vos.disciplineid) OR disciplines.id = ANY(applications.disciplineid)', array());
-					$select->joinLeft('disciplines.any','disciplines.any.id = disciplines.id', array());
+					$select->join('disciplines','disciplines.id = ANY(vos.disciplineid) OR disciplines.id = ANY(applications.disciplineid)', array(), 'left');
+					$select->join('disciplines.any','disciplines.any.id = disciplines.id', array(), 'left');
 				}
 			}
 			if (in_array("countries", $filter->joins) || in_array("appcountries", $filter->joins) ) {
-				$select->joinLeft('appcountries','applications.id = appcountries.appid', array());
-				$select->joinLeft('countries','countries.id = appcountries.id', array());
-				$select->joinLeft('countries.any','countries.any.id = countries.id', array());
+				$select->join('appcountries','applications.id = appcountries.appid', array(), 'left');
+				$select->join('countries','countries.id = appcountries.id', array(), 'left');
+				$select->join('countries.any','countries.any.id = countries.id', array(), 'left');
 			}
 			if (in_array("middlewares", $filter->joins)) {
 				if ( in_array("middlewares", $filter->privateJoins) ) {
-					$select->joinLeft('vo_middlewares','vos.id = vo_middlewares.void', array());
-					$select->joinLeft('middlewares','middlewares.id = vo_middlewares.middlewareid', array());
+					$select->join('vo_middlewares','vos.id = vo_middlewares.void', array(), 'left');
+					$select->join('middlewares','middlewares.id = vo_middlewares.middlewareid', array(), 'left');
 				} else {
-					$select->joinLeft('app_middlewares','applications.id = app_middlewares.appid', array());
-					$select->joinLeft('app_middlewares.any','app_middlewares.any.id = app_middlewares.id', array());
-					$select->joinLeft('vo_middlewares','vos.id = vo_middlewares.void', array());
-					$select->joinLeft('middlewares','middlewares.id = app_middlewares.middlewareid OR middlewares.id = vo_middlewares.middlewareid', array());
+					$select->join('app_middlewares','applications.id = app_middlewares.appid', array(), 'left');
+					$select->join('app_middlewares.any','app_middlewares.any.id = app_middlewares.id', array(), 'left');
+					$select->join('vo_middlewares','vos.id = vo_middlewares.void', array(), 'left');
+					$select->join('middlewares','middlewares.id = app_middlewares.middlewareid OR middlewares.id = vo_middlewares.middlewareid', array(), 'left');
 				}
-				$select->joinLeft('middlewares.any','middlewares.any.id = middlewares.id', array());
+				$select->join('middlewares.any','middlewares.any.id = middlewares.id', array(), 'left');
 			}
 /*			if (in_array("researchers", $filter->joins) || in_array("contacts", $filter->joins) || in_array("positiontypes", $filter->joins)) {
-				$select->joinLeft('researchers_apps','researchers_apps.appid = applications.id', array());
-				$select->joinLeft('researchers','researchers.id = researchers_apps.researcherid AND researchers.deleted IS FALSE', array());
-				$select->joinLeft('researchers.any','researchers.any.id = researchers.id', array());
+				$select->join('researchers_apps','researchers_apps.appid = applications.id', array(), 'left');
+				$select->join('researchers','researchers.id = researchers_apps.researcherid AND researchers.deleted IS FALSE', array(), 'left');
+				$select->join('researchers.any','researchers.any.id = researchers.id', array(), 'left');
 			} */
 			if (in_array("categories", $filter->joins)) {
-				$select->joinLeft('categories','categories.id = ANY(applications.categoryid)', array());
-				$select->joinLeft('categories.any','categories.any.id = categories.id', array());
+				$select->join('categories','categories.id = ANY(applications.categoryid)', array(), 'left');
+				$select->join('categories.any','categories.any.id = categories.id', array(), 'left');
 			}
 /*			if (in_array("contacts", $filter->joins)) {
-				$select->joinLeft('contacts','researchers.id = contacts.researcherid', array());
-				$select->joinLeft('contacts.any', 'contacts.any.id = contacts.id', array());
+				$select->join('contacts','researchers.id = contacts.researcherid', array(), 'left');
+				$select->join('contacts.any', 'contacts.any.id = contacts.id', array(), 'left');
 			} */
 /*			if (in_array("positiontypes", $filter->joins)) {
-				$select->joinLeft('positiontypes','researchers.positiontypeid = positiontypes.id', array());
-				$select->joinLeft('positiontypes.any','positiontypes.any.id = positiontypes.id', array());
+				$select->join('positiontypes','researchers.positiontypeid = positiontypes.id', array(), 'left');
+				$select->join('positiontypes.any','positiontypes.any.id = positiontypes.id', array(), 'left');
 			}*/
 			if ( in_array("oses", $filter->joins) ) {
-				$select->joinLeft('app_oses', 'app_oses.appid = applications.id', array());
-				$select->joinLeft('oses', 'app_oses.osid = oses.id', array());
-				$select->joinLeft('oses.any', 'oses.any.id = oses.id', array());
+				$select->join('app_oses', 'app_oses.appid = applications.id', array(), 'left');
+				$select->join('oses', 'app_oses.osid = oses.id', array(), 'left');
+				$select->join('oses.any', 'oses.any.id = oses.id', array(), 'left');
 			}
 			if ( in_array("licenses", $filter->joins) ) {
-				$select->joinLeft('app_licenses', 'app_licenses.appid = applications.id', array());
-				$select->joinLeft('licenses', 'app_licenses.licenseid = licenses.id', array());
-				$select->joinLeft('licenses.any', 'licenses.any.id = licenses.id', array());
+				$select->join('app_licenses', 'app_licenses.appid = applications.id', array(), 'left');
+				$select->join('licenses', 'app_licenses.licenseid = licenses.id', array(), 'left');
+				$select->join('licenses.any', 'licenses.any.id = licenses.id', array(), 'left');
 			}
 			if ( in_array("proglangs", $filter->joins) ) {
-				$select->joinLeft('appproglangs', 'appproglangs.appid = applications.id', array());
-				$select->joinLeft('proglangs', 'appproglangs.proglangid = proglangs.id', array());
-				$select->joinLeft('proglangs.any', 'proglangs.any.id = proglangs.id', array());
+				$select->join('appproglangs', 'appproglangs.appid = applications.id', array(), 'left');
+				$select->join('proglangs', 'appproglangs.proglangid = proglangs.id', array(), 'left');
+				$select->join('proglangs.any', 'proglangs.any.id = proglangs.id', array(), 'left');
 			}
 			if ( in_array("archs", $filter->joins) ) {
-				$select->joinLeft('app_archs', 'app_archs.appid = applications.id', array());
-				$select->joinLeft('archs', 'app_archs.archid = archs.id', array());
-				$select->joinLeft('archs.any', 'archs.any.id = archs.id', array());
+				$select->join('app_archs', 'app_archs.appid = applications.id', array(), 'left');
+				$select->join('archs', 'app_archs.archid = archs.id', array(), 'left');
+				$select->join('archs.any', 'archs.any.id = archs.id', array(), 'left');
 			}
 			if ( in_array("statuses", $filter->joins) ) {
-				$select->joinLeft('statuses', 'statuses.id = applications.statusid', array());
-				$select->joinLeft('statuses.any', 'statuses.any.id = applications.statusid', array());
+				$select->join('statuses', 'statuses.id = applications.statusid', array(), 'left');
+				$select->join('statuses.any', 'statuses.any.id = applications.statusid', array(), 'left');
 			}
 
 		}
@@ -128,7 +128,7 @@ class VOsMapper extends VOsMapperBase
 		debug_log("HERE HERE HERE: " . var_export($flt->expr(), true));
 		return count($this->fetchAll($flt, $format));
  */
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		if ( (($filter !== null) && ($filter->expr() != '')) ) {
 			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('vos');
 			$this->joins($select, $filter);
@@ -167,7 +167,7 @@ class VOsMapper extends VOsMapperBase
 	
 	public function fetchAll($filter = null, $format = '', $xmldetailed = false)
 	{
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		$executor = $this->getDbTable();
 		if ( $filter !== null ) {
 			$orderby = $filter->orderBy;
@@ -185,7 +185,10 @@ class VOsMapper extends VOsMapperBase
 			$executor->setFetchMode(Zend_Db::FETCH_OBJ);
 		}
 
-		if ($filter !== null) $select->limit($filter->limit, $filter->offset);
+		if (! is_null($filter)) {
+	if (! is_null($filter->limit)) $select->limit($filter->limit);
+	if (! is_null($filter->offset)) $select->offset($filter->offset);
+}
 		if ($filter !== null) {
 			$inv = false;
 			if ( (substr($orderby,0,8) === "vos.rank") ) {

@@ -18,23 +18,5 @@
 <?php
 namespace Application\Model;
 
-class AppMiddlewaresMapper extends AppMiddlewaresMapperBase
-{
-/*	public function fetchAll($filter = null, $format = '') {
-		if ($format == '') {
-			return parent::fetchAll($filter);
-		} else {
-			if ($format === 'xml') {
-				$select = $this->getDbTable()->select();
-				$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
-				$resultSet = $this->getDbTable()->getAdapter()->query('SELECT xmlelement(name "middleware:middleware", xmlattributes(-1 as id), comment) as mw FROM (SELECT DISTINCT comment FROM ('.$select.') AS T WHERE comment <> \'\' AND NOT comment IS NULL) AS TT ORDER BY comment;')->fetchAll();
-				$entries = array();
-				foreach ($resultSet as $row) {
-					$entry = $row->mw;
-					$entries[] = $entry;
-				}
-				return $entries;
-         	}
-		}
-} */
+class AppMiddlewaresMapper extends AppMiddlewaresMapperBase{
 }

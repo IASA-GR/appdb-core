@@ -57,7 +57,7 @@ class VMISupportedContextFormatsMapperBase
 
 		$q1 = array('fmtid = ?', 'vmiinstanceid = ?');
 		$q2 = array($value->fmtid, $value->vmiinstanceid);
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		for ($i=0; $i < count($q1); $i++) {
 			$select->where($q1[$i],$q2[$i]);
 		}
@@ -100,7 +100,7 @@ class VMISupportedContextFormatsMapperBase
 
 	public function count($filter = null)
 	{
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		$select->from($this->getDbTable(),array('COUNT(DISTINCT (fmtid, vmiinstanceid)) AS count'));
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
 			$select->where($filter->expr());
@@ -110,11 +110,14 @@ class VMISupportedContextFormatsMapperBase
 	}
 	public function fetchAll($filter = null, $format = '')
 	{
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		if ( ($filter !== null) && ($filter->expr() != '') ) {
 			$select->where($filter->expr());
 		}
-		if ($filter !== null) $select->limit($filter->limit, $filter->offset);
+		if (! is_null($filter)) {
+	if (! is_null($filter->limit)) $select->limit($filter->limit);
+	if (! is_null($filter->offset)) $select->offset($filter->offset);
+}
 		if ($filter !== null) $select->order($filter->orderBy);
 		$resultSet = $this->getDbTable()->fetchAll($select);
 		$entries = array();

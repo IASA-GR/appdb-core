@@ -24,14 +24,14 @@ class IntAuthorsMapper extends IntAuthorsMapperBase
 	public function joins(&$select, $filter) {
 		if ( is_array($filter->joins) ) {
 			if ( in_array("applications", $filter->joins) ) {
-				$select->joinLeft('appdocuments', 'appdocuments.id = intauthors.docid', array());
-				$select->joinLeft('applications', 'applications.id = appdocuments.appid', array());
+				$select->join('appdocuments', 'appdocuments.id = intauthors.docid', array(), 'left');
+				$select->join('applications', 'applications.id = appdocuments.appid', array(), 'left');
 			}
 		}
 	}
 
 	public function fetchAll($filter = null, $format = '') {
-		$select = $this->getDbTable()->select();
+		$select = $this->getDbTable()->getSql()->select();
 		$executor = $this->getDbTable();
 		if ( (($filter !== null) && ($filter->expr() != '')) ) {
 			$select = $this->getDbTable()->getAdapter()->select()->distinct()->from('intauthors');
