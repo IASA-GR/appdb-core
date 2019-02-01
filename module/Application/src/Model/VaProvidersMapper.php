@@ -33,7 +33,6 @@ class VaProvidersMapper extends VaProvidersMapperBase
 				if ($filter->expr() != "") {
 					$select->where($filter->expr());
 				}
-				$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
 				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT $func(id) as va_provider FROM (".$select.") AS T ORDER BY sitename;")->fetchAll();
 				$entries = array();
 				foreach ($resultSet as $row) {

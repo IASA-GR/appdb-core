@@ -39,7 +39,6 @@ class LinkStatusesMapper extends LinkStatusesMapperBase
 			$this->joins($select, $filter);
 			$select->where($filter->expr());
 			$executor = $this->getDbTable()->getAdapter();
-			$executor->setFetchMode(Zend_Db::FETCH_OBJ);
         }
         //debug_log("".$select);
 		$res = $executor->fetchAll($select);
@@ -57,7 +56,6 @@ class LinkStatusesMapper extends LinkStatusesMapperBase
 					$this->joins($select, $filter);
 					$select->where($filter->expr());
 					$executor = $this->getDbTable()->getAdapter();
-					$executor->setFetchMode(Zend_Db::FETCH_OBJ);
 				}
 			}
 		}

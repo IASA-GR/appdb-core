@@ -22,9 +22,6 @@ namespace Application\Model;
 class AppUrls extends AppUrlsBase
 {
 	public static function getTitles($notEmpty=false) {
-		global $application;
-		$db = $application->getBootstrap()->getResource('db');
-		$db->setFetchMode(Zend_Db::FETCH_OBJ);
 		$q = "SELECT DISTINCT title FROM app_urls" . (($notEmpty===true)?" WHERE title IS NOT NULL AND title<>''":"");
 		$res = $db->query($q);
 		$titles = array();

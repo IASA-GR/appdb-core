@@ -34,7 +34,6 @@ class NGIsMapper extends NGIsMapperBase
 		} else {
 			if ($format === 'xml') {
 				$select = $this->getDbTable()->getSql()->select();
-				$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
 				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT ngi_to_xml(id) as ngi FROM (".$select.") AS T;")->fetchAll();
 				$entries = array();
 				foreach ($resultSet as $row) {

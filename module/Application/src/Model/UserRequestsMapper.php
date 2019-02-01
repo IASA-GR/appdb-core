@@ -72,7 +72,6 @@ class UserRequestsMapper extends UserRequestsMapperBase
 			$this->joins($select, $filter);
 			$select->where($filter->expr());
 			$executor = $this->getDbTable()->getAdapter();
-			$executor->setFetchMode(Zend_Db::FETCH_OBJ);
 		}
 		//debug_log("".$select);
 		$res = $executor->fetchAll($select);

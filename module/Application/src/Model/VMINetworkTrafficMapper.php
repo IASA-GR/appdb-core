@@ -23,7 +23,6 @@ class VMINetworkTrafficMapper extends VMINetworkTrafficMapperBase
 	public function populate(&$entry,$row)
 	{
 		parent::populate($entry, $row);
-		db()->setFetchMode(Zend_Db::FETCH_NUM);
 		$res = db()->query("SELECT vmi_net_traffic.net_protocols FROM vmi_net_traffic WHERE id = " . $row->id)->fetchAll();
 		$res = $res[0];
 		$res = $res[0];

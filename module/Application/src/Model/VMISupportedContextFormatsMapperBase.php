@@ -49,7 +49,6 @@ class VMISupportedContextFormatsMapperBase
 
 	public function save(AROItem $value)
 	{
-		global $application;
 		$data = array();
 		if ( ! isnull($value->getFmtID()) ) $data['fmtid'] = $value->getFmtID();
 		if ( ! isnull($value->getVMIinstanceID()) ) $data['vmiinstanceid'] = $value->getVMIinstanceID();

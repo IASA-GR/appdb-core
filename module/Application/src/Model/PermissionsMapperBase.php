@@ -49,7 +49,6 @@ class PermissionsMapperBase
 
 	public function save(AROItem $value)
 	{
-		global $application;
 		$data = array();
 		if ( ! isnull($value->getId()) ) $data['id'] = $value->getId();
 		if ( ! isnull($value->getActorGUID()) ) $data['actor'] = $value->getActorGUID();

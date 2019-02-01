@@ -49,7 +49,6 @@ class VMINetworkTrafficMapperBase
 
 	public function save(AROItem $value)
 	{
-		global $application;
 		$data = array();
 		if ( ! isnull($value->getId()) ) $data['id'] = $value->getId();
 		if ( ! isnull($value->getVMIinstanceID()) ) $data['vmiinstanceid'] = $value->getVMIinstanceID();

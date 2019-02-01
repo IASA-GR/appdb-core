@@ -49,7 +49,6 @@ class VO2 extends VO2Base
 	}
 	
 	public function getLogo() {
-		db()->setFetchMode(Zend_Db::FETCH_OBJ);
 		$ids = db()->query("SELECT UNNEST(disciplineid) AS did FROM vos WHERE id = " . $this->id . " ORDER BY did DESC LIMIT 1")->fetchAll();
 		$id = $ids->did;
 		$discs = new Disciplines();

@@ -42,7 +42,6 @@ class VOWideImageListsMapper extends VOWideImageListsMapperBase
 				$this->joins($select, $filter);
 				if ( ! is_array($filter->expr()) ) $select->where($filter->expr());
 				$executor = $this->getDbTable()->getAdapter();
-				$executor->setFetchMode(Zend_Db::FETCH_OBJ);
 			}
 		}
 		if (! is_null($filter)) {

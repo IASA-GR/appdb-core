@@ -40,7 +40,6 @@ class IntAuthorsMapper extends IntAuthorsMapperBase
 					$this->joins($select, $filter);
 					$select->where($filter->expr());
 					$executor = $this->getDbTable()->getAdapter();
-					$executor->setFetchMode(Zend_Db::FETCH_OBJ);
 				}
 			}
 		}

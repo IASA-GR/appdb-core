@@ -34,7 +34,6 @@ class DatasetsMapper extends DatasetsMapperBase
 		}
 
 //		parent::save($value);
-		global $application;
 		$data = array();
 		if ( ! isnull($value->getId()) ) $data['id'] = $value->getId();
 		if ( ! isnull($value->getName()) ) $data['name'] = $value->getName();
@@ -77,7 +76,6 @@ class DatasetsMapper extends DatasetsMapperBase
 				if ( $filter !== null ) {
 					if ( trim($filter->expr()) != '' ) $select->where($filter->expr());
 				}
-				$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
         		if ($filter !== null) {
 					$ord = $filter->orderBy;
 					if ( $ord == '' ) $ord = 'name';

@@ -25,8 +25,6 @@ class PplStats
 		
 	public function __construct()
 	{
-		global $application;
-		$this->_db = $application->getBootstrap()->getResource('db');
 	}
 
 	public function setFilter($criteria)
@@ -58,19 +56,16 @@ class PplStats
 	
 	public function perPosition()
 	{
-		$this->_db->setFetchMode(Zend_Db::FETCH_BOTH);
 		return $this->_db->query("SELECT CASE WHEN positiontypes.description IS NULL THEN 'N/A' ELSE positiontypes.description||'s' END AS Position, COUNT(DISTINCT researchers.id) AS PplCount, positiontypes.id AS STID FROM researchers LEFT OUTER JOIN positiontypes ON positiontypeid = positiontypes.id ".$this->getFilter()." GROUP BY Position, positiontypeid, STID ORDER BY positiontypeid DESC;")->fetchAll();
 	}
 	
 	public function perCountry()
 	{
-		$this->_db->setFetchMode(Zend_Db::FETCH_BOTH);
 		return $this->_db->query("SELECT CASE WHEN countries.name IS NULL THEN 'N/A' ELSE countries.name END AS Country, COUNT(DISTINCT researchers.id) AS PplCount, countries.id AS STID FROM researchers LEFT OUTER JOIN countries ON countries.id = countryid ".$this->getFilter()." GROUP BY country, STID ORDER BY country DESC;")->fetchAll();
 	}
 	
 	public function perRegion()
 	{		
-		$this->_db->setFetchMode(Zend_Db::FETCH_BOTH);
 		return $this->_db->query("SELECT CASE WHEN regions.name IS NULL THEN 'N/A' ELSE regions.name END AS Region, COUNT(DISTINCT pplviews.id) AS PplCount, regions.id AS STID FROM pplviews LEFT OUTER JOIN regions ON regions.id = regionid ".$this->getFilter()." GROUP BY Region, STID ORDER BY Region DESC;")->fetchAll();
 	}
 	

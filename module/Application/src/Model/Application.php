@@ -40,7 +40,6 @@ class Application extends ApplicationBase {
 	public function getRelcount() {
 		if ( ! isnull($this->id) ) {
 			if ( isnull($this->_relcount) ) {
-				db()->setFetchMode(Zend_Db::FETCH_OBJ);
 				$res = db()->query("SELECT relcount FROM app_release_count WHERE appid = ?", array($this->id))->toArray();
 				if ( count($res) > 0 ) {
 					$this->_relcount = $res[0]['hitcount'];
@@ -53,7 +52,6 @@ class Application extends ApplicationBase {
 	public function getHitcount() {
 		if ( ! isnull($this->id) ) {
 			if ( isnull($this->_hitcount) ) {
-				db()->setFetchMode(Zend_Db::FETCH_OBJ);
 				$res = db()->query("SELECT count AS hitcount FROM hitcounts WHERE appid = ?", array($this->id))->toArray();
 				if ( count($res) > 0 ) {
 					$this->_hitcount = $res[0]['hitcount'];

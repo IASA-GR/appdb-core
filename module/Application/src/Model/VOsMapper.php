@@ -154,7 +154,6 @@ class VOsMapper extends VOsMapperBase
 			$from = fixuZenduBuguru($from);
 		}
 
-		db()->setFetchMode(Zend_Db::FETCH_OBJ); 
 		if ( is_array($filter->expr()) ) {
 			noDBSeqScan(db());
 			$resultSet = db()->query("SELECT COUNT(DISTINCT vos.id) FROM filtervos((?)::text[],(?)::text[],(?)::text[]) AS vos", array(php_to_pg_array($filter->fltstr, false), php_to_pg_array($from, false), str_replace("''", "\'", php_to_pg_array($where, false))))->fetchAll();
@@ -182,7 +181,6 @@ class VOsMapper extends VOsMapperBase
 			$this->joins($select, $filter);
 			if ( ! is_array($filter->expr()) ) $select->where($filter->expr());
 			$executor = $this->getDbTable()->getAdapter();
-			$executor->setFetchMode(Zend_Db::FETCH_OBJ);
 		}
 
 		if (! is_null($filter)) {
@@ -240,7 +238,6 @@ class VOsMapper extends VOsMapperBase
 //			debug_log(var_export($where,true));
 //			debug_log($orderby);
 
-			$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
 			if ( is_array($filter->expr()) ) {
 				noDBSeqScan(db());
 //				$fff = fopen(APPLICATION_PATH . "/../cache/debuglog", "a+");

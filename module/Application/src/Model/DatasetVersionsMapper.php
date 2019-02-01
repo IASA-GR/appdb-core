@@ -22,7 +22,6 @@ class DatasetVersionsMapper extends DatasetVersionsMapperBase
 {
 	public function save(AROItem $value)
 	{
-		global $application;
 		$data = array();
 		if ( ! isnull($value->getId()) ) $data['id'] = $value->getId();
 		if ( ! isnull($value->getDatasetID()) ) $data['datasetid'] = $value->getDatasetID();
@@ -56,7 +55,6 @@ class DatasetVersionsMapper extends DatasetVersionsMapperBase
 				if ( $filter !== null ) {
 					if ( trim($filter->expr()) != '' ) $select->where($filter->expr());
 				}
-				$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
         		if ($filter !== null) {
 					$ord = $filter->orderBy;
 					if ( $ord == '' ) $ord = 'addedon DESC';

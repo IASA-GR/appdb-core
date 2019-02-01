@@ -89,7 +89,6 @@ class DisseminationMapper extends DisseminationMapperBase
 			$this->joins($select, $filter);
 			$select->where($filter->expr());
 			$executor = $this->getDbTable()->getAdapter();
-			$executor->setFetchMode(Zend_Db::FETCH_OBJ);
         }
         //debug_log("".$select);
 		$res = $executor->fetchAll($select);
@@ -107,7 +106,6 @@ class DisseminationMapper extends DisseminationMapperBase
 					$this->joins($select, $filter);
 					$select->where($filter->expr());
 					$executor = $this->getDbTable()->getAdapter();
-					$executor->setFetchMode(Zend_Db::FETCH_OBJ);
 				}
 			}
 		}
@@ -121,7 +119,6 @@ class DisseminationMapper extends DisseminationMapperBase
 		}
 		//debug_log("".$select);
 		if ($format === 'xml') {
-			$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
 			if ( ($this->count($filter) == 1) ) {
 				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT dissemination_to_xml_ext(id) as data FROM (".$select.") AS T;")->fetchAll();
 			} else {

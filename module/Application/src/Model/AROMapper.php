@@ -134,6 +134,7 @@ class AROMapper {
 
 	public function find($id, &$value)
 	{
+		error_log("PRIMARY:" . var_export($this->getDbTable()->getPrimary()), true);
 		if (! is_array($id)) {
 			$ids = array();
 			$ids[] = $id;

@@ -49,7 +49,6 @@ class AppTeamMapperBase
 
 	public function save(AROItem $value)
 	{
-		global $application;
 		$data = array();
 		if ( ! isnull($value->getAppID()) ) $data['appid'] = $value->getAppID();
 		if ( ! isnull($value->getId()) ) $data['id'] = $value->getId();

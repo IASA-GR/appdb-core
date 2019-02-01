@@ -37,7 +37,6 @@ class UserPrivs
 	}
 
 	public function refresh() {
-		global $application;
 		$perms = db()->query("SELECT actionid, object FROM permissions WHERE actor = '". $this->_actor->guid . "'", array())->toArray();
 		$a = array();
 		foreach($perms as $perm) {
@@ -85,7 +84,6 @@ class UserPrivs
 //		$actions[] = 26;
 //		$actions[] = 30;
 //		$actions[] = 31;
-		db()->setFetchMode(Zend_Db::FETCH_NUM);
 		$res = db()->query("SELECT UNNEST(app_actions())")->fetchAll();
 		foreach($res as $r) {
 			$actions[] = $r[0];
@@ -135,7 +133,6 @@ class UserPrivs
 		} else {
 			$t = $target;
 		}
-		db()->setFetchMode(Zend_Db::FETCH_NUM);
 		$res = db()->query("SELECT " . $mode . "_privilege($action, '" . $this->_actor->guid . "', '$t', " . $this->_session->userid. ")")->fetchAll();
 		if (count($res) > 0) {
 			$res = $res[0];
@@ -288,7 +285,6 @@ class UserPrivs
 
 		if (is_null($this->_actor) || (is_null($this->_actor->id))) return false;
 
-		db()->setFetchMode(Zend_Db::FETCH_NUM);
 		$res = db()->query("
 SELECT 
 	CASE tagpolicy
@@ -372,9 +368,6 @@ FROM applications WHERE guid = '" . $target ."';
 		// admin access
 		if ( ($this->_actor !== null) && userIsAdminOrManager($this->_actor->id) ) return true;
 
-		global $application;
-		$db = $application->getBootstrap()->getResource('db');
-		$db->setFetchMode(Zend_Db::FETCH_NUM);
 
 		$res = db()->query("SELECT query_vowide_img_list_view_perm(?, ?)", array($this->_actor->id, $target))->fetchAll();
 		if (count($res) == 0) {
@@ -391,9 +384,6 @@ FROM applications WHERE guid = '" . $target ."';
 		// admin access
 		if ( ($this->_actor !== null) && userIsAdminOrManager($this->_actor->id) ) return true;
 
-		global $application;
-		$db = $application->getBootstrap()->getResource('db');
-		$db->setFetchMode(Zend_Db::FETCH_NUM);
 
 		$res = db()->query("SELECT query_vowide_img_list_manage_perm(?, ?)", array($this->_actor->id, $target))->fetchAll();
 		if (count($res) == 0) {

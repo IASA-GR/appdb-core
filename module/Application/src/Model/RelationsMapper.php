@@ -21,7 +21,6 @@ namespace Application\Model;
 class RelationsMapper extends RelationsMapperBase
 {
 	public function save(AROItem $value) {
-		global $application;
 		$data = array();
 		$ishidden = false;
 		if( $value->getHiddenByID() === 0 ) {

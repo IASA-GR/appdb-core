@@ -30,8 +30,6 @@ class MyNews {
 
  public function __construct($filter = null)
     {
-        global $application;
-        $this->_db = $application->getBootstrap()->getResource('db');
 		if ( $this->filter === null ) {
 			$this->filter = new Filter();
 			$this->filter->_table = 'news';
@@ -72,7 +70,6 @@ class MyNews {
 	}
 	if ( $this->event != '' ) $where.=" AND ( action = '".$this->event."')";
 	$query = 'SELECT * FROM newsviews as news WHERE (ID NOT IN (SELECT i2 FROM (SELECT DISTINCT t1 as timestamp, si1 as subjectID, st1 as subjectType, a1 as action, i1, i2 FROM (SELECT EXTRACT(EPOCH FROM t1)-EXTRACT(EPOCH FROM t2) as dt,si1,st1,a1,t1,t2,i1,i2 FROM (SELECT n1.timestamp as t1, n1.subjectID as si1, n1.subjectType as st1, n1.action as a1, n1.ID as i1, n2.timestamp as t2, n2.subjectID as si2, n2.subjectType as st2, n2.action as a2, n2.ID as i2 FROM newsviews as n1,newsviews as n2) AS T1 WHERE si1=si2 AND st1=st2 AND a1=a2 AND EXTRACT(EPOCH FROM t1)-EXTRACT(EPOCH FROM t2)>0) AS T2 WHERE dt < 90000 ) AS T3) '.$where.' ORDER BY timestamp DESC '.$l;
-	$this->_db->setFetchMode(Zend_Db::FETCH_BOTH);
 	$this->_news = $this->_db->query($query)->fetchAll();
     return $this;
  }

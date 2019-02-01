@@ -138,7 +138,6 @@ class SitesMapper extends SitesMapperBase
 			$from = 'FROM sites';
 			$where = '';
 		}
-		$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
 		noDBSeqScan(db());
 		if ( is_array($filter->expr()) ) {
 			$res = db()->query("SELECT COUNT(DISTINCT id) FROM filtersites((?)::text[], (?)::text[], (?)::text[])", array(php_to_pg_array($filter->fltstr, false), php_to_pg_array($from, false), str_replace("''", "\'", php_to_pg_array($where, false))))->fetchAll();
@@ -160,10 +159,8 @@ class SitesMapper extends SitesMapperBase
 				$this->joins($select, $filter);
 				if ( ! is_array($filter->expr()) ) $select->where($filter->expr());
 				$executor = $this->getDbTable()->getAdapter();
-				$executor->setFetchMode(Zend_Db::FETCH_OBJ);
 			}
 		}
-		$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
 		if ($filter !== null) {
 			$ord = $filter->orderBy;
 			$select->limit($filter->limit, $filter->offset);
@@ -187,7 +184,6 @@ class SitesMapper extends SitesMapperBase
 		}
 		if ( $from == '' ) $from = 'FROM sites';
 
-		db()->setFetchMode(Zend_Db::FETCH_OBJ);
 		if ( is_array($filter->expr()) ) {
 			noDBSeqScan(db());
 			$resultSet = db()->query("SELECT sites.guid as guid FROM filtersites((?)::text[],(?)::text[],(?)::text[]) AS sites INNER JOIN sites AS s ON s.id = sites.id $limit", array(php_to_pg_array($filter->fltstr, false), php_to_pg_array($from, false), str_replace("''", "\'", php_to_pg_array($where, false))))->fetchAll();
@@ -249,10 +245,8 @@ class SitesMapper extends SitesMapperBase
 						$this->joins($select, $filter);
 						if ( ! is_array($filter->expr()) ) $select->where($filter->expr());
 						$executor = $this->getDbTable()->getAdapter();
-						$executor->setFetchMode(Zend_Db::FETCH_OBJ);
 					}
 				}
-				$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
         		if ($filter !== null) {
 					$ord = $filter->orderBy;
 //					if ( $ord == '' ) $ord = 'name ASC';
@@ -282,7 +276,6 @@ class SitesMapper extends SitesMapperBase
 				} else {
 					$func = "site_to_xml";
 				}
-				db()->setFetchMode(Zend_Db::FETCH_OBJ);
 				if ( is_array($filter->expr()) ) {
 					noDBSeqScan(db());
 					$resultSet = db()->query("SELECT ".$func."(array_agg(sites.guid::text $orderby)) as site FROM filtersites((?)::text[],(?)::text[],(?)::text[]) AS sites INNER JOIN sites AS s ON s.id = sites.id $limit", array(php_to_pg_array($filter->fltstr, false), php_to_pg_array($from, false), str_replace("''", "\'", php_to_pg_array($where, false))))->fetchAll();

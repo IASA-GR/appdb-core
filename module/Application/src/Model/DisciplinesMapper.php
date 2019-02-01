@@ -29,7 +29,6 @@ class DisciplinesMapper extends DisciplinesMapperBase
 				if ( $filter !== null ) {
 					if ( trim($filter->expr()) != '' ) $select->where($filter->expr());
 				}
-				$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
         		if ($filter !== null) {
 					$ord = $filter->orderBy;
 					if ( $ord == '' ) $ord = 'name';

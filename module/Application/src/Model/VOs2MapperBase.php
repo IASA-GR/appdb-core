@@ -47,7 +47,6 @@ class VOs2MapperBase
 
 	public function save(AROItem $value)
 	{
-	    global $application;
 	    $data = array(
 	        'id'   => $value->getId()=='NULL'?null:$value->getId(),
 	        'name'   => $value->getName()=='NULL'?null:$value->getName(),
@@ -79,7 +78,6 @@ class VOs2MapperBase
 		    if (null === ($id = $value->id)) {
 			unset($data['id']);
 			$this->getDbTable()->insert($data);
-			$rs = $application->getBootstrap()->getResource('db')->query('SELECT LAST_INSERT_ID() AS ID')->fetchAll();
                         if ( count($rs) > 0 ) $value->Id = $rs[0]['ID'];
 		    } else {
 			$s = $this->getDbTable()->getAdapter()->quoteInto($q1,$q2);

@@ -168,7 +168,6 @@ class ApplicationsMapper extends ApplicationsMapperBase
 			$from = 'FROM applications';
 			$where = '';
 		}
-//		//$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
 		noDBSeqScan(db());
 		if ( is_array($filter->expr()) ) {
 			$res = db()->query("SELECT COUNT(DISTINCT id) FROM filterapps((?)::text[], (?)::text[], (?)::text[])", array(php_to_pg_array($filter->fltstr, false), php_to_pg_array($from, false), str_replace("''", "\'", php_to_pg_array($where, false))))->toArray();
@@ -223,7 +222,6 @@ class ApplicationsMapper extends ApplicationsMapperBase
 					$this->joins($select, $filter);
 					if ( ! is_array($filter->expr()) ) $select->where($filter->expr());
 					$executor = $this->getDbTable()->getAdapter();
-//					//$executor->setFetchMode(Zend_Db::FETCH_OBJ);
 				}
 			}
 		}
@@ -283,7 +281,6 @@ class ApplicationsMapper extends ApplicationsMapperBase
 			}
 		}
 		if (str_replace('export', '', $format) === 'xml' || str_replace('export', '', $format) === 'csv') {
-//            //$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
             $userid = '';
             if ( $format === 'xml' ) {
 				$func = "app_to_xml"; 

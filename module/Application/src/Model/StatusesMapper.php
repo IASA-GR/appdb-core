@@ -26,7 +26,6 @@ class StatusesMapper extends StatusesMapperBase
 		} else {
 			if ($format === 'xml') {
 				$select = $this->getDbTable()->getSql()->select();
-				$this->getDbTable()->getAdapter()->setFetchMode(Zend_Db::FETCH_OBJ);
 				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT status_to_xml(id) as status FROM (".$select.") AS T;")->fetchAll();
 				$entries = array();
 				foreach ($resultSet as $row) {
