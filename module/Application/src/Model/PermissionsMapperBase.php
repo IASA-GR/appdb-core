@@ -42,7 +42,7 @@ class PermissionsMapperBase
 	public function getDbTable()
 	{
 		if (null === $this->_dbTable) {
-			$this->setDbTable('DbTable_Permissions');
+			$this->setDbTable('DbTable\Permissions');
 		}
 		return $this->_dbTable;
 	}

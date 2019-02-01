@@ -42,7 +42,7 @@ class VMISupportedContextFormatsMapperBase
 	public function getDbTable()
 	{
 		if (null === $this->_dbTable) {
-			$this->setDbTable('DbTable_VMISupportedContextFormats');
+			$this->setDbTable('DbTable\VMISupportedContextFormats');
 		}
 		return $this->_dbTable;
 	}

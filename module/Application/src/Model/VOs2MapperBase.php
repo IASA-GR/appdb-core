@@ -40,7 +40,7 @@ class VOs2MapperBase
 	public function getDbTable()
 	{
 	    if (null === $this->_dbTable) {
-	        $this->setDbTable('DbTable_VOs2');
+	        $this->setDbTable('DbTable\VOs2');
 	    }
 	    return $this->_dbTable;
 	}

@@ -42,7 +42,7 @@ class AppTeamMapperBase
 	public function getDbTable()
 	{
 		if (null === $this->_dbTable) {
-			$this->setDbTable('DbTable_AppTeam');
+			$this->setDbTable('DbTable\AppTeam');
 		}
 		return $this->_dbTable;
 	}

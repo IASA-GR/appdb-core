@@ -42,7 +42,7 @@ class VMINetworkTrafficMapperBase
 	public function getDbTable()
 	{
 		if (null === $this->_dbTable) {
-			$this->setDbTable('DbTable_VMINetworkTraffic');
+			$this->setDbTable('DbTable\VMINetworkTraffic');
 		}
 		return $this->_dbTable;
 	}

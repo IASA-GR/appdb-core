@@ -42,14 +42,13 @@ class AggregateNewsMapperBase
 	public function getDbTable()
 	{
 		if (null === $this->_dbTable) {
-			$this->setDbTable('DbTable_AggregateNews');
+			$this->setDbTable('DbTable\AggregateNews');
 		}
 		return $this->_dbTable;
 	}
 
 	public function save(AROItem $value)
 	{
-		global $application;
 		$data = array();
 		if ( ! isnull($value->getId()) ) $data['id'] = $value->getId();
 		if ( ! isnull($value->getTimestamp()) ) $data['timestamp'] = $value->getTimestamp();

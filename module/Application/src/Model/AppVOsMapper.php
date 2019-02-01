@@ -22,8 +22,7 @@ class AppVOsMapper extends AppVOsMapperBase
 {
 	public function save(AROItem $value)
 	{
-		global $application;
-		$tbl = new DbTable_AppVOsManual(); 
+		$tbl = new DbTable\AppVOsManual(); 
 		$data = array();
 		if ( ! isnull($value->getVoID()) ) $data['void'] = $value->getVoID();
 		if ( ! isnull($value->getAppID()) ) $data['appid'] = $value->getAppID();
@@ -31,11 +30,11 @@ class AppVOsMapper extends AppVOsMapperBase
 
 		$q1 = array('void = ?', 'appid = ?');
 		$q2 = array($value->void, $value->appid);
-		$select = $tbl->select();
+		$select = $tbl->getSql()->select();
 		for ($i=0; $i < count($q1); $i++) {
 			$select->where($q1[$i],$q2[$i]);
 		}
-		$new_entry = ( count($tbl->fetchAll($select)) == 0 );
+		$new_entry = (count(db()->query(SQL2STR($this, $select), array())->toArray()) == 0);
 		if ( $new_entry ) {
 			$tbl->insert($data);
 		} else {
@@ -49,7 +48,7 @@ class AppVOsMapper extends AppVOsMapperBase
 
 	public function delete(AppVO $value)
 	{
-		$tbl = new DbTable_AppVOsManual(); 
+		$tbl = new DbTable\AppVOsManual(); 
 		$q1 = array('void = ?', 'appid = ?');
 		$q2 = array($value->void, $value->appid);
 		$s = array();
