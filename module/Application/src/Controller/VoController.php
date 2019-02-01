@@ -27,8 +27,8 @@ class VoController extends AbstractActionController
 
 //// OBSOLETE, moved to SitesController    
 //	private function makeVAprovidersCache() {
-//		$copyfile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/va_providers.xml';
-//		$hashfile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/datahash';
+//		$copyfile = \RestAPIHelper::getFolder(\RestFolderEnum::FE_CACHE_FOLDER) . '../../public/assets/rp/va_providers.xml';
+//		$hashfile = \RestAPIHelper::getFolder(\RestFolderEnum::FE_CACHE_FOLDER) . '../../public/assets/rp/datahash';
 //
 //		# truncate data hash file (i.e. sync operation in progress)
 //		$f_hashfile = @fopen($hashfile, "w");
@@ -59,7 +59,7 @@ class VoController extends AbstractActionController
 //		$h['Keep-Alive']='300';		
 //		curl_setopt($ch, CURLOPT_HTTPHEADER, $h);
 //		// remove existing cachefiles before making API call, or else this will not work
-//		foreach ( glob(RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) .'/query_RestVAProvidersList_*.xml') as $cachefile ) {
+//		foreach ( glob(\RestAPIHelper::getFolder(\RestFolderEnum::FE_CACHE_FOLDER) .'/query_RestVAProvidersList_*.xml') as $cachefile ) {
 //			@unlink($cachefile);
 //		}
 //		error_log('VA providers RESTful API XML cache STARTED');
@@ -74,7 +74,7 @@ class VoController extends AbstractActionController
 //		}
 //		$ck = "";
 //		try {
-//			$xmlresult = new SimpleXMLElement($result);
+//			$xmlresult = new \SimpleXMLElement($result);
 //			$appdb = $xmlresult->xpath("//appdb:appdb");
 //			$vadata = $xmlresult->xpath("//virtualization:provider");
 //			$vadatastring = "";
@@ -98,14 +98,14 @@ class VoController extends AbstractActionController
 //		}
 //		curl_close($ch);
 //		if ($ck != "") {
-//			if (!@copy(RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) .'/query_RestVAProvidersList_' . $ck . '.xml', $copyfile)) {
+//			if (!@copy(\RestAPIHelper::getFolder(\RestFolderEnum::FE_CACHE_FOLDER) .'/query_RestVAProvidersList_' . $ck . '.xml', $copyfile)) {
 //				$errors = error_get_last();
 //				error_log("[makeVAprovidersCache] Could not copy VA providers cache file into assets. Reason: " . $errors['message']);
 //			} else {
 //				debug_log("Copied VA providers cache file into assets");
 //				// XML cache file has been copied to assets. Create a JSON copy as well.
 //				$copyfile2 = str_replace(".xml", ".json", $copyfile);
-//				$jsondata = RestAPIHelper::transformXMLtoJSON(file_get_contents($copyfile));
+//				$jsondata = \RestAPIHelper::transformXMLtoJSON(file_get_contents($copyfile));
 //				$f_jsonop = true;
 //				$f_jsonfile = @fopen($copyfile2, "w");
 //				if ($f_jsonfile !== false) {
@@ -151,12 +151,13 @@ class VoController extends AbstractActionController
 //		}
 //	}
 
-    public function init()
+    public function __construct()
     {
         /* Initialize action controller here */
-		$this->vofile = $_SERVER['APPLICATION_PATH']."/../cache/vos.xml";
-		$this->xml = $this->fetchVOs();
+		$this->view = new ViewModel();
 		$this->session = new \Zend\Session\Container('base');
+		$this->vofile = $_SERVER['APPLICATION_PATH'] . "/../../data/cache/vos.xml";
+		$this->xml = $this->fetchVOs();
 	}
 
 	public function refreshAction() {
@@ -174,10 +175,9 @@ class VoController extends AbstractActionController
 	}
 
     private function printError() 
-    {
-		$this->_helper->layout->disableLayout();
-        $this->_helper->viewRenderer->setNoRender();
-        echo '<div style="padding: 50px; text-align: left; vertical-align: middle; height: 100%"><div style="text-align: center"><img width="32px" src="/images/error.png"/></div><span><h3>There was an error fetching VO data from the <a href="http://operations-portal.egi.eu" target="_blank">EGI Operations Portal</a>. The service may be down, or experiencing network problems. If this error persists for more than an hour, please <a href="http://helpdesk.egi.eu/" target="_blank">let us know</a>.</h3></span></div>';
+	{
+		DISABLE_LAYOUT($this);
+        return SET_NO_RENDER($this, '<div style="padding: 50px; text-align: left; vertical-align: middle; height: 100%"><div style="text-align: center"><img width="32px" src="/images/error.png"/></div><span><h3>There was an error fetching VO data from the <a href="http://operations-portal.egi.eu" target="_blank">EGI Operations Portal</a>. The service may be down, or experiencing network problems. If this error persists for more than an hour, please <a href="http://helpdesk.egi.eu/" target="_blank">let us know</a>.</h3></span></div>', 200);
     }
 
     private function paging(&$entries, $offset, $length, $total) {
@@ -200,44 +200,47 @@ class VoController extends AbstractActionController
 
     public function getlogoAction()
     {
-	$this->_helper->layout->disableLayout();
-	$this->_helper->viewRenderer->setNoRender();
-	$name = GET_REQUEST_PARAM($this, 'name');
-	$discipline = GET_REQUEST_PARAM($this, 'id');
-	$vid = GET_REQUEST_PARAM($this, 'vid');
-	
-	if( trim($name) !== "" && strtolower( trim($name) ) === "eubrazilcc.eu" ) {
-		$img = "images/vo_eubrazilcc_eu.png";
-	} else {
-		db()->setFetchMode(Zend_Db::FETCH_NUM);
-		if ($vid != '') {
-			$img = db()->query("SELECT vos.logoid FROM vos WHERE id = $vid")->fetchAll();
-			if (count($img) > 0) {
-				$img = $img[0][0];
+		$name = GET_REQUEST_PARAM($this, 'name');
+		$discipline = GET_REQUEST_PARAM($this, 'id');
+		$vid = GET_REQUEST_PARAM($this, 'vid');
+		
+		if( trim($name) !== "" && strtolower( trim($name) ) === "eubrazilcc.eu" ) {
+			$img = "images/vo_eubrazilcc_eu.png";
+		} else {
+			if ($vid != '') {
+				$img = db()->query("SELECT vos.logoid FROM vos WHERE id = $vid", array())->toArray();
+				if (count($img) > 0) {
+					$img = $img[0];
+					if (is_array($img)) {
+						if (count($img) > 0) {
+							$img = $img['logoid'];
+						}
+					}
+				} else {
+					$img = "0";
+				}
 			} else {
 				$img = "0";
-			}
+			}		
+			$img = $_SERVER['APPLICATION_PATH'] . "/../../public/images/disciplines/$img.png";
+		}
+		header('PRAGMA: NO-CACHE');
+		header('CACHE-CONTROL: NO-CACHE');
+		header('Content-type: image/png');
+		if (file_exists($_SERVER['APPLICATION_PATH'] . "/../../public/" . $img)) {
+			readfile($img);	
 		} else {
-			$img = "0";
-		}		
-		$img = "images/disciplines/$img.png";
+			readfile($_SERVER['APPLICATION_PATH'] . "/../../public/images/disciplines/0.png");	
+		}
+		DISABLE_LAYOUT($this);
+		return SET_NO_RENDER($this);
 	}
-	header('PRAGMA: NO-CACHE');
-	header('CACHE-CONTROL: NO-CACHE');
-	header('Content-type: image/png');
-	if (file_exists($_SERVER['APPLICATION_PATH'] . "/../public/" . $img)) {
-		readfile($img);	
-	} else {
-		readfile("images/disciplines/0.png");	
-	}
-}
 
     public function resourcesAction()    
     {
-        $this->_helper->layout->disableLayout();
         $voname = GET_REQUEST_PARAM($this, "id");
         if ($voname != null) {
-            $xml = new SimpleXMLElement($this->xml);
+            $xml = new \SimpleXMLElement($this->xml);
 			$volist = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper($voname)."']");
 	    	if (count($volist)>0) {
                 $r=$volist[0]->Ressources;
@@ -251,7 +254,8 @@ class VoController extends AbstractActionController
                 );
                 $this->view->entry = $res;
             }
-        }
+		}
+		return DISABLE_LAYOUT($this);
     }
 
 
@@ -265,11 +269,10 @@ class VoController extends AbstractActionController
 			$att = $disc->attributes();
 			$d = array();
 			$d["name"] = strval($att["key"]);
-			db()->setFetchMode(Zend_Db::FETCH_BOTH); 
 			if (($lvl > 1) && ($pid != "")) {
-				$res = db()->query("SELECT * FROM htree('disciplines', '', 0, '') AS h WHERE h.name = ? AND parentid = ? AND h.lvl = ?", array(strval($att["key"]), $pid, $lvl))->fetchAll();
+				$res = db()->query("SELECT * FROM htree('disciplines', '', 0, '') AS h WHERE h.name = ? AND parentid = ? AND h.lvl = ?", array(strval($att["key"]), $pid, $lvl))->toArray();
 			} else {
-				$res = db()->query("SELECT * FROM htree('disciplines', '', 0, '') AS h WHERE h.name = ? AND h.lvl = ?", array(strval($att["key"]), $lvl))->fetchAll();
+				$res = db()->query("SELECT * FROM htree('disciplines', '', 0, '') AS h WHERE h.name = ? AND h.lvl = ?", array(strval($att["key"]), $lvl))->toArray();
 			}
 			if (count($res) > 0) {
 				$res = $res[0];
@@ -277,16 +280,16 @@ class VoController extends AbstractActionController
 				$res = null;
 			}
 			if ($res != null) {
-				$d["id"] = "".$res["id"];
-				$d["parentid"] = "".$res["parentid"];
+				$d["id"] = "" . $res["id"];
+				$d["parentid"] = "" . $res["parentid"];
 			} else {
 				$d["id"] = "0";
 				$d["parentid"] = "0";
 			}
-			$res = db()->query("SELECT ord FROM disciplines WHERE id = ?", array($d["id"]))->fetchAll();
+			$res = db()->query("SELECT ord FROM disciplines WHERE id = ?", array($d["id"]))->toArray();
 			if (count($res) > 0) {
 				$res = $res[0];
-				$d["order"] = "".$res["ord"];
+				$d["order"] = "" . $res["ord"];
 			} else {
 				$d["order"] = "1";
 			}
@@ -309,7 +312,7 @@ class VoController extends AbstractActionController
 
 	private function populateVO(&$voentry)
 	{
-		$vo = new Default_Model_VO2();
+		$vo = new \Application\Model\VO2();
 		$att = $voentry->attributes();
 		$vo->name = $att["Name"];
 		$vo->serial = $att["Serial"];
@@ -364,7 +367,7 @@ class VoController extends AbstractActionController
         if ($valid === false) {
             $xml = null;
         } else {
-            $x = new SimpleXMLElement($xml);
+            $x = new \SimpleXMLElement($xml);
             $volist = $x->xpath('//VoDump');
             if (count($volist)==0 || (count($volist)==1 && strlen($x->AsXML()) <= 40)) $xml=null;
         }
@@ -389,11 +392,11 @@ class VoController extends AbstractActionController
 
 		try {
 			// aggregate VOs XML from all sources into one file, giving precedence to EBI
-			$data1 = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../cache/vos.xml");
-			$xml1 = new SimpleXMLElement($data1);
-			$data2 = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../cache/ebivos.xml");
+			$data1 = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../../data/cache/vos.xml");
+			$xml1 = new \SimpleXMLElement($data1);
+			$data2 = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../../data/cache/ebivos.xml");
 			if ( trim($data2) != "" ) {
-				$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'ebi_to_egi_vos.xsl';
+				$xf = \RestAPIHelper::getFolder(\RestFolderEnum::FE_XSL_FOLDER).'ebi_to_egi_vos.xsl';
 				$xsl = new DOMDocument();
 				$xsl->load($xf);
 				$proc = new XSLTProcessor();
@@ -402,9 +405,9 @@ class VoController extends AbstractActionController
 				$xml2 = new DOMDocument();
 				$xml2->loadXML($data2, LIBXML_NSCLEAN | LIBXML_COMPACT);
 				$data2 = $proc->transformToXml($xml2);
-				$xml2 = new SimpleXMLElement($data2);
+				$xml2 = new \SimpleXMLElement($data2);
 			}
-			$f = fopen($_SERVER['APPLICATION_PATH'] . "/../cache/aggvos.xml", "w");
+			$f = fopen($_SERVER['APPLICATION_PATH'] . "/../../data/cache/aggvos.xml", "w");
 			if ($f !== false) {
 				fwrite($f, "<VoDump>\n");
 				if ( trim($data2) != "" ) {
@@ -433,8 +436,8 @@ class VoController extends AbstractActionController
 	}
 
 	private function gridops_is_down() {
-		@exec($_SERVER['APPLICATION_PATH'] . "/../bin/gridops_down");
-		if (file_exists(RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . "/gridops_downtime")) {
+		@exec($_SERVER['APPLICATION_PATH'] . "/../../bin/gridops_down");
+		if (file_exists(\RestAPIHelper::getFolder(\RestFolderEnum::FE_CACHE_FOLDER) . "/gridops_downtime")) {
 			return true;
 		} else {
 			return false;
@@ -442,22 +445,21 @@ class VoController extends AbstractActionController
 	}
 
 	private function syncEBIVOs() {
-		db()->setFetchMode(Zend_Db::FETCH_OBJ);
-		$rs = db()->query("SELECT id,name, url, enabled FROM vo_sources WHERE name = 'EBI-Perun'")->fetchAll();
+		$rs = db()->query("SELECT id,name, url, enabled FROM vo_sources WHERE name = 'EBI-Perun'", array())->toArray();
 		$enabled = false;
 		$uri = null;
 		if (count($rs) > 0) {
 			$rs = $rs[0];
-			if (filter_var($rs->enabled, FILTER_VALIDATE_BOOLEAN) === true) $enabled = true;
-			$uri = $rs->url;
+			if (filter_var($rs['enabled'], FILTER_VALIDATE_BOOLEAN) === true) $enabled = true;
+			$uri = $rs['url'];
 		}
 		if (! $enabled) {
 			error_log("EBI-Perun VO source is disabled; will not sync");
-			ExternalDataNotification::sendNotification('VO::syncEBIVOs', "EBI-Perun VO source is disabled; will not sync", ExternalDataNotification::MESSAGE_TYPE_ERROR);
+			\ExternalDataNotification::sendNotification('VO::syncEBIVOs', "EBI-Perun VO source is disabled; will not sync", \ExternalDataNotification::MESSAGE_TYPE_ERROR);
 			return false;
 		}
 		$inTransaction = false;
-		$vofile = $_SERVER['APPLICATION_PATH'] . "/../cache/ebivos.xml";
+		$vofile = $_SERVER['APPLICATION_PATH'] . "/../../data/cache/ebivos.xml";
 		try {
 			if ( $_SERVER['APPLICATION_ENV]'] == "production" ) {
 				// get entries
@@ -471,8 +473,8 @@ class VoController extends AbstractActionController
 				curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);        
-				curl_setopt($ch, CURLOPT_SSLCERT, $_SERVER['APPLICATION_PATH'] . '/../bin/sec/usercert.pem');
-				curl_setopt($ch, CURLOPT_SSLKEY, $_SERVER['APPLICATION_PATH'] . '/../bin/sec/userkey.pem');
+				curl_setopt($ch, CURLOPT_SSLCERT, $_SERVER['APPLICATION_PATH'] . '/../../bin/sec/usercert.pem');
+				curl_setopt($ch, CURLOPT_SSLKEY, $_SERVER['APPLICATION_PATH'] . '/../../bin/sec/userkey.pem');
 				$headers = apache_request_headers();
 				curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 				$xml = curl_exec($ch);
@@ -486,7 +488,7 @@ class VoController extends AbstractActionController
 				@curl_close($ch);
 				
 				// sort entries
-				$xf = $_SERVER['APPLICATION_PATH'] . '/../bin/sort_vos.xsl';
+				$xf = $_SERVER['APPLICATION_PATH'] . '/../../bin/sort_vos.xsl';
 				$xsl = new DOMDocument();
 				$xsl->load($xf);
 				$proc = new XSLTProcessor();
@@ -514,7 +516,7 @@ class VoController extends AbstractActionController
 				db()->query("ALTER TABLE perun.vo_contacts DISABLE TRIGGER tr_perun_vo_contacts_99_refresh_permissions");
 				db()->query("DELETE FROM perun.vo_contacts");	// will be repopulated later on
 				db()->query("DELETE FROM perun.vos");
-				$xmlobj = new SimpleXMLElement($xml);
+				$xmlobj = new \SimpleXMLElement($xml);
                 $xvos = $xmlobj->xpath("//VoDump/IDCard");
                 // add new VOs and update existing VOs
 				foreach($xvos as $xvo) {
@@ -580,7 +582,7 @@ class VoController extends AbstractActionController
 			db()->query("ALTER TABLE vos ENABLE TRIGGER rtr__vos_cache_delta");
 			db()->query("SELECT request_permissions_refresh()");
 			error_log('Error while syncing EBI VOs: '.$e);
-			ExternalDataNotification::sendNotification('VO::syncEBIVOs', $e->getMessage(), ExternalDataNotification::MESSAGE_TYPE_ERROR);
+			\ExternalDataNotification::sendNotification('VO::syncEBIVOs', $e->getMessage(), \ExternalDataNotification::MESSAGE_TYPE_ERROR);
 		}
 		return $xml;
 	}
@@ -588,21 +590,20 @@ class VoController extends AbstractActionController
 	private function syncEGIVOs() {
 		if ($this->gridops_is_down()) {
 			error_log("EGI Operations portal is in downtime. EGI VO sync aborted");
-			ExternalDataNotification::sendNotification('VO::syncEGIVOs', "EGI Operations portal is in downtime. EGI VO sync aborted", ExternalDataNotification::MESSAGE_TYPE_ERROR);
+			\ExternalDataNotification::sendNotification('VO::syncEGIVOs', "EGI Operations portal is in downtime. EGI VO sync aborted", \ExternalDataNotification::MESSAGE_TYPE_ERROR);
 			return false;
 		}
-		db()->setFetchMode(Zend_Db::FETCH_OBJ);
-		$rs = db()->query("SELECT id, name, enabled, url FROM vo_sources WHERE name = 'EGI Operations Portal'")->fetchAll();
+		$rs = db()->query("SELECT id, name, enabled, url FROM vo_sources WHERE name = 'EGI Operations Portal'", array())->toArray();
 		$enabled = false;
 		$uri = null;
 		if (count($rs) > 0) {
 			$rs = $rs[0];
-			if (filter_var($rs->enabled, FILTER_VALIDATE_BOOLEAN) === true) $enabled = true;
-			$uri = $rs->url;
+			if (filter_var($rs['enabled'], FILTER_VALIDATE_BOOLEAN) === true) $enabled = true;
+			$uri = $rs['url'];
 		}
 		if (! $enabled) {
 			error_log("EGI Operations Portal VO source is disabled; will not sync");
-			ExternalDataNotification::sendNotification('VO::syncEGIVOs', "EGI Operations Portal VO source is disabled; will not sync", ExternalDataNotification::MESSAGE_TYPE_ERROR);
+			\ExternalDataNotification::sendNotification('VO::syncEGIVOs', "EGI Operations Portal VO source is disabled; will not sync", \ExternalDataNotification::MESSAGE_TYPE_ERROR);
 			return false;
 		};
 		$inTransaction = false;
@@ -617,21 +618,21 @@ class VoController extends AbstractActionController
 			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);        
-			curl_setopt($ch, CURLOPT_SSLCERT, $_SERVER['APPLICATION_PATH'] . '/../bin/sec/usercert.pem');
-			curl_setopt($ch, CURLOPT_SSLKEY, $_SERVER['APPLICATION_PATH'] . '/../bin/sec/userkey.pem');
+			curl_setopt($ch, CURLOPT_SSLCERT, $_SERVER['APPLICATION_PATH'] . '/../../bin/sec/usercert.pem');
+			curl_setopt($ch, CURLOPT_SSLKEY, $_SERVER['APPLICATION_PATH'] . '/../../bin/sec/userkey.pem');
 			$headers = apache_request_headers();
 			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 			$xml = curl_exec($ch);
 			
 			if ( $xml === false ) {
 				error_log("error in syncEGIVOs: " . var_export(curl_error($ch), true));
-				ExternalDataNotification::sendNotification('VO::syncEGIVOs', var_export(curl_error($ch), true), ExternalDataNotification::MESSAGE_TYPE_ERROR);
+				\ExternalDataNotification::sendNotification('VO::syncEGIVOs', var_export(curl_error($ch), true), \ExternalDataNotification::MESSAGE_TYPE_ERROR);
 				return false;
 			}
 			@curl_close($ch);
 
 			// sort entries
-			$xf = $_SERVER['APPLICATION_PATH'] . '/../bin/sort_vos.xsl';
+			$xf = $_SERVER['APPLICATION_PATH'] . '/../../bin/sort_vos.xsl';
 			$xsl = new DOMDocument();
 			$xsl->load($xf);
 			$proc = new XSLTProcessor();
@@ -645,14 +646,13 @@ class VoController extends AbstractActionController
 *
 			// convert sciclass IDs to discipline IDs
 			$xsl = new DOMDocument();
-			db()->setFetchMode(Zend_Db::FETCH_BOTH);
-			$xsltable = db()->query('SELECT array_to_string(array_agg(\'<xsl:when test=". = \' || sciclassid::text || \'"><xsl:text>\' || disciplineid::text || \'</xsl:text></xsl:when>\'),E\'\n\') FROM disc_to_sciclass;')->fetchAll();
+			$xsltable = db()->query('SELECT array_to_string(array_agg(\'<xsl:when test=". = \' || sciclassid::text || \'"><xsl:text>\' || disciplineid::text || \'</xsl:text></xsl:when>\'),E\'\n\') FROM disc_to_sciclass;', array())->toArray();
 			$xsltable = $xsltable[0];
 			$xsltable = $xsltable[0];
-			$xsltable2 = db()->query('SELECT array_to_string(array_agg(\'<xsl:when test=". = \' || sciclassid::text || \'"><xsl:text>\' || parentid::text || \'</xsl:text></xsl:when>\'),E\'\n\') FROM disc_to_sciclass;')->fetchAll();
+			$xsltable2 = db()->query('SELECT array_to_string(array_agg(\'<xsl:when test=". = \' || sciclassid::text || \'"><xsl:text>\' || parentid::text || \'</xsl:text></xsl:when>\'),E\'\n\') FROM disc_to_sciclass;', array())->toArray();
 			$xsltable2 = $xsltable2[0];
 			$xsltable2 = $xsltable2[0];
-			$xsltable3 = db()->query('SELECT array_to_string(array_agg(\'<xsl:when test=". = \' || sciclassid::text || \'"><xsl:text>\' || ord::text || \'</xsl:text></xsl:when>\'),E\'\n\') FROM disc_to_sciclass;')->fetchAll();
+			$xsltable3 = db()->query('SELECT array_to_string(array_agg(\'<xsl:when test=". = \' || sciclassid::text || \'"><xsl:text>\' || ord::text || \'</xsl:text></xsl:when>\'),E\'\n\') FROM disc_to_sciclass;', array())->toArray();
 			$xsltable3 = $xsltable3[0];
 			$xsltable3 = $xsltable3[0];
 			$xsldata = 
@@ -722,7 +722,7 @@ class VoController extends AbstractActionController
 				db()->query("ALTER TABLE egiops.vo_contacts DISABLE TRIGGER tr_egiops_vo_contacts_99_refresh_permissions");
 				db()->query("DELETE FROM egiops.vo_contacts");	// will be repopulated later on
 				db()->query("DELETE FROM egiops.vos");
-				$xmlobj = new SimpleXMLElement($xml);
+				$xmlobj = new \SimpleXMLElement($xml);
                 $xvos = $xmlobj->xpath("//VoDump/IDCard");
                 // add new VOs and update existing VOs
 				foreach($xvos as $xvo) {
@@ -757,20 +757,19 @@ class VoController extends AbstractActionController
 				foreach($xvos as $xvo) {
 					// sync vo / middleware relations. Remove existing and repopulate
 					$att = $xvo->attributes();
-                    db()->setFetchMode(Zend_Db::FETCH_OBJ);
-                    db()->query('DELETE FROM vo_middlewares WHERE void = (SELECT id FROM vos WHERE name = ? AND sourceid = 1)', array(strtolower(trim($att["Name"]))))->fetchAll();
+                    db()->query('DELETE FROM vo_middlewares WHERE void = (SELECT id FROM vos WHERE name = ? AND sourceid = 1)', array(strtolower(trim($att["Name"]))));
                     if ( $xvo->Middlewares ) {
                         if ( strval($xvo->Middlewares->attributes()->gLite) == "1" ) {
-                            db()->query('INSERT INTO vo_middlewares (void, middlewareid) VALUES ((SELECT id FROM vos WHERE name = ? AND sourceid = 1), 1)', array(strtolower(trim($att["Name"]))))->fetchAll();
+                            db()->query('INSERT INTO vo_middlewares (void, middlewareid) VALUES ((SELECT id FROM vos WHERE name = ? AND sourceid = 1), 1)', array(strtolower(trim($att["Name"]))));
                         }
                         if ( strval($xvo->Middlewares->attributes()->ARC) == "1" ) {
-                            db()->query('INSERT INTO vo_middlewares (void, middlewareid) VALUES ((SELECT id FROM vos WHERE name = ? AND sourceid = 1), 2)', array(strtolower(trim($att["Name"]))))->fetchAll();
+                            db()->query('INSERT INTO vo_middlewares (void, middlewareid) VALUES ((SELECT id FROM vos WHERE name = ? AND sourceid = 1), 2)', array(strtolower(trim($att["Name"]))));
                         }
                         if ( strval($xvo->Middlewares->attributes()->UNICORE) == "1" ) {
-                            db()->query('INSERT INTO vo_middlewares (void, middlewareid) VALUES ((SELECT id FROM vos WHERE name = ? AND sourceid = 1), 3)', array(strtolower(trim($att["Name"]))))->fetchAll();
+                            db()->query('INSERT INTO vo_middlewares (void, middlewareid) VALUES ((SELECT id FROM vos WHERE name = ? AND sourceid = 1), 3)', array(strtolower(trim($att["Name"]))));
                         }
                         if ( strval($xvo->Middlewares->attributes()->GLOBUS) == "1" ) {
-                            db()->query('INSERT INTO vo_middlewares (void, middlewareid) VALUES ((SELECT id FROM vos WHERE name = ? AND sourceid = 1), 4)', array(strtolower(trim($att["Name"]))))->fetchAll();
+                            db()->query('INSERT INTO vo_middlewares (void, middlewareid) VALUES ((SELECT id FROM vos WHERE name = ? AND sourceid = 1), 4)', array(strtolower(trim($att["Name"]))));
                         }
 					}
 					// sync vo_resources.
@@ -778,11 +777,11 @@ class VoController extends AbstractActionController
 					db()->query("SAVEPOINT $sp_resources");
 					$release_resources_savepoint = true;
 					try {
-						db()->query("DELETE FROM vo_resources WHERE void = (SELECT id FROM vos WHERE name = ? AND sourceid = 1)", array(strtolower(trim($att["Name"]))))->fetchAll();
+						db()->query("DELETE FROM vo_resources WHERE void = (SELECT id FROM vos WHERE name = ? AND sourceid = 1)", array(strtolower(trim($att["Name"]))));
 						if ( $xvo->Ressources ) {
 							$xres = $xmlobj->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper(trim($att["Name"]))."']/Ressources/*");
 							foreach ($xres as $xr) {
-								db()->query("INSERT INTO vo_resources (void, name, value) SELECT (SELECT id FROM vos WHERE name = ? AND sourceid = 1 AND NOT deleted), ?, ? WHERE NOT EXISTS (SELECT * FROM vo_resources WHERE void = (SELECT id FROM vos WHERE name = ? AND sourceid = 1 AND NOT deleted) AND name = ?)", array(strtolower(trim($att["Name"])), strval($xr->getName()), strval($xr), strtolower(trim($att["Name"])), strval($xr->getName())))->fetchAll();
+								db()->query("INSERT INTO vo_resources (void, name, value) SELECT (SELECT id FROM vos WHERE name = ? AND sourceid = 1 AND NOT deleted), ?, ? WHERE NOT EXISTS (SELECT * FROM vo_resources WHERE void = (SELECT id FROM vos WHERE name = ? AND sourceid = 1 AND NOT deleted) AND name = ?)", array(strtolower(trim($att["Name"])), strval($xr->getName()), strval($xr), strtolower(trim($att["Name"])), strval($xr->getName())));
 							}
 						}
 					} catch (Exception $e) {
@@ -801,11 +800,11 @@ class VoController extends AbstractActionController
 					}
 					// sync vo / voms relations.
 					db()->query('DELETE FROM vomses WHERE void = (SELECT id FROM vos WHERE name = ? AND sourceid = 1)', array(strtolower(trim($att["Name"]))));
-					$void = db()->query("SELECT id FROM vos WHERE name = ?", array(strtolower(trim($att["Name"]))))->fetchAll();
+					$void = db()->query("SELECT id FROM vos WHERE name = ?", array(strtolower(trim($att["Name"]))));
 					$void = $void[0]->id;
 					$xvomses = $xvo->xpath("./gLiteConf/VOMSServers/VOMS_Server");
 					foreach( $xvomses as $xvoms ) {
-						$voms = new Default_Model_VOMS();
+						$voms = new \Application\Model\VOMS();
 						$voms->void = $void;
 						$voms->httpsPort = strval($xvoms->attributes()->HttpsPort);
 						$voms->vomsesPort = strval($xvoms->attributes()->VomsesPort);
@@ -842,7 +841,7 @@ class VoController extends AbstractActionController
 			@exec("mv -f " . $this->vofile . ".old " . $this->vofile);
 			@exec("mv -f " . $this->vofile . ".old.bak " . $this->vofile . ".old");
 			error_log('Error while syncing EGI VOs: '.$e);
-			ExternalDataNotification::sendNotification('VO::syncEGIVOs', $e->getMessage(), ExternalDataNotification::MESSAGE_TYPE_ERROR);
+			\ExternalDataNotification::sendNotification('VO::syncEGIVOs', $e->getMessage(), \ExternalDataNotification::MESSAGE_TYPE_ERROR);
 		}
 		@exec("rm -f " . $this->vofile . ".old.bak");
 		return $xml;
@@ -853,8 +852,12 @@ class VoController extends AbstractActionController
 		if ( ! file_exists($this->vofile) ) {
 			$xml = $this->syncVOs();
 		} else {
-			$xml = file_get_contents($this->vofile);
-			$this->validateXMLCache($xml);
+			try {
+				$xml = @file_get_contents($this->vofile);
+				$this->validateXMLCache($xml);
+			} catch (Exception $e) {
+				error_log("[VoController::fetchVOs] " . $e->getMessage());
+			}
 		}
         return $xml;
 	}
@@ -865,7 +868,7 @@ class VoController extends AbstractActionController
         }else{
             $n = $name;
         }
-        $ds = new Default_Model_Domains();
+        $ds = new \Application\Model\Domains();
         $ds->filter->name->equals($n);
         $id = $ds->items[0]->id;
         return $id;
@@ -875,7 +878,7 @@ class VoController extends AbstractActionController
 		$this->_helper->layout->disableLayout();
 		$voname = $id;
 		if ( $voname != null ) {
-			$xml = new SimpleXMLElement($this->xml);
+			$xml = new \SimpleXMLElement($this->xml);
 			$volist = $xml->xpath('//VoDump/IDCard[@Name="'.$voname.'"]');
 					$volist = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper($voname)."']");
 			if (count($volist)>0) {
@@ -896,7 +899,7 @@ class VoController extends AbstractActionController
     }
 	
 	private function getContacts($id){
-		$vocs = new Default_Model_VOs();
+		$vocs = new \Application\Model\VOs();
 		$vocs->filter->name->equals($id);
 		if( count($vocs->items) > 0 ){
 			$voc = $vocs->items[0];
@@ -908,16 +911,15 @@ class VoController extends AbstractActionController
 	
     public function detailsAction()
     {
-        $this->_helper->layout->disableLayout();
 		$this->view->canEdit = false;
         if ( $this->xml !== null ) {
             if ( GET_REQUEST_PARAM($this, "id") != null ) {
-                $vos = new Default_Model_VOs();
+                $vos = new \Application\Model\VOs();
                 $vos->filter->name->ilike(GET_REQUEST_PARAM($this, "id"));
-				if( file_exists($_SERVER['APPLICATION_PATH'] . "/../cache/aggvos.xml") ){
-					$xml = new SimpleXMLElement($_SERVER['APPLICATION_PATH'] . "/../cache/aggvos.xml", 0, true);
+				if( file_exists($_SERVER['APPLICATION_PATH'] . "/../../data/cache/aggvos.xml") ){
+					$xml = new \SimpleXMLElement($_SERVER['APPLICATION_PATH'] . "/../../data/cache/aggvos.xml", 0, true);
 				}else{
-					$xml = new SimpleXMLElement($this->xml);
+					$xml = new \SimpleXMLElement($this->xml);
 				}
 				$volist = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper(GET_REQUEST_PARAM($this, "id"))."']");
 				if (count($volist)>0) {
@@ -941,7 +943,7 @@ class VoController extends AbstractActionController
 					$this->view->relatedItems = array();
 					$this->view->relatedItems = array_merge($this->view->relatedItems, $vo->applications);
 					$this->view->relatedItems = array_merge($this->view->relatedItems, $vo->sites);
-					$this->view->canEdit = VoAdmin::canEditVOImageList($this->session->userid, $vo);
+					$this->view->canEdit = \VoAdmin::canEditVOImageList($this->session->userid, $vo);
 				}
             }
             $this->view->session = $this->session;
@@ -949,7 +951,8 @@ class VoController extends AbstractActionController
 			
         } else {
             $this->printError();
-        }
+		}
+		return DISABLE_LAYOUT($this);
     }
 
     public function listAction(){
@@ -958,7 +961,7 @@ class VoController extends AbstractActionController
 
     public function indexAction()
     {
-        $this->_helper->layout->disableLayout();
+		return DISABLE_LAYOUT($this);
     }
 
 	public function alphanumericreportAction(){
@@ -994,18 +997,17 @@ class VoController extends AbstractActionController
 	}
 
 	public function syncEBIVOMembers() {
-		db()->setFetchMode(Zend_Db::FETCH_OBJ);
-		$rs = db()->query("SELECT id, name, enabled, members_url FROM vo_sources WHERE name = 'EBI-Perun'")->fetchAll();
+		$rs = db()->query("SELECT id, name, enabled, members_url FROM vo_sources WHERE name = 'EBI-Perun'", array())->toArray();
 		$enabled = false;
 		$uri = null;
 		if (count($rs) > 0) {
 			$rs = $rs[0];
-			if (filter_var($rs->enabled, FILTER_VALIDATE_BOOLEAN) === true) $enabled = true;
-			$uri = $rs->members_url;
+			if (filter_var($rs['enabled'], FILTER_VALIDATE_BOOLEAN) === true) $enabled = true;
+			$uri = $rs['members_url'];
 		}
 		if (! $enabled) {
 			error_log("EBI-Perun VO source is disabled; will not sync VO members");
-			ExternalDataNotification::sendNotification('VO::syncEBIVOMembers', "EBI-Perun VO source is disabled; will not sync VO members", ExternalDataNotification::MESSAGE_TYPE_ERROR);
+			\ExternalDataNotification::sendNotification('VO::syncEBIVOMembers', "EBI-Perun VO source is disabled; will not sync VO members", \ExternalDataNotification::MESSAGE_TYPE_ERROR);
 			return false;
 		}
 		$inTransaction = false;
@@ -1019,8 +1021,8 @@ class VoController extends AbstractActionController
 				curl_setopt($ch, 181, 1 | 2);
 				curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-				curl_setopt($ch, CURLOPT_SSLCERT, $_SERVER['APPLICATION_PATH'] . '/../bin/sec/usercert.pem');
-				curl_setopt($ch, CURLOPT_SSLKEY, $_SERVER['APPLICATION_PATH'] . '/../bin/sec/userkey.pem');
+				curl_setopt($ch, CURLOPT_SSLCERT, $_SERVER['APPLICATION_PATH'] . '/../../bin/sec/usercert.pem');
+				curl_setopt($ch, CURLOPT_SSLKEY, $_SERVER['APPLICATION_PATH'] . '/../../bin/sec/userkey.pem');
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);        
 				$headers = apache_request_headers();
 				curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -1029,24 +1031,24 @@ class VoController extends AbstractActionController
 				if ( $xml === false ) {
 					$err = var_export(curl_error($ch), true);
 					error_log("error in syncEBIVOMembers: " . $err);
-					ExternalDataNotification::sendNotification('VO::syncEBIVOMembers', 'Could not sync VO members from EBI-Perun. Error was:\n\n' . $err);
+					\ExternalDataNotification::sendNotification('VO::syncEBIVOMembers', 'Could not sync VO members from EBI-Perun. Error was:\n\n' . $err);
 					return;
 				} else {
 					$xml = "<results>$xml</results>";
 				}	
 				@curl_close($ch);
-				@exec("rm ". $_SERVER['APPLICATION_PATH'] . "/../cache/ebivo_users.xml.old");
-				@exec("mv " . $_SERVER['APPLICATION_PATH'] . "/../cache/egivo_users.xml ". $_SERVER['APPLICATION_PATH'] . "/../cache/ebivo_users.xml.old");
-				$f = fopen($_SERVER['APPLICATION_PATH'] . "/../cache/ebivo_users.xml","w");
+				@exec("rm ". $_SERVER['APPLICATION_PATH'] . "/../../data/cache/ebivo_users.xml.old");
+				@exec("mv " . $_SERVER['APPLICATION_PATH'] . "/../../data/cache/egivo_users.xml ". $_SERVER['APPLICATION_PATH'] . "/../../data/cache/ebivo_users.xml.old");
+				$f = fopen($_SERVER['APPLICATION_PATH'] . "/../../data/cache/ebivo_users.xml","w");
 				fwrite($f, $xml);
 				fclose($f);
 			}
-			if (@md5_file($_SERVER['APPLICATION_PATH'] . "/../cache/ebivo_users.xml") !== @md5_file($_SERVER['APPLICATION_PATH'] . "/../cache/ebivo_users.xml.old")) {
-				$xmldata = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../cache/ebivo_users.xml");
+			if (@md5_file($_SERVER['APPLICATION_PATH'] . "/../../data/cache/ebivo_users.xml") !== @md5_file($_SERVER['APPLICATION_PATH'] . "/../../data/cache/ebivo_users.xml.old")) {
+				$xmldata = file_get_contents($_SERVER['APPLICATION_PATH'] . "/../../data/cache/ebivo_users.xml");
 				if (mb_detect_encoding($xmldata, "UTF-8", true) === false) {
 					$xmldata = recode_string("iso8859-1..utf8", $xmldata);
 				}
-				$xml = new SimpleXMLElement($xmldata);
+				$xml = new \SimpleXMLElement($xmldata);
 				$rows = $xml->xpath("//result/row");
 				if (count($rows) > 0) {
 					error_log("Sync'ing EBI VO members...");
@@ -1088,7 +1090,7 @@ class VoController extends AbstractActionController
 					db()->query("UPDATE config SET data = NOW()::text WHERE var = 'ebi_vo_members_synced'");
 					error_log("EBI VO members sync'ed");
 				} else {
-					ExternalDataNotification::sendNotification('VO::syncEBIVOMembers', 'Could not sync VO members from EBI-Perun. Probably got currupt or empty data');
+					\ExternalDataNotification::sendNotification('VO::syncEBIVOMembers', 'Could not sync VO members from EBI-Perun. Probably got currupt or empty data');
 				}
 			} else {
 				error_log("Sync EBI VO members: nothing to do (MD5 unchanged)");
@@ -1102,7 +1104,7 @@ class VoController extends AbstractActionController
 			db()->query("ALTER TABLE perun.vo_members ENABLE TRIGGER tr_perun_vo_members_99_refresh_permissions;");
 			db()->query("SELECT request_permissions_refresh();");
 			error_log("error in syncEBIVOMembers: $e");
-			ExternalDataNotification::sendNotification('VO::syncEBIVOMembers', 'Could not sync VO members from EBI-Perun. Error was:\n\n' . $e->getMessage());
+			\ExternalDataNotification::sendNotification('VO::syncEBIVOMembers', 'Could not sync VO members from EBI-Perun. Error was:\n\n' . $e->getMessage());
 		}
 	}
 
@@ -1111,21 +1113,20 @@ class VoController extends AbstractActionController
 			error_log("EGI Operations portal is in downtime. EGI VO members sync aborted");
 			return;
 		}
-		db()->setFetchMode(Zend_Db::FETCH_OBJ);
-		$rs = db()->query("SELECT id, name, enabled, members_url FROM vo_sources WHERE name = 'EGI Operations Portal'")->fetchAll();
+		$rs = db()->query("SELECT id, name, enabled, members_url FROM vo_sources WHERE name = 'EGI Operations Portal'", array())->toArray();
 		$enabled = false;
 		$uri = null;
 		if (count($rs) > 0) {
 			$rs = $rs[0];
-			if (filter_var($rs->enabled, FILTER_VALIDATE_BOOLEAN) === true) $enabled = true;
+			if (filter_var($rs['enabled'], FILTER_VALIDATE_BOOLEAN) === true) $enabled = true;
 		}
 		if (! $enabled) {
 			error_log("EGI Operations Portal VO source is disabled; will not sync VO members");
-			ExternalDataNotification::sendNotification('VO::syncEGIVOMembers', "EGI Operations Portal VO source is disabled; will not sync VO members", ExternalDataNotification::MESSAGE_TYPE_ERROR);
+			\ExternalDataNotification::sendNotification('VO::syncEGIVOMembers', "EGI Operations Portal VO source is disabled; will not sync VO members", \ExternalDataNotification::MESSAGE_TYPE_ERROR);
 			return false;
 		}
 		$inTransaction = false;
-		$mode = Zend_Registry::get("vouser_sync");
+		//FIXME: $mode = Zend_Registry::get("vouser_sync");
 		if (is_array($mode) && isset($mode["mode"])) {
 			$mode = $mode["mode"];
 		} else {
@@ -1156,8 +1157,8 @@ class VoController extends AbstractActionController
 				curl_setopt($ch, 181, 1 | 2);
 				curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-				curl_setopt($ch, CURLOPT_SSLCERT, $_SERVER['APPLICATION_PATH'] . '/../bin/sec/usercert.pem');
-				curl_setopt($ch, CURLOPT_SSLKEY, $_SERVER['APPLICATION_PATH'] . '/../bin/sec/userkey.pem');
+				curl_setopt($ch, CURLOPT_SSLCERT, $_SERVER['APPLICATION_PATH'] . '/../../bin/sec/usercert.pem');
+				curl_setopt($ch, CURLOPT_SSLKEY, $_SERVER['APPLICATION_PATH'] . '/../../bin/sec/userkey.pem');
 			} elseif ($mode == "zip") {
 				curl_setopt($ch, 181, 1);
 			}
@@ -1169,35 +1170,35 @@ class VoController extends AbstractActionController
 			if ( $xml === false ) {
 				$err = var_export(curl_error($ch), true);
 				error_log("error in syncEGIVOMembers: " . $err);
-				ExternalDataNotification::sendNotification('VO::syncEGIVOMembers', "Could not sync VO members from EGI operations portal. Error was:\n\n" . $err); 
+				\ExternalDataNotification::sendNotification('VO::syncEGIVOMembers', "Could not sync VO members from EGI operations portal. Error was:\n\n" . $err); 
 				return;
 			}
 			@curl_close($ch);
 			if ($mode == "api") {
-				@exec("rm ". $_SERVER['APPLICATION_PATH'] . "/../cache/vo_users.xml.gz.old");
-				@exec("rm ". $_SERVER['APPLICATION_PATH'] . "/../cache/vo_users.xml");
-				@exec("cp " . $_SERVER['APPLICATION_PATH'] . "/../cache/vo_users.xml.gz ". $_SERVER['APPLICATION_PATH'] . "/../cache/vo_users.xml.gz.old");
-				$f = fopen($_SERVER['APPLICATION_PATH'] . "/../cache/vo_users.xml.gz","w");
+				@exec("rm ". $_SERVER['APPLICATION_PATH'] . "/../../data/cache/vo_users.xml.gz.old");
+				@exec("rm ". $_SERVER['APPLICATION_PATH'] . "/../../data/cache/vo_users.xml");
+				@exec("cp " . $_SERVER['APPLICATION_PATH'] . "/../../data/cache/vo_users.xml.gz ". $_SERVER['APPLICATION_PATH'] . "/../../data/cache/vo_users.xml.gz.old");
+				$f = fopen($_SERVER['APPLICATION_PATH'] . "/../../data/cache/vo_users.xml.gz","w");
 			} elseif ($mode == "zip") {
-				@exec("rm ". $_SERVER['APPLICATION_PATH'] . "/../cache/vo_users.xml.old");
-				@exec("mv " . $_SERVER['APPLICATION_PATH'] . "/../cache/vo_users.xml ". $_SERVER['APPLICATION_PATH'] . "/../cache/vo_users.xml.old");
-				$f = fopen($_SERVER['APPLICATION_PATH'] . "/../cache/vo_users.zip","w");
+				@exec("rm ". $_SERVER['APPLICATION_PATH'] . "/../../data/cache/vo_users.xml.old");
+				@exec("mv " . $_SERVER['APPLICATION_PATH'] . "/../../data/cache/vo_users.xml ". $_SERVER['APPLICATION_PATH'] . "/../../data/cache/vo_users.xml.old");
+				$f = fopen($_SERVER['APPLICATION_PATH'] . "/../../data/cache/vo_users.zip","w");
 			} 
 			fwrite($f, $xml);
 			fclose($f);
 			if ($mode == "zip") {
-				@exec("unzip -p " . $_SERVER['APPLICATION_PATH'] . "/../cache/vo_users.zip data.xml > " . $_SERVER['APPLICATION_PATH'] . "/../cache/vo_users.xml");
-				@exec("rm ". $_SERVER['APPLICATION_PATH'] . "/../cache/vo_users.zip");
+				@exec("unzip -p " . $_SERVER['APPLICATION_PATH'] . "/../../data/cache/vo_users.zip data.xml > " . $_SERVER['APPLICATION_PATH'] . "/../../data/cache/vo_users.xml");
+				@exec("rm ". $_SERVER['APPLICATION_PATH'] . "/../../data/cache/vo_users.zip");
 			}
 			if (
-				(($mode == "api") && (@md5_file($_SERVER['APPLICATION_PATH'] . "/../cache/vo_users.xml.gz") !== @md5_file($_SERVER['APPLICATION_PATH'] . "/../cache/vo_users.xml.gz.old")))
+				(($mode == "api") && (@md5_file($_SERVER['APPLICATION_PATH'] . "/../../data/cache/vo_users.xml.gz") !== @md5_file($_SERVER['APPLICATION_PATH'] . "/../../data/cache/vo_users.xml.gz.old")))
 				|| 
-				(($mode == "zip") && (@md5_file($_SERVER['APPLICATION_PATH'] . "/../cache/vo_users.xml") !== @md5_file($_SERVER['APPLICATION_PATH'] . "/../cache/vo_users.xml.old")))
+				(($mode == "zip") && (@md5_file($_SERVER['APPLICATION_PATH'] . "/../../data/cache/vo_users.xml") !== @md5_file($_SERVER['APPLICATION_PATH'] . "/../../data/cache/vo_users.xml.old")))
 			) {
 				if ($mode == "api") {
-					exec("gunzip " . $_SERVER['APPLICATION_PATH'] . "/../cache/vo_users.xml.gz");
+					exec("gunzip " . $_SERVER['APPLICATION_PATH'] . "/../../data/cache/vo_users.xml.gz");
 				}
-				$xml = new SimpleXMLElement(file_get_contents($_SERVER['APPLICATION_PATH'] . "/../cache/vo_users.xml"));
+				$xml = new \SimpleXMLElement(file_get_contents($_SERVER['APPLICATION_PATH'] . "/../../data/cache/vo_users.xml"));
 				$rows = $xml->xpath("//result/row");
 				if (count($rows) > 0) {
 					error_log("Sync'ing VO members...");
@@ -1218,7 +1219,7 @@ class VoController extends AbstractActionController
 					db()->query("UPDATE config SET data = NOW()::text WHERE var = 'egi_vo_members_synced'");
 					error_log("VO members sync'ed");
 				} else {
-					ExternalDataNotification::sendNotification('VO::syncEGIVOMembers', 'Could not sync VO members from EGI operations portal. Probably got currupt or empty data');
+					\ExternalDataNotification::sendNotification('VO::syncEGIVOMembers', 'Could not sync VO members from EGI operations portal. Probably got currupt or empty data');
 				}
 			} else {
 				error_log("Sync EGI VO members: nothing to do (MD5 unchanged)");
@@ -1232,7 +1233,7 @@ class VoController extends AbstractActionController
 			db()->query("ALTER TABLE egiops.vo_members ENABLE TRIGGER tr_egiops_vo_members_99_refresh_permissions;");
 			db()->query("SELECT request_permissions_refresh();");
 			error_log("error in syncVOMembers: $e");
-			ExternalDataNotification::sendNotification('VO::syncEGIVOMembers', 'Could not sync VO members from EGI operations portal. Error was:\n\n' . $e->getMessage());
+			\ExternalDataNotification::sendNotification('VO::syncEGIVOMembers', 'Could not sync VO members from EGI operations portal. Error was:\n\n' . $e->getMessage());
 		}
 	}
 	
@@ -1257,7 +1258,7 @@ class VoController extends AbstractActionController
 		if( $action === "publish" || $action === "revertchanges" ){
 			$vappliance = null;
 		}
-		$result = VoAdmin::imageAction($action, $this->session->userid, $vo, $vappliance);
+		$result = \VoAdmin::imageAction($action, $this->session->userid, $vo, $vappliance);
 		if( is_string($result) === true ){
 			echo "<result success='false' error='" . htmlentities($result) . "' ></result>";
 		}else if( $result === true ){
@@ -1292,9 +1293,9 @@ class VoController extends AbstractActionController
 				}
 			}
 			if( $imageid !== null ){
-				$result = VoAdmin::getImageInfoById($imageid,$guid,$strict);
+				$result = \VoAdmin::getImageInfoById($imageid,$guid,$strict);
 			}else{
-				$result = VoAdmin::getImageInfoByIdentifier($guid);
+				$result = \VoAdmin::getImageInfoByIdentifier($guid);
 			}
 			$canaccessvadata = false;
 			
@@ -1318,7 +1319,7 @@ class VoController extends AbstractActionController
 			
 			if( $result !== null && isset($result['image']) ){
 				$im = $result['image'];
-				$result['sites'] = VMCaster::getSitesByVMI($im->guid, $im->id);
+				$result['sites'] = \VMCaster::getSitesByVMI($im->guid, $im->id);
 			}
 			
 			if( $result !== null && $format == null ){ //UI call
@@ -1343,7 +1344,7 @@ class VoController extends AbstractActionController
 				return;
 			}else if( $format !== null) {
 				if( $result !== null ){
-					$result = VMCaster::convertImage($result, $format);
+					$result = \VMCaster::convertImage($result, $format);
 				}
 				if( $result !== null ){
 					echo $result;
@@ -1360,7 +1361,7 @@ class VoController extends AbstractActionController
 
 ////OBSOLETE	
 //	private function getVAProvidersArray($inprodOnly = true) {
-//		$vaps = new Default_Model_VaProviders();
+//		$vaps = new \Application\Model\VaProviders();
 //		if ($inprodOnly === true) {
 //			$vaps->filter->in_production->equals(true);
 //		}
@@ -1454,8 +1455,7 @@ class VoController extends AbstractActionController
 //
 //								if ($type == "vo") {
 //									$vowide_instanceID = $instanceID;
-//									db()->setFetchMode(Zend_Db::FETCH_BOTH);							
-//									$instanceID = db()->query("SELECT vapplists.vmiinstanceid FROM vowide_image_list_images INNER JOIN vapplists ON vapplists.id = vowide_image_list_images.vapplistid WHERE vowide_image_list_images.id = ?", array($instanceID))->fetchAll();								
+//									$instanceID = db()->query("SELECT vapplists.vmiinstanceid FROM vowide_image_list_images INNER JOIN vapplists ON vapplists.id = vowide_image_list_images.vapplistid WHERE vowide_image_list_images.id = ?", array($instanceID))->toArray();								
 //									if (count($instanceID) > 0) {
 //										if (count($instanceID[0]) > 0) {
 //											$instanceID = $instanceID[0][0];
@@ -1734,7 +1734,7 @@ class VoController extends AbstractActionController
 		}
 		
 		if( $dispatch === false ){
-			$res = VoAdminNotifications::createVOObsoleteNotifications();
+			$res = \VoAdminNotifications::createVOObsoleteNotifications();
 			echo "<h2>VO Obsolete Images Notifications:</h2>";
 			foreach ($res as $r){
 				echo "<div class='notification' style='border:1px solid #aaa;background-color:#f8f8f8;margin: 5px;margin-bottom:20px;padding:10px;'>";
@@ -1744,7 +1744,7 @@ class VoController extends AbstractActionController
 				echo "</div>";
 			}
 		}else{
-			VoAdminNotifications::sendVOObsoleteNotifications();
+			\VoAdminNotifications::sendVOObsoleteNotifications();
 		}
 	}
 
@@ -1769,7 +1769,7 @@ class VoController extends AbstractActionController
                 }
 
                 if ($res !== '') {
-                    $res = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $res);
+                    $res = str_replace('<' . '?xml version="1.0" encoding="UTF-8"?' . '>', '', $res);
                     $res = trim($res);
                 }
 
@@ -1874,8 +1874,8 @@ class VoController extends AbstractActionController
             AND ((vowideitem.vapplistid = vaviews.vapplistid AND  vaviews.va_version_archived = TRUE) OR vaviews.va_version_archived = false) " . $appidsql . $reportidsql . " 
             ORDER BY vaviews.appid, vaviews.vapplistid";
 
-            $rs = db()->query($sql)->fetchAll();
-            $res = '<?xml version="1.0" encoding="UTF-8"?>';
+            $rs = db()->query($sql, array())->toArray();
+            $res = '<' . '?xml version="1.0" encoding="UTF-8"?' . '>';
             $res .= "\n<result count='" . count($rs) . "'>\n";
             if (count($rs) > 0) {
                 foreach ($rs as $r) {
@@ -1910,7 +1910,7 @@ class VoController extends AbstractActionController
                 header('Content-type: application/xml');
             } else {
                 header('Content-type: application/json');
-                $res = RestAPIHelper::transformXMLtoJSON(trim($res));
+                $res = \RestAPIHelper::transformXMLtoJSON(trim($res));
             }
 
             echo $res;

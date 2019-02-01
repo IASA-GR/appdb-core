@@ -16,44 +16,6 @@
  */
 ?><script type="text/javascript" src="/js/jquery.quicksearch.js" ></script>
 <script type="text/javascript" src="/js/jquery.tablesorter.js"></script>
-<?php 
-
-function isEmptyValue($value){
-	$v = null;
-	if( is_array($value) ){
-		if( count($value) === 0 ){
-			return true;
-		}else if( count($value) === 1){
-			$v = $value[0];
-		}else{
-			return false;
-		}
-	} else {
-		$v = $value;
-	}
-	return ( !$v || trim( str_replace("\n", "", $v) ) === "" );
-}
-function getHtmlValue($value, $context, $split = true){
-	if(isEmptyValue($value)){
-		return '<span class="emptyvalue">n/a</span>';
-	}
-	if( is_array($value) && $split === true ){
-		$escaped = array();
-		foreach($value as $val){
-			$escaped[] = $context->escape( str_replace("\n","<br/>",$val) );
-		}
-		return "<span>". implode('<span class="comboseperator">•</span>', $escaped) . "</span>";
-	}else{
-		return "<span>". $context->escape(str_replace("\n","<br/>",$value)) . "</span>";
-	}
-}
-function getHtmlDateValue($value, $context){
-	if(isEmptyValue($value) || trim($value) == "0000-00-00 00:00:00"){
-		return getHtmlValue("");
-	}
-	return getHtmlValue($value, $context); 
-}
-?>
 <?php if ($this->entry !== null) { ?>
 <div align="left" style="height:100%;padding:0px;">
 	<div id="navdiv<?php echo $this->dialogCount;?>" style="width:100%;height:auto;padding:0px;" class="entityvo<?php if( trim($this->entry->sourceid) !== '1' && trim($this->entry->name) !== 'vo.elixir-europe.org'){ echo ' nonegivo'; }?>" >
@@ -137,7 +99,7 @@ function getHtmlDateValue($value, $context){
 														$role = trim($contact->role);
 														$role = strtolower($role);
 														$role = preg_replace("/^vo\ /","VO ",$role);
-														echo $this->escape($role);
+														echo htmlspecialchars($role);
 													?></span>
 												</td>
 												<td style="width:2px;">:</td>
@@ -188,16 +150,16 @@ function getHtmlDateValue($value, $context){
 			<div class="volinksdiv">
 <?php 
 	$s=''; 
-	if ($this->entry->homepageUrl != null && trim($this->entry->homepageUrl)!="")	$s.='<a href="'.$this->escape($this->entry->homepageUrl).'" target="_blank" >Homepage</a> | ';
-	if ($this->entry->enrollmentUrl != null && trim($this->escape($this->entry->enrollmentUrl))!="") $s.='<a href="'.$this->escape($this->entry->enrollmentUrl).'" target="_blank">Enrollment</a> | ';
+	if ($this->entry->homepageUrl != null && trim($this->entry->homepageUrl)!="")	$s.='<a href="'.htmlspecialchars($this->entry->homepageUrl).'" target="_blank" >Homepage</a> | ';
+	if ($this->entry->enrollmentUrl != null && trim(htmlspecialchars($this->entry->enrollmentUrl))!="") $s.='<a href="'.htmlspecialchars($this->entry->enrollmentUrl).'" target="_blank">Enrollment</a> | ';
 	if ($this->entry->aup != null && trim($this->entry->aup)!="") {
 		if (is_weburl($this->entry->aup)) {
-			$s.='<a href="'.$this->escape($this->entry->aup).'" target="_blank" title="Acceptable Usage Policy">Acceptable Usage Policy</a> | ';
+			$s.='<a href="'.htmlspecialchars($this->entry->aup).'" target="_blank" title="Acceptable Usage Policy">Acceptable Usage Policy</a> | ';
 		}
 	} else if( isEmptyValue($this->entry->aup) === false ) { 
-		$s.='<div class="aupdiv" style="display: none">'.$this->escape($this->entry->aup).'</div><a title="Acceptable Usage Policy" href="#" onclick="alert($(\'.aupdiv:last\').text())">Acceptable Usage Policy</a> | ';
+		$s.='<div class="aupdiv" style="display: none">'.htmlspecialchars($this->entry->aup).'</div><a title="Acceptable Usage Policy" href="#" onclick="alert($(\'.aupdiv:last\').text())">Acceptable Usage Policy</a> | ';
 	}
-	if ($this->entry->supportproc != "") { $s.='<a href="'.$this->escape($this->entry->supportproc).'" target="_blank">Support Procedure</a> | '; }
+	if ($this->entry->supportproc != "") { $s.='<a href="'.htmlspecialchars($this->entry->supportproc).'" target="_blank">Support Procedure</a> | '; }
 	if( trim($this->entry->sourceid) == '1' ){
 		$s .= '<a href="https://operations-portal.egi.eu/vo/view/voname/'.$this->entry->name.'" target="_blank"><img src="/images/opport_favicon.ico" border="0" style="vertical-align: middle" alt="" width="16"/> EGI Operations Portal link</a> | ';
 	}else if(trim($this->entry->sourceid) == '2'){
@@ -237,7 +199,7 @@ function getHtmlDateValue($value, $context){
 				</div>
 			<ul class="itemgrid filteredlist" data-filter="applications" style="z-index:0">
 			<?php foreach ($this->relatedItems as $app) {
-				if( get_class($app) !== 'Default_Model_Site') {
+				if( get_class($app) !== 'Application\\Model\\Site') {
 					$content = "software";
 					$cls = "switem";
 					$contentcaller = 'showApplication';
@@ -277,7 +239,7 @@ function getHtmlDateValue($value, $context){
 					$applogo = '/images/site.png';
 				}
 				
-				if( get_class($app) === 'Default_Model_Site') { ?>
+				if( get_class($app) === 'Application\\Model\\Site') { ?>
 				<li class="itemcontainer <?php echo $cls; ?>">
 					<div class="item">
 						<a title="<?php echo strtolower($app->name); ?>" data-cname="<?php echo strtolower($app->name); ?>" href="/store/site/<?php echo strtolower($app->name); ?>" onClick='appdb.views.Main.showSite({"name":"<?php echo  $app->name;?>"});' title='<?php echo $app->name; ?>' target="_blank" class="itemlink">
@@ -307,7 +269,7 @@ function getHtmlDateValue($value, $context){
 					</div>
 				</li>
 				<?php } else { ?>
-				<li class='itemcontainer <?php echo $cls; ?>'><div class='item'><a href='#' data-cname="<?php echo $app->cname; ?>" title='<?php echo $app->name; ?>' onclick='appdb.views.Main.<?php echo $contentcaller; ?>({id: <?php echo $app->id;?>, cname: "<?php echo $app->cname; ?>"}, {mainTitle: "<?php echo str_replace("'","\\'",$app->name); ?>", content:"<?php echo $content; ?>"});' class='itemlink'><img border='0' src='<?php echo $applogo; ?>' width='100px' height='100px' class='itemimage'><span class='itemname'><?php echo $this->escape($app->Name); ?></span><span class='itemsorttext'><?php echo $this->escape(substr($app->description,0,80)); if (strlen($app->description)>80) echo "..."; ?></span>
+				<li class='itemcontainer <?php echo $cls; ?>'><div class='item'><a href='#' data-cname="<?php echo $app->cname; ?>" title='<?php echo $app->name; ?>' onclick='appdb.views.Main.<?php echo $contentcaller; ?>({id: <?php echo $app->id;?>, cname: "<?php echo $app->cname; ?>"}, {mainTitle: "<?php echo str_replace("'","\\'",$app->name); ?>", content:"<?php echo $content; ?>"});' class='itemlink'><img border='0' src='<?php echo $applogo; ?>' width='100px' height='100px' class='itemimage'><span class='itemname'><?php echo htmlspecialchars($app->Name); ?></span><span class='itemsorttext'><?php echo htmlspecialchars(substr($app->description,0,80)); if (strlen($app->description)>80) echo "..."; ?></span>
 					<?php if($app->rating>0){ ?>
 						<div class='rating'/>
 						<div class='ratingcount'><?php echo $app->rating;?></div>
@@ -386,7 +348,7 @@ function getHtmlDateValue($value, $context){
 	appdb.pages.vo.init({
 		"id": '<?php echo $this->entry->id; ?>',
 		"name": '<?php echo str_replace("'","\\'",$this->entry->name); ?>',
-		"discipline": '<?php echo($this->escape($this->entry->discipline["domain"])); ?>',
+		"discipline": '<?php echo(htmlspecialchars($this->entry->discipline["domain"])); ?>',
 		"disciplines": <?php echo($this->entry->discipline["disciplines"]); ?>,
 		"dialogCount": (window.dialogCount || 0)
 	});

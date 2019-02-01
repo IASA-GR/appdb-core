@@ -23,9 +23,9 @@ if (isset($this->entry)) {
 			if( trim($v) === "" ){
 				continue;
 			}
-			echo '<tr><td colspan="3" style="text-align:left;"><span><b>'.$this->escape($k).'</b></span><span class="sep">:</span><span>'.$this->escape($v).'</td></tr>';
+			echo '<tr><td colspan="3" style="text-align:left;"><span><b>'.htmlspecialchars($k).'</b></span><span class="sep">:</span><span>'.htmlspecialchars($v).'</td></tr>';
 		}else{
-			echo '<tr><td style="width: 180px;text-align: right;"><b>'.$this->escape($k).'</b></td><td class="sep">:</td><td>'.$this->escape($v).'</td></tr>';
+			echo '<tr><td style="width: 180px;text-align: right;"><b>'.htmlspecialchars($k).'</b></td><td class="sep">:</td><td>'.htmlspecialchars($v).'</td></tr>';
 		}
 	}
 }

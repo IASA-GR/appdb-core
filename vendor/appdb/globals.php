@@ -143,6 +143,45 @@ function &DISABLE_LAYOUT(&$controller = NULL, $noRender = false) {
 	}
 }
 
+
+function isEmptyValue($value){
+	$v = null;
+	if( is_array($value) ){
+		if( count($value) === 0 ){
+			return true;
+		}else if( count($value) === 1){
+			$v = $value[0];
+		}else{
+			return false;
+		}
+	} else {
+		$v = $value;
+	}
+	return ( !$v || trim( str_replace("\n", "", $v) ) === "" );
+}
+
+function getHtmlValue($value, $context, $split = true){
+	if(isEmptyValue($value)){
+		return '<span class="emptyvalue">n/a</span>';
+	}
+	if( is_array($value) && $split === true ){
+		$escaped = array();
+		foreach($value as $val){
+			$escaped[] = htmlspecialchars( str_replace("\n","<br/>",$val) );
+		}
+		return "<span>". implode('<span class="comboseperator">•</span>', $escaped) . "</span>";
+	}else{
+		return "<span>". htmlspecialchars(str_replace("\n","<br/>",$value)) . "</span>";
+	}
+}
+
+function getHtmlDateValue($value, $context){
+	if(isEmptyValue($value) || trim($value) == "0000-00-00 00:00:00"){
+		return getHtmlValue("");
+	}
+	return getHtmlValue($value, $context); 
+}
+
 function decodeUTF8($str) {
 	$s = "";
 	for ($i = 0; $i < strlen($str); $i = $i + 1) {
@@ -5210,8 +5249,15 @@ class SEO{
 }
 
 function fixuZenduBuguru($s) {
-	$ret = preg_replace('/ AS "(\w+\.){0,1}\w+\.any_2"/', '', $s);
-	return preg_replace('/\.any\.any ON/', '.any ON', $ret);
+	$ret = $s;
+	$ret = preg_replace('/ AS "(\w+\.){0,1}\w+\.any_2"/', '', $ret);
+	$ret = preg_replace('/"IS" "NULL"/', 'IS NULL', $ret);
+	$ret = preg_replace('/"IS" "FALSE"/', 'IS FALSE', $ret);
+	$ret = preg_replace('/"IS" "TRUE"/', 'IS TRUE', $ret);
+	$ret = preg_replace('/\.any\.any ON/', '.any ON', $ret);
+	$ret = preg_replace('/\.any\.any" ON/', '.any" ON', $ret);
+	$ret = preg_replace('/"(\w+)\.any"/', '"\1"."any"', $ret);
+	return $ret;
 }
 
 function SQL2STR($obj, $select, &$parts = null) {
@@ -5230,6 +5276,27 @@ function SQL2STR($obj, $select, &$parts = null) {
 	}
 	$s = (new \Zend\Db\Sql\Sql($obj->getDbTable()->getAdapter()))->getSqlStringForSqlObject($select);
 	return fixuZenduBuguru($s);
+}
+
+
+//TODO: use this functio to replace all ZF1 getAdapter->quoteInto instances in ARO models
+// Modify it to use is_array() instead of $count
+function SQL_QUOTE_INTO($text, $value, $platform = null, $count = null)
+{
+	if (is_null($platform)) {
+		$platform = db()->getPlatform();
+	}
+	if ($count === null) {
+		return str_replace('?', $platform->quoteValue($value), $text);
+	} else {
+		while ($count > 0) {
+			if (strpos($text, '?') !== false) {
+				$text = substr_replace($text, $platform->quoteValue($value), strpos($text, '?'), 1);
+			}
+			--$count;
+		}
+		return $text;
+	}
 }
 
 class VMCaster{
