@@ -1,6 +1,10 @@
 <?php
 /**
  * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ *
+ * Adapted from the sources available at https://rcdemo.nikhef.nl/demobasic/oidc_getproxy_demo_source.php, used under the terms of the Apache License 2.0
+ * Copyright (C) FOM-Nikhef 2016-
+ * Authors: Mischa Salle (msalle (AT) nikhef.nl)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
