@@ -282,11 +282,10 @@ class RestCategoryAppStatsList extends RestROResourceList {
 			if ( is_numeric($this->getParam("id")) ) {
 				$void = $this->getParam("id");
 			} else {
-				db()->setFetchMode(Zend_Db::FETCH_BOTH);
-				$void = db()->query("SELECT id FROM categories WHERE name = ?", array(preg_replace('/^s:/', '', $this->getParam("id"))))->fetchAll();
+				$void = db()->query("SELECT id FROM categories WHERE name = ?", array(preg_replace('/^s:/', '', $this->getParam("id"))))->toArray();
 				if (is_array($void) && (count($void) > 0)) {
 					$void = $void[0]; //row
-					$void = $void[0]; //column
+					$void = $void["id"]; //column
 				} else {
 					$void = null;
 				}
@@ -318,12 +317,11 @@ class RestCategoryAppStatsList extends RestROResourceList {
 					return false;
 				}
 			}
-			db()->setFetchMode(Zend_Db::FETCH_NUM);
-			$res = db()->query("SELECT * FROM app_cat_stats_to_xml($void, $from, $to)")->fetchAll();
+			$res = db()->query("SELECT * FROM app_cat_stats_to_xml($void, $from, $to)", array())->toArray();
 			$ret = array();
 			foreach ($res as $r) {
 				if (is_array($r) && (count($r) > 0)) {
-					$ret[] = $r[0];
+					$ret[] = $r["app_cat_stats_to_xml"];
 				}
 			}
 			if ($this->getParam("listmode") == "listing") {
@@ -440,11 +438,10 @@ class RestDisciplineVOStatsList extends RestROResourceList {
 			if ( is_numeric($this->getParam("id")) ) {
 				$void = $this->getParam("id");
 			} else {
-				db()->setFetchMode(Zend_Db::FETCH_BOTH);
-				$void = db()->query("SELECT id FROM disciplines WHERE name = ?", array(preg_replace('/^s:/', '', $this->getParam("id"))))->fetchAll();
+				$void = db()->query("SELECT id FROM disciplines WHERE name = ?", array(preg_replace('/^s:/', '', $this->getParam("id"))))->toArray();
 				if (is_array($void) && (count($void) > 0)) {
 					$void = $void[0]; //row
-					$void = $void[0]; //column
+					$void = $void["id"]; //column
 				} else {
 					$void = null;
 				}
@@ -476,12 +473,11 @@ class RestDisciplineVOStatsList extends RestROResourceList {
 					return false;
 				}
 			}
-			db()->setFetchMode(Zend_Db::FETCH_NUM);
-			$res = db()->query("SELECT * FROM vo_disc_stats_to_xml($void, $from, $to)")->fetchAll();
+			$res = db()->query("SELECT * FROM vo_disc_stats_to_xml($void, $from, $to)", array())->toArray();
 			$ret = array();
 			foreach ($res as $r) {
 				if (is_array($r) && (count($r) > 0)) {
-					$ret[] = $r[0];
+					$ret[] = $r["vo_disc_stats_to_xml"];
 				}
 			}
 			if ($this->getParam("listmode") == "listing") {
@@ -534,11 +530,10 @@ class RestDisciplineAppStatsList extends RestROResourceList {
 			if ( is_numeric($this->getParam("id")) ) {
 				$void = $this->getParam("id");
 			} else {
-				db()->setFetchMode(Zend_Db::FETCH_BOTH);
-				$void = db()->query("SELECT id FROM disciplines WHERE name = ?", array(preg_replace('/^s:/', '', $this->getParam("id"))))->fetchAll();
+				$void = db()->query("SELECT id FROM disciplines WHERE name = ?", array(preg_replace('/^s:/', '', $this->getParam("id"))))->toArray();
 				if (is_array($void) && (count($void) > 0)) {
 					$void = $void[0]; //row
-					$void = $void[0]; //column
+					$void = $void["id"]; //column
 				} else {
 					$void = null;
 				}
@@ -570,12 +565,11 @@ class RestDisciplineAppStatsList extends RestROResourceList {
 					return false;
 				}
 			}
-			db()->setFetchMode(Zend_Db::FETCH_NUM);
-			$res = db()->query("SELECT * FROM app_disc_stats_to_xml($void, $from, $to)")->fetchAll();
+			$res = db()->query("SELECT * FROM app_disc_stats_to_xml($void, $from, $to)", array())->toArray();
 			$ret = array();
 			foreach ($res as $r) {
 				if (is_array($r) && (count($r) > 0)) {
-					$ret[] = $r[0];
+					$ret[] = $r["app_disc_stats_to_xml"];
 				}
 			}
 			if ($this->getParam("listmode") == "listing") {
@@ -1341,6 +1335,7 @@ class RestAccessGroupList extends RestROResourceList {
 		return $this->get();
 	}
 
+
 	public function getModel() {
 		$res = new \Application\Model\ActorGroups();
 		$res->filter->orderBy("name");
@@ -1355,17 +1350,16 @@ class RestAccessGroupItem extends RestROAdminResourceItem {
 
 	public function get() {
 		if ( parent::get() !== false ) {
-			db()->setFetchMode(Zend_Db::FETCH_NUM);
 			if ($this->getParam("id") == "-7") {
 				// Don't show VO members
 				$this->setError(RestErrorEnum::RE_ACCESS_DENIED);
 				return false;
 			}
-			$res = db()->query("SELECT privgroup_to_xml(" . pg_escape_string($this->getParam("id")) . ")")->fetchAll();
+			$res = db()->query("SELECT privgroup_to_xml(" . pg_escape_string($this->getParam("id")) . ")", array())->toArray();
 			if ( count($res) > 0 ) {
 				$ret = array();
 				foreach ($res as $r) {
-					$ret[] = $r[0];
+					$ret[] = $r["privgroup_to_xml"];
 				}
 				return new XMLFragmentRestResponse($ret, $this);
 			} else {
@@ -1388,12 +1382,11 @@ class RestRelationTypeList extends RestROResourceList {
 	
 	public function get(){
 		if ( parent::get() !== false ) {
-			db()->setFetchMode(Zend_Db::FETCH_NUM);
-			$res = db()->query("SELECT relation_types_to_xml()")->fetchAll();
+			$res = db()->query("SELECT relation_types_to_xml()", array())->toArray();
 			if ( count($res) > 0 ) {
 				$ret = array();
 				foreach ($res as $r) {
-					$ret[] = $r[0];
+					$ret[] = $r["relation_types_to_xml"];
 				}
 				return new XMLFragmentRestResponse($ret, $this);
 			} else {
@@ -1464,12 +1457,11 @@ class RestStoreStatsList extends RestROResourceList {
 					return false;
 				}
 			}
-			db()->setFetchMode(Zend_Db::FETCH_NUM);
-			$res = db()->query("SELECT * FROM store_stats_to_xml($from, $to)")->fetchAll();
+			$res = db()->query("SELECT * FROM store_stats_to_xml(?, ?)", array($from, $to))->toArray();
 			$ret = array();
 			foreach ($res as $r) {
 				if (is_array($r) && (count($r) > 0)) {
-					$ret[] = $r[0];
+					$ret[] = $r["store_stats_to_xml"];
 				}
 			}
 			if ($this->getParam("listmode") == "listing") {
