@@ -23,7 +23,7 @@ class License extends LicenseBase
 {
 	public function toXML($recursive=false) {
 		$xml = '';
-		if ( $this->_id !== null ) {
+		if (! is_null($this->id)) {
 			$xml = '<application:license id="' . $this->id . '" name="' . $this->name. '" group="' . $this->group . '"><license:title>' . $this->title. '</license:title><license:url>' . $this->link. '</license:url></application:license>';
 		}
 		return $xml;

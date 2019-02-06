@@ -23,7 +23,7 @@ class OSFamily extends OSFamilyBase
 {
 	public function toXML($recursive=false) {
 		$xml = '';
-		if ( $this->_id !== null ) {
+		if (! is_null($this->id)) {
 			$xml = '<application:osfamily id="' . $this->id . '">' . $this->name . '</application:osfamily>';
 		}
 		return $xml;

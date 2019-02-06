@@ -34,7 +34,7 @@ class NGIsMapper extends NGIsMapperBase
 		} else {
 			if ($format === 'xml') {
 				$select = $this->getDbTable()->getSql()->select();
-				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT ngi_to_xml(id) as ngi FROM (" . SQL2STR($select) . ") AS T;", array())->toArray();
+				$resultSet = $this->getDbTable()->getAdapter()->query("SELECT ngi_to_xml(id) as ngi FROM (" . SQL2STR($this, $select) . ") AS T;", array())->toArray();
 				$entries = array();
 				foreach ($resultSet as $row) {
 					$entry = $row['ngi'];

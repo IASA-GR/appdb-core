@@ -24,7 +24,7 @@ class ActorGroup extends ActorGroupBase
 	public function toXML($recursive=false)
 	{
 		$XML = '<privilege:group id="' . $this->id . '" suid="' . $this->guid . '">';
-		if ($this->_name !== null) $XML .= recode_string("utf8..xml",$this->_name);
+		if (! is_null($this->name)) $XML .= recode_string("utf8..xml", $this->name);
 		$XML .= "</privilege:group>";
 		return $XML;
 	}

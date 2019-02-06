@@ -23,7 +23,7 @@ class ProgLang extends ProgLangBase
 {
 	public function toXML($recursive=false) {
 		$xml = '';
-		if ( $this->_id !== null ) {
+		if (! is_null($this->id)) {
 			$xml = '<application:language id="' . $this->id . '">' . $this->name . '</application:language>';
 		}
 		return $xml;

@@ -23,7 +23,7 @@ class VMIformat extends VMIformatBase
 {
 	public function toXML($recursive=false) {
 		$xml = '';
-		if ( $this->_id !== null ) {
+		if (! is_null($this->id)) {
 			$xml = '<virtualization:format id="' . $this->id . '">' . $this->name . '</virtualization:format>';
 		}
 		return $xml;

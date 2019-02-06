@@ -23,7 +23,7 @@ class Hypervisor extends HypervisorBase
 {
 	public function toXML($recursive=false) {
 		$xml = '';
-		if ( $this->_id !== null ) {
+		if (! is_null($this->id !== null)) {
 			$xml = '<virtualization:hypervisor id="' . $this->id . '">' . $this->name . '</virtualization:hypervisor>';
 		}
 		return $xml;

@@ -23,7 +23,7 @@ class Arch extends ArchBase
 {
 	public function toXML($recursive=false) {
 		$xml = '';
-		if ( $this->_id !== null ) {
+		if (! is_null($this->id)) {
 			$xml = '<application:arch id="' . $this->id . '">' . $this->name . '</application:arch>';
 		}
 		return $xml;

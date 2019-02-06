@@ -23,7 +23,7 @@ class OS extends OSBase
 {
 	public function toXML($recursive=false) {
 		$xml = '';
-		if ( $this->_id !== null ) {
+		if (! is_null($this->id)) {
 			$xml = '<application:os id="' . $this->id . '" familyid="' . $this->OSFamilyID . '">' . $this->name . '</application:os>';
 		}
 		return $xml;
