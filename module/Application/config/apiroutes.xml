@@ -654,7 +654,7 @@
 	<resource>RestVOAppStatsList</resource>
 	<comment>Application statistics for all grid Virtual Organization entries</comment>
 </route>
-<route type="proxy" name="roles" url="/:version/people/roles">
+<route type="rest" name="roles" url="/:version/people/roles">
 	<format xslt="persons">xml</format>
 	<resource>RestRoleList</resource>
 	<comment>A list of available roles for users to choose from</comment>
@@ -683,7 +683,7 @@
 	<resource>RestPplFilterNormalization</resource>
 	<comment>Filter normalization resource for user searches</comment>
 </route>
-<route type="proxy" name="pplfilterreflection" url="/:version/people/filter/reflect">
+<route type="rest" name="pplfilterreflection" url="/:version/people/filter/reflect">
 	<format>xml</format>
 	<resource>RestPplFilterReflection</resource>
 	<comment>Filter reflection resource for user searches</comment>

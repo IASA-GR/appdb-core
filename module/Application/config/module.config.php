@@ -3097,7 +3097,7 @@ return [
 					'route' => '/rest/:version/people/roles',
 					'defaults' => [
 						'controller' => Controller\ApiController::class,
-						'action' => 'proxy',
+						'action' => 'rest',
 						'formats' => [
 							[
 								'format' => 'xml',
@@ -3231,7 +3231,7 @@ return [
 					'route' => '/rest/:version/people/filter/reflect',
 					'defaults' => [
 						'controller' => Controller\ApiController::class,
-						'action' => 'proxy',
+						'action' => 'rest',
 						'formats' => [
 							[
 								'format' => 'xml',
