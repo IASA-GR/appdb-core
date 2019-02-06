@@ -95,7 +95,7 @@ class ApiController extends AbstractActionController
     private function handleResource($res) {
 		$ok = true;
 		if ( class_exists($res) ) {
-            $r = new $res($this->pars);
+			$r = new $res($this->pars);
             $r->startLogging($_SERVER['APPLICATION_PATH'] .'/appdbapilog.xml');
 		} else $ok = false;
 		if ( $ok ) {
@@ -106,7 +106,7 @@ class ApiController extends AbstractActionController
             } else {
                 $this->entry = $r->unknown();
             }
-            if ( $this->entry === false ) $this->entry = new XMLFragmentRestResponse("", $r);
+            if ( $this->entry === false ) $this->entry = new \XMLFragmentRestResponse("", $r);
 			$this->Error = \RestErrorEnum::toString($r->error);
 			if ( $r->error != "" && $r->extError != "" ) $this->Error = $this->Error.". ".$r->extError;
 			$this->total = $r->total;
@@ -148,6 +148,7 @@ class ApiController extends AbstractActionController
 				$routeXslt = explode("/", $routeXslt);
 				foreach($routeXslt as $xslt) {
 					if (trim($xslt) != "") {
+						//error_log("Applying XSLT");
 						$this->entry = $this->entry->transform(\RestAPIHelper::getFolder(\RestFolderEnum::FE_XSL_FOLDER) . $xslt);
 					}
 				}
@@ -158,11 +159,17 @@ class ApiController extends AbstractActionController
 		if (isset($_GET['format'])) {
 			if ((trim($_GET['format']) === 'js') || (trim($_GET['format']) === 'json')) {
 				echo \RestAPIHelper::transformXMLtoJSON($ret);
-				return SET_NO_RENDER($this);;
+				DISABLE_LAYOUT($this);
+				return SET_NO_RENDER($this);
 			}
 		}
+		ob_start();
 		echo $ret;
-		return DISABLE_LAYOUT($this);
+		flush();
+		ob_flush();
+		ob_end_flush();
+		DISABLE_LAYOUT($this);
+		return SET_NO_RENDER($this);
     }
 
 	public function redirectAction() {
@@ -412,7 +419,7 @@ class ApiController extends AbstractActionController
 	public function oldproxy() {
 		$ver = $this->params()->fromQuery("version");
 		if ((!isset($ver)) || (trim($ver) == "")) $ver = 'latest';
-		$proxy = new AppDBRESTProxy($ver);
+		$proxy = new \AppDBRESTProxy($ver);
 		$data = array();
 		$act = $this->getRequest()->getMethod();
 		if ($act === "POST") {
