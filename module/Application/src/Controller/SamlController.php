@@ -45,17 +45,17 @@ class SamlController extends AbstractActionController
 			require_once(\SamlAuth::LIB_AUTOLOAD);
 			$source=GET_REQUEST_PARAM($this, "source");
 			if($source == null){
-					$source="";
+				$source = "";
 			}
-			$config = SimpleSAML_Configuration::getInstance();
-			$t = new SimpleSAML_XHTML_Template($config, 'core:authsource_list.tpl.php');
-			$t->data['sources'] = SimpleSAML_Auth_Source::getSourcesMatch('-sp');
+			$config = \SimpleSAML_Configuration::getInstance();
+			$t = new \SimpleSAML_XHTML_Template($config, 'core:authsource_list.tpl.php');
+			$t->data['sources'] = \SimpleSAML_Auth_Source::getSourcesMatch('-sp');
 			
 			$this->session->samlattrs=null;
 			$this->session->samlauthsource=null;
 			
 			foreach($t->data['sources'] as $s){
-				$as = new SimpleSAML_Auth_Simple($s);
+				$as = new \SimpleSAML_Auth_Simple($s);
 				if( $as->isAuthenticated() ) {
 					$as->logout($referer);
 				}
@@ -63,66 +63,62 @@ class SamlController extends AbstractActionController
 			//In case of external service using AppDB as a SP
 			if( isset($_GET['callbackUrl']) && trim($_GET['callbackUrl']) ) {
 				\SamlAuth::logout($this->session);
-				$this->_helper->layout->disableLayout();
-				$this->_helper->viewRenderer->setNoRender();
 				header('Location: ' . trim($_GET['callbackUrl']));
-				return;
+				return DISABLE_LAYOUT($this, true);
 			}
 			//Will reach this code after all sources are logged out
 			$this->redirect()->toRoute('saml', ['action' => 'loggedout']);
+			return $this->view;
 	}
 
 	public function loginAction() {
-			require_once(\SamlAuth::LIB_AUTOLOAD);
-			$this->_helper->layout->disableLayout();
-			$this->_helper->viewRenderer->setNoRender();
-			$isAuth=false;
-			$source="";
+		require_once(\SamlAuth::LIB_AUTOLOAD);
+		$isAuth = false;
+		$source = "";
 
-			$config = SimpleSAML_Configuration::getInstance();
-			$t = new SimpleSAML_XHTML_Template($config, 'core:authsource_list.tpl.php');
-			$t->data['sources'] = SimpleSAML_Auth_Source::getSourcesMatch('-sp');
+		$config = \SimpleSAML_Configuration::getInstance();
+		$t = new \SimpleSAML_XHTML_Template($config, 'core:authsource_list.tpl.php');
+		$t->data['sources'] = \SimpleSAML_Auth_Source::getSourcesMatch('-sp');
 
-			foreach ($t->data['sources'] as &$_source) {
-					$as = new SimpleSAML_Auth_Simple($_source);
-					if($as->isAuthenticated()){
-							$isAuth=true;
-							$source=$_source;
-							break;
-					}
+		foreach ($t->data['sources'] as &$_source) {
+			$as = new \SimpleSAML_Auth_Simple($_source);
+			if($as->isAuthenticated()){
+				$isAuth = true;
+				$source = $_source;
+				break;
 			}
-			if(!$isAuth){
-					print('<p><a href="https://'.$_SERVER["SERVER_NAME"].'/help/saml?source=appdb-multi-sp">Multi</a></p>');
-					print('<p><a href="https://'.$_SERVER["SERVER_NAME"].'/help/saml?source=egi-sso-ldap-sp">EGI-SSO</a></p>');
-					print('<p><a href="https://'.$_SERVER["SERVER_NAME"].'/help/saml?source=x509-sp">Digital Certificates</a></p>');
-					print('<p><a href="https://'.$_SERVER["SERVER_NAME"].'/help/saml?source=dev-env-sp">Development</a></p>');
-					print('<p><a href="https://'.$_SERVER["SERVER_NAME"].'/help/saml?source=facebook-sp">Facebook</a></p>');
-					print('<p><a href="https://'.$_SERVER["SERVER_NAME"].'/help/saml?source=linkedin-sp">LinkedIn</a></p>');
-					print('<p><a href="https://'.$_SERVER["SERVER_NAME"].'/help/saml?source=google-sp">Google+</a></p>');
-					print('<p><a href="https://'.$_SERVER["SERVER_NAME"].'/help/saml?source=twitter-sp">Twitter</a></p>');
-					print('<p><a href="https://'.$_SERVER["SERVER_NAME"].'/help/saml?source=windowslive-sp">WindowsLiveID</a></p>');
-			}else{
-					print "<p>You are already authenticated with your ".$source." account.</p>";
-					print('<p><a href="https://'.$_SERVER["SERVER_NAME"].'/help/samllogout?source='.$source.'">Logout</a></p>');
-			}
+		}
+		if (! $isAuth ) {
+			print('<p><a href="https://' . $_SERVER["SERVER_NAME"] . '/help/saml?source=appdb-multi-sp">Multi</a></p>');
+			print('<p><a href="https://' . $_SERVER["SERVER_NAME"] . '/help/saml?source=egi-sso-ldap-sp">EGI-SSO</a></p>');
+			print('<p><a href="https://' . $_SERVER["SERVER_NAME"] . '/help/saml?source=x509-sp">Digital Certificates</a></p>');
+			print('<p><a href="https://' . $_SERVER["SERVER_NAME"] . '/help/saml?source=dev-env-sp">Development</a></p>');
+			print('<p><a href="https://' . $_SERVER["SERVER_NAME"] . '/help/saml?source=facebook-sp">Facebook</a></p>');
+			print('<p><a href="https://' . $_SERVER["SERVER_NAME"] . '/help/saml?source=linkedin-sp">LinkedIn</a></p>');
+			print('<p><a href="https://' . $_SERVER["SERVER_NAME"] . '/help/saml?source=google-sp">Google+</a></p>');
+			print('<p><a href="https://' . $_SERVER["SERVER_NAME"] . '/help/saml?source=twitter-sp">Twitter</a></p>');
+			print('<p><a href="https://' . $_SERVER["SERVER_NAME"] . '/help/saml?source=windowslive-sp">WindowsLiveID</a></p>');
+		} else {
+			print "<p>You are already authenticated with your " . $source . " account.</p>";
+			print('<p><a href="https://' . $_SERVER["SERVER_NAME"].'/help/samllogout?source=' . $source . '">Logout</a></p>');
+		}
+		return DISABLE_LAYOUT($this, true);
 	}
 	public function loggedoutAction(){
         \SamlAuth::logout($this->session);
-		header('Location: https://'.$_SERVER['HTTP_HOST']);
+		header('Location: https://' . $_SERVER['HTTP_HOST']);
 		return DISABLE_LAYOUT($this, true);
 	}
 	
 	public function samlAction() {
 			require_once(\SamlAuth::LIB_AUTOLOAD);
-			$this->_helper->layout->disableLayout();
-			$this->_helper->viewRenderer->setNoRender();
 			//In case of external service using AppDB as a SP
-			if(isset($_GET['callbackUrl']) && trim($_GET['callbackUrl']) !== '') {
+			if (isset($_GET['callbackUrl']) && trim($_GET['callbackUrl']) !== '') {
 				$this->session->authreferer = trim($_GET['callbackUrl']);
-			}else if( isset($this->session->authreferer) === false ){
+			} elseif ( isset($this->session->authreferer) === false ) {
 				$this->session->authreferer = $_SERVER["HTTP_REFERER"];
 			}
-			$source=GET_REQUEST_PARAM($this, "source");
+			$source = GET_REQUEST_PARAM($this, "source");
 			if($source == null){
 				$source="";
 			}
@@ -136,111 +132,116 @@ class SamlController extends AbstractActionController
 					header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
 				}
 				return;*/
-			} else if (isset($this->session) && $this->session->isNewUser === true) {
+			} elseif (isset($this->session) && $this->session->isNewUser === true) {
 				header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-				return;
+				DISABLE_LAYOUT($this);
+				return SET_NO_RENDER($this);
 			}
-			
 				
-			$config = SimpleSAML_Configuration::getInstance();
-			$t = new SimpleSAML_XHTML_Template($config, 'core:authsource_list.tpl.php');
-			$t->data['sources'] = SimpleSAML_Auth_Source::getSourcesMatch('-sp');
-			if(!in_array($source,$t->data['sources'])){
+			$config = \SimpleSAML_Configuration::getInstance();
+			$t = new \SimpleSAML_XHTML_Template($config, 'core:authsource_list.tpl.php');
+			$t->data['sources'] = \SimpleSAML_Auth_Source::getSourcesMatch('-sp');
+			if (! in_array($source, $t->data['sources'])) {
 				header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
 				exit;
 			}
 
-			$as = new SimpleSAML_Auth_Simple($source);
-			if(!$as->isAuthenticated()) {
-					$as->requireAuth();
+			$as = new \SimpleSAML_Auth_Simple($source);
+			if (! $as->isAuthenticated()) {
+				$as->requireAuth();
 			}
 			$attributes = $as->getAttributes();
 			$uid = $attributes['idp:uid'][0];
 			$_SESSION['identity'] = $uid;
 			$_SESSION['logouturl'] = $as->getLogoutURL();
-			$this->session->samlattrs=$attributes;
-			$this->session->samlauthsource=$source;
+			$this->session->samlattrs = $attributes;
+			$this->session->samlauthsource = $source;
 			$this->redirect()->toRoute('saml', ['action' => 'postauth']);
+			DISABLE_LAYOUT($this);
+			return SET_NO_RENDER($this);
 	}
 
 	public function connectAction(){
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
 		$referer = trim($this->session->connectreferer);
-		if( trim($referer) === "" ){
+		if (trim($referer) === "" ) {
 			$referer = $_SERVER["HTTP_REFERER"];
 			$this->session->connectreferer = $referer;
 		}
-		if( trim($referer) === "" ){
+		if (trim($referer) === "" ) {
 			$referer = "https://" . $_SERVER["HTTP_HOST"];
 		}
 		
-		//check if user is loggedin
-		if( isset($this->session->userid)===false || is_numeric($this->session->userid) === false || intval($this->session->userid) <= 0 ){
+		//check if user is logged in
+		if ((! isset($this->session->userid)) || (! is_numeric($this->session->userid)) || (intval($this->session->userid) <= 0)) {
 			header("Location: " . $referer);
 			unset($this->session->connectreferer);
-			return;
+			DISABLE_LAYOUT($this);
+			return SET_NO_RENDER($this);
 		}
 		
 		//Check if source is given
-		$source= trim(GET_REQUEST_PARAM($this, "source"));
-		if($source == ""){
+		$source = trim(GET_REQUEST_PARAM($this, "source"));
+		if ($source == "") {
 			header("Location: " . $referer);
 			unset($this->session->connectreferer);
-			return;
+			DISABLE_LAYOUT($this);
+			return SET_NO_RENDER($this);
 		}
+
 		$authsource = str_replace( "-sp", "", strtolower(trim($source)) );
 		$connectsource = str_replace("-sp", "-connect", $source);
 		
 		require_once(\SamlAuth::LIB_AUTOLOAD);
 		
 		//Initialize SAML
-		$config = SimpleSAML_Configuration::getInstance();
-		$t = new SimpleSAML_XHTML_Template($config, 'core:authsource_list.tpl.php');
-		$t->data['sources'] = SimpleSAML_Auth_Source::getSourcesMatch('-connect');
-		if( !in_array($connectsource, $t->data['sources']) ){
+		$config = \SimpleSAML_Configuration::getInstance();
+		$t = new \SimpleSAML_XHTML_Template($config, 'core:authsource_list.tpl.php');
+		$t->data['sources'] = \SimpleSAML_Auth_Source::getSourcesMatch('-connect');
+		if (! in_array($connectsource, $t->data['sources'])) {
 			header("Location: " . $referer);
 			unset($this->session->connectreferer);
 			$this->session->userError = array("title"=>"Could not proceed with user account connection", "message"=> "You tried to connect to a " . $authsource . " account. This type of connection is not supported.");
 			exit;
 		}
+
 		//Check if SAML Authentication user account for connection is already authenticated
-		$as = new SimpleSAML_Auth_Simple($connectsource);
+		$as = new \SimpleSAML_Auth_Simple($connectsource);
 		//In case a user is already authenticated with the source logout and redirect here again
 		if( $as->isAuthenticated() ) {
-			$as->logout( 'https://'.$_SERVER["SERVER_NAME"].'/saml/connect?source=' . $source );
-			return;
+			$as->logout( 'https://' . $_SERVER["SERVER_NAME"] . '/saml/connect?source=' . $source );
+			DISABLE_LAYOUT($this);
+			return SET_NO_RENDER($this);
 		}
+
 		//SAML Authentication new user account for connection
-		//$as = new SimpleSAML_Auth_Simple($connectsource);
+		//$as = new \SimpleSAML_Auth_Simple($connectsource);
 		//Do the login
 		$as->login(array(
 			"ReturnTo" => "https://" . $_SERVER["HTTP_HOST"] . "/saml/postconnect?source=" . $source,
 			"ErrorUrl" => "https://" . $_SERVER["HTTP_HOST"] . "/saml/postconnecterror?source=" . $source
 		));
-		return;
+		return DISABLE_LAYOUT($this, true);
 	}
 	public function postconnectAction(){
-		$this->_helper->layout->disableLayout();
-        $this->_helper->viewRenderer->setNoRender();
 		$referer = trim($this->session->connectreferer);
-		if( trim($referer) === "" ){
+		if (trim($referer) === "") {
 			$referer = $_SERVER["HTTP_REFERER"];
 			$this->session->connectreferer = $referer;
 		}
-		if( trim($referer) === "" ){
+		if (trim($referer) === "") {
 			$referer = "https://" . $_SERVER["HTTP_HOST"];
 		}
-		//check if user is loggedin
-		if( isset($this->session->userid)===false || is_numeric($this->session->userid) === false || intval($this->session->userid) <= 0 ){
+		//check if user is logged in
+		if ((! isset($this->session->userid)) || (! is_numeric($this->session->userid)) || (intval($this->session->userid) <= 0)) {
 			header("Location: " . $referer );
-			return;
+			return DISABLE_LAYOUT($this, true);
 		}
+
 		//Check if source is given
-		$source= trim(GET_REQUEST_PARAM($this, "source"));
-		if($source == ""){
+		$source = trim(GET_REQUEST_PARAM($this, "source"));
+		if ($source == "") {
 			header("Location: https://" . $_SERVER["HTTP_HOST"]);
-			return;
+			return DISABLE_LAYOUT($this, true);
 		}
 		$this->session->connectdaccountsource = $source;
 		$authsource =  str_replace( "-sp", "", strtolower(trim($source)) );
@@ -249,57 +250,59 @@ class SamlController extends AbstractActionController
 		require_once(\SamlAuth::LIB_AUTOLOAD);
 		
 		//Initialize SAML
-		$config = SimpleSAML_Configuration::getInstance();
-		$t = new SimpleSAML_XHTML_Template($config, 'core:authsource_list.tpl.php');
-		$t->data['sources'] = SimpleSAML_Auth_Source::getSourcesMatch('-connect');
-		if(!in_array($connectedsource,$t->data['sources'])){
+		$config = \SimpleSAML_Configuration::getInstance();
+		$t = new \SimpleSAML_XHTML_Template($config, 'core:authsource_list.tpl.php');
+		$t->data['sources'] = \SimpleSAML_Auth_Source::getSourcesMatch('-connect');
+		if (! in_array($connectedsource, $t->data['sources'])) {
 			header("Location: " . $referer );
-			return;
+			return DISABLE_LAYOUT($this, true);
 		}
 		
 		//SAML Authentication new user account for connection
-		$as = new SimpleSAML_Auth_Simple($connectedsource);
+		$as = new \SimpleSAML_Auth_Simple($connectedsource);
 		
 		$attributes = $as->getAttributes();
 		$uid = $attributes['idp:uid'][0];
-		if( trim($uid) == "" ){
-			$this->session->userError = array("title" => "New Account Connection", "message"=>"Could not connect with new user account. Not enough information returned from account provider.");
+		if (trim($uid) == "") {
+			$this->session->userError = array("title" => "New Account Connection", "message" => "Could not connect with new user account. Not enough information returned from account provider.");
 			$this->redirect()->toRoute('saml', ['action' => 'postconnected']);
-			return;
+			return DISABLE_LAYOUT($this, true);
 		}
+
 		//Check if user is already connected to the requested account
 		//If true redirect the user to the previous location (referer)
-		$uaccount = AccountConnect::isConnectedTo($this->session, $uid, $authsource);
-		if( $uaccount !== false ){
+		$uaccount = \AccountConnect::isConnectedTo($this->session, $uid, $authsource);
+		if ( $uaccount !== false) {
 			$this->redirect()->toRoute('saml', ['action' => 'postconnected']);
-			return;
-		}else {
+			return DISABLE_LAYOUT($this, true);
+		} else {
 			//Check if this account is already connected to another profile
 			$user = \SamlAuth::getUserByAccountValues($uid, $authsource);
-			if( $user !== null && $user->id != $this->session->userid ){
+			if ($user !== null && $user->id != $this->session->userid) {
 				$this->session->userError = array("title" => "Could not connect to " . str_replace("-"," ",$authsource) . " account", "message" => "The " . str_replace("-"," ",$authsource) . " account you tried to connect your profile to is already connected to another user profile.");
 				$this->redirect()->toRoute('saml', ['action' => 'postconnected']);
-				return;
+				return DISABLE_LAYOUT($this, true);
 			}
 		}
 		
 		//Build account name for user account
-		$userFirstName = ( ( isset($attributes["idp:givenName"]) === true && count($attributes["idp:givenName"]) > 0 )?$attributes["idp:givenName"][0]:"" );
-		$userLastName = ( ( isset($attributes["idp:sn"]) === true && count($attributes["idp:givenName"]) > 0 )?$attributes["idp:sn"][0]:"" );
+		$userFirstName = (((isset($attributes["idp:givenName"]) === true) && (count($attributes["idp:givenName"]) > 0)) ? $attributes["idp:givenName"][0] : "");
+		$userLastName = (((isset($attributes["idp:sn"]) === true) && (count($attributes["idp:givenName"]) > 0)) ? $attributes["idp:sn"][0] : "");
 		$userFullName = trim($userFirstName . " " . $userLastName);
-		$idptrace = ( ( isset($attributes["idp:traceidp"]) === true && count($attributes["idp:traceidp"]) > 0 )?$attributes["idp:traceidp"]:array() );
+		$idptrace = (((isset($attributes["idp:traceidp"])) && (count($attributes["idp:traceidp"]) > 0)) ? $attributes["idp:traceidp"] : array());
 		if( $userFullName === "" ){
 			$userFullName = null;
 		}
 
 		//Do the account connection
-		AccountConnect::connectAccountToProfile($this->session->userid, $uid, $authsource, $userFullName, $idptrace);
+		\AccountConnect::connectAccountToProfile($this->session->userid, $uid, $authsource, $userFullName, $idptrace);
 
 		//Update connected user accounts
 		$this->session->currentUserAccounts = \SamlAuth::getUserAccountsByUser($this->session->userid, true);
 		
 		//redirect to post connected action to logout connected account
 		$this->redirect()->toRoute('saml', ['action' => 'postconnected']);
+		return DISABLE_LAYOUT($this, true);
 	}
 	
 	//Called after postconnect to logout currently conected account
@@ -322,59 +325,55 @@ class SamlController extends AbstractActionController
 		require_once(\SamlAuth::LIB_AUTOLOAD);
 		
 		//Get SAML Authentication new user account for connection (-connect) and perform logout
-		$as = new SimpleSAML_Auth_Simple($connectedsource);
+		$as = new \SimpleSAML_Auth_Simple($connectedsource);
 		$as->logout($referer);
 		return DISABLE_LAYOUT($this, true);
 	}
 	
 	public function postauthAction() {
-			$this->_helper->layout->disableLayout();
-			$this->_helper->viewRenderer->setNoRender();
-				
 			$inited = \SamlAuth::setupSamlAuth($this->session);
 			
 			//Check and redirect if user account is blocked
-			if( $this->session->accountStatus === "blocked" ){
+			if ($this->session->accountStatus === "blocked") {
 				$this->redirect()->toRoute('saml', ['action' => 'blockedaccount']);
-				return;
+				return DISABLE_LAYOUT($this, true);
 			}
 			
 			//Check and redirect if user is deleted
-			if( $this->session->userDeleted === true ){
+			if ($this->session->userDeleted === true) {
 				$this->redirect()->toRoute('saml', ['action' => 'deletedprofile']);
-				return;
+				return DISABLE_LAYOUT($this, true);
 			}
 			
 			//No need any more. Referer is stored in $inited variable
 			unset($this->session->authreferer);
 			
-			if( $inited !== false && $this->session->isNewUser !== true ){ 
+			if ($inited !== false && $this->session->isNewUser !== true) { 
 				//Found user and a url referer. Redirect to referer
 				$this->_helper->layout->disableLayout();
 				$this->_helper->viewRenderer->setNoRender();
 				header("Location: " . $inited);
-			}else if( $this->session->isNewUser === true ){
+			} elseif ($this->session->isNewUser === true) {
 				$this->session->authreferer = $inited;
 				// new user. First login. Redirect to new user account page
 				$this->redirect()->toRoute('saml', ['action' => 'newaccount']);
-			}else if( $this->session->userid !== null &&  $this->session->userid > -1){ 
+			} elseif ($this->session->userid !== null && $this->session->userid > -1) {
 				//Found user, but no url referer. Redirect to home page
 				$this->_helper->layout->disableLayout();
 				$this->_helper->viewRenderer->setNoRender();
 				header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-			}else{ 
+			} else {
 				//No user. perform logout.
 				$this->redirect()->toRoute('saml', ['action' => 'loggedout']);
 			}
+		return DISABLE_LAYOUT($this, true);
 	}
-	public function deletedprofileAction(){
+
+	public function deletedprofileAction() {
 		if( $this->session->userDeleted !== true ){
-			$this->_helper->layout->disableLayout();
-			$this->_helper->viewRenderer->setNoRender();
 			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-			return;
+			return DISABLE_LAYOUT($this, true);
 		}
-		$this->_helper->layout->disableLayout();
 		
 		//Store all useful session variables for displaying the view.
 		$this->view->delAccounts = \SamlAuth::getUserAccountsByUser($this->session->userid);
@@ -394,15 +393,14 @@ class SamlController extends AbstractActionController
 		
 		//Clear session
 		\SamlAuth::logout($this->session);
+		return DISABLE_LAYOUT($this);
 	}
-	public function blockedaccountAction(){
+
+	public function blockedaccountAction() {
 		if( strtolower(trim($this->session->accountStatus)) !== "blocked" ){
-			$this->_helper->layout->disableLayout();
-			$this->_helper->viewRenderer->setNoRender();
 			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-			return;
+			return DISABLE_LAYOUT($this, true);
 		}
-		$this->_helper->layout->disableLayout();
 		
 		//Store all useful session variables for displaying the view.
 		$this->view->userid = $this->session->userid;
@@ -413,38 +411,34 @@ class SamlController extends AbstractActionController
 		$this->session->accountStatus = "";
 		//Clear session
 		\SamlAuth::logout($this->session);
+		return DISABLE_LAYOUT($this);
 	}
-	public function newaccountAction(){
+
+	public function newaccountAction() {
 		$referer = GET_REQUEST_PARAM($this, "r");
 		if( trim($referer) !== "" ){
 			$this->session->authreferer = $referer;
 		}
 		if( $this->session->isNewUser !== true && $this->session->userid !== -1){
-			$this->_helper->layout->disableLayout();
-			$this->_helper->viewRenderer->setNoRender();
 			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-			return;
+			return DISABLE_LAYOUT($this, true);
 		}
-		if( AccountConnect::isConnected($this->session) !== false ){
-			$this->_helper->layout->disableLayout();
-			$this->_helper->viewRenderer->setNoRender();
+		if (\AccountConnect::isConnected($this->session) !== false) {
 			\SamlAuth::setupSamlAuth($this->session);
 			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-			return;
+			return DISABLE_LAYOUT($this, true);
 		}
 		
-		$this->_helper->layout->enableLayout();
 		//check if pending so the session will be updated accrdingly
-		
-		AccountConnect::isPending($this->session);
+		\AccountConnect::isPending($this->session);
 		$this->view->session = $this->session;
+		return $this->view;
 	}
-	public function newprofileAction(){
-		$this->_helper->layout->disableLayout();
+
+	public function newprofileAction() {
 		if( $this->session->isNewUser !== true && $this->session->userid !== -1){
-			$this->_helper->viewRenderer->setNoRender();
 			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-			return;
+			return DISABLE_LAYOUT($this, true);
 		}
 		$profiles = array(\SamlAuth::initNewUserProfile($this->session));
 		$this->view->profiles = $profiles;
@@ -452,44 +446,44 @@ class SamlController extends AbstractActionController
 		
 		//Add helper data for possible editing of a new profile
 		//Create position types list
-		$ptypes = new Default_Model_PositionTypes();
+		$ptypes = new \Application\Model\PositionTypes();
 		$ptypes->filter->orderBy('ord');
 		$positiontypes = array( 'ids' => array(), 'vals' => array() );
-		for($i=0; $i<count($ptypes->items); $i+=1){
+		for ($i = 0; $i < count($ptypes->items); $i += 1) {
 			$ptype = $ptypes->items[$i];
-			array_push( $positiontypes["ids"], stripslashes($ptype->id) );
-			array_push( $positiontypes["vals"], stripslashes($ptype->description));
+			array_push($positiontypes["ids"], stripslashes($ptype->id));
+			array_push($positiontypes["vals"], stripslashes($ptype->description));
 		}
 		$this->view->positionTypes = json_encode($positiontypes);
 		
 		//Create countries list
-		$cntrs = new Default_Model_Countries();
+		$cntrs = new \Application\Model\Countries();
 		$cntrs->filter->orderBy('name');
 		$countries = array('ids' => array(), 'vals' => array() );
-		for($i=0; $i<count($cntrs->items); $i+=1){
+		for ($i = 0; $i < count($cntrs->items); $i += 1) {
 			$country = $cntrs->items[$i];
-			array_push( $countries['ids'], $country->id );
-			array_push( $countries['vals'], $country->name );
+			array_push($countries['ids'], $country->id);
+			array_push($countries['vals'], $country->name);
 		}
 		$this->view->countries = json_encode($countries);
 		
 		//Create contacttype list
-		$ctypes = new Default_Model_ContactTypes();
+		$ctypes = new \Application\Model\ContactTypes();
 		$ctypes->filter->orderBy('description');
 		$contactTypes = array('ids' => array(), 'vals' => array() );
-		for($i=0; $i<count($ctypes->items); $i+=1){
+		for ($i = 0; $i < count($ctypes->items); $i += 1) {
 			$ctype = $ctypes->items[$i];
-			array_push( $contactTypes['ids'], $ctype->id );
-			array_push( $contactTypes['vals'], $ctype->description );
+			array_push($contactTypes['ids'], $ctype->id);
+			array_push($contactTypes['vals'], $ctype->description);
 		}
 		$this->view->contactTypes = json_encode($contactTypes);
+		return DISABLE_LAYOUT($this); 
 	}
-	public function createnewprofileAction(){
-		$this->_helper->layout->disableLayout();
+
+	public function createnewprofileAction() {
 		if( $this->session->userid !== -1 || $this->session->isNewUser !== true){
-			$this->_helper->viewRenderer->setNoRender();
 			header("HTTP/1.0 404 Not Found");
-			return;
+			return DISABLE_LAYOUT($this, true);
 		}
 		
 		$firstname = ( isset($_POST["firstName"])?trim($_POST["firstName"]):null );
@@ -509,11 +503,11 @@ class SamlController extends AbstractActionController
 		if( count($error) > 0 ){
 			//todo: Add Error handler
 			$this->view->error = $error;
-			return;
+			return DISABLE_LAYOUT($this);
 		}
 		
 		//Collect user information
-		$entry = new Default_Model_Researcher();
+		$entry = new \Application\Model\Researcher();
 		$entry->lastName = $lastname;
 		$entry->firstName = $firstname;
 		$entry->institution = "";
@@ -526,7 +520,7 @@ class SamlController extends AbstractActionController
 			if(trim($value) === "" ) continue;
 			if ( (substr($key,0,7) === "contact") && (substr($key,0,11) !== "contactType") ) {
 				$cnum = substr($key,7);
-				$cont = new Default_Model_Contact();
+				$cont = new \Application\Model\Contact();
 				$cont->data = $value;
 				$cont->contactTypeID = $_POST['contactType'.$cnum];
 				if( is_numeric($cont->contactTypeID) === false ) array_push($error, "Invalid contact type given");
@@ -553,15 +547,15 @@ class SamlController extends AbstractActionController
 		if( count($error) > 0 ){
 			//todo: Add error handler
 			$this->view->error = $error;
-			return;
+			return DISABLE_LAYOUT($this);
 		}
 		
 		//Check if user account has been registered in the meanwhile
 		$uid = $this->session->authUid;
 		$source = $this->session->authSource;
-		$useraccounts = new Default_Model_UserAccounts();
-		$f1 = new Default_Model_UserAccountsFilter();
-		$f2 = new Default_Model_UserAccountsFilter();
+		$useraccounts = new \Application\Model\UserAccounts();
+		$f1 = new \Application\Model\UserAccountsFilter();
+		$f2 = new \Application\Model\UserAccountsFilter();
 		$f1->accountid->equals($uid)->or($f1->accountid->overrideEscapeSeq("")->equals($uid));
 		$f2->accounttype->equals($source);
 		$useraccounts->filter->chain($f1, "AND");
@@ -570,7 +564,7 @@ class SamlController extends AbstractActionController
 		if( count($useraccounts->items) > 0 ){
 			array_push($error, "User account is already registered");
 			$this->view->error = $error;
-			return;
+			return DISABLE_LAYOUT($this);
 		}
 		
 		//Everything is ok. Continue with saving new profile
@@ -591,7 +585,7 @@ class SamlController extends AbstractActionController
 		}
 		
 		//Save user account
-		$useraccount = new Default_Model_UserAccount();
+		$useraccount = new \Application\Model\UserAccount();
 		$useraccount->researcherid = $entry->id;
 		$useraccount->accountid = $this->session->authUid;
 		$useraccount->accounttypeid = str_replace("-sp","",$this->session->authSource);
@@ -604,7 +598,7 @@ class SamlController extends AbstractActionController
 			$try_counter = 0;
 			while($try_counter < 25 ){
 				$try_counter += 1;
-				$confs = db()->query("select data from config where var = 'permissions_cache_dirty';")->fetchAll();
+				$confs = db()->query("SELECT data FROM config WHERE var = 'permissions_cache_dirty';", array())->toArray();
 				if( count($confs) > 0 ){
 					$conf = $confs[0];
 					if( (isset($conf["data"]) && trim($conf["data"]) === '0') ){
@@ -615,11 +609,11 @@ class SamlController extends AbstractActionController
 			}
 			
 			//Refetch entry (user) to retrieve guid
-			$us = new Default_Model_Researchers();
+			$us = new \Application\Model\Researchers();
 			$us->filter->id->numequals($entry->id);
 			if( count($us->items) > 0 ){
 				$u = $us->items[0];
-				EntityRelations::syncRelations($u->guid, $u->id, $relations);
+				\EntityRelations::syncRelations($u->guid, $u->id, $relations);
 			}
 		}
 		
@@ -629,7 +623,7 @@ class SamlController extends AbstractActionController
 			$try_counter = 0;
 			while($try_counter < 10 ){
 				$try_counter += 1;
-				$ppl = new Default_Model_Researchers();
+				$ppl = new \Application\Model\Researchers();
 				$ppl->filter->id->equals($entry->id);
 				if( count($ppl->items) > 0 ){
 					break;
@@ -645,31 +639,30 @@ class SamlController extends AbstractActionController
 		
 		$this->view->session = $this->session;
 		$this->view->error = array();
+		return DISABLE_LAYOUT($this);
 	}
 	
 	public function connectableprofilesAction(){
-		$this->_helper->layout->disableLayout();
 		if( $this->session->isNewUser !== true && $this->session->userid !== -1){
-			$this->_helper->viewRenderer->setNoRender();
 			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-			return;
+			return DISABLE_LAYOUT($this, true);
 		}
 		$profileids = \SamlAuth::getConnectableProfileIds($this->session);
 		$this->view->profileids = $profileids;
 		$this->view->session = $this->session;
+		return DISABLE_LAYOUT($this);
 	}
-	public function cancelregistrationAction(){
+
+	public function cancelregistrationAction() {
 		$redirecturl = \SamlAuth::cancelRegistrationProcess($this->session);
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
 		header("Location: " . $redirecturl);
+		return DISABLE_LAYOUT($this, true);
 	}
-	public function sendconfirmationcodeAction(){
-		$this->_helper->layout->disableLayout();
+
+	public function sendconfirmationcodeAction() {
 		if( $this->session->isNewUser !== true && $this->session->userid !== -1){
-			$this->_helper->viewRenderer->setNoRender();
 			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-			return;
+			return DISABLE_LAYOUT($this, true);
 		}
 		
 		$error = null;
@@ -691,40 +684,40 @@ class SamlController extends AbstractActionController
 		//Check for invalid data
 		if( $id === null ){
 			$this->view->error = "No profile information given";
-			return;
+			return DISABLE_LAYOUT($this);
 		}
 		if( $accounttype === null ){
 			$this->view->error = "No account type is given";
-			return;
+			return DISABLE_LAYOUT($this);
 		}
 		if( $accountname === null ){
 			$this->view->error = "No account information given";
-			return;
+			return DISABLE_LAYOUT($this);
 		}
 				
 		//Check if account is already pending for connection to a profile implicitly or through a different session
 		//In this case the view should inform the user and autorefresh to display the confirmation form.
-		if( AccountConnect::isPending($this->session) === true ) {
+		if( \AccountConnect::isPending($this->session) === true ) {
 			$this->view->error = "Your account seems to be waiting for connection approval for another profile";
 			$this->view->implicitpending = false;
 			//Update session so user will be redirected to the appropriate form
 			\SamlAuth::setupSamlAuth($this->session);
-			return;
+			return DISABLE_LAYOUT($this);
 		}
 		
 		//Check if current account is already connected to a profile implicitly or through a different session
 		//In this case the view should inform the user and autorefresh to the portal
-		if( AccountConnect::isConnected($this->session) !== false ){
+		if( \AccountConnect::isConnected($this->session) !== false ){
 			$this->view->error = "Your account is already connected";
 			$this->view->implicitconnect = true;
 			//Update session so user will auto login on page refresh
 			\SamlAuth::setupSamlAuth($this->session);
-			return;
+			return DISABLE_LAYOUT($this);
 		}
 		
 		//Find profile for connection
 		$profile = null;
-		$ppl = new Default_Model_Researchers();
+		$ppl = new \Application\Model\Researchers();
 		$ppl->filter->id->equals($id);
 		if( count($ppl->items) > 0 ){
 			//Profile found
@@ -733,22 +726,20 @@ class SamlController extends AbstractActionController
 		}else { 
 			//profile not found
 			$this->view->error = "Requested profile not found";
-			return;
+			return DISABLE_LAYOUT($this);
 		}
 		
 		//Procceed with sending the request
-		AccountConnect::requestAccountConnection($this->session, $profile);
+		\AccountConnect::requestAccountConnection($this->session, $profile);
 		$this->view->session = $this->session;
 		$this->view->error = null;
-		return;
+		return DISABLE_LAYOUT($this);
 	}
 	
-	public function submitconfirmationcodeAction(){
-		$this->_helper->layout->disableLayout();
+	public function submitconfirmationcodeAction() {
 		if( $this->session->isNewUser !== true && $this->session->userid !== -1){
-			$this->_helper->viewRenderer->setNoRender();
 			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-			return;
+			return DISABLE_LAYOUT($this, true);
 		}
 		$this->view->error = null;
 		$this->view->session =  $this->session;
@@ -756,48 +747,49 @@ class SamlController extends AbstractActionController
 		$code = ( (isset($_POST["confirmationcode"]) === true)?trim($_POST["confirmationcode"]):null );
 		if( $code === null ){
 			$this->view->error = "No confirmation code given";
-			return;
+			return DISABLE_LAYOUT($this);
 		}
 		
 		//Check if current account is already connected to a profile implicitly or through a different session
 		//In this case the view should inform the user and autorefresh to the portal
-		if( AccountConnect::isConnected($this->session) !== false ){
+		if( \AccountConnect::isConnected($this->session) !== false ){
 			//Update session so user will auto login on page refresh
 			\SamlAuth::setupSamlAuth($this->session);
 			$this->view->session =  $this->session;
-			return;
+			return DISABLE_LAYOUT($this);
 		}
 		
 		//Check if account is not pending, which means the request has timedout.
 		//In this case the view should inform the user and autorefresh to display the confirmation form.
-		if( AccountConnect::isPending($this->session) === false ) {
+		if( \AccountConnect::isPending($this->session) === false ) {
 			$this->view->error = "Your connection  request has expired";
 			$this->view->expired = true;
 			//Update session so user will be redirected to the appropriate form
 			\SamlAuth::setupSamlAuth($this->session);
-			return;
+			return DISABLE_LAYOUT($this);
 		}
 		
-		$result = AccountConnect::submitPendingConnectionCode($this->session, $code);
+		$result = \AccountConnect::submitPendingConnectionCode($this->session, $code);
 		if( $result !== true ){
 			$this->view->error = "Given code is not correct";
-			return;
+			return DISABLE_LAYOUT($this);
 		}
 		
 		$this->view->session =  $this->session;
+		return DISABLE_LAYOUT($this);
 	}
-	public function disconnectaccountAction(){
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
+
+	public function disconnectaccountAction() {
 		if( $_SERVER['REQUEST_METHOD'] !== 'POST' ||
 			isset($this->session->userid) === false  ||
 			is_numeric($this->session->userid) === false ||
 			intval($this->session->userid) <= 0 ||
 			isset($_POST["id"]) === false ||
 			is_numeric($_POST["id"]) === false ||
-			intval($_POST["id"]) <= 0 ){
-				header("HTTP/1.0 404 Not Found");
-				return;
+			intval($_POST["id"]) <= 0 ) 
+		{
+			header("HTTP/1.0 404 Not Found");
+			return DISABLE_LAYOUT($this, true);
 		}
 		
 		$result = array();
@@ -805,11 +797,11 @@ class SamlController extends AbstractActionController
 		$uaccs = \SamlAuth::getUserAccountsByUser($this->session->userid);
 		if( count($uaccs) === 1){
 			$result = array("error" => "Cannot remove last user account");
-		}else if( count($uaccs) > 1 ){
-			for($i=0; $i<count($uaccs); $i+=1){
+		} elseif ( count($uaccs) > 1 ) {
+			for ($i = 0; $i < count($uaccs); $i += 1) {
 				$ua = $uaccs[$i];
 				if( $ua->id === $id ) {
-					AccountConnect::disconnectAccount($this->session, $ua);
+					\AccountConnect::disconnectAccount($this->session, $ua);
 					break;
 				}
 			}
@@ -819,41 +811,42 @@ class SamlController extends AbstractActionController
 		
 		header('Content-type: application/json');
 		echo json_encode($result);
+		return DISABLE_LAYOUT($this, true);
 	}
 
-        private function getUserVOInfo($uid, $infoType = 'memberships') {
-            switch($infoType) {
-                case "contacts":
-                    $q = "SELECT
-                        vos.id as id,
-                        vos.name AS name,
-                        domains.name AS discipline,
-                        egiaai.vo_contacts.role AS role 
-                       FROM egiaai.vo_contacts
-                        INNER JOIN vos ON vos.name = egiaai.vo_contacts.vo
-                        INNER JOIN domains ON domains.id = vos.domainid
-                       WHERE
-                        deleted = FALSE AND
-                        egiaai.vo_contacts.puid = ?";
-                    break;
-                case "memberships":
-                    $q = "SELECT
-                        vos.id as id,
-                        vos.name AS name,
-                        domains.name AS discipline
-                       FROM egiaai.vo_members
-                        INNER JOIN vos ON vos.name = egiaai.vo_members.vo
-                        INNER JOIN domains ON domains.id = vos.domainid
-                       WHERE
-                        deleted = FALSE AND
-                        egiaai.vo_members.puid = ?";
-                    break;
-                default:
-                    return array();
-            }
-
-            return db()->query($q, array($uid))->fetchAll();
+	private function getUserVOInfo($uid, $infoType = 'memberships') {
+		switch($infoType) {
+			case "contacts":
+				$q = "SELECT
+					vos.id as id,
+					vos.name AS name,
+					domains.name AS discipline,
+					egiaai.vo_contacts.role AS role 
+				   FROM egiaai.vo_contacts
+					INNER JOIN vos ON vos.name = egiaai.vo_contacts.vo
+					INNER JOIN domains ON domains.id = vos.domainid
+				   WHERE
+					deleted = FALSE AND
+					egiaai.vo_contacts.puid = ?";
+				break;
+			case "memberships":
+				$q = "SELECT
+					vos.id as id,
+					vos.name AS name,
+					domains.name AS discipline
+				   FROM egiaai.vo_members
+					INNER JOIN vos ON vos.name = egiaai.vo_members.vo
+					INNER JOIN domains ON domains.id = vos.domainid
+				   WHERE
+					deleted = FALSE AND
+					egiaai.vo_members.puid = ?";
+				break;
+			default:
+				return array();
 		}
+
+		return db()->query($q, array($uid))->toArray();
+	}
 
 	public function isloggedinAction(){
 		if (strtoupper($this->getRequest()->getMethod()) == "GET") {
@@ -896,11 +889,11 @@ class SamlController extends AbstractActionController
 						}
 
 						if ($userAccount) {
-                                                        if ($sourceIdentifier === 'egi-aai' || ($sourceIdentifier === 'egi-sso-ldap' && ApplicationConfiguration::isEnviroment('production') === false)) {
-                                                            $attrs['entitlements'] = array('vo' => array('contacts' => $this->getUserVOInfo($uid, 'contacts') ,'memberships' => $this->getUserVOInfo($uid, 'memberships')));
-                                                        } else {
-                                                            $attrs['entitlements'] = array('vo' => array('contacts' => VoAdmin::getVOContacts($userAccount->researcherid) ,'memberships' => VoAdmin::getUserMembership($userAccount->researcherid)));
-                                                        }
+							if ($sourceIdentifier === 'egi-aai' || ($sourceIdentifier === 'egi-sso-ldap' && \ApplicationConfiguration::isEnviroment('production') === false)) {
+								$attrs['entitlements'] = array('vo' => array('contacts' => $this->getUserVOInfo($uid, 'contacts') ,'memberships' => $this->getUserVOInfo($uid, 'memberships')));
+							} else {
+								$attrs['entitlements'] = array('vo' => array('contacts' => \VoAdmin::getVOContacts($userAccount->researcherid) ,'memberships' => \VoAdmin::getUserMembership($userAccount->researcherid)));
+							}
 							$uaccounts = array();
 							$alluseraccounts = \SamlAuth::getResearcherUserAccounts($userAccount->researcherid);
 							foreach($alluseraccounts  as $uaccount) {
@@ -909,14 +902,14 @@ class SamlController extends AbstractActionController
 							$attrs['appdb:accounts'] = $uaccounts;
 							$researcher = $userAccount->getResearcher();
 							if ($researcher) {
-                                                                $currentHostName = 'https://'.$_SERVER['HTTP_HOST'];
-                                                                $attrs['appdb:cname'] = $researcher->cname;
-                                                                $attrs['appdb:firstName'] = $researcher->firstname;
-                                                                $attrs['appdb:lastName'] = $researcher->lastname;
-                                                                $attrs['appdb:refs'] = array(
-                                                                  "profile" => $currentHostName .'/store/person/' . $researcher->cname,
-                                                                  "image" => $currentHostName .'/people/getimage?id=' . $researcher->id
-                                                                );
+								$currentHostName = 'https://'.$_SERVER['HTTP_HOST'];
+								$attrs['appdb:cname'] = $researcher->cname;
+								$attrs['appdb:firstName'] = $researcher->firstname;
+								$attrs['appdb:lastName'] = $researcher->lastname;
+								$attrs['appdb:refs'] = array(
+									"profile" => $currentHostName . '/store/person/' . $researcher->cname,
+									"image" => $currentHostName . '/people/getimage?id=' . $researcher->id
+								);
 								$appdbGroups = array();
 								$actorGroups = $researcher->getActorGroups();
 								if ( count($actorGroups) > 0 ) {
@@ -930,7 +923,7 @@ class SamlController extends AbstractActionController
 								$attrs['appdb:roles'] = $appdbGroups;
 							}
 						}
-					}catch(Exception $ex) {
+					} catch (Exception $ex) {
 						$attrs['error'] = $ex->getMessage();
 					}
 				}
@@ -944,14 +937,13 @@ class SamlController extends AbstractActionController
 	}
 	
 	public function entitydescriptorAction(){
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
 		$source = trim(GET_REQUEST_PARAM($this, "source"));
 		header('Access-Control-Allow-Origin: *');
 		header("Content-type: application/samlmetadata+xml");
 		header("Content-Disposition: attachment; filename=" . $source );
 		
 		echo web_get_contents("https://" . $_SERVER['HTTP_HOST'] . "/auth/module.php/saml/sp/metadata.php/" . $source);
+		return DISABLE_LAYOUT($this, true);
 	}
 	
 	/**
@@ -967,7 +959,7 @@ class SamlController extends AbstractActionController
 			return false;
 		}
 		
-		$allowed = explode(';', ApplicationConfiguration::saml('profile.allow', ''));
+		$allowed = explode(';', \ApplicationConfiguration::saml('profile.allow', ''));
 		if( count($allowed) === 0 ) {
 			return false;
 		}
@@ -994,6 +986,5 @@ class SamlController extends AbstractActionController
 		}
 		
 		return false;
-		
 	}
 }
