@@ -23,11 +23,11 @@ class AppUrls extends AppUrlsBase
 {
 	public static function getTitles($notEmpty=false) {
 		$q = "SELECT DISTINCT title FROM app_urls" . (($notEmpty===true)?" WHERE title IS NOT NULL AND title<>''":"");
-		$res = $db->query($q);
+		$res = db()->query($q, array())->toArray();
 		$titles = array();
 		if ( $res !== null ) {
 			foreach($res as $r) {
-				$titles[] = $r->title;
+				$titles[] = $r['title'];
 			}
 		}
 		return $titles;
