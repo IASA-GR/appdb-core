@@ -723,7 +723,7 @@ if( $browserSupported == false ){
 	</div>
 <script type="text/javascript" async="async">
 	<?php
-	if ( $_SERVER['APPLICATION_ENV'] == '' ) {
+	if ( $_SERVER['APPLICATION_ENV'] != '' ) {
 		echo 'var APPLICATION_ENV = "'. $_SERVER['APPLICATION_ENV'] . '";';
 	} else {
 		echo 'var APPLICATION_ENV = null;';
@@ -749,7 +749,9 @@ if( $browserSupported == false ){
 	var userIsAdminOrManager = <?php echo ($isAdminOrManager == false)?'false':'true'; ?>;
 	var userIsAdmin = <?php echo ($isAdmin == false)?'false':'true'; ?>;
 	var userVoMembership = <?php if(! is_null($this->session->userid)) { 
-		echo html_entity_decode(VoAdmin::getUserMembership(trim($this->session->userid), true));
+	//FIXME: This outputs an HTML page!
+		echo "[]";
+		//echo html_entity_decode(\VoAdmin::getUserMembership(trim($this->session->userid), true));
 	} else { 
 		echo "[]";
 	}?>;
