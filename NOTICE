@@ -18,6 +18,12 @@ https://github.com/vlucas/phpdotenv
 License: BSD 3-clause "New" or "Revised" License
 Copyright (c) 2013, Vance Lucas
 
+Demo OIDC client to an EGI MasterPortal using the RCauth Delegation Server
+https://rcdemo.nikhef.nl/demobasic/oidc_getproxy_demo_source.php
+License: Apache v2
+Copyright (C) FOM-Nikhef 2016-
+Authors: Mischa Salle (msalle (AT) nikhef.nl)
+
 ------------------------------------------------
 Attribution for JavaScript Libraries and Plugins
 ------------------------------------------------
