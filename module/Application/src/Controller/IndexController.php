@@ -23,8 +23,7 @@ use Zend\Session\Container;
 class IndexController extends AbstractActionController 
 {
 
-    public function __construct()
-	{
+    public function __construct() {
 		$this->view = new ViewModel();
 		$this->session = new \Zend\Session\Container('base');
 		if( $this->session->isNewUser === true ){
@@ -37,7 +36,7 @@ class IndexController extends AbstractActionController
     }
 
 	public function testAction() {
-//		return DISABLE_LAYOUT($this); 
+		return DISABLE_LAYOUT($this, true); 
 	}
 
 	public function apptagcloudAction()
@@ -121,18 +120,18 @@ class IndexController extends AbstractActionController
 				\SamlAuth::setupSamlAuth($this->session);
 				if( $this->session->isNewUser === true ){
 					header('Location: https://' . $_SERVER['HTTP_HOST'] .'/saml/newaccount');
-					return;
+					return SET_NO_RENDER($this);
 				}
 				//Check and redirect if user account is blocked
 				if( $this->session->accountStatus === "blocked" ){
 					header('Location: https://' . $_SERVER['HTTP_HOST'] .'/saml/blockedaccount');
-					return;
+					return SET_NO_RENDER($this);
 				}
 				
 				//Check and redirect if user is deleted
 				if( $this->session->userDeleted === true ){
 					header('Location: https://' . $_SERVER['HTTP_HOST'] .'/saml/deletedprofile');
-					return;
+					return SET_NO_RENDER($this);
 				}
 			}
 		}
@@ -387,13 +386,12 @@ class IndexController extends AbstractActionController
 		return SET_NO_RENDER($this);
 	}
 	
-	public function customhomeAction(){
+	public function customhomeAction() {
 		if( isset($this->session->usercname) === false ){
 			$ppl = new \Application\Model\Researchers();
 			$ppl->filter->id->equals($this->session->userid);
 			if( count($ppl->items) == 0 ){
-				$this->_helper->viewRenderer->setNoRender();	
-				return DISABLE_LAYOUT($this);
+				return DISABLE_LAYOUT($this, true);
 			}
 			$p = $ppl->items[0];
 			$this->session->usercname = $p->cname;

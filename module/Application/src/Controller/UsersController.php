@@ -23,8 +23,8 @@ use Zend\View\Model\ViewModel;
 class UsersController extends AbstractActionController
 {
 
-    public function init()
-    {
+	public function __construct() {
+		$this->view = new ViewModel();
     	$this->session = new \Zend\Session\Container('base');
     }
 
@@ -413,14 +413,13 @@ class UsersController extends AbstractActionController
 			}
 			session_write_close();
 		}
-    	$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
 		if ( $this->session->userid !== null ) {
-			$inbox = new Default_Model_Messages();		
+			$inbox = new \Application\Model\Messages();		
 			$inbox->filter->isread->equals(false)->and($inbox->filter->receiverid->equals($this->session->userid));
 			$items = $inbox->items;
 			echo count($items);
 		}
+		return DISABLE_LAYOUT($this, true);
     }
     
     public function delmsgAction()
@@ -464,25 +463,30 @@ class UsersController extends AbstractActionController
 	}
 	
 	public function inboxAction(){
-			$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
 		if ( $this->session->userid === null ) {
 			header('HTTP/1.0 403 Forbidden');
-			return;
+			DISABLE_LAYOUT($this);
+			return SET_NO_RENDER($this, "Forbidden", 403);
 		}
+		$ret = "<person:messages error='Bad request'></person:messages>";
+		$retval = 400;
 		header('Content-Type: text/xml');
 		$meth = strtoupper(trim($_SERVER['REQUEST_METHOD']));	
 		switch($meth){
 			case "GET":
-				echo UserInbox::getMessages($this->session->userid,$_GET);
+				$ret = \UserInbox::getMessages($this->session->userid, $_GET);
+				$retval = 200;
 				break;
 			case "POST":
 			case "PUT":
 			case "DELETE":
 				header('HTTP/1.0 403 Forbidden');
-				echo "<person:messages error='not implemented yet' ></person:messages>";
+				$ret = "<person:messages error='not implemented yet' ></person:messages>";
+				$retval = 403;
 				break;
 		}
-		
+		DISABLE_LAYOUT($this);
+		return SET_NO_RENDER($this, $ret, $retval);
 	}
+	
 }
