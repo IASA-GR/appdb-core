@@ -23,9 +23,15 @@ use Zend\View\Model\ViewModel;
 class ErrorController extends AbstractActionController
 {
 
+	public function indexAction() {
+		return DISABLE_LAYOUT($this);
+	}
+
+	public function exceptionAction() {
+		return DISABLE_LAYOUT($this, true);
+	}
+
 	public function invalidrestresourceAction() {
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
 		$entry = RestAPIHelper::wrapResponse("", null, null, -1, null, null, RestErrorEnum::RE_INVALID_RESOURCE, null);
 		$this->getResponse()->clearAllHeaders();
 		header('Content-type: text/xml');
@@ -33,12 +39,11 @@ class ErrorController extends AbstractActionController
 		header("Status: 400 Bad Response");
 		header("X-AppDB-REST-Resource-Invalid: 1");
 		echo $entry;
+		return DISABLE_LAYOUT($this, true);
 	}
 
     public function errorAction()
     {
-		$this->_helper->layout->disableLayout();
-
         $errors = GET_REQUEST_PARAM($this, 'error_handler');
         error_log('[ErrorController::errorAction]: ' . $errors->exception);
 		
@@ -55,7 +60,8 @@ class ErrorController extends AbstractActionController
                 $this->getResponse()->setHttpResponseCode(500);
                 $this->view->message = 'Application error';
                 break;
-        }
+		}
+		return DISABLE_LAYOUT($this);
     }
 
 

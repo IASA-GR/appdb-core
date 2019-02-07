@@ -40,7 +40,6 @@ class UsersController extends AbstractActionController
     
     public function claimaccountAction()
     {
-        $this->_helper->layout->disableLayout();
 		$data=$_POST;
 		if ( is_array($this->session->canClaim) ) {
 			if ( in_array($data['id'],$this->session->canClaim) ) {
@@ -64,11 +63,10 @@ class UsersController extends AbstractActionController
 			}
 		}
 		$this->session->canClaim = null;
+		return DISABLE_LAYOUT($this, true);
 	}
 
 	public function ldapsearchAction() {
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
 		$ldap= ApplicationConfiguration::service('egi.ldap.username');
 		if ( $_SERVER['APPLICATION_ENV]'] != "production" ) {
 			echo "<pre>";
@@ -118,7 +116,8 @@ class UsersController extends AbstractActionController
 			}
 			}
 			echo "</pre>";
-	}
+		}
+		return DISABLE_LAYOUT($this, true);
     }
 
     public function logindev2Action()
@@ -126,12 +125,9 @@ class UsersController extends AbstractActionController
         return $this->loginAction();
     }
     
-    public function logindevAction()
-    {
+    public function logindevAction() {
 		//Apply only in development enviroments
         if ( ApplicationConfiguration::isEnviroment("production") === FALSE ) {
-            $this->_helper->layout->disableLayout();
-			$this->_helper->viewRenderer->setNoRender();
 			$this->session->userid = ((isset($_GET["id"]))?$_GET["id"]:NULL);
 			
 			$us = new Default_Model_Researchers();
@@ -179,7 +175,7 @@ class UsersController extends AbstractActionController
 						$this->session->userDeletedOn = null;
 					}
 					$this->redirect()->toRoute('saml', ['action' => 'deletedprofile']);
-					return;
+					return DISABLE_LAYOUT($this, true);
 				}else{
 					//Get first user account and initialize saml session
 					$uaccounts = new Default_Model_UserAccounts();
@@ -193,7 +189,8 @@ class UsersController extends AbstractActionController
 			}
             header('Location: https://'.$_SERVER['HTTP_HOST']);
 			$this->session->userWarning = array("title"=>"Development user", "message"=>"You are currently signed in developer mode");
-        }
+		}
+		return DISABLE_LAYOUT($this, true);
     }
 
     private function handle_actions() {
@@ -236,14 +233,12 @@ class UsersController extends AbstractActionController
         /* Check whether the user is already logged in */
         if ( $this->session->userid !== null ) {
             if (! $this->handle_actions()) {
-                $this->_helper->layout->disableLayout();
-        		$this->_helper->viewRenderer->setNoRender();
                 header('Location: https://'.$_SERVER['HTTP_HOST'].'/'); 
             }
-            return;
+            return DISABLE_LAYOUT($this, true);
         }
         $this->view->session = $this->session;
-        $ldap= ApplicationConfiguration::service('egi.ldap.host');
+        $ldap = \ApplicationConfiguration::service('egi.ldap.host');
 		if ( array_key_exists('username',$_POST) ) {
 			$this->view->username = $_POST['username'];
             $username = "uid=".$_POST['username'].",ou=People,dc=egi,dc=eu";
@@ -349,22 +344,20 @@ class UsersController extends AbstractActionController
 			} else {
 				error_log($this->view->ldapError);
 			}
-        }        
+		}       
+	   return $this->view;	
     }
 
     public function logoutAction()
     {
-        $this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
-        Zend_Session::destroy(true);
+		$this->session->getManager()->getStorage()->clear();
         clearAuthCookies();
-        header('Location: http://'.$_SERVER['HTTP_HOST']);
+		header('Location: http://'.$_SERVER['HTTP_HOST']);
+		return DISABLE_LAYOUT($this, true);
     }
     
     public function readallmsgAction()
     {
-    	$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
 		if ( $this->session->userid !== null ) {
 			$users = new Default_Model_Researchers();
 			$users->filter->id->equals($this->session->userid);
@@ -375,13 +368,12 @@ class UsersController extends AbstractActionController
 				$item->save();
 			}
 		}
+		return DISABLE_LAYOUT($this, true);
     }
     
     public function getinboxAction()
     {
 		$ss="";
-    	$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
 		if ( $this->session->userid !== null ) {
 			$users = new Default_Model_Researchers();
 			$users->filter->id->equals($this->session->userid);
@@ -403,6 +395,7 @@ class UsersController extends AbstractActionController
 		}
 		header('Content-Type: text/xml');
 		echo $ss;
+		return DISABLE_LAYOUT($this, true);
     }
 
     public function getunreadmsgcountAction()
@@ -424,18 +417,14 @@ class UsersController extends AbstractActionController
     
     public function delmsgAction()
     {
-    	$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
 		$ms = new Default_Model_Messages();
 		$ms->filter->id->equals($_POST['msgid']);
 		$ms->refresh()->remove(0);
+		return DISABLE_LAYOUT($this, true);
     }
     
 	public function updateallAction() {
-		$this->_helper->layout->disableLayout();
-		$this->_helper->viewRenderer->setNoRender();
-		
-		return;
+		return DISABLE_LAYOUT($this, true);;
 
 		$ldap = ApplicationConfiguration::service('egi.ldap.host');
 		$ldapbind=false;
@@ -460,6 +449,7 @@ class UsersController extends AbstractActionController
 			}
 			ldap_close($ds);
 		}
+		return DISABLE_LAYOUT($this, true);;
 	}
 	
 	public function inboxAction(){
