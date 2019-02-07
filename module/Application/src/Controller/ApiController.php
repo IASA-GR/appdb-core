@@ -214,11 +214,15 @@ class ApiController extends AbstractActionController
     }
 
 	public function proxyAction() {
-		$this->newproxy();
+		$retcode = $this->newproxy();		
+		if ($retcode != 200) {
+			$this->getResponse()->getHeaders()->addHeaderLine("Status", "$retcode");
+		}
 		return DISABLE_LAYOUT($this, true);
 	}
 
 	public function newproxy() {
+		$retcode = 200;
 		// optionally run custom server initialization code
 		if (file_exists($_SERVER['APPLICATION_PATH'] . "/config/api_proxy_init.php")) {
 			require_once($_SERVER['APPLICATION_PATH'] . "/config/api_proxy_init.php");
@@ -227,7 +231,7 @@ class ApiController extends AbstractActionController
 			$func = "appdb_api_proxy_init";
 			$ret = $func($this);
 			if ($ret === false) {
-				return;
+				return 500;
 			}
 		}
 
@@ -374,7 +378,7 @@ class ApiController extends AbstractActionController
 					error_log($error);
 					echo \RestAPIHelper::wrapResponse("", null, null, 0, null, null, \RestErrorEnum::RE_INVALID_RESOURCE, null);
 				}
-				return;
+				return 400;
 			}
 		} else {
 			$error = \RestErrorEnum::toString(\RestErrorEnum::RE_INVALID_REPRESENTATION);
@@ -390,7 +394,7 @@ class ApiController extends AbstractActionController
 				error_log($error);
 				echo \RestAPIHelper::wrapResponse("", null, null, 0, null, null, \RestErrorEnum::RE_INVALID_RESOURCE, null);
 			}
-			return;
+			return 400;
 		}	
 		$s_method = strtolower(\RestMethodEnum::toString($method));
 		$res->startLogging($_SERVER['APPLICATION_PATH'] .'/appdbapilog.xml');
@@ -404,6 +408,27 @@ class ApiController extends AbstractActionController
 			if ( ! is_null($routeXslt) ) $res = $res->transform(\RestAPIHelper::getFolder(\RestFolderEnum::FE_XSL_FOLDER).$routeXslt);
 			echo $res;
 		} else {
+			//error_log($postdata);
+			switch($res->getError()) {
+				case \RestErrorEnum::RE_OK:
+					$retcode = 200;
+					break;				
+				case \RestErrorEnum::RE_ACCESS_DENIED:
+				case \RestErrorEnum::RE_INVALID_OPERATION:
+					$retcode = 403;
+					break;
+				case \RestErrorEnum::RE_INVALID_REPRESENTATION:
+					$retcode = 400;
+					break;
+				case \RestErrorEnum::RE_ITEM_NOT_FOUND:
+					$retcode = 404;
+					break;		
+				case \RestErrorEnum::RE_INVALID_METHOD:
+					$retcode = 405;
+					break;
+				default:
+					$retcode = 500;			
+			}
 			$error = \RestErrorEnum::toString($res->getError());
 			$extError = $res->getExtError();
 			if ($extError != "") {
@@ -414,6 +439,7 @@ class ApiController extends AbstractActionController
 				echo \RestAPIHelper::wrapResponse("", null, null, 0, null, null, $res->getError(), null);
 			}
 		}
+		return $retcode;
 	}
 
 	public function oldproxy() {
