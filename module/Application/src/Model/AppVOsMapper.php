@@ -46,7 +46,7 @@ class AppVOsMapper extends AppVOsMapperBase
 		}
 	}
 
-	public function delete(AppVO $value)
+	public function delete($value)
 	{
 		$tbl = new DbTable\AppVOsManual(); 
 		$q1 = array('void = ?', 'appid = ?');
