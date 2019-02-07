@@ -25,7 +25,7 @@ class UserAccount extends UserAccountBase
 	public function getState(){
 		if( $this->_state === null ){
 			$states = new UserAccountStates();
-			$states->filter->id->equals($this->_stateID);
+			$states->filter->id->equals($this->stateID);
 			if( count($states->items) > 0 ){
 				$this->_state = $states->items[0];
 			}
