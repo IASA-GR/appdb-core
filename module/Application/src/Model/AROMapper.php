@@ -90,10 +90,28 @@ class AROMapper {
 
 	public function delete($value)
 	{
-		$q1 = 'id = ?';
-		$q2 = $value->id;
-		$s=$this->getDbTable()->getAdapter()->quoteInto($q1,$q2);
-		$this->getDbTable()->delete($s);
+		if (is_object($value)) {
+			$id = $value->id;
+		} else {
+			$id = $value;
+		}
+		if (! is_array($id)) {
+			$ids = array();
+			$ids[] = $id;
+		} else {
+			$ids = $id;
+		}
+
+		$from = $this->getDbTable()->getName();
+	
+		$primary = $this->getDbTable()->getPrimary();
+		if (is_array($primary)) {
+			$where = implode(" = ? AND ", $primary) . " = ?";
+		} else {
+			$where = "$primary = ?";
+		}
+		
+		$this->getDbTable()->getAdapter()->query("DELETE FROM $from WHERE " . $where, $ids);
 	}
 
 	public function populate(&$entry, $row)
@@ -134,7 +152,7 @@ class AROMapper {
 
 	public function find($id, &$value)
 	{
-		error_log("PRIMARY:" . var_export($this->getDbTable()->getPrimary()), true);
+		$primary = $this->getDbTable()->getPrimary();
 		if (! is_array($id)) {
 			$ids = array();
 			$ids[] = $id;
@@ -147,11 +165,16 @@ class AROMapper {
 		$orderby = '';
 		$limit = '';
 		getZendSelectParts($select, $from, $where, $orderby, $limit);
-		$result = $this->getDbTable()->getAdapter()->query("SELECT * $from WHERE id = ?", array($ids))->toArray();
+		if (is_array($primary)) {
+			$where = implode(" = ? AND ", $primary) . " = ?";
+		} else {
+			$where = "$primary = ?";
+		}
+		$result = $this->getDbTable()->getAdapter()->query("SELECT * $from WHERE $where", $ids)->toArray();
 		if (0 == count($result)) {
 			return;
 		}		
-		$row = $result->current();
+		$row = $result[0];
 		$this->populate($value,$row);	
 	}
 
