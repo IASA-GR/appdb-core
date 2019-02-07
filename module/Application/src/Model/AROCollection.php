@@ -105,7 +105,7 @@ class AROCollection {
 			$this->getMapper()->delete($index);
 			$i=0;
 			foreach($this->_items as $item) {
-				if ( $item == $index ) {
+				if ( $item === $index ) {
 					unset($this->_items[$i]);
 					break;
 				}
