@@ -39,8 +39,7 @@ class SamlController extends AbstractActionController
 			}
 			
 			if( isset($this->session) && $this->session->developsession === true ){
-				$this->redirect()->toRoute('saml', ['action' => 'loggedout']);
-				return;
+				return $this->redirect()->toRoute('Saml', ['action' => 'loggedout']);
 			}
 			require_once(\SamlAuth::LIB_AUTOLOAD);
 			$source=GET_REQUEST_PARAM($this, "source");
@@ -63,12 +62,10 @@ class SamlController extends AbstractActionController
 			//In case of external service using AppDB as a SP
 			if( isset($_GET['callbackUrl']) && trim($_GET['callbackUrl']) ) {
 				\SamlAuth::logout($this->session);
-				header('Location: ' . trim($_GET['callbackUrl']));
-				return DISABLE_LAYOUT($this, true);
+				return $this->redirect()->toUrl(trim($_GET['callbackUrl']));
 			}
 			//Will reach this code after all sources are logged out
-			$this->redirect()->toRoute('saml', ['action' => 'loggedout']);
-			return $this->view;
+			return $this->redirect()->toRoute('Saml', ['action' => 'loggedout']);
 	}
 
 	public function loginAction() {
@@ -105,9 +102,8 @@ class SamlController extends AbstractActionController
 		return DISABLE_LAYOUT($this, true);
 	}
 	public function loggedoutAction(){
-        \SamlAuth::logout($this->session);
-		header('Location: https://' . $_SERVER['HTTP_HOST']);
-		return DISABLE_LAYOUT($this, true);
+		\SamlAuth::logout($this->session);
+		return $this->redirect()->toUrl('https://' . $_SERVER['HTTP_HOST']);
 	}
 	
 	public function samlAction() {
@@ -127,23 +123,20 @@ class SamlController extends AbstractActionController
 			if (\SamlAuth::isAuthenticated() !== false && $this->session->isNewUser !== true) {
 				/*if( isset($this->session->authreferer) && trim($this->session->authreferer) !== ""){
 					$this->session->authreferer = str_replace("http://", "https://", $this->session->authreferer);
-					header("Location: " . $this->session->authreferer);
+					return $this->redirect()->toUrl($this->session->authreferer);
 				}else{
-					header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
+					return $this->redirect()->toUrl("https://" . $_SERVER['HTTP_HOST']);
 				}
 				return;*/
 			} elseif (isset($this->session) && $this->session->isNewUser === true) {
-				header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-				DISABLE_LAYOUT($this);
-				return SET_NO_RENDER($this);
+				return $this->redirect()->toUrl("https://" . $_SERVER['HTTP_HOST']);
 			}
 				
 			$config = \SimpleSAML_Configuration::getInstance();
 			$t = new \SimpleSAML_XHTML_Template($config, 'core:authsource_list.tpl.php');
 			$t->data['sources'] = \SimpleSAML_Auth_Source::getSourcesMatch('-sp');
 			if (! in_array($source, $t->data['sources'])) {
-				header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-				exit;
+				return $this->redirect()->toUrl("https://" . $_SERVER['HTTP_HOST']);
 			}
 
 			$as = new \SimpleSAML_Auth_Simple($source);
@@ -156,9 +149,7 @@ class SamlController extends AbstractActionController
 			$_SESSION['logouturl'] = $as->getLogoutURL();
 			$this->session->samlattrs = $attributes;
 			$this->session->samlauthsource = $source;
-			$this->redirect()->toRoute('saml', ['action' => 'postauth']);
-			DISABLE_LAYOUT($this);
-			return SET_NO_RENDER($this);
+			return $this->redirect()->toRoute('Saml', ['action' => 'postauth']);
 	}
 
 	public function connectAction(){
@@ -173,19 +164,15 @@ class SamlController extends AbstractActionController
 		
 		//check if user is logged in
 		if ((! isset($this->session->userid)) || (! is_numeric($this->session->userid)) || (intval($this->session->userid) <= 0)) {
-			header("Location: " . $referer);
 			unset($this->session->connectreferer);
-			DISABLE_LAYOUT($this);
-			return SET_NO_RENDER($this);
+			return $this->redirect()->toUrl($referer);
 		}
 		
 		//Check if source is given
 		$source = trim(GET_REQUEST_PARAM($this, "source"));
 		if ($source == "") {
-			header("Location: " . $referer);
 			unset($this->session->connectreferer);
-			DISABLE_LAYOUT($this);
-			return SET_NO_RENDER($this);
+			return $this->redirect()->toUrl($referer);
 		}
 
 		$authsource = str_replace( "-sp", "", strtolower(trim($source)) );
@@ -198,9 +185,9 @@ class SamlController extends AbstractActionController
 		$t = new \SimpleSAML_XHTML_Template($config, 'core:authsource_list.tpl.php');
 		$t->data['sources'] = \SimpleSAML_Auth_Source::getSourcesMatch('-connect');
 		if (! in_array($connectsource, $t->data['sources'])) {
-			header("Location: " . $referer);
 			unset($this->session->connectreferer);
 			$this->session->userError = array("title"=>"Could not proceed with user account connection", "message"=> "You tried to connect to a " . $authsource . " account. This type of connection is not supported.");
+			return $this->redirect()->toUrl($referer);
 			exit;
 		}
 
@@ -233,15 +220,13 @@ class SamlController extends AbstractActionController
 		}
 		//check if user is logged in
 		if ((! isset($this->session->userid)) || (! is_numeric($this->session->userid)) || (intval($this->session->userid) <= 0)) {
-			header("Location: " . $referer );
-			return DISABLE_LAYOUT($this, true);
+			return $this->redirect()->toUrl($referer);
 		}
 
 		//Check if source is given
 		$source = trim(GET_REQUEST_PARAM($this, "source"));
 		if ($source == "") {
-			header("Location: https://" . $_SERVER["HTTP_HOST"]);
-			return DISABLE_LAYOUT($this, true);
+			return $this->redirect()->toUrl("https://" . $_SERVER["HTTP_HOST"]);
 		}
 		$this->session->connectdaccountsource = $source;
 		$authsource =  str_replace( "-sp", "", strtolower(trim($source)) );
@@ -254,8 +239,7 @@ class SamlController extends AbstractActionController
 		$t = new \SimpleSAML_XHTML_Template($config, 'core:authsource_list.tpl.php');
 		$t->data['sources'] = \SimpleSAML_Auth_Source::getSourcesMatch('-connect');
 		if (! in_array($connectedsource, $t->data['sources'])) {
-			header("Location: " . $referer );
-			return DISABLE_LAYOUT($this, true);
+			return $this->redirect()->toUrl($referer);
 		}
 		
 		//SAML Authentication new user account for connection
@@ -265,23 +249,20 @@ class SamlController extends AbstractActionController
 		$uid = $attributes['idp:uid'][0];
 		if (trim($uid) == "") {
 			$this->session->userError = array("title" => "New Account Connection", "message" => "Could not connect with new user account. Not enough information returned from account provider.");
-			$this->redirect()->toRoute('saml', ['action' => 'postconnected']);
-			return DISABLE_LAYOUT($this, true);
+			return $this->redirect()->toRoute('Saml', ['action' => 'postconnected']);
 		}
 
 		//Check if user is already connected to the requested account
 		//If true redirect the user to the previous location (referer)
 		$uaccount = \AccountConnect::isConnectedTo($this->session, $uid, $authsource);
 		if ( $uaccount !== false) {
-			$this->redirect()->toRoute('saml', ['action' => 'postconnected']);
-			return DISABLE_LAYOUT($this, true);
+			return $this->redirect()->toRoute('Saml', ['action' => 'postconnected']);
 		} else {
 			//Check if this account is already connected to another profile
 			$user = \SamlAuth::getUserByAccountValues($uid, $authsource);
 			if ($user !== null && $user->id != $this->session->userid) {
 				$this->session->userError = array("title" => "Could not connect to " . str_replace("-"," ",$authsource) . " account", "message" => "The " . str_replace("-"," ",$authsource) . " account you tried to connect your profile to is already connected to another user profile.");
-				$this->redirect()->toRoute('saml', ['action' => 'postconnected']);
-				return DISABLE_LAYOUT($this, true);
+				return $this->redirect()->toRoute('Saml', ['action' => 'postconnected']);
 			}
 		}
 		
@@ -301,8 +282,7 @@ class SamlController extends AbstractActionController
 		$this->session->currentUserAccounts = \SamlAuth::getUserAccountsByUser($this->session->userid, true);
 		
 		//redirect to post connected action to logout connected account
-		$this->redirect()->toRoute('saml', ['action' => 'postconnected']);
-		return DISABLE_LAYOUT($this, true);
+		return $this->redirect()->toRoute('Saml', ['action' => 'postconnected']);
 	}
 	
 	//Called after postconnect to logout currently conected account
@@ -335,14 +315,12 @@ class SamlController extends AbstractActionController
 			
 			//Check and redirect if user account is blocked
 			if ($this->session->accountStatus === "blocked") {
-				$this->redirect()->toRoute('saml', ['action' => 'blockedaccount']);
-				return DISABLE_LAYOUT($this, true);
+				return $this->redirect()->toRoute('Saml', ['action' => 'blockedaccount']);
 			}
 			
 			//Check and redirect if user is deleted
 			if ($this->session->userDeleted === true) {
-				$this->redirect()->toRoute('saml', ['action' => 'deletedprofile']);
-				return DISABLE_LAYOUT($this, true);
+				return $this->redirect()->toRoute('Saml', ['action' => 'deletedprofile']);
 			}
 			
 			//No need any more. Referer is stored in $inited variable
@@ -350,29 +328,24 @@ class SamlController extends AbstractActionController
 			
 			if ($inited !== false && $this->session->isNewUser !== true) { 
 				//Found user and a url referer. Redirect to referer
-				$this->_helper->layout->disableLayout();
-				$this->_helper->viewRenderer->setNoRender();
-				header("Location: " . $inited);
+				return $this->redirect()->toUrl($inited);
 			} elseif ($this->session->isNewUser === true) {
 				$this->session->authreferer = $inited;
 				// new user. First login. Redirect to new user account page
-				$this->redirect()->toRoute('saml', ['action' => 'newaccount']);
+				return $this->redirect()->toRoute('Saml', ['action' => 'newaccount']);
 			} elseif ($this->session->userid !== null && $this->session->userid > -1) {
 				//Found user, but no url referer. Redirect to home page
-				$this->_helper->layout->disableLayout();
-				$this->_helper->viewRenderer->setNoRender();
-				header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
+				return $this->redirect()->toUrl('https://' . $_SERVER['HTTP_HOST']);
 			} else {
 				//No user. perform logout.
-				$this->redirect()->toRoute('saml', ['action' => 'loggedout']);
+				return $this->redirect()->toRoute('Saml', ['action' => 'loggedout']);
 			}
 		return DISABLE_LAYOUT($this, true);
 	}
 
 	public function deletedprofileAction() {
 		if( $this->session->userDeleted !== true ){
-			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-			return DISABLE_LAYOUT($this, true);
+			return $this->redirect()->toUrl('https://' . $_SERVER['HTTP_HOST']);
 		}
 		
 		//Store all useful session variables for displaying the view.
@@ -398,8 +371,7 @@ class SamlController extends AbstractActionController
 
 	public function blockedaccountAction() {
 		if( strtolower(trim($this->session->accountStatus)) !== "blocked" ){
-			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-			return DISABLE_LAYOUT($this, true);
+			return $this->redirect()->toUrl('https://' . $_SERVER['HTTP_HOST']);
 		}
 		
 		//Store all useful session variables for displaying the view.
@@ -420,13 +392,11 @@ class SamlController extends AbstractActionController
 			$this->session->authreferer = $referer;
 		}
 		if( $this->session->isNewUser !== true && $this->session->userid !== -1){
-			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-			return DISABLE_LAYOUT($this, true);
+			return $this->redirect()->toUrl('https://' . $_SERVER['HTTP_HOST']);
 		}
 		if (\AccountConnect::isConnected($this->session) !== false) {
 			\SamlAuth::setupSamlAuth($this->session);
-			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-			return DISABLE_LAYOUT($this, true);
+			return $this->redirect()->toUrl('https://' . $_SERVER['HTTP_HOST']);
 		}
 		
 		//check if pending so the session will be updated accrdingly
@@ -437,8 +407,7 @@ class SamlController extends AbstractActionController
 
 	public function newprofileAction() {
 		if( $this->session->isNewUser !== true && $this->session->userid !== -1){
-			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-			return DISABLE_LAYOUT($this, true);
+			return $this->redirect()->toUrl('https://' . $_SERVER['HTTP_HOST']);
 		}
 		$profiles = array(\SamlAuth::initNewUserProfile($this->session));
 		$this->view->profiles = $profiles;
@@ -644,8 +613,7 @@ class SamlController extends AbstractActionController
 	
 	public function connectableprofilesAction(){
 		if( $this->session->isNewUser !== true && $this->session->userid !== -1){
-			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-			return DISABLE_LAYOUT($this, true);
+			return $this->redirect()->toUrl('https://' . $_SERVER['HTTP_HOST']);
 		}
 		$profileids = \SamlAuth::getConnectableProfileIds($this->session);
 		$this->view->profileids = $profileids;
@@ -655,14 +623,12 @@ class SamlController extends AbstractActionController
 
 	public function cancelregistrationAction() {
 		$redirecturl = \SamlAuth::cancelRegistrationProcess($this->session);
-		header("Location: " . $redirecturl);
-		return DISABLE_LAYOUT($this, true);
+		return $this->redirect()->toUrl($redirecturl);
 	}
 
 	public function sendconfirmationcodeAction() {
 		if( $this->session->isNewUser !== true && $this->session->userid !== -1){
-			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-			return DISABLE_LAYOUT($this, true);
+			return $this->redirect()->toUrl("https://" . $_SERVER['HTTP_HOST']);
 		}
 		
 		$error = null;
@@ -738,8 +704,7 @@ class SamlController extends AbstractActionController
 	
 	public function submitconfirmationcodeAction() {
 		if( $this->session->isNewUser !== true && $this->session->userid !== -1){
-			header("Location: " . "https://" . $_SERVER['HTTP_HOST']);
-			return DISABLE_LAYOUT($this, true);
+			return $this->redirect()->toUrl("https://" . $_SERVER['HTTP_HOST']);
 		}
 		$this->view->error = null;
 		$this->view->session =  $this->session;

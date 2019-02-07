@@ -27,16 +27,16 @@ class IndexController extends AbstractActionController
 		$this->view = new ViewModel();
 		$this->session = new \Zend\Session\Container('base');
 		if( $this->session->isNewUser === true ){
-			return $this->redirect()->toRoute('saml', ['action' => 'newaccount']);
+			return $this->redirect()->toRoute('Saml', ['action' => 'newaccount']);
 		}else if( $this->session->userDeleted === true ){
-			return $this->redirect()->toRoute('saml', ['action' => 'deletedprofile']);
+			return $this->redirect()->toRoute('Saml', ['action' => 'deletedprofile']);
 		}else if( $this->session->accountStatus === "blocked" ) {
-			return $this->redirect()->toRoute('saml', ['action' => 'blockedaccount']);
+			return $this->redirect()->toRoute('Saml', ['action' => 'blockedaccount']);
 		}
     }
 
 	public function testAction() {
-		return DISABLE_LAYOUT($this, true); 
+		return DISABLE_LAYOUT($this, true);
 	}
 
 	public function apptagcloudAction()
