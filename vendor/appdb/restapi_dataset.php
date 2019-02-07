@@ -84,8 +84,6 @@ class RestDSXMLParser extends RestXMLParser {
      *
      */
     public function parse($xml) {
-		global $application;
-
 		if ( ! is_null($this->_user) ) {
 			$ds = new \Application\Model\Dataset();
 			try {
@@ -113,10 +111,8 @@ class RestDSXMLParser extends RestXMLParser {
 			if ( $this->_parent->getMethod() === RestMethodEnum::RM_POST ) {
 				if ( $xml->attributes()->id ) {
 					$ds->id = intval(strval($xml->attributes()->id));
-					$db = $application->getBootstrap()->getResource('db');
-					$db->setFetchMode(Zend_Db::FETCH_OBJ);
-					$r = $db->query('SELECT guid FROM datasets WHERE id = ' . $ds->id)->fetchAll();
-					if ( count($r) > 0 ) $ds->guid = $r[0]->guid;
+					$r = db()->query('SELECT guid FROM datasets WHERE id = ?', array($ds->id))->toArray();
+					if ( count($r) > 0 ) $ds->guid = $r[0]['guid'];
                 } else {                    
 					$this->_error = RestErrorEnum::RE_INVALID_REPRESENTATION;
 					return $ds;
@@ -517,7 +513,6 @@ class RestDSVerXMLParser extends RestXMLParser {
      *
      */
     public function parse($xml) {
-		global $application;
 		$ds = null;
 		if ( ! is_null($this->_user) ) {
 			$ds = new \Application\Model\DatasetVersion();
@@ -562,10 +557,8 @@ class RestDSVerXMLParser extends RestXMLParser {
 			if ( $this->_parent->getMethod() === RestMethodEnum::RM_POST ) {
 				if ( $xml->attributes()->id ) {
 					$ds->id = intval(strval($xml->attributes()->id));
-					$db = $application->getBootstrap()->getResource('db');
-					$db->setFetchMode(Zend_Db::FETCH_OBJ);
-					$r = $db->query('SELECT guid FROM dataset_versions WHERE id = ' . $ds->id)->fetchAll();
-					if ( count($r) > 0 ) $ds->guid = $r[0]->guid;
+					$r = db()->query('SELECT guid FROM dataset_versions WHERE id = ?', array($ds->id))->toArray();
+					if ( count($r) > 0 ) $ds->guid = $r[0]['guid'];
 				} else {                    
 					$this->_error = RestErrorEnum::RE_INVALID_REPRESENTATION;
 					return $ds;
@@ -618,12 +611,10 @@ class RestDSVerXMLParser extends RestXMLParser {
 				if ( count($xmlloc) > 0 ) {
 					if ($ds->id != "") {
 						// keep track of existing locations
-						$db = $application->getBootstrap()->getResource('db');
-						$db->setFetchMode(Zend_Db::FETCH_OBJ);
-						$existing = $db->query("SELECT id FROM dataset_locations WHERE dataset_version_id = " . $ds->id)->fetchAll();
+						$existing = db()->query("SELECT id FROM dataset_locations WHERE dataset_version_id = ?", array($ds->id))->toArray();
 						$eids = array();
 						foreach ($existing as $e) {
-							$eids[] = $e->id;
+							$eids[] = $e['id'];
 						}
 					}
 					foreach($xmlloc as $x) {
@@ -949,7 +940,6 @@ class RestDSLocXMLParser extends RestXMLParser {
      *
      */
     public function parse($xml) {
-		global $application;
 		if ( ! is_null($this->_user) ) {
 			$ds = new \Application\Model\DatasetLocation();
 			try {

@@ -747,7 +747,7 @@ class RestPplPrivList extends RestROSelfAuthResourceList {
 			$res = db()->query("SELECT researcher_privs_to_xml(?, ?)", array($this->getParam("id"), $this->_userid))->toArray();
 			$ret = array();
 			foreach ($res as $r) {
-				$ret[] = $r[0];
+				$ret[] = $r['researcher_privs_to_xml'];
 			}
 			return new XMLFragmentRestResponse($ret, $this);
 		} else return false;

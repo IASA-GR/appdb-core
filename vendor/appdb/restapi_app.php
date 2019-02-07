@@ -30,7 +30,7 @@ class RestAppReport extends RestROSelfAuthResourceList {
 			$res = db()->query("SELECT * FROM app_xml_report(?, ?, ?, 'listing')", array($this->getParam("id"), $this->_pageLength, $this->_pageOffset))->toArray();
 			$ret = array();
 			foreach ($res as $r) {
-				$ret[] = $r[0];
+				$ret[] = $r['app_xml_report'];
 			}
 			return new XMLFragmentRestResponse($ret, $this);
 		} else {
@@ -48,7 +48,7 @@ class RestAppReport extends RestROSelfAuthResourceList {
 			$res = db()->query("SELECT * FROM app_xml_report(?, ?, ?, ?)", array($this->getParam("id"), $this->_pageLength, $this->_pageOffset, $this->_listMode))->toArray();
 			$ret = array();
 			foreach ($res as $r) {
-				$ret[] = $r[0];
+				$ret[] = $r['app_xml_report'];
 			}
 			return new XMLFragmentRestResponse($ret, $this);
 		} else {
@@ -540,7 +540,7 @@ class RestAppOpenAIREList extends RestROResourceList {
 						$s = db()->query("SELECT oai_app_cursor(?,?,?)", array($from, $until, $token))->toArray();
 						if (count($s) > 0) {
 							$s = $s[0];
-							$s = json_decode($s[0], true);
+							$s = json_decode($s['oai_app_cursor'], true);
 							if (is_array($s)) {
 								if (array_key_exists("error", $s)) {
 									$this->setError(RestErrorEnum::RE_BACKEND_ERROR, $s["error"]);
@@ -1479,7 +1479,12 @@ class RestAppRatingReport extends RestROResourceItem {
 			$id = normalizeAppID($this);
 			$p = $id . ($t != '' ? ",$t" : "");
 			$r = db()->query('SELECT apprating_report_to_xml('.$p.');', array())->toArray();
-			return new XMLFragmentRestResponse($r[0]['apprating_report_to_xml'], $this);
+			if (count($r) > 0) {
+				$r = $r[0]['apprating_report_to_xml'];
+			} else {
+				$r = '';
+			}	
+			return new XMLFragmentRestResponse($r, $this);
 		} else return false;
 	}
 }
@@ -1573,7 +1578,7 @@ class RestAppHistoryList extends RestROResourceList {
 				} elseif ( substr($this->getParam('id'),0,2) === "s:" ) {
 					$id = db()->query("SELECT id FROM applications WHERE cname ILIKE '" . pg_escape_string(substr($this->getParam('id'), 2)) . "' FETCH FIRST 1 ROWS ONLY", array())->toArray();
 					try {
-						$id = $id[0][0];
+						$id = $id[0]['id'];
 						$this->_pars["id"] = $id;
 					} catch (Exception $e) {
 						debug_log('could not find ID for application with cname `' . pg_escape_string(substr($this->getParam('id'), 2)) . "'");
@@ -1631,7 +1636,7 @@ class RestAppHistoryList extends RestROResourceList {
                         $id = db()->query("(SELECT id FROM applications WHERE cname ILIKE '" . pg_escape_string(substr($this->getParam('id'), 2)) . "
 ' FETCH FIRST 1 ROWS ONLY)", array())->toArray();
                         try {
-                            $id = $id[0][0];
+                            $id = $id[0]['id'];
                             $this->_pars["id"] = $id;
                         } catch (Exception $e) {
                             debug_log('could not find ID for application with cname `' . pg_escape_string(substr($this->getParam('id'), 2)) . "'");
@@ -1790,8 +1795,12 @@ class RestAppHistoryDiffItem extends RestROResourceItem {
 		if ( parent::get() !== false ) {
 			$hid = $this->getParam("hid");
 			$x = db()->query("SELECT (actions).diff FROM apilog.actions WHERE id = '" . pg_escape_string($hid) . "'", array())->toArray();
-			$x = $x[0];
-			$x = $x[0];
+			if (count($x) > 0) {
+				$x = $x[0];
+				$x = $x['diff'];
+			} else {
+				$x = '';
+			}
 			$xml = RestAPIHelper::wrapResponse('<appdb:diff><![CDATA[' . $x . ']]></appdb:diff>', $this->getDataType());
 			return $xml;
         } else return false;
@@ -2163,7 +2172,7 @@ class RestAppPubList extends RestResourceList {
                 $xml = new DOMDocument();
                 $xml->loadXML(strval(RestAPIHelper::wrapResponse(strval($this->get()))));
                 $xpath = new DOMXPath($xml);
-                $xpres = $xpath->query('//publication:publication[@id="'.$id.'"]');
+                $xpres = $xpath->query('//publication:publication[@id="'. $id .'"]');
             } catch (Exception $e) {
                 $this->setError(RestErrorEnum::RE_INVALID_REPRESENTATION);
                 return false;
@@ -3819,7 +3828,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 					$validAccels = array();
 					$validAccelRS = db()->query("SELECT value::text FROM accelerators", array())->toArray();
 					foreach ($validAccelRS as $validAccel) {
-						$validAccels[] = $validAccel[0];
+						$validAccels[] = $validAccel['value'];
 					}
 					$acceleratorstype = strval($accelerators->attributes()->type);
 					if( in_array($acceleratorstype, $validAccels) ){
@@ -5181,7 +5190,7 @@ class RestAppContext extends RestResourceList{
 			if ( ! is_numeric($appid) ) {
 				$appid = "(SELECT id FROM applications WHERE cname ILIKE '" . pg_escape_string(substr($this->getParam("id"), 2)) . "' FETCH FIRST 1 ROWS ONLY)";
 			}
-			$res = db()->query("SELECT context_to_xml(" . $appid . ") AS xml;", array())->toArray();
+			$res = db()->query("SELECT context_to_xml(?) AS xml;", array($appid))->toArray();
 			$x = array();
 			foreach($res as $r) {
 				$x[] = $r['xml'];
@@ -5571,7 +5580,7 @@ class RestAppContextScriptList extends RestResourceList{
 			if ( ! is_numeric($appid) ) {
 				$appid = "(SELECT id FROM applications WHERE cname ILIKE '" . pg_escape_string(substr($this->getParam("id"), 2)) . "' FETCH FIRST 1 ROWS ONLY)";
 			}
-			$res = db()->query("SELECT context_to_xml(" . $appid . ") AS xml;", array())->toArray();
+			$res = db()->query("SELECT context_to_xml(?) AS xml;", array($appid))->toArray();
 			$x = array();
 			foreach($res as $r) {
 				$x[] = $r['xml'];
@@ -5694,7 +5703,7 @@ class RestAppVAVersionItem extends RestAppVAItem {
 
 	public function get() {
 		if (parent::get() !== false) {
-			$res = db()->query("SELECT vapp_to_xml(" . $this->getParam("vappid") . ", 'vapplications') AS xml;", array())->toArray();
+			$res = db()->query("SELECT vapp_to_xml(?, 'vapplications') AS xml", array($this->getParam("vappid")))->toArray();
 			$x = array();
 			foreach($res as $r) {
 				if (strpos($r['xml'], 'vaversionid="'. $this->getParam("versionid") . '"') !== false) {
@@ -5893,7 +5902,7 @@ class RestAppVAVersionIntegrityItem extends RestResourceItem {
 		if (parent::get() !== false) {
 			error_log("STUB: RestAppVAVersionIntegrityItem::get()");
 			//error_log("[RestAppVAVersionIntegrityItem]: INTEGRITY CHECK FOR vappid: " . $this->_res->vappid . " versionid: " . $this->_res->id);
-			//$res = db()->query("SELECT vapp_to_xml(" . $this->getParam("vappid") . ", 'vapplications') AS xml;", array())->toArray();
+			//$res = db()->query("SELECT vapp_to_xml(?, 'vapplications') AS xml;", array($this->getParam("vappid")))->toArray();
 			$x = array();
 			/*foreach($res as $r) {
 				$x[] = $r['xml'];
@@ -5961,7 +5970,7 @@ class RestAppPrivList extends RestROAuthResourceList {
 			$res = db()->query("SELECT app_target_privs_to_xml(?, ?)", array($this->getParam("id"), $this->_userid))->toArray();
 			$ret = array();
 			foreach ($res as $r) {
-				$ret[] = $r[0];
+				$ret[] = $r['app_target_privs_to_xml'];
 			}
 			return new XMLFragmentRestResponse($ret, $this);
 		} else return false;

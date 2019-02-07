@@ -27,11 +27,10 @@ class RestVoReport extends RestROSelfAuthResourceList {
 		if (parent::_list() !== false) {
 			$limit = $this->_pageLength;
 			$offset = $this->_pageOffset;
-			db()->setFetchMode(Zend_Db::FETCH_NUM);
-			$res = db()->query("SELECT * FROM ppl_vo_xml_report(?, ?, ?, 'listing')", array($this->getParam("id"), $this->_pageLength, $this->_pageOffset))->fetchAll();
+			$res = db()->query("SELECT * FROM ppl_vo_xml_report(?, ?, ?, 'listing')", array($this->getParam("id"), $this->_pageLength, $this->_pageOffset))->toArray();
 			$ret = array();
 			foreach ($res as $r) {
-				$ret[] = $r[0];
+				$ret[] = $r['ppl_vo_xml_report'];
 			}
 			return new XMLFragmentRestResponse($ret, $this);
 		} else {
@@ -46,11 +45,10 @@ class RestVoReport extends RestROSelfAuthResourceList {
 		if (parent::get() !== false) {
 			$limit = $this->_pageLength;
 			$offset = $this->_pageOffset;
-			db()->setFetchMode(Zend_Db::FETCH_NUM);
-			$res = db()->query("SELECT * FROM ppl_vo_xml_report(?, ?, ?, ?)", array($this->getParam("id"), $this->_pageLength, $this->_pageOffset, $this->_listMode))->fetchAll();
+			$res = db()->query("SELECT * FROM ppl_vo_xml_report(?, ?, ?, ?)", array($this->getParam("id"), $this->_pageLength, $this->_pageOffset, $this->_listMode))->toArray();
 			$ret = array();
 			foreach ($res as $r) {
-				$ret[] = $r[0];
+				$ret[] = $r['ppl_vo_xml_report'];
 			}
 			return new XMLFragmentRestResponse($ret, $this);
 		} else {
@@ -411,8 +409,7 @@ class RestVOLogistics extends RestROResourceItem {
 				getZendSelectParts($select, $from, $where, $orderby, $limit);
 			}
 
-			$db->setFetchMode(Zend_Db::FETCH_BOTH);
-			$rs = $db->query('SELECT * FROM vo_logistics(?,?,?)', array($flt, $from, $where))->fetchAll();
+			$rs = $db->query('SELECT * FROM vo_logistics(?,?,?)', array($flt, $from, $where))->toArray();
 			if ( count($rs) > 0 ) {
 				$rs = $rs[0];
 				$x = $rs['vo_logistics'];
@@ -435,11 +432,10 @@ class RestVOAppStatsList extends RestROResourceList {
 			if ( is_numeric($this->getParam("id")) ) {
 				$void = $this->getParam("id");
 			} else {
-				db()->setFetchMode(Zend_Db::FETCH_BOTH);
-				$void = db()->query("SELECT id FROM normalized_vos WHERE name = ? AND NOT deleted", array(preg_replace('/^s:/', '', $this->getParam("id"))))->fetchAll();
+				$void = db()->query("SELECT id FROM normalized_vos WHERE name = ? AND NOT deleted", array(preg_replace('/^s:/', '', $this->getParam("id"))))->toArray();
 				if (is_array($void) && (count($void) > 0)) {
 					$void = $void[0]; //row
-					$void = $void[0]; //column
+					$void = $void['id']; //column
 				} else {
 					$void = null;
 				}
@@ -471,12 +467,11 @@ class RestVOAppStatsList extends RestROResourceList {
 					return false;
 				}
 			}
-			db()->setFetchMode(Zend_Db::FETCH_NUM);
-			$res = db()->query("SELECT * FROM app_vo_stats_to_xml($void, $from, $to)")->fetchAll();
+			$res = db()->query("SELECT * FROM app_vo_stats_to_xml($void, $from, $to)")->toArray();
 			$ret = array();
 			foreach ($res as $r) {
 				if (is_array($r) && (count($r) > 0)) {
-					$ret[] = $r[0];
+					$ret[] = $r['app_vo_stats_to_xml'];
 				}
 			}
 			if ($this->getParam("listmode") == "listing") {

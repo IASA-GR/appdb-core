@@ -39,11 +39,10 @@ class RestSciClassList extends RestROResourceList {
      */
 	public function get() {
 		if (parent::get() !== false) {
-			db()->setFetchMode(Zend_Db::FETCH_OBJ);			
-			$res = db()->query("SELECT sci_class.toxml(version) as x FROM sci_class.cverids")->fetchAll();
+			$res = db()->query("SELECT sci_class.toxml(version) as x FROM sci_class.cverids")->toArray();
 			$x = array();
 			foreach ($res as $r) {
-				$x[] = $r->x;
+				$x[] = $r['x'];
 			}
 //			if ( $this->getParam("format") === "json" ) {
 //				return new JSONRestResponse(new XMLFragmentRestResponse($x, $this), $this);
@@ -71,11 +70,10 @@ class RestSciClassItem extends RestROResourceItem {
 
     public function get() {
         if ( parent::get() !== false ) {
-   			db()->setFetchMode(Zend_Db::FETCH_OBJ);			
-			$res = db()->query("SELECT sci_class.toxmlext(" . $this->getParam("id") . ") as x")->fetchAll();
+			$res = db()->query("SELECT sci_class.toxmlext(?) as x", array($this->getParam("id")))->toArray();
 			$x = array();
 			foreach ($res as $r) {
-				$x[] = $r->x;
+				$x[] = $r['x'];
 			}
 			if ( $this->getParam("format") === "json" ) {
 				return new JSONRestResponse(new XMLFragmentRestResponse($x, $this), $this);

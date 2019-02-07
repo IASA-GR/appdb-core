@@ -151,10 +151,8 @@ class RestSiteLogistics extends RestROResourceItem {
      */
 	public function get($extraFilter = null) {
 		if ( parent::get() !== false ) {
-			global $application;
 			$isAdmin = $this->userIsAdmin();
 			$mapper = new \Application\Model\SitesMapper();
-			$db = $application->getBootstrap()->getResource('db');
 			$flt = $this->getParam("flt");
 			$select = $mapper->getDbTable()->getAdapter()->select()->distinct()->from('sites');
 			$from = '';
@@ -194,8 +192,7 @@ class RestSiteLogistics extends RestROResourceItem {
 				getZendSelectParts($select, $from, $where, $orderby, $limit);
 			}
 
-			$db->setFetchMode(Zend_Db::FETCH_BOTH);
-			$rs = $db->query('SELECT * FROM site_logistics(?,?,?)', array($flt, $from, $where))->fetchAll();
+			$rs = $db->query('SELECT * FROM site_logistics(?,?,?)', array($flt, $from, $where))->toArray();
 			if ( count($rs) > 0 ) {
 				$rs = $rs[0];
 				$x = $rs['site_logistics'];

@@ -202,7 +202,6 @@ class RestAPIHelper implements iRestAPIHelper {
 		}
 		$resTime = microtime(true);
 		if ( is_null($type) ) $type = "entry";
-		//db()->setFetchMode(Zend_Db::FETCH_NUM);
 		try {
 			$cacheState = db()->query("SELECT data FROM config WHERE var = 'cache_build_count';", array())->toArray();
 			$cacheState = $cacheState[0];
