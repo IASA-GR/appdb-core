@@ -49,7 +49,7 @@ class AROCollection {
 	{
 		$method = 'set'.$name;
 		if (('mapper' == $name) || !method_exists($this, $method)) {
-				throw new Exception("Invalid " . $this->_basename . " property: '$name'");
+				throw new \Exception("Invalid " . $this->_basename . " property: '$name'");
 		}
 		$this->$method($value);
 	}
@@ -58,7 +58,7 @@ class AROCollection {
 	{
 		$method = 'get' . $name;
 		if (('mapper' == $name) || !method_exists($this, $method)) {
-				throw new Exception("Invalid " . $this->_basename . " property: '$name'");
+				throw new \Exception("Invalid " . $this->_basename . " property: '$name'");
 		}
 		return $this->$method();
 	}

@@ -61,6 +61,10 @@ class AROItem {
 			$method = 'set' . $name;
 			if (('mapper' == $name) || !method_exists($this, $method)) {
 				error_log("Invalid " . $this->_baseitemname . " property: '$name'");
+
+				$e = new \Exception;
+				error_log(var_export($e->getTraceAsString(), true));
+
 				throw new \Exception("Invalid " . $this->_baseitemname . " property: '$name'");
 			}
 			if (is_string($value)) {
@@ -95,6 +99,10 @@ class AROItem {
 			$method = 'get' . $name;
 			if (('mapper' == $name) || !method_exists($this, $method)) {
 					error_log("Invalid " . $this->_baseitemname . " property: '$name'");
+
+					$e = new \Exception;
+					error_log(var_export($e->getTraceAsString(), true));
+
 					throw new \Exception("Invalid " . $this->_baseitemname . " property: '$name'");
 			}
 			$ret = $this->$method();
