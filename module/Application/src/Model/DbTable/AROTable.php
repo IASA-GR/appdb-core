@@ -15,4 +15,16 @@ class AROTable extends \Zend\Db\TableGateway\AbstractTableGateway
 		$this->table = $this->_name;
 		$this->initialize();
 	}
+
+	public function getName() {
+		return $this->_name;
+	}
+
+	public function getPrimary() {
+		return $this->_primary;
+	}
+
+	public function getSequence() {
+		return $this->_sequence;
+	}
 }
