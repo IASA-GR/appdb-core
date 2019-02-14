@@ -1404,6 +1404,33 @@ class RestRelationTypeList extends RestROResourceList {
 	}
 }
 
+class RestEndorsableList extends RestROResourceList {
+	public function getDataType() {
+		return "endorsable";
+	}
+
+	public function _list() {
+		return $this->get();
+	}
+
+	
+	public function get(){
+		if ( parent::get() !== false ) {
+			db()->setFetchMode(Zend_Db::FETCH_NUM);
+			$res = db()->query("SELECT endorsables_to_xml()")->fetchAll();
+			if ( count($res) > 0 ) {
+				$ret = array();
+				foreach ($res as $r) {
+					$ret[] = $r[0];
+				}
+				return new XMLFragmentRestResponse($ret, $this);
+			} else {
+				$this->setError(RestErrorEnum::RE_ITEM_NOT_FOUND);
+				return false;
+			}
+		} else return false;
+	}
+}
 class RestContextScriptFormatList extends RestROResourceList{
 	public function getDataType() {
 		return "contextualization";

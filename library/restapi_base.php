@@ -138,6 +138,7 @@ class RestAPIHelper implements iRestAPIHelper {
 	public static function XMLNS_ORGANIZATION() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/organization'; }
 	public static function XMLNS_PROJECT() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/project'; }
 	public static function XMLNS_DATASET() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/dataset'; }
+	public static function XMLNS_ENDORSABLE() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/endorsable'; }
 	
 	static public function getVersion() {
 		return RestAPIHelper::VERSION;
@@ -193,6 +194,7 @@ class RestAPIHelper implements iRestAPIHelper {
 		$ns[] = 'xmlns:organization="' .RestAPIHelper::XMLNS_ORGANIZATION() . '"';
 		$ns[] = 'xmlns:project="' .RestAPIHelper::XMLNS_PROJECT() . '"';
 		$ns[] = 'xmlns:dataset="' .RestAPIHelper::XMLNS_DATASET() . '"';
+		$ns[] = 'xmlns:endorsable="' .RestAPIHelper::XMLNS_ENDORSABLE() . '"';
         return $ns;
     }
 
@@ -288,7 +290,7 @@ class RestAPIHelper implements iRestAPIHelper {
         return new XMLRestResponse($response, $parent);
 	}
 
-	static public function transformXMLtoJSON($x) {
+	static public function transformXMLtoJSON($x, $castImplicit = false) {
 		$json = $x;
 		$xslt_path1 = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'xml2js_preprocess.xsl';
 		$xslt_path2 = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'xml2js.xsl';
@@ -312,6 +314,9 @@ class RestAPIHelper implements iRestAPIHelper {
 				$proc = new XSLTProcessor();
 				$proc->registerPHPFunctions();
 				$proc->importStylesheet($xsl);
+				if ($castImplicit) {
+					$proc->setParameter('', 'castImplicitTypes', '1');
+				}
 				$json = $proc->transformToXml( $xml );
 				header('Content-type: application/json');
 			}catch( Exception $e) {

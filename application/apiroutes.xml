@@ -818,4 +818,9 @@
 	<resource>RestDatasetLocationItem</resource>
 	<comment>The dataset location entry specified by the parameter :lid</comment>
 </route>
+<route type="rest" name="endorsables" url="/:version/endorsables">
+	<format>xml</format>
+	<resource>RestEndorsableList</resource>
+	<comment>A list of items that may be endorsed</comment>
+</route>
 </routes>

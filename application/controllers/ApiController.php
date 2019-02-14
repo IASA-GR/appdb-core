@@ -113,7 +113,7 @@ class ApiController extends Zend_Controller_Action
 
 		if (isset($_GET['format'])) {
 			if ((trim($_GET['format']) === 'js') || (trim($_GET['format']) === 'json')) {
-				echo RestAPIHelper::transformXMLtoJSON($ret);
+				echo RestAPIHelper::transformXMLtoJSON($ret, trim($_GET['format']) === 'json');
 				return;
 			}
 		}
