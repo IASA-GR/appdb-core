@@ -43,7 +43,7 @@
                     <xsl:when test="$val='false'">
                         <xsl:text>false</xsl:text>
                     </xsl:when>
-                    <xsl:when test="number($val) = number($val)">
+                    <xsl:when test="number($val) = number($val) and $val != '-'">
                         <xsl:value-of select="$val"/>
                     </xsl:when>
                     <xsl:otherwise><xsl:text>"</xsl:text><xsl:value-of select="$val"/><xsl:text>"</xsl:text></xsl:otherwise>
