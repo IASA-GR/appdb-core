@@ -24,7 +24,7 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:endorsable="http://appdb.egi.eu/api/1.0/endorsable">
 
-	<xs:complexType name="endorsable:rendorsableReferrerType" mixed="true">
+	<xs:complexType name="rendorsableReferrerType" mixed="true">
 		<xs:attribute name="type" type="xs:string" use="required" />
 		<xs:attribute name="name" type="xs:string" use="required" />
 		<xs:attribute name="since" type="xs:string" use="optional" />
@@ -36,6 +36,7 @@
 	<xs:complexType name="endorsableAttributeType" mixed="true">
 		<xs:attribute name="name" type="xs:string" use="required" />
 		<xs:attribute name="value" type="xs:string" use="required" />
+		<xs:attribute name="since" type="xs:dateTime" use="optional" />
 	</xs:complexType>
 
 	<xs:complexType name="endorsableSourceType" mixed="true">
@@ -48,30 +49,29 @@
 
 	<xs:complexType name="endorsableMetaType" mixed="true">
 		<xs:sequence>
-			<xs:element name="source" type="endorsable:endorsableSourceTyppe" minOccurs="1" maxOccurs="1" />
+			<xs:element name="source" type="endorsable:endorsableSourceType" minOccurs="1" maxOccurs="1" />
 		</xs:sequence>
-		<xs:attribute name="kind" type="xs:string" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="endorsableType" mixed="true">
 		<xs:sequence>
-			<xs:element name="attribute" type="endorsable:endorsableMetaType" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="dataUrl" type="xs:string" minOccurs="1" maxOccurs="1" />
-			<xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1" />
-			<xs:element name="imageUrl" type="xs:string" minOccurs="0" maxOccurs="1" />
-			<xs:element name="meta" type="endorsable:endorsableMetaType" minOccurs="1" maxOccurs="1" />
-			<xs:element name="parent" type="endorsable:endorsableType" minOccurs="1" maxOccurs="1" />
-			<xs:element name="referrer" type="endorsable:rendorsableReferrerType" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="signature" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="signatureType" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="source" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="signature" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="referrer" type="endorsable:rendorsableReferrerType" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="parent" type="endorsable:endorsableType" minOccurs="0" maxOccurs="1" />
+			<xs:element name="meta" type="endorsable:endorsableMetaType" minOccurs="0" maxOccurs="1" />
+			<xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1" />
 			<xs:element name="url" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="dataUrl" type="xs:string" minOccurs="0" maxOccurs="1" />
+			<xs:element name="imageUrl" type="xs:string" minOccurs="0" maxOccurs="1" />
+			<xs:element name="attribute" type="endorsable:endorsableAttributeType" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 		<xs:attribute name="kind" type="xs:string" use="required" />
 		<xs:attribute name="name" type="xs:string" use="required" />
 		<xs:attribute name="cname" type="xs:string" use="required" />
+		<xs:attribute name="id" type="xs:string" use="optional" />
 		<xs:attribute name="pid" type="xs:string" use="optional" />
-		<xs:attribute name="createdOn" type="xs:dateTime" use="required" />
+		<xs:attribute name="createdOn" type="xs:dateTime" use="optional" />
 	</xs:complexType>
 
     <xs:element name="endorsable" type="endorsable:endorsableType" />

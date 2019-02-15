@@ -87,6 +87,9 @@
 
     <xs:import namespace="http://appdb.egi.eu/api/1.0/person"
         schemaLocation="person.xsd"/>
+	
+	<xs:import namespace="http://appdb.egi.eu/api/1.0/endorsable"
+        schemaLocation="endorsable.xsd"/>
 
     <xs:simpleType name="appdbResultType">
         <xs:annotation>
@@ -171,6 +174,7 @@
 			<xs:enumeration value="contact" />
 			<xs:enumeration value="classification" />
 			<xs:enumeration value="accessgroup" />
+			<xs:enumeration value="endorsable" />
 			<xs:enumeration value="diff" />
         </xs:restriction>
     </xs:simpleType>
