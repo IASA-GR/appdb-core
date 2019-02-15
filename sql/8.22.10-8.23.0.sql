@@ -87,7 +87,7 @@ AS $function$
 		'/store/vappliance/' ||
 		applications.cname ||
 		'/vaversion/' ||
-		CASE WHEN $1.archived THEN 'prev/' ELSE '' END ||
+		CASE WHEN $1.archived THEN 'previous/' ELSE '' END ||
 		$1.id
 	FROM vapplications
 	INNER JOIN applications ON applications.id = vapplications.appid
