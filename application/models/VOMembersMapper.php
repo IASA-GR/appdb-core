@@ -53,13 +53,13 @@ class Default_Model_VOMembersMapper extends Default_Model_VOMembersMapperBase
 			for ($ic = 0; $ic < count($ret); $ic++) {
 				$i = $ret[$ic];
 				$ii = '<e xmlns:discipline="' . RestAPIHelper::XMLNS_DISCIPLINE() . '" xmlns:vo="' . RestAPIHelper::XMLNS_VO() . "\">$i</e>";
-				$x = new SimpleXMLElement($ii);
+				$x = simplexml_load_string($ii);
 				$x = $x->xpath("//vo:vo");
 				$x = $x[0];
 				$xid = strval($x->attributes()->id);
 				foreach ($ores as $j) {
 					if ($j->void == $xid) {
-						$i = str_replace("<vo:vo ", "<vo:vo relation=\"member\" member_since=\"". $j->memberSince . "\" ", $i);
+						$i = str_replace("<vo:vo ", "<vo:vo relation=\"member\" member_since=\"". xml_quote($j->memberSince) . "\" ", $i);
 						$ret[$ic] = $i;
 						break;
 					}

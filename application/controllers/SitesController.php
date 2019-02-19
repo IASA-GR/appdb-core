@@ -157,7 +157,10 @@ class SitesController extends Zend_Controller_Action{
 		}
 		$ck = "";
 		try {
-			$xmlresult = new SimpleXMLElement($result);
+			$xmlresult = simplexml_load_string($result);
+			if ($xmlresult === false) {
+				throw new Exception("Cannot parse VA Providers data as XML");
+			}
 			$appdb = $xmlresult->xpath("//appdb:appdb");
 			$vadata = $xmlresult->xpath("//virtualization:provider");
 			$vadatastring = "";

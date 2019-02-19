@@ -157,14 +157,8 @@ class RestVOItem extends RestROResourceItem {
 //                    if (strval($vo->children()->ValidationDate) != '') {
 //                        $vo->children()->ValidationDate = str_replace(' ','T',$vo->children()->ValidationDate);
 //                    }
-//                    $xsl = new DOMDocument();
-//                    $xsl->load(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER)."fixvo.xsl");
-//                    $proc = new XSLTProcessor();
-//                    $proc->registerPHPFunctions();
-//                    $proc->importStylesheet($xsl);
-//					$xml = new DOMDocument();
-//					$xml->loadXML($vo->asXML());
-//					return new XMLFragmentRestResponse(str_replace("###PUT_VO_ID_HERE###", $nid, $proc->transformToXml($xml)), $this);
+//					$xml = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER)."fixvo.xsl", $vo->asXML());
+//					return new XMLFragmentRestResponse(str_replace("###PUT_VO_ID_HERE###", $nid, $xml), $this);
 //                } else {
 //                    $this->setError(RestErrorEnum::RE_ITEM_NOT_FOUND);
 //                    return false;

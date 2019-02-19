@@ -20,17 +20,10 @@ class RepositoryXSLT {
 		$xslt = APPLICATION_PATH . "/configs/repository/0.1/xslt/" . $type;
 		$xslt = $xslt . ".xsl";
 		if (file_exists($xslt)) {
-			$xsl = new DOMDocument();
-			$xsl->load($xslt);
-			$xml = new DOMDocument();
-			$xml->loadXML($data, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$data = $proc->transformToXml( $xml );
-			$data = str_replace('<?xml version="1.0"?'.'>', '', $data);
+			$data = xml_transform($xslt, $data);
+			$data = str_replace('<' . '?xml version="1.0"?' . '>', '', $data);
 		} else {
-			error_log('Cannot find '.$xslt);
+			error_log('Cannot find '. $xslt);
 		}
 		return $data;
 	}

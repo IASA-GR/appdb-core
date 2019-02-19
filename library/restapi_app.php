@@ -2173,7 +2173,7 @@ class RestAppPubList extends RestResourceList {
                 $xml = new DOMDocument();
                 $xml->loadXML(strval(RestAPIHelper::wrapResponse(strval($this->get()))));
                 $xpath = new DOMXPath($xml);
-                $xpres = $xpath->query('//publication:publication[@id="'.$id.'"]');
+                $xpres = $xpath->query('//publication:publication[@id='. xpath_quote($id) .']');
             } catch (Exception $e) {
                 $this->setError(RestErrorEnum::RE_INVALID_REPRESENTATION);
                 return false;
@@ -4778,28 +4778,18 @@ class RestAppVAList extends RestResourceList {
 	}
 
 	public function hidePrivateData($data) {
-		$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'virtualization.private.xsl';
-		$xsl = new DOMDocument();
-		$xsl->load($xf);
-		$proc = new XSLTProcessor();
-		$proc->registerPHPFunctions();
-		$proc->importStylesheet($xsl);
-		$xml = new DOMDocument();
-		$xml->loadXML($data, LIBXML_NSCLEAN | LIBXML_COMPACT);
-		$res = $proc->transformToXml($xml);
+		$res = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'virtualization.private.xsl', $data);
+		if ($res === false) {
+			$this->setError(RestErrorEnum::RE_BACKEND_ERROR);
+		}
 		return $res;
 	}
 
 	public function hideWorkingVersion($data) {
-		$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'virtualization.limited.xsl';
-		$xsl = new DOMDocument();
-		$xsl->load($xf);
-		$proc = new XSLTProcessor();
-		$proc->registerPHPFunctions();
-		$proc->importStylesheet($xsl);
-		$xml = new DOMDocument();
-		$xml->loadXML($data, LIBXML_NSCLEAN | LIBXML_COMPACT);
-		$res = $proc->transformToXml($xml);
+		$res = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'virtualization.limited.xsl', $data);
+		if ($res === false) {
+			$this->setError(RestErrorEnum::RE_BACKEND_ERROR);
+		}
 		return $res;
 	}
 
@@ -5015,15 +5005,10 @@ class RestAppVAItem extends RestResourceItem {
 
 		return $data;
 
-		$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'virtualization.private.xsl';
-		$xsl = new DOMDocument();
-		$xsl->load($xf);
-		$proc = new XSLTProcessor();
-		$proc->registerPHPFunctions();
-		$proc->importStylesheet($xsl);
-		$xml = new DOMDocument();
-		$xml->loadXML($data, LIBXML_NSCLEAN | LIBXML_COMPACT);
-		$res = $proc->transformToXml( $xml );
+		$res = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'virtualization.private.xsl', $data);
+		if ($res === false) {
+			$this->setError(RestErrorEnum::RE_BACKEND_ERROR);
+		}
 		return $res;
 	}
 	

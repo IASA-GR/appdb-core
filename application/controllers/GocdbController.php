@@ -158,7 +158,10 @@ class GocdbController extends Zend_Controller_Action
 			fwrite($f, $xml);
 			fclose($f);
 			if (@md5_file(APPLICATION_PATH . "/../cache/site_contacts.xml") !== @md5_file(APPLICATION_PATH . "/../cache/site_contacts.xml.old")) {
-				$xml = new SimpleXMLElement(file_get_contents(APPLICATION_PATH . "/../cache/site_contacts.xml"));
+				$xml = simplexml_load_string(file_get_contents(APPLICATION_PATH . "/../cache/site_contacts.xml"));
+				if ($xml === false) {
+					throw new Exception("Cannot parse site contacts as XML");
+				}
 				$rows = $xml->xpath("//results/SITE");
 				if (count($rows) > 0) {
 					error_log("Sync'ing site contacts...");

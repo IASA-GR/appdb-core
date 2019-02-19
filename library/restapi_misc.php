@@ -969,7 +969,7 @@ class RestBroker extends RestResourceList {
 				$this->_extError = "No request element provided";
 				return false;
 			}
-			$apiroutes = new SimpleXMLElement(APPLICATION_PATH . "/apiroutes.xml", 0, true);
+			$apiroutes = new SimpleXMLElement(file_get_contents(APPLICATION_PATH . "/apiroutes.xml"));
 			$ret = array();
 			foreach ($xmli as $x) {
 				$routeXslt = null;
@@ -1141,15 +1141,7 @@ class RestAppDBResourceList extends RestROResourceList {
 			$s = str_replace("\t", "" , $s);
 			$s = preg_replace('/>\s+/', '>', $s);
 			$s = preg_replace('/<\s+/', '<', $s);
-			$xslt = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . "/apiroutes.xsl";
-			$xsl = new DOMDocument();
-			$xsl->load($xslt);
-			$xml = new DOMDocument();
-			$xml->loadXML($s, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$s = $proc->transformToXml($xml);
+			$s = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . "/apiroutes.xsl", $s);
 			$xml = new SimpleXMLElement($s);
 			$xml->registerXPathNamespace('appdb','http://appdb.egi.eu/api/' . RestAPIHelper::VERSION . '/appdb');
 			$x = $xml->xpath("//appdb:resource");

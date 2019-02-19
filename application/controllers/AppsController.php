@@ -2072,7 +2072,10 @@ class AppsController extends Zend_Controller_Action
 		// error_log("MODS: " . var_export($mods, true));
 		$refs = array();
 		try {
-			$xmods = new SimpleXMLElement($mods);
+			$xmods = simplexml_load_string($mods);
+			if ($xmods === false) {
+				throw new Exception("Cannot parse MODS convertor XML");
+			}
 			$xmods->registerXPathNamespace("a", "http://www.loc.gov/mods/v3");
 			$refs = $xmods->xpath("//a:modsCollection/*");
 		} catch (Exception $e) {

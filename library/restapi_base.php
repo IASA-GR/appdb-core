@@ -295,32 +295,26 @@ class RestAPIHelper implements iRestAPIHelper {
 		$xslt_path1 = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'xml2js_preprocess.xsl';
 		$xslt_path2 = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'xml2js.xsl';
 		if( file_exists($xslt_path1) && file_exists($xslt_path2) ) {
-			try{
+			try {
 				//convert all attributes to elements
-				$xsl = new DOMDocument();
-				$xsl->load($xslt_path1);
-				$xml = new DOMDocument();
-				$xml->loadXML($x, LIBXML_NSCLEAN | LIBXML_COMPACT);
-				$proc = new XSLTProcessor();
-				$proc->registerPHPFunctions();
-				$proc->importStylesheet($xsl);
-				$json = $proc->transformToXml( $xml );
-				
-				//convert all attributes to json
-				$xsl = new DOMDocument();
-				$xsl->load($xslt_path2);
-				$xml = new DOMDocument();
-				$xml->loadXML($json, LIBXML_NSCLEAN | LIBXML_COMPACT);
-				$proc = new XSLTProcessor();
-				$proc->registerPHPFunctions();
-				$proc->importStylesheet($xsl);
-				if ($castImplicit) {
-					$proc->setParameter('', 'castImplicitTypes', '1');
+				$json = xml_transform($xslt_path1, $x);
+				if ($json === false) {
+					throw new Exception("Error while executing stylesheet '" . $xslt_path1 . "'");
+				} else {
+					//convert all elements to json
+					$json = xml_transform($xslt_path2, $json, 0, array(
+						array(
+							"name" => "castImplicitTypes",
+							"value" => "1"
+						)
+					));
+					if ($json === false) {
+						throw new Exception("Error while executing stylesheet '" . $xslt_path2 . "'");
+					}
 				}
-				$json = $proc->transformToXml( $xml );
 				header('Content-type: application/json');
 			}catch( Exception $e) {
-				error_log('[Api::transformXmlToJson]: ' . $e->getMessage());
+				error_log('[Api::transformXMLToJSON]: ' . $e->getMessage());
 				return $x;
 			}
 		}
@@ -430,46 +424,31 @@ abstract class XMLRestResponseBase extends RestResponse {
 			}
 			$xslt = $xslt . ".xsl";
 			if (file_exists($xslt)) {
-				$xsl = new DOMDocument();
-				$xsl->load($xslt);
-				$xml = new DOMDocument();
-				$xml->loadXML($data, LIBXML_NSCLEAN | LIBXML_COMPACT);
-				$proc = new XSLTProcessor();
-				$proc->registerPHPFunctions();
-				$proc->importStylesheet($xsl);
-				$data = $proc->transformToXml( $xml );
+				$data = xml_transform($xslt, $data);
+				if ($data === false) {
+					error_log('[XMLRestResponseBase::_transform] Error while processing stylesheet ' . $xslt);
+					return $data;
+				}
 				if ( is_null($this->_parent) || ( (! is_null($this->_parent)) && (! $this->_parent->authenticate()) ) ) {
-					$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'person_sensitive.xsl';
-					$xsl = new DOMDocument();
-					$xsl->load($xf);
-					$proc = new XSLTProcessor();
-					$proc->registerPHPFunctions();
-					$proc->importStylesheet($xsl);
-					$xml = new DOMDocument();
-					$xml->loadXML($data, LIBXML_NSCLEAN | LIBXML_COMPACT);
-					$data = $proc->transformToXml( $xml );
+					$data = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'person_sensitive.xsl', $data);
+					if ($data === false) {
+						error_log('[XMLRestResponseBase::_transform] Error while processing stylesheet "person_sensitive.xsl"');
+						return $data;
+					}
 				}
 				if ( (! is_null($this->_parent)) && (is_a($this->_parent, "RestVOItem") || is_a($this->_parent, "RestVOList")) && (! $this->_parent->authenticate()) ) {
-					$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'vo_sensitive.xsl';
-					$xsl = new DOMDocument();
-					$xsl->load($xf);
-					$proc = new XSLTProcessor();
-					$proc->registerPHPFunctions();
-					$proc->importStylesheet($xsl);
-					$xml = new DOMDocument();
-					$xml->loadXML($data, LIBXML_NSCLEAN | LIBXML_COMPACT);
-					$data = $proc->transformToXml( $xml );
+					$data = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'vo_sensitive.xsl', $data);
+					if ($data === false) {
+						error_log('[XMLRestResponseBase::_transform] Error while processing stylesheet "vo_sensitive.xsl"');
+						return $data;
+					}
 				}
 				if ( (! is_null($this->_parent)) && (is_a($this->_parent, "RestSiteItem") || is_a($this->_parent, "RestSiteList")) && (! $this->_parent->authenticate()) ) {
-					$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'site_sensitive.xsl';
-					$xsl = new DOMDocument();
-					$xsl->load($xf);
-					$proc = new XSLTProcessor();
-					$proc->registerPHPFunctions();
-					$proc->importStylesheet($xsl);
-					$xml = new DOMDocument();
-					$xml->loadXML($data, LIBXML_NSCLEAN | LIBXML_COMPACT);
-					$data = $proc->transformToXml( $xml );
+					$data = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'site_sensitive.xsl', $data);
+					if ($data === false) {
+						error_log('[XMLRestResponseBase::_transform] Error while processing stylesheet "site_sensitive.xsl"');
+						return $data;
+					}
 				}
 				if ( (! is_null($this->_parent)) && (is_a($this->_parent, "RestAppVAList") || is_a($this->_parent, "RestAppVAList")) ) {
 					if ( ! $this->_parent->canManageVAs() ) {
@@ -479,7 +458,7 @@ abstract class XMLRestResponseBase extends RestResponse {
 				}
 				$data = str_replace('<'. '?xml version="1.0"?'.'>', '', $data);
 			} else {
-				error_log('Cannot find '.$xslt);
+				error_log('Cannot find '. $xslt);
 			}
 		}
         return $data;
@@ -596,64 +575,20 @@ class JSONRestResponse extends RestResponse {
 			}
 			exec("bash " . RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . "group.xsl.template $datatype", $xf);
 			$xf = implode("\n", $xf);
-			$xsl = new DOMDocument();
-			$xsl->loadXML($xf);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$xml = new DOMDocument();
-			$xml->loadXML($result, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$result = $proc->transformToXml( $xml );
-
-			$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'strip_prefix.xsl';
-			$xsl = new DOMDocument();
-			$xsl->load($xf);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$xml = new DOMDocument();
-			$xml->loadXML($result, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$result = $proc->transformToXml( $xml );
-
-			$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'text2att.xsl';
-			$xsl = new DOMDocument();
-			$xsl->load($xf);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$xml = new DOMDocument();
-			$xml->loadXML($result, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$result = $proc->transformToXml( $xml );
-
-			$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'att2elem.xsl';
-			$xsl = new DOMDocument();
-			$xsl->load($xf);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$xml = new DOMDocument();
-			$xml->loadXML($result, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$result = $proc->transformToXml( $xml );
-
-			$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'remove_empty_nodes.xsl';
-			$xsl = new DOMDocument();
-			$xsl->load($xf);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$xml = new DOMDocument();
-			$xml->loadXML($result, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$result = $proc->transformToXml( $xml );
-
-			$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'xml2json.xsl';
-			$xsl = new DOMDocument();
-			$xsl->load($xf);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$xml = new DOMDocument();
-			$xml->loadXML($result, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$result = $proc->transformToXml( $xml );
+			foreach (array(
+				$xf,
+				RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'strip_prefix.xsl',
+				RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'text2att.xsl',
+				RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'att2elem.xsl',
+				RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'remove_empty_nodes.xsl',
+				RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'xml2json.xsl'
+			) as $xsl) {				
+				$result = xml_transform($xsl, $result);
+				if ($result === false) {
+					error_log("[JSONRestResponse::__construct] Error while processing stylesheet '" . $xsl . "'");
+					break;
+				}
+			}
 			$data = $result;
 		}
 		parent::__construct($data, $parent);

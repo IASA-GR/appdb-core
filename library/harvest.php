@@ -306,7 +306,11 @@ class HarvestOrganizations{
 		}
 		
 		$res = array();
-		$doc = new SimpleXMLElement($xml);
+		$doc = simplexml_load_string($xml);
+		if ($doc === false) {
+			error_log("[HarvestOrganizations::parseXML] Cannot parse organization data as XML");
+			return "Cannot parse organization data as XML";
+		}
 		$rel = $doc->rel[0];
 		
 		if( $rel->to !== null ){
@@ -498,7 +502,11 @@ class HarvestProjects{
 		}
 		
 		$res = array();
-		$doc = new SimpleXMLElement($xml);
+		$doc = simplexml_load_string($xml);
+		if ($doc === false) {
+			error_log("[HarvestProjects::parseXML] Cannot parse project data as XML");
+			return "Cannot parse project data as XML";
+		}
 		$rel = $doc->xpath('//oaf:project');
 		if( count($rel) > 0 ){
 			$rel = $rel[0];

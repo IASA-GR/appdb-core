@@ -85,9 +85,6 @@ class AppdbAPIHelper {
         $xname = (isset($view->routeXslt)) ? $view->routeXslt : $view->routeController;
 		$xf = AppdbAPIHelper::getXSLTPath($view->apiVersion) . $xname . '.xsl';
         if (file_exists($xf)) {
-            $xsl = new DOMDocument();
-            $xsl->load($xf);
-            $xml = new DOMDocument();
 			// wrap XML in root element with required namespaces
 			$result = "<appdb02:" .AppdbAPIHelper::getRootTagName()  . " " .
                 'xmlns:xs="http://www.w3.org/2001/XMLSchema" '.
@@ -106,51 +103,23 @@ class AppdbAPIHelper {
                 'xmlns:regional="http://appdb.egi.eu/api/'.'0.2'.'/regional" ' .
                 'xmlns:user="http://appdb.egi.eu/api/'.'0.2'.'/user" ' .
                 'xmlns:vo="http://appdb.egi.eu/api/'.'0.2'.'/vo" >' .
-		        $result. '</appdb02:'.AppdbAPIHelper::getRootTagName().'>';
-            $xml->loadXML($result, LIBXML_NSCLEAN | LIBXML_COMPACT);
-            $proc = new XSLTProcessor();
-            $proc->registerPHPFunctions();
-            $proc->importStylesheet($xsl);
-			$result = $proc->transformToXml( $xml );
-            if ( $view->isAuthenticated !== true ) {
-                $xf = AppdbAPIHelper::getXSLTPath($view->apiVersion) . 'person_sensitive.xsl';
-                $xsl = new DOMDocument();
-                $xsl->load($xf);
-                $proc = new XSLTProcessor();
-                $proc->registerPHPFunctions();
-                $proc->importStylesheet($xsl);
-                $xml = new DOMDocument();
-                $xml->loadXML($result, LIBXML_NSCLEAN | LIBXML_COMPACT);
-                $result = $proc->transformToXml( $xml );
+		        $result . '</appdb02:'.AppdbAPIHelper::getRootTagName().'>';
+			$result = xml_transform($xf, $result);
+			if ( $view->isAuthenticated !== true ) {
+				$result = xml_transform(AppdbAPIHelper::getXSLTPath($view->apiVersion) . 'person_sensitive.xsl', $result);
             }
-            $result = str_replace('<?xml version="1.0"?'.'>', '', $result);
+            $result = str_replace('<' . '?xml version="1.0"?' . '>', '', $result);
 
             //transform XML to JSON
-            if ( $_GET["format"] == "json" ) {
-                $xf = AppdbAPIHelper::getXSLTPath($view->apiVersion) . 'strip_prefix.xsl';
-                $xsl = new DOMDocument();
-                $xsl->load($xf);
-                $proc = new XSLTProcessor();
-                $proc->registerPHPFunctions();
-                $proc->importStylesheet($xsl);
-                $xml = new DOMDocument();
-                $xml->loadXML($result, LIBXML_NSCLEAN | LIBXML_COMPACT);
-                $result = $proc->transformToXml( $xml );
-                $xf = AppdbAPIHelper::getXSLTPath($view->apiVersion) . 'xml2json.xsl';
-                $xsl = new DOMDocument();
-                $xsl->load($xf);
-                $proc = new XSLTProcessor();
-                $proc->registerPHPFunctions();
-                $proc->importStylesheet($xsl);
-                $xml = new DOMDocument();
-                $xml->loadXML($result, LIBXML_NSCLEAN | LIBXML_COMPACT);
-                $result = $proc->transformToXml( $xml );
+			if ( $_GET["format"] == "json" ) {
+				$result = xml_transform(AppdbAPIHelper::getXSLTPath($view->apiVersion) . 'strip_prefix.xsl', $result);
+				$result = xml_transform(AppdbAPIHelper::getXSLTPath($view->apiVersion) . 'xml2json.xsl', $result);
             }
 			
         }
 		
 		// remove namespace wrapping root element
-		$x = new SimpleXMLElement($result);
+		$x = simplexml_load_string($result);
 		$results = $x->xpath("//appdb02:appdb/node()");
 		$result = '';
 		foreach($results as $r) $result = $result . $r->asXML() . "\n";
@@ -643,15 +612,14 @@ class AppdbAPIRequestProcessor {
             $qxml = AppdbAPIRequestProcessor::RequestToXml($query);
             $qres = ""; //xml representation of the request
             $xf = AppdbAPIRequestProcessor::GetRequestXSLTPath($version) . $xsltname . '.xsl';
-            if (file_exists($xf)) {
-                $xsl = new DOMDocument();
-                $xsl->load($xf);
-                $xml = new DOMDocument();
-                $xml->loadXML($qxml, LIBXML_NSCLEAN | LIBXML_COMPACT);
-                $proc = new XSLTProcessor();
-                $proc->importStylesheet($xsl);
-                $qres = str_replace('<?xml version="1.0"?>', '', $proc->transformToXml($xml));
-                return AppdbAPIRequestProcessor::XmlToRequest($qres);
+			if (file_exists($xf)) {
+				$xml = xml_transform($xf, $qxml);
+				if ($xml === false) {
+					return null;
+				} else {
+	                $qres = str_replace('<?xml version="1.0"?>', '', $xml);
+	                return AppdbAPIRequestProcessor::XmlToRequest($qres);
+				}
             }
         }
         return $query;

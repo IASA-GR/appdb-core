@@ -177,7 +177,7 @@ class ApiController extends Zend_Controller_Action
 			}
 		}
 
-		$apiroutes = new SimpleXMLElement(APPLICATION_PATH . "/apiroutes.xml", 0, true);
+		$apiroutes = simplexml_load_string(file_get_contents(APPLICATION_PATH . "/apiroutes.xml"));
 		$pars = array();
 		$postdata = null;
 		$method = strtolower($this->getRequest()->getMethod());

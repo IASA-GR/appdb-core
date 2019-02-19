@@ -232,8 +232,11 @@ class VoController extends Zend_Controller_Action
         $this->_helper->layout->disableLayout();
         $voname = $this->_getParam("id");
         if ($voname != null) {
-            $xml = new SimpleXMLElement($this->xml);
-			$volist = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper($voname)."']");
+			$xml = simplexml_load_string($this->xml);
+			if ($xml === false) {
+				throw new Exception("Cannot parse VO data as XML");
+			}
+			$volist = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')=" . xpath_quote(strtoupper($voname)) . "]");
 	    	if (count($volist)>0) {
                 $r=$volist[0]->Ressources;
                 $res=array(
@@ -350,25 +353,35 @@ class VoController extends Zend_Controller_Action
     private function validateXMLCache(&$xml, $vofile = null)
 	{
 		if (is_null($vofile)) $vofile = $this->vofile;
-        $valid=true;
+        $valid = true;
         try {
-            $valid = simplexml_load_file($vofile);
+			$valid = simplexml_load_string(file_get_contents($vofile));
+			if ($valid === false) {
+				throw new Exception("Invalid XML cache when syncing VOs");
+			}
         } catch (Exception $e) {
             $valid = false;
         }
         if ($valid === false) {
             $xml = null;
         } else {
-            $x = new SimpleXMLElement($xml);
-            $volist = $x->xpath('//VoDump');
-            if (count($volist)==0 || (count($volist)==1 && strlen($x->AsXML()) <= 40)) $xml=null;
+            $x = simplexml_load_string($xml);
+			if ($x === false) {
+				$valid = false;
+				$xml = null;
+			} else {
+	            $volist = $x->xpath('//VoDump');
+				if (count($volist)==0 || (count($volist)==1 && strlen($x->AsXML()) <= 40)) {
+					$xml = null;
+				}
+			}
         }
-        if ($xml === null) {
-		error_log("Invalid XML cache when syncing VOs");
-		return false; 
-	} else {
-		return true;
-	}
+		if ($xml === null) {
+			error_log("Invalid XML cache when syncing VOs");
+			return false; 
+		} else {
+			return true;
+		}
 	}
 
 	private function syncVOs() {
@@ -385,19 +398,20 @@ class VoController extends Zend_Controller_Action
 		try {
 			// aggregate VOs XML from all sources into one file, giving precedence to EBI
 			$data1 = file_get_contents(APPLICATION_PATH . "/../cache/vos.xml");
-			$xml1 = new SimpleXMLElement($data1);
+			$xml1 = simplexml_load_string($data1);
+			if ($xml1 === false) {
+				throw new Exception("Cannot parse EGI VO data as XML");
+			}
 			$data2 = file_get_contents(APPLICATION_PATH . "/../cache/ebivos.xml");
-			if ( trim($data2) != "" ) {
-				$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'ebi_to_egi_vos.xsl';
-				$xsl = new DOMDocument();
-				$xsl->load($xf);
-				$proc = new XSLTProcessor();
-				$proc->registerPHPFunctions();
-				$proc->importStylesheet($xsl);
-				$xml2 = new DOMDocument();
-				$xml2->loadXML($data2, LIBXML_NSCLEAN | LIBXML_COMPACT);
-				$data2 = $proc->transformToXml($xml2);
-				$xml2 = new SimpleXMLElement($data2);
+			$xml2 = false;
+			if (trim($data2) != "") {
+				$data2 = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'ebi_to_egi_vos.xsl', $data2);
+				if ($data2 !== false) {
+					$xml2 = simplexml_load_string($data2);
+				}
+				if ($xml2 === false) {
+					throw new Exception("Cannot parse EBI VO data as XML");
+				}
 			}
 			$f = fopen(APPLICATION_PATH . "/../cache/aggvos.xml", "w");
 			if ($f !== false) {
@@ -411,7 +425,7 @@ class VoController extends Zend_Controller_Action
 				$xp = $xml1->xpath("//IDCard");
 				foreach ($xp as $x) {
 					$xattr = $x->attributes();
-					$xp2 = $xml2->xpath("//IDCard[@Name='" . $xattr["Name"] . "']");
+					$xp2 = $xml2->xpath("//IDCard[@Name=" . xpath_quote($xattr["Name"]) . "]");
 					if (count($xp2) == 0) {
 						fwrite($f, str_replace('<' . '?xml version="1.0"?'.'>', "", $x->asXML()));
 					}
@@ -474,29 +488,25 @@ class VoController extends Zend_Controller_Action
 
 				if ( $xml === false ) {
 					error_log("error in syncEBIVOs: " . var_export(curl_error($ch), true));
-					throw new Exception( var_export(curl_error($ch), true));
+					throw new Exception(var_export(curl_error($ch), true));
 				} else {
 					$xml = "<VoDump>$xml</VoDump>";
 				}
 				@curl_close($ch);
 				
 				// sort entries
-				$xf = APPLICATION_PATH . '/../bin/sort_vos.xsl';
-				$xsl = new DOMDocument();
-				$xsl->load($xf);
-				$proc = new XSLTProcessor();
-				$proc->registerPHPFunctions();
-				$proc->importStylesheet($xsl);
-				$xml2 = new DOMDocument();
-				$xml2->loadXML($xml, LIBXML_NSCLEAN | LIBXML_COMPACT);
-				$xml = $proc->transformToXml( $xml2 );
-
-				// cache entries
-				@exec("rm ". $vofile . ".old");
-				@exec("cp " . $vofile . " " . $vofile . ".old");
-				$f = fopen($vofile,"w");
-				fwrite($f,$xml);
-				fclose($f);
+				$xml = xml_transform(APPLICATION_PATH . '/../bin/sort_vos.xsl', $xml);
+				if ($xml !== false) {
+					// cache entries
+					@exec("rm ". $vofile . ".old");
+					@exec("cp " . $vofile . " " . $vofile . ".old");
+					$f = fopen($vofile,"w");
+					fwrite($f, $xml);
+					fclose($f);
+				} else {
+					error_log("error in syncEBIVOs: Error while transforming XML data with stylesheet 'sort_vos.xsl'");
+					throw new Exception("Error while transforming XML data with stylesheet 'sort_vos.xsl'");
+				}
 			} else {
 				$xml = "<VoDump>" . file_get_contents($vofile) . "</VoDump>";
 			}
@@ -509,7 +519,10 @@ class VoController extends Zend_Controller_Action
 				db()->query("ALTER TABLE perun.vo_contacts DISABLE TRIGGER tr_perun_vo_contacts_99_refresh_permissions");
 				db()->query("DELETE FROM perun.vo_contacts");	// will be repopulated later on
 				db()->query("DELETE FROM perun.vos");
-				$xmlobj = new SimpleXMLElement($xml);
+				$xmlobj = simplexml_load_string($xml);
+				if ($xmlobj === false) {
+					throw new Exception("Cannot parse EBI VO data as XML");
+				}
                 $xvos = $xmlobj->xpath("//VoDump/IDCard");
                 // add new VOs and update existing VOs
 				foreach($xvos as $xvo) {
@@ -626,87 +639,20 @@ class VoController extends Zend_Controller_Action
 			@curl_close($ch);
 
 			// sort entries
-			$xf = APPLICATION_PATH . '/../bin/sort_vos.xsl';
-			$xsl = new DOMDocument();
-			$xsl->load($xf);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$xml2 = new DOMDocument();
-			$xml2->loadXML($xml, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$xml = $proc->transformToXml( $xml2 );
-
-/* NOT needed since the EGI OPS VO dump XML schema change
-*
-			// convert sciclass IDs to discipline IDs
-			$xsl = new DOMDocument();
-			db()->setFetchMode(Zend_Db::FETCH_BOTH);
-			$xsltable = db()->query('SELECT array_to_string(array_agg(\'<xsl:when test=". = \' || sciclassid::text || \'"><xsl:text>\' || disciplineid::text || \'</xsl:text></xsl:when>\'),E\'\n\') FROM disc_to_sciclass;')->fetchAll();
-			$xsltable = $xsltable[0];
-			$xsltable = $xsltable[0];
-			$xsltable2 = db()->query('SELECT array_to_string(array_agg(\'<xsl:when test=". = \' || sciclassid::text || \'"><xsl:text>\' || parentid::text || \'</xsl:text></xsl:when>\'),E\'\n\') FROM disc_to_sciclass;')->fetchAll();
-			$xsltable2 = $xsltable2[0];
-			$xsltable2 = $xsltable2[0];
-			$xsltable3 = db()->query('SELECT array_to_string(array_agg(\'<xsl:when test=". = \' || sciclassid::text || \'"><xsl:text>\' || ord::text || \'</xsl:text></xsl:when>\'),E\'\n\') FROM disc_to_sciclass;')->fetchAll();
-			$xsltable3 = $xsltable3[0];
-			$xsltable3 = $xsltable3[0];
-			$xsldata = 
-'<' . '?xml version="1.0" encoding="UTF-8"?' . '>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-	<xsl:output method="xml"/>
-	<xsl:strip-space elements="*" />
-	<xsl:template match="@*|node()">
-		<xsl:copy>
-			<xsl:apply-templates select="@*|node()"/>
-		</xsl:copy>
-	</xsl:template>
-	<xsl:template match="//Disciplines/Discipline/@id">
-		<xsl:attribute name="id">
-			<xsl:choose>
-' .
-'				' . $xsltable .
-'				<xsl:otherwise>
-					<xsl:value-of select="." />
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:attribute>
-		<xsl:attribute name="parentid">
-			<xsl:choose>
-' .
-'				' . $xsltable2 .
-'				<xsl:otherwise>
-					<xsl:text></xsl:text>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:attribute>
-		<xsl:attribute name="order">
-			<xsl:choose>
-' .
-'				' . $xsltable3 .
-'				<xsl:otherwise>
-					<xsl:text></xsl:text>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:attribute>
-	</xsl:template>
-</xsl:stylesheet>			
-';
-			$xsl->loadXML($xsldata);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$xml2 = new DOMDocument();
-			$xml2->loadXML($xml, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$xml = $proc->transformToXml($xml2);
- */
-			// cache entries
-			// keep a backup of the old file, in order to revert it in case the transaction fails
-			@exec("mv -f " . $this->vofile . ".old " . $this->vofile . ".old.bak");
-			@exec("cp " . $this->vofile . " " . $this->vofile . ".old");
-			$f = fopen($this->vofile,"w");
-			fwrite($f,$xml);
-			fclose($f);
-
+			$xml = xml_transform(APPLICATION_PATH . '/../bin/sort_vos.xsl', $xml);
+			if ($xml !== false) {
+				// cache entries
+				// keep a backup of the old file, in order to revert it in case the transaction fails
+				@exec("mv -f " . $this->vofile . ".old " . $this->vofile . ".old.bak");
+				@exec("cp " . $this->vofile . " " . $this->vofile . ".old");
+				$f = fopen($this->vofile,"w");
+				fwrite($f,$xml);
+				fclose($f);
+			} else {
+				error_log("error in syncEGIVOs: Error while transforming XML data with stylesheet 'sort_vos.xsl'");
+				ExternalDataNotification::sendNotification('VO::syncEGIVOs', "Error while transforming XML data with stylesheet 'sort_vos.xsl'", ExternalDataNotification::MESSAGE_TYPE_ERROR);
+				return false;
+			}
 			// update database
 			if (($this->validateXMLCache($xml)) && (@md5_file($this->vofile) !== @md5_file($this->vofile . ".old"))) {
 				error_log("Sync'ing EGI VOs...");
@@ -717,7 +663,10 @@ class VoController extends Zend_Controller_Action
 				db()->query("ALTER TABLE egiops.vo_contacts DISABLE TRIGGER tr_egiops_vo_contacts_99_refresh_permissions");
 				db()->query("DELETE FROM egiops.vo_contacts");	// will be repopulated later on
 				db()->query("DELETE FROM egiops.vos");
-				$xmlobj = new SimpleXMLElement($xml);
+				$xmlobj = simplexml_load_string($xml);
+				if ($xmlobj === false) {
+					throw new Exception("Cannot parse EGI VO data as XML");
+				}
                 $xvos = $xmlobj->xpath("//VoDump/IDCard");
                 // add new VOs and update existing VOs
 				foreach($xvos as $xvo) {
@@ -775,7 +724,7 @@ class VoController extends Zend_Controller_Action
 					try {
 						db()->query("DELETE FROM vo_resources WHERE void = (SELECT id FROM vos WHERE name = ? AND sourceid = 1)", array(strtolower(trim($att["Name"]))))->fetchAll();
 						if ( $xvo->Ressources ) {
-							$xres = $xmlobj->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper(trim($att["Name"]))."']/Ressources/*");
+							$xres = $xmlobj->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')=" . xpath_quote(strtoupper(trim($att["Name"]))) . "]/Ressources/*");
 							foreach ($xres as $xr) {
 								db()->query("INSERT INTO vo_resources (void, name, value) SELECT (SELECT id FROM vos WHERE name = ? AND sourceid = 1 AND NOT deleted), ?, ? WHERE NOT EXISTS (SELECT * FROM vo_resources WHERE void = (SELECT id FROM vos WHERE name = ? AND sourceid = 1 AND NOT deleted) AND name = ?)", array(strtolower(trim($att["Name"])), strval($xr->getName()), strval($xr), strtolower(trim($att["Name"])), strval($xr->getName())))->fetchAll();
 							}
@@ -864,27 +813,32 @@ class VoController extends Zend_Controller_Action
         $ds->filter->name->equals($n);
         $id = $ds->items[0]->id;
         return $id;
-    }
-    private function getContactsOld($id)
-    {
+	}
+
+	#FIXME: This function seems obsolete; remove it
+    private function getContactsOld($id) {
 		$this->_helper->layout->disableLayout();
 		$voname = $id;
 		if ( $voname != null ) {
-			$xml = new SimpleXMLElement($this->xml);
-			$volist = $xml->xpath('//VoDump/IDCard[@Name="'.$voname.'"]');
-					$volist = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper($voname)."']");
-			if (count($volist)>0) {
-				$clist = $volist[0]->xpath('./Contacts/Individuals/Contact');
-				if (count($clist)>0) {
-					$cs = array();
-					foreach($clist as $c) {
-						$r = array(
-							'name' => $c->Name,
-							'role' => $c->Role
-						);
-						$cs[] = $r;
+			$xml = simplexml_load_string($this->xml);
+			if ($xml === false) {
+				return null;
+			} else {
+				$volist = $xml->xpath('//VoDump/IDCard[@Name=' . xpath_quote($voname) . ']');
+				$volist = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')=" . xpath_quote(strtoupper($voname)) . "]");
+				if (count($volist) > 0) {
+					$clist = $volist[0]->xpath('./Contacts/Individuals/Contact');
+					if (count($clist) > 0) {
+						$cs = array();
+						foreach($clist as $c) {
+							$r = array(
+								'name' => $c->Name,
+								'role' => $c->Role
+							);
+							$cs[] = $r;
+						}
+						return $cs;
 					}
-					return $cs;
 				}
 			}
 		}
@@ -910,38 +864,42 @@ class VoController extends Zend_Controller_Action
                 $vos = new Default_Model_VOs();
                 $vos->filter->name->ilike($this->_getParam("id"));
 				if( file_exists(APPLICATION_PATH . "/../cache/aggvos.xml") ){
-					$xml = new SimpleXMLElement(APPLICATION_PATH . "/../cache/aggvos.xml", 0, true);
+					$xml = simplexml_load_string(file_get_contents(APPLICATION_PATH . "/../cache/aggvos.xml"));
 				}else{
-					$xml = new SimpleXMLElement($this->xml);
+					$xml = simplexml_load_string($this->xml);
 				}
-				$volist = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper($this->_getParam("id"))."']");
-				if (count($volist)>0) {
-					$voentry = $volist[0];
-					$vo = $this->populateVO($voentry);
-					if ( $vos->count() > 0 ) {
-						if ( isset($vos->items[0]) ) {
-							$vo->id = $vos->items[0]->id; 
-							$vo->guid = $vos->items[0]->guid;
-							$vo->sourceid = $vos->items[0]->sourceid;
+				if ($xml === false) {
+					$this->printError();
+					error_log("Cannot parse aggregate VO data as XML");
+				} else {
+					$volist = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')=" . xpath_quote(strtoupper($this->_getParam("id"))) . "]");
+					if (count($volist)>0) {
+						$voentry = $volist[0];
+						$vo = $this->populateVO($voentry);
+						if ( $vos->count() > 0 ) {
+							if ( isset($vos->items[0]) ) {
+								$vo->id = $vos->items[0]->id; 
+								$vo->guid = $vos->items[0]->guid;
+								$vo->sourceid = $vos->items[0]->sourceid;
+							} else {
+								$vo = null;
+							}
 						} else {
-							$vo = null;
+							$vo->id = "";
+							$vo->guid = "";
+							$vo->sourceid = "";
 						}
-					} else {
-						$vo->id = "";
-						$vo->guid = "";
-						$vo->sourceid = "";
+						if ( isset($vo) ) $vo->contacts = $this->getContacts($this->_getParam("id"));
+						$this->view->entry = $vo;
+						$this->view->relatedItems = array();
+						$this->view->relatedItems = array_merge($this->view->relatedItems, $vo->applications);
+						$this->view->relatedItems = array_merge($this->view->relatedItems, $vo->sites);
+						$this->view->canEdit = VoAdmin::canEditVOImageList($this->session->userid, $vo);
 					}
-					if ( isset($vo) ) $vo->contacts = $this->getContacts($this->_getParam("id"));
-					$this->view->entry = $vo;
-					$this->view->relatedItems = array();
-					$this->view->relatedItems = array_merge($this->view->relatedItems, $vo->applications);
-					$this->view->relatedItems = array_merge($this->view->relatedItems, $vo->sites);
-					$this->view->canEdit = VoAdmin::canEditVOImageList($this->session->userid, $vo);
 				}
-            }
-            $this->view->session = $this->session;
-            $this->view->dialogCount = $this->_getParam('dc');
-			
+				$this->view->session = $this->session;
+				$this->view->dialogCount = $this->_getParam('dc');
+			}	
         } else {
             $this->printError();
         }
@@ -1041,7 +999,10 @@ class VoController extends Zend_Controller_Action
 				if (mb_detect_encoding($xmldata, "UTF-8", true) === false) {
 					$xmldata = recode_string("iso8859-1..utf8", $xmldata);
 				}
-				$xml = new SimpleXMLElement($xmldata);
+				$xml = simplexml_load_string($xmldata);
+				if ($xml === false) {
+					throw new Exception("Cannot parse EBI VO member data as XML");
+				}
 				$rows = $xml->xpath("//result/row");
 				if (count($rows) > 0) {
 					error_log("Sync'ing EBI VO members...");
@@ -1192,7 +1153,10 @@ class VoController extends Zend_Controller_Action
 				if ($mode == "api") {
 					exec("gunzip " . APPLICATION_PATH . "/../cache/vo_users.xml.gz");
 				}
-				$xml = new SimpleXMLElement(file_get_contents(APPLICATION_PATH . "/../cache/vo_users.xml"));
+				$xml = simplexml_load_string(file_get_contents(APPLICATION_PATH . "/../cache/vo_users.xml"));
+				if ($xml === false) {
+					throw new Exception("Cannot parse EGI VO member data as XML");
+				}
 				$rows = $xml->xpath("//result/row");
 				if (count($rows) > 0) {
 					error_log("Sync'ing VO members...");

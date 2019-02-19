@@ -18,11 +18,18 @@
 class OaiController extends Zend_Controller_Action
 {
 	public function indexAction() {
-		header("Content-Type:text/xml");
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();        
 		$verb = $this->_getParam("verb");
-		echo $this->handleVerb($verb);
+		$ret = $this->handleVerb($verb);
+		if ($ret === false) {
+			header("HTTP/1.0 500 Internal Server Error");
+			header("Status: 500 Internal Server Error");
+			exit;
+		} else {
+			header("Content-Type:text/xml");
+			echo $ret;
+		}
 	}
 
 	private function handleVerb($verb) {
@@ -68,7 +75,7 @@ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
 
 	private function getRecord($id, $prefix) {
 		if ( ($id == "") || ($prefix == "") ) {
-			return $this->getError("badArgument","The request is missing required arguments");
+			return $this->getError("badArgument", "The request is missing required arguments");
 		} else {
 			if ( $prefix == "oa_dc" ) {
 				if ( substr($id, 0, 17) == "oai:appdb.egi.eu:" ) {
@@ -85,23 +92,18 @@ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
 							$res = new RestPplItem(array("id" => $itemid));
 							break;
 						default:
-							return $this->buildResponse($this->getError("badArgument","Requested invalid resource"), "GetRecord", $prefix);
+							return $this->buildResponse($this->getError("badArgument", "Requested invalid resource"), "GetRecord", $prefix);
 					}
 					debug_log("[OaiController::getRecord]: Getting " . "http://".$_SERVER["APPLICATION_API_HOSTNAME"]."/rest/latest/$item");
 					$res = strval($res->get());
 					$res = $this->buildResponse($res, "GetRecord", $prefix);
-					$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER)."oai-applications.xsl";
-					$xsl = new DOMDocument();
-					$xsl->load($xf);
-					$proc = new XSLTProcessor();
-					$proc->registerPHPFunctions();
-					$proc->importStylesheet($xsl);
-					$xml = new DOMDocument();
-					$xml->loadXML($res, LIBXML_NSCLEAN | LIBXML_COMPACT);
-					$xml = $proc->transformToXml($xml);
+					$xml = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . "oai-applications.xsl", $res);
+					# if the XSL transformation fails, $xml will be FALSE
+					# callers will be responsible for returning a proper HTTP response(HTTP/1.0 500), since OAI-PMH only allows for certain application-level error codes 
+					# https://knb.ecoinformatics.org/knb/docs/oaipmh.html#oai-pmh-error-codes
 					return $xml;
 				} else {
-					return $this->buildResponse($this->getError("idDoesNotExist","Item not found"));
+					return $this->buildResponse($this->getError("idDoesNotExist", "Item not found"));
 				}
 			} else {
 				return $this->buildResponse($this->getError("cannotDisseminateFormat", "The metadata format identified by the value given for the metadataPrefix argument is not supported by the item or by the repository."));

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and 
  * limitations under the License.
  */
+//error_log('LOADING globals.php');
 
 include('appdb_configuration.php');
 include('support.php');
@@ -29,6 +30,62 @@ include('contextualization.php');
 include('datasets.php');
 include('Storage.php');
 include('ContinuousDelivery.php');
+
+/**
+ * Disable External Entity loading to prevent XXE and certain DoS attacks
+ * see:
+ * [1] https://secure.php.net/manual/en/function.libxml-disable-entity-loader.php
+ * [2] https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.mdi
+ * 
+ * Caveats:
+ * - This option is not thread-safe; it disables support for External Entities on all PHP threads on the server
+ * - DOMDocument::loadXML and SimpleXMLElement() cannot accept URLs as arguments to XML data (event if local)
+ * - XSLTProcessor cannot load stylesheets from files
+ */
+libxml_disable_entity_loader(true);
+
+/**
+ * Function to safely quote user-defined data in XQuery path expressions
+ * Credit: Hans Henrik Bergan (https://stackoverflow.com/users/1067003/hanshenrik)
+ * https://stackoverflow.com/questions/13026833/how-to-escape-all-invalid-characters-from-dom-xpath-query
+ */
+function xpath_quote(string $value):string{
+    if(false===strpos($value,'"')){
+        return '"'.$value.'"';
+    }
+    if(false===strpos($value,'\'')){
+        return '\''.$value.'\'';
+    }
+    // if the value contains both single and double quotes, construct an
+    // expression that concatenates all non-double-quote substrings with
+    // the quotes, e.g.:
+    //
+    //    concat("'foo'", '"', "bar")
+    $sb='concat(';
+    $substrings=explode('"',$value);
+    for($i=0;$i<count($substrings);++$i){
+        $needComma=($i>0);
+        if($substrings[$i]!==''){
+            if($i>0){
+                $sb.=', ';
+            }
+            $sb.='"'.$substrings[$i].'"';
+            $needComma=true;
+        }
+        if($i < (count($substrings) -1)){
+            if($needComma){
+                $sb.=', ';
+            }
+            $sb.="'\"'";
+        }
+    }
+    $sb.=')';
+    return $sb;
+}
+
+function xml_quote($text, $encoding = 'UTF-8') {
+	return htmlspecialchars($text, ENT_XML1, $encoding);
+}
 
 $aaimp = $this->getOption("aaimp");
 Zend_Registry::set('aaimp',$aaimp);
@@ -46,6 +103,68 @@ if (isset($app["timezone"])) {
 	date_default_timezone_set($app["timezone"]);
 } else {
 	date_default_timezone_set('UTC');
+}
+
+function xml_transform($xsl_file, $xml_string, $xmlopts = 0, $xsl_params = null) {
+	if ($xmlopts == 0) {
+		$xmlopts = (LIBXML_NSCLEAN | LIBXML_COMPACT | LIBXML_NONET);
+	}
+	$ret = false;
+	$prevXXE = null;
+	try {
+		$xsl = new DOMDocument();
+		# make sure External Entity processing is enabled, in order to import the stylesheet
+		$prevXXE = libxml_disable_entity_loader(false);
+		# use DOMDocument::load, not DOMDocument::loadXML, least the 'xsl:include' directives be denied to load
+		$ret = $xsl->load($xsl_file);
+		if ($ret !== false) {
+			$proc = new XSLTProcessor();
+			$proc->registerPHPFunctions();
+			$ret = $proc->importStylesheet($xsl);
+			if ($ret !== false) {
+				if (! is_null($xsl_params)) {
+					$xsl_params_ok = true;
+					if (is_array($xsl_params)) {
+						foreach($xsl_params as $p) {
+							if (is_array($p)) {
+								if (array_key_exists("name", $p) && array_key_exists("value", $p)) {
+									if (array_key_exists("ns", $p)) {
+										$proc->setParameter($p["ns"], $p["name"], $p["value"]);
+									} else {
+										$proc->setParameter('', $p["name"], $p["value"]);
+									}
+								} else {
+									$xsl_params_ok = false;
+								}
+							} else {
+								$xsl_params_ok = false;
+							}							
+						}
+					} else {
+						$xsl_params_ok = false;
+					}
+					if (! $xsl_params_ok) {
+						error_log("[xml_transform] WARNING: One or more XSL parameters passed are invalid");
+					}
+				}
+				# restore previous XXE state
+				libxml_disable_entity_loader($prevXXE);
+				$xml = new DOMDocument();
+				$xml->loadXML($xml_string, $xmlopts);
+				$ret = $proc->transformToXml($xml);
+			} else {
+				error_log("[xml_transform] Could not import stylesheet");
+			}
+		}
+	} catch (Exception $e) {
+		error_log("[xml_transform]: " . $e->getMessage());
+		# make sure previous XXE state is restored in case an error occurs after altering its state
+		if (! is_null($prevXXE)) {
+			libxml_disable_entity_loader($prevXXE);
+		}
+		$ret = false;
+	}
+	return $ret;
 }
 
 $vouser_sync = $this->getOption("vouser_sync");
@@ -5282,7 +5401,7 @@ class VMCaster{
 		}
 		
 		$result = array("id"=>null,"status"=>null,"message"=>null);
-		$xml = new SimpleXMLElement($response);
+		$xml = simplexml_load_string($response);
 		if( count($xml->xpath("./id")) > 0 ){
 			$id = $xml->xpath("./id");
 			$result["id"] = intval($id[0]);
@@ -6323,12 +6442,12 @@ class VMCaster{
 		if( $format === "xml" ){
 			$d["published"] = ($d["published"] === true)?"true":"false";
 			$d["archived"] = ($d["archived"] === true)?"true":"false";
-			$xml = new SimpleXMLElement('<vmiinstance></vmiinstance>');
+			$xml = simplexml_load_string('<vmiinstance></vmiinstance>');
 			self::convertArrayToXML($d, $xml);
 			$result = $xml->asXML();
 			$apiversion = "1.0";
-			$result = substr($result, strpos($result, '?>') + 2);
-			$result = '<?xml version="1.0" encoding="utf-8"?><appdb:appdb xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:appdb="http://appdb.egi.eu/api/1.0/appdb" xmlns:application="http://appdb.egi.eu/api/1.0/application" xmlns:discipline="http://appdb.egi.eu/api/1.0/discipline" xmlns:category="http://appdb.egi.eu/api/1.0/category" xmlns:dissemination="http://appdb.egi.eu/api/1.0/dissemination" '.
+			$result = substr($result, strpos($result, '?' . '>') + 2);
+			$result = '<' . '?xml version="1.0" encoding="utf-8"?' . '><appdb:appdb xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:appdb="http://appdb.egi.eu/api/1.0/appdb" xmlns:application="http://appdb.egi.eu/api/1.0/application" xmlns:discipline="http://appdb.egi.eu/api/1.0/discipline" xmlns:category="http://appdb.egi.eu/api/1.0/category" xmlns:dissemination="http://appdb.egi.eu/api/1.0/dissemination" '.
 				'xmlns:person="http://appdb.egi.eu/api/' . $apiversion . '/person" '.
 				'xmlns:virtualization="http://appdb.egi.eu/api/' . $apiversion . '/virtualization" '.
 				'xmlns:site="http://appdb.egi.eu/api/' . $apiversion . '/site" '.
@@ -7602,16 +7721,24 @@ class SocialReport{
 		$appsdata = SocialReport::getAppDBdata($config);
 		$apps = SocialReport::fetchSocialShares($appsdata, $config);
 
-		$shares_xml = new SimpleXMLElement("<shares dateProduced=\"".$date."\" dateProduced_unix=\"".$udate."\" count=\"".count($apps)."\"></shares>");
-		SocialReport::array_to_xml($apps,$shares_xml);
-		$xml = $shares_xml->asXML();
-		if( $xml === false ){
-			error_log("[SocialReport::generateShareCountReport]: Could not generate xml " . $folder.$filename.".xml");
+		$readsuccess = true;
+		$shares_xml = simplexml_load_string("<shares dateProduced=\"" . $date . "\" dateProduced_unix=\"" . $udate . "\" count=\"" . count($apps) . "\"></shares>");
+		if ($shares_xml === false) {
+			$readsuccess = false;
+		} else {
+			SocialReport::array_to_xml($apps, $shares_xml);
+			$xml = $shares_xml->asXML();
+			if ($xml == false) {
+				$readsuccess = false;
+			}
+		}
+		if( $readsuccess === false ){
+			error_log("[SocialReport::generateShareCountReport]: Could not generate xml " . $folder . $filename . ".xml");
 			return false;
 		}
-		$writesuccess = file_put_contents($folder.$filename.".xml",$xml);
+		$writesuccess = file_put_contents($folder . $filename . ".xml", $xml);
 		if( $writesuccess === false ){
-			error_log("[SocialReport::generateShareCountReport]: Could not write to file " . $folder.$filename.".xml");
+			error_log("[SocialReport::generateShareCountReport]: Could not write to file " . $folder . $filename . ".xml");
 			return false;
 		}
 		return true;
