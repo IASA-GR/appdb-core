@@ -18,15 +18,15 @@
 <?php echo '<?xml version="1.0" encoding="utf-8"?>'; ?>
 <feed xmlns="http://www.w3.org/2005/Atom">
         <id><?php echo "http://".$_SERVER['APPLICATION_UI_HOSTNAME']."/"; ?></id>
-        <title><?php echo htmlspecialchars((isset($this->request->title)?$this->request->title:$this->request->name)); ?></title>
-        <subtitle><?php echo htmlspecialchars((isset($this->request->title)?$this->request->title:$this->request->name)); ?></subtitle>
-    <icon><?php echo "http://".$_SERVER['APPLICATION_UI_HOSTNAME']."/images/EGI-logo_small.png";?></icon>
-    <logo><?php echo "http://".$_SERVER['APPLICATION_UI_HOSTNAME']."/images/appdb-logo.png";?></logo>
-        <link href="http://<?php echo $_SERVER['APPLICATION_UI_HOSTNAME']; ?>/"/>
+        <title><?php echo xml_escape((isset($this->request->title)?$this->request->title:$this->request->name)); ?></title>
+        <subtitle><?php echo xml_escape((isset($this->request->title)?$this->request->title:$this->request->name)); ?></subtitle>
+    <icon><?php echo "https://".$_SERVER['APPLICATION_UI_HOSTNAME']."/images/EGI-logo_small.png";?></icon>
+    <logo><?php echo "https://".$_SERVER['APPLICATION_UI_HOSTNAME']."/images/appdb-logo.png";?></logo>
+        <link href="https://<?php echo $_SERVER['APPLICATION_UI_HOSTNAME']; ?>/"/>
         <author>
                 <name>EGI Applications database</name>
         </author>
-        <updated><?php echo date('c'); ?></updated>
+        <updated><?php echo xml_escape(date('c')); ?></updated>
         <?php foreach($this->entries as $e){
         $d = NewsFeed::parseEntry($e);
 		if (array_keys($d) !== range(0, count($d) - 1)) {
@@ -36,18 +36,18 @@
 		for($i=0; $i< count($d); $i+=1){
 			$n = $d[$i];
         ?><entry>
-                <title><?php echo htmlspecialchars($n["title"]); ?></title>
-                <link href="<?php echo $n["link"]; ?>"/>
-                <id><?php echo "http://".$e->subjecttype."/".$e->id."/".$e->action; ?></id>
+                <title><?php echo xml_escape($n["title"]); ?></title>
+                <link href="<?php echo xml_escape($n["link"]); ?>"/>
+                <id><?php echo "https://".xml_escape($e->subjecttype)."/".xml_escape($e->id)."/".xml_escape($e->action); ?></id>
                 <updated><?php 
 					if( array_key_exists("timestamp",$n) === true){
-						echo date('c',strtotime($n["timestamp"])); 
+						echo xml_escape(date('c',strtotime($n["timestamp"]))); 
 					}else{
-						echo date('c',strtotime($e->timestamp)); 
+						echo xml_escape(date('c',strtotime($e->timestamp))); 
 					}
 					
 				?></updated>
-                <summary type="html"><?php echo htmlspecialchars($n["html"]); ?></summary>
+                <summary type="html"><?php echo xml_escape($n["html"]); ?></summary>
         </entry>
 		<?php } ?>
         <?php } ?>

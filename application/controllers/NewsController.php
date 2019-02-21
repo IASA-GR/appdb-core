@@ -347,11 +347,11 @@ class NewsController extends Zend_Controller_Action
 				$mail = new Default_Model_MailSubscriptions();
 				$mail->filter->researcherid->equals($this->session->userid)->and($mail->filter->flthash->equals(getFltHash($flt)));
 				header ("Content-Type:text/xml");
-				echo '<?xml version="1.0" encoding="utf-8"?'.'>';
+				echo '<' . '?xml version="1.0" encoding="utf-8"?' . '>';
 				if($mail->count()>0){
 					$mail->refresh();
 					$m = $mail->items[0];
-					echo "<response id='" . $m->id . "' name='" . htmlspecialchars($m->name) . "' events='" . $m->events . "' delivery='" . $m->delivery . "'  unsubscribe_pwd='" . md5($m->unsubscribePassword) . "' />";
+					echo "<response id='" . xml_escape($m->id) . "' name='" . xml_escape($m->name) . "' events='" . xml_escape($m->events) . "' delivery='" . xml_escape($m->delivery) . "'  unsubscribe_pwd='" . xml_escape(md5($m->unsubscribePassword)) . "' />";
 				} else {
 					echo "<response error='Could not insert subscription' />";
 				}
@@ -381,11 +381,11 @@ class NewsController extends Zend_Controller_Action
 			$m->filter->researcherid->equals($this->session->userid)->and($m->filter->subjecttype->equals($subjecttype))->and($m->filter->flthash->equals($fhash));
 			debug_log($m->filter->expr());
 			header ("Content-Type:text/xml");
-			echo '<?xml version="1.0" encoding="utf-8"?'.'>';
+			echo '<' . '?xml version="1.0" encoding="utf-8"?' . '>';
 			if($m->count()>0){
 				$m->refresh();
 				$s = $m->items[0];
-				echo "<response id='" . $s->id . "' name='" . htmlspecialchars($s->name). "' events='" . $s->events . "' delivery='" . $s->delivery . "'  unsubscribe_pwd='" . md5($s->unsubscribePassword) . "' ></response>";
+				echo "<response id='" . xml_escape($s->id) . "' name='" . xml_escape($s->name). "' events='" . xml_escape($s->events) . "' delivery='" . xml_escape($s->delivery) . "'  unsubscribe_pwd='" . xml_escape(md5($s->unsubscribePassword)) . "' ></response>";
 			}else{
 				echo "<response />";
 			}

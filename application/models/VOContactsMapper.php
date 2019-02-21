@@ -48,7 +48,7 @@ class Default_Model_VOContactsMapper extends Default_Model_VOContactsMapperBase
 				$xid = strval($x->attributes()->id);
 				foreach ($ores as $j) {
 					if ($j->void == $xid) {
-						$i = str_replace("<vo:vo ", "<vo:vo relation=\"" . xml_quote(strtolower(str_replace("VO ", "", $j->role))) . "\" ", $i);
+						$i = str_replace("<vo:vo ", "<vo:vo relation=\"" . xml_escape(strtolower(str_replace("VO ", "", $j->role))) . "\" ", $i);
 						$ret[$ic] = $i;
 						break;
 					}

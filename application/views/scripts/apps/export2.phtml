@@ -160,21 +160,21 @@ if($this->type === "text/x-csv"){
         $abstract = str_replace(","," ",$abstract);
         $abstract = str_replace("\r\n","",$abstract);
         echo "<abstract>". recode_string("utf8..xml",$abstract)."</abstract>";
-        echo "<status>".$app->status->name."</status>";
-        echo "<discipline>".$app->domain->name."</discipline>";
+        echo "<status>".xml_escape($app->status->name)."</status>";
+        echo "<discipline>".xml_escape($app->domain->name)."</discipline>";
         if(isnull($app->subdomain)){
             echo "<subdiscipline />";
         }else{
-            echo "<subdiscipline>".$app->subdomain->name."</subdiscipline>";
+            echo "<subdiscipline>".xml_escape($app->subdomain->name)."</subdiscipline>";
         }
         echo "<middlewares>";
         if(count($app->middlewares)){
             foreach ($app->middlewares as $mw) {
-                    echo "<middleware>".$mw->middleware->name."</middleware>";
+                    echo "<middleware>".xml_escape($mw->middleware->name)."</middleware>";
             }
         }
         echo "</middlewares>";
-        echo "<dateadded>".$app->dateAdded."</dateadded>";
+        echo "<dateadded>".xml_escape($app->dateAdded)."</dateadded>";
 
         $owneremail = null;
         if(isnull($app->addedBy)){
@@ -195,7 +195,7 @@ if($this->type === "text/x-csv"){
                 echo  "<addedby>".recode_string("utf8..xml",$app->researcher->lastName.' '.$app->researcher->firstName)."</addedby>";
             }else{
                 $owneremail = str_replace("'", "", $owneremail);
-                echo  "<addedby email='".$owneremail."'>".recode_string("utf8..xml",$app->researcher->lastName.' '.$app->researcher->firstName)."</addedby>";
+                echo  "<addedby email='".xml_escape($owneremail)."'>".recode_string("utf8..xml",$app->researcher->lastName.' '.$app->researcher->firstName)."</addedby>";
             }
         }
         echo "<tool>".($app->tool>0?'true':'false')."</tool>";
@@ -203,21 +203,21 @@ if($this->type === "text/x-csv"){
         echo "<countries>";
         if(count($app->countries)){
              foreach ($app->countries as $country) {
-                echo "<country>".$country->name."</country>";
+                echo "<country>".xml_escape($country->name)."</country>";
             }
         }
         echo "</countries>";
         echo "<regions>";
         if(count($app->regions)){
             foreach ($app->regions as $region) {
-                    echo "<region>".$region->name."</region>";
+                    echo "<region>".xml_escape($region->name)."</region>";
             }
         }
         echo "</regions>";
         echo "<vos>";
         if(count($app->vos)){
            foreach ($app->vos as $vo) {
-                    echo "<vo>".$vo->name."</vo>";
+                    echo "<vo>".xml_escape($vo->name)."</vo>";
             }
         }
         echo "</vos>";
@@ -232,7 +232,7 @@ if($this->type === "text/x-csv"){
                     }
                 }
                 if(is_null($email)){
-                    echo "<researcher>".recode_string("utf8..xml",$r->lastName.' '.$r->firstName)."</researcher>";
+                    echo "<researcher>" .recode_string("utf8..xml",$r->lastName.' '.$r->firstName)."</researcher>";
                 }else{
                     echo "<researcher email='".htmlspecialchars(recode_string("utf8..xml",$email))."'>".recode_string("utf8..xml",$r->lastName.' '.$r->firstName)."</researcher>";
                 }
@@ -242,7 +242,7 @@ if($this->type === "text/x-csv"){
         echo "<urls>";
         if(count($app->urls)){
             foreach ($app->urls as $url) {
-                    echo "<url type='".$url->description."'>".recode_string("utf8..xml",$url->url)."</url>";
+                    echo "<url type='". xml_escape($url->description) . "'>" . recode_string("utf8..xml", $url->url) . "</url>";
             }
         }
         echo "</urls>";

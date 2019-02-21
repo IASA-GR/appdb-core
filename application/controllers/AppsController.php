@@ -728,7 +728,7 @@ class AppsController extends Zend_Controller_Action
 	 $res = "<response>";
 	 $i = 0;
 	 foreach($items as $item){
-	  $res .= "<title index='".($i++)."'>" . htmlspecialchars($item, ENT_XML1, 'UTF-8') . "</title>";
+	  $res .= "<title index='".($i++)."'>" . xml_escape($item) . "</title>";
 	 }
 	 $res .= "</response>";
 	 echo $res;
@@ -1053,7 +1053,7 @@ class AppsController extends Zend_Controller_Action
 	}
 
 	private function messageRecipientToXML($i) {
-		return "<user id='" . $i->id . "' firstname='" . htmlspecialchars($i->firstname, ENT_COMPAT | ENT_HTML401, "UTF-8") . "' lastname='" . htmlspecialchars($i->lastname, ENT_COMPAT | ENT_HTML401, "UTF-8") . "' countryiso='" . $i->country->isocode . "' institute='". htmlspecialchars($i->institution, ENT_COMPAT | ENT_HTML401, "UTF-8") ."' />";
+		return "<user id='" . xml_escape($i->id) . "' firstname='" . xml_escape($i->firstname) . "' lastname='" . xml_escape($i->lastname) . "' countryiso='" . xml_escape($i->country->isocode) . "' institute='". xml_escape($i->institution) ."' />";
 	}
 	
 	public function getApplicationMessageRecipients($appid = 0){
@@ -2001,7 +2001,7 @@ class AppsController extends Zend_Controller_Action
 		
 		$result = ContextualizationScripts::contextualizationScriptAction($userid, $action, $url, $vmiinstanceid, $appid, $formatid);
 		if( is_string($result) ) {
-			echo "<result error='".htmlspecialchars($result, ENT_QUOTES)."'></result>";
+			echo "<result error='" . xml_escape($result) . "'></result>";
 		}else if( $result === false ) {
 			echo "<result error='Unknown error occured.'></result>";
 		}else if( $result === true ) {
@@ -2010,8 +2010,8 @@ class AppsController extends Zend_Controller_Action
 			$format = $result->getContextFormat();
 			echo "<result>" ;
 			echo "<contextscript id='" . $result->id . "' addedon='" . $result->addedon . "'>";
-			echo "<name>" . htmlspecialchars($result->name, ENT_QUOTES) . "</name>";
-			echo "<title>" . htmlspecialchars($result->title, ENT_QUOTES) . "</title>";
+			echo "<name>" . xml_escape($result->name) . "</name>";
+			echo "<title>" . xml_escape($result->title) . "</title>";
 			echo "<url>" . urlencode($result->url) . "</url>";
 			echo "<format id='".$result->formatid."'>" . $format->name . "</format>";
 			echo "<checksum hashtype='" . $result->checksumfunc . "'>" . $result->checksum . "</checksum>";

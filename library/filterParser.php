@@ -495,16 +495,16 @@ class FilterParser {
 				return substr($ss." ".$ops.($obj !== "" ? $obj."." : "").$prop.":".$s,1);
 			} else {
 				$found = false;
-				$xpres = $xp->query('//filter:field[@name='. xpath_quote($obj) .']/filter:field[@name="'.$prop.'"]');
+				$xpres = $xp->query('//filter:field[@name='. xpath_quote($obj) . ']/filter:field[@name=' . xpath_quote($prop) . ']');
 				if (!is_null($xpres)) {
-					if ($xpres->length>0) {
-						$found=true;
-						$isComplex = ($xpres->item(0)->attributes->getNamedItem("type")->nodeValue==="complex"?true:false);
+					if ($xpres->length > 0) {
+						$found = true;
+						$isComplex = ($xpres->item(0)->attributes->getNamedItem("type")->nodeValue === "complex" ? true : false);
 					}
 				}
 				if (!$found) {
-					$error = 'Grammar error. Invalid property ` '.$prop.' \' for specifier ` '.$obj.' \' at keyword '.($argi+1).".";	
-					return substr($ss." ".$ops.($obj !== "" ? $obj."." : "").$prop.":".$s,1);
+					$error = 'Grammar error. Invalid property ` ' . $prop . ' \' for specifier ` ' . $obj . ' \' at keyword ' . ($argi+1) . ".";	
+					return substr($ss . " " . $ops . ($obj !== "" ? $obj . "." : "") . $prop . ":" . $s, 1);
 				} else {
 					if ( $isComplex ) {
 						$obj = $prop;

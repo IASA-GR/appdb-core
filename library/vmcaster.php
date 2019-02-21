@@ -711,7 +711,7 @@ class VMCaster{
 				}
 			}
 			else {
-				$xml->addChild("$key", htmlspecialchars("$value",ENT_COMPAT,'UTF-8'));
+				$xml->addChild("$key", htmlspecialchars("$value",ENT_XML1 | ENT_COMPAT,'UTF-8'));
 			}
 		}
 	}

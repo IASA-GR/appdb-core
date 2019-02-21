@@ -160,8 +160,8 @@ class AaimpxController extends Zend_Controller_Action
 				$this->view->error = 1000;				
          			$this->view->error_description .= "Cannot find token in response<br>";
 				$this->view->error_description .= "response=".$this->sanitize($response)."<br>";
-     				$this->view->error_description .= "url=".$url."<br>";
-     				$this->view->error_description .= "status_code=".$status_code."<br>";
+     				$this->view->error_description .= "url=".$this->sanitize($url)."<br>";
+     				$this->view->error_description .= "status_code=".$this->sanitize($status_code)."<br>";
      				$this->view->error_description .= "fields=";
      				$this->view->error_description .= $this->sanitize(print_r($fields, true));
      				$this->view->error_description .= "<br>";
@@ -329,11 +329,11 @@ class AaimpxController extends Zend_Controller_Action
  	private function parse_curl_status($type, $status_code, $response, $error) {
 		if ($status_code >= 300 || !empty($error)) {
 			$this->view->error=$status_code;
-		        $this->view->error_description .= "Error obtaining $type <br>";
+		        $this->view->error_description .= "Error obtaining " . $this->sanitize($type) . "<br>";
 			if ($error) {
          			$this->view->error_description .= "CURL error: ".$this->sanitize($error)."<br>";
 			} else {
-				$this->view->error_description .= "Status code: ".$status_code."<br>";
+				$this->view->error_description .= "Status code: ".$this->sanitize($status_code)."<br>";
      				// We might get a error= and error_description= back
 				if (strpos($response, 'error_description=') !== false) {
 					$err=parse_ini_string($response);

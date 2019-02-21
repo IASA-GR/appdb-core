@@ -151,7 +151,7 @@ class RestVOItem extends RestROResourceItem {
 //				} catch (Exception $e) {
 //					$this->setError(RestErrorEnum::RE_BACKEND_ERROR, $e->getMessage());
 //				}
-//                $vo = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper($id)."']");
+//                $vo = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')=". xpath_quote(strtoupper($id)) ."]");
 //                if ( count($vo) > 0 ) {
 //                    $vo = $vo[0];
 //                    if (strval($vo->children()->ValidationDate) != '') {

@@ -1433,7 +1433,7 @@ class RestContextScriptFormatList extends RestROResourceList{
 			$res = new Default_Model_ContextFormats();
 			$xml = array();
 			foreach ($res->items as $i) {
-				$xml[] = "<contextualization:format id='" . $i->id . "' name='".$i->name."'>" . htmlspecialchars($i->description, HTML_SPECIALCHARS) . "</contextualization:format>";
+				$xml[] = "<contextualization:format id='" . xml_escape($i->id) . "' name='". xml_escape($i->name) ."'>" . xml_escape($i->description) . "</contextualization:format>";
 			}
 			return new XMLFragmentRestResponse($xml, $this);
 		}	

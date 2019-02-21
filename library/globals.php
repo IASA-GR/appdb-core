@@ -83,8 +83,8 @@ function xpath_quote(string $value):string{
     return $sb;
 }
 
-function xml_quote($text, $encoding = 'UTF-8') {
-	return htmlspecialchars($text, ENT_XML1, $encoding);
+function xml_escape($text, $encoding = 'UTF-8') {
+	return htmlspecialchars($text, ENT_QUOTES | ENT_XML1 | ENT_DISALLOWED, $encoding);
 }
 
 $aaimp = $this->getOption("aaimp");
@@ -6151,7 +6151,7 @@ class VMCaster{
 				}
 			}
 			else {
-				$xml->addChild("$key", htmlspecialchars("$value",ENT_COMPAT,'UTF-8'));
+				$xml->addChild("$key", htmlspecialchars("$value",ENT_XML1 | ENT_COMPAT,'UTF-8'));
 			}
 		}
 	}

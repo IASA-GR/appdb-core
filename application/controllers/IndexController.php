@@ -360,7 +360,7 @@ class IndexController extends Zend_Controller_Action
 				}
 				$to .= $e;
 			}
-			echo "<response to='".htmlspecialchars($to,ENT_QUOTES)."' subject='".htmlspecialchars($subject,ENT_QUOTES)."' cc='" . $cc . "' >" . htmlspecialchars($body,ENT_QUOTES) . "</response>";
+			echo "<response to='" . xml_escape($to) . "' subject='" . xml_escape($subject) . "' cc='" . xml_escape($cc) . "' >" . xml_escape($body, ENT_QUOTES) . "</response>";
 		}
 		
 	}

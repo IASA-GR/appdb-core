@@ -19,10 +19,10 @@
 <rss version="2.0" >
 <channel>
         <ttl>10</ttl>
-        <title><?php echo htmlspecialchars((isset($this->request->title)?$this->request->title:$this->request->name)); ?></title>
-        <link><?php echo 'http://'.$_SERVER['APPLICATION_UI_HOSTNAME'] .'/'; ?></link>
-        <description><?php echo htmlspecialchars((isset($this->request->title)?$this->request->title:$this->request->name)); ?></description>
-        <lastBuildDate><?php echo date('D, d M Y H:i:s O'); ?></lastBuildDate>
+        <title><?php echo xml_escape((isset($this->request->title)?$this->request->title:$this->request->name)); ?></title>
+        <link><?php echo 'https://'.$_SERVER['APPLICATION_UI_HOSTNAME'] .'/'; ?></link>
+        <description><?php echo xml_escape((isset($this->request->title)?$this->request->title:$this->request->name)); ?></description>
+        <lastBuildDate><?php echo xml_escape(date('D, d M Y H:i:s O')); ?></lastBuildDate>
         <language>en-us</language>
 		<?php foreach($this->entries as $e){
 			$d = NewsFeed::parseEntry($e);
@@ -33,19 +33,19 @@
 			for($i=0; $i< count($d); $i+=1){
 				$n = $d[$i];
 		?><item>
-            <title><?php echo $n["title"];?></title>
-            <link><?php echo $n["link"]; ?></link>
-            <guid isPermaLink="false"><?php echo $e->subjecttype.";".$e->id.";".$e->action; ?></guid>
+            <title><?php echo xml_escape($n["title"]);?></title>
+            <link><?php echo xml_escape($n["link"]); ?></link>
+            <guid isPermaLink="false"><?php echo xml_escape($e->subjecttype).";".xml_escape($e->id).";".xml_escape($e->action); ?></guid>
             <pubDate>
 				<?php
 					if( array_key_exists("timestamp",$n) === true){
-						echo date('D, d M Y H:i:s O',strtotime($n["timestamp"])); 
+						echo xml_escape(date('D, d M Y H:i:s O',strtotime($n["timestamp"]))); 
 					}else{
-						echo date('D, d M Y H:i:s O',strtotime($e->timestamp)); 
+						echo xml_escape(date('D, d M Y H:i:s O',strtotime($e->timestamp))); 
 					}
 				?>
 			</pubDate>
-            <description><?php echo htmlspecialchars($n["html"]); ?></description>
+            <description><?php echo xml_escape($n["html"]); ?></description>
         </item>
 		<?php } ?>
 		<?php } ?>

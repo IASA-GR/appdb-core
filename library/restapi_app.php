@@ -1662,13 +1662,13 @@ class RestAppHistoryList extends RestROResourceList {
 	                    $this->setError(RestErrorEnum::RE_BACKEND_ERROR, "Could not access history database.");
 		                return false;
 					}
-                    $log = "<log>".$log."</log>";
+                    $log = "<log>". $log . "</log>";
                     //$log = new SimpleXMLElement($log);
 					$log = simpledom_load_string($log);
 //					error_log("Logfile loaded as XML");
-					$xpath = $log->sortedXPath('action[@target="application" and @id="'.$id.'" and (@event="update" or @event="delete")]','@timestamp');
+					$xpath = $log->sortedXPath('action[@target="application" and @id=' . xpath_quote($id) . ' and (@event="update" or @event="delete")]', '@timestamp');
 //					error_log("Got sorted XPath from XML log");
-                    //$xpath = $log->xpath('action[@target="application" and @id="'.$id.'"]');
+                    //$xpath = $log->xpath('action[@target="application" and @id=' . xpath_quote($id) . ']');
                     $counter = 0;
 					foreach ($xpath as $x) {
                         $counter = $counter + 1;
@@ -2225,7 +2225,7 @@ class RestAppPubList extends RestResourceList {
 		$ret = $res->post();
 		$ret = new SimpleXMLElement(strval($ret->finalize()));
 		if ( $method === RestMethodEnum::RM_POST ) {
-			$xp = $ret->xpath('//publication:publication[@id="'.$id.'"]');
+			$xp = $ret->xpath('//publication:publication[@id=' . xpath_quote($id) . ']');
 		} else {
 			// try to find the publication with the max id attribute, which should be the newest
 			$xp = $ret->xpath('//publication:publication[not(@id <= preceding-sibling::publication:publication/@id) and not(@id <= following-sibling::publication:publication/@id)]');

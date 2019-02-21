@@ -59,7 +59,7 @@ class Default_Model_VOMembersMapper extends Default_Model_VOMembersMapperBase
 				$xid = strval($x->attributes()->id);
 				foreach ($ores as $j) {
 					if ($j->void == $xid) {
-						$i = str_replace("<vo:vo ", "<vo:vo relation=\"member\" member_since=\"". xml_quote($j->memberSince) . "\" ", $i);
+						$i = str_replace("<vo:vo ", "<vo:vo relation=\"member\" member_since=\"". xml_escape($j->memberSince) . "\" ", $i);
 						$ret[$ic] = $i;
 						break;
 					}

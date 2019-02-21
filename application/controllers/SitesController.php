@@ -105,7 +105,7 @@ class SitesController extends Zend_Controller_Action{
 // 			$error_message = 'Unknown error';
 // 		}
 // 		ExternalDataNotification::sendNotification('Sites::syncSites', $error_message, ExternalDataNotification::MESSAGE_TYPE_ERROR);
-// 		echo "<result success='false' error='" . htmlspecialchars($error_message, ENT_QUOTES). "' />";
+// 		echo "<result success='false' error='" . xml_escape($error_message). "' />";
 // 	}
 
 	private function makeVAprovidersCache() {
@@ -478,7 +478,7 @@ class SitesController extends Zend_Controller_Action{
 			echo "<result success='false'";
 			$dt = ($endTime - $startTime);
 			echo " time='" . number_format($dt, 2) . "'";
-			echo " error='" . htmlspecialchars($error_message, ENT_QUOTES). "' />";
+			echo " error='" . xml_escape($error_message). "' />";
 			$this->getResponse()->clearAllHeaders();
 			$this->getResponse()->setRawHeader("HTTP/1.0 500 Internal Server Error");
 			$this->getResponse()->setHeader("Status","500 Internal Server Error");
