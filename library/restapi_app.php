@@ -60,13 +60,7 @@ class RestAppReport extends RestROSelfAuthResourceList {
 
 }
 
-function normalizeAppID($resource, $paramName = "id") {
-	$id = $resource->getParam($paramName);
-	if ( ! is_numeric($id) ) {
-		$id = "(SELECT id FROM applications WHERE cname ILIKE '" . pg_escape_string(substr($resource->getParam($paramName), 2)) . "' FETCH FIRST 1 ROWS ONLY)";
-	}
-	return $id;
-}
+
 
 /**
  * class RestAppXMLParser
@@ -627,28 +621,9 @@ class RestAppFollowedList extends RestResourceList {
 		$res = new Default_Model_Applications();
 		$res->filter = FilterParser::getApplications($this->getParam("flt"));
 		$f = new Default_Model_ApplicationsFilter();
-		$f->id->in("SELECT * FROM followed_app_ids(" . $this->getParam("id") . ") AS appid", false, false);
+		$f->id->in("SELECT * FROM followed_app_ids(" . RestAPIHelper::normalizePplID($this) . ") AS appid", false, false);
 		$res->filter->chain($f, "AND");
 		return $res;
-/*
-		$ids = array();
-		$f = new Default_Model_MailSubscriptions();
-		$f->filter->flt->like('%id:SYSTAG_FOLLOW')->and($f->filter->researcherid->equals($this->getParam("id")));
-		if ( count($f->items) > 0 ) {
-			foreach( $f->items as $i ) {
-				$id = explode(" ", $i->flt);
-				$id = explode(":", $id[0]);
-				$ids[] = $id[1];
-			}
-			$res = new Default_Model_Applications();
-			$res->filter->id->in($ids);
-			if ( trim($this->getParam("flt")) != "" ) {
-				$flt = FilterParser::getApplications($this->getParam("flt"));
-				$res->filter->chain($flt, "AND");
-			}
-		} else $res = null;
-		return $res;
- */
 	}
 
     /**
@@ -949,7 +924,7 @@ class RestEdtAppList extends RestROAuthResourceList {
 		$res = new Default_Model_Applications();
 		$res->filter = FilterParser::getApplications($this->getParam("flt"));
 		$f = new Default_Model_ApplicationsFilter();
-		$f->id->in("SELECT * FROM editable_app_ids(" . $this->getParam("id") . ") AS appid", false, false);
+		$f->id->in("SELECT * FROM editable_app_ids(" . RestAPIHelper::normalizePplID($this) . ") AS appid", false, false);
 		$res->filter->chain($f, "AND");
 		return $res;
 	}
@@ -1020,10 +995,7 @@ class RestAscAppList extends RestROAuthResourceList {
 		$res = new Default_Model_Applications();
 		$res->filter = FilterParser::getApplications($this->getParam("flt"));
 		$f = new Default_Model_ResearchersFilter();
-		$f->id->equals($this->getParam("id"));
-//		$ff = new Default_Model_ApplicationsFilter();
-//		$ff->owner->numequals($this->getParam("id"));
-//		$res->filter->chain($f->chain($ff, "OR"),"AND");
+		$f->id->numequals(RestAPIHelper::normalizePplID($this));
 		$res->filter->chain($f, "AND");
 		return $res;
 	}
@@ -1236,7 +1208,7 @@ class RestRelAppList extends RestROResourceList {
      * overrides RestResource::getModel
      */
 	protected function getModel() {
-		$id = normalizeAppID($this);
+		$id = RestAPIHelper::normalizeAppID($this);
 		$res = new Default_Model_RelatedApplications($id);
 		$res->limit = $this->_pageLength;
 		$res->offset = $this->_pageOffset;
@@ -1294,12 +1266,7 @@ class RestAppItem extends RestResourceItem {
 		$isAdmin = $this->userIsAdmin();
 		$this->_resParent = new Default_Model_Applications();
 		if ( $isAdmin ) $this->_resParent->viewModerated = true;
-		if( substr($this->getParam("id") , 0, 2) === "s:" ) {
-			$s_name = substr(trim($this->getParam("id")), 2);
-			$this->_resParent->filter->cname->ilike($s_name);
-		} else {
-			$this->_resParent->filter->id->equals($this->getParam("id"));
-		}
+		$this->_resParent->filter->id->numequals(RestAPIHelper::normalizeAppID($this));
 		if ( $isAdmin ) {
 			$this->_resParent->viewModerated = true;
 		}
@@ -1326,7 +1293,7 @@ class RestAppItem extends RestResourceItem {
      */
     protected function getModel() {
 		if ( ($this->getMethod() == RestMethodEnum::RM_GET) && (! $this->_logged) ) {
-			$id = normalizeAppID($this);
+			$id = RestAPIHelper::normalizeAppID($this);
 			$cid = $this->getParam("cid"); if ( $cid == '' ) $cid = NULL;
 			$src = base64_decode($this->getParam("src")); if ( $src == '' ) $src = NULL; //else $src = "'" . $src . "'";
 			$userid = isset($this->_userid) ? $this->_userid : NULL;
@@ -1356,7 +1323,7 @@ class RestAppItem extends RestResourceItem {
 			$ret = $this->get();
 			if ( ! $this->_res->deleted ) {
 				$this->_res->deleted = true;
-                $this->_res->name = $this->_res->name.'-DELETED-'.$this->_res->guid;
+                $this->_res->name = $this->_res->name.'-DELETED-' . $this->_res->guid;
                 $this->_res->delInfo->deletedBy = $this->_userid;
                 $this->_res->delInfo->deletedOn = date('Y-m-d H:i:s');
 				$this->_res->save();
@@ -1469,23 +1436,24 @@ class RestAppRatingReport extends RestROResourceItem {
 		if ( parent::get() !== false ) {
 			global $application;
 			$t = $this->getParam("type");
-			switch($t){
+			switch($t) {
 				case "external":
-					$t=2;
+					$t = 2;
 					break;
 				case "internal":
-					$t=1;
+					$t = 1;
 					break;
 				default:
-					$t=0;
-					break;
+					$t = 0;
 			}
-			$id = normalizeAppID($this);
-			$p = $id . ($t != '' ? ",$t" : "");
 			$db = $application->getBootstrap()->getResource('db');
 			$db->setFetchMode(Zend_Db::FETCH_OBJ);
-			$r = $db->query('SELECT apprating_report_to_xml('.$p.');')->fetchAll();
-			return new XMLFragmentRestResponse($r[0]->apprating_report_to_xml, $this);
+			$r = $db->query('SELECT apprating_report_to_xml(' . RestAPIHelper::normalizeAppID($this) . ', ?);', array($t))->fetchAll();
+			if (count($r) > 0) {
+				return new XMLFragmentRestResponse($r[0]->apprating_report_to_xml, $this);				
+			} else {
+				return new XMLFragmentRestResponse(array(), $this);				
+			}
 		} else return false;
 	}
 }
@@ -1516,7 +1484,7 @@ class RestAppRatingList extends RestROResourceList {
      */
     protected function getModel() {
 		$res = new Default_Model_AppRatings();
-		$id = normalizeAppID($this);
+		$id = RestAPIHelper::normalizeAppID($this);
 		$res->filter->appid->numequals($id);            
 		return $res;
     }
@@ -1574,20 +1542,21 @@ class RestAppHistoryList extends RestROResourceList {
 				$oldvalue = '';
 				$newvalue = '';
 				$list = array();
+				$id = 0;
 				if ( is_numeric($this->getParam('id')) ) {
-					$id = $this->getParam('id');
+					$id = (int)($this->getParam('id'));
 				} elseif ( substr($this->getParam('id'),0,2) === "s:" ) {
 					db()->setFetchMode(Zend_Db::FETCH_BOTH);
-					$id = db()->query("SELECT id FROM applications WHERE cname ILIKE '" . pg_escape_string(substr($this->getParam('id'), 2)) . "' FETCH FIRST 1 ROWS ONLY")->fetchAll();
+					$id = db()->query("SELECT id FROM applications WHERE LOWER(cname) = LOWER(?) FETCH FIRST 1 ROWS ONLY", array(substr($this->getParam('id'), 2)))->fetchAll();
 					try {
-						$id = $id[0][0];
+						$id = (int)($id[0][0]);
 						$this->_pars["id"] = $id;
 					} catch (Exception $e) {
 						debug_log('could not find ID for application with cname `' . pg_escape_string(substr($this->getParam('id'), 2)) . "'");
 					}
 				}					
 				db()->setFetchMode(Zend_Db::FETCH_OBJ);
-				$rs = db()->query("SELECT (applications.history).*, (applications.history).nextid, (applications.history).previd FROM applications WHERE applications.id = $id ORDER BY (applications.history).tstamp DESC")->fetchAll();
+				$rs = db()->query("SELECT (applications.history).*, (applications.history).nextid, (applications.history).previd FROM applications WHERE applications.id = ? ORDER BY (applications.history).tstamp DESC", array($id))->fetchAll();
 				foreach ($rs as $r) {
 					$event = $r->event;
 					$userid = $r->userid;
@@ -1604,7 +1573,7 @@ class RestAppHistoryList extends RestROResourceList {
 						$ppl = new Default_Model_Researchers();
 						// retreive the user's CName even if the record has been marked as deleted
 						$ppl->viewModerated = true; 
-						$ppl->filter->id->numequals($userid);
+						$ppl->filter->id->numequals((int)$userid);
 						if (count($ppl->items) > 0) {
 							$userCname = $ppl->items[0]->cname;
 						} else {
@@ -1637,10 +1606,9 @@ class RestAppHistoryList extends RestROResourceList {
                         $id = $this->getParam('id');
                     } elseif ( substr($this->getParam('id'),0,2) === "s:" ) {
                         db()->setFetchMode(Zend_Db::FETCH_BOTH);
-                        $id = db()->query("(SELECT id FROM applications WHERE cname ILIKE '" . pg_escape_string(substr($this->getParam('id'), 2)) . "
-' FETCH FIRST 1 ROWS ONLY)")->fetchAll();
+                        $id = db()->query("(SELECT id FROM applications WHERE LOWER(cname) = LOWER(?) FETCH FIRST 1 ROWS ONLY)", array(substr($this->getParam('id'), 2)))->fetchAll();
                         try {
-                            $id = $id[0][0];
+                            $id = (int)($id[0][0]);
                             $this->_pars["id"] = $id;
                         } catch (Exception $e) {
                             debug_log('could not find ID for application with cname `' . pg_escape_string(substr($this->getParam('id'), 2)) . "'");
@@ -1687,7 +1655,7 @@ class RestAppHistoryList extends RestROResourceList {
 							$ppl = new Default_Model_Researchers();
 							// retreive the user's CName even if the record has been marked as deleted
 							$ppl->viewModerated = true; 
-							$ppl->filter->id->numequals($userid);
+							$ppl->filter->id->numequals((int)$userid);
 							if (count($ppl->items) > 0) {
 								$userCname = $ppl->items[0]->cname;
 							} else {
@@ -1799,10 +1767,10 @@ class RestAppHistoryDiffItem extends RestROResourceItem {
 		if ( parent::get() !== false ) {
 			$hid = $this->getParam("hid");
 			db()->setFetchMode(Zend_Db::FETCH_BOTH);
-			$x = db()->query("SELECT (actions).diff FROM apilog.actions WHERE id = '" . pg_escape_string($hid) . "'")->fetchAll();
+			$x = db()->query("SELECT (actions).diff FROM apilog.actions WHERE id = ?", array($hid))->fetchAll();
 			$x = $x[0];
 			$x = $x[0];
-			$xml = RestAPIHelper::wrapResponse('<appdb:diff><![CDATA[' . $x . ']]></appdb:diff>', $this->getDataType());
+			$xml = RestAPIHelper::wrapResponse('<appdb:diff>' . xml_escape($x) . '</appdb:diff>', $this->getDataType());
 			return $xml;
         } else return false;
     }
@@ -1938,7 +1906,7 @@ class RestAppTagList extends RestResourceList {
         if ( parent::get() !== false ) {
             if ( $this->_listMode === RestListModeEnum::RL_NORMAL ) {
 				$res = new Default_Model_AppTags();
-				$id = normalizeAppID($this);
+				$id = RestAPIHelper::normalizeAppID($this);
                 $res->filter->appid->numequals($id);
                 $res->refresh();
                 $xml = array();
@@ -1976,7 +1944,7 @@ class RestAppTagList extends RestResourceList {
             break;
         case(RestMethodEnum::RM_PUT):
 			$apps = new Default_Model_Applications();
-			$id = normalizeAppID($this);
+			$id = RestAPIHelper::normalizeAppID($this);
             $apps->filter->id->numequals($id);
             if ( count($apps->items) > 0 ) {
                 switch($apps->items[0]->tagPolicy) {
@@ -2120,7 +2088,7 @@ class RestAppPubList extends RestResourceList {
 
     public function init() {
 		$this->_res = new Default_Model_Applications();
-		$id = normalizeAppID($this);
+		$id = RestAPIHelper::normalizeAppID($this);
 		$this->_res->filter->id->numequals($id);
         $this->_res->refresh();
 		if ( count($this->_res->items) > 0 ) {
@@ -2257,7 +2225,7 @@ class RestAppPubList extends RestResourceList {
      */
     protected function getModel() {
 		$res = new Default_Model_AppDocuments();
-		$id = normalizeAppID($this);
+		$id = RestAPIHelper::normalizeAppID($this);
         $res->filter->appid->numequals($id);
         return $res;
     }
@@ -2300,13 +2268,13 @@ class RestAppPubItem extends RestResourceItem {
 
     protected function init() {
 		$this->_res = new Default_Model_Applications();
-		$id = normalizeAppID($this);
+		$id = RestAPIHelper::normalizeAppID($this);
         $this->_res->filter->id->numequals($id);
         $this->_res->refresh();
 		if ( count($this->_res->items) > 0 ) {
             $this->_res = $this->_res->items[0];
 			$res = new Default_Model_AppDocuments();
-			$res->filter->id->equals($this->getParam('pid'))->and($res->filter->appid->numequals($id));
+			$res->filter->id->numequals((int)($this->getParam('pid')))->and($res->filter->appid->numequals($id));
 			$res->refresh();
 			if ( ! (count($res->items) > 0) ) {
 				$this->_res = null;
@@ -2506,7 +2474,7 @@ class RestEdtAppLogistics extends RestAppLogistics {
      */
 	public function get($extraFilter = NULL) {
 		$f = new Default_Model_PermissionsFilter();
-		$f->actor->numequals("(SELECT guid FROM researchers WHERE id = " . $this->getParam("id") . ")")->and($f->actionid->any("app_metadata_actions()", false, false));
+		$f->actor->numequals("(SELECT guid FROM researchers WHERE id = " . normalizePplID($this) . ")")->and($f->actionid->any("app_metadata_actions()", false, false));
 		return parent::get($f);
 	}
 
@@ -3271,7 +3239,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 	private function getCurrentVAVersion() {
 		if( intval($this->vappversionid) > 0){
 			$vaversions = new Default_Model_VAversions();
-			$vaversions->filter->id->numequals($this->vappversionid);
+			$vaversions->filter->id->numequals((int)($this->vappversionid));
 			if( count($vaversions->items) > 0 ) {
 				return $vaversions->items[0];
 			}
@@ -3464,7 +3432,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 		if( $vmiinstanceid ){
 			$scriptids = array();
 			$vmiscripts = new Default_Model_VMIinstanceContextScripts();
-			$vmiscripts->filter->vmiinstanceid->numequals($vmiinstanceid);
+			$vmiscripts->filter->vmiinstanceid->numequals((int)$vmiinstanceid);
 			if( count($vmiscripts->items) > 0 ){
 				foreach($vmiscripts->items as $item){
 					$scriptids[] = $item->contextscriptid;
@@ -3476,10 +3444,10 @@ class RestAppVAXMLParser extends RestXMLParser {
 			//if no relation found remove them from db.
 			foreach($scriptids as $id){
 				$vmiscripts = new Default_Model_VMIinstanceContextScripts();
-				$vmiscripts->filter->contextscriptid->numequals($id);
+				$vmiscripts->filter->contextscriptid->numequals((int)$id);
 				if( count($vmiscripts->items) === 0 ){
 					$scripts = new Default_Model_ContextScripts();
-					$scripts->filter->id->numequals($id);
+					$scripts->filter->id->numequals((int)$id);
 					if( count($scripts->items) > 0 ){
 						VapplianceStorage::remove($scripts->items[0], $vmiinstanceid);
 						$scripts->remove($scripts->items[0]);
@@ -4593,7 +4561,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		
 		$apps = new Default_Model_Applications();
-		$apps->filter->id->equals($m->appid);
+		$apps->filter->id->numequals((int)($m->appid));
 		if( count($apps->items) === 0 ){
 			return $this->_setErrorMessage('Software with id: ' . $m->appid . ' not found.');
 		}
@@ -4605,7 +4573,7 @@ class RestAppVAXMLParser extends RestXMLParser {
 		//Create VAppliance if it doesn't exist
 		if( intval($m->id) <= 0 && $isput === true ){
 			$vas = new Default_Model_VAs();
-			$vas->filter->appid->equals($app->id);
+			$vas->filter->appid->numequals((int)($app->id));
 			if( count($vas->items) === 0 ){
 				$m->appid = $app->id;
 				$m->name = $app->name;
@@ -4679,7 +4647,7 @@ class RestAppVAXMLParser extends RestXMLParser {
                         try {
                                 $apps = new Default_Model_Applications();
                                 $f1 = new Default_Model_ApplicationsFilter();
-                                $f1->id->numequals($this->appid);
+                                $f1->id->numequals((int)($this->appid));
                                 $apps->filter->chain($f1, "AND");
 
                                 if (count($apps->items) > 0) {
@@ -4749,24 +4717,20 @@ class RestAppVAList extends RestResourceList {
 	//				return false;
 					break;
 				}
-				$locked = db()->query("SELECT pg_locks.granted FROM pg_locks WHERE pg_locks.locktype = 'advisory' AND pg_locks.granted AND pg_locks.objid = CRC32('vav" . $this->getParam("id") . "')")->fetchAll();
+				$locked = db()->query("SELECT pg_locks.granted FROM pg_locks WHERE pg_locks.locktype = 'advisory' AND pg_locks.granted AND pg_locks.objid = CRC32('vav" . pg_escape_string($this->getParam("id")) . "')")->fetchAll();
 				$locked = (count($locked) > 0);
 				if ($locked) {
-					error_log("Rest API: VA for APP (" . $this->getParam("id") . ") locked (try: $cnt / 30)");
+					error_log("Rest API: VA for APP (" . pg_escape_string($this->getParam("id")) . ") locked (try: $cnt / 30)");
 					sleep(1);
 				}
 			}
 
 			db()->setFetchMode(Zend_Db::FETCH_OBJ);
-			$appid = $this->getParam("id");
-			if ( ! is_numeric($appid) ) {
-				$appid = "(SELECT id FROM applications WHERE cname ILIKE '" . pg_escape_string(substr($this->getParam("id"), 2)) . "' FETCH FIRST 1 ROWS ONLY)";
-			}
 			$limit = "";
 			if( RestAppVAList::VALIST_VERSION_LIMIT > 0 ){
 				$limit = " LIMIT " .  RestAppVAList::VALIST_VERSION_LIMIT;
 			}
-			$res = db()->query("SELECT vapp_to_xml(" . $appid . ", 'applications') AS xml" . $limit . ";")->fetchAll();
+			$res = db()->query("SELECT vapp_to_xml(" . RestAPIHelper::normalizeAppID($this) . ", 'applications') AS xml" . $limit . ";")->fetchAll();
 			$x = array();
 			foreach($res as $r) {
 				$x[] = $r->xml;
@@ -4797,7 +4761,7 @@ class RestAppVAList extends RestResourceList {
 		if ( ! isset($this->_pars["id"]) ) {
 			return null;
 		} else {
-			$id = normalizeAppID($this);
+			$id = RestAPIHelper::normalizeAppID($this);
 			$vas = new Default_Model_VAs();
 			$vas->filter->appid->numequals($id);
 			if (count($vas->items) > 0) {
@@ -4840,7 +4804,7 @@ class RestAppVAList extends RestResourceList {
 		$canManage = false;
 		if (! is_null($this->getUser())) {
 			$app = new Default_Model_Applications();
-			$id = normalizeAppID($this);
+			$id = RestAPIHelper::normalizeAppID($this);
 			$app->filter->id->numequals($id);
 			if (count($app->items) > 0) {
 				$app = $app->items[0];
@@ -4970,7 +4934,7 @@ class RestAppVAItem extends RestResourceItem {
 
 	public function get() {
 		if (parent::get() !== false) {
-			$res = db()->query("SELECT vapp_to_xml(" . $this->getParam("vappid") . ", 'vapplications') AS xml;")->fetchAll();
+			$res = db()->query("SELECT vapp_to_xml(?, 'vapplications') AS xml;", array($this->getParam("vappid")))->fetchAll();
 			$x = array();
 			foreach($res as $r) {
 				if (is_object($r)) {
@@ -5161,7 +5125,7 @@ class RestAppContext extends RestResourceList{
 	}
 	protected function init() {
 		$m = new Default_Model_Applications();
-		$m->filter->id->numequals($this->getParam("id"));
+		$m->filter->id->numequals(RestAPIHelper::normalizeAppID($this));
 		if( count($m->items) > 0 ){
 			$this->_app = $m->items[0];
 		}else{
@@ -5177,11 +5141,7 @@ class RestAppContext extends RestResourceList{
 	public function get() {
 		if (parent::get() !== false) {
 			db()->setFetchMode(Zend_Db::FETCH_OBJ);
-			$appid = $this->getParam("id");
-			if ( ! is_numeric($appid) ) {
-				$appid = "(SELECT id FROM applications WHERE cname ILIKE '" . pg_escape_string(substr($this->getParam("id"), 2)) . "' FETCH FIRST 1 ROWS ONLY)";
-			}
-			$res = db()->query("SELECT context_to_xml(" . $appid . ") AS xml;")->fetchAll();
+			$res = db()->query("SELECT context_to_xml(" . RestAPIHelper::normalizeAppID($this) . ") AS xml;")->fetchAll();
 			$x = array();
 			foreach($res as $r) {
 				$x[] = $r->xml;
@@ -5299,7 +5259,7 @@ class RestAppContextScriptItem extends RestResourceItem{
 	}
 	protected function init() {
 		$m = new Default_Model_Applications();
-		$m->filter->id->numequals($this->getParam("id"));
+		$m->filter->id->numequals(RestAPIHelper::normalizeAppID($this));
 		if( count($m->items) > 0 ){
 			$this->_app = $m->items[0];
 		}else{
@@ -5309,7 +5269,7 @@ class RestAppContextScriptItem extends RestResourceItem{
 		}
 		
 		$m = new Default_Model_ContextScripts();
-		$m->filter->id->numequals($this->getParam("scriptid"));
+		$m->filter->id->numequals((int)($this->getParam("scriptid")));
 		if( count($m->items) > 0 ){
 			$this->_contextscript = $m->items[0];
 		}else{
@@ -5458,7 +5418,7 @@ class RestAppContextScriptList extends RestResourceList{
 	}
 	protected function init() {
 		$m = new Default_Model_Applications();
-		$m->filter->id->numequals($this->getParam("id"));
+		$m->filter->id->numequals(RestAPIHelper::normalizeAppID($this));
 		if( count($m->items) > 0 ){
 			$this->_app = $m->items[0];
 		}else{
@@ -5569,11 +5529,7 @@ class RestAppContextScriptList extends RestResourceList{
 	public function get() {
 		if (parent::get() !== false) {
 			db()->setFetchMode(Zend_Db::FETCH_OBJ);
-			$appid = $this->getParam("id");
-			if ( ! is_numeric($appid) ) {
-				$appid = "(SELECT id FROM applications WHERE cname ILIKE '" . pg_escape_string(substr($this->getParam("id"), 2)) . "' FETCH FIRST 1 ROWS ONLY)";
-			}
-			$res = db()->query("SELECT context_to_xml(" . $appid . ") AS xml;")->fetchAll();
+			$res = db()->query("SELECT context_to_xml(" . RestAPIHelper::normalizeAppID($this) . ") AS xml;")->fetchAll();
 			$x = array();
 			foreach($res as $r) {
 				$x[] = $r->xml;
@@ -5697,7 +5653,7 @@ class RestAppVAVersionItem extends RestAppVAItem {
 	public function get() {
 		if (parent::get() !== false) {
 			db()->setFetchMode(Zend_Db::FETCH_OBJ);
-			$res = db()->query("SELECT vapp_to_xml(" . $this->getParam("vappid") . ", 'vapplications') AS xml;")->fetchAll();
+			$res = db()->query("SELECT vapp_to_xml(?, 'vapplications') AS xml;", array($this->getParam("vappid")))->fetchAll();
 			$x = array();
 			foreach($res as $r) {
 				if (strpos($r->xml, 'vaversionid="'. $this->getParam("versionid") . '"') !== false) {
@@ -5770,7 +5726,7 @@ class RestAppVAVersionItem extends RestAppVAItem {
 	private function deleteContextFormats($vmiinstanceid) {
 		$scriptids = array();
 		$vmicfs = new Default_Model_VMISupportedContextFormats();
-		$vmicfs->filter->vmiinstanceid->numequals($vmiinstanceid);
+		$vmicfs->filter->vmiinstanceid->numequals((int)$vmiinstanceid);
 		if( count($vmicfs->items) > 0 ){
 			foreach($vmicfs->items as $item){
 				$cfids[] = $item->fmtid;
@@ -5781,7 +5737,7 @@ class RestAppVAVersionItem extends RestAppVAItem {
 	private function deleteContextScripts($vmiinstanceid){
 		$scriptids = array();
 		$vmiscripts = new Default_Model_VMIinstanceContextScripts();
-		$vmiscripts->filter->vmiinstanceid->numequals($vmiinstanceid);
+		$vmiscripts->filter->vmiinstanceid->numequals((int)$vmiinstanceid);
 		if( count($vmiscripts->items) > 0 ){
                         foreach($vmiscripts->items as $item){
 				$scriptids[] = $item->contextscriptid;
@@ -5793,10 +5749,10 @@ class RestAppVAVersionItem extends RestAppVAItem {
 		//if no relation found remove them from db.
 		foreach($scriptids as $id){
 			$vmiscripts = new Default_Model_VMIinstanceContextScripts();
-			$vmiscripts->filter->contextscriptid->numequals($id);
+			$vmiscripts->filter->contextscriptid->numequals((int)$id);
 			if( count($vmiscripts->items) === 0 ){
-                                $scripts = new Default_Model_ContextScripts();
-				$scripts->filter->id->numequals($id);
+				$scripts = new Default_Model_ContextScripts();
+				$scripts->filter->id->numequals((int)$id);
 				if( count($scripts->items) > 0 ){
 					$scripts->remove($scripts->items[0]);
 				}
@@ -5897,7 +5853,7 @@ class RestAppVAVersionIntegrityItem extends RestResourceItem {
 			error_log("STUB: RestAppVAVersionIntegrityItem::get()");
 			//error_log("[RestAppVAVersionIntegrityItem]: INTEGRITY CHECK FOR vappid: " . $this->_res->vappid . " versionid: " . $this->_res->id);
 			//db()->setFetchMode(Zend_Db::FETCH_OBJ);
-			//$res = db()->query("SELECT vapp_to_xml(" . $this->getParam("vappid") . ", 'vapplications') AS xml;")->fetchAll();
+			//$res = db()->query("SELECT vapp_to_xml(?, 'vapplications') AS xml;", array($this->getParam("vappid")))->fetchAll();
 			$x = array();
 			/*foreach($res as $r) {
 				$x[] = $r->xml;
@@ -5998,13 +5954,8 @@ class RestVAImageList extends RestROResourceList {
      */
 	public function get() {
 		if (parent::get() !== false) {
-			$id = $this->getParam("id");
-			if ( ! is_numeric($id) ) {
-				$id = "(SELECT id FROM applications WHERE cname ILIKE '" . pg_escape_string(substr($this->getParam("id"), 2)) . "' FETCH FIRST 1 ROWS ONLY)";
-			}
 			db()->setFetchMode(Zend_Db::FETCH_OBJ);
-			//error_log("SELECT vapp_image_providers_to_xml($id) AS xml");
-			$res = db()->query("SELECT vapp_image_providers_to_xml($id) AS xml")->fetchAll();
+			$res = db()->query("SELECT vapp_image_providers_to_xml(" . RestAPIHelper::normalizeAppID($this) . ") AS xml")->fetchAll();
 			$ret = array();
 			//error_log("c:" . count($res));
 			foreach ($res as $r) {
@@ -6035,12 +5986,8 @@ class RestSWAppImageList extends RestROResourceList {
      */
 	public function get() {
 		if (parent::get() !== false) {
-			$id = $this->getParam("id");
-			if ( ! is_numeric($id) ) {
-				$id = "(SELECT id FROM applications WHERE cname ILIKE '" . pg_escape_string(substr($this->getParam("id"), 2)) . "' FETCH FIRST 1 ROWS ONLY)";
-			}
 			db()->setFetchMode(Zend_Db::FETCH_OBJ);
-			$res = db()->query("SELECT swapp_image_providers_to_xml($id) AS xml")->fetchAll();
+			$res = db()->query("SELECT swapp_image_providers_to_xml(" . RestAPIHelper::normalizeAppID($this) . ") AS xml")->fetchAll();
 			$ret = array();
 			foreach ($res as $r) {
 				$ret[] = $r->xml;

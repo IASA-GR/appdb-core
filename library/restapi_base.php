@@ -321,6 +321,25 @@ class RestAPIHelper implements iRestAPIHelper {
 		
 		return $json;
 	}
+
+	private static function normalizeID(&$resource, $table, $paramName = "id") {
+		$id = $resource->getParam($paramName);
+		if ( ! is_numeric($id) ) {
+			$id = "(SELECT id FROM $table WHERE LOWER(cname) = LOWER('" . pg_escape_string(substr($resource->getParam($paramName), 2)) . "') FETCH FIRST 1 ROWS ONLY)";
+		} else {
+			$id = (int)$id;
+		}
+		error_log("NORMALIZING: $table.id = $id");
+		return $id;
+	}
+
+	public static function normalizeAppID(&$resource, $paramName = "id") {
+		return RestAPIHelper::normalizeID($resource, 'applications', $paramName);
+	}
+
+	public static function normalizePplID(&$resource, $paramName = "id") {
+		return RestAPIHelper::normalizeID($resource, 'researchers', $paramName);
+	}
 }
 
 /**

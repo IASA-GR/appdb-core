@@ -441,6 +441,8 @@ class RestVOAppStatsList extends RestROResourceList {
 			}
 			if ($void == "") {
 				$void = "NULL";
+			} else {
+				$void = (int)$void;
 			}
 			$from = $this->getParam("from");
 			if ($from == "") {

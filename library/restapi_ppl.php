@@ -422,7 +422,7 @@ class RestPplItem extends RestResourceItem {
 			$s_name = trim($s_name);
 			$this->_resParent->filter->cname->ilike($s_name);
 		} else {
-			$this->_resParent->filter->id->equals($this->getParam("id"));
+			$this->_resParent->filter->id->numequals(RestAPIHelper::normalizePplID($this));
 		}
         if ( count($this->_resParent->items) > 0 ) {
             $this->_res = $this->_resParent->items[0];
@@ -438,9 +438,10 @@ class RestPplItem extends RestResourceItem {
      */
     protected function getModel() {
 		if ( ($this->getMethod() == RestMethodEnum::RM_GET) && (! $this->_logged) ) {
-			$id = $this->getParam("id");
-			if ( ! isset($id) ) {
-				$id = "(SELECT id FROM researchers WHERE cname = '" . substr($this->getParam("name"), 2) . "')";
+			if( substr($this->getParam("name"), 0, 2) === "s:" ) {
+				$id = "(SELECT id FROM researchers WHERE LOWER(cname) = LOWER(?)" . pg_escape_string(substr($this->getParam("name"), 2)) . ")";
+			} else {
+				$id = RestAPIHelper::normalizePplID($this);
 			}
 			$cid = $this->getParam("cid"); if ( $cid == '' ) $cid = NULL;
 			$src = base64_decode($this->getParam("src")); if ( $src == '' ) $src = NULL; //else $src = "'" . $src . "'";

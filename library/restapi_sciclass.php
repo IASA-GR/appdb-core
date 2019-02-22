@@ -72,7 +72,7 @@ class RestSciClassItem extends RestROResourceItem {
     public function get() {
         if ( parent::get() !== false ) {
    			db()->setFetchMode(Zend_Db::FETCH_OBJ);			
-			$res = db()->query("SELECT sci_class.toxmlext(" . $this->getParam("id") . ") as x")->fetchAll();
+			$res = db()->query("SELECT sci_class.toxmlext(?) as x", array($this->getParam("id")))->fetchAll();
 			$x = array();
 			foreach ($res as $r) {
 				$x[] = $r->x;

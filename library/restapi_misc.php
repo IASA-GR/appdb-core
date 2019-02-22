@@ -259,7 +259,7 @@ class RestCategoryItem extends RestROResourceItem {
 		if ( parent::get() !== false ) {
 			$res = new Default_Model_Categories();
 			if ( is_numeric($this->getParam("id")) ) {
-				$res->filter->id->numequals($this->getParam("id"));
+				$res->filter->id->numequals((int)($this->getParam("id")));
 			} elseif ( substr($this->getParam("id"), 0, 2) === "s:" ) {
 				$res->filter->name->ilike(substr($this->getParam("id"), 2));
 			} else {
@@ -293,6 +293,8 @@ class RestCategoryAppStatsList extends RestROResourceList {
 			}
 			if ($void == "") {
 				$void = "NULL";
+			} else {
+				$void = (int)$void;
 			}
 			$from = $this->getParam("from");
 			if ($from == "") {
@@ -416,7 +418,7 @@ class RestDisciplineItem extends RestROResourceItem {
 		if ( parent::get() !== false ) {
 			$res = new Default_Model_Disciplines();
 			if ( is_numeric($this->getParam("id")) ) {
-				$res->filter->id->numequals($this->getParam("id"));
+				$res->filter->id->numequals((int)($this->getParam("id")));
 			} elseif ( substr($this->getParam("id"), 0, 2) === "s:" ) {
 				$res->filter->name->ilike(substr($this->getParam("id"), 2));
 			} else {
@@ -451,6 +453,8 @@ class RestDisciplineVOStatsList extends RestROResourceList {
 			}
 			if ($void == "") {
 				$void = "NULL";
+			} else {
+				$void = (int)$void;
 			}
 			$from = $this->getParam("from");
 			if ($from == "") {
@@ -545,6 +549,8 @@ class RestDisciplineAppStatsList extends RestROResourceList {
 			}
 			if ($void == "") {
 				$void = "NULL";
+			} else {
+				$void = (int)$void;
 			}
 			$from = $this->getParam("from");
 			if ($from == "") {
@@ -1353,7 +1359,7 @@ class RestAccessGroupItem extends RestROAdminResourceItem {
 				$this->setError(RestErrorEnum::RE_ACCESS_DENIED);
 				return false;
 			}
-			$res = db()->query("SELECT privgroup_to_xml(" . pg_escape_string($this->getParam("id")) . ")")->fetchAll();
+			$res = db()->query("SELECT privgroup_to_xml(?)", array($this->getParam("id")))->fetchAll();
 			if ( count($res) > 0 ) {
 				$ret = array();
 				foreach ($res as $r) {
