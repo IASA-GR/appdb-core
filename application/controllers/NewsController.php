@@ -548,11 +548,7 @@ class NewsController extends Zend_Controller_Action
     public function rolerequestmailAction($person=null){
 		$this->_helper->layout->disableLayout();
 		// OBSOLETE ----------
-		$this->_helper->viewRenderer->setNoRender();
-		$this->getResponse()->clearAllHeaders();
-		$this->getResponse()->setRawHeader("HTTP/1.0 404 Not Found");
-		$this->getResponse()->setHeader("Status","404 Not Found");
-		return;
+		return $this->NotFound();
 	}
 
 	public function disseminationAction() {

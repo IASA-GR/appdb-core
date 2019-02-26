@@ -600,7 +600,7 @@ class SamlController extends Zend_Controller_Action
 			$try_counter = 0;
 			while($try_counter < 25 ){
 				$try_counter += 1;
-				$confs = db()->query("select data from config where var = 'permissions_cache_dirty';")->fetchAll();
+				$confs = db()->query("SELECT data FROM config WHERE var = 'permissions_cache_dirty';")->fetchAll();
 				if( count($confs) > 0 ){
 					$conf = $confs[0];
 					if( (isset($conf["data"]) && trim($conf["data"]) === '0') ){

@@ -60,54 +60,6 @@ class SitesController extends Zend_Controller_Action{
 		 }
 	}
 	
-// OBSOLETE	
-// 	public function syncsitesAction(){
-// 		$this->_helper->layout->disableLayout();
-// 		$this->_helper->viewRenderer->setNoRender();
-// 		$islocal = localRequest();
-// 		
-// 		$update =  ( $this->_getParam("update") != null )?$this->_getParam("update"):"true";
-// 		$update = ( strtolower(trim($update)) === "false" )?false:true;
-// 		
-// 		$force =  ( $this->_getParam("force") != null )?$this->_getParam("force"):"true";
-// 		$force = ( strtolower(trim($force)) === "true" )?true:false;
-// 		
-// 		if( !$islocal ){
-// 			header('HTTP/1.0 404 Not Found');
-// 			header("Status: 404 Not Found");
-// 			return;
-// 		}
-// 		header('Content-type: text/xml');
-// 		echo '<' . '?xml version="1.0" encoding="UTF-8"?'.'>'."\n";
-// 		$result = Gocdb::syncSites( $update, $force );
-// 		db()->query("REFRESH MATERIALIZED VIEW CONCURRENTLY sites;");
-// 		db()->query("SELECT request_permissions_refresh();");
-// 		db()->query("REFRESH MATERIALIZED VIEW site_services_xml;");
-// 		db()->query("REFRESH MATERIALIZED VIEW site_service_images_xml;");
-// 		db()->query("DELETE FROM cache.filtercache WHERE m_from LIKE '%FROM sites%'");
-// 		if( is_array($result) ){
-// 			echo "<result success='true'";
-// 			if( isset($result["inserted"]) ){
-// 				echo " inserted='" . $result["inserted"] . "'";
-// 			}
-// 			if( isset($result["updated"]) ){
-// 				echo " updated='" . $result["updated"] . "'";
-// 			}
-// 			if( isset($result["deleted"]) ){
-// 				echo " deleted='" . $result["deleted"] . "'";
-// 			}
-// 			echo " />";
-// 			return;
-// 		}
-// 		
-// 		$error_message = trim($result);
-// 		if( is_string($result) === false ) {
-// 			$error_message = 'Unknown error';
-// 		}
-// 		ExternalDataNotification::sendNotification('Sites::syncSites', $error_message, ExternalDataNotification::MESSAGE_TYPE_ERROR);
-// 		echo "<result success='false' error='" . xml_escape($error_message). "' />";
-// 	}
-
 	private function makeVAprovidersCache() {
 		$copyfile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/va_providers.xml';
 		$hashfile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/datahash';
