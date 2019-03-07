@@ -217,7 +217,7 @@ AS $$
 	    xmlelement(
 	      name "endorsable:attribute",
 	      xmlattributes(
-	        'url' AS "name",
+	        'publisherUrl' AS "name",
 	        vappversion_publishers.curl AS "value"
 	      )
 	    )
