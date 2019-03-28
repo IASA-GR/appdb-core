@@ -139,6 +139,7 @@ class RestAPIHelper implements iRestAPIHelper {
 	public static function XMLNS_PROJECT() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/project'; }
 	public static function XMLNS_DATASET() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/dataset'; }
 	public static function XMLNS_ENDORSABLE() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/endorsable'; }
+        public static function XMLNS_SECANT() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/secant'; }
 	
 	static public function getVersion() {
 		return RestAPIHelper::VERSION;
@@ -195,6 +196,7 @@ class RestAPIHelper implements iRestAPIHelper {
 		$ns[] = 'xmlns:project="' .RestAPIHelper::XMLNS_PROJECT() . '"';
 		$ns[] = 'xmlns:dataset="' .RestAPIHelper::XMLNS_DATASET() . '"';
 		$ns[] = 'xmlns:endorsable="' .RestAPIHelper::XMLNS_ENDORSABLE() . '"';
+                $ns[] = 'xmlns:secant="' .RestAPIHelper::XMLNS_SECANT() . '"';
         return $ns;
     }
 

@@ -22,9 +22,13 @@
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
     targetNamespace="http://appdb.egi.eu/api/1.0/endorsable"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:secant="http://appdb.egi.eu/api/1.0/secant"
     xmlns:endorsable="http://appdb.egi.eu/api/1.0/endorsable">
 
-	<xs:complexType name="rendorsableReferrerType" mixed="true">
+	 <xs:import namespace="http://appdb.egi.eu/api/1.0/secant"
+		schemaLocation="secant.xsd"/>
+
+	<xs:complexType name="endorsableReferrerType" mixed="true">
 		<xs:attribute name="type" type="xs:string" use="required" />
 		<xs:attribute name="name" type="xs:string" use="required" />
 		<xs:attribute name="since" type="xs:string" use="optional" />
@@ -37,6 +41,15 @@
 		<xs:attribute name="name" type="xs:string" use="required" />
 		<xs:attribute name="value" type="xs:string" use="required" />
 		<xs:attribute name="since" type="xs:dateTime" use="optional" />
+	</xs:complexType>
+
+	<xs:complexType name="endorsableReportType" mixed="true">
+		<xs:sequence>
+			<xs:element ref="secant:report" minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+		<xs:attribute name="kind" type="xs:string" use="required" />
+		<xs:attribute name="source" type="xs:string" use="required" />
+		<xs:attribute name="harvestedOn" type="xs:dateTime" use="optional" />
 	</xs:complexType>
 
 	<xs:complexType name="endorsableSourceType" mixed="true">
@@ -57,7 +70,7 @@
 		<xs:sequence>
 			<xs:element name="signatureType" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="signature" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="referrer" type="endorsable:rendorsableReferrerType" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="referrer" type="endorsable:endorsableReferrerType" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="parent" type="endorsable:endorsableType" minOccurs="0" maxOccurs="1" />
 			<xs:element name="meta" type="endorsable:endorsableMetaType" minOccurs="0" maxOccurs="1" />
 			<xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1" />
@@ -65,6 +78,7 @@
 			<xs:element name="dataUrl" type="xs:string" minOccurs="0" maxOccurs="1" />
 			<xs:element name="imageUrl" type="xs:string" minOccurs="0" maxOccurs="1" />
 			<xs:element name="attribute" type="endorsable:endorsableAttributeType" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="report" type="endorsable:endorsableReportType" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 		<xs:attribute name="kind" type="xs:string" use="required" />
 		<xs:attribute name="name" type="xs:string" use="required" />
