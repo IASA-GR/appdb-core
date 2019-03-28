@@ -104,10 +104,15 @@ appdb.config = {
 	}
 };
 if( <?php echo $hasRepository; ?> ){
-	appdb.config.repository = { };
-	appdb.config.repository.endpoint = {};
-	appdb.config.repository.endpoint.base = "<?php echo ApplicationConfiguration::url('/repository/')?>";
-	appdb.config.repository.endpoint.upload = "<?php echo ApplicationConfiguration::url('/repository/storage/upload')?>";
+        appdb.config.repository = { };
+        appdb.config.repository.endpoint = {};
+        appdb.config.repository.endpoint.base = "<?php echo ApplicationConfiguration::url('/repository/')?>";
+        appdb.config.repository.endpoint.upload = "<?php echo ApplicationConfiguration::url('/repository/storage/upload')?>";
+        appdb.config.repository.uploader = {
+            chunk_size : '500kb',
+            max_file_size : '200mb',
+            runtimes: 'html5,flash,silverlight,gears,html4,browserplus'
+        };
 }
 if( appdb.config.routing.useHash == false && typeof history.pushState === "undefined"){
 	appdb.config.routing.useHash = true;
