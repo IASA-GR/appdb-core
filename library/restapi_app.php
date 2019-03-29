@@ -2810,9 +2810,9 @@ class RestAppVAXMLParser extends RestXMLParser {
                         return date('Y-m-d', strtotime('+1 years'));
                 }
 
-                $expiresontimeval = intval($expiresontime['year'] . '' . $expiresontime['month'] . '' . $expiresontime['day']);
+				$expiresontimeval = mktime($expiresontime['hour'], $expiresontime['minute'], $expiresontime['second'], $expiresontime['month'], $expiresontime['day'], $expiresontime['year']);
                 $yearfromnow = date_parse(date('Y-m-d', strtotime('+1 years')));
-                $yearfromnow = intval($yearfromnow['year'] . '' . $yearfromnow['month'] . '' . $yearfromnow['day']);
+				$yearfromnow = mktime($yearfromnow['hour'], $yearfromnow['minute'], $yearfromnow['second'], $yearfromnow['month'], $yearfromnow['day'], $yearfromnow['year']);
 
                 if ($expiresontimeval > $yearfromnow) {
                         return date('Y-m-d', strtotime('+1 years'));
