@@ -8,7 +8,7 @@
  http://www.apache.org/licenses/LICENSE-2.0
 
  Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
+ distributed under the License is distributed ON an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and 
  limitations under the License.
@@ -75,7 +75,7 @@ SELECT
       name "endorsable:endorsable", 
       XMLATTRIBUTES(
         'vapplianceVersion' AS "kind",
-        'http://hdl.handle.net/' || vapp_versions.pidhandle as "pid",
+        'http://hdl.handle.net/' || vapp_versions.pidhandle AS "pid",
         vaviews.va_version AS "name",
         vaviews.va_version AS "cname",
         vaviews.va_version_publishedon AS "createdOn"
@@ -260,15 +260,15 @@ SELECT
       xmlelement(
         name "endorsable:report",
         xmlattributes(
-          'security' as "kind",
-          'secant' as "source",
+          'security' AS "kind",
+          'secant' AS "source",
           secant.closedon AS "harvestedOn"
         ),
         xmlelement(
           name "secant:report",
           xmlattributes(
-            secant.outcome as "outcome",
-            secant.version as "version"
+            secant.outcome AS "outcome",
+            secant.version AS "version"
           ),
           xmlelement(
             name "secant:mpuri",
@@ -278,14 +278,14 @@ SELECT
             name "secant:description",
             (xpath('//SECANT/OUTCOME_DESCRIPTION/text()', secant.data::text::xml))[1]::text
           ),
-          array_to_string(array_agg(distinct 
-            (select xmlagg(xmlelement(
+          array_to_string(array_agg(DISTINCT 
+            (SELECT xmlagg(xmlelement(
                 name "secant:check",
                 xmlattributes(
-                  (xpath('//CHECK/TEST_ID/text()', d))[1] as "name",
-                  (xpath('//CHECK/VERSION/text()', d))[1] as "version",
-                  (xpath('//CHECK/OUTCOME/text()', d))[1] as "outcome",
-                  (xpath('//SECANT/MESSAGEID/text()', secant.data::xml))[1] as "messageid"
+                  (xpath('//CHECK/TEST_ID/text()', d))[1] AS "name",
+                  (xpath('//CHECK/VERSION/text()', d))[1] AS "version",
+                  (xpath('//CHECK/OUTCOME/text()', d))[1] AS "outcome",
+                  (xpath('//SECANT/MESSAGEID/text()', secant.data::xml))[1] AS "messageid"
                 ),
                 xmlelement(
                   name "secant:description",
@@ -299,15 +299,15 @@ SELECT
                   name "secant:details",
                   (xpath('//CHECK/DETAILS/text()', d))[1]
                 )
-            )) from unnest(xpath('//SECANT/LOG/CHECK', secant.data::xml)) as d)::text), '')::xml
+            )) FROM unnest(xpath('//SECANT/LOG/CHECK', secant.data::xml)) AS d)::text), '')::xml
         )
       )
       ELSE NULL::xml END
   ) AS dataxml
   FROM applications 
-  INNER JOIN vaviews on vaviews.appid = applications.id
+  INNER JOIN vaviews ON vaviews.appid = applications.id
   INNER JOIN vapp_versions ON vapp_versions.id = vaviews.vappversionid
-  INNER JOIN  researchers AS vappversion_publishers on vappversion_publishers.id = vaviews.va_version_publishedby
+  INNER JOIN  researchers AS vappversion_publishers ON vappversion_publishers.id = vaviews.va_version_publishedby
   LEFT OUTER JOIN (
     SELECT 
       DISTINCT 
@@ -349,24 +349,23 @@ SELECT
      INNER JOIN vaviews ON vaviews.vapplistid = vowide_image_list_images.vapplistid 
      ORDER BY va_providers.sitename, vaviews.vappversionid
   ) AS sitevoimages ON sitevoimages.vappversionid = vaviews.vappversionid
-  left outer join (
-    select distinct sc.vmiinstanceid,
+  LEFT OUTER JOIN (
+    SELECT DISTINCT sc.vmiinstanceid,
            sc.base_mpuri,
            sc.closedon,
-           sc.secant_version as "version",
-           sc.report_outcome as outcome,
-           xtrim(replace(replace(decode(sc.report_data::text, 'base64')::text, '\012', E'\n'), '\011', '')) as "data"
-      from public.va_sec_check_queue as sc
-      where sc.state='closed' and not sc.report_data is null and sc.report_data not like  '<%'
-      group by sc.vmiinstanceid,
+           sc.secant_version AS "version",
+           sc.report_outcome AS outcome,
+           xtrim(replace(replace(decode(sc.report_data::text, 'base64')::text, '\012', E'\n'), '\011', '')) AS "data"
+      FROM public.va_sec_check_queue AS sc
+      WHERE sc.state='closed' and not sc.report_data is null and sc.report_data not like  '<%'
+      GROUP BY sc.vmiinstanceid,
            sc.base_mpuri,
            sc.closedon,
            sc.secant_version,
            sc.report_outcome,
            sc.report_data::text
-    ) as secant on secant.vmiinstanceid = vaviews.vmiinstanceid
+    ) AS secant ON secant.vmiinstanceid = vaviews.vmiinstanceid
   WHERE vaviews.va_version_published AND (NOT vaviews.imglst_private) AND (NOT vaviews.va_version_publishedon IS NULL) AND vaviews.va_version_expireson > NOW() 
-  and vaviews.vmiinstanceid = 7741
   GROUP BY vaviews.va_version, vaviews.vappversionid, 
   applications.id,
   applications.name,
