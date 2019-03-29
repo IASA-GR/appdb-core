@@ -103,9 +103,28 @@
                 <xsl:with-param name="s" select="concat(substring-before($s,'&#13;'),'\r',substring-after($s,'&#13;'))"/>
             </xsl:call-template>
         </xsl:when>
-        <xsl:when test="contains($s,'\')">
+        <!-- Unescape ’ character-->
+        <xsl:when test="contains($s,'\’')">
             <xsl:call-template name="escape-string">
-                <xsl:with-param name="s" select="concat(substring-before($s,'\'),'',substring-after($s,'\'))"/>
+                <xsl:with-param name="s" select="concat(substring-before($s,'\’'),'’',substring-after($s,'\’'))"/>
+            </xsl:call-template>
+        </xsl:when>
+        <!-- Unescape single quotes -->
+        <xsl:when test="contains($s,&quot;\'&quot;)">
+            <xsl:call-template name="escape-string">
+                <xsl:with-param name="s" select="concat(substring-before($s,&quot;\'&quot;),&quot;'&quot;,substring-after($s,&quot;\'&quot;))"/>
+            </xsl:call-template>
+        </xsl:when>
+        <!-- Unescape dot characters -->
+        <xsl:when test="contains($s,'\.')">
+            <xsl:call-template name="escape-string">
+                <xsl:with-param name="s" select="concat(substring-before($s,'\.'),'.',substring-after($s,'\.'))"/>
+            </xsl:call-template>
+        </xsl:when>
+        <!-- Unescape tilde chracters -->
+        <xsl:when test="contains($s,'\~')">
+            <xsl:call-template name="escape-string">
+                <xsl:with-param name="s" select="concat(substring-before($s,'\~'),'~',substring-after($s,'\~'))"/>
             </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
