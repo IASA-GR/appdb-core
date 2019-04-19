@@ -592,3 +592,5 @@ REFRESH MATERIALIZED VIEW CONCURRENTLY permissions;
 INSERT INTO version (major,minor,revision,notes) 
     SELECT 8, 22, 12, E'Explicitly support org.openstack.nova endpoints for managed VO-wide image list access, until AppDB-IS w/ GLUE2.1 support gets released'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=22 AND revision=12);
+
+COMMIT;	
