@@ -15,6 +15,11 @@
  * limitations under the License.
  */
 
+/**
+ * temporary fix for syncing org.openstack.nova endpoints until AppDB-IS w/ GLUE 2.1 support gets released
+ */
+require_once(APPLICATION_PATH . "/../library/NovaSyncer.php");
+// OBSOLETE
 //require_once(APPLICATION_PATH . "/../library/argo.php");
 
 class GocdbController extends Zend_Controller_Action
@@ -421,5 +426,21 @@ class GocdbController extends Zend_Controller_Action
 //			$this->getResponse()->setHeader("Status","403 Forbidden");
 //		}
 //	}
+
+	/**
+	 * Synchronizes org.openstack.nova endpoints from GocDB. Temporary solution until AppDB-IS w/ support for GLUE 2.1 gets released
+	 * Uses NovaSyncer class
+	 */
+	public function syncnovaprovidersAction() {
+		if ( localRequest() ) {
+			$ns = new NovaSyncer();
+			$ns->sync();
+		} else {
+			$this->getResponse()->clearAllHeaders();
+			$this->getResponse()->setRawHeader("HTTP/1.0 403 Forbidden");
+			$this->getResponse()->setHeader("Status","403 Forbidden");
+		}
+	}
+
 }
 
