@@ -42,6 +42,12 @@ class VoController extends Zend_Controller_Action
 		}
 	}
 
+    private function normalizeQuotes($str) {
+        $str = str_replace('"', '”', $str);
+        $str = str_replace("'", "’", $str);
+        return $str;
+    }
+
     private function printError() 
     {
 		$this->_helper->layout->disableLayout();
@@ -186,7 +192,7 @@ class VoController extends Zend_Controller_Action
 		$vo->name = $att["Name"];
 		$vo->serial = $att["Serial"];
 		$vo->alias = $att["Alias"];
-		$vo->description = trim(strval($voentry->Description));
+		$vo->description = $this->normalizeQuotes(trim(strval($voentry->Description)));
 		$discs = array();
 		$discnames = array();
 		$minid = -1;
@@ -405,7 +411,7 @@ class VoController extends Zend_Controller_Action
 					if (substr($vd, 0, 4) === "0000") {
 						$vd = null;
 					}
-					db()->query("INSERT INTO perun.vos (name, validated, description, homepage, enrollment, alias, status) VALUES (?, ?, ?, ?, ?, ?, ?)", array(strtolower(trim($att["name"])), $vd, trim($xvo->description), trim($xvo->homepageUrl), trim($xvo->enrollmentUrl), trim($att["alias"]), trim($att["status"])));
+					db()->query("INSERT INTO perun.vos (name, validated, description, homepage, enrollment, alias, status) VALUES (?, ?, ?, ?, ?, ?, ?)", array(strtolower(trim($att["name"])), $vd, $this->normalizeQuotes(trim($xvo->description)), trim($xvo->homepageUrl), trim($xvo->enrollmentUrl), trim($att["alias"]), trim($att["status"])));
 				}
 				db()->query("INSERT INTO vos (name,domainid,validated,description,homepage,enrollment,alias,status,sourceid) SELECT name,3,validated,description,homepage,enrollment,alias,status,(SELECT id FROM vo_sources WHERE name = 'EBI-Perun') AS sourceid FROM perun.vos AS x WHERE NOT EXISTS (SELECT * FROM vos AS y WHERE y.name = x.name AND y.sourceid = (SELECT id FROM vo_sources WHERE name = 'EBI-Perun'))");
 				// mark missing EBI VOs as deleted
@@ -555,7 +561,7 @@ class VoController extends Zend_Controller_Action
 					foreach ($xdiscs as $xdisc) {
 						$discs[] = $xdisc["id"];
 					}
-					db()->query("INSERT INTO egiops.vos (name, scope, validated, description, homepage, enrollment, aup, domainname, disciplineid, alias, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, (?)::int[], ?, ?)", array(strtolower(trim($att["Name"])), trim($xvo->Scope), $vd, trim($xvo->Description), trim($xvo->HomepageUrl), trim($xvo->EnrollmentUrl), trim($xvo->AUP), trim($xvo->Discipline), php_to_pg_array($discs, false) ,trim($att["Alias"]), trim($att["Status"])));
+					db()->query("INSERT INTO egiops.vos (name, scope, validated, description, homepage, enrollment, aup, domainname, disciplineid, alias, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, (?)::int[], ?, ?)", array(strtolower(trim($att["Name"])), trim($xvo->Scope), $vd, $this->normalizeQuotes(trim($xvo->Description)), trim($xvo->HomepageUrl), trim($xvo->EnrollmentUrl), trim($xvo->AUP), trim($xvo->Discipline), php_to_pg_array($discs, false) ,trim($att["Alias"]), trim($att["Status"])));
 				}
 				db()->query("UPDATE vos SET
 					scope = x.scope,
