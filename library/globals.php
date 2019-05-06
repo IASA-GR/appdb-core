@@ -2532,7 +2532,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$fld = "name";
 								$f2->$fld->matches("^[^A-Za-z0-9].+");
 							} else {
-								continue;
+								continue 2;
 							}							
 							$filter->chain($f2, $chainOp, $private);
 							break;
@@ -2634,7 +2634,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$f3->$fld->lt("'0'", false, false)->or($f3->$fld->gt("'99999999999999999999999999999999999999999999999999'", false, false));
 								$f2->chain($f3, "AND", $private);
 							} else {
-								continue;
+								continue 2;
 							}							
 							$filter->chain($f2, $chainOp, $private);
 							break;
@@ -2792,7 +2792,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$fld = "name";
 								$f2->$fld->matches("^[^A-Za-z0-9].+");
 							} else {
-								continue;
+								continue 2;
 							}							
 							$filter->chain($f2, $chainOp, $private);
 						}
@@ -2880,7 +2880,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$fld = "name";
 								$f2->$fld->matches("^[^A-Za-z0-9].+");
 							} else {
-								continue;
+								continue 2;
 							}							
 							$filter->chain($f2, $chainOp, $private);
 							break;
