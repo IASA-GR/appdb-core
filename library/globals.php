@@ -10123,7 +10123,7 @@ class AccessTokens{
 		foreach($ips as $ip){
 			$res = (isIPv4($ip)>0 || isIPv6($ip)>0 || isCIDR($ip)>0 || isCIDR6($ip)>0 );
 			if($res==false){
-				$res = (preg_match('/^(([a-zA-Z]|[a-zA-Z][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])$/',$ip)>0);
+				$res = (preg_match('/^(([a-zA-Z]|[0-9a-zA-Z][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])$/',$ip)>0);
 			}
 			if( $res === false ){
 				return "Invalid net filter: " . $ip;
