@@ -20722,7 +20722,10 @@ appdb.views.AutoCompleteList = appdb.ExtendClass(appdb.View, "appdb.views.AutoCo
 			var keycode = (ev.keyCode ? ev.keyCode : ev.which);
 			if( keycode === 13 ){
 				ev.stopPropagation();
+				ev.preventDefault();
+				return false;
 			}
+
 			return true;
 		});
 		$(this.options.dom.input).off("change").on("change", (function(self){
