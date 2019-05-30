@@ -8105,7 +8105,7 @@ appdb.utils.GroupSiteImages = function(occiservices, flattenVOs){
 			$.each(e.occi, function(ii,ee){
 				ee.template = extendArray(e.template);
 				ee.mpuri = ""+e.mpuri;
-				ee.occi_endpoint_url = "" + e.occi_endpoint_url;
+				ee.occi_endpoint_url = (e.occi_endpoint_url && e.occi_endpoint_url.val) ? e.occi_endpoint_url.val() : '' + e.occi_endpoint_url;
 				$.each(ee.template, function(ti,t){
 					t.occi_endpoint_url = ee.occi_endpoint_url;
 				});
