@@ -3823,13 +3823,21 @@ appdb.views.SitesList = appdb.ExtendClass(appdb.View, "appdb.views.SitesList", f
 		if (d.service.length > 0) {
 			div2 = $("<div class='supports'></div>");
 			var servs = $.grep(d.service, function(e) {
-				return ["occi", "openstack"].indexOf(e["type"]) >= 0;
+				return ["occi", "openstack", "opennebula"].indexOf(e["type"]) >= 0;
 			});
 			if (d.service.length > 0) {
 				var insts = this.getImageCount(servs);
+				var supportedBy = this.getSupportedServiceTypes(servs);
 				//TODO: support multiple service types instead of service[0] only
 				//TODO: support non-OCCI icons
-				$(div2).append("<span class='serviceitem occi'><span class='status'><img src='/images/occi.png' alt=''/><span>" + d.service[0].type + "</span></span><span class='instances'><span class='count'></span><span>images</span></span></span>");
+				if(supportedBy.openstack) {
+				   $(div2).append("<span class='serviceitem occi'><span class='status'><img src='/images/openstack.png' alt='' style='width:auto;height:12px;opacity:0.8;'/><span></span></span><span class='instances'><span class='count'></span><span>images</span></span></span>");
+				} else if (supportedBy.opennebula) {
+				    $(div2).append("<span class='serviceitem occi'><span class='status'><img src='/images/opennebula.png' alt='' style='width:auto;height:12px;opacity:0.8;'/><span></span></span><span class='instances'><span class='count'></span><span>images</span></span></span>");
+				} else {
+				    $(div2).append("<span class='serviceitem occi'><span class='status'><img src='/images/occi.png' alt=''/><span>occi enabled</span></span><span class='instances'><span class='count'></span><span>images</span></span></span>");
+				}
+
 				$(div2).find(".count").text(insts);
 				if (insts > 0) {
 					$(div2).find('.serviceitem').addClass("hasinstances");
@@ -3840,6 +3848,21 @@ appdb.views.SitesList = appdb.ExtendClass(appdb.View, "appdb.views.SitesList", f
 
 		$(res).append($(div));
 		return res;
+	};
+	this.getSupportedServiceTypes = function(services) {
+	   var supported = ["occi", "openstack", "opennebula"];
+	   var res = {};
+	   $.each(supported, function(i, s) {
+	       let servs = $.grep(services, function(e) { return $.trim(e["type"]).toLowerCase() === s; });
+	       servs = servs.length ? servs[0] : null;
+	       if (servs) {
+		   servs.image = servs.image || [];
+		   servs.image = $.isArray(servs.image) ? servs.image : [servs.image];
+		   res[s] = servs.image.length;
+	       }
+	   });
+
+	   return res;
 	};
 	this.render = function(d) {
 		var i, len = (d) ? ((typeof d.length !== "undefined") ? d.length : len) : 0, f = (($(this.dom).length > 0) ? $(this.dom)[0] : null);
