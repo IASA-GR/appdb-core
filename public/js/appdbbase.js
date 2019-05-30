@@ -2419,16 +2419,17 @@ appdb.components.Site = appdb.ExtendClass(appdb.Component, "appdb.components.Sit
 	this.reset = function(){
 		
 	};
-	this.getServices = function(servicetype){
-		servicetype = $.trim(servicetype);
+	this.getServices = function(servicetypes){
+		servicetypes = servicetypes || [];
+		servicetypes = $.isArray(servicetypes) ? servicetypes : [servicetypes];
 		var d = (this.options.data || {}).service || [];
 		d = $.isArray(d)?d:[d];
 		return $.grep(d, function(e){
-			return ( servicetype !== "" && $.trim(e["type"]).toLowerCase() === "occi" );
+			return ( servicetypes.length > 0 && servicetypes.indexOf($.trim(e["type"]).toLowerCase()) >= 0 );
 		});
 	};
 	this.getOcciImages = function(){
-		var servs = this.getServices("occi");
+		var servs = this.getServices(["occi", "openstack"]);
 		return appdb.utils.GroupSiteImages(servs, true);
 	};
 	this.renderLoading = function(enabled){

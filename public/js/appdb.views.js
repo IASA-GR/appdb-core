@@ -3823,11 +3823,13 @@ appdb.views.SitesList = appdb.ExtendClass(appdb.View, "appdb.views.SitesList", f
 		if (d.service.length > 0) {
 			div2 = $("<div class='supports'></div>");
 			var servs = $.grep(d.service, function(e) {
-				return e["type"] === "occi";
+				return ["occi", "openstack"].indexOf(e["type"]) >= 0;
 			});
 			if (d.service.length > 0) {
 				var insts = this.getImageCount(servs);
-				$(div2).append("<span class='serviceitem occi'><span class='status'><img src='/images/occi.png' alt=''/><span>occi enabled</span></span><span class='instances'><span class='count'></span><span>images</span></span></span>");
+				//TODO: support multiple service types instead of service[0] only
+				//TODO: support non-OCCI icons
+				$(div2).append("<span class='serviceitem occi'><span class='status'><img src='/images/occi.png' alt=''/><span>" + d.service[0].type + "</span></span><span class='instances'><span class='count'></span><span>images</span></span></span>");
 				$(div2).find(".count").text(insts);
 				if (insts > 0) {
 					$(div2).find('.serviceitem').addClass("hasinstances");
