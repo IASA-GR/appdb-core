@@ -17,11 +17,36 @@
 /* 
 EGI AppDB incremental SQL script
 Previous version: 8.22.x
-New version: 8.22.9000
+New version: 8.22.99
 Author: wvkarag@lovecraft.priv.iasa.gr
 */
 
 START TRANSACTION;
+
+CREATE OR REPLACE FUNCTION cloud_service_types() RETURNS TEXT[] AS 
+$$
+	SELECT ARRAY['eu.egi.cloud.vm-management.occi', 'org.openstack.nova'];
+$$
+LANGUAGE SQL IMMUTABLE;
+ALTER FUNCTION cloud_service_types() OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION cloud_service_names() RETURNS TEXT[] AS 
+$$
+	SELECT ARRAY['occi', 'openstack'];
+$$
+LANGUAGE SQL IMMUTABLE;
+ALTER FUNCTION cloud_service_names() OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION cloud_service_name_from_type(servtype TEXT) RETURNS TEXT AS 
+$$
+SELECT CASE LOWER($1)
+	WHEN 'eu.egi.cloud.vm-management.occi' THEN 'occi'
+	WHEN 'org.openstack.nova' THEN 'openstack'
+	ELSE 'unknown'
+END;
+$$
+LANGUAGE SQL IMMUTABLE;
+ALTER FUNCTION cloud_service_name_from_type(TEXT) OWNER TO appdb;
 
 DROP VIEW vldap_group_members;
 DROP VIEW editable_apps;
@@ -592,7 +617,8 @@ BEGIN
         statusv := (j->>'info')::jsonb->>'StatusValue';
         epkey := (j->>'info')::jsonb->>'SiteEndpointPKey';
         srvgrp := (j->>'info')::jsonb->>'StatusEndpointGroup';
-        IF (srvgrp = 'eu.egi.cloud.vm-management.occi') OR (srvgrp = 'org.openstack.nova') THEN
+        IF LOWER(srvgrp) = ANY(cloud_service_types()) THEN
+        -- IF (srvgrp = 'eu.egi.cloud.vm-management.occi') OR (srvgrp = 'org.openstack.nova') THEN
         	-- RAISE NOTICE 'processing status: %, ts: %, pkey: % for srvgrp %', statusv, statust, epkey, srvgrp;
             UPDATE gocdb.va_providers
                 SET service_status = statusv, service_status_date = statust
@@ -622,11 +648,12 @@ FROM (
 		XMLELEMENT(
 			name "site:service",
 			XMLATTRIBUTES(
-				CASE va_providers.service_type
+				cloud_service_name_from_type(va_providers.service_type) AS type,
+				/*CASE va_providers.service_type
 					WHEN 'eu.egi.cloud.vm-management.occi' THEN 'occi'
 					WHEN 'org.openstack.nova' THEN 'openstack'
 					ELSE 'UNKNOWN'
-				END AS type,
+				END AS type,*/
 				va_providers.id AS id ,
 				hostname AS host,
 				COUNT(DISTINCT va_provider_images.good_vmiinstanceid) AS instances,
@@ -662,11 +689,12 @@ CREATE OR REPLACE FUNCTION public.site_service_to_xml_ext(sitename text)
 AS $function$
 SELECT xmlagg(services.x) FROM (SELECT XMLELEMENT(NAME "site:service",
     XMLATTRIBUTES(
-    	CASE va_providers.service_type
+    		cloud_service_name_from_type(va_providers.service_type) AS type,
+    		/*CASE va_providers.service_type
 			WHEN 'eu.egi.cloud.vm-management.occi' THEN 'occi'
 			WHEN 'org.openstack.nova' THEN 'openstack'
 			ELSE 'UNKNOWN'
-		END AS type,
+		END AS type,*/
     	va_providers.id as id,
     	hostname as host,
     	va_providers.beta as beta,
@@ -688,11 +716,12 @@ SELECT xmlagg(services.x) FROM (SELECT XMLELEMENT(NAME "site:service",
     	array_to_string(array_agg(
 			DISTINCT xmlelement(name "siteservice:occi_endpoint_url",
 				XMLATTRIBUTES(
-					CASE va_providers.service_type
+					cloud_service_name_from_type(va_providers.service_type) AS type
+				/*	CASE va_providers.service_type
 						WHEN 'eu.egi.cloud.vm-management.occi' THEN 'occi'
 						WHEN 'org.openstack.nova' THEN 'openstack'
 						ELSE 'UNKNOWN'
-					END AS type
+					END AS type*/
 				),
 				endpoint_url
 			)::text
@@ -748,7 +777,8 @@ CREATE OR REPLACE FUNCTION public.site_supports(servname text)
  LANGUAGE plpgsql
 AS $function$
 BEGIN
-	IF ($1 = 'occi') OR ($1 = 'openstack') THEN
+	IF LOWER($1) = ANY(cloud_service_names()) THEN
+	-- IF ($1 = 'occi') OR ($1 = 'openstack') THEN
 		RETURN QUERY SELECT DISTINCT(sites.id) FROM sites INNER JOIN va_providers ON va_providers.sitename = sites.name AND va_providers.in_production = true;
 	ELSE
 		RETURN QUERY SELECT DISTINCT(sites.id) FROM sites WHERE sites.name NOT IN (SELECT va_providers.sitename FROM va_providers WHERE va_providers.in_production = true);
@@ -763,7 +793,8 @@ CREATE OR REPLACE FUNCTION public.site_instances(servname text)
  LANGUAGE plpgsql
 AS $function$
 BEGIN
-	IF ($1 = 'occi') OR ($1 = 'openstack') THEN
+	IF LOWER($1) = ANY(cloud_service_names()) THEN
+	-- IF ($1 = 'occi') OR ($1 = 'openstack') THEN
 		RETURN QUERY
 			SELECT DISTINCT(sites.id)
 			FROM sites
@@ -809,7 +840,7 @@ AS SELECT nextval('va_provider_templates_id_seq'::regclass) AS id,
     jsonb_array_elements((((t.j ->> 'info'::text)::jsonb) ->> 'templates'::text)::jsonb) ->> 'GLUE2ExecutionEnvironmentDiskSize'::text AS disc_size
    FROM egiis.vapj g
      LEFT JOIN egiis.tvapj t ON t.pkey = g.pkey AND (g.lastseen - t.lastseen) < '00:10:00'::interval
-  WHERE UPPER(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointInterfaceName'::text) IN ('OCCI', 'OPENSTACK') AND COALESCE(btrim(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2ComputingEndpointComputingServiceForeignKey'::text), ''::text) <> ''::text AND COALESCE(((g.j ->> 'info'::text)::jsonb) ->> 'SiteEndpointInProduction'::text, 'FALSE'::text)::boolean IS DISTINCT FROM false
+  WHERE LOWER(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointInterfaceName'::text) = ANY(cloud_service_names()) AND COALESCE(btrim(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2ComputingEndpointComputingServiceForeignKey'::text), ''::text) <> ''::text AND COALESCE(((g.j ->> 'info'::text)::jsonb) ->> 'SiteEndpointInProduction'::text, 'FALSE'::text)::boolean IS DISTINCT FROM false
 WITH DATA;
 
 -- View indexes:
@@ -880,7 +911,7 @@ AS SELECT xx.id,
                     (jsonb_array_elements((((t.j ->> 'info'::text)::jsonb) ->> 'images'::text)::jsonb) -> 'ImageVoVmiInstanceId'::text)::text AS vowide_vmiinstanceid
                    FROM egiis.vapj g
                      LEFT JOIN egiis.tvapj t ON g.pkey = t.pkey AND (g.lastseen - t.lastseen) < '00:10:00'::interval
-                  WHERE UPPER(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointInterfaceName'::text) IN ('OCCI', 'OPENSTACK') AND COALESCE(((g.j ->> 'info'::text)::jsonb) ->> 'SiteEndpointInProduction'::text, 'FALSE'::text)::boolean IS DISTINCT FROM false) x) xx
+                  WHERE LOWER(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointInterfaceName'::text) = ANY(cloud_service_names()) AND COALESCE(((g.j ->> 'info'::text)::jsonb) ->> 'SiteEndpointInProduction'::text, 'FALSE'::text)::boolean IS DISTINCT FROM false) x) xx
 WITH DATA;
 
 -- View indexes:
@@ -914,11 +945,12 @@ AS SELECT __va_providers.id,
     XMLELEMENT(
     	NAME "site:service",
     	XMLATTRIBUTES(
-			CASE __va_providers.service_type
+    			cloud_service_name_from_type(__va_providers.service_type) AS type,
+			/*CASE __va_providers.service_type
 				WHEN 'eu.egi.cloud.vm-management.occi' THEN 'occi'
 				WHEN 'org.openstack.nova' THEN 'openstack'
 				ELSE 'UNKNOWN'
-			END AS type,
+			END AS type,*/
     		__va_providers.id AS id,
     		__va_providers.hostname AS host,
     		COUNT(DISTINCT good_vmiinstanceid(va_provider_images.*)) AS instances,
@@ -996,7 +1028,7 @@ AS SELECT nextval('va_provider_endpoints_id_seq'::regclass) AS id,
     ((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointImplementor'::text AS deployment_type
    FROM egiis.vapj g
      LEFT JOIN egiis.tvapj t ON g.pkey = t.pkey AND (g.lastseen - t.lastseen) < '00:10:00'::interval
-  WHERE UPPER(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointInterfaceName'::text) IN ('OCCI', 'OPENSTACK')
+  WHERE LOWER(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointInterfaceName'::text) = ANY(cloud_service_names())
 WITH DATA;
 
 -- View indexes:
@@ -1007,7 +1039,6 @@ CREATE INDEX idx_va_provider_endpoints_va_provider_id_trgmops ON public.va_provi
 
 INSERT INTO version (major,minor,revision,notes) 
 SELECT 8, 22, 99, E'Support for OpenStack native cloud endpoints (aka va_providers)'
-	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=23 AND revision=99);
+	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=22 AND revision=99);
 
 COMMIT;
-
