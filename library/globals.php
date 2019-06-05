@@ -809,6 +809,9 @@ function validateFilterActionHelper($flt, $type, $ver = null) {
 		case FilterParser::NORM_SITE:
 			$stype="site";
 			break;
+		case FilterParser::NORM_VAPROVIDER:
+			$stype="vaprovider";
+			break;
 	}
 	$s = '<'.$stype.':filter xmlns:filter="http://appdb.egi.eu/api/'.$ver.'/filter" xmlns:'.$stype.'="http://appdb.egi.eu/api/'.$ver.'/'.$stype.'">';
 	if ( $error != '' ) {
@@ -1793,6 +1796,7 @@ class FilterParser {
 	const NORM_VOS = 2;
 	const NORM_DISSEMINATION = 3;
 	const NORM_SITE = 4;
+	const NORM_VAPROVIDER= 5;
 
 	public static function fieldsToXML($flds, $base, $n = 0) {
 		$a = explode(" ",$flds);
@@ -1802,7 +1806,14 @@ class FilterParser {
 		foreach ($a as $i) {
 			$end = "/>";
 			if ($n === 0) {
-                switch ($i) {
+				switch ($i) {
+					case("vaprovider"):
+                        $fltstr = "id:string name:string type:string beta:boolean production:boolean monitored:boolean downtime:integer status:text";
+                        if ( $base === $i ) {
+                            $fltstr = $fltstr." country:complex";
+                        }
+						$end = '>'.FilterParser::fieldsToXML($fltstr, $base, $n+1).'</filter:field>';
+                        break;
                     case("site"):
                         $fltstr = "id:string name:string description:string tier:numeric roc:string subgrid:string supports:string";
                         if ( $base === $i ) {
@@ -1900,6 +1911,9 @@ class FilterParser {
 				break;
 			case (FilterParser::NORM_SITE):
 				$normalizer = new RestSiteFilterReflection();
+				break;
+			case (FilterParser::NORM_VAPROVIDER):
+				$normalizer = new RestVAProviderFilterReflection();
 				break;
 		}
 		$reflection_str = strval($normalizer->get()->finalize());
@@ -2109,6 +2123,16 @@ class FilterParser {
                                     $obj = "site";
                             }
                             break;
+                        case (FilterParser::NORM_VAPROVIDER):
+                            switch ($prop) {
+								case "country":
+                                    $obj = $prop;
+                                    $prop = "any";
+                                    break;
+                                default:
+                                    $obj = "vaprovider";
+                            }
+                            break;
 					}
 				}
 			}
@@ -2286,6 +2310,11 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 		FilterParser::buildFilter($f, $fltstr, $isfuzzy);
 		return $f;
 	}
+	public static function getVaProviders($fltstr, $isfuzzy=false) {
+		$f = new Default_Model_VaProvidersFilter();
+		FilterParser::buildFilter($f, $fltstr, $isfuzzy);
+		return $f;
+	}
 
 	public static function buildFilter(&$filter, $fltstr, $isfuzzy=false){
 		$fltstr = trim($fltstr);
@@ -2333,6 +2362,9 @@ public static function getApplications($fltstr, $isfuzzy=false) {
             break;
         case "Default_Model_SitesFilter":
             $defaultTable = "site";
+            break;
+        case "Default_Model_VaProvidersFilter":
+            $defaultTable = "vaprovider";
             break;
 		default:
 			return false;
@@ -2506,6 +2538,42 @@ public static function getApplications($fltstr, $isfuzzy=false) {
                     $interval = Zend_Registry::get("app");
                     $interval = $interval["invalid"];
 					switch($tbl) {
+					case "vaprovider":
+						switch($fld) {
+						case "id":
+						case "beta":
+							break;
+						case "name":
+						case "sitename":
+							$fld = "sitename";
+							break;
+						case "type":
+						case "service_type":
+							$fld = "service_type";
+							break;
+						case "node_monitored":
+						case "monitored":
+							$fld = "node_monitored";
+							break;
+						case "in_production":
+						case "inproduction":
+						case "production":
+							$fld = "in_production";
+							break;
+						case "service_downtime":
+							$fld = "service_downtime::int";
+						case "downtime":
+							$fld = "service_downtime::int::boolean";
+							break;
+						case "service_status":
+						case "status":
+							$fld = "service_status";
+							break;
+						default:
+							continue 3;
+						}
+						if ($f1 === null) $f1 = new Default_Model_VaProvidersFilter();
+						break;
 					case "site":
 						switch($fld) {
 						case "id":

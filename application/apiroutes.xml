@@ -444,6 +444,20 @@
 	<resource>RestVAProviderItem</resource>
 	<comment>The virtualization provider entry specified by parameter :id</comment>
 </route>
+<route type="proxy" name="va_providerlogistics" url="/:version/va_providers/logistics">
+	<format>xml</format>
+	<resource>RestVAProviderLogistics</resource>
+	<comment>A list of VAProvider logistics per various properties</comment>
+</route>
+<route type="rest" hidden="true" name="va_providerfiltercheck" url="/:version/va_providers/filter/normalize">
+	<format>xml</format>
+	<resource>RestVAProviderFilterNormalization</resource>
+</route>
+<route type="rest" name="va_providerfilterreflection" url="/:version/va_providers/filter/reflect">
+	<format>xml</format>
+	<resource>RestVAProviderFilterReflection</resource>
+	<comment>Filter reflection resource for va_provider searchers</comment>
+</route>
 <route type="rest" name="sites" url="/:version/sites">
 	<format xslt="site">xml</format>
 	<format>xml</format>

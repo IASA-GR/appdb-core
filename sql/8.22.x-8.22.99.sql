@@ -1037,6 +1037,581 @@ CREATE INDEX idx_va_provider_endpoints_va_provider_id ON public.va_provider_endp
 CREATE INDEX idx_va_provider_endpoints_va_provider_id_textops ON public.va_provider_endpoints USING btree (va_provider_id text_pattern_ops);
 CREATE INDEX idx_va_provider_endpoints_va_provider_id_trgmops ON public.va_provider_endpoints USING gin (va_provider_id gin_trgm_ops);
 
+
+--------------- VA PROVIDER FILTERING SUPPORT ---------------
+
+CREATE SCHEMA va_providers;
+ALTER SCHEMA va_providers OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION va_providers."any"(mid text)
+ RETURNS text
+ LANGUAGE sql
+ STABLE
+AS $function$
+	SELECT public.any('va_providers', $1);
+$function$;
+ALTER FUNCTION va_providers."any"(text) OWNER TO appdb;
+
+CREATE TABLE va_providers."any"(
+	id TEXT NOT NULL PRIMARY KEY,
+	"any" TEXT
+);
+ALTER TABLE va_providers."any" OWNER TO appdb;
+
+CREATE TABLE IF NOT EXISTS rankedvaproviders (
+	LIKE va_providers,
+	rank INT NOT NULL DEFAULT 0
+);
+ALTER TABLE rankedvaproviders OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION public.filtervaproviders(fltstr text, m_from text, m_where text)
+ RETURNS SETOF rankedvaproviders
+ LANGUAGE plpgsql
+AS $function$
+DECLARE h TEXT;
+BEGIN
+	SELECT filteritems(fltstr, m_from, m_where, 'rankedvaproviders') INTO h;
+	RETURN QUERY EXECUTE 'SELECT * FROM cache.filtercache_' || h || ' ORDER BY rank DESC, sitename ASC';
+END;
+$function$;
+ALTER FUNCTION filtervaproviders(text, text, text) OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION public.filtervaproviders(fltstr text[], m_from text[], m_where text[])
+ RETURNS SETOF rankedvaproviders
+ LANGUAGE plpgsql
+AS $function$
+DECLARE h TEXT;
+DECLARE i INT;
+DECLARE j INT;
+DECLARE ids rankedidstxt[];
+BEGIN
+	ids := NULL::rankedidstxt[];
+	FOR i IN 1..ARRAY_LENGTH(fltstr, 1) LOOP
+		IF i = ARRAY_LENGTH(fltstr ,1) THEN
+			IF ids IS NULL AND i = 1 THEN
+				RETURN QUERY SELECT * FROM filtervaproviders(fltstr[i], m_from[i], m_where[i]);
+			ELSE
+				RETURN QUERY SELECT
+					va_providers.*,
+					f.rank + rids.rank
+				FROM filtervaproviders(fltstr[i], m_from[i], m_where[i]) AS f 
+				INNER JOIN UNNEST(ids) AS rids ON rids.id = f.id
+				INNER JOIN va_providers ON va_providers.id = rids.id;
+			END IF;
+		ELSE
+			IF ids IS NULL THEN
+				SELECT array_agg((f.id, f.rank)::rankedidstxt ORDER BY f.rank) FROM filtervaproviders(fltstr[i]::text, m_from[i]::text, m_where[i]::text) AS f INTO ids;
+			ELSE
+				SELECT array_agg((f.id, f.rank + rids.rank)::rankedidstxt ORDER BY f.rank) FROM filtervaproviders(fltstr[i]::text, m_from[i]::text, m_where[i]::text) AS f INNER JOIN UNNEST(ids) AS rids ON rids.id = f.id INTO ids;		
+			END IF;
+		END IF;
+	END LOOP;
+END;
+$function$;
+ALTER FUNCTION filtervaproviders(text[], text[], text[]) OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION public.rankvaprovider(m_id __va_providers, m_query text)
+ RETURNS integer
+ LANGUAGE plpgsql
+AS $function$
+DECLARE rank INT;
+DECLARE lrank INT;
+DECLARE args TEXT[];
+DECLARE arg TEXT;
+DECLARE field TEXT;
+DECLARE fields TEXT[];
+DECLARE vals TEXT[];
+DECLARE val TEXT;
+DECLARE ops TEXT[];
+DECLARE tmp TEXT[];
+DECLARE i INT;
+DECLARE j INT;
+DECLARE kk INT;
+DECLARE k TEXT;
+DECLARE r RECORD;
+DECLARE m_country TEXT;
+BEGIN
+	RAISE NOTICE 'in ranvaprovider function';
+	IF m_query IS NULL OR TRIM(m_query) = '' THEN RETURN 0; END IF;
+	m_query := fltstr_nbs(m_query);
+	SELECT countries.name FROM countries WHERE countries.id = m_id.country_id INTO m_country;
+	fields = '{id, name, type, countryname}'::TEXT[];
+	rank := 0;
+	args := string_to_array(m_query, ' ');
+	FOR i IN 1..array_length(args, 1) LOOP
+		arg := args[i];		
+		LOOP
+			IF SUBSTRING(arg,1,1) = '+' OR 
+			SUBSTRING(arg,1,1) = '-' OR 
+			SUBSTRING(arg,1,1) = '=' OR 
+			SUBSTRING(arg,1,1) = '<' OR 
+			SUBSTRING(arg,1,1) = '>' OR 
+			SUBSTRING(arg,1,1) = '~' OR 
+			SUBSTRING(arg,1,1) = '$' OR 
+			SUBSTRING(arg,1,1) = '&' THEN
+				ops = array_append(ops, SUBSTRING(arg,1,1));
+				arg = SUBSTRING(arg,2); 
+			ELSE
+				EXIT;
+			END IF;
+		END LOOP;
+		IF SUBSTRING(arg,1,12) = 'country.name' THEN arg := 'vaprovider.countryname' || SUBSTRING(arg,13); END IF;
+		IF SUBSTRING(arg,1,11) = 'country.any' THEN arg := 'vaprovider.countryname' || SUBSTRING(arg,12); END IF;		
+		IF NOT (SUBSTRING(arg,1,11) = 'vaprovider.' OR SUBSTRING(arg,1,4) = 'any.' OR instr(arg,'.') = 0) THEN CONTINUE; END IF;
+		IF SUBSTR(arg,1,11) = 'vaprovider.' THEN arg = SUBSTRING(arg,6);
+		ELSIF SUBSTR(arg,1,4) = 'any.' THEN arg = SUBSTRING(arg,5); END IF;
+		tmp := string_to_array(arg, ':');
+		field := NULL;
+		IF array_length(tmp, 1) > 1 THEN
+			IF tmp[1] <> 'any' THEN
+				field := tmp[1];
+			END IF;	
+			val := '';
+			FOR j IN 2..array_length(tmp, 1) LOOP
+				val := val || tmp[j];
+			END LOOP;
+		ELSE
+			val = tmp[1];
+		END IF;
+		IF NOT val IS NULL THEN
+			FOR j IN 1..array_length(fields, 1) LOOP
+				IF ops IS NULL OR ops = '{=}'::TEXT[] THEN
+					vals := ('{' || val || ', %' || val || '%}')::TEXT[];
+					FOR kk IN 1..array_length(vals, 1) LOOP
+						k := vals[kk];
+						RAISE NOTICE '%', k;
+						lrank := 0;					
+						IF fields[j] = 'name' THEN IF m_id.sitename ILIKE k THEN lrank := lrank + 4; END IF; END IF;
+						IF fields[j] = 'type' THEN IF m_id.service_type ILIKE k THEN lrank := lrank + 4; END IF; END IF;
+						IF fields[j] = 'id' THEN IF m_id.id::TEXT ILIKE k THEN lrank := lrank + 1; END IF; END IF;
+						IF fields[j] = 'countryname' THEN IF m_country ILIKE k THEN lrank := lrank + 1; END IF; END IF;
+						-- BONUS FOR SPECIFIC FIELD
+						IF fields[j] = field THEN lrank = lrank * 2; END IF;
+						rank := rank + lrank;
+					END LOOP;
+				END IF;
+			END LOOP;
+		END IF;
+	END LOOP;
+	RETURN rank;
+END
+$function$;
+ALTER FUNCTION rankvaprovider(__va_providers, text) OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION public.filteritems(fltstr text, m_from text, m_where text, itemtype text)
+ RETURNS text
+ LANGUAGE plpgsql
+AS $function$
+DECLARE h TEXT;
+DECLARE t TEXT;
+DECLARE rank TEXT;
+DECLARE _rank TEXT;
+DECLARE cols TEXT[];
+DECLARE cachecount BIGINT;
+BEGIN
+	IF fltstr IS NULL THEN fltstr = ''; END IF;
+	IF m_from IS NULL THEN m_from = ''; END IF;
+	IF m_where IS NULL THEN m_where = ''; END IF;
+	fltstr := TRIM(fltstr);
+	m_from := TRIM(m_from);
+	m_where := TRIM(m_where);
+	IF itemtype IS NULL THEN itemtype = ''; END IF;
+	IF itemtype = 'rankedapps' THEN
+		t := 'applications';
+		-- rank := 'rankapp(' || t || '.*, ''' || fltstr || ''') as rank';
+		rank := 'rankapp';
+		cols := (SELECT array_agg(column_name::text ORDER BY ordinal_position) FROM INFORMATION_SCHEMA.columns WHERE table_name = 'applications' AND table_schema = 'public');
+	ELSIF itemtype = 'rankedppl' THEN
+		t := 'researchers';
+		-- rank := 'rankppl(' || t || '.*, ''' || fltstr || ''') as rank';
+		rank := 'rankppl';
+		cols := (SELECT array_agg(column_name::text ORDER BY ordinal_position) FROM INFORMATION_SCHEMA.columns WHERE table_name = 'researchers' AND table_schema = 'public');
+	ELSIF itemtype = 'rankedvos' THEN
+		t := 'vos';
+		-- rank := 'rankvo(' || t || '.*, ''' || fltstr || ''') as rank';
+		rank := 'rankvo';
+		cols := (SELECT array_agg(column_name::text ORDER BY ordinal_position) FROM INFORMATION_SCHEMA.columns WHERE table_name = 'vos' AND table_schema = 'public');
+	ELSIF itemtype = 'rankedsites' THEN
+		t := 'sites';
+		-- rank := 'ranksite(' || t || '.*, ''' || fltstr || ''') as rank';
+		rank := 'ranksite';
+		cols := (SELECT array_agg(column_name::text ORDER BY ordinal_position) FROM INFORMATION_SCHEMA.columns WHERE table_name = '__sites' AND table_schema = 'public');
+	ELSIF itemtype = 'rankedvaproviders' THEN
+		t := 'va_providers';
+		rank := 'rankvaprovider';
+		cols := (SELECT array_agg(column_name::text ORDER BY ordinal_position) FROM INFORMATION_SCHEMA.columns WHERE table_name = '__va_providers' AND table_schema = 'public');
+	END IF;
+	_rank := '0 as rank';
+	h := MD5(m_from || ' ' || m_where);
+	IF m_where = 'WHERE ()' THEN m_where = ''; END IF;
+	IF EXISTS (SELECT * FROM config WHERE var = 'disable_filtercache' AND data::BOOLEAN IS TRUE) THEN
+		DELETE FROM cache.filtercache WHERE hash = h;
+	END IF;
+	cachecount := 0;
+	BEGIN
+		EXECUTE 'SELECT COUNT(*) FROM cache.filtercache_' || h INTO cachecount;
+	EXCEPTION
+		WHEN OTHERS THEN
+	END;
+	IF (NOT EXISTS (SELECT hash FROM cache.filtercache WHERE hash = h AND invalid IS FALSE)) OR (cachecount = 0) THEN
+		EXECUTE 'DROP TABLE IF EXISTS cache.filtercache_' || h || '; ' ||
+			'CREATE TABLE IF NOT EXISTS cache.filtercache_' || h || ' AS SELECT DISTINCT ON (' || t || '.id) ' || t || '.*, ' || _rank || ' ' || m_from || ' ' || m_where || '; ' ||
+			'UPDATE cache.filtercache_' || h || ' SET rank = ' || rank || '((' || array_to_string(cols,' ,') || '), ''' || REPLACE(fltstr,'''','''''') || ''')';
+		IF NOT EXISTS (SELECT hash FROM cache.filtercache WHERE hash = h) THEN
+			INSERT INTO cache.filtercache (hash, m_from, m_where, fltstr) SELECT h, m_from, m_where, fltstr WHERE NOT EXISTS (SELECT hash FROM cache.filtercache AS c WHERE c.hash = h);
+		ELSE
+			UPDATE cache.filtercache SET usecount = usecount+1, invalid = FALSE WHERE hash = h;
+		END IF;
+	ELSE
+		UPDATE cache.filtercache SET usecount = usecount+1 WHERE hash = h;
+	END IF;
+	RETURN h;
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.va_provider_to_xml(mid text[])
+ RETURNS SETOF xml
+ LANGUAGE sql
+ STABLE
+AS $function$
+        SELECT va_provider_to_xml(id::text) FROM UNNEST(mid) AS id;
+$function$;
+ALTER FUNCTION va_provider_to_xml(text[]) OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION public.va_provider_to_xml(mid text)
+ RETURNS SETOF xml
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+RETURN QUERY
+SELECT 
+        xmlelement(
+                name "virtualization:provider", 
+                xmlattributes(
+                        va_providers.id,
+                        beta,
+                        in_production,
+                        node_monitored,
+                        service_downtime::int AS service_downtime,
+                        service_type AS service_type,
+                        service_status AS service_status,
+                        service_status_date AS service_status_date
+                ),
+                xmlelement(name "provider:name", sitename)
+        )
+FROM
+        va_providers
+WHERE id = mid;
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.va_provider_to_xml_ext(mid text)
+ RETURNS SETOF xml
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+RETURN QUERY
+SELECT 
+	xmlelement(
+		name "virtualization:provider", 
+		xmlattributes(
+			va_providers.id,
+			beta,
+			in_production,
+			node_monitored,
+			service_type AS service_type,
+			service_downtime::int AS service_downtime,
+			service_status AS service_status,
+			service_status_date AS service_status_date
+		),
+		xmlelement(name "provider:name", sitename),
+		CASE WHEN NOT sites.id IS NULL THEN
+		XMLELEMENT(
+			name "appdb:site", 
+			XMLATTRIBUTES(
+				sites.id as id,
+				sites.name as name,
+				sites.productioninfrastructure as infrastructure, 
+				sites.certificationstatus as status,
+				sites.deleted as deleted,
+				sites.datasource as source
+			),
+			XMLELEMENT(
+				name "site:officialname", 
+				sites.officialname
+			), 
+			XMLELEMENT(
+				name "site:url", 
+				XMLATTRIBUTES('portal' as type),
+				sites.portalurl
+			), 
+			XMLELEMENT(
+				name "site:url", 
+				XMLATTRIBUTES('home' as type), 
+				sites.homeurl
+			)
+		)
+		END,
+		xmlelement(name "provider:url", url),
+		CASE WHEN EXISTS (SELECT * FROM va_provider_endpoints WHERE va_provider_endpoints.va_provider_id = va_providers.id) THEN 
+			array_to_string(array_agg(DISTINCT
+				xmlelement(name "provider:endpoint_url", endpoint_url)::text ||
+				xmlelement(name "provider:deployment_type", deployment_type)::text
+			),'')::xml 
+		END,
+		xmlelement(name "provider:gocdb_url", gocdb_url),
+		CASE WHEN COALESCE(host_dn, '') <> '' THEN xmlelement(name "provider:dn", host_dn) END,
+		CASE WHEN COALESCE(host_ip, '') <> '' THEN xmlelement(name "provider:ip", host_ip) END,
+		CASE WHEN COALESCE(host_os_id, 0) <> 0 THEN xmlelement(
+			name "provider:os", 
+			xmlattributes(host_os_id AS id),
+			oses.name
+		) END,
+		CASE WHEN COALESCE(host_arch_id, 0) <> 0 THEN xmlelement(
+			name "provider:arch", 
+			xmlattributes(host_arch_id AS id),
+			archs.name
+		) END,
+		country_to_xml(country_id),
+		CASE WHEN EXISTS(SELECT * FROM va_provider_templates WHERE va_provider_templates.va_provider_id = va_providers.id) THEN
+		array_to_string(array_agg(DISTINCT
+			xmlelement(name "provider:template",
+				 xmlattributes(
+					va_provider_templates.group_hash AS group_hash
+				 ),
+				 xmlelement(name "provider_template:resource_name", resource_name),
+				 xmlelement(name "provider_template:main_memory_size", memsize),
+				 xmlelement(name "provider_template:logical_cpus", logical_cpus),
+				 xmlelement(name "provider_template:physical_cpus", physical_cpus),
+				 xmlelement(name "provider_template:cpu_multiplicity", cpu_multiplicity),
+				 xmlelement(name "provider_template:resource_manager", resource_manager),
+				 xmlelement(name "provider_template:computing_manager", computing_manager),
+				 xmlelement(name "provider_template:os_family", os_family),
+				 xmlelement(name "provider_template:connectivity_in", connectivity_in),
+				 xmlelement(name "provider_template:connectivity_out", connectivity_out),
+				 xmlelement(name "provider_template:cpu_model", cpu_model),
+				 xmlelement(name "provider_template:disc_size", disc_size),
+				 xmlelement(name "provider_template:resource_id", resource_id)
+			)::text
+		), '')::xml
+		END,
+		CASE WHEN EXISTS(SELECT * FROM va_provider_images WHERE va_provider_images.va_provider_id = va_providers.id) THEN
+		(
+			SELECT (array_to_string(array_agg(DISTINCT
+				xmlelement(name "provider:image",
+					xmlattributes(
+						content_type,
+						mp_uri,
+						'https://appdb.egi.eu/store/vm/image/' || vmiinstances.guid::text || ':' || va_provider_images.vmiinstanceid::text AS base_mp_uri,
+						vmiinstances.version AS "vmiversion",
+						va_provider_image_id,
+						va_provider_images.vmiinstanceid,
+						va_provider_images.vowide_vmiinstanceid,	
+						va_provider_images.good_vmiinstanceid,
+						applications.id as "appid", 
+						applications.name as "appname", 
+						applications.cname as "appcname", 
+						vos.id as "void", 
+						vos.name as "voname",
+						vapp_versions.archived
+					)
+				)::text), '')::XML
+			) FROM va_provider_images 
+			INNER JOIN vmiinstances ON vmiinstances.id = va_provider_images.vmiinstanceid
+			INNER JOIN vmiflavours ON vmiflavours.id = vmiinstances.vmiflavourid
+			INNER JOIN vmis ON vmis.id = vmiflavours.vmiid
+			INNER JOIN vapplications ON vapplications.id = vmis.vappid
+			INNER JOIN vapplists ON vapplists.vmiinstanceid = va_provider_images.vmiinstanceid
+			INNER JOIN vapp_versions ON vapp_versions.id = vapplists.vappversionid
+			INNER JOIN applications ON applications.id = vapplications.appid
+			LEFT OUTER JOIN vowide_image_list_images ON vowide_image_list_images.id = va_provider_images.vowide_vmiinstanceid
+			LEFT OUTER JOIN vowide_image_lists ON vowide_image_lists.id = vowide_image_list_images.vowide_image_list_id
+			LEFT OUTER JOIN vos ON vos.id = vowide_image_lists.void			
+			WHERE va_provider_id = va_providers.id AND ((
+				vowide_image_lists.state IN ('published'::e_vowide_image_state, 'obsolete'::e_vowide_image_state)
+			) OR (
+				vowide_image_lists.state IS NULL
+			)) 
+			
+		)
+		END
+	)
+FROM
+	va_providers 
+	LEFT JOIN oses ON oses.id = host_os_id
+	LEFT JOIN archs ON archs.id = host_arch_id
+	LEFT JOIN va_provider_endpoints ON va_provider_endpoints.va_provider_id = va_providers.id
+	LEFT JOIN va_provider_templates ON va_provider_templates.va_provider_id = va_providers.id
+	LEFT OUTER JOIN sites ON sites.name = va_providers.sitename
+WHERE va_providers.id = mid
+	GROUP BY 
+		va_providers.id,
+		va_providers.beta,
+		va_providers.in_production,
+		va_providers.node_monitored,
+		va_providers.service_downtime,
+		va_providers.service_type,
+		va_providers.service_status,
+		va_providers.service_status_date,
+		va_providers.sitename,
+		va_providers.url,
+		va_providers.gocdb_url,
+		va_providers.host_dn,
+		va_providers.host_ip,
+		va_providers.host_os_id,
+		va_providers.host_arch_id,
+		oses.name,
+		archs.name,
+		country_id,
+		sites.id,
+		sites.name,
+		sites.productioninfrastructure,
+		sites.certificationstatus,
+		sites.deleted,
+		sites.datasource,
+		sites.officialname,
+		sites.portalurl,
+		sites.homeurl
+;
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.va_provider_to_xml_ext(mid text[])
+ RETURNS SETOF xml
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+        RETURN QUERY SELECT va_provider_to_xml_ext(id::text) FROM va_providers WHERE id::TEXT = ANY($1);
+END;
+$function$;
+ALTER FUNCTION va_provider_to_xml_ext(text[]) OWNER TO appdb;
+
+SELECT va_provider_to_xml(array_agg(va_providers.id)) FROM filtervaproviders('', 'FROM va_providers', '') AS va_providers INNER JOIN va_providers AS s ON s.id = va_providers.id
+
+CREATE OR REPLACE FUNCTION public.count_vaprovider_matches(itemname text, cachetable text, private boolean DEFAULT false)
+ RETURNS SETOF record
+ LANGUAGE plpgsql
+AS $function$
+DECLARE q TEXT;
+DECLARE allitems INT;
+BEGIN
+	IF itemname = 'country' THEN
+		q := 'SELECT countries.name::TEXT AS count_text, COUNT(DISTINCT va_providers.id) AS count, countries.id AS count_id FROM ' || cachetable || ' AS va_providers LEFT JOIN countries ON countries.id = va_providers.country_id';
+	ELSIF itemname = 'type' THEN
+		q := 'SELECT va_providers.service_type::TEXT AS count_text, COUNT(DISTINCT va_providers.id) AS count, idx(cloud_service_types(), va_providers.service_type) AS count_id FROM ' || cachetable || ' AS va_providers';
+	ELSE
+		RAISE NOTICE 'Unknown va_provider property requested for logistics counting: %', itemname;
+		RETURN;
+	END IF;
+	RETURN QUERY EXECUTE 'SELECT count_text, count, count_id::text FROM (' || q || ' GROUP BY count_text, count_id) AS t WHERE NOT count_text IS NULL';
+END;
+$function$;
+ALTER FUNCTION count_vaprovider_matches(text, text, boolean) OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION public.count_vaprovider_matches(itemname text, cachetable text[], private boolean DEFAULT false)
+ RETURNS SETOF record
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+	RAISE NOTICE '%', '(SELECT * FROM va_providers WHERE id IN (SELECT id FROM ' || array_to_string(cachetable, ' INTERSECT SELECT id FROM ') || '))';
+	RETURN QUERY SELECT * FROM count_vaprovider_matches(itemname, '(SELECT * FROM va_providers WHERE id IN (SELECT id FROM ' || array_to_string(cachetable, ' INTERSECT SELECT id FROM ') || '))', private) AS count_vaprovider_matches(count_text text, count bigint, count_id text);
+END;
+$function$;
+ALTER FUNCTION count_vaprovider_matches(text, text[], boolean) OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION public.vaprovider_logistics(m_fltstr text, m_from text, m_where text)
+ RETURNS xml
+ LANGUAGE plpgsql
+AS $function$
+DECLARE h TEXT[];
+DECLARE hh TEXT;
+DECLARE fl TEXT[];
+DECLARE fr TEXT[];
+DECLARE w TEXT[];
+DECLARE i INT;
+DECLARE len INT;
+BEGIN
+        IF m_fltstr IS NULL THEN m_fltstr := ''; END IF;
+        IF m_from IS NULL THEN m_from := ''; END IF;
+        IF m_where IS NULL THEN m_where := ''; END IF;
+		m_fltstr := TRIM(m_fltstr);
+		m_from := TRIM(m_from);
+		m_where := TRIM(m_where);
+		IF SUBSTRING(m_fltstr, 1, 1) = '{' THEN
+			fl := m_fltstr::text[];
+			fr := m_from::text[];
+			w := m_where::text[];
+		ELSE
+			fl := ('{"' || REPLACE(m_fltstr, '"', '\"') || '"}')::text[];
+			fr := ('{"' || REPLACE(m_from, '"', '\"') || '"}')::text[];
+			w := ('{"' ||  REPLACE(m_where, '"', '\"') || '"}')::text[];
+		END IF;
+		h := NULL::TEXT[];
+		IF m_fltstr = '' THEN
+			len := 0;
+			hh := MD5(m_from || ' ' || m_where);
+			IF NOT EXISTS (SELECT hash FROM cache.filtercache WHERE hash = hh) THEN
+				PERFORM filtervaproviders(m_fltstr, m_from, m_where);
+			END IF;
+			h := ARRAY['cache.filtercache_' || hh];
+		ELSE
+			len := ARRAY_LENGTH(fl, 1);
+		END IF;
+		FOR i IN 1..len LOOP
+			m_fltstr = TRIM(fl[i]);
+			m_from = TRIM(fr[i]);
+			m_where = TRIM(w[i]);
+			hh := MD5(m_from || ' ' || m_where);
+			IF NOT EXISTS (SELECT hash FROM cache.filtercache WHERE hash = hh) THEN
+				PERFORM filtervaproviders(m_fltstr, m_from, m_where);
+			END IF;
+			hh := 'cache.filtercache_' || hh;
+			h := array_append(h, hh);
+		END LOOP;
+        RETURN xmlelement(name "provider:logistics",
+                xmlconcat(
+               (SELECT xmlagg(xmlelement(name "logistics:cloud_service_type", xmlattributes(t.name as "text", t.count as "count", t.id::text::text::text as "id"))) FROM count_vaprovider_matches('type', h) as t(name TEXT, count bigint, id text)),
+			(SELECT xmlagg(xmlelement(name "logistics:country", xmlattributes(t.name as "text", t.count as "count", t.id::text::text::text as "id"))) FROM count_vaprovider_matches('country', h) as t(name TEXT, count bigint, id text)),
+			(SELECT xmlagg(xmlelement(name "logistics:phonebook", xmlattributes(t.name as "text", t.count as "count", t.id::text::text::text as "id"))) FROM 
+(
+WITH c AS (SELECT * FROM cached_ids(h) AS id)
+SELECT l AS "name", COUNT(DISTINCT va_providers.id) AS count, n::text AS id FROM 
+(
+WITH RECURSIVE t(n) AS (
+	VALUES (1)
+	UNION ALL
+	SELECT n+1 FROM t WHERE n < 28
+)
+SELECT 
+CASE 
+WHEN n<=26 THEN 
+	SUBSTRING('ABCDEFGHIJKLMNOPQRSTUVWXYZ',n,1)
+WHEN n=27 THEN 
+	'0-9'
+ELSE 
+	'#'
+END AS l,
+CASE 
+WHEN n<=26 THEN 
+	'^' || SUBSTRING('ABCDEFGHIJKLMNOPQRSTUVWXYZ',n,1) || '.+'
+WHEN n=27 THEN 
+	'^[0-9].+'
+ELSE 
+	'^[^A-Za-z0-9].+'
+END AS p,
+n
+FROM t) AS q
+INNER JOIN va_providers ON va_providers.sitename ~* p
+WHERE va_providers.id IN (SELECT id::text FROM c)
+GROUP BY l, n
+ORDER BY n
+) AS t
+)
+));
+END;
+$function$;
+ALTER FUNCTION vaprovider_logistics(text, text, text) OWNER TO appdb;
+
 INSERT INTO version (major,minor,revision,notes) 
 SELECT 8, 22, 99, E'Support for OpenStack native cloud endpoints (aka va_providers)'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=22 AND revision=99);

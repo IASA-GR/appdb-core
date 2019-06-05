@@ -1290,7 +1290,14 @@ class RestVAProvidersList extends RestROResourceList {
 	}
 
 	public function getModel() {
-		return new Default_Model_VaProviders();
+		$res = new Default_Model_VaProviders();
+		if ( ! is_null($this->getParam("orderby")) ) {
+			$res->filter->orderBy($this->getParam("orderby"));
+		}
+		if ( $this->getParam("flt") != "" ) {
+			$res->filter = FilterParser::getVaProviders($this->getParam("flt"));
+		}
+		return $res;
 	}
 }
 class RestVAProviderItem extends RestROResourceItem {
@@ -1329,6 +1336,128 @@ class RestVAProviderItem extends RestROResourceItem {
             $this->res = null;
         }
     }
+}
+
+/**
+ * class RestVAProviderFilterReflection
+ * handles application filter reflection requests
+ */
+class RestVAProviderFilterReflection extends RestROResourceItem {
+    /**
+     * realization of getDataType from iRestResource
+     */
+    public function getDataType() {
+        return "filter";
+    }
+    
+    /**
+     * overrides RestResource::get()
+     */
+	public function get() {
+		if ( parent::get() !== false ) {
+			$s = '<provider:filter>';
+			$s .= FilterParser::fieldsToXML("any vaprovider country", "vaprovider");
+			$s .= '</provider:filter>';
+			return new XMLFragmentRestResponse($s, $this);
+		} else return false;
+    }
+}
+
+/**
+ * class RestVAProviderFilterNormalization
+ * handles application filter syntax normalization and validation
+ */
+class RestVAProviderFilterNormalization extends RestROResourceItem {
+    /**
+     * realization of getDataType from iRestResource
+     */
+    public function getDataType() {
+        return "filter";
+    }
+    
+    /**
+     * overrides RestResource::get()
+     */
+	public function get() {
+		if (  parent::get() !== false ) {
+            if ( isset($this->_pars["flt"]) ) $flt = $this->_pars["flt"]; else $flt = "";
+			return new XMLFragmentRestResponse(validateFilterActionHelper($flt, FilterParser::NORM_VAPROVIDER), $this);
+		} else return false;
+	}
+}
+
+
+/**
+ * class RestVAProviderLogistics
+ * handles VA provider counting per various properties
+ */
+class RestVAProviderLogistics extends RestROResourceItem {
+    /**
+     * realization of getDataType from iRestResource
+     */
+    public function getDataType() {
+        return "logistics";
+	}
+
+   /**
+     * overrides RestResource::get()
+     */
+	public function get($extraFilter = null) {
+		if ( parent::get() !== false ) {
+			global $application;
+			$isAdmin = $this->userIsAdmin();
+			$mapper = new Default_Model_VaProvidersMapper();
+			$db = $application->getBootstrap()->getResource('db');
+			$flt = $this->getParam("flt");
+			$select = $mapper->getDbTable()->getAdapter()->select()->distinct()->from('va_providers');
+			$from = '';
+			$where = '';
+			$orderby = '';
+			$limit = '';
+			$filter = FilterParser::getVaProviders($flt);
+			if ( is_array($filter->expr()) ) {
+				$ex = implode(" ", $filter->expr()); 
+			} else {
+				$ex = $filter->expr();
+			}
+			$fltexp = $filter->expr();
+			if ( ! is_array($fltexp) ) $fltexp = array($fltexp);
+			foreach($fltexp as $x) {
+				getZendSelectParts($select, $from, $where, $orderby, $limit);
+			}
+			if (! is_null($extraFilter)) {
+				$filter->chain($extraFilter, "AND");
+			}
+			$mapper->joins($select, $filter);
+			if ( is_array($filter->expr()) ) {
+				$from = array();
+				$where = array();
+				foreach($filter->expr() as $x) {
+					$s = clone $select;
+					$s->where($x);
+					getZendSelectParts($s, $f, $w, $orderby, $limit);
+					$from[] = $f;
+					$where[] = $w;
+				}
+				$flt = str_replace("''", "\'", php_to_pg_array($filter->fltstr, false));
+				$from = str_replace("''", "\'", php_to_pg_array($from, false));
+				$where = str_replace("''", "\'", php_to_pg_array($where, false));
+			} else {
+				$select->where($filter->expr());
+				getZendSelectParts($select, $from, $where, $orderby, $limit);
+			}
+
+			$db->setFetchMode(Zend_Db::FETCH_BOTH);
+			$rs = $db->query('SELECT * FROM vaprovider_logistics(?,?,?)', array($flt, $from, $where))->fetchAll();
+			if ( count($rs) > 0 ) {
+				$rs = $rs[0];
+				$x = $rs['vaprovider_logistics'];
+			} else {
+				$x = '';
+			}
+			return new XMLFragmentRestResponse($x, $this);
+		} else return false;
+	}
 }
 class RestAccessGroupList extends RestROResourceList {
 	public function getDataType() {

@@ -25,7 +25,12 @@ class Default_Model_VaProvidersFilterBase extends Default_Model_Filter {
 		$this->_fields[] = 'url';
 		$this->_fields[] = 'gocdb_url';
 		$this->_fields[] = 'hostname';
+		$this->_fields[] = 'service_type';
 		$this->_fields[] = 'serviceid';
+		$this->_fields[] = 'service_status';
+		$this->_fields[] = 'service_downtime';
+		$this->_fields[] = 'service_downtime::int';
+		$this->_fields[] = 'service_downtime::int::boolean';
 		$this->_fields[] = 'host_dn';
 		$this->_fields[] = 'host_ip';
 		$this->_fields[] = 'host_os_id';
@@ -41,7 +46,12 @@ class Default_Model_VaProvidersFilterBase extends Default_Model_Filter {
 		$this->_fieldTypes['url'] = 'string';
 		$this->_fieldTypes['gocdb_url'] = 'string';
 		$this->_fieldTypes['hostname'] = 'string';
+		$this->_fieldTypes['service_type'] = 'string';
 		$this->_fieldTypes['serviceid'] = 'string';
+		$this->_fieldTypes['service_status'] = 'boolean';
+		$this->_fieldTypes['service_downtime'] = 'string';
+		$this->_fieldTypes['service_downtime::int'] = 'integer';
+		$this->_fieldTypes['service_downtime::int::boolean'] = 'boolean';
 		$this->_fieldTypes['host_dn'] = 'string';
 		$this->_fieldTypes['host_ip'] = 'string';
 		$this->_fieldTypes['host_os_id'] = 'integer';
