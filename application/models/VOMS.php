@@ -17,7 +17,76 @@
 ?>
 <?php
 // PUT YOUR CUSTOM CODE HERE
+class VOMSConfig {
+	private $voms;
+	private $vomses;
+	private $vomsdir;
+	
+	public function __construct(Default_Model_VOMS $voms) {
+		$this->voms = $voms;
+	}
+
+	public function refresh() {
+		$ch = curl_init();
+		$url = "https://" . $this->voms->hostname . ":" . $this->voms->https_port . "/voms/" . $this->voms->VO->name . "/configuration/configuration.action";
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, 181, 1 | 2);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_SSLCERT, APPLICATION_PATH . '/../bin/sec/usercert.pem');
+		curl_setopt($ch, CURLOPT_SSLKEY, APPLICATION_PATH . '/../bin/sec/userkey.pem');
+		curl_setopt($ch, CURLOPT_HTTPHEADER, apache_request_headers());
+		$data = curl_exec($ch);
+		$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		$error = curl_error($ch); 
+		curl_close($ch);
+
+		$ok = true;
+		if (!$error && trim($code) !== "200") {
+			# http error : self::getHttpErrorCodes($code);
+			$ok = false;
+		}
+		
+		$filesize = strlen($data);
+		if ($filesize === 0) {
+			# data error : "No data retrieved";
+			$ok = false;
+		}
+
+		if ($ok) {
+			$doc = new DOMDocument();
+			libxml_use_internal_errors(true);
+			#$data = mb_convert_encoding($data, 'HTML-ENTITIES', "UTF-8")
+			@$doc->loadHTML($data);
+			$confs = $doc->getElementsByClass('configurationInfo');
+			if (count($confs) === 4) {
+				$this->vomses = $confs[1]->nodeValue;
+				$this->vomsdir = $confs[2]->nodeValue;
+			}
+		}
+	}
+
+	public function getVOMSES() {
+		return $this->vomses;
+	}
+
+	public function getVOMSDIR() {
+		return $this->vomsdir;
+	}
+
+}
+
 class Default_Model_VOMS extends Default_Model_VOMSBase
 {
+	private $config;
 
+	public function getConfig() {
+		if (is_null($this->config)) {
+			$this->config = new VOMSConfig($this);
+		}
+		return $this->config;
+	}
 }
