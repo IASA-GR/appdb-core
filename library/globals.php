@@ -2532,7 +2532,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$fld = "name";
 								$f2->$fld->matches("^[^A-Za-z0-9].+");
 							} else {
-								continue 2;
+								continue 3;
 							}							
 							$filter->chain($f2, $chainOp, $private);
 							break;
@@ -2634,7 +2634,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$f3->$fld->lt("'0'", false, false)->or($f3->$fld->gt("'99999999999999999999999999999999999999999999999999'", false, false));
 								$f2->chain($f3, "AND", $private);
 							} else {
-								continue 2;
+								continue 3;
 							}							
 							$filter->chain($f2, $chainOp, $private);
 							break;
@@ -2792,7 +2792,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$fld = "name";
 								$f2->$fld->matches("^[^A-Za-z0-9].+");
 							} else {
-								continue 2;
+								continue 3;
 							}							
 							$filter->chain($f2, $chainOp, $private);
 						}
@@ -2880,7 +2880,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$fld = "name";
 								$f2->$fld->matches("^[^A-Za-z0-9].+");
 							} else {
-								continue 2;
+								continue 3;
 							}							
 							$filter->chain($f2, $chainOp, $private);
 							break;
@@ -5790,9 +5790,9 @@ class VMCaster{
 						$instance->integrityStatus = "error";
 						$instance->integrityMessage = "Integrity check could not calculate the file checksum";
 						$hasimageerrors = true;
-					}else {
-                                                $successfulimages[] = $instance->id;
-                                        }
+					} else {
+						$successfulimages[] = $instance->id;
+					}
 					break;
 				case "cancelled":
 					$instance->integrityStatus = "canceled";
@@ -5809,9 +5809,9 @@ class VMCaster{
 					}
 					$instance->integrityStatus = "error";
 					$hasimageerrors = true;
-                                        break;
+					break;
 				default:
-					continue;
+					continue 2;
 			}
 			self::updateVMInstanceIntegrity($instance);
 		}
