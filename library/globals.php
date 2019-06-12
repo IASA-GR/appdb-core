@@ -1815,7 +1815,7 @@ class FilterParser {
 						$end = '>'.FilterParser::fieldsToXML($fltstr, $base, $n+1).'</filter:field>';
                         break;
                     case("site"):
-                        $fltstr = "id:string name:string description:string tier:numeric roc:string subgrid:string supports:string";
+                        $fltstr = "id:string name:string description:string tier:numeric roc:string subgrid:string supports:string offers:string";
                         if ( $base === $i ) {
                             $fltstr = $fltstr." country:complex";
                         }
@@ -2606,53 +2606,38 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 							break;
 						case "supports":
 							$f1 = false;
-							$f2 = new Default_Model_SitesFilter();
-							if (is_numeric(trim(str_replace("%", '', $val)))) {
-								$supports = trim(str_replace("%", '', $val));
-							} else {
-								switch (strtolower($supports)) {
-								case "occi":
-									$supports = 1;
-									break;
-								default:
-									$supports = 0;
-									break;
-								}
-							}
-							switch (intval($supports)) {
-							case 1:
-								$f2->id->in("(SELECT site_supports('occi'))",false,false);
+							$f2 = new default_model_sitesfilter();
+							$supports = trim(str_replace("%", '', $val));
+							switch(strtolower($supports)) {
+							case "true":
+							case "1":
+								$f2->supports->notequals(null);
 								break;
-							case 0:
+							case "false":
+							case "0":
+								$f2->supports->equals(null);
+								break;
 							default:
-								$f2->id->notin("(SELECT site_supports('occi'))",false,false);
-								break;
+								$f2->supports->like($val);
 							}
 							$filter->chain($f2, $chainOp, $private);
 							break;
+						case "offers":
 						case "hasinstances":
 							$f1 = false;
 							$f2 = new Default_Model_SitesFilter();
-							if (is_numeric(trim(str_replace("%", '', $val)))) {
-								$siteinstances = trim(str_replace("%", '', $val));
-							} else {
-								switch (strtolower($siteinstances)) {
-								case "occi":
-									$siteinstances = 1;
-									break;
-								default:
-									$siteinstances = 0;
-									break;
-								}
-							}
-							switch (intval($siteinstances)) {
-							case 1:
-								$f2->id->in("(SELECT site_instances('occi'))",false,false);
+							$offers = trim(str_replace("%", '', $val));
+							switch(strtolower($offers)) {
+							case "true":
+							case "1":
+								$f2->offers->notequals(null);
 								break;
-							case 0:
+							case "false":
+							case "0":
+								$f2->offers->equals(null);
+								break;
 							default:
-								$f2->id->notin("(SELECT site_instances('occi'))",false,false);
-								break;
+								$f2->supports->like($val);
 							}
 							$filter->chain($f2, $chainOp, $private);
 							break;

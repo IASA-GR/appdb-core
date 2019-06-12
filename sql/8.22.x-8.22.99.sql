@@ -777,6 +777,7 @@ CREATE OR REPLACE FUNCTION public.site_supports(servname text)
  LANGUAGE plpgsql
 AS $function$
 BEGIN
+	RAISE LOG 'Function site_supports(text) is obsolete and may be removed soon. Please replace any calls to it';
 	IF LOWER($1) = ANY(cloud_service_names()) THEN
 	-- IF ($1 = 'occi') OR ($1 = 'openstack') THEN
 		RETURN QUERY SELECT DISTINCT(sites.id) FROM sites INNER JOIN va_providers ON va_providers.sitename = sites.name AND va_providers.in_production = true;
@@ -793,6 +794,7 @@ CREATE OR REPLACE FUNCTION public.site_instances(servname text)
  LANGUAGE plpgsql
 AS $function$
 BEGIN
+	RAISE LOG 'Function site_instances(text) is obsolete and may be removed soon. Please replace any calls to it';         
 	IF LOWER($1) = ANY(cloud_service_names()) THEN
 	-- IF ($1 = 'occi') OR ($1 = 'openstack') THEN
 		RETURN QUERY
@@ -1611,6 +1613,38 @@ ORDER BY n
 END;
 $function$;
 ALTER FUNCTION vaprovider_logistics(text, text, text) OWNER TO appdb;
+
+CREATE OR REPLACE FUNCTION supports(sites) RETURNS TEXT[] AS
+$function$
+BEGIN
+	RETURN (
+		SELECT ARRAY_AGG(DISTINCT service_type)
+		FROM va_providers
+		WHERE va_providers.sitename = $1.name AND va_providers.in_production
+	);
+END;
+$function$
+LANGUAGE plpgsql;
+ALTER FUNCTION supports(sites) OWNER TO appdb;
+COMMENT ON FUNCTION supports(sites) IS 'Returns an array of supported cloud endpoints';
+
+CREATE OR REPLACE FUNCTION offers(sites) RETURNS TEXT[] AS
+$function$
+BEGIN
+	RETURN (
+		SELECT ARRAY_AGG(DISTINCT service_type)
+		FROM va_providers
+		INNER JOIN va_provider_images ON va_provider_images.va_provider_id = va_providers.id
+		INNER JOIN vaviews ON vaviews.vmiinstanceid = va_provider_images.vmiinstanceid
+		WHERE va_providers.sitename = $1.name AND va_providers.in_production
+
+	);
+END;
+$function$
+LANGUAGE plpgsql;
+ALTER FUNCTION offers(sites) OWNER TO appdb;
+COMMENT ON FUNCTION offers(sites) IS 'Returns an array of supported cloud endpoints which offer VM images';
+
 
 INSERT INTO version (major,minor,revision,notes) 
 SELECT 8, 22, 99, E'Support for OpenStack native cloud endpoints (aka va_providers)'
