@@ -444,6 +444,16 @@
 	<resource>RestVAProviderItem</resource>
 	<comment>The virtualization provider entry specified by parameter :id</comment>
 </route>
+<route type="rest" name="va_providers_nova" url="/:version/va_providers/nova">
+	<format>xml</format>
+	<resource>RestVAProvidersNovaList</resource>
+	<comment>A list of virtualization providers that expose a Nova OpenStack endpoint</comment>
+</route>
+<route type="rest" name="va_providers_all" url="/:version/va_providers/all">
+	<format>xml</format>
+	<resource>RestVAProvidersAllList</resource>
+	<comment>A list of virtualization providers</comment>
+</route>
 <route type="proxy" name="va_providerlogistics" url="/:version/va_providers/logistics">
 	<format>xml</format>
 	<resource>RestVAProviderLogistics</resource>

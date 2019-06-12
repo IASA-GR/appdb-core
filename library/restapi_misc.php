@@ -1279,6 +1279,12 @@ class RestVAProvidersList extends RestROResourceList {
 		parent::init();
 		$this->_cacheLife = 900; // 15 minutes
 		$this->_cacheable = true;
+		//FIXME: remove this compatibility hack when API change gets disseminated
+		if (isset($this->_pars["flt"])) {
+			$this->_pars["flt"] .= ' +=type:eu.egi.cloud.vm-management.occi';
+		} else {
+			$this->_pars["flt"] = '+=type:eu.egi.cloud.vm-management.occi';
+		}
 	}
 
 	public function getDataType() {
@@ -1300,6 +1306,52 @@ class RestVAProvidersList extends RestROResourceList {
 		return $res;
 	}
 }
+
+class RestVAProvidersOCCIList extends RestVAProvidersList {
+	/**
+     * overrides RestResource::init()
+     */
+	protected function init() {
+		parent::init();
+		if (isset($this->_pars["flt"])) {
+			$this->_pars["flt"] .= ' +=type:eu.egi.cloud.vm-management.occi';
+		} else {
+			$this->_pars["flt"] = '+=type:eu.egi.cloud.vm-management.occi';
+		}
+	}
+
+}
+
+class RestVAProvidersNovaList extends RestVAProvidersList {
+	/**
+     * overrides RestResource::init()
+     */
+	protected function init() {
+		parent::init();
+		if (isset($this->_pars["flt"])) {
+			//FIXME: Remove the following line after API change gets disseminated. (compatibility hack)
+			$this->_pars["flt"] = preg_replace('/\+=type:eu.egi.cloud.vm-management.occi/', '', $this->_pars["flt"]);
+			$this->_pars["flt"] .= ' +=type:org.openstack.nova';
+		} else {
+			$this->_pars["flt"] = '+=type:org.openstack.nova';
+		}
+		error_log($this->_pars["flt"]);
+	}
+}
+
+//FIXME: remove this class along with relevant API route when API change gets disseminated (compatilibity hack)
+class RestVAProvidersAllList extends RestVAProvidersList {
+	/**
+     * overrides RestResource::init()
+     */
+	protected function init() {
+		parent::init();
+		if (isset($this->_pars["flt"])) {
+			$this->_pars["flt"] = preg_replace('/\+=type:eu.egi.cloud.vm-management.occi/', '', $this->_pars["flt"]);
+		}
+	}
+}
+
 class RestVAProviderItem extends RestROResourceItem {
     /*** Attributes ***/
 
