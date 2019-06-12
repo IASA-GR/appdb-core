@@ -438,12 +438,6 @@
 	<resource>RestVAProvidersList</resource>
 	<comment>A list of virtualization providers</comment>
 </route>
-<route type="rest" name="va_provider" url="/:version/va_providers/:id">
-	<format>xml</format>
-    <param name="id" fmt=".+"/>
-	<resource>RestVAProviderItem</resource>
-	<comment>The virtualization provider entry specified by parameter :id</comment>
-</route>
 <route type="rest" name="va_providers_nova" url="/:version/va_providers/nova">
 	<format>xml</format>
 	<resource>RestVAProvidersNovaList</resource>
@@ -453,6 +447,12 @@
 	<format>xml</format>
 	<resource>RestVAProvidersAllList</resource>
 	<comment>A list of virtualization providers</comment>
+</route>
+<route type="rest" name="va_provider" url="/:version/va_providers/:id">
+	<format>xml</format>
+        <param name="id" fmt="^(?!all$)(?!nova$)[a-zA-Z0-9]+$"/>
+	<resource>RestVAProviderItem</resource>
+	<comment>The virtualization provider entry specified by parameter :id</comment>
 </route>
 <route type="proxy" name="va_providerlogistics" url="/:version/va_providers/logistics">
 	<format>xml</format>
