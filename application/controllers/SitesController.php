@@ -29,7 +29,7 @@ class SitesController extends Zend_Controller_Action{
 	
 	public function init(){
 		$this->vaSyncScopes = Zend_Registry::get("app");
-		$this->vaSyncScopes = $this->vaSyncScopes['va_sync_scopes'];
+		$this->vaSyncScopes = (isset($this->vaSyncScopes['va_sync_scopes']) ? $this->vaSyncScopes['va_sync_scopes'] : "");
 
 		if (trim($this->vaSyncScopes) == "") {
 			$this->vaSyncScopes = 'FedCloud';
