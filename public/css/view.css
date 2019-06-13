@@ -22900,6 +22900,9 @@ a.helperlink.wikilink:hover{
     vertical-align: top;
     line-height: 14px;
 }
+.inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue > .field > .icontext b {
+    color: #555;
+}
 .inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue > .value{
 	display: table-cell;
 	font-size: 14px;
@@ -22963,7 +22966,7 @@ a.helperlink.wikilink:hover{
 
 }
 .sitecontents.inlinedialog > .dialog > .message > .usageids > .fieldvalues > .fieldvalue.contextscript_url > .field {
-	width: 135px;
+	width: 155px;
 }
 .inlinedialog > .dialog > .message > .usageids .fieldvalues.contextscript_url > .fieldvalue.contextscript_url > .value > .dijitComboBox,
 .inlinedialog > .dialog > .message > .usageids .fieldvalues.contextscript_url > .fieldvalue.contextscript_url > .value > .dijitSelect,

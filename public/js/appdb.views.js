@@ -18926,7 +18926,7 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 		case 'opennebula':
 		    endpointTitle = '<div class="icontext"><img src="/images/opennebula.png" alt="opennebula" /><span>endpoint:</span></div>';
 		case 'occi':
-		    endpointTitle = '<div class="icontext"><img src="/images/occi.png" alt="occi" /><span>OCCI endpoint:</span></div>';
+		    endpointTitle = '<div class="icontext"><img src="/images/occi.png" alt="occi" /><span><b>OCCI</b> endpoint:</span></div>';
 		    break;
 		default:
 		    endpointTitle = '<div class="icontext"><span>Site endpoint:</span></div>';
@@ -19507,7 +19507,7 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 				if(  $.inArray($.trim(item.endpointurl), templ.occi_endpoint_url) === -1 ) return;
 				var li = $("<li class='fieldvalues'></li>");
 				var nativeEndpoint = null;
-				var endpoint_title = '<div class="icontext"><img src="/images/occi.png" alt="OCCI"/><span>OCCI endpoint:</span></div>';
+				var endpoint_title = '<div class="icontext"><img src="/images/occi.png" alt="OCCI"/><span><b>OCCI</b> endpoint:</span></div>';
 
 				if (item.serviceType === 'openstack') {
 				    endpoint_title = '<div class="icontext"><img src="/images/openstack.png" alt="Openstack"/><span> endpoint:</span></div>'; 
