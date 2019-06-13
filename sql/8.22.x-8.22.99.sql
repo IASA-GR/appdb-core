@@ -1687,11 +1687,12 @@ SELECT
 			xmlelement(name "virtualization:provider",
 				xmlattributes(
 					va_provider_images.va_provider_id as provider_id,
+					va_providers.sitename as name,
+					va_providers.service_type,
 					va_provider_images.va_provider_image_id as occi_id, --FIXME: this should be renamed to endpoint_id
 					vowide_image_lists.void,
 					vos.name as voname,
-					va_provider_images.vmiinstanceid as vmiinstanceid,
-					va_providers.service_type
+					va_provider_images.vmiinstanceid as vmiinstanceid
 				)
 			)::text
 		),'')::xml
