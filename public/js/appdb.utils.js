@@ -8032,7 +8032,20 @@ appdb.utils.GroupSiteImages = function(occiservices, flattenVOs){
 		}
 
 		if (flattenVOs === true) {
-		    res = flattenPerVO(res);
+			res = flattenPerVO(res);
+		}
+
+		if (!appdb.config.features.displayOCCINativeEndpoints) {
+			for(var j in res){
+				var instances = res[j].instances || [];
+				for(var i in instances) {
+					if (instances[i] && instances[i].items && instances[i].items.length > 1) {
+						res[j].instances[i].items = $.grep(instances[i].items, function(item, index) {
+							return (item.serviceType === 'occi');
+						});
+					}
+				}
+			}
 		}
 
 		return res;
@@ -8105,9 +8118,11 @@ appdb.utils.GroupSiteImages = function(occiservices, flattenVOs){
 			$.each(e.occi, function(ii,ee){
 				ee.template = extendArray(e.template);
 				ee.mpuri = ""+e.mpuri;
+				ee.serviceType = (e.occi_endpoint_url && e.occi_endpoint_url.type) ? e.occi_endpoint_url.type : 'occi';
 				ee.occi_endpoint_url = (e.occi_endpoint_url && e.occi_endpoint_url.val) ? e.occi_endpoint_url.val() : '' + e.occi_endpoint_url;
 				$.each(ee.template, function(ti,t){
 					t.occi_endpoint_url = ee.occi_endpoint_url;
+					t.serviceType = ee.serviceType;
 				});
 			});
 			if( appdb.config.features.groupvaprovidertemplates ){
@@ -8175,11 +8190,11 @@ appdb.utils.GroupSiteImages = function(occiservices, flattenVOs){
 				uniq[hash] = e;
 				uniq[hash].occiids = [e.id];
 				uniq[hash].template = e.template;
-				uniq[hash].items = [{templates: e.template, occid: e.id, endpointurl: e.occi_endpoint_url}];
+				uniq[hash].items = [{templates: e.template, occid: e.id, endpointurl: e.occi_endpoint_url, serviceType: e.serviceType}];
 			}else{
 				uniq[hash].occiids.push(e.id);
 				uniq[hash].template = uniq[hash].template.concat(extendArray(e.template));
-				uniq[hash].items.push({templates: e.template, occid: e.id, endpointurl: e.occi_endpoint_url});
+				uniq[hash].items.push({templates: e.template, occid: e.id, endpointurl: e.occi_endpoint_url, serviceType: e.serviceType});
 			}
 		});
 		
