@@ -22861,7 +22861,7 @@ a.helperlink.wikilink:hover{
 	width: 180px;
 }
 .sitecontents.inlinedialog > .dialog{
-	width: 700px;
+	width: 800px;
 	margin-top: 2%;
 }
 .sitecontents.inlinedialog > .dialog > .message > .usageids > .fieldvalues > .fieldvalue > .field{
@@ -22879,7 +22879,7 @@ a.helperlink.wikilink:hover{
 	display: table-row;
 }
 .inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue > .field {
-	width: 95px;
+	width: 140px;
 	text-align: right;
 	color: black;
 	font-size: 12px;
@@ -22888,6 +22888,17 @@ a.helperlink.wikilink:hover{
 	height: 30px;
 	color: #555;
 	padding-right: 10px;
+        vertical-align: top;
+}
+.inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue > .field img {
+    height: 14px;
+    width: auto;
+}
+.inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue > .field > .icontext,
+.inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue > .field > .icontext > span,
+.inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue > .field > .icontext > img {
+    vertical-align: top;
+    line-height: 14px;
 }
 .inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue > .value{
 	display: table-cell;
@@ -22895,13 +22906,16 @@ a.helperlink.wikilink:hover{
 	white-space: pre-wrap;
 	word-wrap: break-word;
 	word-break: break-all;
+        vertical-align: top;
+        line-height: 14px;
+        padding: 1px;
 }
 .inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue > .value.empty{
 	color: #666;
 }
 .inlinedialog > .dialog > .message > .usageids  .groupfieldvalues{
 	display: block;
-	width: 90%;
+	width: 96%;
 	margin: 0 auto;
 	padding: 0px;
 }

@@ -3830,13 +3830,22 @@ appdb.views.SitesList = appdb.ExtendClass(appdb.View, "appdb.views.SitesList", f
 				var supportedBy = this.getSupportedServiceTypes(servs);
 				//TODO: support multiple service types instead of service[0] only
 				//TODO: support non-OCCI icons
-				if(supportedBy.openstack) {
-				   $(div2).append("<span class='serviceitem occi'><span class='status'><img src='/images/openstack.png' alt='' style='width:auto;height:12px;opacity:0.8;'/><span></span></span><span class='instances'><span class='count'></span><span>images</span></span></span>");
+				var icons = [];
+				if (supportedBy.occi) {
+				    if (appdb.config.features.displayOCCINativeEndpoints) {
+					if(supportedBy.openstack) {
+					    icons.push("<img src='/images/openstack.png' alt='' style='width:auto;height:12px;opacity:0.8;'/>");
+					} else if (supportedBy.opennebula) {
+					    icons.push("<img src='/images/opennebula.png' alt='' style='width:auto;height:12px;opacity:0.8;'/>");
+					}
+				    }
+				    icons.push("<img src='/images/occi.png' alt=''/><span>occi enabled</span>");
+				} else if(supportedBy.openstack) {
+				    icons.push("<img src='/images/openstack.png' alt='openstack' style='width:auto;height:12px;opacity:0.8;'/>");
 				} else if (supportedBy.opennebula) {
-				    $(div2).append("<span class='serviceitem occi'><span class='status'><img src='/images/opennebula.png' alt='' style='width:auto;height:12px;opacity:0.8;'/><span></span></span><span class='instances'><span class='count'></span><span>images</span></span></span>");
-				} else {
-				    $(div2).append("<span class='serviceitem occi'><span class='status'><img src='/images/occi.png' alt=''/><span>occi enabled</span></span><span class='instances'><span class='count'></span><span>images</span></span></span>");
+				    icons.push("<img src='/images/opennebula.png' alt='opennebula' style='width:auto;height:12px;opacity:0.8;'/>");
 				}
+				$(div2).append("<span class='serviceitem occi'><span class='status'>"+icons.join("<span>/</span>")+"</span><span class='instances'><span class='count'></span><span>images</span></span></span>");
 
 				$(div2).find(".count").text(insts);
 				if (insts > 0) {
@@ -3858,7 +3867,7 @@ appdb.views.SitesList = appdb.ExtendClass(appdb.View, "appdb.views.SitesList", f
 	       if (servs) {
 		   servs.image = servs.image || [];
 		   servs.image = $.isArray(servs.image) ? servs.image : [servs.image];
-		   res[s] = servs.image.length;
+		   res[s] = servs.image.length || 0
 	       }
 	   });
 
@@ -18800,7 +18809,7 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 		$(endpoint_url_html).find(".value").text(endpoint_url);
 		var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>Template ID:</div><div class='value'></div></div>");
 		$(template_id_html).find(".value").text(template_id);
-		var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>OCCI ID:</div><div class='value'></div></div>");
+		var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>Resource ID:</div><div class='value'></div></div>");
 		$(occi_id_html).find(".value").text(occi_id);
 
 		var usageids = $("<div class='usageids'></div>");
@@ -18917,7 +18926,7 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 				$(endpoint_url_html).find(".value").text(item.endpointurl);
 				var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>Template ID:</div><div class='value'></div></div>");
 				$(template_id_html).find(".value").text(templ.resource_name);
-				var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>OCCI ID:</div><div class='value'></div></div>");
+				var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>Resource ID:</div><div class='value'></div></div>");
 				$(occi_id_html).find(".value").text(item.occid);
 				$(li).append(endpoint_url_html).append(template_id_html).append(occi_id_html);
 				$(ul).append(li);
@@ -19056,7 +19065,7 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 			};
 		})(this, data.contextscript, data));
 	};
-	this.renderTemplates = function(dom, data) {
+	this.renderTemplates = function(dom, data,instance) {
 		var d = data.templates || [];
 		var ul = $("<ul class='cancollapse'></ul>");
 		var liheader = $("<li class='va-template va-template-header'></li>");
@@ -19067,6 +19076,23 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 				return function(i, e) {
 					var l = $("<li class='va-template va-template-data'></li>");
 					$(l).data("template", e);
+					if (instance) {
+						if (data.occi_endpoint_url && data.occi_endpoint_url.type && data.occi_endpoint_url.val) {
+							instance.serviceType = data.occi_endpoint_url.type;
+							instance.serviceEndpoint = data.occi_endpoint_url.val();
+							$.each(instance.items, function(i, dii) {
+								if (instance.serviceEndpoint === dii.endpointurl) {
+								    dii.serviceType = instance.serviceType;
+								}
+							});
+							//sort by servicetype OCCI, opennebula, openstack
+							instance.items.sort(function(a, b) {
+							    if (a.serviceType < b.serviceType) return -1;
+							    if (a.serviceType > b.serviceType) return 1;
+							    return 0;
+							})
+						}
+					}
 					self.renderTemplate(l, e, data);
 					$(container).append(l);
 				};
@@ -19412,7 +19438,7 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 		$(endpoint_url_html).find(".value").text(endpoint_url);
 		var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>Template ID:</div><div class='value'></div></div>");
 		$(template_id_html).find(".value").text(template_id);
-		var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>OCCI ID:</div><div class='value'></div></div>");
+		var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>Resource ID:</div><div class='value'></div></div>");
 		$(occi_id_html).find(".value").text(occi_id);
 
 		var usageids = $("<div class='usageids'></div>");
@@ -19452,13 +19478,36 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 				templ.occi_endpoint_url = $.isArray(templ.occi_endpoint_url)?templ.occi_endpoint_url:[templ.occi_endpoint_url];
 				if(  $.inArray($.trim(item.endpointurl), templ.occi_endpoint_url) === -1 ) return;
 				var li = $("<li class='fieldvalues'></li>");
-				var endpoint_url_html = $("<div class='fieldvalue endpoint'><div class='field'>Site endpoint:</div><div class='value'></div></div>");
+				var nativeEndpoint = null;
+				var endpoint_title = '<div class="icontext"><img src="/images/occi.png" alt="OCCI"/><span>OCCI endpoint:</span></div>';
+
+				if (item.serviceType === 'openstack') {
+				    endpoint_title = '<div class="icontext"><img src="/images/openstack.png" alt="Openstack"/><span> endpoint:</span></div>'; 
+				} else  if (item.serviceType === 'opennebula') {
+				    endpoint_title = '<div class="icontext"><img src="/images/opennebula.png" alt="Opennebula"/><span> endpoint:</span></div>'; 
+				} else if(item.nativeApis && appdb.config.features.displayOCCINativeEndpoints) {
+				    nativeEndpoint = $("<div class='fieldvalue endpoint'><div class='field'></div><div class='value'></div></div>");
+				    switch(item.nativeApis.serviceType) {
+					case 'openstack':
+					    $(nativeEndpoint).find('.field').append($('<div class="icontext"><img src="/images/openstack.png" alt="Openstack"/><span>endpoint:</span><div>'));
+					    break;
+					case 'opennebula':
+					    $(nativeEndpoint).find('.field').append($('<div class="icontext"><img src="/images/opennebula.png" alt="Opennebula"/><span>endpoint:</span></div>'));
+					    break;
+					default:
+					    $(nativeEndpoint).find('.field').append($('<div class="icontext"><span>Native endpoint:</span></div>'));
+					    break;
+				    }
+				    $(nativeEndpoint).find('.value').text(item.nativeApis.endpointUrl);
+				}
+				var endpoint_url_html = $("<div class='fieldvalue endpoint'><div class='field'></div><div class='value'></div></div>");
+				$(endpoint_url_html).find(".field").append(endpoint_title);
 				$(endpoint_url_html).find(".value").text(item.endpointurl);
 				var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>Template ID:</div><div class='value'></div></div>");
 				$(template_id_html).find(".value").text(templ.resource_name);
-				var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>OCCI ID:</div><div class='value'></div></div>");
+				var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>Resource ID:</div><div class='value'></div></div>");
 				$(occi_id_html).find(".value").text(item.occid);
-				$(li).append(endpoint_url_html).append(template_id_html).append(occi_id_html);
+				$(li).append(endpoint_url_html).append(nativeEndpoint).append(template_id_html).append(occi_id_html);
 				$(ul).append(li);
 			});
 		});
@@ -19580,6 +19629,40 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 				return function(i, e) {
 					var l = $("<li class='va-template va-template-data'></li>");
 					$(l).data("template", e);
+					if (instance) {
+						if (data.occi_endpoint_url && data.occi_endpoint_url.type && data.occi_endpoint_url.val) {
+							instance.serviceType = data.occi_endpoint_url.type;
+							instance.serviceEndpoint = data.occi_endpoint_url.val();
+							var occiIndex = -1;
+							//sort by servicetype OCCI, opennebula, openstack
+							instance.items.sort(function(a, b) {
+							    if (a.serviceType < b.serviceType) return -1;
+							    if (a.serviceType > b.serviceType) return 1;
+							    return 0;
+							});
+							$.each(instance.items, function(i, dii) {
+								if (instance.serviceEndpoint === dii.endpointurl) {
+								    dii.serviceType = instance.serviceType;
+								}
+								if (dii.serviceType === 'occi') {
+								    occiIndex = i;
+								}
+							});
+							if (occiIndex > -1 && instance.items.length > 1) {
+							    var tmpInstanceItem = instance.items[occiIndex];
+							    var restInstanceItems = $.grep(instance.items, function(item, i) {
+								return i !== occiIndex;
+							    });
+							    if (restInstanceItems.length > 0) {
+								tmpInstanceItem.nativeApis = {
+								    serviceType: restInstanceItems[0].serviceType,
+								    endpointUrl: restInstanceItems[0].endpointurl
+								};
+								instance.items = [tmpInstanceItem];
+							    }
+							}
+						}
+					}
 					self.renderTemplate(l, e, data,instance);
 					$(container).append(l);
 				};
@@ -19600,10 +19683,12 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 	this.render = function(d, instance) {
 		d = d || {};
 		this.options.data = d || this.options.data;
+		this.options.serviceType = (this.options.data.occi_endpoint_url && this.options.data.occi_endpoint_url.type) ? this.options.data.occi_endpoint_url.type : 'occi';
 		this.options.instanceData = instance || this.options.instanceData || {};
 		var data = this.transformData($.extend(true, {}, this.options.data));
 		$(this.dom).children(".header").remove();
-		$(this.dom).append($("<div class='header'>Select a template and get the rOCCI ids</div>"));
+		var headerText = 'Select a template and get the infrastructure ids';
+		$(this.dom).append($("<div class='header'>" + headerText + "</div>"));
 		this.renderTemplates(this.dom, data, instance);
 	};
 
