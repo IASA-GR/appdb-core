@@ -18916,19 +18916,47 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 			$(dom).addClass("hasmany");
 		}
 	};
+	this.getEndpointHTML = function(item) {
+	    var endpoint_url_html =  $("<div class='fieldvalue endpoint'><div class='field'></div><div class='value'></div></div>");
+	    var endpointTitle = null;
+	    switch(item.serviceType) {
+		case 'openstack':
+		    endpointTitle = '<div class="icontext"><img src="/images/openstack.png" alt="openstack" /><span>endpoint:</span></div>';
+		    break;
+		case 'opennebula':
+		    endpointTitle = '<div class="icontext"><img src="/images/opennebula.png" alt="opennebula" /><span>endpoint:</span></div>';
+		case 'occi':
+		    endpointTitle = '<div class="icontext"><img src="/images/occi.png" alt="occi" /><span>OCCI endpoint:</span></div>';
+		    break;
+		default:
+		    endpointTitle = '<div class="icontext"><span>Site endpoint:</span></div>';
+		    break;
+	    }
+	    $(endpoint_url_html).find(".field").append($(endpointTitle));
+	    $(endpoint_url_html).find(".value").text(item.endpointUrl || item.endpointurl);
+
+	    return endpoint_url_html;
+	};
 	this.renderTemplateItemList  = function(grouphash,data){
 		var ul = $("<ul class='groupfieldvalues'></ul>");
+		var self = this;
 		$.each(data.items, function(ii, item){
 			var templates = appdb.utils.findGroupTemplatesByHash(grouphash, item.templates);
 			$.each(templates, function(i,templ){
 				var li = $("<li class='fieldvalues'></li>");
-				var endpoint_url_html = $("<div class='fieldvalue endpoint'><div class='field'>Site endpoint:</div><div class='value'></div></div>");
-				$(endpoint_url_html).find(".value").text(item.endpointurl);
+				var endpoint_url_html = self.getEndpointHTML(item);//$("<div class='fieldvalue endpoint'><div class='field'></div><div class='value'></div></div>");
+				//$(endpoint_url_html).find(".value").text(item.endpointurl);
 				var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>Template ID:</div><div class='value'></div></div>");
 				$(template_id_html).find(".value").text(templ.resource_name);
 				var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>Resource ID:</div><div class='value'></div></div>");
 				$(occi_id_html).find(".value").text(item.occid);
-				$(li).append(endpoint_url_html).append(template_id_html).append(occi_id_html);
+				$(li).append(endpoint_url_html);
+				if (appdb.config.features.displayOCCINativeEndpoints && item.nativeApis && item.nativeApis.length > 0) {
+				    $.each(item.nativeApis, function(index, api) {
+					$(li).append(self.getEndpointHTML(api));
+				    });
+				}
+				$(li).append(template_id_html).append(occi_id_html);
 				$(ul).append(li);
 			});
 		});
