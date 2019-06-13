@@ -705,9 +705,13 @@
 	}
 	function loadVAProviders(){
 		var broker = new appdb.utils.broker(true);
+		var resourceName = 'va_providers';
+		if (appdb.config.features.displayNativeAPIs === true) {
+		    resourceName = 'va_providers/all';
+		}
 		broker.request([{
 			"id": "vaproviders",
-			"resource": "va_providers",
+			"resource": resourceName,
 			"method": "GET",
 			"param": [{"name": "listmode", "val": "details"}]
 		}]);
