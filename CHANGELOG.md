@@ -5,7 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [6.2.0] - 2019-06-14
 ### Changed
-- Populate VM images from site endpoints exposing native APIs(eg openstack) instead only from OCCI enabled ones
+- Populate VM images from site endpoints exposing native APIs (e.g. openstack) along with OCCI enabled ones
+- Updated acceptable netfilter rules according to RFC 1123
+### Fixed
+- Fixed organizations autocomplete list redirection bug
+- Fixed bug related to missing organizations
+- Fixed bug related to VA expiry dates
 
 ## [6.1.15] - 2019-04-10
 ### Changed
