@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.2.0] - 2019-06-14
+### Changed
+- Populate VM images from site endpoints exposing native APIs(eg openstack) instead only from OCCI enabled ones
+
 ## [6.1.15] - 2019-04-10
 ### Changed
 - Access to VO-wide image lists granted site administrators for sites with org.openstack.nova endpoints
