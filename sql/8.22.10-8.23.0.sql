@@ -21,6 +21,8 @@ New version: 8.23.0
 Author: wvkarag@lovecraft.priv.iasa.gr
 */
 
+START TRANSACTION;
+
 CREATE OR REPLACE FUNCTION pidhandle(vapp_versions)
  RETURNS text
  LANGUAGE sql
@@ -99,7 +101,7 @@ DROP VIEW IF EXISTS endorsables;
 
 CREATE VIEW endorsables AS
 SELECT
-	'vapplianceVersion' AS "kind",
+	'vapplianceVersion'::text AS "kind",
 	'http://hdl.handle.net/' || vapp_versions.pidhandle as "pid",
 	vaviews.va_version AS "name",
 	vaviews.va_version AS "cname",
@@ -368,3 +370,5 @@ ALTER FUNCTION endorsables_to_xml() OWNER TO appdb;
 INSERT INTO version (major,minor,revision,notes) 
 SELECT 8, 23, 0, E'Added endorsable-related views and functions'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=23 AND revision=0);
+
+COMMIT;

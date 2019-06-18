@@ -21,6 +21,8 @@ New version: 8.23.2
 Author: nakos@kelsos.priv.iasa.gr
 */
 
+START TRANSACTION;
+
 CREATE OR REPLACE FUNCTION public.appdb_ns_array()
  RETURNS text[]
  LANGUAGE sql
@@ -399,3 +401,5 @@ $function$
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 23, 2, E'Update endorsables_to_xml_function'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=23 AND revision=2);
+
+COMMIT;

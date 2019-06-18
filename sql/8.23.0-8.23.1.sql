@@ -21,6 +21,8 @@ New version: 8.23.1
 Author: wvkarag@lovecraft.priv.iasa.gr
 */
 
+START TRANSACTION;
+
 CREATE OR REPLACE FUNCTION endorsables_to_xml()
 RETURNS SETOF XML
 LANGUAGE SQL
@@ -301,3 +303,5 @@ ALTER FUNCTION endorsables_to_xml() OWNER TO appdb;
 INSERT INTO version (major,minor,revision,notes) 
 	SELECT 8, 23, 1, E'Updated endorsables_to_xml function'
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=23 AND revision=1);
+
+COMMIT;

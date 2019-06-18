@@ -1488,8 +1488,6 @@ END;
 $function$;
 ALTER FUNCTION va_provider_to_xml_ext(text[]) OWNER TO appdb;
 
-SELECT va_provider_to_xml(array_agg(va_providers.id)) FROM filtervaproviders('', 'FROM va_providers', '') AS va_providers INNER JOIN va_providers AS s ON s.id = va_providers.id
-
 CREATE OR REPLACE FUNCTION public.count_vaprovider_matches(itemname text, cachetable text, private boolean DEFAULT false)
  RETURNS SETOF record
  LANGUAGE plpgsql
