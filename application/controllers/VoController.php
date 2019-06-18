@@ -305,7 +305,7 @@ class VoController extends Zend_Controller_Action
 				$xp = $xml1->xpath("//IDCard");
 				foreach ($xp as $x) {
 					$xattr = $x->attributes();
-					$xp2 = $xml2->xpath("//IDCard[@Name=" . xpath_quote($xattr["Name"]) . "]");
+					$xp2 = $xml2->xpath("//IDCard[@Name=" . xpath_quote(strval($xattr["Name"])) . "]");
 					if (count($xp2) == 0) {
 						fwrite($f, str_replace('<' . '?xml version="1.0"?'.'>', "", $x->asXML()));
 					}

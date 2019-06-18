@@ -49,7 +49,7 @@ libxml_disable_entity_loader(true);
  * Credit: Hans Henrik Bergan (https://stackoverflow.com/users/1067003/hanshenrik)
  * https://stackoverflow.com/questions/13026833/how-to-escape-all-invalid-characters-from-dom-xpath-query
  */
-function xpath_quote(string $value):string{
+function xpath_quote($value){
     if(false===strpos($value,'"')){
         return '"'.$value.'"';
     }
