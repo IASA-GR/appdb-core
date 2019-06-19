@@ -60,9 +60,24 @@ class SitesController extends Zend_Controller_Action{
 		 }
 	}
 	
-	private function makeVAprovidersCache() {
-		$copyfile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/va_providers.xml';
-		$hashfile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/datahash';
+	private function makeVAprovidersCache($subres = "") {
+		$subname = "";
+		$subcname = "";
+		if ($subres != "") {
+			$subname = "-$subres";
+			switch($subres) {
+			case "nova":
+				$subcname = "Nova";
+				break;
+			case "all":
+				$subcname = "All";
+				break;
+			default:
+				$subcname = ucfirst($subres);
+			}
+		}
+		$copyfile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/va_providers' . $subname . '.xml';
+		$hashfile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/datahash' . $subname;
 
 		# truncate data hash file (i.e. sync operation in progress)
 		$f_hashfile = @fopen($hashfile, "w");
@@ -71,9 +86,9 @@ class SitesController extends Zend_Controller_Action{
 			fclose($f_hashfile);
 		} else {
 			$errors = error_get_last();
-			error_log("[makeVAprovidersCache] Could not open+truncate VA providers cache data hash file. Reason: " . $errors['message']);
+			error_log("[makeVAprovidersCache$subname] Could not open+truncate VA providers cache data hash file. Reason: " . $errors['message']);
 		}
-		$uri = 'https://' . $_SERVER['APPLICATION_API_HOSTNAME'] . '/rest/latest/va_providers?listmode=details';
+		$uri = 'https://' . $_SERVER['APPLICATION_API_HOSTNAME'] . '/rest/latest/va_providers/' . $subres . '?listmode=details';
 		error_log($uri);
 		$ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $uri);
@@ -94,13 +109,13 @@ class SitesController extends Zend_Controller_Action{
 		$h['Keep-Alive']='300';
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $h);
 		// remove existing cachefiles before making API call, or else this will not work
-		foreach ( glob(RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) .'/query_RestVAProvidersList_*.xml') as $cachefile ) {
+		foreach ( glob(RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) .'/query_RestVAProviders' . $subcname . 'List_*.xml') as $cachefile ) {
 			@unlink($cachefile);
 		}
-		error_log('VA providers RESTful API XML cache STARTED');
+		error_log('VA providers' . $subname . ' RESTful API XML cache STARTED');
 		// 1st call creates the cache
 		$result = curl_exec($ch);
-		error_log('VA providers RESTful API XML cache DONE');		
+		error_log('VA providers' . $subname . ' RESTful API XML cache DONE');		
 		// 2nd call returns the cached response
 		$result = curl_exec($ch);
 		$result_tmp = @gzdecode($result);
@@ -111,7 +126,7 @@ class SitesController extends Zend_Controller_Action{
 		try {
 			$xmlresult = simplexml_load_string($result);
 			if ($xmlresult === false) {
-				throw new Exception("Cannot parse VA Providers data as XML");
+				throw new Exception("Cannot parse VA Providers$subname data as XML");
 			}
 			$appdb = $xmlresult->xpath("//appdb:appdb");
 			$vadata = $xmlresult->xpath("//virtualization:provider");
@@ -124,23 +139,23 @@ class SitesController extends Zend_Controller_Action{
 				$appdb = $appdb[0];
 				$ck = trim(strval($appdb->attributes()->cachekey));
 				if ($ck != "") {
-					debug_log("[makeVAprovidersCache] cache key is " . $ck);
+					debug_log("[makeVAprovidersCache$subname] cache key is " . $ck);
 				} else {
-					error_log("[makeVAprovidersCache] Did not find cache key in XML response");
+					error_log("[makeVAprovidersCache$subname] Did not find cache key in XML response");
 				}
 			} else {
-				error_log("[makeVAprovidersCache] Could not find appdb:appdb root element in XML response");
+				error_log("[makeVAprovidersCache$subname] Could not find appdb:appdb root element in XML response");
 			}
 		} catch (Exception $e) {
-			error_log("[makeVAprovidersCache] Could not parse respone as XML. Reason: " . $e->getMessage());
+			error_log("[makeVAprovidersCache$subname] Could not parse respone as XML. Reason: " . $e->getMessage());
 		}
 		curl_close($ch);
 		if ($ck != "") {
-			if (!@copy(RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) .'/query_RestVAProvidersList_' . $ck . '.xml', $copyfile)) {
+			if (!@copy(RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) .'/query_RestVAProviders' . $subcname . 'List_' . $ck . '.xml', $copyfile)) {
 				$errors = error_get_last();
-				error_log("[makeVAprovidersCache] Could not copy VA providers cache file into assets. Reason: " . $errors['message']);
+				error_log("[makeVAprovidersCache$subname] Could not copy VA providers cache file into assets. Reason: " . $errors['message']);
 			} else {
-				debug_log("Copied VA providers cache file into assets");
+				debug_log("Copied VA providers$subname cache file into assets");
 				// XML cache file has been copied to assets. Create a JSON copy as well.
 				$copyfile2 = str_replace(".xml", ".json", $copyfile);
 				$jsondata = RestAPIHelper::transformXMLtoJSON(file_get_contents($copyfile));
@@ -149,17 +164,17 @@ class SitesController extends Zend_Controller_Action{
 				if ($f_jsonfile !== false) {
 					if (@fwrite($f_jsonfile, "" . $jsondata) === false) {
 						$errors = error_get_last();
-						error_log("[makeVAprovidersCache] Could not write to VA providers cache file JSON copy in assets. Reason: " . $errors['message']);
+						error_log("[makeVAprovidersCache$subname] Could not write to VA providers cache file JSON copy in assets. Reason: " . $errors['message']);
 						$f_jsonop = false;
 					}
 					@fclose($f_jsonfile);
 				} else {
 						$errors = error_get_last();
-						error_log("[makeVAprovidersCache] Could not open VA providers cache file JSON copy for writing in assets. Reason: " . $errors['message']);
+						error_log("[makeVAprovidersCache$subname] Could not open VA providers cache file JSON copy for writing in assets. Reason: " . $errors['message']);
 						$f_jsonop = false;
 				}
 				if ($f_jsonop) {
-					debug_log("Created VA providers cache file JSON copy in assets");
+					debug_log("Created VA providers$subname cache file JSON copy in assets");
 				}
 				// Keep a hashfile of the cache
 				$f_hashop = true;
@@ -167,22 +182,22 @@ class SitesController extends Zend_Controller_Action{
 				if ($f_hashfile !== false) {
 					if (@fwrite($f_hashfile, $hash) === false) {
 						$errors = error_get_last();
-						error_log("[makeVAprovidersCache] Could not write to VA providers cache data hash file. Reason: " . $errors['message']);
+						error_log("[makeVAprovidersCache$subname] Could not write to VA providers cache data hash file. Reason: " . $errors['message']);
 						$f_hashop = false;
 					}
 					@fclose($f_hashfile);
 				} else {
 					$errors = error_get_last();
-					error_log("[makeVAprovidersCache] Could not open VA providers cache data hash file for writing. Reason: " . $errors['message']);
+					error_log("[makeVAprovidersCache$subname] Could not open VA providers cache data hash file for writing. Reason: " . $errors['message']);
 					$f_hashop = false;
 				}
 				debug_log("Data md5 is $hash");
 				if ($f_hashop) {
-					debug_log("Copied VA providers cache hash file into assets");
+					debug_log("Copied VA providers$subname cache hash file into assets");
 				}
 			}
 		} else {
-			error_log("[makeVAprovidersCache] No VA providers cache file to copy into assets");
+			error_log("[makeVAprovidersCache$subname] No VA providers$subname cache file to copy into assets");
 			$f_hashfile = @fopen($hashfile, "w");
 			@fwrite("ERROR", $hash);
 			fclose($f_hashfile);
@@ -394,6 +409,8 @@ class SitesController extends Zend_Controller_Action{
 			sleep(2);
 			// create VA providers cache
 			$this->makeVAprovidersCache();
+			// create VA providers cache for all service types, including native OpenStack endpoints (default resource only lists OCCI endpoints)
+			$this->makeVAprovidersCache("all");
 		}
 
 		if ($success) {
