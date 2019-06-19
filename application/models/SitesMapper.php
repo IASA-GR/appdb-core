@@ -37,8 +37,8 @@ class Default_Model_SitesMapper extends Default_Model_SitesMapperBase
 				$select->joinLeft('applications', 'applications.id = vaviews.appid', array() );
 				$select->joinLeft('applications.any', 'applications.any.id = applications.id', array() );
 			}
-			
-			if ( ! in_array("countries", $filter->joins) && in_array("countries", $filter->privateJoins) ) {
+
+			if ( /*! in_array("countries", $filter->joins) &&*/ in_array("countries", $filter->privateJoins) ) {
 				$select->joinLeft('countries', 'countries.id = sites.countryid', array() );
 				$select->joinLeft('countries.any', 'countries.any.id = countries.id', array() );
 			} elseif ( in_array("countries", $filter->joins) ) {
