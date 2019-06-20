@@ -3862,7 +3862,7 @@ appdb.views.SitesList = appdb.ExtendClass(appdb.View, "appdb.views.SitesList", f
 	   var supported = ["occi", "openstack", "opennebula"];
 	   var res = {};
 	   $.each(supported, function(i, s) {
-	       let servs = $.grep(services, function(e) { return $.trim(e["type"]).toLowerCase() === s; });
+	       var servs = $.grep(services, function(e) { return $.trim(e["type"]).toLowerCase() === s; });
 	       servs = servs.length ? servs[0] : null;
 	       if (servs) {
 		   servs.image = servs.image || [];

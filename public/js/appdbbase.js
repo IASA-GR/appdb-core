@@ -9737,7 +9737,7 @@ appdb.components.VapplianceResourceProviders = appdb.ExtendClass(appdb.Component
 	};
 	this.getProvider = function(id){
 		id = $.trim(id);
-		let providers = this.getCompactVAProviders();
+		var providers = this.getCompactVAProviders();
 		var res = $.grep(providers, function(e){
 			return ($.trim(e.id) === id|| (e.nativeProviders && e.nativeProviders.indexOf(id) > -1));
 		});
