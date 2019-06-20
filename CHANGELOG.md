@@ -3,7 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [6.2.0] - 2019-06-14
+## [6.2.1] - 2019-06-19
+### Added
+- Added "authn" attribute to virtualization:provider and site:service XML elements in RESTful API
+### Fixed
+- Fixed regression bug in scientific classification API, which resulted in empty documents
+- Fixed default country search scope for sites
+- Fixed resource caching for cloud sites with native OpenStack endpoints
+
+- ## [6.2.0] - 2019-06-14
 ### Changed
 - Populate VM images from site endpoints exposing native APIs (e.g. openstack) along with OCCI enabled ones
 - Updated acceptable netfilter rules according to RFC 1123
