@@ -8769,8 +8769,8 @@ class SamlAuth{
 	  }
 	  return $res;
 	}
-	
-	//Reject VM Operator if account is not entitled with VO membership
+
+        //Reject VM Operator if account is not entitled with VO membership
 	private static function validateEntitlements($user, $entitlements = array()) {
 			$vos = ((isset($entitlements['vos'])) ? $entitlements['vos'] : array());
 			$vmops = ((isset($vos['vmops'])) ? $vos['vmops'] : array());
@@ -8873,7 +8873,7 @@ class SamlAuth{
 	public static function setupSamlAuth($session){
 		$attrs = $session->samlattrs;
 		$source = strtolower(trim($session->samlauthsource));
-		$uid = ( isset($attrs["idp:uid"])?$attrs["idp:uid"][0]:"");
+                $uid = ( isset($attrs["idp:uid"])?$attrs["idp:uid"][0]:"");
 
 		if( trim($uid) == "" ) return false;
 		$accounttype = str_replace("-sp","",$source);
@@ -8941,7 +8941,7 @@ class SamlAuth{
 
 		//Check if user account is blocked and updates session
 		self::setupUserAccountStatus($session, $useraccount);
-		
+
 		$session->authSource = $source;
 		$session->authUid = $uid;
 		$session->logoutUrl = 'https://' . $_SERVER['HTTP_HOST'] . '/saml/logout?source=' . $source;
