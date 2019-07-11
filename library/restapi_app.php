@@ -3183,7 +3183,47 @@ class RestAppVAXMLParser extends RestXMLParser {
 		}
 		return false;
 	}
-	private function versionHasUniqueUrls(){
+	/**
+         * Returns a list of VM location URLs for this VA version
+         *
+         * @return string[] Array of VM image URLs
+         */
+        private function getVersionUrls() {
+                $urls = array();
+                $vapplists = new Default_Model_VALists();
+                $vapplists->filter->vappversionid->equals($this->vappversionid);
+
+                if( count($vapplists->items) === 0 ) {
+                        return $urls;
+                }
+
+                for($i=0; $i<count($vapplists->items); $i+=1){
+                        $vapplist = $vapplists->items[$i];
+                        $inst = $vapplist->getVMIinstance();
+                        $urls[] = "".trim($inst->uri);
+                }
+
+                return $urls;
+        }
+        /**
+         * Check each VM image URL for accessibility.
+         * Returns on first error.
+         *
+         * @return boolean|string   True if all URLs are accessible, else error message of first inaccessible URL
+         */
+        private function checkVersionUrlAccesibility() {
+                $urls = $this->getVersionUrls();
+
+                for($i=0; $i<count($urls); $i+=1){
+                        $isAccessible = isURLAccessible($urls[0]);
+                        if ($isAccessible !== true) {
+                                return $isAccessible;
+                        }
+                }
+
+                return true;
+        }
+        private function versionHasUniqueUrls(){
 		$collect = array();
 		$vapplists = new Default_Model_VALists();
 		$vapplists->filter->vappversionid->equals($this->vappversionid);
@@ -4635,6 +4675,22 @@ class RestAppVAXMLParser extends RestXMLParser {
 			if( $vapp === false ){
 				return false;
 			}
+
+                        /**
+                         * Check is URLs are accessible and with valid certificates
+                         * in case of HTTPS, since cloudkeeper is more strict regarding
+                         * the images to download to sites.
+                         */
+                        if ($this->vappversion_state->toBeIntegrityChecked()) {
+                                $isAccessible = $this->checkVersionUrlAccesibility();
+
+                                if ($isAccessible !== true) {
+                                        $this->_error = RestErrorEnum::RE_INVALID_REPRESENTATION;
+                                        $this->_extError = 'Could not verify VM image. Reason: ' . $isAccessible;
+                                        return false;
+                                }
+                        }
+
 			/*
 			 * Check if an external action is required, such as publishing a version
 			 */
