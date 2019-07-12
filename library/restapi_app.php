@@ -4681,11 +4681,14 @@ class RestAppVAXMLParser extends RestXMLParser {
                          * in case of HTTPS, since cloudkeeper is more strict regarding
                          * the images to download to sites.
                          */
-                        $isVMImageAccessible = $this->checkVersionUrlAccesibility();
-                        if ($isVMImageAccessible !== true) {
-                                $this->_error = RestErrorEnum::RE_INVALID_REPRESENTATION;
-                                $this->_extError = 'Could not verify VM image location. Reason: ' . $isVMImageAccessible;
-                                return false;
+                        if ($this->vappversion_state->toBeIntegrityChecked()) {
+                                $isVMImageAccessible = $this->checkVersionUrlAccesibility();
+
+                                if ($isVMImageAccessible !== true) {
+                                        $this->_error = RestErrorEnum::RE_INVALID_REPRESENTATION;
+                                        $this->_extError = 'Could not verify VM image. Reason: ' . $isVMImageAccessible;
+                                        return false;
+                                }
                         }
 
 			/*
