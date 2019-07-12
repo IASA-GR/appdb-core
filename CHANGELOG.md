@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.2.2] - 2019-07-12
+### Changed
+- Forbid virtual appliance working versions to be verified if the VM image location URL use a self-signed certificate
+
 ## [6.2.1] - 2019-06-20
 ### Added
 - Added "authn" attribute to virtualization:provider and site:service XML elements in RESTful API
