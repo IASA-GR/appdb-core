@@ -18916,8 +18916,8 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 			$(dom).addClass("hasmany");
 		}
 	};
-	this.getEndpointHTML = function(item) {
-	    var endpoint_url_html =  $("<div class='fieldvalue endpoint'><div class='field'></div><div class='value'></div></div>");
+	this.getEndpointHTML = function(item, attached) {
+	    var endpoint_url_html =  $("<div class='fieldvalue endpoint" + (attached === true ? ' attached' : '')  + "'><div class='field'></div><div class='value'></div></div>");
 	    var endpointTitle = null;
 	    switch(item.serviceType) {
 		case 'openstack':
@@ -18950,13 +18950,17 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 				$(template_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(item.serviceType, templ.resource_name));
 				var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>" + appdb.utils.CloudInfo.getResourceTitle(item.serviceType) + ":</div><div class='value'></div></div>");
 				$(occi_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(item.serviceType, item.occid));
-				$(li).append(endpoint_url_html);
+				$(li).append(endpoint_url_html).append(template_id_html).append(occi_id_html);
 				if (appdb.config.features.displayOCCINativeEndpoints && item.nativeApis && item.nativeApis.length > 0) {
 				    $.each(item.nativeApis, function(index, api) {
-					$(li).append(self.getEndpointHTML(api));
+					$(li).append(self.getEndpointHTML(api, true));
+					var native_template_id_html = $("<div class='fieldvalue templateid'><div class='field'>" + appdb.utils.CloudInfo.getTemplateTitle(api.serviceType) + ":</div><div class='value'></div></div>");
+					$(native_template_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(api.serviceType, templ.resource_name));
+					var native_occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>" + appdb.utils.CloudInfo.getResourceTitle(api.serviceType) + ":</div><div class='value'></div></div>");
+					$(native_occi_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(api.serviceType, item.occid));
+					$(li).append(native_template_id_html).append(native_occi_id_html);
 				    });
 				}
-				$(li).append(template_id_html).append(occi_id_html);
 				$(ul).append(li);
 			});
 		});
@@ -19514,7 +19518,7 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 				} else  if (item.serviceType === 'opennebula') {
 				    endpoint_title = '<div class="icontext"><img src="/images/opennebula.png" alt="Opennebula"/><span> endpoint:</span></div>'; 
 				} else if(item.nativeApis && appdb.config.features.displayOCCINativeEndpoints) {
-				    nativeEndpoint = $("<div class='fieldvalue endpoint'><div class='field'></div><div class='value'></div></div>");
+				    nativeEndpoint = $("<div class='fieldvalue endpoint attached'><div class='field'></div><div class='value'></div></div>");
 				    switch(item.nativeApis.serviceType) {
 					case 'openstack':
 					    $(nativeEndpoint).find('.field').append($('<div class="icontext"><img src="/images/openstack.png" alt="Openstack"/><span>endpoint:</span><div>'));
@@ -19535,7 +19539,17 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 				$(template_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(item.serviceType, templ.resource_name));
 				var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>" + appdb.utils.CloudInfo.getResourceTitle(item.serviceType) + ":</div><div class='value'></div></div>");
 				$(occi_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(item.serviceType, item.occid));
-				$(li).append(endpoint_url_html).append(nativeEndpoint).append(template_id_html).append(occi_id_html);
+				$(li).append(endpoint_url_html).append(template_id_html).append(occi_id_html);
+
+				if (nativeEndpoint) {
+				    $(li).append(nativeEndpoint);
+				    var native_template_id_html = $("<div class='fieldvalue templateid'><div class='field'>" + appdb.utils.CloudInfo.getTemplateTitle(item.nativeApis.serviceType) + ":</div><div class='value'></div></div>");
+				    $(native_template_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(item.nativeApis.serviceType, templ.resource_name));
+				    var native_occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>" + appdb.utils.CloudInfo.getResourceTitle(item.nativeApis.serviceType) + ":</div><div class='value'></div></div>");
+				    $(native_occi_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(item.nativeApis.serviceType, item.occid));
+				    $(li).append(native_template_id_html).append(native_occi_id_html);
+				}
+
 				$(ul).append(li);
 			});
 		});
