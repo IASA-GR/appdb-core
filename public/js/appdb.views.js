@@ -18804,13 +18804,13 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 		var template_id = (template) ? $.trim(template.resource_name) : "";
 		var occi_id = (image) ? $.trim(image.occi_id) : "";
 		var endpoint_url = (site) ? $.trim(site.endpoint_url) : "";
-
+		var serviceType = appdb.utils.CloudInfo.getServiceType(site);
 		var endpoint_url_html = $("<div class='fieldvalue endpoint'><div class='field'>Site endpoint:</div><div class='value'></div></div>");
 		$(endpoint_url_html).find(".value").text(endpoint_url);
-		var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>Template ID:</div><div class='value'></div></div>");
-		$(template_id_html).find(".value").text(template_id);
-		var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>Resource ID:</div><div class='value'></div></div>");
-		$(occi_id_html).find(".value").text(occi_id);
+		var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>" + appdb.utils.CloudInfo.getTemplateTitle(serviceType) + ":</div><div class='value'></div></div>");
+		$(template_id_html).find(".value").text(appdb.utils.CloudInfo.getTemplateID(serviceType, template_id));
+		var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>" + appdb.utils.CloudInfo.getResourceTitle(serviceType) + ":</div><div class='value'></div></div>");
+		$(occi_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(serviceType, occi_id));
 
 		var usageids = $("<div class='usageids'></div>");
 		var fieldvalues = $("<div class='fieldvalues'></div>");
@@ -18946,10 +18946,10 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 				var li = $("<li class='fieldvalues'></li>");
 				var endpoint_url_html = self.getEndpointHTML(item);//$("<div class='fieldvalue endpoint'><div class='field'></div><div class='value'></div></div>");
 				//$(endpoint_url_html).find(".value").text(item.endpointurl);
-				var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>Template ID:</div><div class='value'></div></div>");
-				$(template_id_html).find(".value").text(templ.resource_name);
-				var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>Resource ID:</div><div class='value'></div></div>");
-				$(occi_id_html).find(".value").text(item.occid);
+				var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>" + appdb.utils.CloudInfo.getTemplateTitle(item.serviceType) + ":</div><div class='value'></div></div>");
+				$(template_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(item.serviceType, templ.resource_name));
+				var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>" + appdb.utils.CloudInfo.getResourceTitle(item.serviceType) + ":</div><div class='value'></div></div>");
+				$(occi_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(item.serviceType, item.occid));
 				$(li).append(endpoint_url_html);
 				if (appdb.config.features.displayOCCINativeEndpoints && item.nativeApis && item.nativeApis.length > 0) {
 				    $.each(item.nativeApis, function(index, api) {
@@ -19461,13 +19461,13 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 		var template_id = (template) ? $.trim(template.resource_name) : "";
 		var occi_id = (image) ? $.trim(this.options.instanceData.id) : "";
 		var endpoint_url = (this.options.instanceData && this.options.instanceData.occi_endpoint_url)?this.options.instanceData.occi_endpoint_url:"";
-
+		var serviceType = (this.options.instanceData && this.options.instanceData.serviceType) ? this.options.instanceData.serviceType : 'occi';
 		var endpoint_url_html = $("<div class='fieldvalue endpoint'><div class='field'>Site endpoint:</div><div class='value'></div></div>");
 		$(endpoint_url_html).find(".value").text(endpoint_url);
-		var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>Template ID:</div><div class='value'></div></div>");
-		$(template_id_html).find(".value").text(template_id);
-		var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>Resource ID:</div><div class='value'></div></div>");
-		$(occi_id_html).find(".value").text(occi_id);
+		var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>" + appdb.utils.CloudInfo.getTemplateTitle(serviceType) + ":</div><div class='value'></div></div>");
+		$(template_id_html).find(".value").text(appdb.utils.CloudInfo.getTemplateID(serviceType, template_id));
+		var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>" + appdb.utils.CloudInfo.getResourceTitle(serviceType) + ":</div><div class='value'></div></div>");
+		$(occi_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(serviceType, occi_id));
 
 		var usageids = $("<div class='usageids'></div>");
 		var fieldvalues = $("<div class='fieldvalues'></div>");
@@ -19531,10 +19531,10 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 				var endpoint_url_html = $("<div class='fieldvalue endpoint'><div class='field'></div><div class='value'></div></div>");
 				$(endpoint_url_html).find(".field").append(endpoint_title);
 				$(endpoint_url_html).find(".value").text(item.endpointurl);
-				var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>Template ID:</div><div class='value'></div></div>");
-				$(template_id_html).find(".value").text(templ.resource_name);
-				var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>Resource ID:</div><div class='value'></div></div>");
-				$(occi_id_html).find(".value").text(item.occid);
+				var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>" + appdb.utils.CloudInfo.getTemplateTitle(item.serviceType) + ":</div><div class='value'></div></div>");
+				$(template_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(item.serviceType, templ.resource_name));
+				var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>" + appdb.utils.CloudInfo.getResourceTitle(item.serviceType) + ":</div><div class='value'></div></div>");
+				$(occi_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(item.serviceType, item.occid));
 				$(li).append(endpoint_url_html).append(nativeEndpoint).append(template_id_html).append(occi_id_html);
 				$(ul).append(li);
 			});
