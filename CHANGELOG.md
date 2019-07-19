@@ -3,9 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [6.2.2] - 2019-07-12
+## [6.2.2] - 2019-07-19
 ### Changed
 - Forbid virtual appliance working versions to be verified if the VM image location URL use a self-signed certificate
+### Fixed
+- Display proper IDs for OCCI and OpenStack endpoints
 
 ## [6.2.1] - 2019-06-20
 ### Added
