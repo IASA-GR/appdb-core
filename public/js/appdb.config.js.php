@@ -98,7 +98,7 @@ appdb.config = {
             "logistics": true,
             "groupvaprovidertemplates": true,
             "displayNativeAPIs": true,
-            "displayOCCINativeEndpoints": false,
+            "displayOCCINativeEndpoints": true,
             "swappliance": <?php echo ( ( Supports::swappliance() )?"true":"false"); ?>,
             "singleVMIPolicy": <?php echo ( ( Supports::singleVMIPolicy() )?"true":"false"); ?>,
             "email": <?php echo ( ( ApplicationConfiguration::email('enable', false) )?"true":"false"); ?>,
