@@ -9078,3 +9078,53 @@ appdb.utils.SecantVOImagelistWatcher = function(voId, callback) {
 	start: start
     };
 }
+
+/**
+ * Provides helper functions to retrieve the appropriate 
+ * rendering information for va providers.
+ */
+appdb.utils.CloudInfo = {
+    getServiceType: function(d) {
+	var serviceType = d;
+	if ($.isPlainObject(d)) {
+	    serviceType = d.service_type || '';
+	}
+
+	switch(serviceType) {
+	    case 'org.openstack.nova':
+		return 'openstack';
+	    default:
+		return 'occi'
+	}
+    },
+    getResourceID: function(type, id) {
+	if (typeof(id) === 'string' && typeof type === 'string' && type.toLowerCase() === 'openstack') {
+	    id = id.split('#');
+	    return id[id.length -1];
+	}
+
+	return id;
+    },
+    getTemplateID: function(type, id) {
+	return appdb.utils.CloudInfo.getResourceID(type, id);
+    },
+    getResourceTitle: function(type) {
+	type = ('' + (type || '')).toLowerCase();
+
+	switch(type) {
+	    case 'openstack':
+		return 'Image ID';
+	    default:
+		return 'OCCI ID';
+	}
+    },
+    getTemplateTitle: function(type) {
+	type = ('' + (type || '')).toLowerCase();
+	switch(type) {
+	    case 'openstack':
+		return 'Flavor ID';
+	    default:
+		return 'Template ID';
+	}
+    }
+}
