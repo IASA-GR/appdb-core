@@ -338,7 +338,6 @@ class AaioidcController extends Zend_Controller_Action
                     return $this->sendResponse(200, array(
                         "result" => "success",
                         "data" => $this->sanitize($accessToken),
-                        "refreshtoken" => $this->sanitize($this->_client->getUserRefreshTokenInfo()),
                         "clientName" => $validClient->getClientName()
                     ));
                 }
