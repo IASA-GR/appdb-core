@@ -5323,19 +5323,11 @@ class VMCaster{
 
 	/**
 	 * Transforms external VMCaster XML into AppDB-compliant XML, for input from VMCaster CLI tool
-	 * Used by RestAppVAXMLParser::parse(). 
+	 * Used by RestAppVAXMLParser::parse() and by the ApplicationsController::vmc2appdbAction
 	 *
 	 * @return String
 	 */
-	public static function transformXml($vmcxml = null, $apiversion = '1.0') {
-		$envelop_start = '<appdb:appdb xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:appdb="http://appdb.egi.eu/api/1.0/appdb" xmlns:application="http://appdb.egi.eu/api/1.0/application" xmlns:discipline="http://appdb.egi.eu/api/1.0/discipline" xmlns:category="http://appdb.egi.eu/api/1.0/category" xmlns:dissemination="http://appdb.egi.eu/api/1.0/dissemination" '.
-				'xmlns:person="http://appdb.egi.eu/api/' . $apiversion . '/person" '.
-				'xmlns:permission="http://appdb.egi.eu/api/' . $apiversion . '/permission" '.
-				'xmlns:privilege="http://appdb.egi.eu/api/' . $apiversion . '/privilege" '.
-				'xmlns:user="http://appdb.egi.eu/api/' . $apiversion . '/user" '.
-				'xmlns:virtualization="http://appdb.egi.eu/api/' . $apiversion . '/virtualization" '.
-				'datatype="virtualization" version="' . $apiversion . '">';
-		$envelop_end = '</appdb:appdb>';
+	public static function transformXml($vmcxml = null) {
 		$result = '';
 		
 		if( $vmcxml !== null && trim($vmcxml) !== "" && !is_numeric($vmcxml) ) {
@@ -5350,8 +5342,8 @@ class VMCaster{
 				$result = '';
 			}
 		}
-		
-		return $envelop_start . $result . $envelop_end;
+
+		return RestAPIHelper::wrapResponse($result, "virtualization");
 	}
 	public static function createImageList($vaversionid, $target="published"){
 		//Call vmcaster service to produce image list
@@ -6529,15 +6521,8 @@ class VMCaster{
 			$xml = simplexml_load_string('<vmiinstance></vmiinstance>');
 			self::convertArrayToXML($d, $xml);
 			$result = $xml->asXML();
-			$apiversion = "1.0";
 			$result = substr($result, strpos($result, '?' . '>') + 2);
-			$result = '<' . '?xml version="1.0" encoding="utf-8"?' . '><appdb:appdb xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:appdb="http://appdb.egi.eu/api/1.0/appdb" xmlns:application="http://appdb.egi.eu/api/1.0/application" xmlns:discipline="http://appdb.egi.eu/api/1.0/discipline" xmlns:category="http://appdb.egi.eu/api/1.0/category" xmlns:dissemination="http://appdb.egi.eu/api/1.0/dissemination" '.
-				'xmlns:person="http://appdb.egi.eu/api/' . $apiversion . '/person" '.
-				'xmlns:virtualization="http://appdb.egi.eu/api/' . $apiversion . '/virtualization" '.
-				'xmlns:site="http://appdb.egi.eu/api/' . $apiversion . '/site" '.
-				'xmlns:siteservice="http://appdb.egi.eu/api/' . $apiversion . '/site" '.
-				'xmlns:vo="http://appdb.egi.eu/api/' . $apiversion . '/vo" '.
-				'datatype="virtualization" version="' . $apiversion . '">' . $result . '</appdb:appdb>';
+			$result = RestAPIHelper::wrapResponse($result, "virtualization");
 			try {
 				$xsl = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . "virtualization.image.xsl";
 				if (file_exists($xsl)) {
@@ -7896,19 +7881,6 @@ function shortenURL($url) {
 	}
 }
 class UserInbox{
-	private static function getEnvelopStart($apiversion = '1.0'){
-		return  '<appdb:appdb xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:appdb="http://appdb.egi.eu/api/1.0/appdb" xmlns:application="http://appdb.egi.eu/api/1.0/application" xmlns:discipline="http://appdb.egi.eu/api/1.0/discipline" xmlns:category="http://appdb.egi.eu/api/1.0/category" xmlns:dissemination="http://appdb.egi.eu/api/1.0/dissemination" '.
-				'xmlns:person="http://appdb.egi.eu/api/' . $apiversion . '/person" '.
-				'xmlns:permission="http://appdb.egi.eu/api/' . $apiversion . '/permission" '.
-				'xmlns:privilege="http://appdb.egi.eu/api/' . $apiversion . '/privilege" '.
-				'xmlns:user="http://appdb.egi.eu/api/' . $apiversion . '/user" '.
-				'xmlns:virtualization="http://appdb.egi.eu/api/' . $apiversion . '/virtualization" '.
-				'xmlns:message="http://appdb.egi.eu/api/' . $apiversion . '/message" '.
-				'datatype="virtualization" version="' . $apiversion . '">';
-	}
-	private static function getEnvelopEnd(){
-		return '</appdb:appdb>';
-	}
 	private static function getModel($uid,$flt=array()){
 		$msgs = new Default_Model_Messages();
 		$length = ( (isset($flt["length"]) && is_numeric($flt["length"]) )?intval($flt["length"]):10 );
@@ -7960,23 +7932,22 @@ class UserInbox{
 		
 		return $msgs;
 	}
+
 	public static function getMessages($uid,$flt=array()){
-		$envelop_start = self::getEnvelopStart();
-		$envelop_end = self::getEnvelopEnd();
+		$res = "";
 		$folder = strtolower(trim(( (isset($flt["folder"]) && is_string($flt["folder"]) )?strval($flt["folder"]):null )));
 		$action = strtolower(trim(( (isset($flt["action"]) && is_string($flt["action"]) )?strval($flt["action"]):'fetch' )));
 		$onlycount = ($action==="count")?true:false;
 		if( $uid === null ){
-			return $envelop_start . "<person:messages count='0' length='0' offset='0' folder='".$folder."'></person:messages>" . $envelop_end;
+			return RestAPIHelper::wrapResponse("<person:messages count='0' length='0' offset='0' folder='" . xml_escape($folder) . "'></person:messages>", "message");
 		}
 		
 		$msgs = self::getModel($uid,$flt);
 		$msgscount = count($msgs->items);
-		$res = $envelop_start;
-		$res .= "<person:messages count='".$msgscount."' length='".$msgs->filter->limit."' offset='".$msgs->filter->offset."' orderby='".$msgs->filter->orderBy."'>";
+		$res = "<person:messages count='" . xml_escape($msgscount) . "' length='" . xml_escape($msgs->filter->limit) . "' offset='" . xml_escape($msgs->filter->offset) . "' orderby='" . xml_escape($msgs->filter->orderBy) . "'>";
 		if( $msgscount === 0 || $onlycount ){
-			$res .= "</person:messages>" . $envelop_end;
-			return $res;
+			$res .= "</person:messages>";			
+			return RestAPIHelper::wrapResponse($res, "message");
 		}
 		$senders = array();
 		for($i=0; $i<$msgscount; $i+=1){
@@ -7984,14 +7955,18 @@ class UserInbox{
 			$isread = ( ($item->isread===true)?"true":"false" );
 			$dir = "unknown";
 			$personid = -1;
-			$msg = "<person:message id='" . $item->id . "' isread='" . $isread  . "' sendon='" . $item->senton . "' ";
+			$msg = "<person:message id='" . xml_escape($item->id) . "' isread='" . xml_escape($isread)  . "' sendon='" . xml_escape($item->senton) . "' ";
 			if( $uid == $item->receiverid ){
 				$msg .= "folder='inbox' >";
 				$dir = "from";
 				$personid = $item->senderid;
 				if( isset($senders[$personid]) == false ){
 					$s = $item->getSender();
-					$senders[$personid] = " id='" . $s->id . "' cname='" . $s->cname . "' firstname='" . $s->firstname . "' lastname='" . $s->lastname . "' ";
+					if (is_object($s)) {
+						$senders[$personid] = " id='" . xml_escape($s->id) . "' cname='" . xml_escape($s->cname) . "' firstname='" . xml_escape($s->firstname) . "' lastname='" . xml_escape($s->lastname) . "' ";
+					} else {
+						$senders[$personid] = " id='0' cname='system.notification' firstname='System' lastname='Notification' ";
+					}
 				}
 			}else if($uid == $item->senderid){
 				$msg .= "folder='outbox' >";
@@ -7999,22 +7974,24 @@ class UserInbox{
 				$personid = $item->receiverid;
 				if( isset($senders[$personid]) == false ){
 					$s = $item->getReceiver();
-					$senders[$personid] = " id='" . $s->id . "' cname='" . $s->cname . "' firstname='" . $s->firstname . "' lastname='" . $s->lastname . "' ";
+					$senders[$personid] = " id='" . xml_escape($s->id) . "' cname='" . xml_escape($s->cname) . "' firstname='" . xml_escape($s->firstname) . "' lastname='" . xml_escape($s->lastname) . "' ";
 				}
 			}else{
 				$msg .= "folder='unknown' ></person:message>";
 				$res .= $msg;
 				continue;
 			}
-			
-			$msg .= "<message:headers><message:" . $dir . " " . $senders[$personid] . "></message:" . $dir . "></message:headers>";
-			$msg .= "<message:content>" . $item->msg . "</message:content>";
+
+			if (isset($senders[$personid])) {	
+				$msg .= "<message:headers><message:" . xml_escape($dir) . " " . $senders[$personid] . "></message:" . xml_escape($dir) . "></message:headers>";
+			}
+			$msg .= "<message:content>" . xml_escape($item->msg) . "</message:content>";
 			$msg .= "</person:message>";
 			$res .= $msg;
 		}
 		
-		$res .= "</person:messages>" . $envelop_end;
-		return $res;
+		$res .= "</person:messages>";
+		return RestAPIHelper::wrapResponse($res, "message");
 	}
 }
 
@@ -12013,10 +11990,10 @@ class VAProviders{
 		return null;
 	}
 	public static function getProductionImages($vapp){
-		$result = '<appdb:appdb xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:appdb="http://appdb.egi.eu/api/1.0/appdb" xmlns:application="http://appdb.egi.eu/api/1.0/application" xmlns:discipline="http://appdb.egi.eu/api/1.0/discipline" xmlns:category="http://appdb.egi.eu/api/1.0/category" xmlns:dissemination="http://appdb.egi.eu/api/1.0/dissemination" xmlns:filter="http://appdb.egi.eu/api/1.0/filter" xmlns:history="http://appdb.egi.eu/api/1.0/history" xmlns:logistics="http://appdb.egi.eu/api/1.0/logistics" xmlns:resource="http://appdb.egi.eu/api/1.0/resource" xmlns:middleware="http://appdb.egi.eu/api/1.0/middleware" xmlns:person="http://appdb.egi.eu/api/1.0/person" xmlns:permission="http://appdb.egi.eu/api/1.0/permission" xmlns:privilege="http://appdb.egi.eu/api/1.0/privilege" xmlns:publication="http://appdb.egi.eu/api/1.0/publication" xmlns:rating="http://appdb.egi.eu/api/1.0/rating" xmlns:ratingreport="http://appdb.egi.eu/api/1.0/ratingreport" xmlns:regional="http://appdb.egi.eu/api/1.0/regional" xmlns:user="http://appdb.egi.eu/api/1.0/user" xmlns:vo="http://appdb.egi.eu/api/1.0/vo" xmlns:virtualization="http://appdb.egi.eu/api/1.0/virtualization" xmlns:license="http://appdb.egi.eu/api/1.0/license" xmlns:provider="http://appdb.egi.eu/api/1.0/provider" xmlns:provider_template="http://appdb.egi.eu/api/1.0/provider_template" xmlns:classification="http://appdb.egi.eu/api/1.0/classification">';
+		$result = '';
 		$vappliance = self::getVAppliance($vapp);
 		if( $vappliance === null ) {
-			return $result . "</appdb:appdb>";
+			return RestAPIHelper::wrapResponse($result, "virtualization");
 		}
 		$q = 'SELECT xmlelement(
 				name "virtualization:image",
@@ -12078,12 +12055,11 @@ class VAProviders{
 				if( count($r) === 0) {
 					continue;
 				}
-				$result .= $r[0];
+				$result = $r[0];
 			}
 		}
-		$result .= '</appdb:appdb>';
 		
-		return $result;
+		return RestAPIHelper::wrapResponse($result, "virtualization");
 	}
 
 	public function findOS($os) {
