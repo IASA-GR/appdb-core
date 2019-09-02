@@ -5320,7 +5320,13 @@ class VMCaster{
 		}
 		return VMCaster::$vmcasterurl;
 	}
-	
+
+	/**
+	 * Transforms external VMCaster XML into AppDB-compliant XML, for input from VMCaster CLI tool
+	 * Used by RestAppVAXMLParser::parse(). 
+	 *
+	 * @return String
+	 */
 	public static function transformXml($vmcxml = null, $apiversion = '1.0') {
 		$envelop_start = '<appdb:appdb xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:appdb="http://appdb.egi.eu/api/1.0/appdb" xmlns:application="http://appdb.egi.eu/api/1.0/application" xmlns:discipline="http://appdb.egi.eu/api/1.0/discipline" xmlns:category="http://appdb.egi.eu/api/1.0/category" xmlns:dissemination="http://appdb.egi.eu/api/1.0/dissemination" '.
 				'xmlns:person="http://appdb.egi.eu/api/' . $apiversion . '/person" '.
@@ -5333,32 +5339,13 @@ class VMCaster{
 		$result = '';
 		
 		if( $vmcxml !== null && trim($vmcxml) !== "" && !is_numeric($vmcxml) ) {
-			if( strpos($vmcxml, "<?xml") !== 0 ) {
+			if( strpos($vmcxml, "<" . "?xml") !== 0 ) {
 				$vmcxml = '<' . '?xml version="1.0" encoding="utf-8"?' . '>' . $vmcxml;
 			}
 			
 			try {
-				$xsl = new DOMDocument();
-				$xsl->load("../application/configs/api/1.0/xslt/vmc2appdb_group.xsl");
-				$inputdom = new DomDocument();
-				$inputdom->loadXML($vmcxml);
-
-				$proc = new XSLTProcessor();
-				$proc->importStylesheet($xsl);
-				$proc->setParameter(null, "", "");
-
-				$grouped = $proc->transformToXml($inputdom);
-
-				$xsl = new DOMDocument();
-				$xsl->load("../application/configs/api/1.0/xslt/vmc2appdb.xsl");
-				$inputdom = new DomDocument();
-				$inputdom->loadXML($grouped);
-
-				$proc = new XSLTProcessor();
-				$proc->importStylesheet($xsl);
-				$proc->setParameter(null, "", "");
-
-				$result .= $proc->transformToXml($inputdom);
+				$grouped = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'vmc2appdb_group.xsl', $vmcxml);
+				$result = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'vmc2appdb.xsl', $grouped);
 			} catch(Exception $e) {
 				$result = '';
 			}
@@ -6552,16 +6539,12 @@ class VMCaster{
 				'xmlns:vo="http://appdb.egi.eu/api/' . $apiversion . '/vo" '.
 				'datatype="virtualization" version="' . $apiversion . '">' . $result . '</appdb:appdb>';
 			try {
-				$xsl = new DOMDocument();
-				$xsl->load("../application/configs/api/1.0/xslt/virtualization.image.xsl");
-				$inputdom = new DomDocument();
-				$inputdom->loadXML($result);
-
-				$proc = new XSLTProcessor();
-				$proc->importStylesheet($xsl);
-				$proc->setParameter(null, "", "");
-
-				$result = $proc->transformToXml($inputdom);
+				$xsl = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . "virtualization.image.xsl";
+				if (file_exists($xsl)) {
+					$result = xml_transform($xsl, $result);
+				} else {
+					error_log("[VMCaster::convertImage] Error: XSL file 'virtualization.image.xsl' could not be found");
+				}
 			}catch(Exception $e){
 				return null;
 			}
@@ -7764,16 +7747,7 @@ class SocialReport{
 		$result = true;
 		try {
 			$xml = file_get_contents("../public/reports/social/" . $filename . ".xml");
-			$xsl = new DOMDocument();
-			$xsl->load("../application/configs/api/1.0/xslt/swsocial_export_csv.xsl");
-			$inputdom = new DomDocument();
-			$inputdom->loadXML($xml);
-
-			$proc = new XSLTProcessor();
-			$proc->importStylesheet($xsl);
-			$proc->setParameter(null, "", "");
-
-			$transform = $proc->transformToXml($inputdom);
+			$transform = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'swsocial_export_csv.xsl', $xml);
 			if( $transform !== false ){
 				$result = file_put_contents("../public/reports/social/" . $filename . ".csv", $transform);
 			}
@@ -7789,16 +7763,7 @@ class SocialReport{
 		$result = true;
 		try {
 			$xml = file_get_contents("../public/reports/social/" . $filename . ".xml");
-			$xsl = new DOMDocument();
-			$xsl->load("../application/configs/api/1.0/xslt/swsocial_export_nonzero.xsl");
-			$inputdom = new DomDocument();
-			$inputdom->loadXML($xml);
-
-			$proc = new XSLTProcessor();
-			$proc->importStylesheet($xsl);
-			$proc->setParameter(null, "", "");
-
-			$transform = $proc->transformToXml($inputdom);
+			$transform = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'swsocial_export_nonzero.xsl', $xml);
 			if( $transform !== false ){
 				$result = file_put_contents("../public/reports/social/" . $filename . "_nz.xml", $transform);
 			}
