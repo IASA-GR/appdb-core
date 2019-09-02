@@ -8251,7 +8251,7 @@ class SamlAuth{
 		$attrs = $session->samlattrs;
 		//initialize session data
 		$session->authCredSessionId = session_id();
-		$session->authCredSamlAuthToken = $_COOKIE["SimpleSAMLAuthToken"];
+                $session->authCredSamlAuthToken = ((isset($_COOKIE["SimpleSAMLAuthToken"]) && $_COOKIE["SimpleSAMLAuthToken"]) ? $_COOKIE["SimpleSAMLAuthToken"] : '');
 		$session->authCredId = null;
 		$session->userid = -1;
 		$session->isNewUser = true;
@@ -8912,7 +8912,7 @@ class SamlAuth{
                                 self::harvestX509UserAccounts($session, $user);
                         }
 			self::setupSamlSession($session, $useraccount, $user);
-			if( $_COOKIE["SimpleSAMLAuthToken"] ){
+			if( isset($_COOKIE["SimpleSAMLAuthToken"]) && $_COOKIE["SimpleSAMLAuthToken"] ){
 				self::setupSamlUserCredentials($user, $session);
                         }
 		}else{
