@@ -23,10 +23,22 @@
     targetNamespace="http://appdb.egi.eu/api/1.0/provider"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:provider="http://appdb.egi.eu/api/1.0/provider"
-    xmlns:regional="http://appdb.egi.eu/api/1.0/regional">
+    xmlns:provider_template="http://appdb.egi.eu/api/1.0/provider_template"
+    xmlns:vo="http://appdb.egi.eu/api/1.0/vo"
+    xmlns:regional="http://appdb.egi.eu/api/1.0/regional"
+    xmlns:virtualization="http://appdb.egi.eu/api/1.0/virtualization">
 
     <xs:import namespace="http://appdb.egi.eu/api/1.0/regional"
-        schemaLocation="regional.xsd"/>
+		schemaLocation="regional.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/vo"
+        schemaLocation="vo.xsd"/>
+
+	<xs:import namespace="http://appdb.egi.eu/api/1.0/virtualization"
+		schemaLocation="virtualization.xsd"/>
+
+	<xs:import namespace="http://appdb.egi.eu/api/1.0/provider_template"
+        schemaLocation="provider_template.xsd"/>
 
 	<xs:complexType name="osType" mixed="true">
 		<xs:attribute name="id" type="xs:integer" use="required"/>
@@ -36,9 +48,22 @@
 		<xs:attribute name="id" type="xs:integer" use="required"/>
 	</xs:complexType>
 
+	<xs:complexType name="shareType" mixed="true">
+		<xs:sequence>
+			<xs:element ref="vo:vo" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="templateType" mixed="true">
+		<xs:sequence>
+			<xs:element ref="vo:vo" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
     <xs:complexType name="providerType" mixed="false">
         <xs:sequence>
             <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="shares" type="provider:shareType" minOccurs="0" maxOccurs="1"/>
             <xs:element name="url" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <xs:element name="gocdb_url" type="xs:string" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="dn" type="xs:string" minOccurs="0" maxOccurs="1"/>
@@ -46,6 +71,8 @@
 			<xs:element name="os" type="provider:osType" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="arch" type="provider:archType" minOccurs="0" maxOccurs="1"/>
 			<xs:element ref="regional:country" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="template" type="provider_template:templateType" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="image" type="virtualization:imageType" minOccurs="0" maxOccurs="unbounded" />
         </xs:sequence>
         <xs:attribute name="id" type="xs:string" use="required" />
         <xs:attribute name="authn" type="xs:string" use="optional" />

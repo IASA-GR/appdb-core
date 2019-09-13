@@ -276,7 +276,8 @@
                     <xs:element ref="person:logistics" minOccurs="1" maxOccurs="unbounded" />
                     <xs:element ref="person:contact" minOccurs="1" maxOccurs="unbounded" />
                     <xs:element ref="endorsable:endorsable" minOccurs="1" maxOccurs="unbounded" />
-                    <xs:element ref="classification:version" minOccurs="1" maxOccurs="unbounded" />
+					<xs:element ref="classification:version" minOccurs="1" maxOccurs="unbounded" />
+					<xs:element ref="virtualization:provider" minOccurs="1" maxOccurs="unbounded" />
                     <xs:group ref="privilege:personprivs" minOccurs="1" maxOccurs="unbounded" />
                 </xs:choice>
             </xs:sequence>
