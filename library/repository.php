@@ -1780,7 +1780,11 @@ class RepositoryBackend{
 		return $app["commrepoBackendUrl"];
 	}
 	public static function checkSuccessfulResponse($response){
-		$res = new SimpleXMLElement($response);
+		$res = simplexml_load_string($response);
+		if ($res === false) {
+			error_log("[RepositoryBackend::checkSuccessfulResponse] Cannot parse response data as XML");
+			return false;
+		}
 		$statuses = $res->xpath("//entry/status");
 		
 		foreach($statuses as $status){

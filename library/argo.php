@@ -102,10 +102,9 @@ class ArgoOCCI extends Argo {
 					return;
 				}
 
-				try {
-					$xml = new SimpleXMLElement($xml);
-				} catch (Exception $e) {
-					error_log("error reading OCCI status XML output in Argo::syncStatus for site $sitename and endpoint $endpoint: $e");
+				$xml = simplexml_load_string($xml);
+				if ($xml === false) {
+					error_log("error reading OCCI status XML output in Argo::syncStatus for site $sitename and endpoint $endpoint");
 					continue;
 				}
 				$statuses = $xml->xpath("//status");

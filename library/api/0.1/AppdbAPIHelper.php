@@ -76,14 +76,13 @@ class AppdbAPIHelper {
     public static function TransformResult($result, $view) {//return $result;
         $xname = (isset($view->routeXslt)) ? $view->routeXslt : $view->routeController;
         $xf = AppdbAPIHelper::getXSLTPath($view->apiVersion) . $xname . '.xsl';
-        if (file_exists($xf)) {
-            $xsl = new DOMDocument();
-            $xsl->load($xf);
-            $xml = new DOMDocument();
-            $xml->loadXML($result, LIBXML_NSCLEAN | LIBXML_COMPACT);
-            $proc = new XSLTProcessor();
-            $proc->importStylesheet($xsl);
-            return str_replace('<?xml version="1.0"?>', '',$proc->transformToXml( $xml) );
+		if (file_exists($xf)) {
+			$xml = xml_transform($xf, $result);
+			if ($xml === false) {
+				return null;
+			} else {
+	            return str_replace('<?xml version="1.0"?>', '', $xml);
+			}
         } else {
             return $result;
         }
@@ -424,15 +423,14 @@ class AppdbAPIRequestProcessor {
             $qxml = AppdbAPIRequestProcessor::RequestToXml($query);
             $qres = ""; //xml representation of the request
             $xf = AppdbAPIRequestProcessor::GetRequestXSLTPath($version) . $xsltname . '.xsl';
-            if (file_exists($xf)) {
-                $xsl = new DOMDocument();
-                $xsl->load($xf);
-                $xml = new DOMDocument();
-                $xml->loadXML($qxml, LIBXML_NSCLEAN | LIBXML_COMPACT);
-                $proc = new XSLTProcessor();
-                $proc->importStylesheet($xsl);
-                $qres = str_replace('<?xml version="1.0"?>', '', $proc->transformToXml($xml));
-                return AppdbAPIRequestProcessor::XmlToRequest($qres);
+			if (file_exists($xf)) {
+				$xml = xml_transform($xf, $qxml);
+				if ($xml === false) {
+					return null;
+				} else {
+	                $qres = str_replace('<?xml version="1.0"?>', '', $xml);
+		            return AppdbAPIRequestProcessor::XmlToRequest($qres);
+				}
             }
         }
         return $query;

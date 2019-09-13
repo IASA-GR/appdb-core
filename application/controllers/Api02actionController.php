@@ -311,10 +311,9 @@ class Api02actionController extends Zend_Controller_Action
 				break;
 		}
 		$id = $this->_getParam("id");
-		$p = $id.($t != ''?",$t":"");
 		$db = $application->getBootstrap()->getResource('db');
 		$db->setFetchMode(Zend_Db::FETCH_OBJ);
-		$r = $db->query('SELECT apprating_report_to_xml('.$p.');')->fetchAll();
+		$r = $db->query('SELECT apprating_report_to_xml(?, ?)', array($id, $t))->fetchAll();
 		$this->view->entries = $r[0]->apprating_report_to_xml;
 	}
 

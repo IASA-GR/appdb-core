@@ -1276,7 +1276,7 @@ appdb.pages.home = (function(){
 		loadImage('joinascontact.png', 'img.joinascontact');
 		$('#announcediv').addClass("hidden");
 		$.ajax({
-			url: appdb.config.endpoint.base + '/help/wiki?page=main:about:announcements', 
+			url: appdb.config.endpoint.base + 'help/wiki?page=main:about:announcements', 
 			success : function(data, textStatus) { 
 				$('#announcediv').empty().html("<div class='aboutpage'><div class='aboutheader'><h1>Announcements</h1></div><div class='announcementscontainer'><ul class='announcelist'></ul></div></div>");
 				var jdata = $(data);
@@ -5477,7 +5477,7 @@ appdb.pages.newaccount = (function(){
 			dialogCount = 0;
 			$(function(){
 				$.ajax({
-					url: appdb.config.endpoint.base + "/saml/newprofile",
+					url: appdb.config.endpoint.base + "saml/newprofile",
 					success: function(d){
 						$("#maincontent.newprofile .createnewprofile .main .contents").html(d);
 						$("#maincontent.newprofile .createnewprofile").removeClass("loading");
@@ -5489,7 +5489,7 @@ appdb.pages.newaccount = (function(){
 					}
 				});
 				$.ajax({
-					url: appdb.config.endpoint.base + "/saml/connectableprofiles",
+					url: appdb.config.endpoint.base + "saml/connectableprofiles",
 					success: function(d){
 						$("#maincontent.newprofile .connecttoprofile .main .contents").html(d);
 						$("#maincontent.newprofile .createnewprofile").removeClass("loading");

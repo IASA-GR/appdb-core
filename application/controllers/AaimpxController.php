@@ -1,6 +1,10 @@
 <?php
 /**
  * Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ *
+ * Adapted from the sources available at https://rcdemo.nikhef.nl/demobasic/oidc_getproxy_demo_source.php, used under the terms of the Apache License 2.0
+ * Copyright (C) FOM-Nikhef 2016-
+ * Authors: Mischa Salle (msalle (AT) nikhef.nl)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -156,8 +160,8 @@ class AaimpxController extends Zend_Controller_Action
 				$this->view->error = 1000;				
          			$this->view->error_description .= "Cannot find token in response<br>";
 				$this->view->error_description .= "response=".$this->sanitize($response)."<br>";
-     				$this->view->error_description .= "url=".$url."<br>";
-     				$this->view->error_description .= "status_code=".$status_code."<br>";
+     				$this->view->error_description .= "url=".$this->sanitize($url)."<br>";
+     				$this->view->error_description .= "status_code=".$this->sanitize($status_code)."<br>";
      				$this->view->error_description .= "fields=";
      				$this->view->error_description .= $this->sanitize(print_r($fields, true));
      				$this->view->error_description .= "<br>";
@@ -325,11 +329,11 @@ class AaimpxController extends Zend_Controller_Action
  	private function parse_curl_status($type, $status_code, $response, $error) {
 		if ($status_code >= 300 || !empty($error)) {
 			$this->view->error=$status_code;
-		        $this->view->error_description .= "Error obtaining $type <br>";
+		        $this->view->error_description .= "Error obtaining " . $this->sanitize($type) . "<br>";
 			if ($error) {
          			$this->view->error_description .= "CURL error: ".$this->sanitize($error)."<br>";
 			} else {
-				$this->view->error_description .= "Status code: ".$status_code."<br>";
+				$this->view->error_description .= "Status code: ".$this->sanitize($status_code)."<br>";
      				// We might get a error= and error_description= back
 				if (strpos($response, 'error_description=') !== false) {
 					$err=parse_ini_string($response);

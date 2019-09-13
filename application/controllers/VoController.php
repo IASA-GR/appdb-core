@@ -20,132 +20,6 @@ class VoController extends Zend_Controller_Action
     protected $vofile;
     protected $xml;
 
-//// OBSOLETE, moved to SitesController    
-//	private function makeVAprovidersCache() {
-//		$copyfile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/va_providers.xml';
-//		$hashfile = RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) . '../public/assets/rp/datahash';
-//
-//		# truncate data hash file (i.e. sync operation in progress)
-//		$f_hashfile = @fopen($hashfile, "w");
-//		if ($f_hashfile !== false) { 
-//			fwrite($f_hashfile, "");
-//			fclose($f_hashfile);
-//		} else {
-//			$errors = error_get_last();
-//			error_log("[makeVAprovidersCache] Could not open+truncate VA providers cache data hash file. Reason: " . $errors['message']);
-//		}
-//		$uri = 'https://' . $_SERVER['APPLICATION_API_HOSTNAME'] . '/rest/latest/va_providers?listmode=details';
-//		$ch = curl_init();
-//        curl_setopt($ch, CURLOPT_URL, $uri);
-//        curl_setopt($ch, CURLOPT_HEADER, false);
-//        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-//		if ( defined('CURLOPT_PROTOCOLS') ) curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
-//        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-//        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-//        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);        
-//		$headers = apache_request_headers();
-//		$h = array();
-//		$h["Expect"] = '';
-//		if ( isset($headers['Accept-Encoding']) ) $h['Accept-Encoding'] = $headers['Accept-Encoding'];
-//		foreach($h as $k => $v) {
-//			$h[] = "$k: $v";
-//		}
-//		$h['Connection']='Keep-Alive';
-//		$h['Keep-Alive']='300';		
-//		curl_setopt($ch, CURLOPT_HTTPHEADER, $h);
-//		// remove existing cachefiles before making API call, or else this will not work
-//		foreach ( glob(RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) .'/query_RestVAProvidersList_*.xml') as $cachefile ) {
-//			@unlink($cachefile);
-//		}
-//		error_log('VA providers RESTful API XML cache STARTED');
-//		// 1st call creates the cache
-//		$result = curl_exec($ch);
-//		error_log('VA providers RESTful API XML cache DONE');		
-//		// 2nd call returns the cached response
-//		$result = curl_exec($ch);
-//		$result_tmp = @gzdecode($result);
-//		if ($result_tmp !== false) {
-//			$result = $result_tmp;
-//		}
-//		$ck = "";
-//		try {
-//			$xmlresult = new SimpleXMLElement($result);
-//			$appdb = $xmlresult->xpath("//appdb:appdb");
-//			$vadata = $xmlresult->xpath("//virtualization:provider");
-//			$vadatastring = "";
-//			foreach ($vadata as $vadatum) {
-//				$vadatastring .= $vadatum->asXML();
-//			}
-//			$hash = md5($vadatastring);
-//			if (count($appdb) > 0) {
-//				$appdb = $appdb[0];
-//				$ck = trim(strval($appdb->attributes()->cachekey));
-//				if ($ck != "") {
-//					debug_log("[makeVAprovidersCache] cache key is " . $ck);
-//				} else {
-//					error_log("[makeVAprovidersCache] Did not find cache key in XML response");
-//				}
-//			} else {
-//				error_log("[makeVAprovidersCache] Could not find appdb:appdb root element in XML response");
-//			}
-//		} catch (Exception $e) {
-//			error_log("[makeVAprovidersCache] Could not parse respone as XML. Reason: " . $e->getMessage());
-//		}
-//		curl_close($ch);
-//		if ($ck != "") {
-//			if (!@copy(RestAPIHelper::getFolder(RestFolderEnum::FE_CACHE_FOLDER) .'/query_RestVAProvidersList_' . $ck . '.xml', $copyfile)) {
-//				$errors = error_get_last();
-//				error_log("[makeVAprovidersCache] Could not copy VA providers cache file into assets. Reason: " . $errors['message']);
-//			} else {
-//				debug_log("Copied VA providers cache file into assets");
-//				// XML cache file has been copied to assets. Create a JSON copy as well.
-//				$copyfile2 = str_replace(".xml", ".json", $copyfile);
-//				$jsondata = RestAPIHelper::transformXMLtoJSON(file_get_contents($copyfile));
-//				$f_jsonop = true;
-//				$f_jsonfile = @fopen($copyfile2, "w");
-//				if ($f_jsonfile !== false) {
-//					if (@fwrite($f_jsonfile, "" . $jsondata) === false) {
-//						$errors = error_get_last();
-//						error_log("[makeVAprovidersCache] Could not write to VA providers cache file JSON copy in assets. Reason: " . $errors['message']);
-//						$f_jsonop = false;
-//					}
-//					@fclose($f_jsonfile);
-//				} else {
-//						$errors = error_get_last();
-//						error_log("[makeVAprovidersCache] Could not open VA providers cache file JSON copy for writing in assets. Reason: " . $errors['message']);
-//						$f_jsonop = false;
-//				}
-//				if ($f_jsonop) {
-//					debug_log("Created VA providers cache file JSON copy in assets");
-//				}
-//				// Keep a hashfile of the cache
-//				$f_hashop = true;
-// 				$f_hashfile = @fopen($hashfile, "w");
-// 				if ($f_hashfile !== false) {
-//					if (@fwrite($f_hashfile, $hash) === false) {
-//						$errors = error_get_last();
-//						error_log("[makeVAprovidersCache] Could not write to VA providers cache data hash file. Reason: " . $errors['message']);
-//						$f_hashop = false;
-//					}
-//					@fclose($f_hashfile);
-// 				} else {
-// 					$errors = error_get_last();
-//					error_log("[makeVAprovidersCache] Could not open VA providers cache data hash file for writing. Reason: " . $errors['message']);
-//					$f_hashop = false;
-// 				}
-// 				debug_log("Data md5 is $hash");
-//				if ($f_hashop) {
-//					debug_log("Copied VA providers cache hash file into assets");
-//				}
-//			}
-//		} else {
-//			error_log("[makeVAprovidersCache] No VA providers cache file to copy into assets");
-//			$f_hashfile = @fopen($hashfile, "w");
-//			@fwrite("ERROR", $hash);
-//			fclose($f_hashfile);
-//		}
-//	}
-
     public function init()
     {
         /* Initialize action controller here */
@@ -167,6 +41,12 @@ class VoController extends Zend_Controller_Action
 			$this->getResponse()->setHeader("Status","403 Forbidden");
 		}
 	}
+
+    private function normalizeQuotes($str) {
+        $str = str_replace('"', '”', $str);
+        $str = str_replace("'", "’", $str);
+        return $str;
+    }
 
     private function printError() 
     {
@@ -206,7 +86,7 @@ class VoController extends Zend_Controller_Action
 	} else {
 		db()->setFetchMode(Zend_Db::FETCH_NUM);
 		if ($vid != '') {
-			$img = db()->query("SELECT vos.logoid FROM vos WHERE id = $vid")->fetchAll();
+			$img = db()->query("SELECT vos.logoid FROM vos WHERE id = ?", array($vid))->fetchAll();
 			if (count($img) > 0) {
 				$img = $img[0][0];
 			} else {
@@ -232,8 +112,11 @@ class VoController extends Zend_Controller_Action
         $this->_helper->layout->disableLayout();
         $voname = $this->_getParam("id");
         if ($voname != null) {
-            $xml = new SimpleXMLElement($this->xml);
-			$volist = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper($voname)."']");
+			$xml = simplexml_load_string($this->xml);
+			if ($xml === false) {
+				throw new Exception("Cannot parse VO data as XML");
+			}
+			$volist = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')=" . xpath_quote(strtoupper($voname)) . "]");
 	    	if (count($volist)>0) {
                 $r=$volist[0]->Ressources;
                 $res=array(
@@ -309,7 +192,7 @@ class VoController extends Zend_Controller_Action
 		$vo->name = $att["Name"];
 		$vo->serial = $att["Serial"];
 		$vo->alias = $att["Alias"];
-		$vo->description = trim(strval($voentry->Description));
+		$vo->description = $this->normalizeQuotes(trim(strval($voentry->Description)));
 		$discs = array();
 		$discnames = array();
 		$minid = -1;
@@ -350,25 +233,35 @@ class VoController extends Zend_Controller_Action
     private function validateXMLCache(&$xml, $vofile = null)
 	{
 		if (is_null($vofile)) $vofile = $this->vofile;
-        $valid=true;
+        $valid = true;
         try {
-            $valid = simplexml_load_file($vofile);
+			$valid = simplexml_load_string(file_get_contents($vofile));
+			if ($valid === false) {
+				throw new Exception("Invalid XML cache when syncing VOs");
+			}
         } catch (Exception $e) {
             $valid = false;
         }
         if ($valid === false) {
             $xml = null;
         } else {
-            $x = new SimpleXMLElement($xml);
-            $volist = $x->xpath('//VoDump');
-            if (count($volist)==0 || (count($volist)==1 && strlen($x->AsXML()) <= 40)) $xml=null;
+            $x = simplexml_load_string($xml);
+			if ($x === false) {
+				$valid = false;
+				$xml = null;
+			} else {
+	            $volist = $x->xpath('//VoDump');
+				if (count($volist)==0 || (count($volist)==1 && strlen($x->AsXML()) <= 40)) {
+					$xml = null;
+				}
+			}
         }
-        if ($xml === null) {
-		error_log("Invalid XML cache when syncing VOs");
-		return false; 
-	} else {
-		return true;
-	}
+		if ($xml === null) {
+			error_log("Invalid XML cache when syncing VOs");
+			return false; 
+		} else {
+			return true;
+		}
 	}
 
 	private function syncVOs() {
@@ -385,19 +278,20 @@ class VoController extends Zend_Controller_Action
 		try {
 			// aggregate VOs XML from all sources into one file, giving precedence to EBI
 			$data1 = file_get_contents(APPLICATION_PATH . "/../cache/vos.xml");
-			$xml1 = new SimpleXMLElement($data1);
+			$xml1 = simplexml_load_string($data1);
+			if ($xml1 === false) {
+				throw new Exception("Cannot parse EGI VO data as XML");
+			}
 			$data2 = file_get_contents(APPLICATION_PATH . "/../cache/ebivos.xml");
-			if ( trim($data2) != "" ) {
-				$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'ebi_to_egi_vos.xsl';
-				$xsl = new DOMDocument();
-				$xsl->load($xf);
-				$proc = new XSLTProcessor();
-				$proc->registerPHPFunctions();
-				$proc->importStylesheet($xsl);
-				$xml2 = new DOMDocument();
-				$xml2->loadXML($data2, LIBXML_NSCLEAN | LIBXML_COMPACT);
-				$data2 = $proc->transformToXml($xml2);
-				$xml2 = new SimpleXMLElement($data2);
+			$xml2 = false;
+			if (trim($data2) != "") {
+				$data2 = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'ebi_to_egi_vos.xsl', $data2);
+				if ($data2 !== false) {
+					$xml2 = simplexml_load_string($data2);
+				}
+				if ($xml2 === false) {
+					throw new Exception("Cannot parse EBI VO data as XML");
+				}
 			}
 			$f = fopen(APPLICATION_PATH . "/../cache/aggvos.xml", "w");
 			if ($f !== false) {
@@ -411,7 +305,7 @@ class VoController extends Zend_Controller_Action
 				$xp = $xml1->xpath("//IDCard");
 				foreach ($xp as $x) {
 					$xattr = $x->attributes();
-					$xp2 = $xml2->xpath("//IDCard[@Name='" . $xattr["Name"] . "']");
+					$xp2 = $xml2->xpath("//IDCard[@Name=" . xpath_quote(strval($xattr["Name"])) . "]");
 					if (count($xp2) == 0) {
 						fwrite($f, str_replace('<' . '?xml version="1.0"?'.'>', "", $x->asXML()));
 					}
@@ -474,29 +368,25 @@ class VoController extends Zend_Controller_Action
 
 				if ( $xml === false ) {
 					error_log("error in syncEBIVOs: " . var_export(curl_error($ch), true));
-					throw new Exception( var_export(curl_error($ch), true));
+					throw new Exception(var_export(curl_error($ch), true));
 				} else {
 					$xml = "<VoDump>$xml</VoDump>";
 				}
 				@curl_close($ch);
 				
 				// sort entries
-				$xf = APPLICATION_PATH . '/../bin/sort_vos.xsl';
-				$xsl = new DOMDocument();
-				$xsl->load($xf);
-				$proc = new XSLTProcessor();
-				$proc->registerPHPFunctions();
-				$proc->importStylesheet($xsl);
-				$xml2 = new DOMDocument();
-				$xml2->loadXML($xml, LIBXML_NSCLEAN | LIBXML_COMPACT);
-				$xml = $proc->transformToXml( $xml2 );
-
-				// cache entries
-				@exec("rm ". $vofile . ".old");
-				@exec("cp " . $vofile . " " . $vofile . ".old");
-				$f = fopen($vofile,"w");
-				fwrite($f,$xml);
-				fclose($f);
+				$xml = xml_transform(APPLICATION_PATH . '/../bin/sort_vos.xsl', $xml);
+				if ($xml !== false) {
+					// cache entries
+					@exec("rm ". $vofile . ".old");
+					@exec("cp " . $vofile . " " . $vofile . ".old");
+					$f = fopen($vofile,"w");
+					fwrite($f, $xml);
+					fclose($f);
+				} else {
+					error_log("error in syncEBIVOs: Error while transforming XML data with stylesheet 'sort_vos.xsl'");
+					throw new Exception("Error while transforming XML data with stylesheet 'sort_vos.xsl'");
+				}
 			} else {
 				$xml = "<VoDump>" . file_get_contents($vofile) . "</VoDump>";
 			}
@@ -509,7 +399,10 @@ class VoController extends Zend_Controller_Action
 				db()->query("ALTER TABLE perun.vo_contacts DISABLE TRIGGER tr_perun_vo_contacts_99_refresh_permissions");
 				db()->query("DELETE FROM perun.vo_contacts");	// will be repopulated later on
 				db()->query("DELETE FROM perun.vos");
-				$xmlobj = new SimpleXMLElement($xml);
+				$xmlobj = simplexml_load_string($xml);
+				if ($xmlobj === false) {
+					throw new Exception("Cannot parse EBI VO data as XML");
+				}
                 $xvos = $xmlobj->xpath("//VoDump/IDCard");
                 // add new VOs and update existing VOs
 				foreach($xvos as $xvo) {
@@ -518,7 +411,7 @@ class VoController extends Zend_Controller_Action
 					if (substr($vd, 0, 4) === "0000") {
 						$vd = null;
 					}
-					db()->query("INSERT INTO perun.vos (name, validated, description, homepage, enrollment, alias, status) VALUES (?, ?, ?, ?, ?, ?, ?)", array(strtolower(trim($att["name"])), $vd, trim($xvo->description), trim($xvo->homepageUrl), trim($xvo->enrollmentUrl), trim($att["alias"]), trim($att["status"])));
+					db()->query("INSERT INTO perun.vos (name, validated, description, homepage, enrollment, alias, status) VALUES (?, ?, ?, ?, ?, ?, ?)", array(strtolower(trim($att["name"])), $vd, $this->normalizeQuotes(trim($xvo->description)), trim($xvo->homepageUrl), trim($xvo->enrollmentUrl), trim($att["alias"]), trim($att["status"])));
 				}
 				db()->query("INSERT INTO vos (name,domainid,validated,description,homepage,enrollment,alias,status,sourceid) SELECT name,3,validated,description,homepage,enrollment,alias,status,(SELECT id FROM vo_sources WHERE name = 'EBI-Perun') AS sourceid FROM perun.vos AS x WHERE NOT EXISTS (SELECT * FROM vos AS y WHERE y.name = x.name AND y.sourceid = (SELECT id FROM vo_sources WHERE name = 'EBI-Perun'))");
 				// mark missing EBI VOs as deleted
@@ -626,87 +519,20 @@ class VoController extends Zend_Controller_Action
 			@curl_close($ch);
 
 			// sort entries
-			$xf = APPLICATION_PATH . '/../bin/sort_vos.xsl';
-			$xsl = new DOMDocument();
-			$xsl->load($xf);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$xml2 = new DOMDocument();
-			$xml2->loadXML($xml, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$xml = $proc->transformToXml( $xml2 );
-
-/* NOT needed since the EGI OPS VO dump XML schema change
-*
-			// convert sciclass IDs to discipline IDs
-			$xsl = new DOMDocument();
-			db()->setFetchMode(Zend_Db::FETCH_BOTH);
-			$xsltable = db()->query('SELECT array_to_string(array_agg(\'<xsl:when test=". = \' || sciclassid::text || \'"><xsl:text>\' || disciplineid::text || \'</xsl:text></xsl:when>\'),E\'\n\') FROM disc_to_sciclass;')->fetchAll();
-			$xsltable = $xsltable[0];
-			$xsltable = $xsltable[0];
-			$xsltable2 = db()->query('SELECT array_to_string(array_agg(\'<xsl:when test=". = \' || sciclassid::text || \'"><xsl:text>\' || parentid::text || \'</xsl:text></xsl:when>\'),E\'\n\') FROM disc_to_sciclass;')->fetchAll();
-			$xsltable2 = $xsltable2[0];
-			$xsltable2 = $xsltable2[0];
-			$xsltable3 = db()->query('SELECT array_to_string(array_agg(\'<xsl:when test=". = \' || sciclassid::text || \'"><xsl:text>\' || ord::text || \'</xsl:text></xsl:when>\'),E\'\n\') FROM disc_to_sciclass;')->fetchAll();
-			$xsltable3 = $xsltable3[0];
-			$xsltable3 = $xsltable3[0];
-			$xsldata = 
-'<' . '?xml version="1.0" encoding="UTF-8"?' . '>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-	<xsl:output method="xml"/>
-	<xsl:strip-space elements="*" />
-	<xsl:template match="@*|node()">
-		<xsl:copy>
-			<xsl:apply-templates select="@*|node()"/>
-		</xsl:copy>
-	</xsl:template>
-	<xsl:template match="//Disciplines/Discipline/@id">
-		<xsl:attribute name="id">
-			<xsl:choose>
-' .
-'				' . $xsltable .
-'				<xsl:otherwise>
-					<xsl:value-of select="." />
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:attribute>
-		<xsl:attribute name="parentid">
-			<xsl:choose>
-' .
-'				' . $xsltable2 .
-'				<xsl:otherwise>
-					<xsl:text></xsl:text>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:attribute>
-		<xsl:attribute name="order">
-			<xsl:choose>
-' .
-'				' . $xsltable3 .
-'				<xsl:otherwise>
-					<xsl:text></xsl:text>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:attribute>
-	</xsl:template>
-</xsl:stylesheet>			
-';
-			$xsl->loadXML($xsldata);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$xml2 = new DOMDocument();
-			$xml2->loadXML($xml, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$xml = $proc->transformToXml($xml2);
- */
-			// cache entries
-			// keep a backup of the old file, in order to revert it in case the transaction fails
-			@exec("mv -f " . $this->vofile . ".old " . $this->vofile . ".old.bak");
-			@exec("cp " . $this->vofile . " " . $this->vofile . ".old");
-			$f = fopen($this->vofile,"w");
-			fwrite($f,$xml);
-			fclose($f);
-
+			$xml = xml_transform(APPLICATION_PATH . '/../bin/sort_vos.xsl', $xml);
+			if ($xml !== false) {
+				// cache entries
+				// keep a backup of the old file, in order to revert it in case the transaction fails
+				@exec("mv -f " . $this->vofile . ".old " . $this->vofile . ".old.bak");
+				@exec("cp " . $this->vofile . " " . $this->vofile . ".old");
+				$f = fopen($this->vofile,"w");
+				fwrite($f,$xml);
+				fclose($f);
+			} else {
+				error_log("error in syncEGIVOs: Error while transforming XML data with stylesheet 'sort_vos.xsl'");
+				ExternalDataNotification::sendNotification('VO::syncEGIVOs', "Error while transforming XML data with stylesheet 'sort_vos.xsl'", ExternalDataNotification::MESSAGE_TYPE_ERROR);
+				return false;
+			}
 			// update database
 			if (($this->validateXMLCache($xml)) && (@md5_file($this->vofile) !== @md5_file($this->vofile . ".old"))) {
 				error_log("Sync'ing EGI VOs...");
@@ -717,7 +543,10 @@ class VoController extends Zend_Controller_Action
 				db()->query("ALTER TABLE egiops.vo_contacts DISABLE TRIGGER tr_egiops_vo_contacts_99_refresh_permissions");
 				db()->query("DELETE FROM egiops.vo_contacts");	// will be repopulated later on
 				db()->query("DELETE FROM egiops.vos");
-				$xmlobj = new SimpleXMLElement($xml);
+				$xmlobj = simplexml_load_string($xml);
+				if ($xmlobj === false) {
+					throw new Exception("Cannot parse EGI VO data as XML");
+				}
                 $xvos = $xmlobj->xpath("//VoDump/IDCard");
                 // add new VOs and update existing VOs
 				foreach($xvos as $xvo) {
@@ -732,7 +561,7 @@ class VoController extends Zend_Controller_Action
 					foreach ($xdiscs as $xdisc) {
 						$discs[] = $xdisc["id"];
 					}
-					db()->query("INSERT INTO egiops.vos (name, scope, validated, description, homepage, enrollment, aup, domainname, disciplineid, alias, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, (?)::int[], ?, ?)", array(strtolower(trim($att["Name"])), trim($xvo->Scope), $vd, trim($xvo->Description), trim($xvo->HomepageUrl), trim($xvo->EnrollmentUrl), trim($xvo->AUP), trim($xvo->Discipline), php_to_pg_array($discs, false) ,trim($att["Alias"]), trim($att["Status"])));
+					db()->query("INSERT INTO egiops.vos (name, scope, validated, description, homepage, enrollment, aup, domainname, disciplineid, alias, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, (?)::int[], ?, ?)", array(strtolower(trim($att["Name"])), trim($xvo->Scope), $vd, $this->normalizeQuotes(trim($xvo->Description)), trim($xvo->HomepageUrl), trim($xvo->EnrollmentUrl), trim($xvo->AUP), trim($xvo->Discipline), php_to_pg_array($discs, false) ,trim($att["Alias"]), trim($att["Status"])));
 				}
 				db()->query("UPDATE vos SET
 					scope = x.scope,
@@ -775,7 +604,7 @@ class VoController extends Zend_Controller_Action
 					try {
 						db()->query("DELETE FROM vo_resources WHERE void = (SELECT id FROM vos WHERE name = ? AND sourceid = 1)", array(strtolower(trim($att["Name"]))))->fetchAll();
 						if ( $xvo->Ressources ) {
-							$xres = $xmlobj->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper(trim($att["Name"]))."']/Ressources/*");
+							$xres = $xmlobj->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')=" . xpath_quote(strtoupper(trim($att["Name"]))) . "]/Ressources/*");
 							foreach ($xres as $xr) {
 								db()->query("INSERT INTO vo_resources (void, name, value) SELECT (SELECT id FROM vos WHERE name = ? AND sourceid = 1 AND NOT deleted), ?, ? WHERE NOT EXISTS (SELECT * FROM vo_resources WHERE void = (SELECT id FROM vos WHERE name = ? AND sourceid = 1 AND NOT deleted) AND name = ?)", array(strtolower(trim($att["Name"])), strval($xr->getName()), strval($xr), strtolower(trim($att["Name"])), strval($xr->getName())))->fetchAll();
 							}
@@ -864,32 +693,8 @@ class VoController extends Zend_Controller_Action
         $ds->filter->name->equals($n);
         $id = $ds->items[0]->id;
         return $id;
-    }
-    private function getContactsOld($id)
-    {
-		$this->_helper->layout->disableLayout();
-		$voname = $id;
-		if ( $voname != null ) {
-			$xml = new SimpleXMLElement($this->xml);
-			$volist = $xml->xpath('//VoDump/IDCard[@Name="'.$voname.'"]');
-					$volist = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper($voname)."']");
-			if (count($volist)>0) {
-				$clist = $volist[0]->xpath('./Contacts/Individuals/Contact');
-				if (count($clist)>0) {
-					$cs = array();
-					foreach($clist as $c) {
-						$r = array(
-							'name' => $c->Name,
-							'role' => $c->Role
-						);
-						$cs[] = $r;
-					}
-					return $cs;
-				}
-			}
-		}
-    }
-	
+	}
+
 	private function getContacts($id){
 		$vocs = new Default_Model_VOs();
 		$vocs->filter->name->equals($id);
@@ -910,38 +715,42 @@ class VoController extends Zend_Controller_Action
                 $vos = new Default_Model_VOs();
                 $vos->filter->name->ilike($this->_getParam("id"));
 				if( file_exists(APPLICATION_PATH . "/../cache/aggvos.xml") ){
-					$xml = new SimpleXMLElement(APPLICATION_PATH . "/../cache/aggvos.xml", 0, true);
+					$xml = simplexml_load_string(file_get_contents(APPLICATION_PATH . "/../cache/aggvos.xml"));
 				}else{
-					$xml = new SimpleXMLElement($this->xml);
+					$xml = simplexml_load_string($this->xml);
 				}
-				$volist = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')='".strtoupper($this->_getParam("id"))."']");
-				if (count($volist)>0) {
-					$voentry = $volist[0];
-					$vo = $this->populateVO($voentry);
-					if ( $vos->count() > 0 ) {
-						if ( isset($vos->items[0]) ) {
-							$vo->id = $vos->items[0]->id; 
-							$vo->guid = $vos->items[0]->guid;
-							$vo->sourceid = $vos->items[0]->sourceid;
+				if ($xml === false) {
+					$this->printError();
+					error_log("Cannot parse aggregate VO data as XML");
+				} else {
+					$volist = $xml->xpath("//VoDump/IDCard[translate(@Name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')=" . xpath_quote(strtoupper($this->_getParam("id"))) . "]");
+					if (count($volist)>0) {
+						$voentry = $volist[0];
+						$vo = $this->populateVO($voentry);
+						if ( $vos->count() > 0 ) {
+							if ( isset($vos->items[0]) ) {
+								$vo->id = $vos->items[0]->id; 
+								$vo->guid = $vos->items[0]->guid;
+								$vo->sourceid = $vos->items[0]->sourceid;
+							} else {
+								$vo = null;
+							}
 						} else {
-							$vo = null;
+							$vo->id = "";
+							$vo->guid = "";
+							$vo->sourceid = "";
 						}
-					} else {
-						$vo->id = "";
-						$vo->guid = "";
-						$vo->sourceid = "";
+						if ( isset($vo) ) $vo->contacts = $this->getContacts($this->_getParam("id"));
+						$this->view->entry = $vo;
+						$this->view->relatedItems = array();
+						$this->view->relatedItems = array_merge($this->view->relatedItems, $vo->applications);
+						$this->view->relatedItems = array_merge($this->view->relatedItems, $vo->sites);
+						$this->view->canEdit = VoAdmin::canEditVOImageList($this->session->userid, $vo);
 					}
-					if ( isset($vo) ) $vo->contacts = $this->getContacts($this->_getParam("id"));
-					$this->view->entry = $vo;
-					$this->view->relatedItems = array();
-					$this->view->relatedItems = array_merge($this->view->relatedItems, $vo->applications);
-					$this->view->relatedItems = array_merge($this->view->relatedItems, $vo->sites);
-					$this->view->canEdit = VoAdmin::canEditVOImageList($this->session->userid, $vo);
 				}
-            }
-            $this->view->session = $this->session;
-            $this->view->dialogCount = $this->_getParam('dc');
-			
+				$this->view->session = $this->session;
+				$this->view->dialogCount = $this->_getParam('dc');
+			}	
         } else {
             $this->printError();
         }
@@ -1041,7 +850,10 @@ class VoController extends Zend_Controller_Action
 				if (mb_detect_encoding($xmldata, "UTF-8", true) === false) {
 					$xmldata = recode_string("iso8859-1..utf8", $xmldata);
 				}
-				$xml = new SimpleXMLElement($xmldata);
+				$xml = simplexml_load_string($xmldata);
+				if ($xml === false) {
+					throw new Exception("Cannot parse EBI VO member data as XML");
+				}
 				$rows = $xml->xpath("//result/row");
 				if (count($rows) > 0) {
 					error_log("Sync'ing EBI VO members...");
@@ -1192,7 +1004,10 @@ class VoController extends Zend_Controller_Action
 				if ($mode == "api") {
 					exec("gunzip " . APPLICATION_PATH . "/../cache/vo_users.xml.gz");
 				}
-				$xml = new SimpleXMLElement(file_get_contents(APPLICATION_PATH . "/../cache/vo_users.xml"));
+				$xml = simplexml_load_string(file_get_contents(APPLICATION_PATH . "/../cache/vo_users.xml"));
+				if ($xml === false) {
+					throw new Exception("Cannot parse EGI VO member data as XML");
+				}
 				$rows = $xml->xpath("//result/row");
 				if (count($rows) > 0) {
 					error_log("Sync'ing VO members...");
@@ -1352,361 +1167,6 @@ class VoController extends Zend_Controller_Action
 		echo json_encode(array("result"=>"error", "message"=>"Image not found"));
 	}
 
-
-////OBSOLETE	
-//	private function getVAProvidersArray($inprodOnly = true) {
-//		$vaps = new Default_Model_VaProviders();
-//		if ($inprodOnly === true) {
-//			$vaps->filter->in_production->equals(true);
-//		}
-//		$ret = array();
-//		foreach ($vaps->items as $vap) {
-//			$url=trim(substr($vap->url,0,(strpos($vap->url,"?") == true ? strpos($vap->url,"?") : strlen($vap->url))),'/');
-//			preg_match('/(?P<hostname>[a-zA-Z0-9.\-_]+):(?P<port>\d+)/', $url, $matches);
-//			if($matches){
-//				$pat=$matches['hostname'].":".$matches['port'];
-//				$url = substr($url,0,(strpos($url,$pat) + strlen($pat)));
-//			}
-//			$ret[] = array("id" => $vap->id, "name" => $vap->sitename, "url" => $url, "serviceid" => $vap->serviceid);
-////          $ret[] = array("id" => $vap->id, "name" => $vap->sitename, "url" => trim(substr($vap->url,0,(strpos($vap->url,"?") == true ? strpos($vap->url,"?") : strlen($vap->url))),'/'), "serviceid" => $vap->serviceid);
-//		}
-//		return $ret;
-//	}
-//
-//	private function getTopBDIIData ($basedn, $filter, $attrs) {
-//		$top="topbdii.appdb.marie.hellasgrid.gr:2170";
-//		$cnx = ldap_connect($top);
-//		ldap_set_option($cnx, LDAP_OPT_REFERRALS, 0);
-//		ldap_set_option($cnx, LDAP_OPT_PROTOCOL_VERSION, 3);
-//		$info = array();
-//		$search = @ldap_search($cnx,$basedn,$filter, $attrs);
-//		if ($search) {
-//			$info = ldap_get_entries($cnx,$search);
-//		}
-//		return $info;
-//	}
-//
-//	public function syncvaproviderimagesAction() {
-//		if ( localRequest() ) {
-//			$this->_helper->layout->disableLayout();
-//			$this->_helper->viewRenderer->setNoRender();
-//			error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images START");
-//			$filter = '(&(GLUE2ApplicationEnvironmentRepository=*/appdb.egi.eu/*))';
-//			$attrs = array(
-//				'dn',
-//				'GLUE2ApplicationEnvironmentID',
-//				'GLUE2ApplicationEnvironmentAppName',
-//				'GLUE2ApplicationEnvironmentDescription',
-//				'GLUE2ApplicationEnvironmentComputingManagerForeignKey',
-//				'GLUE2EntityName',
-//				'GLUE2ApplicationEnvironmentAppVersion',
-//				'GLUE2ApplicationEnvironmentRepository'
-//			);
-//
-//			try {
-//				db()->beginTransaction();
-//				$prod_sites = $this->getVAProvidersArray();
-//				db()->query("TRUNCATE TABLE va_provider_images");
-//				foreach ($prod_sites as $site) {
-//					$basedn = 'GLUE2GroupID=cloud,GLUE2DomainID=' . $site["name"] . ',GLUE2GroupID=grid,o=glue';
-//					if(trim($site["serviceid"]) != "") {
-//						$basedn = 'GLUE2ServiceID=' . $site["serviceid"] . ',' . $basedn;
-//					} else {
-//						continue; // if there is no service id, no images should be queried
-//					}
-//					$result = $this->getTopBDIIData($basedn, $filter, $attrs);
-//					if (!empty($result)) {
-//						if (isset($result["count"])) {
-//							if ($result["count"] <= 0) {
-//								//throw new Exception("Number of results returned by top-BDII is zero. Aborting operation.");
-//								error_log("Warning: Number of image results returned by top-BDII is zero for " . $site["name"]);
-//							}
-//							for ($i = 0; $i < $result["count"]; $i++) {
-//								$mpURI = $result[$i]["glue2applicationenvironmentrepository"][0];
-//								$imageID = $result[$i]["glue2entityname"][0];
-//
-//								# parse mpURI and find type
-//								$start = strpos($mpURI,"/store/") + strlen("/store/");
-//								$len = strpos($mpURI,"/image/") - $start;
-//								$type = substr($mpURI,$start,$len);
-//
-//								# parse mpURI and find instanceID
-//								$mpURI_tmp = parse_url($mpURI,PHP_URL_PATH);
-//								$params = substr($mpURI_tmp, strrpos($mpURI_tmp,'image/')+5);
-//								if( strlen($params) > 1 ){
-//									$params = explode('/',$params);
-//									$params = explode(':',$params[1]);
-//
-//									if( count($params) > 1 ){
-//										if( is_numeric($params[1])){
-//											$instanceID = intval($params[1]);
-//										}
-//
-//									}
-//								}
-//
-//								$vowide_instanceID = null;
-//
-//								if ($type == "vo") {
-//									$vowide_instanceID = $instanceID;
-//									db()->setFetchMode(Zend_Db::FETCH_BOTH);							
-//									$instanceID = db()->query("SELECT vapplists.vmiinstanceid FROM vowide_image_list_images INNER JOIN vapplists ON vapplists.id = vowide_image_list_images.vapplistid WHERE vowide_image_list_images.id = ?", array($instanceID))->fetchAll();								
-//									if (count($instanceID) > 0) {
-//										if (count($instanceID[0]) > 0) {
-//											$instanceID = $instanceID[0][0];
-//										} else {
-//											$instanceID = null;
-//										}
-//									} else {
-//										$instanceID = null;
-//									}
-//								}
-//								$sp_vap_img = "sync_va_provider_images" . (microtime(true) * 10000);
-//								db()->query("SAVEPOINT $sp_vap_img");
-//								$release_vap_img = true;
-//								try {
-//									db()->query("INSERT INTO va_provider_images (va_provider_id, vmiinstanceid, content_type, va_provider_image_id, mp_uri, vowide_vmiinstanceid) VALUES (?, ?, ?, ?, ?, ?)", array($site["id"], $instanceID, $type, $imageID, $mpURI, $vowide_instanceID));
-//								} catch (Exception $e) {
-//									error_log("ERROR in 'INSERT INTO va_provider_images (va_provider_id, vmiinstanceid, content_type, va_provider_image_id, mp_uri, vowide_vmiinstanceid)' -- entry ignored");
-//									error_log("VALUES: " . 
-//										"'" . var_export($site["id"], true) . "', " .  
-//										"'" . var_export($instanceID, true) . "', " .
-//										"'" . var_export($type, true) . "', " .
-//										"'" . var_export($imageID, true) . "', " .
-//										"'" . var_export($mpURI, true) . "', " .
-//										"'" . var_export($vowide_instanceID, true) . "', "
-//									);
-//									$release_vap_img = false;
-//									db()->query("ROLLBACK TO SAVEPOINT $sp_vap_img");
-//								}
-//								if ($release_vap_img) {
-//									db()->query("RELEASE SAVEPOINT $sp_vap_img");
-//								}
-//							}
-//						}
-//					}
-//				}
-//				error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images DONE [1/2]. Will refresh related materialized views");
-//				error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images: Refreshing site_services_xml...");
-//				db()->query("REFRESH MATERIALIZED VIEW site_services_xml;");
-//				error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images: Refreshing site_service_images_xml...");
-//				db()->query("REFRESH MATERIALIZED VIEW site_service_images_xml;");
-//				error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images DONE [2/2]");
-//				db()->commit();
-//				db()->query("DELETE FROM cache.filtercache WHERE m_from LIKE '%FROM sites%'");
-//				sleep(2); // give the commit some time to settle before making next two calls
-//				$this->makeVAprovidersCache();
-//				if ( strtolower($_SERVER["SERVER_NAME"]) == "appdb.egi.eu" ) {
-//					web_get_contents("https://dashboard.appdb.egi.eu/services/appdb/sync/cloud");
-//				}
-//			} catch (Exception $e) {
-//				error_log($e->getMessage());
-//				error_log(gmdate("Y-m-d H:i:s", time()) . ": Sync VA Provider Images FAILED");
-//				db()->rollBack();
-//			}
-//		} else {
-//			$this->getResponse()->clearAllHeaders();
-//			$this->getResponse()->setRawHeader("HTTP/1.0 403 Forbidden");
-//			$this->getResponse()->setHeader("Status","403 Forbidden");
-//		}
-//	}
-//
-//
-//	public function syncvaprovidertemplatesAction() {
-//		if ( localRequest() ) {
-//			$this->_helper->layout->disableLayout();
-//			$this->_helper->viewRenderer->setNoRender();
-//			error_log("Sync VA Provider Templates START");
-//			$filter = '(objectClass=GLUE2ExecutionEnvironment)';
-//			$attrs = array(
-//				'GLUE2EntityName',
-//				'GLUE2ExecutionEnvironmentMainMemorySize',
-//				'GLUE2ExecutionEnvironmentLogicalCPUs',
-//				'GLUE2ExecutionEnvironmentCPUMultiplicity',
-//				'GLUE2ResourceManagerForeignKey',
-//				'GLUE2ExecutionEnvironmentOSFamily',
-//				'GLUE2ExecutionEnvironmentConnectivityIn',
-//				'GLUE2ExecutionEnvironmentConnectivityOut',
-//				'GLUE2ExecutionEnvironmentCPUModel',
-//				'GLUE2ResourceID',
-//				'GLUE2ExecutionEnvironmentPhysicalCPUs',
-//				'GLUE2ExecutionEnvironmentComputingManagerForeignKey',
-//				'GLUE2EntityOtherInfo',
-//			);
-//
-//			$prod_sites = $this->getVAProvidersArray();
-//			try {
-//				db()->beginTransaction();
-//				db()->query("TRUNCATE TABLE va_provider_templates");
-//				foreach($prod_sites as $site) {
-//					$basedn = 'GLUE2GroupID=cloud,GLUE2DomainID=' . $site["name"] . ',GLUE2GroupID=grid,o=glue';
-//					if(trim($site["serviceid"]) != "") {
-//						$basedn = 'GLUE2ServiceID=' . $site["serviceid"] . ',' . $basedn;
-//					} else {
-//						continue; // if there is no service id, no templates should be queried
-//					}
-//					$result = $this->getTopBDIIData($basedn, $filter, $attrs);
-//					$disc_size = null;
-//					if (isset($result["count"])) {
-//						if ($result["count"] <= 0) {
-//							//throw new Exception("Number of results returned by top-BDII is zero. Aborting operation.");
-//							error_log("Number of template results returned by top-BDII is zero for " . $site["name"]);
-//						}
-//						for ($i = 0; $i < $result["count"]; $i++) {
-//							if (array_key_exists("glue2entityotherinfo", $result[$i])) {
-//								if (trim($result[$i]["glue2entityotherinfo"][0]) != "") {
-//									$pregm = array();
-//									preg_match('/\bdisk=([0-9]+)\b/', trim($result[$i]["glue2entityotherinfo"][0]), $pregm);
-//									if (count($pregm)>=2) {
-//										if (is_numeric($pregm[1])) {
-//											$disc_size = intval($pregm[1]);
-//										}
-//									}
-//								}
-//							}
-//							$sp_vap_tmpl = "sync_va_provider_templates" . (microtime(true) * 10000);
-//							db()->query("SAVEPOINT $sp_vap_tmpl");
-//							$release_vap_tmpl = true;
-//							try {
-//								db()->query("INSERT INTO va_provider_templates (va_provider_id, resource_name, memsize, logical_cpus, physical_cpus, cpu_multiplicity, resource_manager, computing_manager, os_family, connectivity_in, connectivity_out, cpu_model, disc_size, resource_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", array(
-//									$site["id"],
-//									$result[$i]["glue2entityname"][0],
-//									$result[$i]["glue2executionenvironmentmainmemorysize"][0],
-//									$result[$i]["glue2executionenvironmentlogicalcpus"][0],
-//									$result[$i]["glue2executionenvironmentphysicalcpus"][0],
-//									$result[$i]["glue2executionenvironmentcpumultiplicity"][0],
-//									$result[$i]["glue2resourcemanagerforeignkey"][0],
-//									$result[$i]["glue2executionenvironmentcomputingmanagerforeignkey"][0],
-//									$result[$i]["glue2executionenvironmentosfamily"][0],
-//									$result[$i]["glue2executionenvironmentconnectivityin"][0],
-//									$result[$i]["glue2executionenvironmentconnectivityout"][0],
-//									$result[$i]["glue2executionenvironmentcpumodel"][0],
-//									$disc_size,
-//									$result[$i]["glue2resourceid"][0]
-//								));
-//							} catch (Exception $e) {
-//								error_log("ERROR in 'INSERT INTO va_provider_templates (va_provider_id, resource_name, memsize, logical_cpus, physical_cpus, cpu_multiplicity, resource_manager, computing_manager, os_family, connectivity_in, connectivity_out, cpu_model, disc_size, resource_id)' -- entry ignored");
-//								error_log("VALUES: " . 
-//									"'" . var_export($site["id"], true) . "', " .
-//									"'" . var_export($result[$i]["glue2entityname"][0], true) . "', " .
-//									"'" . var_export($result[$i]["glue2executionenvironmentmainmemorysize"][0], true) . "', " .
-//									"'" . var_export($result[$i]["glue2executionenvironmentlogicalcpus"][0], true) . "', " .
-//									"'" . var_export($result[$i]["glue2executionenvironmentphysicalcpus"][0], true) . "', " .
-//									"'" . var_export($result[$i]["glue2executionenvironmentcpumultiplicity"][0], true) . "', " .
-//									"'" . var_export($result[$i]["glue2resourcemanagerforeignkey"][0], true) . "', " .
-//									"'" . var_export($result[$i]["glue2executionenvironmentcomputingmanagerforeignkey"][0], true) . "', " .
-//									"'" . var_export($result[$i]["glue2executionenvironmentosfamily"][0], true) . "', " .
-//									"'" . var_export($result[$i]["glue2executionenvironmentconnectivityin"][0], true) . "', " .
-//									"'" . var_export($result[$i]["glue2executionenvironmentconnectivityout"][0], true) . "', " .
-//									"'" . var_export($result[$i]["glue2executionenvironmentcpumodel"][0], true) . "', " .
-//									"'" . var_export($disc_size, true) . "', " .
-//									"'" . var_export($result[$i]["glue2resourceid"][0], true) . "'"
-//								);
-//								$release_vap_tmpl = false;
-//								db()->query("ROLLBACK TO SAVEPOINT $sp_vap_tmpl");
-//							}
-//							if ($release_vap_tmpl) {
-//								db()->query("RELEASE SAVEPOINT $sp_vap_tmpl");
-//							}
-//						}
-//					}
-//				}	
-//				error_log("Sync VA Provider Templates DONE");
-//				db()->commit();
-//			} catch (Exception $e) {
-//				error_log($e->getMessage());
-//				error_log("Sync VA Provider Templates FAILED");
-//				db()->rollBack();
-//			}
-//		} else {
-//			$this->getResponse()->clearAllHeaders();
-//			$this->getResponse()->setRawHeader("HTTP/1.0 403 Forbidden");
-//			$this->getResponse()->setHeader("Status","403 Forbidden");
-//		}
-//	}
-//
-//	public function syncvaproviderendpointsAction() {
-//		if ( localRequest() ) {
-//			$this->_helper->layout->disableLayout();
-//			$this->_helper->viewRenderer->setNoRender();
-//			error_log("Sync VA Provider Endpoints START");
-//			$attrs = array(
-//				'GLUE2EndpointURL',
-//				'GLUE2EndpointImplementationName',
-//				'GLUE2EndpointImplementor',
-//				'GLUE2ComputingEndpointComputingServiceForeignKey',
-//				'GLUE2EntityOtherInfo',
-//				'GLUE2EndpointCapability',
-//				'GLUE2EndpointImplementationVersion',
-//				'GLUE2EndpointID',
-//				'GLUE2EndpointTechnology',
-//				'GLUE2EndpointHealthState',
-//				'GLUE2EndpointServingState',
-//				'GLUE2EndpointServiceForeignKey',
-//				'GLUE2ComputingEndpointComputingServiceForeignKey',
-//				'GLUE2EndpointImplementor'
-//			);
-//
-//			$prod_sites = $this->getVAProvidersArray(false);
-//			try {
-//				db()->beginTransaction();
-//				db()->query("TRUNCATE TABLE va_provider_endpoints");
-//				$k=1;
-//				foreach($prod_sites as $site) {
-//					
-//					$basedn='GLUE2GroupID=cloud,GLUE2DomainID='.$site["name"].',GLUE2GroupID=grid,o=glue';
-//					$filter = '(&(objectClass=GLUE2Endpoint)(|(GLUE2EndpointInterfaceName=OCCI)))';
-//					if ($site["url"] != '') {
-//						$filter = '(&(objectClass=GLUE2Endpoint)(|(GLUE2EndpointID='.$site["url"].'*))(|(GLUE2EndpointInterfaceName=OCCI)))';
-//					}
-//					$result = $this->getTopBDIIData($basedn, $filter, $attrs);
-//					if(isset($result["count"])){
-//						if ($result["count"] <= 0) {
-//							//throw new Exception("Number of results returned by top-BDII is zero. Aborting operation.");
-//							error_log("Warning: Number of endpoint results returned by top-BDII is zero for " . $site["name"]);
-//						}
-//						for($i=0; $i<$result["count"];$i++) {
-//							$sp_vap_endp = "sync_va_provider_endpoints" . (microtime(true) * 10000);
-//							db()->query("SAVEPOINT $sp_vap_endp");
-//							$release_vap_endp = true;
-//							try {								
-//								db()->query("INSERT INTO va_provider_endpoints (va_provider_id, endpoint_url, deployment_type) VALUES (?, ?, ?)", array(
-//									$site["id"],
-//									$result[$i]["glue2endpointurl"][0],
-//									$result[$i]["glue2endpointimplementor"][0]
-//								));
-//								error_log($k.". Endpoint processed SITE: ".$site["name"]." ID:".$site["id"]." VALUE: ".$result[$i]["glue2endpointurl"][0]);
-//								if(trim($result[$i]["glue2computingendpointcomputingserviceforeignkey"][0]) != ""){
-//									db()->query("UPDATE gocdb.va_providers SET serviceid='".trim($result[$i]["glue2computingendpointcomputingserviceforeignkey"][0])."' WHERE gocdb.va_providers.pkey='".$site["id"]."'");
-//								}
-//							} catch (Exception $e) {
-//								error_log("ERROR in 'INSERT INTO va_provider_endpoints(va_provider_id, vmiinstanceid, content_type, va_provider_image_id, mp_uri, vowide_vmiinstanceid)' -- entry ignored");
-//								$release_vap_endp = false;
-//								db()->query("ROLLBACK TO SAVEPOINT $sp_vap_endp");
-//							}
-//							if ($release_vap_endp) {
-//								db()->query("RELEASE SAVEPOINT $sp_vap_endp");
-//							}
-//						}
-//					}
-//				$k++;
-//				}
-//				db()->query("REFRESH MATERIALIZED VIEW CONCURRENTLY va_providers;");
-//				db()->query("SELECT request_permissions_refresh();");
-//				db()->commit();
-//				error_log("Sync VA Provider Endpoints DONE");
-//			} catch (Exception $e) {
-//				error_log($e->getMessage());
-//				error_log("Sync VA Provider Endpoints FAILED");
-//				db()->rollBack();
-//			}
-//		} else {
-//			$this->getResponse()->clearAllHeaders();
-//			$this->getResponse()->setRawHeader("HTTP/1.0 403 Forbidden");
-//			$this->getResponse()->setHeader("Status","403 Forbidden");
-//		}
-//	}
-	
 	public function dispatchobsoleteimagelistAction(){
 	$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();

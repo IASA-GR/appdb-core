@@ -259,7 +259,7 @@ class RestCategoryItem extends RestROResourceItem {
 		if ( parent::get() !== false ) {
 			$res = new Default_Model_Categories();
 			if ( is_numeric($this->getParam("id")) ) {
-				$res->filter->id->numequals($this->getParam("id"));
+				$res->filter->id->numequals((int)($this->getParam("id")));
 			} elseif ( substr($this->getParam("id"), 0, 2) === "s:" ) {
 				$res->filter->name->ilike(substr($this->getParam("id"), 2));
 			} else {
@@ -293,6 +293,8 @@ class RestCategoryAppStatsList extends RestROResourceList {
 			}
 			if ($void == "") {
 				$void = "NULL";
+			} else {
+				$void = (int)$void;
 			}
 			$from = $this->getParam("from");
 			if ($from == "") {
@@ -416,7 +418,7 @@ class RestDisciplineItem extends RestROResourceItem {
 		if ( parent::get() !== false ) {
 			$res = new Default_Model_Disciplines();
 			if ( is_numeric($this->getParam("id")) ) {
-				$res->filter->id->numequals($this->getParam("id"));
+				$res->filter->id->numequals((int)($this->getParam("id")));
 			} elseif ( substr($this->getParam("id"), 0, 2) === "s:" ) {
 				$res->filter->name->ilike(substr($this->getParam("id"), 2));
 			} else {
@@ -451,6 +453,8 @@ class RestDisciplineVOStatsList extends RestROResourceList {
 			}
 			if ($void == "") {
 				$void = "NULL";
+			} else {
+				$void = (int)$void;
 			}
 			$from = $this->getParam("from");
 			if ($from == "") {
@@ -545,6 +549,8 @@ class RestDisciplineAppStatsList extends RestROResourceList {
 			}
 			if ($void == "") {
 				$void = "NULL";
+			} else {
+				$void = (int)$void;
 			}
 			$from = $this->getParam("from");
 			if ($from == "") {
@@ -969,7 +975,7 @@ class RestBroker extends RestResourceList {
 				$this->_extError = "No request element provided";
 				return false;
 			}
-			$apiroutes = new SimpleXMLElement(APPLICATION_PATH . "/apiroutes.xml", 0, true);
+			$apiroutes = new SimpleXMLElement(file_get_contents(APPLICATION_PATH . "/apiroutes.xml"));
 			$ret = array();
 			foreach ($xmli as $x) {
 				$routeXslt = null;
@@ -1141,15 +1147,7 @@ class RestAppDBResourceList extends RestROResourceList {
 			$s = str_replace("\t", "" , $s);
 			$s = preg_replace('/>\s+/', '>', $s);
 			$s = preg_replace('/<\s+/', '<', $s);
-			$xslt = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . "/apiroutes.xsl";
-			$xsl = new DOMDocument();
-			$xsl->load($xslt);
-			$xml = new DOMDocument();
-			$xml->loadXML($s, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$s = $proc->transformToXml($xml);
+			$s = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . "/apiroutes.xsl", $s);
 			$xml = new SimpleXMLElement($s);
 			$xml->registerXPathNamespace('appdb','http://appdb.egi.eu/api/' . RestAPIHelper::VERSION . '/appdb');
 			$x = $xml->xpath("//appdb:resource");
@@ -1281,6 +1279,12 @@ class RestVAProvidersList extends RestROResourceList {
 		parent::init();
 		$this->_cacheLife = 900; // 15 minutes
 		$this->_cacheable = true;
+		//FIXME: remove this compatibility hack when API change gets disseminated
+		if (isset($this->_pars["flt"])) {
+			$this->_pars["flt"] .= ' +=type:eu.egi.cloud.vm-management.occi';
+		} else {
+			$this->_pars["flt"] = '+=type:eu.egi.cloud.vm-management.occi';
+		}
 	}
 
 	public function getDataType() {
@@ -1292,9 +1296,62 @@ class RestVAProvidersList extends RestROResourceList {
 	}
 
 	public function getModel() {
-		return new Default_Model_VaProviders();
+		$res = new Default_Model_VaProviders();
+		if ( ! is_null($this->getParam("orderby")) ) {
+			$res->filter->orderBy($this->getParam("orderby"));
+		}
+		if ( $this->getParam("flt") != "" ) {
+			$res->filter = FilterParser::getVaProviders($this->getParam("flt"));
+		}
+		return $res;
 	}
 }
+
+class RestVAProvidersOCCIList extends RestVAProvidersList {
+	/**
+     * overrides RestResource::init()
+     */
+	protected function init() {
+		parent::init();
+		if (isset($this->_pars["flt"])) {
+			$this->_pars["flt"] .= ' +=type:eu.egi.cloud.vm-management.occi';
+		} else {
+			$this->_pars["flt"] = '+=type:eu.egi.cloud.vm-management.occi';
+		}
+	}
+
+}
+
+class RestVAProvidersNovaList extends RestVAProvidersList {
+	/**
+     * overrides RestResource::init()
+     */
+	protected function init() {
+		parent::init();
+		if (isset($this->_pars["flt"])) {
+			//FIXME: Remove the following line after API change gets disseminated. (compatibility hack)
+			$this->_pars["flt"] = preg_replace('/\+=type:eu.egi.cloud.vm-management.occi/', '', $this->_pars["flt"]);
+			$this->_pars["flt"] .= ' +=type:org.openstack.nova';
+		} else {
+			$this->_pars["flt"] = '+=type:org.openstack.nova';
+		}
+		error_log($this->_pars["flt"]);
+	}
+}
+
+//FIXME: remove this class along with relevant API route when API change gets disseminated (compatilibity hack)
+class RestVAProvidersAllList extends RestVAProvidersList {
+	/**
+     * overrides RestResource::init()
+     */
+	protected function init() {
+		parent::init();
+		if (isset($this->_pars["flt"])) {
+			$this->_pars["flt"] = preg_replace('/\+=type:eu.egi.cloud.vm-management.occi/', '', $this->_pars["flt"]);
+		}
+	}
+}
+
 class RestVAProviderItem extends RestROResourceItem {
     /*** Attributes ***/
 
@@ -1332,6 +1389,128 @@ class RestVAProviderItem extends RestROResourceItem {
         }
     }
 }
+
+/**
+ * class RestVAProviderFilterReflection
+ * handles application filter reflection requests
+ */
+class RestVAProviderFilterReflection extends RestROResourceItem {
+    /**
+     * realization of getDataType from iRestResource
+     */
+    public function getDataType() {
+        return "filter";
+    }
+    
+    /**
+     * overrides RestResource::get()
+     */
+	public function get() {
+		if ( parent::get() !== false ) {
+			$s = '<provider:filter>';
+			$s .= FilterParser::fieldsToXML("any vaprovider country", "vaprovider");
+			$s .= '</provider:filter>';
+			return new XMLFragmentRestResponse($s, $this);
+		} else return false;
+    }
+}
+
+/**
+ * class RestVAProviderFilterNormalization
+ * handles application filter syntax normalization and validation
+ */
+class RestVAProviderFilterNormalization extends RestROResourceItem {
+    /**
+     * realization of getDataType from iRestResource
+     */
+    public function getDataType() {
+        return "filter";
+    }
+    
+    /**
+     * overrides RestResource::get()
+     */
+	public function get() {
+		if (  parent::get() !== false ) {
+            if ( isset($this->_pars["flt"]) ) $flt = $this->_pars["flt"]; else $flt = "";
+			return new XMLFragmentRestResponse(validateFilterActionHelper($flt, FilterParser::NORM_VAPROVIDER), $this);
+		} else return false;
+	}
+}
+
+
+/**
+ * class RestVAProviderLogistics
+ * handles VA provider counting per various properties
+ */
+class RestVAProviderLogistics extends RestROResourceItem {
+    /**
+     * realization of getDataType from iRestResource
+     */
+    public function getDataType() {
+        return "logistics";
+	}
+
+   /**
+     * overrides RestResource::get()
+     */
+	public function get($extraFilter = null) {
+		if ( parent::get() !== false ) {
+			global $application;
+			$isAdmin = $this->userIsAdmin();
+			$mapper = new Default_Model_VaProvidersMapper();
+			$db = $application->getBootstrap()->getResource('db');
+			$flt = $this->getParam("flt");
+			$select = $mapper->getDbTable()->getAdapter()->select()->distinct()->from('va_providers');
+			$from = '';
+			$where = '';
+			$orderby = '';
+			$limit = '';
+			$filter = FilterParser::getVaProviders($flt);
+			if ( is_array($filter->expr()) ) {
+				$ex = implode(" ", $filter->expr()); 
+			} else {
+				$ex = $filter->expr();
+			}
+			$fltexp = $filter->expr();
+			if ( ! is_array($fltexp) ) $fltexp = array($fltexp);
+			foreach($fltexp as $x) {
+				getZendSelectParts($select, $from, $where, $orderby, $limit);
+			}
+			if (! is_null($extraFilter)) {
+				$filter->chain($extraFilter, "AND");
+			}
+			$mapper->joins($select, $filter);
+			if ( is_array($filter->expr()) ) {
+				$from = array();
+				$where = array();
+				foreach($filter->expr() as $x) {
+					$s = clone $select;
+					$s->where($x);
+					getZendSelectParts($s, $f, $w, $orderby, $limit);
+					$from[] = $f;
+					$where[] = $w;
+				}
+				$flt = str_replace("''", "\'", php_to_pg_array($filter->fltstr, false));
+				$from = str_replace("''", "\'", php_to_pg_array($from, false));
+				$where = str_replace("''", "\'", php_to_pg_array($where, false));
+			} else {
+				$select->where($filter->expr());
+				getZendSelectParts($select, $from, $where, $orderby, $limit);
+			}
+
+			$db->setFetchMode(Zend_Db::FETCH_BOTH);
+			$rs = $db->query('SELECT * FROM vaprovider_logistics(?,?,?)', array($flt, $from, $where))->fetchAll();
+			if ( count($rs) > 0 ) {
+				$rs = $rs[0];
+				$x = $rs['vaprovider_logistics'];
+			} else {
+				$x = '';
+			}
+			return new XMLFragmentRestResponse($x, $this);
+		} else return false;
+	}
+}
 class RestAccessGroupList extends RestROResourceList {
 	public function getDataType() {
 		return "accessgroup";
@@ -1361,7 +1540,7 @@ class RestAccessGroupItem extends RestROAdminResourceItem {
 				$this->setError(RestErrorEnum::RE_ACCESS_DENIED);
 				return false;
 			}
-			$res = db()->query("SELECT privgroup_to_xml(" . pg_escape_string($this->getParam("id")) . ")")->fetchAll();
+			$res = db()->query("SELECT privgroup_to_xml(?)", array($this->getParam("id")))->fetchAll();
 			if ( count($res) > 0 ) {
 				$ret = array();
 				foreach ($res as $r) {
@@ -1404,6 +1583,33 @@ class RestRelationTypeList extends RestROResourceList {
 	}
 }
 
+class RestEndorsableList extends RestROResourceList {
+	public function getDataType() {
+		return "endorsable";
+	}
+
+	public function _list() {
+		return $this->get();
+	}
+
+	
+	public function get(){
+		if ( parent::get() !== false ) {
+			db()->setFetchMode(Zend_Db::FETCH_NUM);
+			$res = db()->query("SELECT endorsables_to_xml()")->fetchAll();
+			if ( count($res) > 0 ) {
+				$ret = array();
+				foreach ($res as $r) {
+					$ret[] = $r[0];
+				}
+				return new XMLFragmentRestResponse($ret, $this);
+			} else {
+				$this->setError(RestErrorEnum::RE_ITEM_NOT_FOUND);
+				return false;
+			}
+		} else return false;
+	}
+}
 class RestContextScriptFormatList extends RestROResourceList{
 	public function getDataType() {
 		return "contextualization";
@@ -1414,7 +1620,7 @@ class RestContextScriptFormatList extends RestROResourceList{
 			$res = new Default_Model_ContextFormats();
 			$xml = array();
 			foreach ($res->items as $i) {
-				$xml[] = "<contextualization:format id='" . $i->id . "' name='".$i->name."'>" . htmlspecialchars($i->description, HTML_SPECIALCHARS) . "</contextualization:format>";
+				$xml[] = "<contextualization:format id='" . xml_escape($i->id) . "' name='". xml_escape($i->name) ."'>" . xml_escape($i->description) . "</contextualization:format>";
 			}
 			return new XMLFragmentRestResponse($xml, $this);
 		}	

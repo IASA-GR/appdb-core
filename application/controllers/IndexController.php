@@ -94,7 +94,7 @@ class IndexController extends Zend_Controller_Action
 			//do nothing. It's local development instance where no SImpleSaml installed
 		}else{
 			$auth = SamlAuth::isAuthenticated();
-			if( $auth === false ){
+                        if( $auth === false && !$this->session->userIsGuest){
 				//if logged in but not authdicated the clear session
 				if( isset($this->session->userid) && is_numeric($this->session->userid)  ){
 					SamlAuth::logout($this->session);
@@ -360,7 +360,7 @@ class IndexController extends Zend_Controller_Action
 				}
 				$to .= $e;
 			}
-			echo "<response to='".htmlspecialchars($to,ENT_QUOTES)."' subject='".htmlspecialchars($subject,ENT_QUOTES)."' cc='" . $cc . "' >" . htmlspecialchars($body,ENT_QUOTES) . "</response>";
+			echo "<response to='" . xml_escape($to) . "' subject='" . xml_escape($subject) . "' cc='" . xml_escape($cc) . "' >" . xml_escape($body, ENT_QUOTES) . "</response>";
 		}
 		
 	}

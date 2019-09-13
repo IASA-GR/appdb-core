@@ -642,10 +642,14 @@ class PeopleController extends Zend_Controller_Action
 
     public function authorizeroleAction()
     {
-    	$this->_helper->layout->disableLayout();
-        $this->_helper->viewRenderer->setNoRender();
 		// OBSOLETE		
-    }
+		$this->_helper->viewRenderer->setNoRender();
+    	$this->_helper->layout->disableLayout();
+		$this->getResponse()->clearAllHeaders();
+		$this->getResponse()->setRawHeader("HTTP/1.0 404 Not Found");
+		$this->getResponse()->setHeader("Status","404 Not Found");
+
+	}
 
 	public function reflectfilterAction() {
 		$s = '<person:filter xmlns:person="http://appdb.egi.eu/api/0.2/person" xmlns:filter="http://appdb.egi.eu/api/0.2/filter">';

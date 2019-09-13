@@ -21,8 +21,12 @@ $headers = null;
 $cb = false;
 
 function transformSoftware($response){
-	$xml = new SimpleXMLElement($response);
-	$sw = new SimpleXMLElement("<software></software>");
+	$xml = simplexml_load_string($response);
+	if ($xml === false) {
+		error_log("Cannot parse software response as XML");
+		return $response;
+	}
+	$sw = simplexml_load_string("<software></software>");
 	$swpath = $xml->xpath("//application:application");
 	if( count($swpath)>0 ){
 		$swpath = $swpath[0];

@@ -105,96 +105,102 @@ class RestFolderEnum {
 class RestAPIHelper implements iRestAPIHelper {
     const VERSION = '1.0';
     
-    const XMLNS_APPDB_BASE = 'http://appdb.egi.eu/api/';
-    public static function XMLNS_XSI() { return 'http://www.w3.org/2001/XMLSchema-instance'; }
-    public static function XMLNS_XS() { return 'http://www.w3.org/2001/XMLSchema'; }
-    public static function XMLNS_APPDB() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/appdb'; }
-    public static function XMLNS_APPLICATION() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/application'; }
-    public static function XMLNS_VIRTUALIZATION() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/virtualization'; }
+        const XMLNS_APPDB_BASE = 'http://appdb.egi.eu/api/';
+        public static function XMLNS_XSI() { return 'http://www.w3.org/2001/XMLSchema-instance'; }
+        public static function XMLNS_XS() { return 'http://www.w3.org/2001/XMLSchema'; }
+        public static function XMLNS_APPDB() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/appdb'; }
+        public static function XMLNS_APPLICATION() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/application'; }
+        public static function XMLNS_VIRTUALIZATION() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/virtualization'; }
 	public static function XMLNS_CONTEXTUALIZATION() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/contextualization'; }
-    public static function XMLNS_DISCIPLINE() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/discipline'; }
-    public static function XMLNS_CATEGORY() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/category'; }
-    public static function XMLNS_DISSEMINATION() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/dissemination'; }
-    public static function XMLNS_FILTER() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/filter'; }
-    public static function XMLNS_HISTORY() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/history'; }
-    public static function XMLNS_RESOURCE() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/resource'; }
-    public static function XMLNS_LOGISTICS() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/logistics'; }
-    public static function XMLNS_MIDDLEWARE() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/middleware'; }
-    public static function XMLNS_PERSON() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/person'; }
-    public static function XMLNS_PRIVILEGE() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/privilege'; }
-    public static function XMLNS_PERMISSION() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/permission'; }
-    public static function XMLNS_PUBLICATION() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/publication'; }
-    public static function XMLNS_RATING() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/rating'; }
-    public static function XMLNS_RATINGREPORT() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/ratingreport'; }
-    public static function XMLNS_REGIONAL() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/regional'; }
-    public static function XMLNS_USER() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/user'; }
-    public static function XMLNS_VO() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/vo'; }
-    public static function XMLNS_LICENSE() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/license'; }
-    public static function XMLNS_PROVIDER() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/provider'; }
-    public static function XMLNS_PROVIDER_TEMPLATE() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/provider_template'; }
-    public static function XMLNS_CLASSIFICATION() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/classification'; }
+        public static function XMLNS_DISCIPLINE() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/discipline'; }
+        public static function XMLNS_CATEGORY() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/category'; }
+        public static function XMLNS_DISSEMINATION() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/dissemination'; }
+        public static function XMLNS_FILTER() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/filter'; }
+        public static function XMLNS_HISTORY() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/history'; }
+        public static function XMLNS_RESOURCE() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/resource'; }
+        public static function XMLNS_LOGISTICS() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/logistics'; }
+        public static function XMLNS_MIDDLEWARE() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/middleware'; }
+        public static function XMLNS_PERSON() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/person'; }
+        public static function XMLNS_PRIVILEGE() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/privilege'; }
+        public static function XMLNS_PERMISSION() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/permission'; }
+        public static function XMLNS_PUBLICATION() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/publication'; }
+        public static function XMLNS_RATING() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/rating'; }
+        public static function XMLNS_RATINGREPORT() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/ratingreport'; }
+        public static function XMLNS_REGIONAL() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/regional'; }
+        public static function XMLNS_USER() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/user'; }
+        public static function XMLNS_VO() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/vo'; }
+        public static function XMLNS_LICENSE() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/license'; }
+        public static function XMLNS_PROVIDER() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/provider'; }
+        public static function XMLNS_PROVIDER_TEMPLATE() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/provider_template'; }
+        public static function XMLNS_CLASSIFICATION() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/classification'; }
 	public static function XMLNS_SITE() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/site'; }
 	public static function XMLNS_ENTITY() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/entity'; }
 	public static function XMLNS_ORGANIZATION() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/organization'; }
 	public static function XMLNS_PROJECT() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/project'; }
 	public static function XMLNS_DATASET() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/dataset'; }
+	public static function XMLNS_ENDORSABLE() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/endorsable'; }
+        public static function XMLNS_SECANT() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/secant'; }
+        public static function XMLNS_MESSAGE() { return RestAPIHelper::XMLNS_APPDB_BASE . RestAPIHelper::VERSION . '/message'; }
 	
 	static public function getVersion() {
 		return RestAPIHelper::VERSION;
 	}
 
-    static public function getFolder($folder) {
-        switch ($folder) {
-        case RestFolderEnum::FE_CACHE_FOLDER:
-            return APPLICATION_PATH."/../cache/"; 
-        case RestFolderEnum::FE_XSD_FOLDER:
-            return APPLICATION_PATH."/configs/api/".RestAPIHelper::VERSION."/schema/";
-        case RestFolderEnum::FE_XSL_FOLDER:
-            return APPLICATION_PATH."/configs/api/".RestAPIHelper::VERSION."/xslt/";
-        case RestFolderEnum::FE_BIN_FOLDER:
-            return APPLICATION_PATH."/../bin/";
-        default: 
-            return null;
+        static public function getFolder($folder) {
+                switch ($folder) {
+                case RestFolderEnum::FE_CACHE_FOLDER:
+                    return APPLICATION_PATH."/../cache/"; 
+                case RestFolderEnum::FE_XSD_FOLDER:
+                    return APPLICATION_PATH."/configs/api/".RestAPIHelper::VERSION."/schema/";
+                case RestFolderEnum::FE_XSL_FOLDER:
+                    return APPLICATION_PATH."/configs/api/".RestAPIHelper::VERSION."/xslt/";
+                case RestFolderEnum::FE_BIN_FOLDER:
+                    return APPLICATION_PATH."/../bin/";
+                default: 
+                    return null;
+                }
         }
-    }
 
-    static public function namespaces() {
-        $ns = array();
-        $ns[] = 'xmlns:xs="' . RestAPIHelper::XMLNS_XS() . '"';
-        $ns[] = 'xmlns:xsi="' . RestAPIHelper::XMLNS_XSI() . '"';
-        $ns[] = 'xmlns:appdb="' . RestAPIHelper::XMLNS_APPDB() . '"';
-        $ns[] = 'xmlns:application="' . RestAPIHelper::XMLNS_APPLICATION() . '"';
-        $ns[] = 'xmlns:discipline="' . RestAPIHelper::XMLNS_DISCIPLINE() . '"';
-        $ns[] = 'xmlns:category="' . RestAPIHelper::XMLNS_CATEGORY() . '"';
-        $ns[] = 'xmlns:dissemination="' . RestAPIHelper::XMLNS_DISSEMINATION() . '"';
-        $ns[] = 'xmlns:filter="' . RestAPIHelper::XMLNS_FILTER() . '"';
-        $ns[] = 'xmlns:history="' . RestAPIHelper::XMLNS_HISTORY() . '"';
-        $ns[] = 'xmlns:logistics="' . RestAPIHelper::XMLNS_LOGISTICS() . '"';
-        $ns[] = 'xmlns:resource="' . RestAPIHelper::XMLNS_RESOURCE() . '"';
-        $ns[] = 'xmlns:middleware="' . RestAPIHelper::XMLNS_MIDDLEWARE() . '"';
-        $ns[] = 'xmlns:person="' . RestAPIHelper::XMLNS_PERSON() . '"';
-        $ns[] = 'xmlns:permission="' . RestAPIHelper::XMLNS_PERMISSION() . '"';
-        $ns[] = 'xmlns:privilege="' . RestAPIHelper::XMLNS_PRIVILEGE() . '"';
-        $ns[] = 'xmlns:publication="' . RestAPIHelper::XMLNS_PUBLICATION() . '"';
-        $ns[] = 'xmlns:rating="' . RestAPIHelper::XMLNS_RATING() . '"';
-        $ns[] = 'xmlns:ratingreport="' . RestAPIHelper::XMLNS_RATINGREPORT() . '"';
-        $ns[] = 'xmlns:regional="' . RestAPIHelper::XMLNS_REGIONAL() . '"';
-        $ns[] = 'xmlns:user="' . RestAPIHelper::XMLNS_USER() . '"';
-        $ns[] = 'xmlns:vo="' . RestAPIHelper::XMLNS_VO() . '"';
-        $ns[] = 'xmlns:virtualization="' . RestAPIHelper::XMLNS_VIRTUALIZATION() . '"';
-		$ns[] = 'xmlns:contextualization="' . RestAPIHelper::XMLNS_CONTEXTUALIZATION() . '"';
-        $ns[] = 'xmlns:license="' . RestAPIHelper::XMLNS_LICENSE() . '"';
-        $ns[] = 'xmlns:provider="' . RestAPIHelper::XMLNS_PROVIDER() . '"';
-        $ns[] = 'xmlns:provider_template="' . RestAPIHelper::XMLNS_PROVIDER_TEMPLATE() . '"';
-        $ns[] = 'xmlns:classification="' . RestAPIHelper::XMLNS_CLASSIFICATION() . '"';
-		$ns[] = 'xmlns:site="' . RestAPIHelper::XMLNS_SITE() . '"';
-		$ns[] = 'xmlns:siteservice="' . RestAPIHelper::XMLNS_SITE() . '"';
-		$ns[] = 'xmlns:entity="' .RestAPIHelper::XMLNS_ENTITY() . '"';
-		$ns[] = 'xmlns:organization="' .RestAPIHelper::XMLNS_ORGANIZATION() . '"';
-		$ns[] = 'xmlns:project="' .RestAPIHelper::XMLNS_PROJECT() . '"';
-		$ns[] = 'xmlns:dataset="' .RestAPIHelper::XMLNS_DATASET() . '"';
-        return $ns;
-    }
+        static public function namespaces() {
+                $ns = array();
+                $ns[] = 'xmlns:xs="' . RestAPIHelper::XMLNS_XS() . '"';
+                $ns[] = 'xmlns:xsi="' . RestAPIHelper::XMLNS_XSI() . '"';
+                $ns[] = 'xmlns:appdb="' . RestAPIHelper::XMLNS_APPDB() . '"';
+                $ns[] = 'xmlns:application="' . RestAPIHelper::XMLNS_APPLICATION() . '"';
+                $ns[] = 'xmlns:discipline="' . RestAPIHelper::XMLNS_DISCIPLINE() . '"';
+                $ns[] = 'xmlns:category="' . RestAPIHelper::XMLNS_CATEGORY() . '"';
+                $ns[] = 'xmlns:dissemination="' . RestAPIHelper::XMLNS_DISSEMINATION() . '"';
+                $ns[] = 'xmlns:filter="' . RestAPIHelper::XMLNS_FILTER() . '"';
+                $ns[] = 'xmlns:history="' . RestAPIHelper::XMLNS_HISTORY() . '"';
+                $ns[] = 'xmlns:logistics="' . RestAPIHelper::XMLNS_LOGISTICS() . '"';
+                $ns[] = 'xmlns:resource="' . RestAPIHelper::XMLNS_RESOURCE() . '"';
+                $ns[] = 'xmlns:middleware="' . RestAPIHelper::XMLNS_MIDDLEWARE() . '"';
+                $ns[] = 'xmlns:person="' . RestAPIHelper::XMLNS_PERSON() . '"';
+                $ns[] = 'xmlns:permission="' . RestAPIHelper::XMLNS_PERMISSION() . '"';
+                $ns[] = 'xmlns:privilege="' . RestAPIHelper::XMLNS_PRIVILEGE() . '"';
+                $ns[] = 'xmlns:publication="' . RestAPIHelper::XMLNS_PUBLICATION() . '"';
+                $ns[] = 'xmlns:rating="' . RestAPIHelper::XMLNS_RATING() . '"';
+                $ns[] = 'xmlns:ratingreport="' . RestAPIHelper::XMLNS_RATINGREPORT() . '"';
+                $ns[] = 'xmlns:regional="' . RestAPIHelper::XMLNS_REGIONAL() . '"';
+                $ns[] = 'xmlns:user="' . RestAPIHelper::XMLNS_USER() . '"';
+                $ns[] = 'xmlns:vo="' . RestAPIHelper::XMLNS_VO() . '"';
+                $ns[] = 'xmlns:virtualization="' . RestAPIHelper::XMLNS_VIRTUALIZATION() . '"';
+                $ns[] = 'xmlns:contextualization="' . RestAPIHelper::XMLNS_CONTEXTUALIZATION() . '"';
+                $ns[] = 'xmlns:license="' . RestAPIHelper::XMLNS_LICENSE() . '"';
+                $ns[] = 'xmlns:provider="' . RestAPIHelper::XMLNS_PROVIDER() . '"';
+                $ns[] = 'xmlns:provider_template="' . RestAPIHelper::XMLNS_PROVIDER_TEMPLATE() . '"';
+                $ns[] = 'xmlns:classification="' . RestAPIHelper::XMLNS_CLASSIFICATION() . '"';
+                $ns[] = 'xmlns:site="' . RestAPIHelper::XMLNS_SITE() . '"';
+                $ns[] = 'xmlns:siteservice="' . RestAPIHelper::XMLNS_SITE() . '"';
+                $ns[] = 'xmlns:entity="' .RestAPIHelper::XMLNS_ENTITY() . '"';
+                $ns[] = 'xmlns:organization="' .RestAPIHelper::XMLNS_ORGANIZATION() . '"';
+                $ns[] = 'xmlns:project="' .RestAPIHelper::XMLNS_PROJECT() . '"';
+                $ns[] = 'xmlns:dataset="' .RestAPIHelper::XMLNS_DATASET() . '"';
+                $ns[] = 'xmlns:endorsable="' .RestAPIHelper::XMLNS_ENDORSABLE() . '"';
+                $ns[] = 'xmlns:secant="' .RestAPIHelper::XMLNS_SECANT() . '"';
+                $ns[] = 'xmlns:message="' .RestAPIHelper::XMLNS_MESSAGE() . '"';
+                return $ns;
+        }
 
 	static public function responseHead($datatype, $type = null, $count = null, $pageLength = null, $pageOffset = null, $error = null, $exterror = null, $reqTime = null, $authenticated = null) {
 		if (is_null($authenticated)) {
@@ -214,17 +220,17 @@ class RestAPIHelper implements iRestAPIHelper {
 			$permsState = $permsState[0];
 		} catch (Exception $e) { /*do nothing*/ }
 		return '<appdb:appdb ' .
-            implode(" ", RestAPIHelper::namespaces()) . ' ' .
-            'datatype="'.$datatype.'" ' .
-            'type="'.$type.'" ' . 
-            ($type === "list" ? 'count="'.($count === null ? 0 : $count).'" ' : '' ) .
-            ($type === "list" && ! is_null($pageLength) ? 'pagelength="'.$pageLength.'" ' : '' ) .
-            ($type === "list" && ! is_null($pageOffset) ? 'pageoffset="'.$pageOffset.'" ' : '' ) .
+                        implode(" ", RestAPIHelper::namespaces()) . ' ' .
+                        'datatype="'.$datatype.'" ' .
+                        'type="'.$type.'" ' . 
+                        ($type === "list" ? 'count="'.($count === null ? 0 : $count).'" ' : '' ) .
+                        ($type === "list" && ! is_null($pageLength) ? 'pagelength="'.$pageLength.'" ' : '' ) .
+                        ($type === "list" && ! is_null($pageOffset) ? 'pageoffset="'.$pageOffset.'" ' : '' ) .
 			($error != "" ? 'error="'.RestErrorEnum::toString($error).'" ' : '' ) .
 			($error != "" ? 'errornum="'.$error.'" ' : '' ) .
 			($exterror != "" ? 'errordesc="'. htmlentities($exterror, ENT_QUOTES | ENT_XML1 | ENT_DISALLOWED, "UTF-8") .'" ' : '' ) .
 			//($exterror != "" ? 'errordesc="'. htmlspecialchars($exterror, HTML_SPECIALCHARS, "UTF-8") .'" ' : '' ) .
-            'host="'.$_SERVER['APPLICATION_UI_HOSTNAME'].'" ' .
+                        'host="'.$_SERVER['APPLICATION_UI_HOSTNAME'].'" ' .
 			'apihost="'.$_SERVER['APPLICATION_API_HOSTNAME'].'" ' .
 			'cacheState="' . $cacheState . '" ' .
 			'permsState="' . $permsState . '" ' .
@@ -232,95 +238,111 @@ class RestAPIHelper implements iRestAPIHelper {
 			'deliveredOn="' . sprintf("%.3f", $resTime) . '" ' .
 			'processingTime="' . sprintf("%.3f", $resTime - $reqTime) . '" ' .
 			($authenticated ? 'authenticated="true" ' : '') .
-            'version="'.RestAPIHelper::VERSION.'" >';
-    }
+                        'version="'.RestAPIHelper::VERSION.'" >';
+        }
 
-    static public function responseTail() {
-        return '</appdb:appdb>';
-    }
+        static public function responseTail() {
+                return '</appdb:appdb>';
+        }
 
 	static public function wrapResponse($response, $datatype = null, $type = null, $count = null, $pageLength = null, $pageOffset = null, $error = null, $exterror = null, $authenticated = null) {
 		if (is_null($authenticated)) {
 			$authenticated = false;
 		}
 		$reqTime = null;
-        $originalResponse = $response;
+                $originalResponse = $response;
 		$parent = null;
-        if ( is_object($response) ) {
+                if ( is_object($response) ) {
 			$parent = $response->getParent();
 			if (is_object($parent)) {
 				$reqTime = $parent->getRequestTime();
 			}
-            if ( ! is_null($parent) ) {
-                if ( is_null($error) ) {
-					$error = $parent->error;
-					if ( $parent->error != "" && $parent->extError != "" ) $exterror = $parent->extError;
-				}
-                if ( is_null($datatype) ) $datatype = $parent->dataType;
-                if ( is_null($type) ) $type = ( $parent->total === -1 ? "entry" : "list" );
-                if ( is_null($count) && $type === "list" ) $count = $parent->total;
-                if ( is_null($pageLength) && $type === "list" ) $pageLength = $parent->pageLength;
-                if ( is_null($pageOffset) && $type === "list" ) $pageOffset = $parent->pageOffset;
-                $response = strval($response);
-            } else {
-                $response = $response->getData();
-            }
-        }
-        if ( is_array($response) ) {
-            if ( is_null($type) ) $type = "list";
-            if ( is_null($count) ) $count = count($response);
-            $response = implode("\n", $response);
-        } else {
-            if ( is_null($type) ) $type = "entry";
-        }
-        $response = array();
-        $response[] = RestAPIHelper::responseHead($datatype, $type, $count, $pageLength, $pageOffset, $error, $exterror, $reqTime, $authenticated);
-        if ( is_object($originalResponse) ) {
-            $originalResponse = $originalResponse->getData();
-        }
-        if ( is_array($originalResponse) ) {
-            $response = array_merge($response, $originalResponse); 
-        } else {
-            $response[] = $originalResponse;
-        }
-        $response[] = RestAPIHelper::responseTail();
-        if ( ! is_array($originalResponse) ) $response = implode("\n", $response);
-        return new XMLRestResponse($response, $parent);
+                        if ( ! is_null($parent) ) {
+                                if ( is_null($error) ) {
+                                        $error = $parent->error;
+                                        if ( $parent->error != "" && $parent->extError != "" ) $exterror = $parent->extError;
+                                }
+                        if ( is_null($datatype) ) $datatype = $parent->dataType;
+                        if ( is_null($type) ) $type = ( $parent->total === -1 ? "entry" : "list" );
+                        if ( is_null($count) && $type === "list" ) $count = $parent->total;
+                        if ( is_null($pageLength) && $type === "list" ) $pageLength = $parent->pageLength;
+                        if ( is_null($pageOffset) && $type === "list" ) $pageOffset = $parent->pageOffset;
+                        $response = strval($response);
+                    } else {
+                        $response = $response->getData();
+                    }
+                }
+                if ( is_array($response) ) {
+                    if ( is_null($type) ) $type = "list";
+                    if ( is_null($count) ) $count = count($response);
+                    $response = implode("\n", $response);
+                } else {
+                    if ( is_null($type) ) $type = "entry";
+                }
+                $response = array();
+                $response[] = RestAPIHelper::responseHead($datatype, $type, $count, $pageLength, $pageOffset, $error, $exterror, $reqTime, $authenticated);
+                if ( is_object($originalResponse) ) {
+                    $originalResponse = $originalResponse->getData();
+                }
+                if ( is_array($originalResponse) ) {
+                    $response = array_merge($response, $originalResponse); 
+                } else {
+                    $response[] = $originalResponse;
+                }
+                $response[] = RestAPIHelper::responseTail();
+                if ( ! is_array($originalResponse) ) $response = implode("\n", $response);
+                return new XMLRestResponse($response, $parent);
 	}
 
-	static public function transformXMLtoJSON($x) {
+	static public function transformXMLtoJSON($x, $castImplicit = false) {
 		$json = $x;
 		$xslt_path1 = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'xml2js_preprocess.xsl';
 		$xslt_path2 = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'xml2js.xsl';
 		if( file_exists($xslt_path1) && file_exists($xslt_path2) ) {
-			try{
+			try {
 				//convert all attributes to elements
-				$xsl = new DOMDocument();
-				$xsl->load($xslt_path1);
-				$xml = new DOMDocument();
-				$xml->loadXML($x, LIBXML_NSCLEAN | LIBXML_COMPACT);
-				$proc = new XSLTProcessor();
-				$proc->registerPHPFunctions();
-				$proc->importStylesheet($xsl);
-				$json = $proc->transformToXml( $xml );
-				
-				//convert all attributes to json
-				$xsl = new DOMDocument();
-				$xsl->load($xslt_path2);
-				$xml = new DOMDocument();
-				$xml->loadXML($json, LIBXML_NSCLEAN | LIBXML_COMPACT);
-				$proc = new XSLTProcessor();
-				$proc->registerPHPFunctions();
-				$proc->importStylesheet($xsl);
-				$json = $proc->transformToXml( $xml );
+				$json = xml_transform($xslt_path1, $x);
+				if ($json === false) {
+					throw new Exception("Error while executing stylesheet '" . $xslt_path1 . "'");
+				} else {
+					//convert all elements to json
+					$json = xml_transform($xslt_path2, $json, 0, array(
+						array(
+							"name" => "castImplicitTypes",
+							"value" => "1"
+						)
+					));
+					if ($json === false) {
+						throw new Exception("Error while executing stylesheet '" . $xslt_path2 . "'");
+					}
+				}
 				header('Content-type: application/json');
 			}catch( Exception $e) {
-				error_log('[Api::transformXmlToJson]: ' . $e->getMessage());
+				error_log('[Api::transformXMLToJSON]: ' . $e->getMessage());
 				return $x;
 			}
 		}
 		
 		return $json;
+	}
+
+	private static function normalizeID(&$resource, $table, $paramName = "id") {
+		$id = $resource->getParam($paramName);
+		if ( ! is_numeric($id) ) {
+			$id = "(SELECT id FROM $table WHERE LOWER(cname) = LOWER('" . pg_escape_string(substr($resource->getParam($paramName), 2)) . "') FETCH FIRST 1 ROWS ONLY)";
+		} else {
+			$id = (int)$id;
+		}
+		error_log("NORMALIZING: $table.id = $id");
+		return $id;
+	}
+
+	public static function normalizeAppID(&$resource, $paramName = "id") {
+		return RestAPIHelper::normalizeID($resource, 'applications', $paramName);
+	}
+
+	public static function normalizePplID(&$resource, $paramName = "id") {
+		return RestAPIHelper::normalizeID($resource, 'researchers', $paramName);
 	}
 }
 
@@ -425,46 +447,31 @@ abstract class XMLRestResponseBase extends RestResponse {
 			}
 			$xslt = $xslt . ".xsl";
 			if (file_exists($xslt)) {
-				$xsl = new DOMDocument();
-				$xsl->load($xslt);
-				$xml = new DOMDocument();
-				$xml->loadXML($data, LIBXML_NSCLEAN | LIBXML_COMPACT);
-				$proc = new XSLTProcessor();
-				$proc->registerPHPFunctions();
-				$proc->importStylesheet($xsl);
-				$data = $proc->transformToXml( $xml );
+				$data = xml_transform($xslt, $data);
+				if ($data === false) {
+					error_log('[XMLRestResponseBase::_transform] Error while processing stylesheet ' . $xslt);
+					return $data;
+				}
 				if ( is_null($this->_parent) || ( (! is_null($this->_parent)) && (! $this->_parent->authenticate()) ) ) {
-					$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'person_sensitive.xsl';
-					$xsl = new DOMDocument();
-					$xsl->load($xf);
-					$proc = new XSLTProcessor();
-					$proc->registerPHPFunctions();
-					$proc->importStylesheet($xsl);
-					$xml = new DOMDocument();
-					$xml->loadXML($data, LIBXML_NSCLEAN | LIBXML_COMPACT);
-					$data = $proc->transformToXml( $xml );
+					$data = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'person_sensitive.xsl', $data);
+					if ($data === false) {
+						error_log('[XMLRestResponseBase::_transform] Error while processing stylesheet "person_sensitive.xsl"');
+						return $data;
+					}
 				}
 				if ( (! is_null($this->_parent)) && (is_a($this->_parent, "RestVOItem") || is_a($this->_parent, "RestVOList")) && (! $this->_parent->authenticate()) ) {
-					$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'vo_sensitive.xsl';
-					$xsl = new DOMDocument();
-					$xsl->load($xf);
-					$proc = new XSLTProcessor();
-					$proc->registerPHPFunctions();
-					$proc->importStylesheet($xsl);
-					$xml = new DOMDocument();
-					$xml->loadXML($data, LIBXML_NSCLEAN | LIBXML_COMPACT);
-					$data = $proc->transformToXml( $xml );
+					$data = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'vo_sensitive.xsl', $data);
+					if ($data === false) {
+						error_log('[XMLRestResponseBase::_transform] Error while processing stylesheet "vo_sensitive.xsl"');
+						return $data;
+					}
 				}
 				if ( (! is_null($this->_parent)) && (is_a($this->_parent, "RestSiteItem") || is_a($this->_parent, "RestSiteList")) && (! $this->_parent->authenticate()) ) {
-					$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'site_sensitive.xsl';
-					$xsl = new DOMDocument();
-					$xsl->load($xf);
-					$proc = new XSLTProcessor();
-					$proc->registerPHPFunctions();
-					$proc->importStylesheet($xsl);
-					$xml = new DOMDocument();
-					$xml->loadXML($data, LIBXML_NSCLEAN | LIBXML_COMPACT);
-					$data = $proc->transformToXml( $xml );
+					$data = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER).'site_sensitive.xsl', $data);
+					if ($data === false) {
+						error_log('[XMLRestResponseBase::_transform] Error while processing stylesheet "site_sensitive.xsl"');
+						return $data;
+					}
 				}
 				if ( (! is_null($this->_parent)) && (is_a($this->_parent, "RestAppVAList") || is_a($this->_parent, "RestAppVAList")) ) {
 					if ( ! $this->_parent->canManageVAs() ) {
@@ -474,7 +481,7 @@ abstract class XMLRestResponseBase extends RestResponse {
 				}
 				$data = str_replace('<'. '?xml version="1.0"?'.'>', '', $data);
 			} else {
-				error_log('Cannot find '.$xslt);
+				error_log('Cannot find '. $xslt);
 			}
 		}
         return $data;
@@ -591,64 +598,20 @@ class JSONRestResponse extends RestResponse {
 			}
 			exec("bash " . RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . "group.xsl.template $datatype", $xf);
 			$xf = implode("\n", $xf);
-			$xsl = new DOMDocument();
-			$xsl->loadXML($xf);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$xml = new DOMDocument();
-			$xml->loadXML($result, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$result = $proc->transformToXml( $xml );
-
-			$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'strip_prefix.xsl';
-			$xsl = new DOMDocument();
-			$xsl->load($xf);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$xml = new DOMDocument();
-			$xml->loadXML($result, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$result = $proc->transformToXml( $xml );
-
-			$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'text2att.xsl';
-			$xsl = new DOMDocument();
-			$xsl->load($xf);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$xml = new DOMDocument();
-			$xml->loadXML($result, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$result = $proc->transformToXml( $xml );
-
-			$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'att2elem.xsl';
-			$xsl = new DOMDocument();
-			$xsl->load($xf);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$xml = new DOMDocument();
-			$xml->loadXML($result, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$result = $proc->transformToXml( $xml );
-
-			$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'remove_empty_nodes.xsl';
-			$xsl = new DOMDocument();
-			$xsl->load($xf);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$xml = new DOMDocument();
-			$xml->loadXML($result, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$result = $proc->transformToXml( $xml );
-
-			$xf = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'xml2json.xsl';
-			$xsl = new DOMDocument();
-			$xsl->load($xf);
-			$proc = new XSLTProcessor();
-			$proc->registerPHPFunctions();
-			$proc->importStylesheet($xsl);
-			$xml = new DOMDocument();
-			$xml->loadXML($result, LIBXML_NSCLEAN | LIBXML_COMPACT);
-			$result = $proc->transformToXml( $xml );
+			foreach (array(
+				$xf,
+				RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'strip_prefix.xsl',
+				RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'text2att.xsl',
+				RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'att2elem.xsl',
+				RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'remove_empty_nodes.xsl',
+				RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'xml2json.xsl'
+			) as $xsl) {				
+				$result = xml_transform($xsl, $result);
+				if ($result === false) {
+					error_log("[JSONRestResponse::__construct] Error while processing stylesheet '" . $xsl . "'");
+					break;
+				}
+			}
 			$data = $result;
 		}
 		parent::__construct($data, $parent);

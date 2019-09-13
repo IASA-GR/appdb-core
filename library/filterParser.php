@@ -257,7 +257,7 @@ class FilterParser {
 		}
 		$reflection_str = strval($normalizer->get()->finalize());
 		$reflection = new DOMDocument();
-		$reflection->loadXML($reflection_str, LIBXML_NSCLEAN | LIBXML_COMPACT);
+		$reflection->loadXML($reflection_str, LIBXML_NSCLEAN | LIBXML_COMPACT | LIBXML_NONET);
 		$help = '';
 		$nbs = " "; // UTF-8 NO-BREAK SPACE;
 		$ss = '';
@@ -485,7 +485,7 @@ class FilterParser {
 
 			// validate specifiers and properties against API reflection 
 			$xp = new DOMXPath($reflection);
-			$xpres = $xp->query('//filter:field[@name="'.$obj.'"]');
+			$xpres = $xp->query('//filter:field[@name='. xpath_quote($obj) .']');
 			$found = false;
 			if (!is_null($xpres)) {
 				if (count($xpres)>0) $found=true;
@@ -495,16 +495,16 @@ class FilterParser {
 				return substr($ss." ".$ops.($obj !== "" ? $obj."." : "").$prop.":".$s,1);
 			} else {
 				$found = false;
-				$xpres = $xp->query('//filter:field[@name="'.$obj.'"]/filter:field[@name="'.$prop.'"]');
+				$xpres = $xp->query('//filter:field[@name='. xpath_quote($obj) . ']/filter:field[@name=' . xpath_quote($prop) . ']');
 				if (!is_null($xpres)) {
-					if ($xpres->length>0) {
-						$found=true;
-						$isComplex = ($xpres->item(0)->attributes->getNamedItem("type")->nodeValue==="complex"?true:false);
+					if ($xpres->length > 0) {
+						$found = true;
+						$isComplex = ($xpres->item(0)->attributes->getNamedItem("type")->nodeValue === "complex" ? true : false);
 					}
 				}
 				if (!$found) {
-					$error = 'Grammar error. Invalid property ` '.$prop.' \' for specifier ` '.$obj.' \' at keyword '.($argi+1).".";	
-					return substr($ss." ".$ops.($obj !== "" ? $obj."." : "").$prop.":".$s,1);
+					$error = 'Grammar error. Invalid property ` ' . $prop . ' \' for specifier ` ' . $obj . ' \' at keyword ' . ($argi+1) . ".";	
+					return substr($ss . " " . $ops . ($obj !== "" ? $obj . "." : "") . $prop . ":" . $s, 1);
 				} else {
 					if ( $isComplex ) {
 						$obj = $prop;

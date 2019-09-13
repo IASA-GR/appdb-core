@@ -2419,17 +2419,18 @@ appdb.components.Site = appdb.ExtendClass(appdb.Component, "appdb.components.Sit
 	this.reset = function(){
 		
 	};
-	this.getServices = function(servicetype){
-		servicetype = $.trim(servicetype);
+	this.getServices = function(servicetypes){
+		servicetypes = servicetypes || [];
+		servicetypes = $.isArray(servicetypes) ? servicetypes : [servicetypes];
 		var d = (this.options.data || {}).service || [];
 		d = $.isArray(d)?d:[d];
 		return $.grep(d, function(e){
-			return ( servicetype !== "" && $.trim(e["type"]).toLowerCase() === "occi" );
+			return ( servicetypes.length > 0 && servicetypes.indexOf($.trim(e["type"]).toLowerCase()) >= 0 );
 		});
 	};
 	this.getOcciImages = function(){
-		var servs = this.getServices("occi");
-		return appdb.utils.GroupSiteImages(servs);
+		var servs = this.getServices(["occi", "openstack"]);
+		return appdb.utils.GroupSiteImages(servs, true);
 	};
 	this.renderLoading = function(enabled){
 		enabled = (typeof enabled === "boolean")?enabled:false;
@@ -9736,8 +9737,9 @@ appdb.components.VapplianceResourceProviders = appdb.ExtendClass(appdb.Component
 	};
 	this.getProvider = function(id){
 		id = $.trim(id);
-		var res = $.grep((appdb.model.StaticList.VAProviders || []), function(e){
-			return $.trim(e.id) === id;
+		var providers = this.getCompactVAProviders();
+		var res = $.grep(providers, function(e){
+			return ($.trim(e.id) === id|| (e.nativeProviders && e.nativeProviders.indexOf(id) > -1));
 		});
 		return (res.length === 0 )?null:res[0];
 	};
@@ -9760,7 +9762,7 @@ appdb.components.VapplianceResourceProviders = appdb.ExtendClass(appdb.Component
 					res[goodid].template = [];
 				}
 				res[goodid].template = res[goodid].template.concat(appdb.utils.extendArray( e.templates ));
-				res[goodid].items = res[goodid].items.concat( appdb.utils.extendArray([{templates: e.templates, occid: e.occi_id, endpointurl: e.occi_endpoint_url}]) );
+				res[goodid].items = res[goodid].items.concat( appdb.utils.extendArray([{templates: e.templates, occid: e.occi_id, endpointurl: e.occi_endpoint_url, serviceType: e.serviceType, nativeApis: e.nativeApis}]) );
 			});
 
 			//group duplicates
@@ -9791,6 +9793,32 @@ appdb.components.VapplianceResourceProviders = appdb.ExtendClass(appdb.Component
 			
 			$.each(e.images, function(ii,ee){
 				ee.occi_endpoint_url = e.endpoint_url;
+				ee.serviceType = 'occi';
+				switch(e.service_type) {
+				    case 'org.openstack.nova':
+					ee.serviceType = 'openstack';
+					break;
+				    case 'eu.egi.cloud.vm-management.occi':
+				    default:
+					break
+				}
+				ee.nativeApis = [];
+				$.each(e.nativeApis || [], function(index, api) {
+				    var st = 'occi';
+				    switch(api.service_type) {
+					case 'org.openstack.nova':
+					    st = 'openstack';
+					    break;
+					case 'eu.egi.cloud.vm-management.occi':
+					default:
+					    break
+				    }
+				    ee.nativeApis.push({
+					serviceType: st,
+					service_type: api.service_type,
+					endpointUrl: api.endpoint_url
+				    });	
+				});
 				ee.instances = [];
 			});
 			if( !uniq[e.name] ){
@@ -9822,6 +9850,49 @@ appdb.components.VapplianceResourceProviders = appdb.ExtendClass(appdb.Component
 		
 		return this.groupProvidersBySite(vo[0].providers);
 	};
+	this.getCompactVAProviders = function(providers) {
+	    if (this.options.compactVaProviders) {
+		return this.options.compactVaProviders;
+	    }
+	    var vaproviders = appdb.model.StaticList.VAProviders || [];
+	    var compactVaProviders = {};
+	    //first get all occi vaproviders
+	    $.each(vaproviders, function(index, vaprovider) {
+		var sitename = vaprovider.name;
+		if (vaprovider.service_type === 'eu.egi.cloud.vm-management.occi') {
+		    compactVaProviders[sitename] = vaprovider;
+		}
+	    });
+
+	    if (appdb.config.features.displayNativeAPIs) {
+		$.each(vaproviders, function(index, vaprovider) {
+		    var sitename = vaprovider.name;
+		    if (vaprovider.service_type !== 'eu.egi.cloud.vm-management.occi') {
+			//In case of already occi vaprovider with same sitename then
+			//append native api va provider in occi one
+			if (compactVaProviders[sitename]) {
+			    compactVaProviders[sitename].nativeProviders = compactVaProviders[sitename].nativeProviders || [];
+			    if (compactVaProviders[sitename].nativeProviders.indexOf(vaprovider.id) === -1) {
+				compactVaProviders[sitename].nativeProviders.push(vaprovider.id);
+				compactVaProviders[sitename].nativeApis = compactVaProviders[sitename].nativeApis || [];
+				compactVaProviders[sitename].nativeApis.push(vaprovider);
+			    }
+			} else {
+			    compactVaProviders[sitename] = vaprovider;
+			}
+		    }
+		});
+	    }
+
+	    var result = [];
+	    $.each(Object.keys(compactVaProviders), function(index, sitename) {
+		result.push(compactVaProviders[sitename]);
+	    });
+
+	    this.options.compactVaProviders = result;
+
+	    return this.options.compactVaProviders;
+	}
 	this.transformData = function(d){
 		d = d || this.options.images || [];
 		d = $.isArray(d)?d:[d];
@@ -9829,11 +9900,12 @@ appdb.components.VapplianceResourceProviders = appdb.ExtendClass(appdb.Component
 			return ($.trim(e.enabled)!=="false");
 		});		
 		var vos = {};
-		
+
 		$.each(this.options.images,(function(self){ 
 			return  function(i, e){
 				e.provider = e.provider || [];
 				e.provider = $.isArray(e.provider)?e.provider:[e.provider];
+
 				$.each(e.provider, function(ii, ee){
 					if( ee.in_production === "false" ) return;
 					var pvoid = (typeof ee["void"] ==="undefined")?"-":$.trim(ee["void"]);
@@ -9842,6 +9914,12 @@ appdb.components.VapplianceResourceProviders = appdb.ExtendClass(appdb.Component
 					var pdata = self.getProvider(ee.provider_id);
 					var imgs = (pdata && vos[pvoid].providers[pdata.id] && vos[pvoid].providers[pdata.id].images )?vos[pvoid].providers[pdata.id].images:{};
 					if( pdata !== null ){
+						switch(pdata) {
+							case "eu.egi.cloud.vm-management.occi":
+							   break;
+							case "org.openstack.nova":
+							    break;
+						}
 						vos[pvoid].providers = vos[pvoid].providers || {};
 						vos[pvoid].providers[pdata.id] = $.extend(true,{},pdata);
 						if( vos[pvoid].providers[pdata.id].template ){
@@ -9884,7 +9962,7 @@ appdb.components.VapplianceResourceProviders = appdb.ExtendClass(appdb.Component
 				});
 			};
 		})(this));
-		
+
 		//Arrayify data
 		var res = [];
 		for(var v in vos){

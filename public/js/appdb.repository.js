@@ -8756,14 +8756,14 @@ appdb.repository.UploaderRegistry = (function(){
 		this.getUploadObject = function(trigger){
 			if(! _uploadobjects[trigger.containerid] ){
 				_uploadobjects[trigger.containerid] = new plupload.Uploader({
-					runtimes : 'html5,flash,silverlight,gears,html4,browserplus',//old version of firefox have isues with flash
+					runtimes : appdb.config.repository.uploader.runtimes || 'html5,flash,silverlight,gears,html4,browserplus',//old version of firefox have isues with flash
 					browse_button : trigger.actionid,
 					container : trigger.containerid,
 					multi_selection: true,
 					unique_names : false,
 					prevent_duplicates: true,
-					chunk_size : '500kb',
-					max_file_size : '100mb',
+					chunk_size : appdb.config.repository.uploader.chunk_size || '500kb',
+					max_file_size : appdb.config.repository.uploader.max_file_size || '200mb',
 					url : appdb.config.repository.endpoint.upload,
 					flash_swf_url : '/plupload.flash.swf',
 					silverlight_xap_url : '/plupload.silverlight.xap',

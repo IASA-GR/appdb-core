@@ -3,6 +3,43 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.2.2] - 2019-07-19
+### Changed
+- Forbid virtual appliance working versions to be verified if the VM image location URL use a self-signed certificate
+### Fixed
+- Display proper IDs for OCCI and OpenStack endpoints
+
+## [6.2.1] - 2019-06-20
+### Added
+- Added "authn" attribute to virtualization:provider and site:service XML elements in RESTful API
+### Fixed
+- Fixed regression bug in scientific classification API, which resulted in empty documents
+- Fixed default country search scope for sites
+- Fixed resource caching for cloud sites with native OpenStack endpoints
+
+## [6.2.0] - 2019-06-14
+### Changed
+- Populate VM images from site endpoints exposing native APIs (e.g. openstack) along with OCCI enabled ones
+- Updated acceptable netfilter rules according to RFC 1123
+### Fixed
+- Fixed organizations autocomplete list redirection bug
+- Fixed bug related to missing organizations
+- Fixed bug related to VA expiry dates
+
+## [6.1.15] - 2019-04-10
+### Changed
+- Access to VO-wide image lists granted site administrators for sites with org.openstack.nova endpoints
+
+## [6.1.14] - 2019-01-25
+### Changed
+- Added more warning messages and documentation links in continuous delivery UI to prevent user mistakes
+### Fixed
+- Properly handle site images that are not provided under a VO wide image list
+
+## [6.1.13] - 2018-01-10
+### Fixed
+- Fixed invalid report of expired VM versions in site details page
+
 ## [6.1.12] - 2018-12-06
 ### Fixed
 - Fixed issues regarding base64 encoding of unicode and object types

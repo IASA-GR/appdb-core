@@ -46,7 +46,7 @@ class ElixirController extends Zend_Controller_Action{
 						if($_POST["action"] == "add" && $this->mappingexists($_POST["topic_uri"], $_POST["discipline_id"])===false ){
 							db()->query("INSERT INTO elixir.discipline_topics VALUES(?,?,?,?)", array($_POST["topic_id"],$_POST["topic_uri"],$_POST["topic_label"], $_POST["discipline_id"]))->fetchAll();
 						}else if($_POST["action"] == "remove" && $this->mappingexists($_POST["topic_uri"], $_POST["discipline_id"])===true ){
-							db()->query("delete from elixir.discipline_topics where topic_uri=? and discipline_id=?",array($_POST["topic_uri"],$_POST["discipline_id"]))->fetchAll();
+							db()->query("DELETE from elixir.discipline_topics WHERE topic_uri=? AND discipline_id=?",array($_POST["topic_uri"],$_POST["discipline_id"]))->fetchAll();
 						}
 					} catch (Exception $ex) {
 							$error = $ex->getMessage();
@@ -71,7 +71,7 @@ class ElixirController extends Zend_Controller_Action{
 	}
 	
 	private function mappingexists($uri,$disciplineid){
-		$rows = db()->query("select * from elixir.discipline_topics where discipline_id=? and topic_uri = ?", array($disciplineid,$uri))->fetchAll();
+		$rows = db()->query("SELECT * FROM elixir.discipline_topics WHERE discipline_id=? AND topic_uri = ?", array($disciplineid,$uri))->fetchAll();
 		if( count($rows) > 0 ){
 			return true;
 		}

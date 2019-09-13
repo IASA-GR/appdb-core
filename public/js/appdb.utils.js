@@ -7966,10 +7966,14 @@ appdb.utils.extendArray = function(arr){
 	});
 	return res;
 };
-appdb.utils.GroupSiteImages = function(occiservices){
+appdb.utils.GroupSiteImages = function(occiservices, flattenVOs){
 	occiservices = occiservices || [];
 	occiservices = $.isArray(occiservices)?occiservices:[occiservices];
-	
+
+	function getNoneVO() {
+		return {id: '<none>', name: '<none>'};
+	}
+
 	function collectImages(servs){
 		var res = [];
 		$.each(servs, function(i, e){
@@ -7981,6 +7985,7 @@ appdb.utils.GroupSiteImages = function(occiservices){
 					ext.template = e.template;
 					ext.occi_endpoint_url = e.occi_endpoint_url;
 					ext.occi.mpuri = e.mpuri;
+					ext.occi.vo = ext.occi.vo || getNoneVO();
 					ext.instances = []; //will be used to group image instances
 					res.push(ext);
 				});
@@ -8025,7 +8030,48 @@ appdb.utils.GroupSiteImages = function(occiservices){
 			if( goodids.hasOwnProperty(i) === false ) continue;
 			res.push(goodids[i]);
 		}
-		
+
+		if (flattenVOs === true) {
+			res = flattenPerVO(res);
+		}
+
+		if (!appdb.config.features.displayOCCINativeEndpoints) {
+			for(var j in res){
+				var instances = res[j].instances || [];
+				for(var i in instances) {
+					if (instances[i] && instances[i].items && instances[i].items.length > 1) {
+						res[j].instances[i].items = $.grep(instances[i].items, function(item, index) {
+							return (item.serviceType === 'occi');
+						});
+					}
+				}
+			}
+		}
+
+		return res;
+	}
+
+	function flattenPerVO(groups) {
+		var instancevos = {};
+		var res = [];
+
+		$.each(groups, function(gi, g) {
+			$.each(g.instances, function(ii, inst) {
+				var uid = g.id  + '_' + inst.vo.id;
+				if (!instancevos[uid]) {
+					instancevos[uid] = Object.assign({}, g);
+					instancevos[uid].instances = [Object.assign({}, inst)];
+				} else {
+					instancevos[uid].instances.push(inst);
+				}
+			});
+		});
+
+		for(var i in instancevos) {
+			if (instancevos.hasOwnProperty(i) === false) continue;
+			res.push(instancevos[i]);
+		}
+
 		return res;
 	}
 	
@@ -8057,6 +8103,13 @@ appdb.utils.GroupSiteImages = function(occiservices){
 		
 		$.each(images, function(i, e){
 			if( !e.goodid ) return;
+			var uuid = e.goodid;
+			if(e.occi && !e.occi.vo) {
+				e.occi.vo = getNoneVO();
+			}
+			if (flattenVOs === true && e.occi && e.occi.vo) {
+			    uuid = uuid + '_' + e.occi.vo.id;
+			}
 			e.template = e.template || [];
 			e.template = $.isArray(e.template)?e.template:[e.template];
 			e.occi = e.occi || [];
@@ -8065,21 +8118,23 @@ appdb.utils.GroupSiteImages = function(occiservices){
 			$.each(e.occi, function(ii,ee){
 				ee.template = extendArray(e.template);
 				ee.mpuri = ""+e.mpuri;
-				ee.occi_endpoint_url = "" + e.occi_endpoint_url;
+				ee.serviceType = (e.occi_endpoint_url && e.occi_endpoint_url.type) ? e.occi_endpoint_url.type : 'occi';
+				ee.occi_endpoint_url = (e.occi_endpoint_url && e.occi_endpoint_url.val) ? e.occi_endpoint_url.val() : '' + e.occi_endpoint_url;
 				$.each(ee.template, function(ti,t){
 					t.occi_endpoint_url = ee.occi_endpoint_url;
+					t.serviceType = ee.serviceType;
 				});
 			});
 			if( appdb.config.features.groupvaprovidertemplates ){
 				e.occi = groupOccis(e.occi);
 			}
-			if( !res[e.goodid] ){
+			if( !res[uuid] ){
 				e.instances = e.instances.concat( extendArray(e.occi) );
 				delete e.occi;
-				res[e.goodid] = e;
+				res[uuid] = e;
 			} else {
 				if( appdb.config.features.groupvaprovidertemplates ){
-					res[e.goodid].instances = appendOccisToInstancesPerVO(res[e.goodid].instances, e.occi);
+					res[uuid].instances = appendOccisToInstancesPerVO(res[uuid].instances, e.occi);
 					//res[e.goodid].instances[0].items = res[e.goodid].instances[0].items.concat( extendArray(e.occi[0].items) );
 					$.each(e.template, (function(eurl){ return function(i,t) {
 						t.occi_endpoint_url = t.occi_endpoint_url || [];
@@ -8090,12 +8145,12 @@ appdb.utils.GroupSiteImages = function(occiservices){
 						t.occi_endpoint_url = eurl;
 						e.template[i] = t;
 					};})(e.occi_endpoint_url));
-					$.each(res[e.goodid].instances, function(instanceIndex, instance) {
-						res[e.goodid].instances[instanceIndex].template = instance.template.concat(extendArray(e.template));
+					$.each(res[uuid].instances, function(instanceIndex, instance) {
+						res[uuid].instances[instanceIndex].template = instance.template.concat(extendArray(e.template));
 					});
 					//res[e.goodid].instances[0].template = res[e.goodid].instances[0].template.concat(extendArray(e.template));
 				}else {
-					res[e.goodid].instances = res[e.goodid].instances.concat( extendArray(e.occi) );
+					res[uuid].instances = res[uuid].instances.concat( extendArray(e.occi) );
 				}
 			}
 		});
@@ -8105,6 +8160,7 @@ appdb.utils.GroupSiteImages = function(occiservices){
 			if( res.hasOwnProperty(i) === false ) continue;
 			var uniq = {};
 			$.each(res[i].instances, function(ii, e){
+				e.vo = e.vo || getNoneVO();
 				uniq[e.providerimageid] = e;
 			});
 			res[i].instances = [];
@@ -8134,11 +8190,11 @@ appdb.utils.GroupSiteImages = function(occiservices){
 				uniq[hash] = e;
 				uniq[hash].occiids = [e.id];
 				uniq[hash].template = e.template;
-				uniq[hash].items = [{templates: e.template, occid: e.id, endpointurl: e.occi_endpoint_url}];
+				uniq[hash].items = [{templates: e.template, occid: e.id, endpointurl: e.occi_endpoint_url, serviceType: e.serviceType}];
 			}else{
 				uniq[hash].occiids.push(e.id);
 				uniq[hash].template = uniq[hash].template.concat(extendArray(e.template));
-				uniq[hash].items.push({templates: e.template, occid: e.id, endpointurl: e.occi_endpoint_url});
+				uniq[hash].items.push({templates: e.template, occid: e.id, endpointurl: e.occi_endpoint_url, serviceType: e.serviceType});
 			}
 		});
 		
@@ -8148,6 +8204,9 @@ appdb.utils.GroupSiteImages = function(occiservices){
 		}
 		return res;
 	}
+
+	flattenVOs = (typeof flattenVOs === 'boolean') ? flattenVOs : false;
+
 	return group(occiservices);
 };
 appdb.utils.GroupSiteTemplates = function(data){
@@ -9018,4 +9077,54 @@ appdb.utils.SecantVOImagelistWatcher = function(voId, callback) {
 	watch: watch,
 	start: start
     };
+}
+
+/**
+ * Provides helper functions to retrieve the appropriate 
+ * rendering information for va providers.
+ */
+appdb.utils.CloudInfo = {
+    getServiceType: function(d) {
+	var serviceType = d;
+	if ($.isPlainObject(d)) {
+	    serviceType = d.service_type || '';
+	}
+
+	switch(serviceType) {
+	    case 'org.openstack.nova':
+		return 'openstack';
+	    default:
+		return 'occi'
+	}
+    },
+    getResourceID: function(type, id) {
+	if (typeof(id) === 'string' && typeof type === 'string' && type.toLowerCase() === 'openstack') {
+	    id = id.split('#');
+	    return id[id.length -1];
+	}
+
+	return id;
+    },
+    getTemplateID: function(type, id) {
+	return appdb.utils.CloudInfo.getResourceID(type, id);
+    },
+    getResourceTitle: function(type) {
+	type = ('' + (type || '')).toLowerCase();
+
+	switch(type) {
+	    case 'openstack':
+		return 'Image ID';
+	    default:
+		return 'OCCI ID';
+	}
+    },
+    getTemplateTitle: function(type) {
+	type = ('' + (type || '')).toLowerCase();
+	switch(type) {
+	    case 'openstack':
+		return 'Flavor ID';
+	    default:
+		return 'Template ID';
+	}
+    }
 }

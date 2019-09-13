@@ -728,7 +728,7 @@ class AppsController extends Zend_Controller_Action
 	 $res = "<response>";
 	 $i = 0;
 	 foreach($items as $item){
-	  $res .= "<title index='".($i++)."'>" . htmlspecialchars($item, ENT_XML1, 'UTF-8') . "</title>";
+	  $res .= "<title index='".($i++)."'>" . xml_escape($item) . "</title>";
 	 }
 	 $res .= "</response>";
 	 echo $res;
@@ -1053,7 +1053,7 @@ class AppsController extends Zend_Controller_Action
 	}
 
 	private function messageRecipientToXML($i) {
-		return "<user id='" . $i->id . "' firstname='" . htmlspecialchars($i->firstname, ENT_COMPAT | ENT_HTML401, "UTF-8") . "' lastname='" . htmlspecialchars($i->lastname, ENT_COMPAT | ENT_HTML401, "UTF-8") . "' countryiso='" . $i->country->isocode . "' institute='". htmlspecialchars($i->institution, ENT_COMPAT | ENT_HTML401, "UTF-8") ."' />";
+		return "<user id='" . xml_escape($i->id) . "' firstname='" . xml_escape($i->firstname) . "' lastname='" . xml_escape($i->lastname) . "' countryiso='" . xml_escape($i->country->isocode) . "' institute='". xml_escape($i->institution) ."' />";
 	}
 	
 	public function getApplicationMessageRecipients($appid = 0){
@@ -1340,6 +1340,12 @@ class AppsController extends Zend_Controller_Action
 			return;
 		}
 		
+                $accessible = isURLAccessible($url);
+                if ($accessible !== true) {
+                    echo "<response result='error' message='" . htmlspecialchars($accessible, ENT_XML1 | ENT_QUOTES, 'UTF-8') . "' ></response>";
+                    return;
+                }
+
 		$file_headers = @get_headers($url,1);
 		
 		if(  count($file_headers) === 0  || !isset($file_headers[0]) || trim( $file_headers[0] ) === ""  ) {
@@ -2001,7 +2007,7 @@ class AppsController extends Zend_Controller_Action
 		
 		$result = ContextualizationScripts::contextualizationScriptAction($userid, $action, $url, $vmiinstanceid, $appid, $formatid);
 		if( is_string($result) ) {
-			echo "<result error='".htmlspecialchars($result, ENT_QUOTES)."'></result>";
+			echo "<result error='" . xml_escape($result) . "'></result>";
 		}else if( $result === false ) {
 			echo "<result error='Unknown error occured.'></result>";
 		}else if( $result === true ) {
@@ -2010,8 +2016,8 @@ class AppsController extends Zend_Controller_Action
 			$format = $result->getContextFormat();
 			echo "<result>" ;
 			echo "<contextscript id='" . $result->id . "' addedon='" . $result->addedon . "'>";
-			echo "<name>" . htmlspecialchars($result->name, ENT_QUOTES) . "</name>";
-			echo "<title>" . htmlspecialchars($result->title, ENT_QUOTES) . "</title>";
+			echo "<name>" . xml_escape($result->name) . "</name>";
+			echo "<title>" . xml_escape($result->title) . "</title>";
 			echo "<url>" . urlencode($result->url) . "</url>";
 			echo "<format id='".$result->formatid."'>" . $format->name . "</format>";
 			echo "<checksum hashtype='" . $result->checksumfunc . "'>" . $result->checksum . "</checksum>";
@@ -2072,7 +2078,10 @@ class AppsController extends Zend_Controller_Action
 		// error_log("MODS: " . var_export($mods, true));
 		$refs = array();
 		try {
-			$xmods = new SimpleXMLElement($mods);
+			$xmods = simplexml_load_string($mods);
+			if ($xmods === false) {
+				throw new Exception("Cannot parse MODS convertor XML");
+			}
 			$xmods->registerXPathNamespace("a", "http://www.loc.gov/mods/v3");
 			$refs = $xmods->xpath("//a:modsCollection/*");
 		} catch (Exception $e) {

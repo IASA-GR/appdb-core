@@ -646,7 +646,11 @@ class Storage {
 			@mkdir($log_folder, 0777, true);
 		}
 		
-		$x = new SimpleXMLElement('<' . $action . '></' . $action .'>');
+		$x = simplexml_load_string('<' . $action . '></' . $action .'>');
+		if ($x === false) {
+			error_log("[Storage::save_log] Cannot parse log data as XML");
+			return;
+		}
 		$x->addAttribute('on', date('Y') . '-' . date('m') . '-'. date('d') . ' '. date('H') . ':' . date('i') . ':' . date('s'));
 		$x->addAttribute('user', $data['meta']['userid']);
 		$x->addAttribute('id', $data['meta']['id']);
@@ -661,7 +665,11 @@ class Storage {
 		$dom = dom_import_simplexml($x)->ownerDocument;
 		$dom->formatOutput = TRUE;
 		$formatted = $dom->saveXML();
-		$customXML = new SimpleXMLElement($formatted);
+		$customXML = simplexml_load_string($formatted);
+		if ($customXML === false) {
+			error_log("[Storage::save_log] Cannot parse custom log data as XML");
+			return;
+		}
 		$dom = dom_import_simplexml($customXML);
 		$formatted = $dom->ownerDocument->saveXML($dom->ownerDocument->documentElement);
 		file_put_contents($log_path, $formatted , FILE_APPEND );

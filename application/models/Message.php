@@ -35,7 +35,9 @@ class Default_Model_Message extends Default_Model_MessageBase
 		if ( $this->_sender === null ) {
 			$users = new Default_Model_Researchers();
 			$users->filter->id->equals($this->senderID);
-			$this->_sender = $users->items[0];
+			if (count($users->items) > 0) {
+				$this->_sender = $users->items[0];
+			}
 		}
 		return $this->_sender;
 	}

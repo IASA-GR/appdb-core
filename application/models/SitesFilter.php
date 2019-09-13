@@ -17,4 +17,11 @@
 ?>
 <?php
 class Default_Model_SitesFilter extends Default_Model_SitesFilterBase {
+	public function __construct() {
+		parent::__construct();
+		$this->_fields[] = 'supports';
+		$this->_fields[] = 'offers';
+		$this->_fieldTypes['supports'] = 'string[]';
+		$this->_fieldTypes['offers'] = 'string[]';
+	}
 }

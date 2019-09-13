@@ -111,16 +111,30 @@ class SamlController extends Zend_Controller_Action
 			require_once(SamlAuth::LIB_AUTOLOAD);
 			$this->_helper->layout->disableLayout();
 			$this->_helper->viewRenderer->setNoRender();
+
 			//In case of external service using AppDB as a SP
 			if(isset($_GET['callbackUrl']) && trim($_GET['callbackUrl']) !== '') {
 				$this->session->authreferer = trim($_GET['callbackUrl']);
 			}else if( isset($this->session->authreferer) === false ){
-				$this->session->authreferer = $_SERVER["HTTP_REFERER"];
+				$this->session->authreferer = (isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : '');
 			}
-			$source=$this->_getParam("source");
-			if($source == null){
+                        $source=$this->_getParam("source");
+                        if($source == null){
 				$source="";
-			}
+			} else if ($source === 'local-guest-sp'){
+                                if(!ApplicationConfiguration::isProductionInstance() && ApplicationConfiguration::saml('guest.uid', false)) {
+                                        $this->session->isNewUser = false;
+                                        $this->session->userIsGuest = true;
+                                        $this->session->samlattrs = array(
+                                            "idp:uid" => array( ApplicationConfiguration::saml('guest.uid') ),
+                                            "idp:entitlement" => array()
+                                        );
+                                        $this->session->samlauthsource = ApplicationConfiguration::saml('guest.source', 'egi-aai-sp');
+                                        $this->_helper->redirector('postauth');
+
+                                        return;
+                                }
+                        }
 			
 			//Check if user is already logged in
 			if( SamlAuth::isAuthenticated() !== false && $this->session->isNewUser !== true ){
@@ -600,7 +614,7 @@ class SamlController extends Zend_Controller_Action
 			$try_counter = 0;
 			while($try_counter < 25 ){
 				$try_counter += 1;
-				$confs = db()->query("select data from config where var = 'permissions_cache_dirty';")->fetchAll();
+				$confs = db()->query("SELECT data FROM config WHERE var = 'permissions_cache_dirty';")->fetchAll();
 				if( count($confs) > 0 ){
 					$conf = $confs[0];
 					if( (isset($conf["data"]) && trim($conf["data"]) === '0') ){
@@ -866,6 +880,10 @@ class SamlController extends Zend_Controller_Action
 				$res = "1";
 			}
 		}
+                if( $this->session && $this->session->userIsGuest && $this->session->userid) {
+                    $res = "1";
+                    $source = false;
+                }
 		if( $res === "0" ) {
 			$source = SamlAuth::isAuthenticated();
 		}

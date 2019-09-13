@@ -40,6 +40,8 @@
     xmlns:provider_template="http://appdb.egi.eu/api/1.0/provider_template"
     xmlns:classification="http://appdb.egi.eu/api/1.0/classification"
     xmlns:privilege="http://appdb.egi.eu/api/1.0/privilege"
+    xmlns:endorsable="http://appdb.egi.eu/api/1.0/endorsable"
+    xmlns:secant="http://appdb.egi.eu/api/1.0/secant"
     xmlns:regional="http://appdb.egi.eu/api/1.0/regional">
 
     <xs:import namespace="http://appdb.egi.eu/api/1.0/privilege"
@@ -86,6 +88,12 @@
 
     <xs:import namespace="http://appdb.egi.eu/api/1.0/person"
         schemaLocation="person.xsd"/>
+	
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/endorsable"
+        schemaLocation="endorsable.xsd"/>
+
+    <xs:import namespace="http://appdb.egi.eu/api/1.0/secant"
+        schemaLocation="secant.xsd"/>
 
     <xs:simpleType name="appdbResultType">
         <xs:annotation>
@@ -166,11 +174,12 @@
             <xs:enumeration value="category" />
             <xs:enumeration value="tag" />
             <xs:enumeration value="hypervisor" />
-			<xs:enumeration value="logistics" />
-			<xs:enumeration value="contact" />
-			<xs:enumeration value="classification" />
-			<xs:enumeration value="accessgroup" />
-			<xs:enumeration value="diff" />
+            <xs:enumeration value="logistics" />
+            <xs:enumeration value="contact" />
+            <xs:enumeration value="classification" />
+            <xs:enumeration value="accessgroup" />
+            <xs:enumeration value="endorsable" />
+            <xs:enumeration value="diff" />
         </xs:restriction>
     </xs:simpleType>
 
@@ -266,9 +275,9 @@
                     <xs:element ref="application:logistics" minOccurs="1" maxOccurs="unbounded" />
                     <xs:element ref="person:logistics" minOccurs="1" maxOccurs="unbounded" />
                     <xs:element ref="person:contact" minOccurs="1" maxOccurs="unbounded" />
-					<xs:element ref="classification:version" minOccurs="1" maxOccurs="unbounded" />
-					<xs:element ref="virtualization:provider" minOccurs="1" maxOccurs="unbounded" />
-					<xs:group ref="privilege:personprivs" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="endorsable:endorsable" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element ref="classification:version" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:group ref="privilege:personprivs" minOccurs="1" maxOccurs="unbounded" />
                 </xs:choice>
             </xs:sequence>
             <xs:attribute name="error" type="xs:string" use="optional" />

@@ -18343,6 +18343,7 @@ ul.itemlist > li.itemcontainer > div.item a.itemlink span.itemlongtext{
 	list-style: none;
 	padding: 2px 4px;
 	margin: 0px;
+        margin-right: 10px;
 }
 .filterdecorator .filter > li {
 	display: inline-block;
@@ -21294,6 +21295,129 @@ html.dj_ie .voimagelistcontainer td.customcell > .customcellwrap > .expandable:h
 	line-height: 22px;
 	height: 23px;
 }
+.sitecontents .vmitemsfilter > div.resourceproviders {
+    display: block;
+    margin: 0;
+    margin-bottom: 10px;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header {
+    padding: 0;
+    height: auto;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name {
+    border: none;
+    padding: 5px;
+    margin: 0;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector,
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect,
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect .dijitButtonContents {
+    width: 730px;
+    min-width: 730px;
+    max-width: 730px;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .vodetailslink {
+    position: relative;
+    right: -30px;
+}
+/*********************************************
+START: Overide resourceproviders generic layout
+**********************************************/
+.sitecontents .vmitemsfilter > div.resourceproviders {
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header {
+    padding: 0;
+    height: auto;
+    background-color: transparent;
+    border: none;
+    margin: 0 auto;
+    text-align: center;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name {
+    border: none;
+    padding: 5px;
+    margin: 0;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > div:nth-child(1),
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > div:nth-child(3) {
+    display: none;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector,
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect,
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect .dijitButtonContents {
+    width: 400px;
+    min-width: 400px;
+    max-width: 400px;
+    height: 30px;
+    min-height: 30px;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect.dijitActive .dijitButtonContents,
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect.dijitSelectHover.dijitHover .dijitButtonContents,
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect.dijitSelectOpened .dijitButtonContents,
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect .dijitButtonContents {
+    color: white;
+    background-color: #E48014;
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    line-height: 18px;
+    vertical-align: top;
+    height: 30px;
+    border: 1px solid #945007;
+}
+
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect .dijitButtonNode {
+    color: white;
+    background: none;
+    background-color: #E48014;
+    border: 1px solid #945007;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect.dijitActive .dijitButtonContents {
+    height: 30px;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect .dijitButtonText,
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector > .dijitSelect .dijitSelectLabel {
+    padding: 0
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector .vooption {
+    height: 30px;
+    padding: 0;
+    display: inline-block;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector .vooption,
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector .vooption * {
+    font-size: 18px;
+    line-height: 20px;
+    vertical-align: middle;
+    color: white;
+    background-color: #E48014;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector .vooption img {
+    padding: 5px;
+    padding-left: 10px;
+    padding-top: 7px;
+    width: 16px;
+    height: 16px;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .voselector .vooption .details {
+    font-size: 12px;
+    line-height: 28px;
+    vertical-align: middle;
+}
+.sitecontents .vmitemsfilter > div.resourceproviders > .header > .field-name > .vodetailslink {
+    position: relative;
+    right: -30px;
+}
+.sitecontents .vmitemsfilter > .filters > ul > li > .filter > .value,
+.sitecontents .vmitemsfilter > .filters > ul > li > .filter > .value > .dijitComboBox {
+    width: 260px;
+}
+/*********************************************
+END: Overide resourceproviders generic layout
+**********************************************/
 .resourceproviders .va-image > ul > li.va-template-data  .template-empty {
 	width: 520px;
 	min-width: 520px;
@@ -21616,7 +21740,7 @@ html.dj_ie .voimagelistcontainer td.customcell > .customcellwrap > .expandable:h
 	margin: 0 auto;
 	color: #555;
 	border: 1px solid #e0e0e0;
-	margin-bottom: 10px;
+	margin-bottom: 15px;
 }
 .inlinedialog > .dialog > .message > .usageids.hasmany > .usagetemplate{
 	margin-bottom: 0px;
@@ -22737,7 +22861,7 @@ a.helperlink.wikilink:hover{
 	width: 180px;
 }
 .sitecontents.inlinedialog > .dialog{
-	width: 700px;
+	width: 800px;
 	margin-top: 2%;
 }
 .sitecontents.inlinedialog > .dialog > .message > .usageids > .fieldvalues > .fieldvalue > .field{
@@ -22755,15 +22879,29 @@ a.helperlink.wikilink:hover{
 	display: table-row;
 }
 .inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue > .field {
-	width: 95px;
+	width: 140px;
 	text-align: right;
 	color: black;
 	font-size: 12px;
 	display: table-cell;
-	min-height: 30px;
-	height: 30px;
+	min-height: 28px;
+	height: 28px;
 	color: #555;
 	padding-right: 10px;
+        vertical-align: top;
+}
+.inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue > .field img {
+    height: 14px;
+    width: auto;
+}
+.inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue > .field > .icontext,
+.inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue > .field > .icontext > span,
+.inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue > .field > .icontext > img {
+    vertical-align: top;
+    line-height: 14px;
+}
+.inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue > .field > .icontext b {
+    color: #555;
 }
 .inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue > .value{
 	display: table-cell;
@@ -22771,13 +22909,21 @@ a.helperlink.wikilink:hover{
 	white-space: pre-wrap;
 	word-wrap: break-word;
 	word-break: break-all;
+        vertical-align: top;
+        line-height: 14px;
+        padding: 1px;
+}
+.inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue.endpoint.attached > .field,
+.inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue.endpoint.attached > .value{
+        border-top: 1px solid #ccc;
+        padding-top: 15px;
 }
 .inlinedialog > .dialog > .message > .usageids  .fieldvalues > .fieldvalue > .value.empty{
 	color: #666;
 }
 .inlinedialog > .dialog > .message > .usageids  .groupfieldvalues{
 	display: block;
-	width: 90%;
+	width: 96%;
 	margin: 0 auto;
 	padding: 0px;
 }
@@ -22825,7 +22971,7 @@ a.helperlink.wikilink:hover{
 
 }
 .sitecontents.inlinedialog > .dialog > .message > .usageids > .fieldvalues > .fieldvalue.contextscript_url > .field {
-	width: 135px;
+	width: 155px;
 }
 .inlinedialog > .dialog > .message > .usageids .fieldvalues.contextscript_url > .fieldvalue.contextscript_url > .value > .dijitComboBox,
 .inlinedialog > .dialog > .message > .usageids .fieldvalues.contextscript_url > .fieldvalue.contextscript_url > .value > .dijitSelect,
@@ -22910,13 +23056,18 @@ a.helperlink.wikilink:hover{
 }
 .sitecontents .vmitemsfilter{
 	border-top: none;
-	padding: 10px 5px;
+	padding: 10px 0px;
 	margin: 0px 0px;
 	text-align: left;
 	margin-bottom: 10px;
 }
 .sitecontents .vmitemsfilter > .title{
 	color: #666;
+        margin-left: 5px;
+        height: 20px;
+        vertical-align: middle;
+        line-height: 20px;
+        margin-right: 10px;
 }
 .sitecontents .vmitemsfilter > .filters > ul{
 	list-style: none;
@@ -23306,7 +23457,7 @@ a.helperlink.wikilink:hover{
 }
 
 .relationlist > ul.relations > li.invalid {
-	background-color: #F2EFC6;
+	background-color: #d88a8a;
 }
 .relationlist.viewmode{
 	display: inline;
@@ -25381,7 +25532,22 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
     width: 20px;
     height: 20px;
 }
-
+.cdversion > .readmore {
+    position: absolute;
+    top: 0;
+    padding: 10px;
+    right: 0;
+}
+.cdversion > .readmore > img {
+    width: 14px;
+    height: 14px;
+    opacity: 0.8;
+    padding-right: 5px;
+    margin-bottom: -2px;
+}
+.cdversion > .readmore:hover > img {
+    opacity: 1;
+}
 .cdversion .panel {
     display: block;
     max-width: 500px;
@@ -25477,6 +25643,7 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
 }
 .cdversion .cdversion-setup .field {
     font-size: 14px;
+    position: relative;
 }
 .cdversion .cdversion-setup .value {
     height: 20px;
@@ -25488,6 +25655,18 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
 }
 .cdversion .cdversion-setup .fieldvalue {
     margin: 10px 0;
+}
+.cdversion .cdversion-setup .fieldvalue .field .right-field-text,
+.cdversion .cdversion-setup .fieldvalue .field .right-field-text a {
+    font-size: 10px;
+}
+.cdversion .cdversion-setup .fieldvalue .field .right-field-text {
+    color: #666;
+    text-align: right;
+    display: inline-block;
+    right: 0;
+    position: absolute;
+    padding: 5px 0;
 }
 .cdversion .panel > .error,
 .cdversion .panel > .exterror,
@@ -25501,7 +25680,49 @@ td.customcell[data-name="name"] > .customcellwrap > .secant_current_report  {
     margin: 10px 0;
 }
 .cdversion .panel > .warning {
-    background-color: #f9ed95;
+    background-color: #fdf5bc;
+}
+.cdversion .panel > .warning > img {
+    vertical-align: top;
+}
+.cdversion .panel > .warning > .message {
+    display: inline-block;
+    max-width: 900px;
+}
+.cdversion .panel > .warning > .message > ul {
+    list-style: none;
+    padding: 0;
+    margin: 0px;
+    margin-left: 20px;
+    display: inline-block;
+    vertical-align: top;
+}
+.cdversion .panel > .warning > .message > ul > li {
+    padding: 6px;
+    margin: 0;
+    line-height: 18px;
+    border-bottom: 1px solid #ded383;
+    list-style-type: decimal;
+    white-space: pre-wrap;
+}
+
+.cdversion .panel > .warning > .message > ul > li:first-child {
+    padding-top: 0;
+}
+.cdversion .panel > .warning > .message > ul > li:last-child {
+    border-bottom: none;
+}
+.cdversion .panel > .warning.single > .message > ul > li {
+    border-bottom: none;
+    padding: 0;
+    list-style-type: none;
+}
+.cdversion .panel > .warning.single > .message > ul,
+.cdversion .panel > .warning.single > .message > ul > li {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    list-style-type: none;
 }
 .cdversion-paused-process-warning {
     background-color: #fbf6d4;

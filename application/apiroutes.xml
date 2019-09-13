@@ -438,11 +438,35 @@
 	<resource>RestVAProvidersList</resource>
 	<comment>A list of virtualization providers</comment>
 </route>
+<route type="rest" name="va_providers_nova" url="/:version/va_providers/nova">
+	<format>xml</format>
+	<resource>RestVAProvidersNovaList</resource>
+	<comment>A list of virtualization providers that expose a Nova OpenStack endpoint</comment>
+</route>
+<route type="rest" name="va_providers_all" url="/:version/va_providers/all">
+	<format>xml</format>
+	<resource>RestVAProvidersAllList</resource>
+	<comment>A list of virtualization providers</comment>
+</route>
 <route type="rest" name="va_provider" url="/:version/va_providers/:id">
 	<format>xml</format>
-    <param name="id" fmt=".+"/>
+        <param name="id" fmt="^(?!all$)(?!nova$)[a-zA-Z0-9]+$"/>
 	<resource>RestVAProviderItem</resource>
 	<comment>The virtualization provider entry specified by parameter :id</comment>
+</route>
+<route type="proxy" name="va_providerlogistics" url="/:version/va_providers/logistics">
+	<format>xml</format>
+	<resource>RestVAProviderLogistics</resource>
+	<comment>A list of VAProvider logistics per various properties</comment>
+</route>
+<route type="rest" hidden="true" name="va_providerfiltercheck" url="/:version/va_providers/filter/normalize">
+	<format>xml</format>
+	<resource>RestVAProviderFilterNormalization</resource>
+</route>
+<route type="rest" name="va_providerfilterreflection" url="/:version/va_providers/filter/reflect">
+	<format>xml</format>
+	<resource>RestVAProviderFilterReflection</resource>
+	<comment>Filter reflection resource for va_provider searchers</comment>
 </route>
 <route type="rest" name="sites" url="/:version/sites">
 	<format xslt="site">xml</format>
@@ -817,5 +841,10 @@
 	<param name="lid" fmt="(\d+|.+)"/>
 	<resource>RestDatasetLocationItem</resource>
 	<comment>The dataset location entry specified by the parameter :lid</comment>
+</route>
+<route type="rest" name="endorsables" url="/:version/endorsables">
+	<format>xml</format>
+	<resource>RestEndorsableList</resource>
+	<comment>A list of items that may be endorsed</comment>
 </route>
 </routes>

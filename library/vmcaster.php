@@ -41,33 +41,22 @@ class VMCaster{
 		$result = '';
 		
 		if( $vmcxml !== null && trim($vmcxml) !== "" && !is_numeric($vmcxml) ) {
-			if( strpos($vmcxml, "<?xml") !== 0 ) {
+			if( strpos($vmcxml, "<" . "?xml") !== 0 ) {
 				$vmcxml = '<' . '?xml version="1.0" encoding="utf-8"?' . '>' . $vmcxml;
 			}
 			
 			try {
-				$xsl = new DOMDocument();
-				$xsl->load("../application/configs/api/1.0/xslt/vmc2appdb_group.xsl");
-				$inputdom = new DomDocument();
-				$inputdom->loadXML($vmcxml);
-
-				$proc = new XSLTProcessor();
-				$proc->importStylesheet($xsl);
-				$proc->setParameter(null, "", "");
-
-				$grouped = $proc->transformToXml($inputdom);
-
-				$xsl = new DOMDocument();
-				$xsl->load("../application/configs/api/1.0/xslt/vmc2appdb.xsl");
-				$inputdom = new DomDocument();
-				$inputdom->loadXML($grouped);
-
-				$proc = new XSLTProcessor();
-				$proc->importStylesheet($xsl);
-				$proc->setParameter(null, "", "");
-
-				$result .= $proc->transformToXml($inputdom);
+				$grouped = xml_transform(APPLICATION_PATH . "/configs/api/1.0/xslt/vmc2appdb_group.xsl", $vmcxml);
+				if ($grouped === false) {
+					throw new Exception("[VMCaster::transformXml] Error while applying XSL transformation #1");
+				} else {
+					$result = xml_transform(APPLICATION_PATH . "/configs/api/1.0/xslt/vmc2appdb.xsl", $grouped);
+					if ($result === false) {
+						throw new Exception("[VMCaster::transformXml] Error while applying XSL transformation #2");
+					}
+				}
 			} catch(Exception $e) {
+				error_log($e->getMessage());
 				$result = '';
 			}
 		}
@@ -93,7 +82,13 @@ class VMCaster{
 		}
 		
 		$result = array("id"=>null,"status"=>null,"message"=>null);
-		$xml = new SimpleXMLElement($response);
+		$xml = simplexml_load_string($response);
+		if ($xml === false) {
+			return array(
+				"status"=> "error",
+				"message" => "[VMCaster::parseIntegrityCheckResponse] Cannot parse response data as XML"
+			);
+		}
 		if( count($xml->xpath("./id")) > 0 ){
 			$id = $xml->xpath("./id");
 			$result["id"] = intval($id[0]);
@@ -716,7 +711,7 @@ class VMCaster{
 				}
 			}
 			else {
-				$xml->addChild("$key", htmlspecialchars("$value",ENT_COMPAT,'UTF-8'));
+				$xml->addChild("$key", htmlspecialchars("$value",ENT_XML1 | ENT_COMPAT,'UTF-8'));
 			}
 		}
 	}
@@ -953,7 +948,7 @@ class VMCaster{
 		if( $format === "xml" ){
 			$d["published"] = ($d["published"] === true)?"true":"false";
 			$d["archived"] = ($d["archived"] === true)?"true":"false";
-			$xml = new SimpleXMLElement('<vmiinstance></vmiinstance>');
+			$xml = simplexml_load_string('<vmiinstance></vmiinstance>');
 			self::convertArrayToXML($d, $xml);
 			$result = $xml->asXML();
 			$apiversion = "1.0";
@@ -966,17 +961,12 @@ class VMCaster{
 				'xmlns:vo="http://appdb.egi.eu/api/' . $apiversion . '/vo" '.
 				'datatype="virtualization" version="' . $apiversion . '">' . $result . '</appdb:appdb>';
 			try {
-				$xsl = new DOMDocument();
-				$xsl->load("../application/configs/api/1.0/xslt/virtualization.image.xsl");
-				$inputdom = new DomDocument();
-				$inputdom->loadXML($result);
-
-				$proc = new XSLTProcessor();
-				$proc->importStylesheet($xsl);
-				$proc->setParameter(null, "", "");
-
-				$result = $proc->transformToXml($inputdom);
+				$result = xml_transform(APPLICATION_PATH . "/configs/api/1.0/xslt/virtualization.image.xsl", $result);
+				if ($result === false) {
+					throw new Exception("[VMCaster::convertImage] Error while applying XSL trasformation");
+				}
 			}catch(Exception $e){
+				error_log($e->getMessage());
 				return null;
 			}
 		}else if( $format === "json" ){ 

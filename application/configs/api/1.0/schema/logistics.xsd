@@ -48,5 +48,6 @@
     <xs:element name="vo" type="logistics:logisticsType" />
     <xs:element name="middleware" type="logistics:logisticsType" />
     <xs:element name="validated" type="logistics:logisticsType" />
+    <xs:element name="cloud_service_type" type="logistics:logisticsType" />
     <xs:element name="phonebook" type="logistics:logisticsType" />
 </xs:schema>

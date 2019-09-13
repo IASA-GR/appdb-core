@@ -115,7 +115,7 @@ class RestDSXMLParser extends RestXMLParser {
 					$ds->id = intval(strval($xml->attributes()->id));
 					$db = $application->getBootstrap()->getResource('db');
 					$db->setFetchMode(Zend_Db::FETCH_OBJ);
-					$r = $db->query('SELECT guid FROM datasets WHERE id = ' . $ds->id)->fetchAll();
+					$r = $db->query('SELECT guid FROM datasets WHERE id = ?', array($ds->id))->fetchAll();
 					if ( count($r) > 0 ) $ds->guid = $r[0]->guid;
                 } else {                    
 					$this->_error = RestErrorEnum::RE_INVALID_REPRESENTATION;
@@ -136,7 +136,7 @@ class RestDSXMLParser extends RestXMLParser {
 					return $ds;
 				} else {
 					$datasets = new Default_Model_Datasets();
-					$datasets->filter->id->numequals($newParentID);
+					$datasets->filter->id->numequals((int)$newParentID);
 					if (
 						(count($datasets->items) == 0) ||
 						((count($datasets->items) > 0) && ($datasets->items[0]->parentID !== null)) // parent dataset must be primary dataset
@@ -157,7 +157,7 @@ class RestDSXMLParser extends RestXMLParser {
 					$ds->parentID = $newParentID;
 				} elseif ($this->_parent->getMethod() === RestMethodEnum::RM_POST) { // only allow setting parent on update if parent was NULL
 					$datasets = new Default_Model_Datasets();
-					$datasets->filter->id->numequals($ds->id);
+					$datasets->filter->id->numequals((int)($ds->id));
 					if ($datasets->items[0]->parentID === null) {
 						$ds->parentID = $newParentID;
 					} elseif ($datasets->items[0]->parentID == $newParentID) {
@@ -173,7 +173,7 @@ class RestDSXMLParser extends RestXMLParser {
 				// no parent id has been provided in the XML; look up database if this is an update
 				if ($this->_parent->getMethod() == RestMethodEnum::RM_POST) {
 					$datasets = new Default_Model_Datasets();
-					$datasets->filter->id->numequals($ds->id);
+					$datasets->filter->id->numequals((int)($ds->id));
 					$effectiveParentID = $datasets->items[0]->parentID;
 				} else {
 					$effectiveParentID = null;
@@ -223,7 +223,7 @@ class RestDSXMLParser extends RestXMLParser {
 
 			// Also save versions if they exist
 			if (count($xml->xpath('//dataset:version[@xsi:nil="true"]')) > 0) {
-				db()->exec("SELECT delete_dataset_version(id) FROM datasets WHERE datasetid = " . $ds->id);
+				db()->query("SELECT delete_dataset_version(id) FROM datasets WHERE datasetid = ?", array($ds->id))->fetchAll();
 			} else {
 				$xmlver = $xml->xpath("//dataset:version");
 				if ( count($xmlver) > 0 ) {
@@ -448,14 +448,14 @@ class RestDatasetItem extends RestROResourceItem {
 	public function delete() {
 		if ( parent::delete() !== false ) {
 			$datasets = new Default_Model_Datasets();
-			$datasets->filter->parentid->numequals($this->getParam("id"));
+			$datasets->filter->parentid->numequals((int)($this->getParam("id")));
 			if (count($datasets->items) > 0) {
 				$this->_error = RestErrorEnum::RE_BACKEND_ERROR;
 				$this->_extError = "Cannot delete a dataset which is referenced by other datasets as their parent";
 				return false;
 			}
 			$ret = $this->get();
-			db()->exec("SELECT delete_dataset(" . $this->getParam("id") . ");");
+			db()->query("SELECT delete_dataset(?)", array($this->getParam("id")))->fetchAll();
 			return $ret;
 		} else return false;
 	}
@@ -475,7 +475,7 @@ class RestDatasetItem extends RestROResourceItem {
 			break;
 		case RestMethodEnum::RM_DELETE:
 			$item = new Default_Model_Datasets();
-			$item->filter->id->numequals($this->getParam("id"));
+			$item->filter->id->numequals((int)($this->getParam("id")));
 			if (count($item->items) == 1) {
 				$item = $item->items[0];
 			} else {
@@ -564,7 +564,7 @@ class RestDSVerXMLParser extends RestXMLParser {
 					$ds->id = intval(strval($xml->attributes()->id));
 					$db = $application->getBootstrap()->getResource('db');
 					$db->setFetchMode(Zend_Db::FETCH_OBJ);
-					$r = $db->query('SELECT guid FROM dataset_versions WHERE id = ' . $ds->id)->fetchAll();
+					$r = $db->query('SELECT guid FROM dataset_versions WHERE id = ?', array($ds->id))->fetchAll();
 					if ( count($r) > 0 ) $ds->guid = $r[0]->guid;
 				} else {                    
 					$this->_error = RestErrorEnum::RE_INVALID_REPRESENTATION;
@@ -590,7 +590,7 @@ class RestDSVerXMLParser extends RestXMLParser {
 					return $ds;
 				} else {
 					$datasets = new Default_Model_DatasetVersions();
-					$datasets->filter->id->numequals($ds->parentID);
+					$datasets->filter->id->numequals((int)($ds->parentID));
 					if (count($datasets->items) == 0) {
 						$this->_error = RestErrorEnum::RE_ITEM_NOT_FOUND;
 						$this->_extError = "Parent dataset version not found";
@@ -605,7 +605,7 @@ class RestDSVerXMLParser extends RestXMLParser {
 			if (count($xml->xpath('//dataset:location[@xsi:nil="true"]')) >0) {
 				if ($ds->id != "") {
 					$locations = new Default_Model_DatasetLocations();
-					$locations->filter->dataset_version_id->numequals($ds->id);
+					$locations->filter->dataset_version_id->numequals((int)($ds->id));
 					if( count($locations->items) > 0 ) {
 						foreach($locations->items as $loc) {
 							$locres = new RestDatasetLocationItem(array_merge($this->_parent->getParams(), array('data' => $data, 'vid' => $ds->id, 'lid' => $loc->id)));
@@ -620,7 +620,7 @@ class RestDSVerXMLParser extends RestXMLParser {
 						// keep track of existing locations
 						$db = $application->getBootstrap()->getResource('db');
 						$db->setFetchMode(Zend_Db::FETCH_OBJ);
-						$existing = $db->query("SELECT id FROM dataset_locations WHERE dataset_version_id = " . $ds->id)->fetchAll();
+						$existing = $db->query("SELECT id FROM dataset_locations WHERE dataset_version_id = ?", array($ds->id))->fetchAll();
 						$eids = array();
 						foreach ($existing as $e) {
 							$eids[] = $e->id;
@@ -720,7 +720,7 @@ class RestDatasetVersionList extends RestResourceList {
      */
 	protected function getModel() {
 		$res = new Default_Model_DatasetVersions();
-    	$res->filter->datasetid->numequals($this->getParam("id"));
+    	$res->filter->datasetid->numequals((int)($this->getParam("id")));
 		if ( ! is_null($this->getParam("orderby")) ) {
 			$res->filter->orderBy($this->getParam("orderby"));
 		}
@@ -864,9 +864,9 @@ class RestDatasetVersionItem extends RestROResourceItem {
 		$res = new Default_Model_DatasetVersions();
 		$id = $this->getParam("vid");
 		if ( is_numeric($id) ) {
-	        $res->filter->id->numequals($id)->and($res->filter->datasetid->numequals($this->getParam("id")));
+	        $res->filter->id->numequals((int)$id)->and($res->filter->datasetid->numequals((int)($this->getParam("id"))));
 		} else {
-	        $res->filter->guid->ilike($id)->and($res->filter->datasetid->numequals($this->getParam("id")));
+	        $res->filter->guid->ilike($id)->and($res->filter->datasetid->numequals((int)($this->getParam("id"))));
 		}
 		if ( ! is_null($this->getParam("orderby")) ) {
 			$res->filter->orderBy($this->getParam("orderby"));
@@ -880,14 +880,14 @@ class RestDatasetVersionItem extends RestROResourceItem {
 	public function delete() {
 		if ( parent::delete() !== false ) {
 			$dataset_versions = new Default_Model_DatasetVersions();
-			$dataset_versions->filter->parentid->numequals($this->getParam("id"));
+			$dataset_versions->filter->parentid->numequals((int)($this->getParam("id")));
 			if (count($dataset_versions->items) > 0) {
 				$this->_error = RestErrorEnum::RE_BACKEND_ERROR;
 				$this->_extError = "Cannot delete a dataset version which is referenced by other dataset versions as their parent";
 				return false;
 			}
 			$ret = $this->get();
-			db()->exec("SELECT delete_dataset_version(" . $this->getParam("vid") . ");");
+			db()->query("SELECT delete_dataset_version(?)", array($this->getParam("vid")))->fetchAll();
 			return $ret;
 		} else return false;
 	}
@@ -907,7 +907,7 @@ class RestDatasetVersionItem extends RestROResourceItem {
 			break;
 		case RestMethodEnum::RM_DELETE:
 			$item = new Default_Model_DatasetVersions();
-			$item->filter->id->numequals($this->getParam("vid"));
+			$item->filter->id->numequals((int)($this->getParam("vid")));
 			if (count($item->items) == 1) {
 				$item = $item->items[0];
 			} else {
@@ -1024,11 +1024,11 @@ class RestDSLocXMLParser extends RestXMLParser {
 			if (count($xml->xpath('//dataset:organization[@xsi:nil="true"]')) > 0) {
 				//$ds->organizationID = "0"; // N.B.: mapper overriden to nullify "0" values
 				if ($ds->id != "") {
-					db()->exec("DELETE FROM dataset_location_organizations WHERE dataset_location_id = " . $ds->id);
+					db()->query("DELETE FROM dataset_location_organizations WHERE dataset_location_id = ?", array($ds->id))->fetchAll();
 				}
 			} else if ( ! is_null($this->el($xml,"dataset:organization"))) {
 				if ($ds->id != "") {
-					db()->exec("DELETE FROM dataset_location_organizations WHERE dataset_location_id = " . $ds->id);
+					db()->query("DELETE FROM dataset_location_organizations WHERE dataset_location_id = ?", array($ds->id))->fetchAll();
 				}
 				//$xorg = $this->el($xml,"dataset:organization");
 				foreach($xml->xpath("//dataset:organization") as $xorg) {
@@ -1062,12 +1062,12 @@ class RestDSLocXMLParser extends RestXMLParser {
 			if (count($xml->xpath('//appdb:site[@xsi:nil="true"]')) > 0) {
 				//$ds->siteID = "0"; // N.B.: mapper overriden to nullify "0" values
 				if ($ds->id != "") {
-					db()->exec("DELETE FROM dataset_location_sites WHERE dataset_location_id = " . $ds->id);
+					db()->query("DELETE FROM dataset_location_sites WHERE dataset_location_id = ?", array($ds->id))->fetchAll();
 				}
 			} elseif ( ! is_null($this->el($xml,"appdb:site"))) {
 				//$xsite = $this->el($xml,"appdb:site");
 				if ($ds->id != "") {
-					db()->exec("DELETE FROM dataset_location_sites WHERE dataset_location_id = " . $ds->id);
+					db()->query("DELETE FROM dataset_location_sites WHERE dataset_location_id = ?", array($ds->id))->fetchAll();
 				}
 				foreach($xml->xpath("//appdb:site") as $xsite) {
 					$dss = new Default_Model_DatasetLocationSite();
@@ -1139,7 +1139,7 @@ class RestDatasetLocationList extends RestResourceList {
      */
 	protected function getModel() {
 		$res = new Default_Model_DatasetLocations();
-    	$res->filter->dataset_version_id->numequals($this->getParam("vid"));
+    	$res->filter->dataset_version_id->numequals((int)($this->getParam("vid")));
 		if ( ! is_null($this->getParam("orderby")) ) {
 			$res->filter->orderBy($this->getParam("orderby"));
 		}
@@ -1284,9 +1284,9 @@ class RestDatasetLocationItem extends RestROResourceItem {
 		$res = new Default_Model_DatasetLocations();
 		$id = $this->getParam("lid");
 		if ( is_numeric($id) ) {
-	        $res->filter->id->equals($id)->and($res->filter->dataset_version_id->numequals($this->getParam("vid")));
+	        $res->filter->id->equals($id)->and($res->filter->dataset_version_id->numequals((int)($this->getParam("vid"))));
 		} else {
-	        $res->filter->guid->ilike($id)->and($res->filter->dataset_version_id->numequals($this->getParam("vid")));
+	        $res->filter->guid->ilike($id)->and($res->filter->dataset_version_id->numequals((int)($this->getParam("vid"))));
 		}
 		if ( ! is_null($this->getParam("orderby")) ) {
 			$res->filter->orderBy($this->getParam("orderby"));
@@ -1302,11 +1302,11 @@ class RestDatasetLocationItem extends RestROResourceItem {
 			$ret = $this->get();
 			$locs = new Default_Model_DatasetLocations();
 			$lid = $this->getParam("lid");
-			$locs->filter->id->numequals($lid);
+			$locs->filter->id->numequals((int)$lid);
 			if (count($locs->items) == 1) {
 				$loc = $locs->items[0];
-				db()->exec("DELETE FROM dataset_location_organizations WHERE dataset_location_id = " . $lid);
-				db()->exec("DELETE FROM dataset_location_sites WHERE dataset_location_id = " . $lid);
+				db()->query("DELETE FROM dataset_location_organizations WHERE dataset_location_id = ?", array($lid))->fetchAll();
+				db()->query("DELETE FROM dataset_location_sites WHERE dataset_location_id = ", array($lid))->fetchAll();
 				$locs->remove($loc);
 			}
 			return $ret;
@@ -1328,7 +1328,7 @@ class RestDatasetLocationItem extends RestROResourceItem {
 			break;
 		case RestMethodEnum::RM_DELETE:
 			$item = new Default_Model_DatasetLocations();
-			$item->filter->id->numequals($this->getParam("lid"));
+			$item->filter->id->numequals((int)($this->getParam("lid")));
 			if (count($item->items) == 1) {
 				$item = $item->items[0];
 			} else {

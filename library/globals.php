@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and 
  * limitations under the License.
  */
+//error_log('LOADING globals.php');
 
 include('appdb_configuration.php');
 include('support.php');
@@ -29,6 +30,62 @@ include('contextualization.php');
 include('datasets.php');
 include('Storage.php');
 include('ContinuousDelivery.php');
+
+/**
+ * Disable External Entity loading to prevent XXE and certain DoS attacks
+ * see:
+ * [1] https://secure.php.net/manual/en/function.libxml-disable-entity-loader.php
+ * [2] https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.mdi
+ * 
+ * Caveats:
+ * - This option is not thread-safe; it disables support for External Entities on all PHP threads on the server
+ * - DOMDocument::loadXML and SimpleXMLElement() cannot accept URLs as arguments to XML data (event if local)
+ * - XSLTProcessor cannot load stylesheets from files
+ */
+libxml_disable_entity_loader(true);
+
+/**
+ * Function to safely quote user-defined data in XQuery path expressions
+ * Credit: Hans Henrik Bergan (https://stackoverflow.com/users/1067003/hanshenrik)
+ * https://stackoverflow.com/questions/13026833/how-to-escape-all-invalid-characters-from-dom-xpath-query
+ */
+function xpath_quote($value){
+    if(false===strpos($value,'"')){
+        return '"'.$value.'"';
+    }
+    if(false===strpos($value,'\'')){
+        return '\''.$value.'\'';
+    }
+    // if the value contains both single and double quotes, construct an
+    // expression that concatenates all non-double-quote substrings with
+    // the quotes, e.g.:
+    //
+    //    concat("'foo'", '"', "bar")
+    $sb='concat(';
+    $substrings=explode('"',$value);
+    for($i=0;$i<count($substrings);++$i){
+        $needComma=($i>0);
+        if($substrings[$i]!==''){
+            if($i>0){
+                $sb.=', ';
+            }
+            $sb.='"'.$substrings[$i].'"';
+            $needComma=true;
+        }
+        if($i < (count($substrings) -1)){
+            if($needComma){
+                $sb.=', ';
+            }
+            $sb.="'\"'";
+        }
+    }
+    $sb.=')';
+    return $sb;
+}
+
+function xml_escape($text, $encoding = 'UTF-8') {
+	return htmlspecialchars($text, ENT_QUOTES | ENT_XML1 | ENT_DISALLOWED, $encoding);
+}
 
 $aaimp = $this->getOption("aaimp");
 Zend_Registry::set('aaimp',$aaimp);
@@ -46,6 +103,68 @@ if (isset($app["timezone"])) {
 	date_default_timezone_set($app["timezone"]);
 } else {
 	date_default_timezone_set('UTC');
+}
+
+function xml_transform($xsl_file, $xml_string, $xmlopts = 0, $xsl_params = null) {
+	if ($xmlopts == 0) {
+		$xmlopts = (LIBXML_NSCLEAN | LIBXML_COMPACT | LIBXML_NONET);
+	}
+	$ret = false;
+	$prevXXE = null;
+	try {
+		$xsl = new DOMDocument();
+		# make sure External Entity processing is enabled, in order to import the stylesheet
+		$prevXXE = libxml_disable_entity_loader(false);
+		# use DOMDocument::load, not DOMDocument::loadXML, least the 'xsl:include' directives be denied to load
+		$ret = $xsl->load($xsl_file);
+		if ($ret !== false) {
+			$proc = new XSLTProcessor();
+			$proc->registerPHPFunctions();
+			$ret = $proc->importStylesheet($xsl);
+			if ($ret !== false) {
+				if (! is_null($xsl_params)) {
+					$xsl_params_ok = true;
+					if (is_array($xsl_params)) {
+						foreach($xsl_params as $p) {
+							if (is_array($p)) {
+								if (array_key_exists("name", $p) && array_key_exists("value", $p)) {
+									if (array_key_exists("ns", $p)) {
+										$proc->setParameter($p["ns"], $p["name"], $p["value"]);
+									} else {
+										$proc->setParameter('', $p["name"], $p["value"]);
+									}
+								} else {
+									$xsl_params_ok = false;
+								}
+							} else {
+								$xsl_params_ok = false;
+							}							
+						}
+					} else {
+						$xsl_params_ok = false;
+					}
+					if (! $xsl_params_ok) {
+						error_log("[xml_transform] WARNING: One or more XSL parameters passed are invalid");
+					}
+				}
+				# restore previous XXE state
+				libxml_disable_entity_loader($prevXXE);
+				$xml = new DOMDocument();
+				$xml->loadXML($xml_string, $xmlopts);
+				$ret = $proc->transformToXml($xml);
+			} else {
+				error_log("[xml_transform] Could not import stylesheet");
+			}
+		}
+	} catch (Exception $e) {
+		error_log("[xml_transform]: " . $e->getMessage());
+		# make sure previous XXE state is restored in case an error occurs after altering its state
+		if (! is_null($prevXXE)) {
+			libxml_disable_entity_loader($prevXXE);
+		}
+		$ret = false;
+	}
+	return $ret;
 }
 
 $vouser_sync = $this->getOption("vouser_sync");
@@ -689,6 +808,9 @@ function validateFilterActionHelper($flt, $type, $ver = null) {
 			break;
 		case FilterParser::NORM_SITE:
 			$stype="site";
+			break;
+		case FilterParser::NORM_VAPROVIDER:
+			$stype="vaprovider";
 			break;
 	}
 	$s = '<'.$stype.':filter xmlns:filter="http://appdb.egi.eu/api/'.$ver.'/filter" xmlns:'.$stype.'="http://appdb.egi.eu/api/'.$ver.'/'.$stype.'">';
@@ -1471,7 +1593,51 @@ function validateAppCName($cname, $id = null) {
 	}
 	return $valid;
 }
+/**
+ * Checks if given URL is accessible and returns status 200
+ * NOTE: It does not ignore self-signed sertificates.
+ *
+ * @param string        $url                    The url to check
+ * @param string        $defaultErrorPrefix     Prefix connection error.
+ * @return string|bool                          On sucess returns true, else the error message.
+ */
+function isURLAccessible($url, $defaultErrorPrefix = "") {
+    $parsed = parse_url($url);
+    $scheme = (isset($parsed['scheme']) ? strtolower($parsed['scheme']) : '');
+    if (!$scheme || ($scheme !== 'https' && $scheme !== 'http')) {
+        return $defaultErrorPrefix . 'Invalid URL scheme';
+    }
 
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_NOBODY, true);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HEADER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+    $headers = curl_exec($ch);
+    $error = null;
+
+    if($headers === false) {
+        $error = $defaultErrorPrefix . curl_error($ch);
+    } else {
+        $info = curl_getinfo($ch);
+        if ($info['http_code'] !== 200) {
+            $error = explode("\r\n", $headers);
+            $error = $error[0];
+            $error = trim($error, '\r');
+        }
+    }
+
+    curl_close($ch);
+
+    if (!$error) {
+        return true;
+    }
+
+    return $error;
+};
 /**
  * Retrieve textual representation of an item's metatype
  *
@@ -1674,6 +1840,7 @@ class FilterParser {
 	const NORM_VOS = 2;
 	const NORM_DISSEMINATION = 3;
 	const NORM_SITE = 4;
+	const NORM_VAPROVIDER= 5;
 
 	public static function fieldsToXML($flds, $base, $n = 0) {
 		$a = explode(" ",$flds);
@@ -1683,9 +1850,16 @@ class FilterParser {
 		foreach ($a as $i) {
 			$end = "/>";
 			if ($n === 0) {
-                switch ($i) {
+				switch ($i) {
+					case("vaprovider"):
+                        $fltstr = "id:string name:string type:string beta:boolean production:boolean monitored:boolean downtime:integer status:text";
+                        if ( $base === $i ) {
+                            $fltstr = $fltstr." country:complex";
+                        }
+						$end = '>'.FilterParser::fieldsToXML($fltstr, $base, $n+1).'</filter:field>';
+                        break;
                     case("site"):
-                        $fltstr = "id:string name:string description:string tier:numeric roc:string subgrid:string supports:string";
+                        $fltstr = "id:string name:string description:string tier:numeric roc:string subgrid:string supports:string offers:string";
                         if ( $base === $i ) {
                             $fltstr = $fltstr." country:complex";
                         }
@@ -1781,6 +1955,9 @@ class FilterParser {
 				break;
 			case (FilterParser::NORM_SITE):
 				$normalizer = new RestSiteFilterReflection();
+				break;
+			case (FilterParser::NORM_VAPROVIDER):
+				$normalizer = new RestVAProviderFilterReflection();
 				break;
 		}
 		$reflection_str = strval($normalizer->get()->finalize());
@@ -1990,6 +2167,16 @@ class FilterParser {
                                     $obj = "site";
                             }
                             break;
+                        case (FilterParser::NORM_VAPROVIDER):
+                            switch ($prop) {
+								case "country":
+                                    $obj = $prop;
+                                    $prop = "any";
+                                    break;
+                                default:
+                                    $obj = "vaprovider";
+                            }
+                            break;
 					}
 				}
 			}
@@ -2167,6 +2354,11 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 		FilterParser::buildFilter($f, $fltstr, $isfuzzy);
 		return $f;
 	}
+	public static function getVaProviders($fltstr, $isfuzzy=false) {
+		$f = new Default_Model_VaProvidersFilter();
+		FilterParser::buildFilter($f, $fltstr, $isfuzzy);
+		return $f;
+	}
 
 	public static function buildFilter(&$filter, $fltstr, $isfuzzy=false){
 		$fltstr = trim($fltstr);
@@ -2214,6 +2406,9 @@ public static function getApplications($fltstr, $isfuzzy=false) {
             break;
         case "Default_Model_SitesFilter":
             $defaultTable = "site";
+            break;
+        case "Default_Model_VaProvidersFilter":
+            $defaultTable = "vaprovider";
             break;
 		default:
 			return false;
@@ -2387,6 +2582,42 @@ public static function getApplications($fltstr, $isfuzzy=false) {
                     $interval = Zend_Registry::get("app");
                     $interval = $interval["invalid"];
 					switch($tbl) {
+					case "vaprovider":
+						switch($fld) {
+						case "id":
+						case "beta":
+							break;
+						case "name":
+						case "sitename":
+							$fld = "sitename";
+							break;
+						case "type":
+						case "service_type":
+							$fld = "service_type";
+							break;
+						case "node_monitored":
+						case "monitored":
+							$fld = "node_monitored";
+							break;
+						case "in_production":
+						case "inproduction":
+						case "production":
+							$fld = "in_production";
+							break;
+						case "service_downtime":
+							$fld = "service_downtime::int";
+						case "downtime":
+							$fld = "service_downtime::int::boolean";
+							break;
+						case "service_status":
+						case "status":
+							$fld = "service_status";
+							break;
+						default:
+							continue 3;
+						}
+						if ($f1 === null) $f1 = new Default_Model_VaProvidersFilter();
+						break;
 					case "site":
 						switch($fld) {
 						case "id":
@@ -2413,59 +2644,44 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$fld = "name";
 								$f2->$fld->matches("^[^A-Za-z0-9].+");
 							} else {
-								continue;
+								continue 3;
 							}							
 							$filter->chain($f2, $chainOp, $private);
 							break;
 						case "supports":
 							$f1 = false;
-							$f2 = new Default_Model_SitesFilter();
-							if (is_numeric(trim(str_replace("%", '', $val)))) {
-								$supports = trim(str_replace("%", '', $val));
-							} else {
-								switch (strtolower($supports)) {
-								case "occi":
-									$supports = 1;
-									break;
-								default:
-									$supports = 0;
-									break;
-								}
-							}
-							switch (intval($supports)) {
-							case 1:
-								$f2->id->in("(SELECT site_supports('occi'))",false,false);
+							$f2 = new default_model_sitesfilter();
+							$supports = trim(str_replace("%", '', $val));
+							switch(strtolower($supports)) {
+							case "true":
+							case "1":
+								$f2->supports->notequals(null);
 								break;
-							case 0:
+							case "false":
+							case "0":
+								$f2->supports->equals(null);
+								break;
 							default:
-								$f2->id->notin("(SELECT site_supports('occi'))",false,false);
-								break;
+								$f2->supports->like($val);
 							}
 							$filter->chain($f2, $chainOp, $private);
 							break;
+						case "offers":
 						case "hasinstances":
 							$f1 = false;
 							$f2 = new Default_Model_SitesFilter();
-							if (is_numeric(trim(str_replace("%", '', $val)))) {
-								$siteinstances = trim(str_replace("%", '', $val));
-							} else {
-								switch (strtolower($siteinstances)) {
-								case "occi":
-									$siteinstances = 1;
-									break;
-								default:
-									$siteinstances = 0;
-									break;
-								}
-							}
-							switch (intval($siteinstances)) {
-							case 1:
-								$f2->id->in("(SELECT site_instances('occi'))",false,false);
+							$offers = trim(str_replace("%", '', $val));
+							switch(strtolower($offers)) {
+							case "true":
+							case "1":
+								$f2->offers->notequals(null);
 								break;
-							case 0:
+							case "false":
+							case "0":
+								$f2->offers->equals(null);
+								break;
 							default:
-								$f2->id->notin("(SELECT site_instances('occi'))",false,false);
-								break;
+								$f2->supports->like($val);
 							}
 							$filter->chain($f2, $chainOp, $private);
 							break;
@@ -2515,7 +2731,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$f3->$fld->lt("'0'", false, false)->or($f3->$fld->gt("'99999999999999999999999999999999999999999999999999'", false, false));
 								$f2->chain($f3, "AND", $private);
 							} else {
-								continue;
+								continue 3;
 							}							
 							$filter->chain($f2, $chainOp, $private);
 							break;
@@ -2673,7 +2889,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$fld = "name";
 								$f2->$fld->matches("^[^A-Za-z0-9].+");
 							} else {
-								continue;
+								continue 3;
 							}							
 							$filter->chain($f2, $chainOp, $private);
 						}
@@ -2761,7 +2977,7 @@ public static function getApplications($fltstr, $isfuzzy=false) {
 								$fld = "name";
 								$f2->$fld->matches("^[^A-Za-z0-9].+");
 							} else {
-								continue;
+								continue 3;
 							}							
 							$filter->chain($f2, $chainOp, $private);
 							break;
@@ -5104,51 +5320,30 @@ class VMCaster{
 		}
 		return VMCaster::$vmcasterurl;
 	}
-	
-	public static function transformXml($vmcxml = null, $apiversion = '1.0') {
-		$envelop_start = '<appdb:appdb xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:appdb="http://appdb.egi.eu/api/1.0/appdb" xmlns:application="http://appdb.egi.eu/api/1.0/application" xmlns:discipline="http://appdb.egi.eu/api/1.0/discipline" xmlns:category="http://appdb.egi.eu/api/1.0/category" xmlns:dissemination="http://appdb.egi.eu/api/1.0/dissemination" '.
-				'xmlns:person="http://appdb.egi.eu/api/' . $apiversion . '/person" '.
-				'xmlns:permission="http://appdb.egi.eu/api/' . $apiversion . '/permission" '.
-				'xmlns:privilege="http://appdb.egi.eu/api/' . $apiversion . '/privilege" '.
-				'xmlns:user="http://appdb.egi.eu/api/' . $apiversion . '/user" '.
-				'xmlns:virtualization="http://appdb.egi.eu/api/' . $apiversion . '/virtualization" '.
-				'datatype="virtualization" version="' . $apiversion . '">';
-		$envelop_end = '</appdb:appdb>';
+
+	/**
+	 * Transforms external VMCaster XML into AppDB-compliant XML, for input from VMCaster CLI tool
+	 * Used by RestAppVAXMLParser::parse() and by the ApplicationsController::vmc2appdbAction
+	 *
+	 * @return String
+	 */
+	public static function transformXml($vmcxml = null) {
 		$result = '';
 		
 		if( $vmcxml !== null && trim($vmcxml) !== "" && !is_numeric($vmcxml) ) {
-			if( strpos($vmcxml, "<?xml") !== 0 ) {
+			if( strpos($vmcxml, "<" . "?xml") !== 0 ) {
 				$vmcxml = '<' . '?xml version="1.0" encoding="utf-8"?' . '>' . $vmcxml;
 			}
 			
 			try {
-				$xsl = new DOMDocument();
-				$xsl->load("../application/configs/api/1.0/xslt/vmc2appdb_group.xsl");
-				$inputdom = new DomDocument();
-				$inputdom->loadXML($vmcxml);
-
-				$proc = new XSLTProcessor();
-				$proc->importStylesheet($xsl);
-				$proc->setParameter(null, "", "");
-
-				$grouped = $proc->transformToXml($inputdom);
-
-				$xsl = new DOMDocument();
-				$xsl->load("../application/configs/api/1.0/xslt/vmc2appdb.xsl");
-				$inputdom = new DomDocument();
-				$inputdom->loadXML($grouped);
-
-				$proc = new XSLTProcessor();
-				$proc->importStylesheet($xsl);
-				$proc->setParameter(null, "", "");
-
-				$result .= $proc->transformToXml($inputdom);
+				$grouped = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'vmc2appdb_group.xsl', $vmcxml);
+				$result = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'vmc2appdb.xsl', $grouped);
 			} catch(Exception $e) {
 				$result = '';
 			}
 		}
-		
-		return $envelop_start . $result . $envelop_end;
+
+		return RestAPIHelper::wrapResponse($result, "virtualization");
 	}
 	public static function createImageList($vaversionid, $target="published"){
 		//Call vmcaster service to produce image list
@@ -5282,7 +5477,7 @@ class VMCaster{
 		}
 		
 		$result = array("id"=>null,"status"=>null,"message"=>null);
-		$xml = new SimpleXMLElement($response);
+		$xml = simplexml_load_string($response);
 		if( count($xml->xpath("./id")) > 0 ){
 			$id = $xml->xpath("./id");
 			$result["id"] = intval($id[0]);
@@ -5671,9 +5866,9 @@ class VMCaster{
 						$instance->integrityStatus = "error";
 						$instance->integrityMessage = "Integrity check could not calculate the file checksum";
 						$hasimageerrors = true;
-					}else {
-                                                $successfulimages[] = $instance->id;
-                                        }
+					} else {
+						$successfulimages[] = $instance->id;
+					}
 					break;
 				case "cancelled":
 					$instance->integrityStatus = "canceled";
@@ -5690,9 +5885,9 @@ class VMCaster{
 					}
 					$instance->integrityStatus = "error";
 					$hasimageerrors = true;
-                                        break;
+					break;
 				default:
-					continue;
+					continue 2;
 			}
 			self::updateVMInstanceIntegrity($instance);
 		}
@@ -6032,7 +6227,7 @@ class VMCaster{
 				}
 			}
 			else {
-				$xml->addChild("$key", htmlspecialchars("$value",ENT_COMPAT,'UTF-8'));
+				$xml->addChild("$key", htmlspecialchars("$value",ENT_XML1 | ENT_COMPAT,'UTF-8'));
 			}
 		}
 	}
@@ -6323,29 +6518,18 @@ class VMCaster{
 		if( $format === "xml" ){
 			$d["published"] = ($d["published"] === true)?"true":"false";
 			$d["archived"] = ($d["archived"] === true)?"true":"false";
-			$xml = new SimpleXMLElement('<vmiinstance></vmiinstance>');
+			$xml = simplexml_load_string('<vmiinstance></vmiinstance>');
 			self::convertArrayToXML($d, $xml);
 			$result = $xml->asXML();
-			$apiversion = "1.0";
-			$result = substr($result, strpos($result, '?>') + 2);
-			$result = '<?xml version="1.0" encoding="utf-8"?><appdb:appdb xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:appdb="http://appdb.egi.eu/api/1.0/appdb" xmlns:application="http://appdb.egi.eu/api/1.0/application" xmlns:discipline="http://appdb.egi.eu/api/1.0/discipline" xmlns:category="http://appdb.egi.eu/api/1.0/category" xmlns:dissemination="http://appdb.egi.eu/api/1.0/dissemination" '.
-				'xmlns:person="http://appdb.egi.eu/api/' . $apiversion . '/person" '.
-				'xmlns:virtualization="http://appdb.egi.eu/api/' . $apiversion . '/virtualization" '.
-				'xmlns:site="http://appdb.egi.eu/api/' . $apiversion . '/site" '.
-				'xmlns:siteservice="http://appdb.egi.eu/api/' . $apiversion . '/site" '.
-				'xmlns:vo="http://appdb.egi.eu/api/' . $apiversion . '/vo" '.
-				'datatype="virtualization" version="' . $apiversion . '">' . $result . '</appdb:appdb>';
+			$result = substr($result, strpos($result, '?' . '>') + 2);
+			$result = RestAPIHelper::wrapResponse($result, "virtualization");
 			try {
-				$xsl = new DOMDocument();
-				$xsl->load("../application/configs/api/1.0/xslt/virtualization.image.xsl");
-				$inputdom = new DomDocument();
-				$inputdom->loadXML($result);
-
-				$proc = new XSLTProcessor();
-				$proc->importStylesheet($xsl);
-				$proc->setParameter(null, "", "");
-
-				$result = $proc->transformToXml($inputdom);
+				$xsl = RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . "virtualization.image.xsl";
+				if (file_exists($xsl)) {
+					$result = xml_transform($xsl, $result);
+				} else {
+					error_log("[VMCaster::convertImage] Error: XSL file 'virtualization.image.xsl' could not be found");
+				}
 			}catch(Exception $e){
 				return null;
 			}
@@ -7548,16 +7732,7 @@ class SocialReport{
 		$result = true;
 		try {
 			$xml = file_get_contents("../public/reports/social/" . $filename . ".xml");
-			$xsl = new DOMDocument();
-			$xsl->load("../application/configs/api/1.0/xslt/swsocial_export_csv.xsl");
-			$inputdom = new DomDocument();
-			$inputdom->loadXML($xml);
-
-			$proc = new XSLTProcessor();
-			$proc->importStylesheet($xsl);
-			$proc->setParameter(null, "", "");
-
-			$transform = $proc->transformToXml($inputdom);
+			$transform = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'swsocial_export_csv.xsl', $xml);
 			if( $transform !== false ){
 				$result = file_put_contents("../public/reports/social/" . $filename . ".csv", $transform);
 			}
@@ -7573,16 +7748,7 @@ class SocialReport{
 		$result = true;
 		try {
 			$xml = file_get_contents("../public/reports/social/" . $filename . ".xml");
-			$xsl = new DOMDocument();
-			$xsl->load("../application/configs/api/1.0/xslt/swsocial_export_nonzero.xsl");
-			$inputdom = new DomDocument();
-			$inputdom->loadXML($xml);
-
-			$proc = new XSLTProcessor();
-			$proc->importStylesheet($xsl);
-			$proc->setParameter(null, "", "");
-
-			$transform = $proc->transformToXml($inputdom);
+			$transform = xml_transform(RestAPIHelper::getFolder(RestFolderEnum::FE_XSL_FOLDER) . 'swsocial_export_nonzero.xsl', $xml);
 			if( $transform !== false ){
 				$result = file_put_contents("../public/reports/social/" . $filename . "_nz.xml", $transform);
 			}
@@ -7602,16 +7768,24 @@ class SocialReport{
 		$appsdata = SocialReport::getAppDBdata($config);
 		$apps = SocialReport::fetchSocialShares($appsdata, $config);
 
-		$shares_xml = new SimpleXMLElement("<shares dateProduced=\"".$date."\" dateProduced_unix=\"".$udate."\" count=\"".count($apps)."\"></shares>");
-		SocialReport::array_to_xml($apps,$shares_xml);
-		$xml = $shares_xml->asXML();
-		if( $xml === false ){
-			error_log("[SocialReport::generateShareCountReport]: Could not generate xml " . $folder.$filename.".xml");
+		$readsuccess = true;
+		$shares_xml = simplexml_load_string("<shares dateProduced=\"" . $date . "\" dateProduced_unix=\"" . $udate . "\" count=\"" . count($apps) . "\"></shares>");
+		if ($shares_xml === false) {
+			$readsuccess = false;
+		} else {
+			SocialReport::array_to_xml($apps, $shares_xml);
+			$xml = $shares_xml->asXML();
+			if ($xml == false) {
+				$readsuccess = false;
+			}
+		}
+		if( $readsuccess === false ){
+			error_log("[SocialReport::generateShareCountReport]: Could not generate xml " . $folder . $filename . ".xml");
 			return false;
 		}
-		$writesuccess = file_put_contents($folder.$filename.".xml",$xml);
+		$writesuccess = file_put_contents($folder . $filename . ".xml", $xml);
 		if( $writesuccess === false ){
-			error_log("[SocialReport::generateShareCountReport]: Could not write to file " . $folder.$filename.".xml");
+			error_log("[SocialReport::generateShareCountReport]: Could not write to file " . $folder . $filename . ".xml");
 			return false;
 		}
 		return true;
@@ -7707,19 +7881,6 @@ function shortenURL($url) {
 	}
 }
 class UserInbox{
-	private static function getEnvelopStart($apiversion = '1.0'){
-		return  '<appdb:appdb xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:appdb="http://appdb.egi.eu/api/1.0/appdb" xmlns:application="http://appdb.egi.eu/api/1.0/application" xmlns:discipline="http://appdb.egi.eu/api/1.0/discipline" xmlns:category="http://appdb.egi.eu/api/1.0/category" xmlns:dissemination="http://appdb.egi.eu/api/1.0/dissemination" '.
-				'xmlns:person="http://appdb.egi.eu/api/' . $apiversion . '/person" '.
-				'xmlns:permission="http://appdb.egi.eu/api/' . $apiversion . '/permission" '.
-				'xmlns:privilege="http://appdb.egi.eu/api/' . $apiversion . '/privilege" '.
-				'xmlns:user="http://appdb.egi.eu/api/' . $apiversion . '/user" '.
-				'xmlns:virtualization="http://appdb.egi.eu/api/' . $apiversion . '/virtualization" '.
-				'xmlns:message="http://appdb.egi.eu/api/' . $apiversion . '/message" '.
-				'datatype="virtualization" version="' . $apiversion . '">';
-	}
-	private static function getEnvelopEnd(){
-		return '</appdb:appdb>';
-	}
 	private static function getModel($uid,$flt=array()){
 		$msgs = new Default_Model_Messages();
 		$length = ( (isset($flt["length"]) && is_numeric($flt["length"]) )?intval($flt["length"]):10 );
@@ -7771,23 +7932,22 @@ class UserInbox{
 		
 		return $msgs;
 	}
+
 	public static function getMessages($uid,$flt=array()){
-		$envelop_start = self::getEnvelopStart();
-		$envelop_end = self::getEnvelopEnd();
+		$res = "";
 		$folder = strtolower(trim(( (isset($flt["folder"]) && is_string($flt["folder"]) )?strval($flt["folder"]):null )));
 		$action = strtolower(trim(( (isset($flt["action"]) && is_string($flt["action"]) )?strval($flt["action"]):'fetch' )));
 		$onlycount = ($action==="count")?true:false;
 		if( $uid === null ){
-			return $envelop_start . "<person:messages count='0' length='0' offset='0' folder='".$folder."'></person:messages>" . $envelop_end;
+			return RestAPIHelper::wrapResponse("<person:messages count='0' length='0' offset='0' folder='" . xml_escape($folder) . "'></person:messages>", "message");
 		}
 		
 		$msgs = self::getModel($uid,$flt);
 		$msgscount = count($msgs->items);
-		$res = $envelop_start;
-		$res .= "<person:messages count='".$msgscount."' length='".$msgs->filter->limit."' offset='".$msgs->filter->offset."' orderby='".$msgs->filter->orderBy."'>";
+		$res = "<person:messages count='" . xml_escape($msgscount) . "' length='" . xml_escape($msgs->filter->limit) . "' offset='" . xml_escape($msgs->filter->offset) . "' orderby='" . xml_escape($msgs->filter->orderBy) . "'>";
 		if( $msgscount === 0 || $onlycount ){
-			$res .= "</person:messages>" . $envelop_end;
-			return $res;
+			$res .= "</person:messages>";			
+			return RestAPIHelper::wrapResponse($res, "message");
 		}
 		$senders = array();
 		for($i=0; $i<$msgscount; $i+=1){
@@ -7795,14 +7955,18 @@ class UserInbox{
 			$isread = ( ($item->isread===true)?"true":"false" );
 			$dir = "unknown";
 			$personid = -1;
-			$msg = "<person:message id='" . $item->id . "' isread='" . $isread  . "' sendon='" . $item->senton . "' ";
+			$msg = "<person:message id='" . xml_escape($item->id) . "' isread='" . xml_escape($isread)  . "' sendon='" . xml_escape($item->senton) . "' ";
 			if( $uid == $item->receiverid ){
 				$msg .= "folder='inbox' >";
 				$dir = "from";
 				$personid = $item->senderid;
 				if( isset($senders[$personid]) == false ){
 					$s = $item->getSender();
-					$senders[$personid] = " id='" . $s->id . "' cname='" . $s->cname . "' firstname='" . $s->firstname . "' lastname='" . $s->lastname . "' ";
+					if (is_object($s)) {
+						$senders[$personid] = " id='" . xml_escape($s->id) . "' cname='" . xml_escape($s->cname) . "' firstname='" . xml_escape($s->firstname) . "' lastname='" . xml_escape($s->lastname) . "' ";
+					} else {
+						$senders[$personid] = " id='0' cname='system.notification' firstname='System' lastname='Notification' ";
+					}
 				}
 			}else if($uid == $item->senderid){
 				$msg .= "folder='outbox' >";
@@ -7810,22 +7974,24 @@ class UserInbox{
 				$personid = $item->receiverid;
 				if( isset($senders[$personid]) == false ){
 					$s = $item->getReceiver();
-					$senders[$personid] = " id='" . $s->id . "' cname='" . $s->cname . "' firstname='" . $s->firstname . "' lastname='" . $s->lastname . "' ";
+					$senders[$personid] = " id='" . xml_escape($s->id) . "' cname='" . xml_escape($s->cname) . "' firstname='" . xml_escape($s->firstname) . "' lastname='" . xml_escape($s->lastname) . "' ";
 				}
 			}else{
 				$msg .= "folder='unknown' ></person:message>";
 				$res .= $msg;
 				continue;
 			}
-			
-			$msg .= "<message:headers><message:" . $dir . " " . $senders[$personid] . "></message:" . $dir . "></message:headers>";
-			$msg .= "<message:content>" . $item->msg . "</message:content>";
+
+			if (isset($senders[$personid])) {	
+				$msg .= "<message:headers><message:" . xml_escape($dir) . " " . $senders[$personid] . "></message:" . xml_escape($dir) . "></message:headers>";
+			}
+			$msg .= "<message:content>" . xml_escape($item->msg) . "</message:content>";
 			$msg .= "</person:message>";
 			$res .= $msg;
 		}
 		
-		$res .= "</person:messages>" . $envelop_end;
-		return $res;
+		$res .= "</person:messages>";
+		return RestAPIHelper::wrapResponse($res, "message");
 	}
 }
 
@@ -8589,8 +8755,8 @@ class SamlAuth{
 	  }
 	  return $res;
 	}
-	
-	//Reject VM Operator if account is not entitled with VO membership
+
+        //Reject VM Operator if account is not entitled with VO membership
 	private static function validateEntitlements($user, $entitlements = array()) {
 			$vos = ((isset($entitlements['vos'])) ? $entitlements['vos'] : array());
 			$vmops = ((isset($vos['vmops'])) ? $vos['vmops'] : array());
@@ -8693,7 +8859,7 @@ class SamlAuth{
 	public static function setupSamlAuth($session){
 		$attrs = $session->samlattrs;
 		$source = strtolower(trim($session->samlauthsource));
-		$uid = ( isset($attrs["idp:uid"])?$attrs["idp:uid"][0]:"");
+                $uid = ( isset($attrs["idp:uid"])?$attrs["idp:uid"][0]:"");
 
 		if( trim($uid) == "" ) return false;
 		$accounttype = str_replace("-sp","",$source);
@@ -8761,7 +8927,7 @@ class SamlAuth{
 
 		//Check if user account is blocked and updates session
 		self::setupUserAccountStatus($session, $useraccount);
-		
+
 		$session->authSource = $source;
 		$session->authUid = $uid;
 		$session->logoutUrl = 'https://' . $_SERVER['HTTP_HOST'] . '/saml/logout?source=' . $source;
@@ -9996,7 +10162,7 @@ class AccessTokens{
 		foreach($ips as $ip){
 			$res = (isIPv4($ip)>0 || isIPv6($ip)>0 || isCIDR($ip)>0 || isCIDR6($ip)>0 );
 			if($res==false){
-				$res = (preg_match('/^(([a-zA-Z]|[a-zA-Z][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])$/',$ip)>0);
+				$res = (preg_match('/^(([a-zA-Z]|[0-9a-zA-Z][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])$/',$ip)>0);
 			}
 			if( $res === false ){
 				return "Invalid net filter: " . $ip;
@@ -11824,10 +11990,10 @@ class VAProviders{
 		return null;
 	}
 	public static function getProductionImages($vapp){
-		$result = '<appdb:appdb xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:appdb="http://appdb.egi.eu/api/1.0/appdb" xmlns:application="http://appdb.egi.eu/api/1.0/application" xmlns:discipline="http://appdb.egi.eu/api/1.0/discipline" xmlns:category="http://appdb.egi.eu/api/1.0/category" xmlns:dissemination="http://appdb.egi.eu/api/1.0/dissemination" xmlns:filter="http://appdb.egi.eu/api/1.0/filter" xmlns:history="http://appdb.egi.eu/api/1.0/history" xmlns:logistics="http://appdb.egi.eu/api/1.0/logistics" xmlns:resource="http://appdb.egi.eu/api/1.0/resource" xmlns:middleware="http://appdb.egi.eu/api/1.0/middleware" xmlns:person="http://appdb.egi.eu/api/1.0/person" xmlns:permission="http://appdb.egi.eu/api/1.0/permission" xmlns:privilege="http://appdb.egi.eu/api/1.0/privilege" xmlns:publication="http://appdb.egi.eu/api/1.0/publication" xmlns:rating="http://appdb.egi.eu/api/1.0/rating" xmlns:ratingreport="http://appdb.egi.eu/api/1.0/ratingreport" xmlns:regional="http://appdb.egi.eu/api/1.0/regional" xmlns:user="http://appdb.egi.eu/api/1.0/user" xmlns:vo="http://appdb.egi.eu/api/1.0/vo" xmlns:virtualization="http://appdb.egi.eu/api/1.0/virtualization" xmlns:license="http://appdb.egi.eu/api/1.0/license" xmlns:provider="http://appdb.egi.eu/api/1.0/provider" xmlns:provider_template="http://appdb.egi.eu/api/1.0/provider_template" xmlns:classification="http://appdb.egi.eu/api/1.0/classification">';
+		$result = '';
 		$vappliance = self::getVAppliance($vapp);
 		if( $vappliance === null ) {
-			return $result . "</appdb:appdb>";
+			return RestAPIHelper::wrapResponse($result, "virtualization");
 		}
 		$q = 'SELECT xmlelement(
 				name "virtualization:image",
@@ -11889,12 +12055,11 @@ class VAProviders{
 				if( count($r) === 0) {
 					continue;
 				}
-				$result .= $r[0];
+				$result = $r[0];
 			}
 		}
-		$result .= '</appdb:appdb>';
 		
-		return $result;
+		return RestAPIHelper::wrapResponse($result, "virtualization");
 	}
 
 	public function findOS($os) {

@@ -162,19 +162,9 @@ class SocialReport{
 	private static function convertReportToCSV($filename){
 		$result = true;
 		try {
-			$xml = file_get_contents("../public/reports/social/" . $filename . ".xml");
-			$xsl = new DOMDocument();
-			$xsl->load("../application/configs/api/1.0/xslt/swsocial_export_csv.xsl");
-			$inputdom = new DomDocument();
-			$inputdom->loadXML($xml);
-
-			$proc = new XSLTProcessor();
-			$proc->importStylesheet($xsl);
-			$proc->setParameter(null, "", "");
-
-			$transform = $proc->transformToXml($inputdom);
+			$transform = xml_transform(APPLICATION_PATH . "/configs/api/1.0/xslt/swsocial_export_csv.xsl", file_get_contents(APPLICATION_PATH . "/../public/reports/social/" . $filename . ".xml"));
 			if( $transform !== false ){
-				$result = file_put_contents("../public/reports/social/" . $filename . ".csv", $transform);
+				$result = file_put_contents(APPLICATION_PATH . "/../public/reports/social/" . $filename . ".csv", $transform);
 			}
 			if( $result !== false ){
 				$result = true;
@@ -187,17 +177,7 @@ class SocialReport{
 	private static function generateNonZeroShareCountReport($filename){
 		$result = true;
 		try {
-			$xml = file_get_contents("../public/reports/social/" . $filename . ".xml");
-			$xsl = new DOMDocument();
-			$xsl->load("../application/configs/api/1.0/xslt/swsocial_export_nonzero.xsl");
-			$inputdom = new DomDocument();
-			$inputdom->loadXML($xml);
-
-			$proc = new XSLTProcessor();
-			$proc->importStylesheet($xsl);
-			$proc->setParameter(null, "", "");
-
-			$transform = $proc->transformToXml($inputdom);
+			$transform = xml_transform(APPLICATION_PATH . "/configs/api/1.0/xslt/swsocial_export_nonzero.xsl", file_get_contents(APPLICATION_PATH . "/../public/reports/social/" . $filename . ".xml"));
 			if( $transform !== false ){
 				$result = file_put_contents("../public/reports/social/" . $filename . "_nz.xml", $transform);
 			}
