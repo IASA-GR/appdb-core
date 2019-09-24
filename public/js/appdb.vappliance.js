@@ -1557,7 +1557,6 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 				this.showLoading(true);
 		}, caller: this});
 		this._model.subscribe({event: "select", callback: function(v){
-				this.showLoading(false);
 				if( v && v.appliance ){
 					this.options.currentData = v.appliance;
 					this.options.currentData.instance = this.options.currentData.instance || [];
@@ -1565,16 +1564,78 @@ appdb.vappliance.components.VirtualApplianceProvider  = appdb.ExtendClass(appdb.
 				}else{
 					this.options.currentData = undefined;
 				}
-				this.render(this.options.currentData);
-				if(vid!==""){
-					this.selectVersionById(vid);
-				}
-				$(this.dom).find(".reloadappliance").removeClass("hidden");
-				this.initContextualizationRegistry();
-				this.loadCDHandler(d);
-				this.publish({event: "load", value: this});
+				var postSelect = function() {
+				    this.showLoading(false);
+				    this.render(this.options.currentData);
+				    if(vid!==""){
+					    this.selectVersionById(vid);
+				    }
+				    $(this.dom).find(".reloadappliance").removeClass("hidden");
+				    this.initContextualizationRegistry();
+				    this.loadCDHandler(d);
+				    this.publish({event: "load", value: this});
+				}.bind(this);
+
+				this.checkLatestImageAccessibility(this.options.currentData, postSelect);
 		}, caller: this});
 		this._model.get(d);
+	};
+	this.checkLatestImageAccessibility = function(data, cb) {
+	    var shouldCheck = false;
+	    var statusPerms = appdb.config.views.application.checkVMIAccessibilityViewStatusPermissions || {"error": "all", "warning": "all"};
+
+	    if (appdb.config.views.application.checkVMIAccessibility === true) {
+		var cd = data || {};
+		var latest = null;
+
+		if (cd.instance) {
+		    $.each(cd.instance, function(index, i) {
+		       if (latest === null && i.published === 'true' && i.archived === 'false') {
+			   latest = i;
+		       }
+		    });
+		}
+
+		if (latest && latest.image && latest.image.instance && latest.image.instance.url) {
+		    shouldCheck = true;
+		}
+	    }
+
+	    if (shouldCheck) {
+		$('.vappliance-accessibility').removeClass('error warning');
+		$.get(appdb.config.endpoint.base + 'apps/isvmiaccessible?id=' + appdb.pages.Application.currentId(), function(data) {
+		    if (data && data.status !== 'ok') {
+			var perms = statusPerms[data.status] || "all";
+			var canView = userIsAdmin;
+
+			switch(perms) {
+			    case "owner":
+				canView = canView || appdb.pages.application.currentUserIsOwner();
+				break;
+			    case "contacts":
+				canView = canView  || appdb.pages.application.isContactPoint() || appdb.pages.application.currentUserIsOwner();
+				break;
+			    case "none":
+				break;
+			    case "authenticated":
+				canView = (!!userID) ? true : false;
+				break;
+			    case "all":
+			    default:
+				canView = true;
+				break;
+			}
+
+			if (canView) {
+			    $('.vappliance-accessibility').find('.response').text(data.message);
+			    $('.vappliance-accessibility').addClass(data.status);
+			}
+		    }
+		    cb();
+		});
+	    } else {
+		cb();
+	    }
 	};
 	this.getCDData = function(data) {
 	    data = data || {};

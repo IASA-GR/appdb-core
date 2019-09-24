@@ -26051,3 +26051,111 @@ table.cdtaskinstance-list tr > .img > img {
     max-height: 190px;
     overflow: auto;
 }
+/* Vappliance-accessibility START */
+.vappliance-accessibility {
+    display: none;
+    position: absolute;
+    left: 10px;
+    z-index: 1000;
+    top: 60px;
+    cursor: pointer;
+}
+
+.vappliance-accessibility > * {
+    display: none;
+}
+
+.vappliance-accessibility.error,
+.vappliance-accessibility.warning{
+    display: block;
+}
+
+.vappliance-accessibility.error > .error,
+.vappliance-accessibility.warning > .warning{
+    display: block;
+    position: relative;
+}
+
+.vappliance-accessibility > * > * {
+    background-color: white;
+}
+
+.vappliance-accessibility > * > .header {
+    position: absolute;
+    z-index: 1000;
+    padding: 5px;
+    color: #999;
+    padding-bottom: 0px;
+    background-color: transparent;
+    border-radius: 2px 2px 0px 0px;
+}
+
+.vappliance-accessibility > * > .header > .title {
+    white-space: nowrap;
+}
+
+.vappliance-accessibility > .error > .header {
+    color: #ee3b3b;
+}
+
+.vappliance-accessibility > * > .content {
+    position: absolute;
+    display: none;
+    box-shadow: 0px 0px 0px 1px #bbb;
+    z-index: 100;
+    padding: 10px;
+    width: 500px;
+    top: 27px;
+    border-radius: 0px 2px 2px 2px;
+}
+
+.vappliance-accessibility:hover > * > .header {
+    box-shadow: 0px -1px 0px 1px #bbb;
+    padding: 5px;
+    background-color: white;
+}
+
+.vappliance-accessibility:hover > * > .content {
+    display: block;
+    color: #444;
+}
+.vappliance-accessibility > * > .content .response {
+    padding: 5px;
+    border: 1px solid #bbb;
+    background-color: #eee;
+    margin: 5px;
+    border-radius: 2px;
+}
+.vappliance-accessibility > .error > .content .response{
+    border-color: #ee3b3b;
+    background-color: #eaa4a4c9;
+}
+.vappliance-accessibility > * > .header,
+.vappliance-accessibility > * > .header * {
+    vertical-align: middle;
+    line-height: 16px;
+}
+
+.vappliance-accessibility > * > .header img {
+    width: 14px;
+    height: 14px;
+    margin-right: 5px;
+}
+
+.vappliance-accessibility:hover > .warning > .header span {
+    color: #111;
+}
+
+.vappliance-accessibility.position-above {
+    top: -32px;
+    left: 810px;
+}
+.vappliance-accessibility.position-above > * > .header,
+.vappliance-accessibility.position-above > * > .content{
+    right: 100%;
+}
+
+#detailswrapper .entityvirtualappliance .publicationcontainer > .dojoxGrid {
+    margin-top: 15px;
+}
+/* Vappliance-accessibility END */
