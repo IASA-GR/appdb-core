@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-require_once(__DIR__ . '/../../library/checklink.php');
- 
 class AppsController extends Zend_Controller_Action
 {
 	public function buildlogocacheAction() {
