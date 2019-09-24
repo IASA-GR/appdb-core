@@ -3300,6 +3300,7 @@ appdb.pages.application = (function(){
 		if (appdb.vappliance && appdb.vappliance.components && appdb.vappliance.components.CDVersion) {
 			appdb.vappliance.components.CDVersion.stopMonitor();
 		}
+		$('.vappliance-accessibility').removeClass('error warning');
 	};
 	page.init = function(o){
 		var _perms = page.currentPermissions();
@@ -3321,7 +3322,7 @@ appdb.pages.application = (function(){
 		page.currentSocialToolbox(null);
 		page.currentSoftwareLicenses(null);
 		//Make init calls
-		
+
 		$(document).ready((function(extdata,currentid,perms){ 
 			return function(){ 
 				if( extdata && extdata.application && !extdata.application.permissions && $.trim(currentid) === $.trim(extdata.application.id)){
@@ -3332,6 +3333,7 @@ appdb.pages.application = (function(){
 				page.onEventReady(extdata);
 			};
 		})(o.data,currentid,_perms));
+		$('.vappliance-accessibility').removeClass('error warning');
 		page.immediate();
 	};
 	return page;

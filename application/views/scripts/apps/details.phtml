@@ -30,7 +30,43 @@
 	<a class="app-history" href="#" onclick="appHistory(appdb.pages.application.currentId());"><img alt="history" border="0" src="/images/history.png"/>History</a>
 </div>
 <div align="left" style="height:100%;">
-
+    <div class='vappliance-accessibility position-above'>
+        <div class="error">
+            <div class="header">
+                <div class="title">
+                    <img src="/images/vappliance/redwarning.png" alt="error"/>
+                    <span class="title">Inaccessible VM image</span>
+                </div>
+            </div>
+            <div class="content">
+                It seems the VM image location is inaccessible. When retrieving information about the VM we get the following response:
+                <div class="response"></div>
+                <div class="author">
+                    This can cause the following issues:
+                    <ul>
+                        <li>Users won't be able to download and use this VM image</li>
+                        <li>The VM image won't be able to be replicated to the EGI FedCloud infrastructure if it is referenced from a Virtual Organization</li>
+                    </ul>
+                </div>
+                <div class="user">
+                    You might not be able to download and use the latest VM image of this virtual appliance.
+                </div>
+            </div>
+        </div>
+        <div class="warning">
+            <div class="header">
+                <div class="title">
+                    <img src="/images/vappliance/warning.png" alt="warning"/>
+                    <span class="title">Issues with VM image location</span>
+                </div>
+            </div>
+            <div class="content">
+                While checking the VM image location this issue came up:
+                <div class="response"></div>
+                This might create issues when downloading the VM image depending on the client
+            </div>
+        </div>
+    </div>
 <div id="navdiv<?php echo $this->dialogCount;?>" style="width:100%;height:100%;padding:0px;padding-right:0px;margin:0px;overflow: visible;" class="invisible<?php echo ' entity' . $this->entitytype; ?> viewmode" tabStrip="true" doLayout="false" itemscope itemtype="http://schema.org/SoftwareApplication">
 	<ul>
 		<li><a href="#infodiv<?php echo $this->dialogCount;?>">Information</a></li>
@@ -50,7 +86,7 @@
 	<form onvalidate="validateApp()" id="editapp<?php echo $this->dialogCount;?>" name="editapp<?php echo $this->dialogCount;?>" action="apps/update" method="post" callback="onAppUpdate" callback_data="{appID: '<?php echo $this->entryid;?>'}" errorcallback="onError" <?php if ( $this->entryid == "" ) { ?>cancelcallback="appdb.pages.application.cancelCallback();"<?php } else {?>cancelcallback="appdb.views.Main.refresh();"<?php } ?>>
 		<input type="hidden" name="metatype" id="metatype" value="<?php echo $this->entitytypeid; ?>" />
 		<div id="infodiv<?php echo $this->dialogCount;?>" dojoType="dijit.layout.ContentPane" title="" class="information">
-			<table width="100%" cellspacing="0">
+                    <table width="100%" cellspacing="0">
 			<tr>
 			<td width="100%">
 			<table border="0" width="100%">				
