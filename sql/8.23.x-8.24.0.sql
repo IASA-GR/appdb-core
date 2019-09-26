@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ Copyright (C) 2015 - 2019 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -33,7 +33,8 @@ DROP MATERIALIZED VIEW site_service_images_xml;
 DROP MATERIALIZED VIEW site_services_xml;  
 DROP FUNCTION public.good_vmiinstanceid(va_provider_images);
 DROP MATERIALIZED VIEW public.va_provider_images;
-DROP MATERIALIZED VIEW public.va_provider_managers;
+DROP MATERIALIZED VIEW IF EXISTS public.va_provider_managers;
+
 CREATE MATERIALIZED VIEW public.va_provider_managers
 AS
 SELECT 
@@ -54,6 +55,7 @@ FROM (
 		jsonb_array_elements((((t.j ->> 'info'::text)::jsonb) ->> 'managers'::text)::jsonb) ->> 'GLUE2CloudComputingManagerHypervisorVersion'::text AS hypervisor_version	
 	FROM egiis.vapj g
 	LEFT JOIN egiis.tvapj t ON g.pkey = t.pkey
+        	-- AND (g.lastseen - t.lastseen) < '00:10:00'::interval
 	WHERE LOWER(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointInterfaceName'::text) ~ '(occi|openstack|opennebula|synnefo|wnodes|cloudstack|vcloud)'::text
 ) AS q
 LEFT JOIN hypervisors ON LOWER(q.hypervisor) ~ LOWER(hypervisors.name)
@@ -67,7 +69,7 @@ CREATE UNIQUE INDEX idx_va_provider_managers_id
 CREATE SEQUENCE IF NOT EXISTS va_provider_shares_id_seq;
 ALTER SEQUENCE va_provider_shares_id_seq OWNER TO appdb;
 
-DROP MATERIALIZED VIEW public.va_provider_shares;
+DROP MATERIALIZED VIEW IF EXISTS public.va_provider_shares;
 CREATE MATERIALIZED VIEW public.va_provider_shares
 AS
 SELECT 
@@ -83,6 +85,7 @@ FROM (
 		jsonb_array_elements((((t.j ->> 'info'::text)::jsonb) ->> 'shares'::text)::jsonb) ->> 'ShareVO'::text AS vo
 	FROM egiis.vapj g
 	LEFT JOIN egiis.tvapj t ON g.pkey = t.pkey
+        	-- AND (g.lastseen - t.lastseen) < '00:10:00'::interval
 	WHERE LOWER(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointInterfaceName'::text) ~ '(occi|openstack|opennebula|synnefo|wnodes|cloudstack|vcloud)'::text
 ) AS q
 WITH DATA;
@@ -147,6 +150,7 @@ FROM (
 	jsonb_array_elements((((t.j ->> 'info'::text)::jsonb) ->> 'templates'::text)::jsonb) ->> 'ManagerName'::text AS manager_name
 	FROM egiis.vapj g
 	     LEFT JOIN egiis.tvapj t ON t.pkey = g.pkey
+             	-- AND (g.lastseen - t.lastseen) < '00:10:00'::interval
 	WHERE LOWER(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointInterfaceName'::text) ~ '(occi|openstack|opennebula|synnefo|wnodes|cloudstack|vcloud)'::text AND 
 		COALESCE(btrim(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointServiceForeignKey'::text), ''::text) <> ''::text AND 
 		COALESCE(((g.j ->> 'info'::text)::jsonb) ->> 'SiteEndpointInProduction'::text, 'FALSE'::text)::boolean IS DISTINCT FROM false
@@ -225,6 +229,7 @@ SELECT nextval('va_provider_endpoints_id_seq'::regclass) AS id,
 	END AS deployment_type	
    	FROM egiis.vapj g
     LEFT JOIN egiis.tvapj t ON g.pkey = t.pkey
+    	-- AND (g.lastseen - t.lastseen) < '00:10:00'::interval
 WHERE LOWER(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointInterfaceName'::text) ~ '(occi|openstack|opennebula|synnefo|wnodes|cloudstack|vcloud)'::text
 WITH DATA;
 
@@ -304,6 +309,7 @@ AS
 				jsonb_array_elements((((t.j ->> 'info'::text)::jsonb) ->> 'images'::text)::jsonb) ->> 'ManagerName'::text AS manager_name
                FROM egiis.vapj g
                  LEFT JOIN egiis.tvapj t ON g.pkey = t.pkey
+                 	-- AND (g.lastseen - t.lastseen) < '00:10:00'::interval
               WHERE LOWER(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointInterfaceName'::text) ~ '(occi|openstack|opennebula|synnefo|wnodes|cloudstack|vcloud)'::text AND 
               	COALESCE(btrim(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointServiceForeignKey'::text), ''::text) <> ''::text AND 
               	COALESCE(((g.j ->> 'info'::text)::jsonb) ->> 'SiteEndpointInProduction'::text, 'FALSE'::text)::boolean IS DISTINCT FROM false
@@ -953,4 +959,3 @@ INSERT INTO version (major,minor,revision,notes)
 	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=24 AND revision=0);
 
 COMMIT;
-
