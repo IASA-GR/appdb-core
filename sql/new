@@ -31,7 +31,7 @@ fi
 touch $new
 cat > $new << EOF
 /*
- Copyright (C) 2015 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ Copyright (C) 2015 - $(date +%Y) IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
