@@ -19381,7 +19381,7 @@ appdb.views.SwapplianceResourceProvidersList = appdb.ExtendClass(appdb.views.Vap
 	};
 });
 
-appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMUsageItem", function(o) {
+appdb.views.SiteVMUsageItemOld = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMUsageItem", function(o) {
 	this.options = {
 		container: $(o.container),
 		parent: o.parent || null,
@@ -19740,8 +19740,8 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 	};
 	this._init();
 });
-
-appdb.views.SiteVMUsageList = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMUsageList", function(o) {
+//TODO: Remove old component appdb.views.SiteVMUsageListGlue20
+appdb.views.SiteVMUsageListGlue20 = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMUsageListGlue20", function(o) {
 	this.options = {
 		container: $(o.container),
 		parent: o.parent || null,
@@ -19833,7 +19833,8 @@ appdb.views.SiteVMUsageList = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 	};
 	this._init();
 });
-appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMImageListFilter", function(o) {
+//TODO: Remove old component appdb.views.SiteVMImageListFilterGlue20
+appdb.views.SiteVMImageListFilterGlue20 = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMImageListFilterGlue20", function(o) {
 	this.options = {
 		container: $(o.container),
 		parent: o.parent || null,
@@ -20328,7 +20329,8 @@ appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.S
 	};
 	this._init();
 });
-appdb.views.SiteVMImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMImageListItem", function(o) {
+//TODO: Remove old component appdb.views.SiteVMImageListItemGlue20
+appdb.views.SiteVMImageListItemGlue20 = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMImageListItemGlue20", function(o) {
 	this.options = {
 		container: $(o.container),
 		parent: o.parent || null,
@@ -20479,7 +20481,8 @@ appdb.views.SiteVMImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.Sit
 	};
 	this._init();
 });
-appdb.views.SiteVMImageList = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMImageList", function(o) {
+//TODO: Remove old component appdb.views.SiteVMImageListGlue20
+appdb.views.SiteVMImageListGlue20 = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMImageListGlue20", function(o) {
 	this.options = {
 		container: $(o.container),
 		parent: o.parent || null,
@@ -20594,6 +20597,1160 @@ appdb.views.SiteVMImageList = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMI
 
 });
 
+appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMUsageItem", function(o) {
+	this.options = {
+		container: $(o.container),
+		parent: o.parent || null,
+		data: o.data || {},
+		siteData: o.siteData || {},
+		instanceData: o.instanceData || {},
+		allowed: ($.isArray(o.allowed))?o.allowed:["contextscript"],
+		itemid: $.trim(o.itemid)
+	};
+	this.getAvailableContextScripts = function(cntxtscripts){
+		var contextscripts = cntxtscripts ||[];
+		contextscripts = $.isArray(contextscripts)?contextscripts:[contextscripts];
+		var res = $.grep(contextscripts, (function(allowed){
+			return function(e){
+				if( !e ) return false;
+				if( e.application && e.application.id ){
+					if($.inArray("swappliance",allowed) > -1){
+						return true;
+					}else{
+						return false;
+					}
+				}
+				if( $.inArray("contextscript",allowed) > -1 ) return true;
+
+				return false;
+			};
+		})(this.options.allowed));
+
+		if( $.inArray("owned",this.options.allowed) > -1 && this.options.itemid ){
+			res = $.grep(res, (function(itemid){
+				return function(e){
+					return ( e && e.application && $.trim(e.application.id) === itemid );
+				};
+			})(this.options.itemid));
+		}
+
+		return res;
+	};
+	this.renderContextScripts = function(dom,contextscripts){
+		var download = $("<a href='#' target='_blank' class='downloadcscript' title='Download contextualization script'>Download</a>");
+		$(download).off("click").on("click", function(ev){
+			ev.stopPropagation();
+			return true;
+		});
+
+		if(contextscripts.length === 1) {
+			$(download).attr("href",contextscripts[0].url).text(contextscripts[0].url);
+			$(dom).append(download);
+		}else if(contextscripts.length > 1) {
+			var select = $("<select class='refcontextscripts'></select>");
+
+			$.each(contextscripts, function(i,e){
+				var option = $("<option></option>").text($.trim(e.url));
+				$(option).attr("value",e.id);
+				$(select).append(option);
+			});
+
+			$(select).find("options:first").prop("selected", true);
+			$(download).attr("href",contextscripts[0].url);
+			$(dom).append(select).append(download);
+
+			new dijit.form.Select/*ComboBox*/({
+				onChange: (function(dom){
+					return function(v){
+						console.log(v);
+						var urls = $.grep(this.getOptions(), function(e){
+							return $.trim(e.value) === v;
+						});
+						if( urls.length > 0 ){
+							$(dom).find("a.downloadcscript").attr("href",urls[0].label);
+						}
+					};
+				})(dom)
+			}, $(select)[0]);
+
+			$(dom).addClass("hasmany");
+		}
+	};
+	this.getTemplateImageList = function (images) {
+		var ul = $("<ul class='groupfieldvalues'></ul>");
+
+		$.each(images, function(ii, image) {
+			var service = image.service || {};
+			var occi_endpoint_url = null;
+			var serviceType = service.type || 'occi';
+			var li = $("<li class='fieldvalues'></li>");
+			var endpoint_title = '<div class="icontext"><img src="/images/occi.png" alt="OCCI"/><span><b>OCCI</b> endpoint:</span></div>';
+			var endpoint_url_html = $("<div class='fieldvalue endpoint'><div class='field'></div><div class='value'></div></div>");
+			var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>" + appdb.utils.CloudInfo.getTemplateTitle(serviceType) + ":</div><div class='value'></div></div>");
+			var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>" + appdb.utils.CloudInfo.getResourceTitle(serviceType) + ":</div><div class='value'></div></div>");
+
+			if ((service.occi_endpoint_url || {}).val) {
+			    occi_endpoint_url = service.occi_endpoint_url.val();
+			}
+
+			if (serviceType === 'openstack') {
+			    endpoint_title = '<div class="icontext"><img src="/images/openstack.png" alt="Openstack"/><span> endpoint:</span></div>';
+			} else  if (serviceType === 'opennebula') {
+			    endpoint_title = '<div class="icontext"><img src="/images/opennebula.png" alt="Opennebula"/><span> endpoint:</span></div>';
+			}
+
+			$(endpoint_url_html).find(".field").append(endpoint_title);
+			$(endpoint_url_html).find(".value").text(occi_endpoint_url);
+			$(template_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(serviceType, image.template.resource_name));
+			$(occi_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(serviceType, image.id));
+
+			$(li).append(endpoint_url_html).append(template_id_html).append(occi_id_html);
+			$(ul).append(li);
+		});
+
+		$(ul).find(".fieldvalue .value").each(function(i, e) {
+			if ($.trim($(e).text()) === "") {
+				$(e).addClass("empty").text("not available yet");
+			}
+		});
+
+		$(ul).find(".fieldvalues:first").addClass("current");
+
+		if($(ul).children("li").length > 1 ){
+			$(ul).addClass("haspaging");
+		}
+
+		return appdb.utils.pagifyHTMLList(ul);
+	};
+
+	this.showTemplateImages = function(el, contextscript, images, template) {
+		var vappVersion = this.options.data;
+		var usageids = $("<div class='usageids'></div>");
+		var imageid = $("<div class='imageid'></div>");
+		var temp = $("<div class='usagetemplate'></div>");
+		var td = $(el).closest(".va-template.va-template-data");
+		var listhtmllist = this.getTemplateImageList(images);
+		var contextscripts = this.getAvailableContextScripts(contextscript);
+
+		$(imageid).text("Image: ver." + vappVersion.version + " - " + vappVersion.os.val() + " " + vappVersion.os.version + " / " + vappVersion.arch.val() + " / " + vappVersion.hypervisor.val());
+		$(temp).append("<span>CPUs: <b>" + $(td).find(".template-cell.cpus > span").text() + "</b></span><span>Memory: <b>" + $(td).find(".template-cell.memory > span").text() + "</b></span><span>Disk: <b>" + $(td).find(".template-cell.disk > span").text()  + "</b></span><span> In\Out: <b>" + $(td).find(".template-cell.connectivity > span").text() + "</b></span><span>OS: <b>" + $(td).find(".template-cell.osfamily > span").text() +"</b></span>");
+		$(usageids).append(imageid).append(temp).append(listhtmllist);
+
+		if ( contextscripts.length > 0 ) {
+			var contextscript_html = $("<div class='fieldvalues contextscript_url'><div class='fieldvalue contextscript_url'><div class='field'>Contextualization script:</div><div class='value'></div></div></div>");
+
+			this.renderContextScripts($(contextscript_html).find(".fieldvalue > .value"), contextscripts);
+			$(usageids).append(contextscript_html);
+		}
+
+		if (this.parent.renderInlineDialog) {
+			var title = vappVersion.application.name + " IDs";
+			var vo = template.vo || null;
+			var voname = (vo.val) ? vo.val() :  vo.name;
+
+			if (voname) {
+				title += " endorsed by " + voname;
+			}
+			this.parent.renderInlineDialog(true, usageids, "<span>" + title + "</span>", "sitecontents");
+		}
+
+		$(usageids).find(".contextscript_url .value.hasmany").closest(".fieldvalue").addClass("hasmany");
+
+		if( $(usageids).find(".pagifier").length > 0 ){
+			$(usageids).addClass("hasmany");
+		}
+	};
+
+	this.renderEmptyTemplate = function(dom) {
+		$(dom).append("<div class='template-empty'><span class='message'>No templates provided</span></div><div class='template-cell action'><div class='getids' title='View related IDs'>get IDs</div></div>");
+		$(dom).find(".getids").remove();
+	};
+	this.renderTemplate = function(dom, d, data,instance) {
+		d = d || {};
+		var memory = $("<div class='template-cell memory'></div>");
+		var cpus = $("<div class='template-cell cpus'></div>");
+		var connectivity = $("<div class='template-cell connectivity'></div>");
+		var osfamily = $("<div class='template-cell osfamily'></div>");
+		var action = $("<div class='template-cell action'><div class='getids' title='View related IDs'></div><div class='getcontextscript hidden' title='View contextualization script'></div></div>");
+		var memorytext = ($.trim(d.main_memory_size) === "" ? "-" : $.trim(d.main_memory_size));
+		var cpustext = ($.trim(d.logical_cpus) === "" ? "-" : $.trim(d.logical_cpus)) + "/" + ($.trim(d.physical_cpus) === "" ? "-" : $.trim(d.physical_cpus));
+		var connectivitytext = ($.trim(d.connectivity_in).toUpperCase() === "FALSE" ? "no" : ($.trim(d.connectivity_in).toUpperCase() === "TRUE") ? "yes" : ($.trim(d.connectivity_in) || "-")) + "/" + ($.trim(d.connectivity_out).toUpperCase() === "FALSE" ? "no" : ($.trim(d.connectivity_out).toUpperCase() === "TRUE") ? "yes" : ($.trim(d.connectivity_out) || "-"));
+		var osfamilytext = ($.trim(d.os_family) === "" ? "-" : $.trim(d.os_family));
+		var disk = $("<div class='template-cell disk'></div>");
+		var disktext = $("<span></span>").text($.trim(d.disc_size));
+		var diskSize = parseInt($.trim(d.disc_size) || "-1");
+
+		if (isNaN(diskSize) === false) {
+		  switch(diskSize) {
+		    case -1:
+		      disktext = $("<span></span>").append("<i>n/a</i>");
+		      break;
+		    case 0:
+		      disktext = $("<span></span>").append("<i>any</i>");
+		      break;
+		    default:
+		      disktext = $("<span></span>").text(diskSize + " GB");
+		      break;
+		  }
+		}
+
+		$(disk).append("<span></span>").append(disktext);
+		$(memory).append($("<span></span>").text(memorytext));
+		$(cpus).append($("<span></span>").text(cpustext));
+		$(connectivity).append($("<span></span>").text(connectivitytext));
+		$(osfamily).append($("<span></span>").text(osfamilytext));
+
+		if ($.trim(d.noaction) !== "true") {
+			$(action).find(".getids").text("get IDs");
+		} else {
+			$(action).empty();
+		}
+
+		$(dom).append(cpus).append(memory).append(disk).append(connectivity).append(osfamily).append(action);
+		$(action).find(".getids").off("click").on("click", (function(self, cscript, instance) {
+			return function(ev) {
+				ev.preventDefault();
+				self.showTemplateImages(this, cscript, d.images || [], d);
+				return false;
+			};
+		})(this, data.contextscript,instance));
+	};
+	this.sortTemplates = function(templates) {
+		var min = 1;
+		var max = -1;
+
+		return templates.sort(function(a, b) {
+		    if (parseInt(a.physical_cpus) > parseInt(b.physical_cpus)) return min;
+		    if (parseInt(a.physical_cpus) < parseInt(b.physical_cpus)) return max;
+
+		    if (parseInt(a.logical_cpus) > parseInt(b.logical_cpus)) return min;
+		    if (parseInt(a.logical_cpus) < parseInt(b.logical_cpus)) return max;
+
+		    if (parseInt(a.main_memory_size) > parseInt(b.main_memory_size)) return min;
+		    if (parseInt(a.main_memory_size) < parseInt(b.main_memory_size)) return max;
+
+		    if (parseInt(a.disc_size) > parseInt(b.disc_size)) return min;
+		    if (parseInt(a.disc_size) < parseInt(b.disc_size)) return max;
+
+		    return 0;
+		});
+	};
+	this.renderTemplates = function(dom, d, instance) {
+		var ul = $("<ul class='cancollapse'></ul>");
+		var liheader = $("<li class='va-template va-template-header'></li>");
+
+		this.renderTemplate(liheader, {main_memory_size: "Memory", disc_size: "Disk", logical_cpus: "Logical", physical_cpus: "/Physical CPUs", connectivity_in: "Connectivity In", connectivity_out: "/Out", os_family: "OS Family", noaction: "true"}, data);
+
+		$(ul).append(liheader);
+		d = this.sortTemplates(d);
+
+		if (d.length > 0) {
+			$.each(d, (function(self, container) {
+				return function(i, e) {
+					var l = $("<li class='va-template va-template-data'></li>").data("template", e);
+					self.renderTemplate(l, e, d, instance);
+					$(container).append(l);
+				};
+			})(this, ul));
+		} else {
+			var l = $("<li class='va-template va-template-data empty'></li>");
+			this.renderEmptyTemplate(l);
+			$(ul).append(l);
+		}
+
+		$(dom).append(ul);
+	};
+	this.render = function(d, vo) {
+		d = d || {};
+
+		var templates = vo.templates;
+		var headerText = 'Select a template and get the infrastructure ids';
+
+		this.options.data = d || this.options.data;
+		this.options.serviceType = (this.options.data.occi_endpoint_url && this.options.data.occi_endpoint_url.type) ? this.options.data.occi_endpoint_url.type : 'occi';
+		this.options.instanceData = vo || this.options.instanceData || {};
+
+		$(this.dom).children(".header").remove();
+		$(this.dom).append($("<div class='header'>" + headerText + "</div>"));
+
+		this.renderTemplates(this.dom, templates, vo);
+	};
+	this._init = function() {
+		this.dom = $(this.options.container);
+		this.parent = this.options.parent;
+	};
+	this._init();
+});
+
+appdb.views.SiteVMUsageList = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMUsageList", function(o) {
+	this.options = {
+		container: $(o.container),
+		parent: o.parent || null,
+		data: o.data || {},
+		siteData: o.siteData || {},
+		usageitem: null,
+		selectedVO: o.selectedVO || null
+	};
+	this.renderInlineDialog = function(enabled, html, title, classes) {
+		if (this.parent.renderInlineDialog) {
+			this.parent.renderInlineDialog(enabled, html, title, classes);
+		}
+	};
+	this.renderUsageItem = function(data) {
+		if (this.options.usageitem) {
+			this.options.usageitem.reset();
+			this.options.usageitem = null;
+		}
+		this.options.usageitem = new appdb.views.SiteVMUsageItem({
+			container: $(this.dom).find(".usageitem"),
+			parent: this,
+			data: this.options.data,
+			siteData: this.options.siteData
+		});
+		this.options.usageitem.render(this.options.data, data);
+	};
+
+	this.addItem = function(d) {
+		var li = $("<li></li>");
+		var a = $("<a href='#' title='Select to view usage'><span class='name'></span></a>");
+		var voname = d.name || "none";
+
+		$(li).append(a);
+		$(a).find(".name").text(voname);
+		$(a).off("click").on("click", (function(self, data) {
+			return function(ev) {
+				ev.preventDefault();
+				$(this).closest("ul").find(".current").removeClass("current");
+				$(this).addClass("current");
+				self.renderUsageItem(data);
+				return false;
+			};
+		})(this, d));
+
+		return li;
+	};
+	this.orderEndorsements = function() {
+		this.options.data = this.options.data || {};
+		this.options.data.vos = this.options.data.vos || [];
+		this.options.data.vos.sort(function(a, b) {
+			if (!a.voimageid) {
+				return -1;
+			}
+			if (!b.voimageid) {
+				return 1;
+			}
+			var an = a.vo.name;
+			var bn = b.vo.name;
+			if (an > bn)
+				return -1;
+			if (an < bn)
+				return 1;
+			return 0;
+		});
+	};
+	this.render = function(d) {
+		d = d || {};
+		this.options.data = d || this.options.data;
+		this.orderEndorsements();
+		$(this.dom).find("ul.usagelist").empty();
+
+		$.each(this.options.data.vos, (function(self, dom) {
+			return function(i, e) {
+				var voname = e.name || "none";
+				if (voname === self.options.selectedVO) {
+				    var li = self.addItem(e);
+				    if (li) {
+					    $(dom).append(li);
+				    }
+				}
+			};
+		})(this, $(this.dom).find("ul.usagelist")));
+
+		$(this.dom).find("ul.usagelist > li:first > a").trigger("click");
+	};
+	this._initContainer = function() {
+		$(this.dom).empty();
+		$(this.dom).append("<div class='title'>Endorsed by VO:</div><ul class='usagelist'></ul><div class='usageitem va-image'></div>");
+		$(this.dom).addClass("resourceproviders");
+	};
+	this._init = function() {
+		this.dom = $(this.options.container);
+		this.parent = this.options.parent;
+		this._initContainer();
+	};
+	this._init();
+});
+appdb.views.SiteVMImageListFilter = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMImageListFilter", function(o) {
+	this.options = {
+		container: $(o.container),
+		parent: o.parent || null,
+		vmimagelist: o.vmimagelist || null,
+		data: o.data || [],
+		siteData: o.siteData || {},
+		filters: [
+			{
+				id: 'vo',
+				name: "Endorsed by VOs",
+				persist: true,
+				clear: function() {
+				    return;
+				},
+				getContainer: function(dom) {
+					return $(dom).find(".resourceproviders > .header > .voselector");
+				},
+				update: function(filter, data) {
+					var preselect = 'fedcloud.egi.eu';
+					var postselect = '<none>';
+					var sel = $(this.dom).find(".resourceproviders .voselector");
+					var avos = filter.getValueObjects(this.options.data);
+					avos.sort(function(a,b){
+						var an = a.val;
+						var bn = b.val;
+
+						if( an === postselect) return 1;
+						if( an < bn) return -1;
+						if( an > bn) return 1;
+
+						return 0;
+					});
+					avos.sort(function(a, b) {
+					    var an = a.val;
+
+					    if (an === preselect) return -1;
+					    return 1;
+					})
+					var listdom = $("<select></select>");
+					$.each(avos, function(i, e) {
+						var opt = $("<option value=''></option>");
+						$(opt).text(e.val).val(e.id);
+						$(listdom).append(opt);
+					});
+					filter.itemCount = avos.length;
+
+					$(filter.dom).find(".value").append(listdom);
+					filter.currentValue = filter.userValue;
+
+					$(filter.dom).removeClass("single").removeClass("empty");
+
+					$(sel).empty();
+					var html = $("<select></select>");
+
+					$.each(avos, function(i, e){
+						var opt = $("<option value=''></option>");
+						$(opt).attr("value",e.id);
+						if( $.trim(e.id) === preselect ){
+							$(opt).attr("selected");
+						}
+						var inner = $("<div class='vooption icontext'><img src='' alt=''/><span class='name'></span><span class='details'></span></div>");
+						$(inner).find("span.name").text(e.name);
+						$(inner).find("img").attr("src", "/vo/getlogo?name="+encodeURI(e.name) +"&vid="+ (e.voId<<0));// +"&id=" + e.discipline);
+						$(inner).find("span.details").text(e.count + " image" + ((e.count>1)?"s":"") +" available");
+						$(opt).append(inner);
+						$(html).append(opt);
+					});
+					$(sel).append(html);
+
+					//clear previous dojo comboboxes
+					if (filter.combobox) {
+						filter.combobox.destroyRecursive(false);
+						filter.combobox = null;
+					}
+
+					filter.combobox = new dijit.form.Select({
+						name: "availablevos",
+						value: preselect,
+						title: 'Select to view images endorsed by specific VOs',
+						onChange: (function(self, flt, data) {
+							return function(v) {
+								var shouldUpdate = false;
+								if( data.length <= 1) return;
+								if ($.trim(v) === "") {
+									delete filter.userValue;
+									$(flt.dom).removeClass("hasselection");
+								} else {
+									shouldUpdate = (filter.userValue !== v);
+									filter.userValue = v;
+									$(flt.dom).addClass("hasselection");
+								}
+								$(self.dom).find('.resourceproviders .vodetailslink a').attr('href', '/store/vo/' + v);
+								if(shouldUpdate) {
+								    $.each(self.options.filters, function(i, filter) {
+									    if (filter!== flt) {
+										    self.clearFilters(filter, false);
+									    }
+								    });
+								}
+
+								self.filter(flt);
+							};
+						})(this, filter, avos)
+					},$(html)[0]);
+
+					if (!filter.userValue && avos.length > 0) {
+					    filter.userValue = avos[0].val;
+					    $(this.dom).find('.resourceproviders .vodetailslink a').attr('href', '/store/vo/' + filter.userValue);
+					}
+				},
+				getValueObjects: function(d) {
+					var vos = {};
+					$.each(d, function(i, e) {
+						e.vos = e.vos || [];
+						e.vos = $.isArray(e.vos) ? e.vos : [e.vos];
+
+						$.each(e.vos, function(ii, vo) {
+						    if (vos[vo.id]) {
+							vos[vo.id].count = vos[vo.id].count + 1;
+							return;
+						    }
+						    vos[vo.id] = $.extend(true, {}, vo);
+						    vos[vo.id].count = 1;
+						});
+					});
+					var res = [];
+					for (var i in vos) {
+						if (vos.hasOwnProperty(i) === false) continue;
+						res.push({
+						    id: vos[i].name,
+						    val: vos[i].name,
+						    name: vos[i].name,
+						    voId: vos[i].id,
+						    alias: vos[i].alias,
+						    logoid: vos[i].logoid,
+						    discipline: vos[i].discipline,
+						    scope: vos[i].scope,
+						    sourceid: vos[i].sourceid,
+						    status: vos[i].status,
+						    validatedOn: vos[i].validatedOn,
+						    count: vos[i].count
+						});
+					}
+					return res;
+				},
+				filterOut: function(id, d) {
+					return $.grep(d, function(vapp) {
+						return vapp.vos.filter(function(vo) { return vo.name == id; }).length > 0;
+					});
+				}
+			},{
+				name: "OSes",
+				getValueObjects: function(d) {
+					var oses = {};
+					$.each(d, function(i, vapp) {
+						if (vapp.os && vapp.os.id) {
+							oses[vapp.os.id] = $.extend(true, {}, vapp.os);
+						}
+					});
+					var res = [];
+					for (var i in oses) {
+						if (oses.hasOwnProperty(i) === false)
+							continue;
+						res.push({id: oses[i].val(), val: oses[i].val()});
+					}
+					return res;
+				},
+				filterOut: function(id, d) {
+					return $.grep(d, function(vapp) {
+						return (vapp.os && vapp.os.val && vapp.os.val() === id) ? true : false;
+					});
+				}
+			}, /*{
+				name: "Hypervisors",
+				getValueObjects: function(d) {
+					var hyps = {};
+					$.each(d, function(i, e) {
+						if (e.hypervisor && e.hypervisor.id) {
+							hyps[e.hypervisor.id] = $.extend(true, {}, e.hypervisor);
+						}
+						;
+					});
+					var res = [];
+					for (var i in hyps) {
+						if (hyps.hasOwnProperty(i) === false)
+							continue;
+						res.push({id: hyps[i].val(), val: hyps[i].val()});
+					}
+					return res;
+				},
+				filterOut: function(id, d) {
+					return $.grep(d, function(e) {
+						return (e.hypervisor && e.hypervisor.val() === id) ? true : false;
+					});
+				}
+			},*/
+			{
+				name: "Virtual Appliances",
+				getValueObjects: function(d) {
+					var vapps = {};
+					$.each(d, function(i, vapp) {
+						if (vapp.application && vapp.application.id) {
+							vapps[vapp.application.id] = $.extend(true, {}, vapp.application);
+						}
+					});
+					var res = [];
+					for (var i in vapps) {
+						if (vapps.hasOwnProperty(i) === false)
+							continue;
+						res.push({id: vapps[i].name, val: vapps[i].name});
+					}
+					return res;
+				},
+				filterOut: function(id, d) {
+					return $.grep(d, function(vapp) {
+						return (vapp.application && vapp.application.name && vapp.application.name === id) ? true : false;
+					});
+				}
+			},
+			{
+				name: "image state",
+				getValueObjects: function(d) {
+					var deleted = {
+						id: "deleted",
+						val: "deleted images",
+						count: this.filterOut("deleted", d).length
+					};
+					var moderated = {
+						id: "moderated",
+						val: "moderated images",
+						count: this.filterOut("moderated", d).length
+					};
+					var expired = {
+						id: "expired",
+						val: "expired images",
+						count: this.filterOut("expired", d).length
+					};
+					var outdated = {
+						id: "outdated",
+						val: "outdated images",
+						count: this.filterOut("outdated", d).length
+					};
+					var valid = {
+						id: "valid",
+						val: "valid images",
+						count: d.length - (deleted.count + moderated.count + expired.count)
+					};
+					var marks = [valid, expired, deleted, moderated];
+
+					return $.grep(marks, function(mark) {
+						return (mark.count > 0);
+					});
+				},
+				filterOut: function(id, d) {
+				    return $.grep(d, function(vapp) {
+					var app = (vapp || {}).application || {deleted: "false", moderated: false};
+					switch(id) {
+						case "moderated":
+							return $.trim(app.moderated).toLowerCase() === "true";
+						case "deleted":
+							return $.trim(app.deleted).toLowerCase() === "true";
+						case "expired":
+							return $.trim(vapp.isexpired).toLowerCase() === "true";
+						case "outdated":
+							return $.trim(vapp.archived).toLowerCase() === "true";
+						case "valid":
+							return ([
+								$.trim(app.moderated).toLowerCase(),
+								$.trim(app.deleted).toLowerCase(),
+								$.trim(vapp.isexpired).toLowerCase()
+							].indexOf('true') === -1)
+						default:
+							return true;
+					}
+				    });
+				}
+			}
+		]
+	};
+	this.getFilteredData = function(filters) {
+		filters = filters || this.options.filters;
+		filters = $.isArray(filters)?filters:[filters];
+		var res = this.options.data.slice(0);
+		$.each(filters, (function(self) {
+			return function(i, e) {
+				if (e.userValue) {
+					res = e.filterOut(e.userValue, res);
+				}
+			};
+		})(this));
+		return res;
+	};
+	this.filter = function(filter) {
+		if (this.options.vmimagelist && this.options.vmimagelist.onFilterChange) {
+		    this.options.vmimagelist.onFilterChange(this.getFilterState());
+		}
+		var fd = this.getFilteredData();
+		if (this.options.vmimagelist) {
+			this.options.vmimagelist.render(fd);
+			this.renderCount(fd);
+		}
+		$.each(this.options.filters, (function(self) {
+			return function(i, e) {
+				if (filter && e.name === filter.name) return;
+				self.updateFilter(e, fd, e.userValue);
+			};
+		})(this));
+		this.validateFilters(filter);
+	};
+	this.getFilterState = function() {
+	    return (this.options.filters || []).reduce(function(acc, filter) {
+		acc[filter.id || filter.name] = filter.userValue;
+		return acc;
+	    }, {});
+	};
+	this.getFilterValues = function(filter){
+		var flts = $.grep(this.options.filters, function(e) {
+			if (filter && e.name === filter.name) return false;
+			return (e.userValue)?true:false;
+		});
+		return this.getFilteredData(flts);
+	};
+	this.clearFilters = function(flt, autofilter) {
+		if( !flt ){
+			this.render();
+			this.filter();
+		}else{
+			if ($.isFunction(flt.clear)) {
+				flt.clear();
+			} else {
+				delete flt.userValue;
+				flt.currentValue = '';
+			}
+
+			$(flt.dom).removeClass("hasselection");
+
+			if (autofilter !== false) {
+			    this.filter(flt);
+			}
+		}
+	};
+	this.updateFilter = function(filter, data) {
+		if (filter.update) {
+		    filter.update.bind(this)(filter, data);
+		    return;
+		}
+		var fd = filter.getValueObjects(this.getFilterValues(filter));
+		fd.sort(function(a,b){
+			var an = a.val;
+			var bn = b.val;
+
+			if( an < bn) return -1;
+			if( an > bn) return 1;
+
+			return 0;
+		});
+		var listdom = $("<select></select>");
+		$.each(fd, function(i, e) {
+			var opt = $("<option value=''></option>");
+			$(opt).text(e.val).val(e.id);
+			$(listdom).append(opt);
+		});
+		filter.itemCount = fd.length;
+		//clear previous dojo comboboxes
+		if (filter.combobox) {
+			filter.combobox.destroyRecursive(false);
+			filter.combobox = null;
+		}
+
+		$(filter.dom).find(".value").append(listdom);
+		filter.currentValue = filter.userValue;
+
+		$(filter.dom).removeClass("single").removeClass("empty");
+
+		if ($(listdom).find("option").length > 1) {
+			$(listdom).prepend("<options value=' '></option>");
+		} else if ($(listdom).find("option").length === 0) {
+			$(filter.dom).addClass("empty");
+		} else {
+			$(filter.dom).addClass("single");
+			$(listdom).children("option:first").prop("selected", true);
+			filter.currentValue = fd[0].val;
+		}
+
+		filter.combobox = new dijit.form.FilteringSelect({
+			placeHolder: $.trim(filter.name).toLowerCase(),
+			style: "min-width: 80px;",
+			required: false,
+			value: filter.currentValue,
+			onChange: (function(self, flt, data) {
+				return function(v) {
+					if( data.length <= 1) return;
+					if ($.trim(v) === "") {
+						delete filter.userValue;
+						$(flt.dom).removeClass("hasselection");
+					} else {
+						filter.userValue = v;
+						$(flt.dom).addClass("hasselection");
+					}
+					self.filter(flt);
+				};
+			})(this, filter, fd)
+		}, $(filter.dom).find("select")[0]);
+	};
+	this.addFilter = function(filter) {
+		if (filter.dom) {
+			$(filter.dom).remove();
+			delete filter.dom;
+		}
+		if (typeof filter.userValue !== "undefined") {
+			delete filter.userValue;
+		}
+		if (filter.getContainer) {
+		    filter.dom = filter.getContainer(this.dom);
+		} else {
+		    filter.dom = $("<li><div class='filter'><div class='field'></div><div class='value'></div><a href='#' class='action clear' title='Clear current filter'>x</a></div></li>");
+		    $(filter.dom).find(".field").text(filter.name + ":");
+		    $(filter.dom).find(".action.clear").off("click").on("click", (function(self, flt) {
+			    return function(ev) {
+				    ev.preventDefault();
+				    delete flt.userValue;
+				    self.clearFilters(flt);
+				    if( flt.combobox ){
+					    flt.combobox.focus();
+				    }
+				    return false;
+			    };
+		    })(this, filter));
+		}
+
+		this.updateFilter(filter, this.options.data);
+	};
+	this.validateFilters = function(filter){
+		$.each(this.options.filters, function(i, e){
+			if( e.combobox.get("value") !== e.userValue ){
+				e.combobox.set("value", e.userValue );
+				e.combobox.set("displayedValue", (e.itemCount === 1)?e.currentValue || e.userValue:'' );
+			}
+			e.combobox.set("disabled", (e.itemCount === 1) );
+			if( e.itemCount === 0 ){
+				$(e.dom).hide();
+			}else{
+				$(e.dom).show();
+			}
+		});
+	};
+	this.renderFilters = function() {
+		$(this.dom).find(".filters > ul").empty();
+		$.each(this.options.filters, (function(self) {
+			return function(i, e) {
+				if (!(e.combobox && e.persist === true)) {
+				    self.addFilter(e);
+				    $(self.dom).find(".filters > ul").append(e.dom);
+				}
+			};
+		})(this));
+	};
+	this.renderCount = function(d){
+		d = d || [];
+		d = $.isArray(d)?d:[d];
+		$(this.dom).find(".results").removeClass("single");
+		$(this.dom).find(".results > .count").text(d.length);
+		if( d.length === 1 ){
+			$(this.dom).find(".results").addClass("single");
+		}
+	};
+	this.render = function(d) {
+		this.renderFilters();
+
+		$(this.dom).find(".action.clearall").off("click").on("click", (function(self) {
+			return function(ev) {
+				ev.preventDefault();
+				self.clearFilters();
+				return false;
+			};
+		})(this));
+
+		this.filter();
+	};
+	this._initContainer = function() {
+		$(this.dom).empty();
+		$(this.dom).append('<div class="resourceproviders"><div class="header"><div class="field-name"><div>Endorsed by VO: </div><div class="voselector"></div><div class="vodetailslink">(<a href="" title="View VO details in new window" target="_blank">view VO details</a>)</div></div></div></div>');
+		$(this.dom).append("<div class='title'>Filter By:</div>");
+		$(this.dom).append("<div class='filters'><ul></ul></div>");
+		$(this.dom).append("<a href='#' class='clearall action' title='clear all filters'>clear all</a>");
+		$(this.dom).append("<div class='results'><span class='count'></span><span>image<span class='plural'>s</span></span></a>");
+	};
+	this._init = function() {
+		this.dom = $(this.options.container);
+		this.parent = this.options.parent;
+		this._initContainer();
+	};
+	this._init();
+});
+appdb.views.SiteVMImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMImageListItem", function(o) {
+	this.options = {
+		container: $(o.container),
+		parent: o.parent || null,
+		data: o.data || {},
+		siteData: o.siteData || {},
+		usage: null,
+		selectedVO: o.selectedVO || null
+	};
+	this.renderInlineDialog = function(enabled, html, title, classes) {
+		enabled = (typeof enabled === "boolean") ? enabled : false;
+		title = $.trim(title);
+		classes = $.trim(classes);
+		$(this.dom).children(".inlinedialog").remove();
+		if (enabled) {
+			var dialog = $("<div class='inlinedialog " + classes + "'><div class='shader'/><div class='dialog'><div class='header'></div><div class='message'></div><div class='footer'><div class='action close btn btn-primary btn-compact'>close</div></div></div></div>");
+			$(dialog).find(".header").append(title);
+			if (title === "") {
+				$(dialog).find(".header").addClass("hidden");
+			}
+			$(dialog).find(".message").append(html);
+			$(dialog).off("click").on("click", function(ev) {
+				ev.preventDefault();
+				return false;
+			});
+			$(dialog).find(".action.close, .shader").off("click").on("click", (function(self) {
+				return function(ev) {
+					ev.preventDefault();
+					self.renderInlineDialog(false);
+					return false;
+				};
+			})(this));
+			$(this.dom).append(dialog);
+		}
+	};
+	this.renderUsage = function(d) {
+		if (this.options.usage) {
+			this.options.usage.reset();
+			this.options.usage = null;
+		}
+		$(this.dom).find(".usage").remove();
+		$(this.dom).append("<div class='usage'></div>");
+		this.options.usage = new appdb.views.SiteVMUsageList({
+			container: $(this.dom).find(".usage"),
+			parent: this,
+			data: d,
+			siteData: this.options.siteData,
+			selectedVO: this.options.selectedVO
+		});
+		this.options.usage.render(d);
+	};
+	this.renderActions = function(d) {
+		var actions = $("<div class='actions'></div>");
+		var usage = $("<a class='action usage richbutton' href='#'><img src='/images/occi.png' alt=''><div class='content'><span>Use it</span></div></a>");
+		var details = $("<a class='action details' href='#' target='_blank' title='View image details'><span>view image details</span></a>");
+		var download = $("<a class='action download richbutton' title='Download image' href='#' target='_blank'>" +
+				"<img class='hideonprivate' src='/images/download.png' alt=''><img class='showonprivate' src='/images/logout3.png' alt=''>" +
+				"<div class='content'><span class='hideonprivate'>Download</span><span class='showonprivate'>Private</span>" +
+				"</div></a>");
+
+		$(usage).off("click").on("click", (function(self, data) {
+			return function(ev) {
+				if ($(self.dom).hasClass("expanded")) {
+					$(self.dom).removeClass("expanded");
+				} else {
+					$(self.parent.dom).find(".expanded").removeClass("expanded");
+					$(self.dom).addClass("expanded");
+				}
+			};
+		})(this, d));
+
+		var mpuri = d.mpuri;
+		if (d.id !== d.goodid && $.trim(d.isexpired) === "true") {
+		    //The goodid is based only on the image checksum and does not take into account the expiration date.
+		    //Due to the fact that all images may expire at some point, many authors update the image versions
+		    //just to refresh the expiration date, which will also have the same goodid (same image file checksum)
+		    //as the previous expired versions. In these cases the end user will get confused since the url of the
+		    //provided mpuri(goodid based) will lead to a more recent not-expired version than the one showned in
+		    //the UI image list as expired.
+		    //For the above reasons, we must replace the goodid with the actual vmi instance id in the mpuri.
+		    mpuri = mpuri.replace(/\:\d+\/{0,1}$/i, ':' + d.id + '/?strict');
+		}
+		$(details).attr("href", mpuri).off("click");
+		$(download).attr("href", ($.trim(d["private"]) === 'true') ? d.mpuri : d.url);
+		$(actions).append(download).append(usage);
+		$(this.dom).find(".actions").remove();
+		$(this.dom).append(actions);
+		$(this.dom).find(".app-image-info").after(details);
+	};
+	this.renderDeletedModerated = function(){
+		$(this.dom).removeClass("deleted moderated");
+		if( !this.options.data || !this.options.data.application ) return;
+		var data = this.options.data.application;
+		var statename = "";
+		var state = $("<div class='app-state'></div>");
+		if( $.trim(data.deleted) === "true" ){
+			statename = "deleted";
+		}else if( $.trim(data.moderated) === "true" ){
+			statename = "moderated";
+		}else if( $.trim(this.options.data.isexpired) === "true" ){
+			statename = "expired";
+		}
+		if( statename !== "" ){
+			$(state).addClass(statename).text(statename);
+			$(this.dom).addClass("state-" + statename);
+			var p = this.getClosestParent("appdb.views.SiteVMImageList");
+			if( p !== null ){
+				$(state).append(p.getStatePanel(statename));
+			}
+			$(this.dom).find(".app-name").prepend(state);
+		}
+	};
+	this.render = function(d) {
+		d = d || this.options.data || {};
+		this.options.data = d;
+		var applogo = $("<img src='" + appdb.config.endpoint.base + "apps/getlogo?id=" + d.application.id + "' class='app-logo' />");
+		var appname = $("<div class='app-name'></div>");
+		var applink = $("<a href='#' target='_blank' title='View item' ></a>");
+		var imageinfo = $("<div class='app-image-info'></div>");
+		var instances = $("<div class='app-image-instances'>" + d.length + "</div>");
+		$(applink).attr("href", appdb.config.endpoint.base + "store/vappliance/" + d.application.cname).off("click").on("click", (function(data) {
+			return function(ev) {
+				ev.preventDefault();
+				appdb.views.Main.showVirtualAppliance({id: data.application.id, cname: data.application.cname});
+				return false;
+			};
+		})(d));
+		$(applink).text(d.application.name);
+		$(appname).append(applink);
+		$(imageinfo).text(d.version + " " + d.os.val() + " " + d.os.version + " / " + d.arch.val() + " / " + d.hypervisor.val());
+		$(this.dom).append(applogo).append(appname).append(imageinfo).append(instances);
+		if ($.trim(d["private"]) === 'true') {
+			$(this.dom).addClass("isprivate");
+		} else {
+			$(this.dom).removeClass("isprivate");
+		}
+		this.renderDeletedModerated();
+		this.renderUsage(d);
+		this.renderActions(d);
+		$(this.dom).attr("title", d.application.name + " VM image");
+	};
+	this._initContainer = function() {
+
+	};
+	this._init = function() {
+		this.dom = $(this.options.container);
+		this.parent = this.options.parent;
+		this._initContainer();
+	};
+	this._init();
+});
+appdb.views.SiteVMImageList = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMImageList", function(o) {
+	this.options = {
+		container: $(o.container),
+		parent: o.parent || null,
+		items: [],
+		data: o.data || [],
+		siteData: o.siteData || {},
+		selectedVO: o.selectedVO || null
+	};
+	this.reset = function() {
+		this.unsubscribeAll();
+		$(this.dom).empty();
+		$.each(this.options.items, function(i, e) {
+			e.reset();
+			e = null;
+		});
+		this.options.items = [];
+		this._initContainer();
+	};
+	this.addItem = function(d) {
+		var li = $("<li></li>");
+		var image = new appdb.views.SiteVMImageListItem({
+			container: li,
+			parent: this,
+			data: d,
+			siteData: this.options.siteData,
+			selectedVO: this.options.selectedVO || null
+		});
+
+		this.options.items.push(image);
+		image.render();
+
+		return li;
+	};
+	this.sortData = function(data) {
+	    return data.sort(function(a, b){
+		    //order by vappliance name
+		    var an = $.trim( (a.application)?a.application.name:'' ).toLowerCase();
+		    var bn = $.trim( (b.application)?b.application.name:'' ).toLowerCase();
+
+		    if( an < bn ) return -1;
+		    if( an > bn ) return 1;
+
+		    //else order by os
+		    var an = $.trim( (a.os && typeof a.os.val === 'function')?a.os.val():'' ).toLowerCase();
+		    var bn = $.trim( (b.os && typeof b.os.val === 'function')?b.os.val():'' ).toLowerCase();
+
+		    if( an < bn ) return -1;
+		    if( an > bn ) return 1;
+
+		    //else order by os version
+		    var an = $.trim( (a.os && a.os.version)?a.os.version:'' ).toLowerCase();
+		    var bn = $.trim( (b.os && b.os.version)?b.os.version:'' ).toLowerCase();
+
+		    if( an < bn ) return -1;
+		    if( an > bn ) return 1;
+
+		    //else order by arch
+		    var an = $.trim( (a.arch && typeof a.arch.val === 'function')?a.arch.val():'' ).toLowerCase();
+		    var bn = $.trim( (b.arch && typeof b.arch.val === 'function')?b.arch.val():'' ).toLowerCase();
+
+		    if( an < bn ) return -1;
+		    if( an > bn ) return 1;
+
+		    //else order by hypervisor
+		    var an = $.trim( (a.hypervisor && typeof a.hypervisor.val === 'function')?a.hypervisor.val():'' ).toLowerCase();
+		    var bn = $.trim( (b.hypervisor && typeof b.hypervisor.val === 'function')?b.hypervisor.val():'' ).toLowerCase();
+
+		    if( an < bn ) return -1;
+		    if( an > bn ) return 1;
+
+		    return 0;
+	    });
+	};
+	this.onFilterChange = function(filters) {
+	    if (filters && filters.vo) {
+		this.options.selectedVO = filters.vo;
+	    }
+	};
+	this.render = function(d, filter) {
+		d = d || [];
+		d = $.isArray(d) ? d : [d];
+		d = this.sortData(d);
+		this.reset();
+
+		$.each(d, (function(self) {
+			return function(i, e) {
+				var li = self.addItem(e);
+				if (li !== null) {
+					$(self.dom).append(li);
+				}
+			};
+		})(this));
+		$(this.dom).attr("title", this.options.siteData.name + " VM image list");
+	};
+	this._initContainer = function() {
+		$(this.dom).append($(this.options.statepanels).clone(true));
+		$(this.dom).off("click").on("click", (function(self) {
+			return function(ev) {
+				self.options.items = self.options.items || [];
+				self.options.items = $.isArray(self.options.items) ? self.options.items : [self.options.items];
+				$.each(self.options.items, function(i, e) {
+					e.renderInlineDialog(false);
+				});
+			};
+		})(this));
+	};
+	this.getStatePanel = function(state){
+		state = $.trim(state);
+		var panel = $(this.options.statepanels).find(".app-state-panel." + state);
+		if( $(panel).length > 0 ){
+			return $(panel).clone(true);
+		}
+		return null;
+	};
+	this._init = function() {
+		this.dom = $(this.options.container);
+		this.parent = this.options.parent;
+		this.options.statepanels = $(this.dom).find(".app-state-panels").clone(true);
+		$(this.dom).find(".app-state-panels").remove();
+		this._initContainer();
+	};
+	this._init();
+
+});
 
 appdb.views.AutoCompleteList = appdb.ExtendClass(appdb.View, "appdb.views.AutoCompleteList", function(o){
 	this.options = {

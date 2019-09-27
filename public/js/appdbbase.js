@@ -2428,10 +2428,6 @@ appdb.components.Site = appdb.ExtendClass(appdb.Component, "appdb.components.Sit
 			return ( servicetypes.length > 0 && servicetypes.indexOf($.trim(e["type"]).toLowerCase()) >= 0 );
 		});
 	};
-	this.getOcciImages = function(){
-		var servs = this.getServices(["occi", "openstack"]);
-		return appdb.utils.GroupSiteImages(servs, true);
-	};
 	this.renderLoading = function(enabled){
 		enabled = (typeof enabled === "boolean")?enabled:false;
 		hideAjaxLoading();
@@ -2540,7 +2536,7 @@ appdb.components.Site = appdb.ExtendClass(appdb.Component, "appdb.components.Sit
 	};
 	this.renderSiteContents = function(d){
 		this._initSiteContents();
-		var images = this.getOcciImages();
+		var images = appdb.utils.CloudInfo.getSiteCloudContents(this.options.data, ["occi", "openstack"]);
 		
 		$(this.dom).find(".sitecontents .filterdecorator").addClass("hidden");
 		$(this.dom).find(".sitecontents > .emptycontent").removeClass("hidden");
