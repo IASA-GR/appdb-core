@@ -9127,4 +9127,215 @@ appdb.utils.CloudInfo = {
 		return 'Template ID';
 	}
     }
-}
+};
+
+/**
+ * Generates an aggregated cloud information list of vappliance versions that 
+ * a site supports based on the response data of a site rest API call.
+ *
+ * @param   {object}	data		The site rest API response data
+ * @param   {string[]}	serviceTypes	Optional. A list of specific service types 
+ *					to aggregate data. If parameter is not set
+ *					it will aggregate data for all service types.
+ * @returns {object[]}			Aggregated array of vappliance versions.
+ */
+appdb.utils.CloudInfo.getSiteCloudContents = function _getCoudContentsOfSite(data, serviceTypes) {
+    /*
+     * Local registry of unique VOs (key -> vo.name)
+     * @type object
+     */
+    var VOs = {};
+
+    /*
+     * Local registry of unique vappliance versions (key -> versionid)
+     * @type type
+     */
+    var VAPPs = {};
+
+    /**
+     * Iterates the given data for services of the given service type
+     *
+     * @returns {object[]}
+     */
+    function getServices() {
+	    var services = (data || {}).service || [];
+	    services = $.isArray(services)?services:[services];
+
+	    if (!!serviceTypes) {
+		    serviceTypes = serviceTypes || [];
+		    serviceTypes = $.isArray(serviceTypes) ? serviceTypes : [serviceTypes];
+
+		    return services.filter(function(e){
+			    return (
+				    serviceTypes.length > 0 &&
+				    serviceTypes.indexOf($.trim(e["type"]).toLowerCase()) >= 0
+				);
+		    });
+	    }
+
+	    return services;
+    }
+    
+    /**
+     * Registers a unique VO in the local registry of VOs.
+     *
+     * @param	{object}	voData  An object from where to extract VO information
+     * @returns {object|null}		A VO object if VO data are found, else null
+     */
+    function addVO(voData) {
+	    if (voData && voData.id) {
+		var vo = Object.assign({}, voData);
+
+		if (!vo.name){
+			if($.isFunction(vo.val)) {
+				vo.name = vo.val();
+				delete vo.val;
+			} else {
+				return null;
+			}
+		} else if ($.isFunction(vo.val)) {
+			vo.value = vo.val();
+			delete vo.val;
+		}
+
+		if (!VOs[vo.name]) {
+			VOs[vo.name] = vo;
+		}
+
+		return VOs[vo.name];
+	    }
+
+	    return null;
+    }
+    /**
+     * Aggregates all related cloud information regarding a VAppliance version
+     * and adds it to a local object.
+     *
+     * The hierarchy of aggregattion is:
+     * VApplianceVersion -> VOs -> Grouped Templates -> Images -> {Template, Service}
+     *
+     * @param {object}       service
+     * @param {onject}       image
+     * @param {object}       occi
+     * @param {object[]}     templates
+     * @returns {void}
+     */
+    function addVAppVersion(service, image, occi, templates) {
+	    var vo = addVO((occi || {}).vo);
+	    var vappVersion = null;
+	    var vappVersionTemplates = {};
+
+	    if (vo) {
+		    vappVersion = Object.assign({}, image);
+		    delete vappVersion.occi;
+
+		    //Ensure vappliance version is registered with proper structure
+		    if(!VAPPs[vappVersion.versionid]) {
+			    VAPPs[vappVersion.versionid] = vappVersion;
+			    VAPPs[vappVersion.versionid].vos = {};
+		    }
+
+		    //Ensure VO registered for current vappliance version
+		    if(!VAPPs[vappVersion.versionid].vos[vo.id]) {
+			    VAPPs[vappVersion.versionid].vos[vo.id] = Object.assign({}, vo);
+			    VAPPs[vappVersion.versionid].vos[vo.id].templates = {};
+		    }
+
+		    //Hold current VO in its own variable to work on
+		    var curVO = VAPPs[vappVersion.versionid].vos[vo.id];
+
+		    //Aggregate templates by group hash value
+		    vappVersionTemplates = templates.filter(function(template) {
+				var voId = (template.vo || {}).id || null;
+				return (voId == curVO.id);
+			})
+			.reduce(function(acc, template) {
+				var templ = Object.assign({}, template);
+				var img = Object.assign({}, occi);
+
+				img.service = Object.assign({}, service);
+				img.template = Object.assign({}, template);
+
+				acc[templ.group_hash] = acc[templ.group_hash] || templ;
+				acc[templ.group_hash].images = acc[templ.group_hash].images || [];
+				acc[templ.group_hash].images.push(img);
+
+				return acc;
+			}, {});
+
+		    //Append to the templates of the current VO of the current VAppliance version
+		    curVO.templates = Object.keys(vappVersionTemplates).reduce(function(acc, hash) {
+			if (acc[hash]) {
+			    acc[hash].values = acc[hash].values.concat(vappVersionTemplates[hash].values);
+			} else {
+			    acc[hash] = Object.assign({}, vappVersionTemplates[hash]);
+			}
+
+			return acc;
+		    }, curVO.templates);
+
+		    //Save current VO data to the VO list of the current VApplicance version 
+		    VAPPs[vappVersion.versionid].vos[vo.id] = curVO;
+	    }
+
+	    return VAPPs;
+    }
+    /**
+     * Helper function to return the values of the properties of an object
+     * as an array.
+     *
+     * @param   {object}   obj	    The object to convert
+     * @param   {string[]} props    A string array of property names to recursivly 
+     *				    convert nested objects to array
+     * @returns {object[]}	    An array of object values
+     */
+    function objectToArray(obj, props) {
+	    props = props || [];
+	    var propsKey = props.pop();
+	    var res = Object.keys(obj).reduce(function(acc, key) {
+		    var o = Object.assign({}, obj[key]);
+
+		    if (propsKey && o && o[propsKey]) {
+			    o[propsKey] = [].concat(objectToArray(o[propsKey], [].concat(props)));
+		    }
+
+		    acc.push(o);
+		    return acc;
+	    }, []);
+
+	    return res;
+    }
+
+    /**
+     * Collects from the supported services all images and templates and
+     * generates an aggregated array of information.
+     *
+     * @returns {object[]}
+     */
+    function start() {
+	    services = getServices();
+	    services.forEach(function(service) {
+		    var images = service.image || [];
+		    var templates = service.template  || [];
+		    var flatService = Object.assign({}, service);
+
+		    delete flatService.template;
+		    delete flatService.image;
+
+		    images = $.isArray(images) ? images : [images];
+		    templates = $.isArray(templates) ? templates : [templates];
+
+		    images.forEach(function(image) {
+			    var occis = image.occi || [];
+			    occis = $.isArray(occis) ? occis : [occis];
+			    occis.forEach(function(occi) {
+				    addVAppVersion(flatService, image, occi, templates);
+			    });
+		    });
+	    });
+
+	    return objectToArray(VAPPs, ['templates', 'vos']);
+    }
+
+    return start();
+};
