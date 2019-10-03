@@ -9109,26 +9109,54 @@ appdb.utils.CloudInfo = {
 	return appdb.utils.CloudInfo.getResourceID(type, id);
     },
     getResourceTitle: function(type) {
-	type = ('' + (type || '')).toLowerCase();
+	    type = ('' + (type || '')).toLowerCase();
 
-	switch(type) {
-	    case 'openstack':
-		return 'Image ID';
-	    default:
-		return 'OCCI ID';
-	}
+	    switch(type) {
+		    case 'openstack':
+		    case 'org.openstack.nova':
+			    return 'Image ID';
+		    case 'eu.egi.cloud.vm-management.occi':
+		    default:
+			    return 'OCCI ID';
+	    }
     },
     getTemplateTitle: function(type) {
-	type = ('' + (type || '')).toLowerCase();
-	switch(type) {
-	    case 'openstack':
-		return 'Flavor ID';
-	    default:
-		return 'Template ID';
-	}
+	    type = ('' + (type || '')).toLowerCase();
+	    switch(type) {
+		    case 'openstack':
+		    case 'org.openstack.nova':
+			    return 'Flavor ID';
+		    case 'eu.egi.cloud.vm-management.occi':
+		    default:
+			    return 'Template ID';
+	    }
     }
 };
+/**
+ * Helper function to return the values of the properties of an object
+ * as an array.
+ *
+ * @param   {object}   obj	The object to convert
+ * @param   {string[]} props    A string array of property names to recursivly
+ *				convert nested objects to array
+ * @returns {object[]}		An array of object values
+ */
+appdb.utils.objectToArray = function (obj, props) {
+       props = props || [];
+       var propsKey = props.pop();
+       var res = Object.keys(obj).reduce(function(acc, key) {
+	       var o = Object.assign({}, obj[key]);
 
+	       if (propsKey && o && o[propsKey]) {
+		       o[propsKey] = [].concat(appdb.utils.objectToArray(o[propsKey], [].concat(props)));
+	       }
+
+	       acc.push(o);
+	       return acc;
+       }, []);
+
+       return res;
+}
 /**
  * Generates an aggregated cloud information list of vappliance versions that 
  * a site supports based on the response data of a site rest API call.
@@ -9257,18 +9285,18 @@ appdb.utils.CloudInfo.getSiteCloudContents = function _getCoudContentsOfSite(dat
 				img.template = Object.assign({}, template);
 
 				acc[templ.group_hash] = acc[templ.group_hash] || templ;
-				acc[templ.group_hash].images = acc[templ.group_hash].images || [];
-				acc[templ.group_hash].images.push(img);
+				acc[templ.group_hash].values = acc[templ.group_hash].values || [];
+				acc[templ.group_hash].values.push(img);
 
 				return acc;
 			}, {});
 
 		    //Append to the templates of the current VO of the current VAppliance version
 		    curVO.templates = Object.keys(vappVersionTemplates).reduce(function(acc, hash) {
-			if (acc[hash]) {
-			    acc[hash].values = acc[hash].values.concat(vappVersionTemplates[hash].values);
-			} else {
+			if (!acc[hash]) {
 			    acc[hash] = Object.assign({}, vappVersionTemplates[hash]);
+			} else {
+			   acc[hash].values = acc[hash].values.concat(vappVersionTemplates[hash].values);
 			}
 
 			return acc;
@@ -9280,32 +9308,6 @@ appdb.utils.CloudInfo.getSiteCloudContents = function _getCoudContentsOfSite(dat
 
 	    return VAPPs;
     }
-    /**
-     * Helper function to return the values of the properties of an object
-     * as an array.
-     *
-     * @param   {object}   obj	    The object to convert
-     * @param   {string[]} props    A string array of property names to recursivly 
-     *				    convert nested objects to array
-     * @returns {object[]}	    An array of object values
-     */
-    function objectToArray(obj, props) {
-	    props = props || [];
-	    var propsKey = props.pop();
-	    var res = Object.keys(obj).reduce(function(acc, key) {
-		    var o = Object.assign({}, obj[key]);
-
-		    if (propsKey && o && o[propsKey]) {
-			    o[propsKey] = [].concat(objectToArray(o[propsKey], [].concat(props)));
-		    }
-
-		    acc.push(o);
-		    return acc;
-	    }, []);
-
-	    return res;
-    }
-
     /**
      * Collects from the supported services all images and templates and
      * generates an aggregated array of information.
@@ -9334,8 +9336,312 @@ appdb.utils.CloudInfo.getSiteCloudContents = function _getCoudContentsOfSite(dat
 		    });
 	    });
 
-	    return objectToArray(VAPPs, ['templates', 'vos']);
+	    return appdb.utils.objectToArray(VAPPs, ['templates', 'vos']);
     }
 
     return start();
 };
+appdb.utils.CloudInfo.getVApplianceVOCloudContents = function(vapp, serviceTypes) {
+	var providers = vapp.provider || [];
+	providers = $.isArray(providers) ? providers : [providers];
+
+	var VOs = providers.reduce(function(acc, provider) {
+		var voId = provider.void;
+		var voName = provider.voname;
+
+		if (!acc[voName]) {
+		    acc[voName] = {
+			id: voId,
+			name: voName
+		    };
+		}
+
+		return acc;
+	}, {});
+
+	return appdb.utils.objectToArray(VOs);
+};
+appdb.utils.CloudInfo.getVApplianceCloudContentsPerVappliance = function(vapp, serviceTypes) {
+    function start() {
+	    var sites = {};
+	    var providers = appdb.model.StaticList.VAProviders || [];
+	    var vappProviders = vapp.provider || [];
+	    var resourceIds = vappProviders.reduce(function(acc, vappProvider) {
+		    var id = vappProvider.provider_id + '/' + vappProvider.voname + '/' + vappProvider.vmiinstanceid
+		    acc[id] = acc[id] || Object.assign({}, vappProvider);
+		    return acc;
+	    }, {});
+	    var VOs = vappProviders.reduce(function(acc, vappProvider) {
+		    var voId = vappProvider.void;
+		    var voName = vappProvider.voname;
+
+		    acc[voName] = {
+			    id: voId,
+			    name: voName
+		    };
+
+		    return acc;
+	    }, {});
+	    var relatedVAProviders = providers.filter(function(provider) {
+		    return vappProviders.find(function(vappprovider) {
+			    return provider.id === vappprovider.provider_id;
+		    });
+	    }).map(function(provider) {
+		    var images = provider.image || [];
+		    var templates = provider.template || [];
+
+		    images = $.isArray(images) ? images : [images];
+		    images = images.filter(function(image) {
+			    return ( image.appid === vapp.appid && !VOs[image.voName] );
+		    });
+
+		    delete provider.image;
+		    provider.images = images;
+
+		    templates = $.isArray(templates) ? templates : [templates];
+		    templates = templates.map(function(template) {
+				var templVO = template.vo || {};
+
+				if (templVO.val) {
+				    templVO = templVO.val()
+				} else {
+				    templVO = templVO.id;
+				}
+
+				template.voname = templVO;
+
+				return template;
+			}).filter(function(template) {
+				return (!!VOs[template.voname]);
+			});
+
+		    delete provider.template;
+		    provider.templates = templates;
+
+		    return provider;
+	    });
+
+	    sites = relatedVAProviders.reduce(function(acc, provider) {
+		    var site = provider.site || null;
+
+		    if (!site) {
+			    return acc;
+		    }
+
+		    return provider.images.reduce(function(acc, image) {
+
+			    if (!image.voname) {
+				    return acc;
+			    }
+
+			    acc[site.name] = acc[site.name] || {
+				    id: site.id,
+				    name: site.name,
+				    deleted: site.deleted,
+				    infrastructure: site.infrastructure,
+				    officialname: site.officialname,
+				    source: site.source,
+				    status: site.status,
+				    vos: {}
+			    };
+
+			    acc[site.name].vos[image.voname] = acc[site.name].vos[image.voname] || Object.assign({}, VOs[image.voname], {versions: {}});
+			    acc[site.name].vos[image.voname].versions[image.vmiinstanceid] = acc[site.name].vos[image.voname].versions[image.vmiinstanceid] || Object.assign({}, image, {templates: {}});
+
+			    var curTemplates = acc[site.name].vos[image.voname].versions[image.vmiinstanceid].templates;
+			    var templates = provider.templates.filter(function(template) { return template.voname === image.voname; });
+
+			    templates = templates.reduce(function(acc, template) {
+					var resource = resourceIds[provider.id + '/' + image.voname + '/' + image.vmiinstanceid] || {};
+					var value = {
+						template: Object.assign({}, template),
+						endpointUrl: provider.endpoint_url,
+						resourceid: resource.occi_id,
+						service_type: resource.service_type
+					};
+
+					if (!acc[template.group_hash]) {
+					    acc[template.group_hash] = template;
+					    acc[template.group_hash].values = [];
+					}
+
+					acc[template.group_hash].values.push(value);
+
+					return acc;
+				}, curTemplates);
+
+			    acc[site.name].vos[image.voname].versions[image.vmiinstanceid].templates = templates;
+
+			    return acc;
+		    }, acc);
+	    }, sites);
+
+	    sites = appdb.utils.objectToArray(sites, ['templates', 'versions', 'vos']);
+
+	    return sites;
+    }
+
+    return start();
+}
+appdb.utils.CloudInfo.getVApplianceCloudContentsPerVO = function(vapp, serviceTypes) {
+	function getVAppliance(vapp) {
+	    var res = Object.assign({}, vapp);
+	    delete res.provider;
+
+	    res.hypervisor = res.hypervisor || [];
+	    res.hypervisor = $.isArray(res.hypervisor) ? res.hypervisor : [res.hypervisor];
+	    res.hypervisors = res.hypervisor.map(function(hypervisor) {
+		if (hypervisor.name) {
+		    return hypervisor.name;
+		} else if ($.isFunction(hypervisor.val)) {
+		    return hypervisor.val();
+		}
+		return '';
+	    }).filter(function(hypervisor) {
+		return hypervisor && $.trim(hypervisor);
+	    }).join(', ');
+
+	    delete res.hypervisor;
+
+	    return res;
+	}
+	function start() {
+		var vappProviders = vapp.provider || [];
+		var vappliance = getVAppliance(vapp);
+		var availableVOs = vappProviders.reduce(function(acc, vappProvider) {
+			var voname = vappProvider.voname || '<none>';
+
+			acc[voname] = acc[voname] || {
+			    id: (vappProvider.voname) ? vappProvider.void : '-1',
+			    name: voname
+			};
+
+			return acc;
+		    },{});
+		var availableProviderIds = vappProviders.map(function(vappProvider) { return vappProvider.provider_id; });
+		var availableProviders = (appdb.model.StaticList.VAProviders || []).filter(function(provider) { return (availableProviderIds.indexOf(provider.id) > -1); });
+		var resourceIds = vappProviders.reduce(function(acc, vappProvider) {
+			var voname = vappProvider.voname || '<none>';
+			var id = voname + '/' + vappProvider.provider_id + '/' + vappProvider.vmiinstanceid;
+			acc[id] = acc[id] || Object.assign({}, vappProvider);
+
+			return acc;
+		}, {});
+
+		var VOs = availableProviders.reduce(function(acc, provider) {
+			var images = provider.image || [];
+			var templatesPerVO = provider.template || [];
+			var providerEndpointUrl = provider.endpoint_url;
+
+			images = $.isArray(images) ? images : [images];
+			templatesPerVO = $.isArray(templatesPerVO) ? templatesPerVO : [templatesPerVO];
+			templatesPerVO = templatesPerVO.reduce(function(acc, template) {
+				var voname = '<none>';
+				if (template.vo) {
+					if (template.vo.val) {
+					        voname = template.vo.val() || voname;
+					} else {
+						voname = template.name || voname;
+					}
+				}
+
+				if (availableVOs[voname]) {
+					acc[voname] = acc[voname] || [];
+					acc[voname].push(template);
+				}
+				return acc;
+			}, {});
+
+			return images.reduce(function(acc, image) {
+				var imgvoname = image.voname || '<none>';
+				var resource = resourceIds[imgvoname + '/' + provider.id + '/' + image.vmiinstanceid];
+				var site = Object.assign({}, provider.site, {country: provider.country || {}});
+
+				if (!resource) {
+				    return acc;
+				}
+
+				if (!availableVOs[imgvoname]) {
+					return acc;
+				}
+
+				acc[imgvoname] = acc[imgvoname] || Object.assign({}, availableVOs[imgvoname]);
+				acc[imgvoname].sites = acc[imgvoname].sites || {};
+
+				if(!acc[imgvoname].sites[site.name]) {
+					acc[imgvoname].sites[site.name] = Object.assign({}, site);
+					acc[imgvoname].sites[site.name].versions = {};
+				}
+
+				if(!acc[imgvoname].sites[site.name].versions[image.vmiinstanceid]) {
+					var version = Object.assign(
+						{},
+						image,
+						{
+						    templates: {},
+						    os: vappliance.os,
+						    arch: vappliance.arch,
+						    hypervisors: vappliance.hypervisors,
+						    vmiinstance: vappliance.vmiinstance,
+						    archived: vappliance.archived,
+						    isexpired: vappliance.isexpired,
+						    enabled: vappliance.enabled,
+						    good_vmiinstanceid: vappliance.good_vmiinstanceid,
+						    identifier: vappliance.identifier
+						});
+					delete version.mp_uri;
+					delete version.va_provider_image_id;
+					delete version.void;
+					delete version.voname;
+					delete version.vowide_vmiinstanceid;
+
+					acc[imgvoname].sites[site.name].versions[image.vmiinstanceid] = version;
+					acc[imgvoname].versions = acc[imgvoname].versions || {};
+					acc[imgvoname].versions[image.vmiinstanceid] = true;
+				}
+
+				var imgtemplates = acc[imgvoname].sites[site.name].versions[image.vmiinstanceid].templates;
+
+				imgtemplates = templatesPerVO[imgvoname].reduce(function(acc, template) {
+					var group_hash = template.group_hash;
+
+					acc[group_hash] = acc[group_hash] || Object.assign({}, template, {values: []});
+
+					acc[group_hash].values.push(
+						Object.assign(
+							{},
+							resource,
+							{endpointUrl: providerEndpointUrl},
+							{ template: Object.assign({}, template) }
+						)
+					);
+
+					return acc;
+				}, {});
+
+				acc[imgvoname].sites[site.name].versions[image.vmiinstanceid].templates = imgtemplates;
+
+				return acc;
+			}, acc);
+
+			return acc;
+		}, {});
+
+		VOs = appdb.utils.objectToArray(VOs, ['templates', 'versions', 'sites']);
+		VOs = VOs.map(function(vo) {
+		    vo.count = Object.keys(vo.versions || {}).length;
+		    delete vo.versions;
+		    return vo;
+		});
+		VOs = VOs.sort(function(a,b){
+			var aa = $.trim(a.name);
+			var bb = $.trim(b.name);
+			if( aa < bb ) return -1;
+			if( aa > bb ) return 1;
+			return 0;
+		});
+		return VOs;
+	}
+
+    return start();
+}
