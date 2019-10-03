@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and 
  * limitations under the License.
  */
- 
+
 class AppsController extends Zend_Controller_Action
 {
 	public function buildlogocacheAction() {
@@ -1319,7 +1319,52 @@ class AppsController extends Zend_Controller_Action
 		$news->subscribeAction();
 		return;
 	}
-	
+
+        /**
+         * Used by the client to determine if the VM image location of the
+         * latest version of a vappliance is accessible to the public.
+         *
+         * @params  id The application id
+         * @returns    Json object with accessibility results
+         */
+	public function isvmiaccessibleAction() {
+            $this->_helper->layout->disableLayout();
+            $this->_helper->viewRenderer->setNoRender();
+            $appid = ( isset($_GET["id"])?$_GET["id"]:"-1" );
+            $result = array();
+            header('Content-type: application/json');
+
+            if (is_numeric($appid)) {
+                $appid = (int)$appid;
+            } else {
+                $appid = -1;
+            }
+
+            if ($appid <= 0) {
+                $result = array("sattus" => "error", "error" => "Invalid parameters given");
+            } else {
+                $vaviews = new Default_Model_VAviews();
+                $f1 = new Default_Model_VAviewsFilter();
+                $f2 = new Default_Model_VAviewsFilter();
+                $f3 = new Default_Model_VAviewsFilter();
+                $f1->appid->numequals($appid);
+                $f2->va_version_archived->equals(false);
+                $f3->va_version_published->equals(true);
+                $vaviews->filter->chain($f1, "AND");
+                $vaviews->filter->chain($f2, "AND");
+                $vaviews->filter->chain($f3, "AND");
+
+                if (count($vaviews->items) === 0) {
+                    $result = array("status" => "error", "error" => "Could not find image location for virtual appliance latest version");
+                } else {
+                    $vmiinstance = $vaviews->items[0];
+                    $result = isValidVAimageURL($vmiinstance->uri);
+                }
+            }
+
+            echo json_encode($result);
+        }
+
 	public function checkurlAction(){
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();

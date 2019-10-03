@@ -4665,6 +4665,78 @@ function compareReleaseDates($a, $b){
 	return strcmp($b['publishedon'], $a['publishedon']);
 }
 
+/**
+ * Checks whether a URL for a VA image points to a location that is available and which provides a binary file 
+ *
+ * @param string $url
+ * @return string[]|an associative array describing the results
+ */
+function isValidVAimageURL($url) {
+	$responseCode = null;
+	$contentType = null;
+	$curl_handle = curl_init();
+	$isBinary = null;
+	$isOK = false;
+        $warning = null;
+        $message = null;
+	$ret = null;
+	curl_setopt($curl_handle, CURLOPT_URL, $url);
+	curl_setopt($curl_handle, CURLOPT_NOBODY, true);
+	curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($curl_handle, CURLOPT_FOLLOWLOCATION, true);
+	curl_setopt($curl_handle, CURLOPT_HEADER, true);
+	curl_setopt($curl_handle, 181, 1 | 2 | 4 | 8 | 32);	// Accept HTTP, HTTPS, FTP, FTPS, SFTP
+        curl_setopt($curl_handle, CURLOPT_TIMEOUT, 10);
+
+        $header = curl_exec($curl_handle);
+        
+        if ($header !== false) {
+		$info = curl_getinfo($curl_handle);	
+		if ($info !== false) {
+			if (array_key_exists("http_code", $info)) {
+                            $responseCode = $info["http_code"];
+			}
+			if (array_key_exists("content_type", $info)) {
+                            $contentType = $info["content_type"];
+			}
+			if ($responseCode == "200") {
+                            $isOK = true;
+			}
+			if (
+                            (strpos($contentType, "binary") !== false) || 
+                            (strpos($contentType, "application") !== false) ||
+                            (strpos($contentType, "octet-stream") !== false)
+			) {
+                            $isBinary = true;
+			} else {
+                            $message = "Image location is accessible but does not seem to return binary content";
+                        }
+		} else {
+                    $message = "Could not retrieve information from VA image location";
+		}
+	} else {
+                $message = curl_error($curl_handle);
+	}
+	
+        curl_close($curl_handle);
+
+        $ret = array();
+
+        if ($isOK && $isBinary) {
+		$ret['status'] = 'ok';
+	} elseif ($isOK && ! $isBinary) {
+		$ret['status'] = 'warning';
+	} else {
+		$ret['status'] = 'error';
+	}
+
+        $ret['message'] = $message;
+	$ret['response_code'] = $responseCode;
+	$ret['content_type'] = $contentType;
+
+	return $ret;
+}
+
 class SEO{
 	private static $loaded = array();
 	private static function getPagesContentData($uri){

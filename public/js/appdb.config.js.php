@@ -68,7 +68,26 @@ appdb.config = {
 		},
 		application: {
 			displayInvalidatedText: true,
-			social: true
+			social: true,
+                        checkVMIAccessibility: true,
+                        checkVMIAccessibilityViewStatusPermissions: {
+                            /**
+                            * Defines who can view the result of the accessibility
+                            * check based on the status of the response.
+                            *
+                            * Possible values:
+                            * "all"          : All users can view the message (Default)
+                            * "authenticated": Only authneticated users can view the message
+                            * "owner"        : Only owner can view the message
+                            * "contacts"     : Only vappliance contacts, owner can view the message
+                            * "none"         : No one can view the message
+                            *
+                            * NOTE: Applied if "checkVMIAccessibility" is set to true.
+                            * NOTE: Admins can always view the message.
+                            **/
+                            error: "all",
+                            warning: "all"
+                        }
 		}
 	},
 	checkers:{
