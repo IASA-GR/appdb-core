@@ -18789,6 +18789,648 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 		container: $(o.container),
 		parent: o.parent || null,
 		allowed: ($.isArray(o.allowed))?o.allowed:["contextscript"],
+		itemid: $.trim(o.itemid),
+		application: o.application || {}
+	};
+
+	this.reset = function() {
+		this.unsubscribeAll();
+		$(this.dom).empty();
+	};
+	this.showElementIds = function(el, contextscript) {
+		var template = $(el).closest("li.va-template").data("template");
+		var image = $(el).closest("li.va-image").data("image");
+		var site = $(el).closest("li.va-site").data("site");
+
+		var template_id = (template) ? $.trim(template.resource_name) : "";
+		var occi_id = (image) ? $.trim(image.occi_id) : "";
+		var endpoint_url = (site) ? $.trim(site.endpoint_url) : "";
+		var serviceType = appdb.utils.CloudInfo.getServiceType(site);
+		var endpoint_url_html = $("<div class='fieldvalue endpoint'><div class='field'>Site endpoint:</div><div class='value'></div></div>");
+		$(endpoint_url_html).find(".value").text(endpoint_url);
+		var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>" + appdb.utils.CloudInfo.getTemplateTitle(serviceType) + ":</div><div class='value'></div></div>");
+		$(template_id_html).find(".value").text(appdb.utils.CloudInfo.getTemplateID(serviceType, template_id));
+		var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>" + appdb.utils.CloudInfo.getResourceTitle(serviceType) + ":</div><div class='value'></div></div>");
+		$(occi_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(serviceType, occi_id));
+
+		var usageids = $("<div class='usageids'></div>");
+		var fieldvalues = $("<div class='fieldvalues'></div>");
+		$(fieldvalues).append(endpoint_url_html).append(template_id_html).append(occi_id_html);
+
+		if (contextscript ){
+			if( $.isArray(contextscript) === false && $.trim(contextscript.url)) {
+				var contextscript_html = $("<div class='fieldvalue contextscript_url'><div class='field'>Contextualization script:</div><div class='value'></div></div>");
+				var contextscript_url = $("<a href='#' title='Download contextualization script' target='_blank'></a>");
+				$(contextscript_url).attr("href", $.trim(contextscript.url)).text($.trim(contextscript.url));
+				$(contextscript_html).find(".value").empty().append(contextscript_url);
+				$(fieldvalues).append(contextscript_html);
+			}else{
+				var contextscript_html = $("<div class='fieldvalue contextscript_url'><div class='field'>Contextualization scripts:</div><div class='value'></div></div>");
+				$.each(contextscript, function(ii,ee){
+					var contextscript_url = $("<a href='#' title='Download contextualization script' target='_blank'></a>");
+					$(contextscript_url).attr("href", $.trim(ee.url)).text($.trim(ee.url));
+					$(contextscript_html).find(".value").append(contextscript_url).append("<br/>");
+				});
+				$(fieldvalues).append(contextscript_html);
+			}
+		}
+		$(fieldvalues).find(".fieldvalue .value").each(function(i, e) {
+			if ($.trim($(e).text()) === "") {
+				$(e).addClass("empty").text("not available yet");
+			}
+		});
+		var imageid = $("<div class='imageid'></div>");
+		$(imageid).text("Image: ver." + image.vmiinstance_version + " - " + image.os.val() + " " + image.os.version + " / " + image.arch.val() + " / " + image.hypervisors);
+
+		$(usageids).append(imageid).append(fieldvalues);
+
+		if (this.parent.renderInlineDialog) {
+			this.parent.renderInlineDialog(true, usageids, "<span>" + site.name + " IDs</span>");
+		}
+	};
+	this.getAvailableContextScripts = function(cntxtscripts){
+		contextscripts = cntxtscripts ||[];
+		contextscripts = $.isArray(contextscripts)?contextscripts:[contextscripts];
+		var res = $.grep(contextscripts, (function(allowed){
+			return function(e){
+				if( !e ) return false;
+				if( e.application && e.application.id ){
+					if($.inArray("swappliance",allowed) > -1){
+						return true;
+					}else{
+						return false;
+					}
+				}
+				if( $.inArray("contextscript",allowed) > -1 ) return true;
+				return false;
+			};
+		})(this.options.allowed));
+
+		if( $.inArray("owned",this.options.allowed) > -1 && this.options.itemid ){
+			res = $.grep(res, (function(itemid){
+				return function(e){
+					return ( e && e.application && $.trim(e.application.id) === itemid );
+				};
+			})(this.options.itemid));
+		}
+
+		return res;
+	};
+	this.renderContextScripts = function(dom,contextscripts){
+		contextscripts = contextscripts ||[];
+		contextscripts = $.isArray(contextscripts)?contextscripts:[contextscripts];
+		var download = $("<a href='#' target='_blank' class='downloadcscript' title='Download contextualization script'>Download</a>");
+		$(download).off("click").on("click", function(ev){
+			ev.stopPropagation();
+			return true;
+		});
+
+		if( contextscripts.length === 0  ){
+		}else if(contextscripts.length === 1){
+			$(download).attr("href",contextscripts[0].url).text(contextscripts[0].url);
+			$(dom).append(download);
+		}else{
+			var select = $("<select class='refcontextscripts'></select>");
+			$.each(contextscripts, function(i,e){
+				var option = $("<option></option>").text($.trim(e.url));
+				$(option).attr("value",e.id);
+				$(select).append(option);
+			});
+			$(select).find("options:first").prop("selected", true);
+			$(download).attr("href",contextscripts[0].url);
+			$(dom).append(select).append(download);
+
+			new dijit.form.Select/*ComboBox*/({
+				onChange: (function(dom){
+					return function(v){
+						console.log(v);
+						var urls = $.grep(this.getOptions(), function(e){
+							return $.trim(e.value) === v;
+						});
+						if( urls.length > 0 ){
+							$(dom).find("a.downloadcscript").attr("href",urls[0].label);
+						}
+					};
+				})(dom)
+			}, $(select)[0]);
+			$(dom).addClass("hasmany");
+		}
+	};
+	this.getEndpointHTML = function(item, attached) {
+	    var endpoint_url_html =  $("<div class='fieldvalue endpoint" + (attached === true ? ' attached' : '')  + "'><div class='field'></div><div class='value'></div></div>");
+	    var endpointTitle = null;
+	    switch(item.serviceType) {
+		case 'openstack':
+		    endpointTitle = '<div class="icontext"><img src="/images/openstack.png" alt="openstack" /><span>endpoint:</span></div>';
+		    break;
+		case 'opennebula':
+		    endpointTitle = '<div class="icontext"><img src="/images/opennebula.png" alt="opennebula" /><span>endpoint:</span></div>';
+		case 'occi':
+		    endpointTitle = '<div class="icontext"><img src="/images/occi.png" alt="occi" /><span><b>OCCI</b> endpoint:</span></div>';
+		    break;
+		default:
+		    endpointTitle = '<div class="icontext"><span>Site endpoint:</span></div>';
+		    break;
+	    }
+	    $(endpoint_url_html).find(".field").append($(endpointTitle));
+	    $(endpoint_url_html).find(".value").text(item.endpointUrl || item.endpointurl);
+
+	    return endpoint_url_html;
+	};
+	this.renderTemplateItemList  = function(grouphash,data){
+		var ul = $("<ul class='groupfieldvalues'></ul>");
+		var self = this;
+		$.each(data.items, function(ii, item){
+			var templates = appdb.utils.findGroupTemplatesByHash(grouphash, item.templates);
+			$.each(templates, function(i,templ){
+				var li = $("<li class='fieldvalues'></li>");
+				var endpoint_url_html = self.getEndpointHTML(item);//$("<div class='fieldvalue endpoint'><div class='field'></div><div class='value'></div></div>");
+				//$(endpoint_url_html).find(".value").text(item.endpointurl);
+				var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>" + appdb.utils.CloudInfo.getTemplateTitle(item.serviceType) + ":</div><div class='value'></div></div>");
+				$(template_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(item.serviceType, templ.resource_name));
+				var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>" + appdb.utils.CloudInfo.getResourceTitle(item.serviceType) + ":</div><div class='value'></div></div>");
+				$(occi_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(item.serviceType, item.occid));
+				$(li).append(endpoint_url_html).append(template_id_html).append(occi_id_html);
+				if (appdb.config.features.displayOCCINativeEndpoints && item.nativeApis && item.nativeApis.length > 0) {
+				    $.each(item.nativeApis, function(index, api) {
+					$(li).append(self.getEndpointHTML(api, true));
+					var native_template_id_html = $("<div class='fieldvalue templateid'><div class='field'>" + appdb.utils.CloudInfo.getTemplateTitle(api.serviceType) + ":</div><div class='value'></div></div>");
+					$(native_template_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(api.serviceType, templ.resource_name));
+					var native_occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>" + appdb.utils.CloudInfo.getResourceTitle(api.serviceType) + ":</div><div class='value'></div></div>");
+					$(native_occi_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(api.serviceType, item.occid));
+					$(li).append(native_template_id_html).append(native_occi_id_html);
+				    });
+				}
+				$(ul).append(li);
+			});
+		});
+		$(ul).find(".fieldvalue .value").each(function(i, e) {
+			if ($.trim($(e).text()) === "") {
+				$(e).addClass("empty").text("not available yet");
+			}
+		});
+		$(ul).find(".fieldvalues:first").addClass("current");
+		if($(ul).children("li").length > 1 ){
+			$(ul).addClass("haspaging");
+		}
+		return appdb.utils.pagifyHTMLList(ul);
+	};
+	this.showElementIdsGrouped = function(el, contextscript, instance) {
+		var template = $(el).closest("li.va-template").data("template");
+		var image = instance;
+		var site = $(el).closest("li.va-site").data("site");
+		var listhtmllist = this.renderTemplateItemList(template.group_hash, instance);
+		var usageids = $("<div class='usageids'></div>");
+
+		var imageid = $("<div class='imageid'></div>");
+		$(imageid).text("Image: ver." + image.vmiinstance_version + " - " + image.os.val() + " " + image.os.version + " / " + image.arch.val() + " / " + image.hypervisor.val());
+
+		var temp = $("<div class='usagetemplate'></div>");
+                var td = $(el).closest(".va-template.va-template-data");
+
+                $(temp).append("<span>Memory: <b>" + $(td).find(".template-cell.memory > span").text() + "</b></span><span>Disk: <b>" + $(td).find(".template-cell.disk > span").text()  + "</b></span><span>CPUs: <b>" + $(td).find(".template-cell.cpus > span").text() + "</b></span><span> In\Out: <b>" + $(td).find(".template-cell.connectivity > span").text() + "</b></span><span>OS: <b>" + $(td).find(".template-cell.osfamily > span").text() +"</b></span>");
+
+		$(usageids).append(imageid).append(temp).append(listhtmllist);
+		var availablecontextscripts = this.getAvailableContextScripts(contextscript);
+		if ( availablecontextscripts.length > 0 ) {
+			var contextscript_html = $("<div class='fieldvalues contextscript_url'><div class='fieldvalue contextscript_url'><div class='field'>Contextualization script:</div><div class='value'></div></div></div>");
+			this.renderContextScripts($(contextscript_html).find(".fieldvalue > .value"), availablecontextscripts);
+			$(usageids).append(contextscript_html);
+		}
+
+		if (this.parent.renderInlineDialog) {
+			this.parent.renderInlineDialog(true, usageids, "<span>" + site.name + " IDs</span>", "sitecontents");
+		}
+
+		$(usageids).find(".contextscript_url .value.hasmany").closest(".fieldvalue").addClass("hasmany");
+		if( $(usageids).find(".pagifier").length > 0 ){
+			$(usageids).addClass("hasmany");
+		}
+	};
+	this.showContextScript = function(cscript, el) {
+		var d = cscript || {};
+		var template = $(el).closest("li.va-template").data("template");
+		var image = $(el).closest("li.va-image").data("image");
+		var site = $(el).closest("li.va-site").data("site");
+
+		var dom = $("<div class='contextsrciptdetails usageids'></div>");
+		var fieldvalues = $("<div class='fieldvalues'></div>");
+		var url = $("<div class='fieldvalue url'><div class='field'>Download:</div><div class='value'></div></div>");
+		var hash = $("<div class='fieldvalue hash'><div class='field'></div><div class='value'></div></div>");
+		var fsize = $("<div class='fieldvalue size'><span class='field'>Size:</span><span class='value'></span></div>");
+		var urllink = $("<a href='#' title='Download script' target='_blank'></a>");
+
+		$(urllink).attr('href', d.url).text($.trim(d.url));
+		$(url).find(".value").append(urllink);
+		$(hash).find(".field").text(d.checksum.hashtype + ":");
+		$(hash).find(".value").text(d.checksum.val());
+		$(fsize).find(".value").text(d.size + " bytes");
+		$(fieldvalues).empty().append(url).append(hash).append(fsize);
+
+		var imageid = $("<div class='imageid'></div>");
+		$(imageid).text("Image: ver." + image.vmiinstance_version + " - " + image.os.val() + " " + image.os.version + " / " + image.arch.val() + " / " + image.hypervisors);
+
+		$(dom).append(imageid).append(fieldvalues);
+		if (this.parent.renderInlineDialog) {
+			this.parent.renderInlineDialog(true, dom, "<span>" + site.name + " Contextualization Script</span>");
+		}
+		return dom;
+	};
+	this.renderEmptyTemplate = function(dom) {
+		$(dom).append("<div class='template-empty'><span class='message'>No templates provided</span></div><div class='template-cell action'><div class='getids' title='View related IDs'>get IDs</div></div>");
+		$(dom).find(".getids").off("click").on("click", (function(self) {
+			return function(ev) {
+				ev.preventDefault();
+				self.showElementIds(this);
+				return false;
+			};
+		})(this));
+	};
+	this.renderTemplateOld = function(dom, d, data) {
+		d = d || {};
+		var memory = $("<div class='template-cell memory'></div>");
+		var cpus = $("<div class='template-cell cpus'></div>");
+		var connectivity = $("<div class='template-cell connectivity'></div>");
+		var osfamily = $("<div class='template-cell osfamily'></div>");
+		var action = $("<div class='template-cell action'><div class='getids' title='View related IDs'></div><div class='getcontextscript hidden' title='View contextualization script'></div></div>");
+		var memorytext = ($.trim(d.main_memory_size) === "" ? "-" : $.trim(d.main_memory_size));
+		var cpustext = ($.trim(d.logical_cpus) === "" ? "-" : $.trim(d.logical_cpus)) + "/" + ($.trim(d.physical_cpus) === "" ? "-" : $.trim(d.physical_cpus));
+		var connectivitytext = ($.trim(d.connectivity_in).toUpperCase() === "FALSE" ? "no" : ($.trim(d.connectivity_in).toUpperCase() === "TRUE") ? "yes" : ($.trim(d.connectivity_in) || "-")) + "/" + ($.trim(d.connectivity_out).toUpperCase() === "FALSE" ? "no" : ($.trim(d.connectivity_out).toUpperCase() === "TRUE") ? "yes" : ($.trim(d.connectivity_out) || "-"));
+		var osfamilytext = ($.trim(d.os_family) === "" ? "-" : $.trim(d.os_family));
+
+		var disk = $("<div class='template-cell disk'></div>");
+                var disktext = $("<span></span>").text($.trim(d.disc_size));
+                var diskSize = parseInt($.trim(d.disc_size) || "-1");
+                if (isNaN(diskSize) === false) {
+                  switch(diskSize) {
+                    case -1:
+                      disktext = $("<span></span>").append("<i>n/a</i>");
+                      break;
+                    case 0:
+                      disktext = $("<span></span>").append("<i>any</i>");
+                      break;
+                    default:
+                      disktext = $("<span></span>").text(diskSize + " GB");
+                      break;
+                  }
+                }
+                $(disk).append("<span></span>").append(disktext);
+		$(memory).append($("<span></span>").text(memorytext));
+		$(cpus).append($("<span></span>").text(cpustext));
+		$(connectivity).append($("<span></span>").text(connectivitytext));
+		$(osfamily).append($("<span></span>").text(osfamilytext));
+		if ($.trim(d.noaction) !== "true") {
+			$(action).find(".getids").text("get IDs");
+		} else {
+			$(action).empty();
+		}
+		$(dom).append(memory).append(disk).append(cpus).append(connectivity).append(osfamily).append(action);
+		$(action).find(".getids").off("click").on("click", (function(self, cscript, instance) {
+			return function(ev) {
+				ev.preventDefault();
+				if( appdb.config.features.groupvaprovidertemplates ){
+					self.showElementIdsGrouped(this, cscript, instance);
+				}else{
+					self.showElementIds(this, cscript, instance);
+				}
+				return false;
+			};
+		})(this, data.contextscript, data));
+	};
+	this.getTemplateImageList = function (images) {
+		var ul = $("<ul class='groupfieldvalues'></ul>");
+
+		$.each(images, function(ii, image) {
+			var occi_endpoint_url = image.endpointUrl;
+			var serviceType = appdb.utils.CloudInfo.getServiceType(image.service_type || 'occi');
+			var li = $("<li class='fieldvalues'></li>");
+			var endpoint_title = '<div class="icontext"><img src="/images/occi.png" alt="OCCI"/><span><b>OCCI</b> endpoint:</span></div>';
+			var endpoint_url_html = $("<div class='fieldvalue endpoint'><div class='field'></div><div class='value'></div></div>");
+			var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>" + appdb.utils.CloudInfo.getTemplateTitle(serviceType) + ":</div><div class='value'></div></div>");
+			var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>" + appdb.utils.CloudInfo.getResourceTitle(serviceType) + ":</div><div class='value'></div></div>");
+
+			if (serviceType === 'openstack') {
+			    endpoint_title = '<div class="icontext"><img src="/images/openstack.png" alt="Openstack"/><span> endpoint:</span></div>';
+			} else  if (serviceType === 'opennebula') {
+			    endpoint_title = '<div class="icontext"><img src="/images/opennebula.png" alt="Opennebula"/><span> endpoint:</span></div>';
+			}
+
+			$(endpoint_url_html).find(".field").append(endpoint_title);
+			$(endpoint_url_html).find(".value").text(occi_endpoint_url);
+			$(template_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(serviceType, image.template.resource_name));
+			$(occi_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(serviceType, image.occi_id));
+
+			$(li).append(endpoint_url_html).append(template_id_html).append(occi_id_html);
+			$(ul).append(li);
+		});
+
+		$(ul).find(".fieldvalue .value").each(function(i, e) {
+			if ($.trim($(e).text()) === "") {
+				$(e).addClass("empty").text("not available yet");
+			}
+		});
+
+		$(ul).find(".fieldvalues:first").addClass("current");
+
+		if($(ul).children("li").length > 1 ){
+			$(ul).addClass("haspaging");
+		}
+
+		return appdb.utils.pagifyHTMLList(ul);
+	};
+	this.showTemplateImages = function(el, contextscript, images, template, vappVersion) {
+		//var vappVersion = this.options.data;
+		var usageids = $("<div class='usageids'></div>");
+		var imageid = $("<div class='imageid'></div>");
+		var temp = $("<div class='usagetemplate'></div>");
+		var td = $(el).closest(".va-template.va-template-data");
+		var listhtmllist = this.getTemplateImageList(images);
+		var contextscripts = this.getAvailableContextScripts(contextscript);
+
+		$(imageid).text("Image: ver." + vappVersion.vmiversion + " - " + vappVersion.os.val() + " " + vappVersion.os.version + " / " + vappVersion.arch.val() + " / " + vappVersion.hypervisors);
+		$(temp).append("<span>CPUs: <b>" + $(td).find(".template-cell.cpus > span").text() + "</b></span><span>Memory: <b>" + $(td).find(".template-cell.memory > span").text() + "</b></span><span>Disk: <b>" + $(td).find(".template-cell.disk > span").text()  + "</b></span><span> In\Out: <b>" + $(td).find(".template-cell.connectivity > span").text() + "</b></span><span>OS: <b>" + $(td).find(".template-cell.osfamily > span").text() +"</b></span>");
+		$(usageids).append(imageid).append(temp).append(listhtmllist);
+
+		if ( contextscripts.length > 0 ) {
+			var contextscript_html = $("<div class='fieldvalues contextscript_url'><div class='fieldvalue contextscript_url'><div class='field'>Contextualization script:</div><div class='value'></div></div></div>");
+
+			this.renderContextScripts($(contextscript_html).find(".fieldvalue > .value"), contextscripts);
+			$(usageids).append(contextscript_html);
+		}
+
+		if (this.parent.renderInlineDialog) {
+			var title = this.options.application.name + " IDs";
+			var vo = template.vo || null;
+			var voname = (vo.val) ? vo.val() :  vo.name;
+
+			if (voname) {
+				title += " endorsed by " + voname;
+			}
+			this.parent.renderInlineDialog(true, usageids, "<span>" + title + "</span>", "sitecontents");
+		}
+
+		$(usageids).find(".contextscript_url .value.hasmany").closest(".fieldvalue").addClass("hasmany");
+
+		if( $(usageids).find(".pagifier").length > 0 ){
+			$(usageids).addClass("hasmany");
+		}
+	};
+	this.renderTemplate = function(dom, d, data,instance) {
+		d = d || {};
+		var memory = $("<div class='template-cell memory'></div>");
+		var cpus = $("<div class='template-cell cpus'></div>");
+		var connectivity = $("<div class='template-cell connectivity'></div>");
+		var osfamily = $("<div class='template-cell osfamily'></div>");
+		var action = $("<div class='template-cell action'><div class='getids' title='View related IDs'></div><div class='getcontextscript hidden' title='View contextualization script'></div></div>");
+		var memorytext = ($.trim(d.main_memory_size) === "" ? "-" : $.trim(d.main_memory_size));
+		var cpustext = ($.trim(d.logical_cpus) === "" ? "-" : $.trim(d.logical_cpus)) + "/" + ($.trim(d.physical_cpus) === "" ? "-" : $.trim(d.physical_cpus));
+		var connectivitytext = ($.trim(d.connectivity_in).toUpperCase() === "FALSE" ? "no" : ($.trim(d.connectivity_in).toUpperCase() === "TRUE") ? "yes" : ($.trim(d.connectivity_in) || "-")) + "/" + ($.trim(d.connectivity_out).toUpperCase() === "FALSE" ? "no" : ($.trim(d.connectivity_out).toUpperCase() === "TRUE") ? "yes" : ($.trim(d.connectivity_out) || "-"));
+		var osfamilytext = ($.trim(d.os_family) === "" ? "-" : $.trim(d.os_family));
+		var disk = $("<div class='template-cell disk'></div>");
+		var disktext = $("<span></span>").text($.trim(d.disc_size));
+		var diskSize = parseInt($.trim(d.disc_size) || "-1");
+
+		if (isNaN(diskSize) === false) {
+		  switch(diskSize) {
+		    case -1:
+		      disktext = $("<span></span>").append("<i>n/a</i>");
+		      break;
+		    case 0:
+		      disktext = $("<span></span>").append("<i>any</i>");
+		      break;
+		    default:
+		      disktext = $("<span></span>").text(diskSize + " GB");
+		      break;
+		  }
+		}
+
+		$(disk).append("<span></span>").append(disktext);
+		$(memory).append($("<span></span>").text(memorytext));
+		$(cpus).append($("<span></span>").text(cpustext));
+		$(connectivity).append($("<span></span>").text(connectivitytext));
+		$(osfamily).append($("<span></span>").text(osfamilytext));
+
+		if ($.trim(d.noaction) !== "true") {
+			$(action).find(".getids").text("get IDs");
+		} else {
+			$(action).empty();
+		}
+
+		$(dom).append(cpus).append(memory).append(disk).append(connectivity).append(osfamily).append(action);
+		$(action).find(".getids").off("click").on("click", (function(self, cscript, instance) {
+			return function(ev) {
+				ev.preventDefault();
+				self.showTemplateImages(this, cscript, d.values || [], d, data);
+				return false;
+			};
+		})(this, data.contextscript,instance));
+	};
+	this.renderTemplates = function(dom, data,instance) {
+		var d = data.templates || [];
+		var ul = $("<ul class='cancollapse'></ul>");
+		var liheader = $("<li class='va-template va-template-header'></li>");
+		this.renderTemplate(liheader, {main_memory_size: "Memory", disc_size: "Disk", logical_cpus: "Logical", physical_cpus: "/Physical CPUs", connectivity_in: "Connectivity In", connectivity_out: "/Out", os_family: "OS Family", noaction: "true"}, data);
+		$(ul).append(liheader);
+		if (d.length > 0) {
+			$.each(d, (function(self, container) {
+				return function(i, e) {
+					var l = $("<li class='va-template va-template-data'></li>");
+					$(l).data("template", e);
+					if (instance) {
+						if (data.occi_endpoint_url && data.occi_endpoint_url.type && data.occi_endpoint_url.val) {
+							instance.serviceType = data.occi_endpoint_url.type;
+							instance.serviceEndpoint = data.occi_endpoint_url.val();
+							$.each(instance.items, function(i, dii) {
+								if (instance.serviceEndpoint === dii.endpointurl) {
+								    dii.serviceType = instance.serviceType;
+								}
+							});
+							//sort by servicetype OCCI, opennebula, openstack
+							instance.items.sort(function(a, b) {
+							    if (a.serviceType < b.serviceType) return -1;
+							    if (a.serviceType > b.serviceType) return 1;
+							    return 0;
+							})
+						}
+					}
+					self.renderTemplate(l, e, data);
+					$(container).append(l);
+				};
+			})(this, ul));
+		} else {
+			var l = $("<li class='va-template va-template-data empty'></li>");
+			this.renderEmptyTemplate(l);
+			$(ul).append(l);
+		}
+		$(dom).append(ul);
+	};
+	this.sortTemplates = function(templates) {
+		var min = 1;
+		var max = -1;
+
+		return templates.sort(function(a, b) {
+		    if (parseInt(a.physical_cpus) > parseInt(b.physical_cpus)) return min;
+		    if (parseInt(a.physical_cpus) < parseInt(b.physical_cpus)) return max;
+
+		    if (parseInt(a.logical_cpus) > parseInt(b.logical_cpus)) return min;
+		    if (parseInt(a.logical_cpus) < parseInt(b.logical_cpus)) return max;
+
+		    if (parseInt(a.main_memory_size) > parseInt(b.main_memory_size)) return min;
+		    if (parseInt(a.main_memory_size) < parseInt(b.main_memory_size)) return max;
+
+		    if (parseInt(a.disc_size) > parseInt(b.disc_size)) return min;
+		    if (parseInt(a.disc_size) < parseInt(b.disc_size)) return max;
+
+		    return 0;
+		});
+	};
+	this.renderVersion = function(dom, d) {
+		var li = $("<li class='va-image expandable'></li>");
+		var img = $("<div class='image handler'></div>");
+		var version = $("<div class='version fieldvalue'><div class='field'></div><div class='value'></div></div>");
+		var os = $("<div class='os'></div>");
+		var arch = $("<div class='arch'></div>");
+		var hypervisors = $("<div class='hypervisors'></div>");
+		var permalink = $("<div class='permalink' ><a href='' title='View image details in new window' target='_blank'><span>Image</span></a>:</div>");
+		var sep = "<span class='seperator'>/</span>";
+		$(version).find(".value").text("ver." + d.vmiversion);
+		$(os).text(d.os.val() + " " + d.os.version);
+		$(arch).text(d.arch.val());
+		$(hypervisors).text(d.hypervisors);
+		if (typeof d.vmiinstanceid !== "undefined" && typeof d.identifier !== "undefined" && $.trim(d.vmiinstanceid) !== "" && $.trim(d.identifier) !== "") {
+			$(permalink).find("a").attr("href", appdb.config.endpoint.base + "store/vm/image/" + $.trim(d.identifier) + ":" + $.trim(d.vmiinstanceid)).off("click").on("click", function(ev) {
+				ev.stopPropagation();
+			});
+			$(img).append(permalink);
+		}
+		$(img).append(version).append(os).append(sep).append(arch).append(sep).append(hypervisors);
+		$(li).append(img);
+		$(li).data("image", d);
+		d.templates = d.templates || [];
+		d.templates = this.sortTemplates(d.templates);
+		this.renderTemplates(li, d);
+		$(dom).append(li);
+	};
+
+	this.renderSite = function(dom, d) {
+		var li = $("<li class='va-site expandable'></li>");
+		var site = $("<div class='site handler'></div>");
+		var name = $("<div class='name fieldvalue'><a class='field permalink' href='' title='View site details in new window' target='_blank'><span>Site:</span></a><div class='value'></div></div>");
+		var country = $("<div class='country'></div>");
+
+		var ul = $("<ul class='cancollapse'></ul>");
+
+		$(name).find(".value").text($.trim(d.name).toUpperCase());
+		$(name).find("a").attr("href",appdb.config.endpoint.base + "store/site/" + $.trim(d.name).toUpperCase()).off("click").on("click", function(ev) {
+			ev.stopPropagation();
+		});
+		$(site).append(name);
+		$(site).attr("data-id", d.id);
+		//$(site).data("vos", d.vos);
+		$(site).addClass("in_production");
+		if ($.trim(d.in_production) === "true") {
+			$(site).addClass("in_production");
+		}
+		$(site).addClass("node_monitored");
+		if ($.trim(d.node_monitored) === "true") {
+			$(site).addClass("node_monitored");
+		}
+		if ($.trim(d.beta) === "true") {
+			$(site).addClass("beta");
+		}
+		if (d.country && typeof d.country.val === "function") {
+			$(country).text(d.country.val());
+			if ($.trim(d.country.id) !== "") {
+				$(country).attr("data-id", d.country.id);
+			}
+			if ($.trim(d.country.isocode) !== "") {
+				$(country).attr("data-isocode", d.country.isocode);
+				$(country).text("(" + $.trim(d.country.isocode).toUpperCase() + ")");
+			}
+			$(site).append(country);
+		}
+		$(li).append(site);
+		$(li).append(ul);
+		$(li).data("site", d);
+
+		d.versions = d.versions || [];
+		$.each(d.versions, (function(self, container) {
+			return function(i, e) {
+				self.renderVersion(container, e);
+			};
+		})(this, ul));
+		$(dom).append(li);
+	};
+	this.initAccordion = function() {
+		$(this.dom).find(".expandable").each((function(self) {
+			return function(i, e) {
+				$(this).children(".handler:first").off("click").on("click", (function(self) {
+					return function(ev) {
+						var list = $(this).siblings(".cancollapse");
+
+						if ($(this).parent().hasClass("expanded") === true) {
+							$(list).slideUp("fast", function() {
+								$(this).find(".expandable > .cancollapse").hide();
+								$(this).closest("li").removeClass("expanded");
+							});
+						} else {
+							$(list).closest("li").siblings(".expanded").children(".cancollapse").slideUp("fast", function() {
+								$(this).closest("li").removeClass("expanded");
+							});
+							$(list).find(".cancollapse").hide();
+							$(list).find(".expandable").removeClass("expanded");
+							$(list).slideDown("fast", function() {
+								$(this).closest("li").addClass("expanded");
+							});
+
+						}
+					};
+				})(self));
+			};
+		})(this));
+		$(this.dom).find(".expandable > .cancollapse").hide();
+	};
+	this.render = function(d) {
+		$(this.dom).fadeOut(200, (function(self) {
+			return function() {
+				self.doRender(d);
+			};
+		})(this));
+	};
+	this.doRender = function(d) {
+		this.reset();
+		d = d || [];
+		d = $.isArray(d) ? d : [d];
+		$.each(d, (function(self) {
+			return function(i, e) {
+				self.renderSite(self.dom, e);
+			};
+		})(this));
+
+		$(this.dom).fadeIn(200);
+		this.initAccordion();
+	};
+
+	this._init = function() {
+		this.dom = $(this.options.container);
+		this.parent = this.options.parent;
+	};
+	this._init();
+});
+appdb.views.VapplianceResourceProvidersListGLUE20 = appdb.ExtendClass(appdb.View, "appdb.views.VapplianceResourceProvidersListGLUE20", function(o) {
+	/*Allowed is an array of policies to filter context scripts. Policies are: 
+	 * "swappliance": Allow contextscripts provided by software appliances 
+	 * "contexstscript": Allow contextscripts provided by images (explicit by users)
+	 * "owned": Allow contextscripts owned by the current item. Current item is 
+	 *			defined by its id in the 'this.options.itemid' variable.
+	 *			Used in the case of Software Appliance usage, where only the 
+	 *			contextscripts defined in the same software appliance will be 
+	 *			displayed. NOTE: Will be ignored if no item id is procided
+	 */
+	this.options = {
+		container: $(o.container),
+		parent: o.parent || null,
+		allowed: ($.isArray(o.allowed))?o.allowed:["contextscript"],
 		itemid: $.trim(o.itemid)
 	};
 
@@ -18815,7 +19457,7 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 		var usageids = $("<div class='usageids'></div>");
 		var fieldvalues = $("<div class='fieldvalues'></div>");
 		$(fieldvalues).append(endpoint_url_html).append(template_id_html).append(occi_id_html);
-		
+
 		if (contextscript ){
 			if( $.isArray(contextscript) === false && $.trim(contextscript.url)) {
 				var contextscript_html = $("<div class='fieldvalue contextscript_url'><div class='field'>Contextualization script:</div><div class='value'></div></div>");
@@ -20810,7 +21452,7 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 		$(action).find(".getids").off("click").on("click", (function(self, cscript, instance) {
 			return function(ev) {
 				ev.preventDefault();
-				self.showTemplateImages(this, cscript, d.images || [], d);
+				self.showTemplateImages(this, cscript, d.values || [], d);
 				return false;
 			};
 		})(this, data.contextscript,instance));

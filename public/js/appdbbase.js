@@ -9706,7 +9706,531 @@ appdb.components.VapplianceResourceProviders = appdb.ExtendClass(appdb.Component
 				res.push(vos[i]);
 			}
 		}
+
+		this.options.availableVos = res;
+	};
+	this.getAvailableVos = function(){
+		if( this.options.availableVos === null ){
+			this.options.availableVos = this.options.vos.map(function(vo) {
+				var v = Object.assign({}, vo || {});
+				delete v.sites;
+				return v;
+			});
+		}
+		return this.options.availableVos || [];
+	};
+	this.getEmptyVoData = function(){
+		return {
+			alias: "none",
+			discipline: "other",
+			id: "-",
+			name: "<none>",
+			status: "none"
+		};
+	};
+	this.getVoData = function(id){
+		id = (typeof id === "undefined")?"-":($.trim(id) || "-");
+		var res = $.grep(this.getAvailableVos(), function(e){
+			return e.id === id;
+		});
+		return (res.length === 0)?null:res[0];
+	};
+	this.getProvider = function(id){
+		id = $.trim(id);
+		var providers = this.getCompactVAProviders();
+		var res = $.grep(providers, function(e){
+			return ($.trim(e.id) === id|| (e.nativeProviders && e.nativeProviders.indexOf(id) > -1));
+		});
+		return (res.length === 0 )?null:res[0];
+	};
+	this.groupProviderImages = function(providers){
+		providers = providers || [];
+		providers = $.isArray(providers)?providers:[providers];
+		$.each(providers, function(ii,provider){
+			provider.images = provider.images || [];
+			provider.images = $.isArray(provider.images)?provider.images:[provider.images];
+			var res = {};
+			var result = [];
+			$.each(provider.images, function(i, e){
+				var goodid = e.goodid || e.vmiinstanceid;
+				if( !goodid ) return;
+				e.templates = e.templates || [];
+				e.templates = $.isArray(e.templates)?e.templates:[e.templates];
+				if( !res[goodid] ){
+					res[goodid] = $.extend(true,{}, e);
+					res[goodid].items = [];
+					res[goodid].template = [];
+				}
+				res[goodid].template = res[goodid].template.concat(appdb.utils.extendArray( e.templates ));
+				res[goodid].items = res[goodid].items.concat( appdb.utils.extendArray([{templates: e.templates, occid: e.occi_id, endpointurl: e.occi_endpoint_url, serviceType: e.serviceType, nativeApis: e.nativeApis}]) );
+			});
+
+			//group duplicates
+			for(var i in res ){
+				if( res.hasOwnProperty(i) === false ) continue;
+				res[i].template = appdb.utils.GroupSiteTemplates(res[i].template);
+				res[i].templates = appdb.utils.extendArray(res[i].template);
+			}
+			for(var i in res ){
+				if( res.hasOwnProperty(i) === false ) continue;
+				result.push(res[i]);
+			}
+			provider.images = result;
+		});
 		
+		return providers;
+	};
+	this.groupProvidersBySite = function(providers){
+		if( appdb.config.features.groupvaprovidertemplates === false ){
+			return providers;
+		}
+		providers = providers || [];
+		providers = $.isArray(providers)?providers:[providers];
+		var uniq = {};
+		$.each(providers, function(i,e){
+			//if (e.name !== 'CESGA') return;
+
+			e.images = e.images || [];
+			e.images = $.isArray(e.images)?e.images:[e.images];
+
+			$.each(e.images, function(ii,ee){
+				ee.occi_endpoint_url = e.endpoint_url;
+				ee.serviceType = 'occi';
+				switch(e.service_type) {
+				    case 'org.openstack.nova':
+					ee.serviceType = 'openstack';
+					break;
+				    case 'eu.egi.cloud.vm-management.occi':
+				    default:
+					break
+				}
+				ee.nativeApis = [];
+				$.each(e.nativeApis || [], function(index, api) {
+				    var st = 'occi';
+				    switch(api.service_type) {
+					case 'org.openstack.nova':
+					    st = 'openstack';
+					    break;
+					case 'eu.egi.cloud.vm-management.occi':
+					default:
+					    break
+				    }
+				    ee.nativeApis.push({
+					serviceType: st,
+					service_type: api.service_type,
+					endpointUrl: api.endpoint_url
+				    });	
+				});
+				ee.instances = [];
+			});
+			if( !uniq[e.name] ){
+				uniq[e.name] = $.extend(true, {}, e);
+			}else{
+				uniq[e.name].images = uniq[e.name].images.concat(appdb.utils.extendArray(e.images));
+			}
+		});
+		var res = [];
+		for(var i in uniq){
+			if( uniq.hasOwnProperty(i) === false ) continue;
+			res.push(uniq[i]);
+		} 
+
+		return this.groupProviderImages(res);
+	};
+	this.getProvidersByVoId = function(id){
+		id = ( (typeof id === "undefined")?"-":($.trim(id) || "-") );
+		this.options.vos = this.options.vos || [];
+		this.options.vos = $.isArray(this.options.vos )?this.options.vos:[this.options.vos];
+		var vo = $.grep(this.options.vos, function(e){
+			return $.trim(e.id) === id;
+		});
+		if( vo.length === 0 ){
+			return [];
+		}
+
+		return vo[0].sites;
+	};
+	this.getCompactVAProviders = function(providers) {
+	    if (this.options.compactVaProviders) {
+		return this.options.compactVaProviders;
+	    }
+	    var vaproviders = appdb.model.StaticList.VAProviders || [];
+	    var compactVaProviders = {};
+	    //first get all occi vaproviders
+	    $.each(vaproviders, function(index, vaprovider) {
+		var sitename = vaprovider.name;
+		if (vaprovider.service_type === 'eu.egi.cloud.vm-management.occi') {
+		    compactVaProviders[sitename] = vaprovider;
+		}
+	    });
+
+	    if (appdb.config.features.displayNativeAPIs) {
+		$.each(vaproviders, function(index, vaprovider) {
+		    var sitename = vaprovider.name;
+		    if (vaprovider.service_type !== 'eu.egi.cloud.vm-management.occi') {
+			//In case of already occi vaprovider with same sitename then
+			//append native api va provider in occi one
+			if (compactVaProviders[sitename]) {
+			    compactVaProviders[sitename].nativeProviders = compactVaProviders[sitename].nativeProviders || [];
+			    if (compactVaProviders[sitename].nativeProviders.indexOf(vaprovider.id) === -1) {
+				compactVaProviders[sitename].nativeProviders.push(vaprovider.id);
+				compactVaProviders[sitename].nativeApis = compactVaProviders[sitename].nativeApis || [];
+				compactVaProviders[sitename].nativeApis.push(vaprovider);
+			    }
+			} else {
+			    compactVaProviders[sitename] = vaprovider;
+			}
+		    }
+		});
+	    }
+
+	    var result = [];
+	    $.each(Object.keys(compactVaProviders), function(index, sitename) {
+		result.push(compactVaProviders[sitename]);
+	    });
+
+	    this.options.compactVaProviders = result;
+
+	    return this.options.compactVaProviders;
+	}
+	this.transformData = function(d){
+		this.options.vos = appdb.utils.CloudInfo.getVApplianceCloudContentsPerVO(d);
+
+		return data;
+
+		//TODO: Remove code bellow.
+		var vos = appdb.utils.CloudInfo.getVApplianceVOCloudContents(d);
+		d = d || this.options.images || [];
+		d = $.isArray(d)?d:[d];
+		this.options.images = $.grep(d, function(e){
+			return ($.trim(e.enabled)!=="false");
+		});
+		var vos = {};
+
+		$.each(this.options.images,(function(self){
+			return  function(i, e){
+				e.provider = e.provider || [];
+				e.provider = $.isArray(e.provider)?e.provider:[e.provider];
+
+				$.each(e.provider, function(ii, ee){
+					if( ee.in_production === "false" ) return;
+					var pvoid = (typeof ee["void"] ==="undefined")?"-":$.trim(ee["void"]);
+					var pvoname = (typeof ee["voname"] === "undefined")?"":$.trim(ee["voname"]);
+					vos[pvoid] = vos[pvoid] || {id:pvoid, name: pvoname, providers:{}};
+					var pdata = self.getProvider(ee.provider_id);
+					var imgs = (pdata && vos[pvoid].providers[pdata.id] && vos[pvoid].providers[pdata.id].images )?vos[pvoid].providers[pdata.id].images:{};
+					if( pdata !== null ){
+						switch(pdata) {
+							case "eu.egi.cloud.vm-management.occi":
+							   break;
+							case "org.openstack.nova":
+							    break;
+						}
+						vos[pvoid].providers = vos[pvoid].providers || {};
+						vos[pvoid].providers[pdata.id] = $.extend(true,{},pdata);
+						if( vos[pvoid].providers[pdata.id].template ){
+							delete vos[pvoid].providers[pdata.id].template;
+						}
+						if( vos[pvoid].providers[pdata.id].image ){
+							delete vos[pvoid].providers[pdata.id].image;
+						}
+						vos[pvoid].providers[pdata.id].images = vos[pvoid].providers[pdata.id].images || imgs;
+						vos[pvoid].providers[pdata.id].images[e.vmiinstanceid] = vos[pvoid].providers[pdata.id].images[e.vmiinstanceid] || $.extend(true,{},e);
+						vos[pvoid].providers[pdata.id].images[e.vmiinstanceid].occi_id = ee.occi_id;
+						var hyper = vos[pvoid].providers[pdata.id].images[e.vmiinstanceid].hypervisor;
+						hyper = hyper || [];
+						hyper = $.isArray(hyper)?hyper:[hyper];
+						var hyperstr = [];
+						$.each(hyper, function(h, hyp){
+							if( typeof hyp.val === "function"){
+								var hv = $.trim(hyp.val());
+								if( hv !== "" ){
+									hyperstr.push(hv);
+								}
+							}
+						});
+						vos[pvoid].providers[pdata.id].images[e.vmiinstanceid].hypervisors = hyperstr.join(",");
+						pdata.template = pdata.template || [];
+						pdata.template = $.isArray(pdata.template)?pdata.template:[pdata.template];
+						vos[pvoid].providers[pdata.id].images[e.vmiinstanceid].templates = [];
+						//assure unique templates
+						var utemp = {};
+						$.each(pdata.template, function(ti, te){
+							if( !utemp[te.resource_id] && $.trim(te.resource_id) !== "" ){
+								utemp[te.resource_id] = te;
+							}
+						});
+						for(var t in utemp){
+							if( utemp.hasOwnProperty(t) === false ) continue;
+							vos[pvoid].providers[pdata.id].images[e.vmiinstanceid].templates.push(utemp[t]);
+						}
+					}
+				});
+			};
+		})(this));
+
+		//Arrayify data
+		var res = [];
+		for(var v in vos){
+			if( vos.hasOwnProperty(v) === false ) continue;
+			var vo = vos[v];
+			var voprov = [];
+
+			for(var p in vo.providers){
+				if( vo.providers.hasOwnProperty(p) === false ) continue;
+				var prov = vo.providers[p];
+				var images = [];
+
+				for(var i in prov.images){
+					if( prov.images.hasOwnProperty(i) === false) continue;
+					images.push(prov.images[i]);
+				}
+
+				prov.images = images;
+				voprov.push(prov);
+			}
+
+			vo.providers = voprov;
+			res.push(vo);
+		}
+		this.options.vos = res;
+	};
+	this.renderAvailableVos = function(){
+		var preselect = this.options.selectedVoId;
+		var avos = this.options.vos;
+		var selprovs = [];
+
+		var sel = $(this.dom).find(".voselector");
+		if( $(sel).length > 0 ){
+			if($.trim($(sel).data("preselect")) !== ""){
+				preselect = $.trim($(sel).data("preselect")) || this.options.selectedVoId;
+			}
+			if( $.trim(preselect)!=="-" ){
+				selprovs = this.getProvidersByVoId(preselect);
+				if( selprovs.length === 0 ){
+					preselect = this.options.selectedVoId;
+				}
+			}
+			if( $.trim(preselect)==="-" && avos.length > 0 ){
+				preselect = avos[0].id;
+			}
+			selprovs = this.getProvidersByVoId(preselect);
+			if( selprovs.length === 0 ){
+				preselect = this.options.selectedVoId;
+			}
+		}
+
+		this.options.selectedVoId = preselect;
+
+		$(sel).empty();
+		var html = $("<select></select>");
+
+		$.each(avos, function(i, e){
+			var opt = $("<option value=''></option>");
+			$(opt).attr("value",e.id);
+			if( $.trim(e.id) === preselect ){
+				$(opt).attr("selected");
+			}
+			var inner = $("<div class='vooption icontext'><img src='' alt=''/><span class='name'></span><span class='details'></span></div>");
+			$(inner).find("span.name").text(e.name);
+			$(inner).find("img").attr("src", "/vo/getlogo?name="+encodeURI(e.name)+"&vid="+ (e.id<<0) +"&id=" + e.discipline);
+			$(inner).find("span.details").text(e.count + " image" + ((e.count>1)?"s":"") +" available");
+			$(opt).append(inner);
+			$(html).append(opt);
+		});
+		$(sel).append(html);
+
+		if( this.options.dom.vos !== null ){
+			this.options.dom.vos.destroyRecursive(false);
+			this.options.dom.vos = null;
+		}
+		this.options.dom.vos = new dijit.form.Select({
+			name: "availablevos",
+			value: preselect,
+			onChange: (function(self){
+				return function(v){
+					self.renderSelection(v);
+				};
+			})(this)
+		},$(html)[0]);
+	};
+	this.renderSelection = function(v){
+		v = v || this.options.selectedVoId;
+		this.options.selectedVoId = v;
+		this.renderVoDetailsLink(v);
+		this.renderSiteList(v);
+	};
+	this.renderVoDetailsLink = function(v){
+		var vo = this.getVoData(v);
+		if( $.trim(v) === "-" || !vo || $.trim(vo.name) === "" ){
+			$(this.dom).find(".vodetailslink").addClass("hidden");
+			return;
+		}
+		$(this.dom).find(".vodetailslink > a").attr("href", appdb.config.endpoint.base + "store/vo/" + $.trim(vo.name));
+		$(this.dom).find(".vodetailslink").removeClass("hidden");
+	};
+	this.renderSiteList = function(vo_id){
+		this.views.sitelist.render(this.getProvidersByVoId(vo_id));
+	};
+	this.render = function(){
+		if( this.options.vos.length === 0 ){
+			$(this.dom).addClass("empty");
+		}else{
+			$(this.dom).removeClass("empty");
+		}
+		if( this.options.vos.length > 0 ){
+			this.renderAvailableVos();
+			this.renderSelection(this.options.selectedVoId);
+		}
+	};
+	this.renderInlineDialog = function(enabled, html, title, classes){
+		enabled = (typeof enabled === "boolean")?enabled:false;
+		title = $.trim(title);
+		classes = $.trim(classes);
+		$(this.dom).children(".inlinedialog").remove();
+		if( enabled ){
+			var dialog = $("<div class='inlinedialog "+classes+"'><div class='shader'/><div class='dialog'><div class='header'></div><div class='message'></div><div class='footer'><div class='action close btn btn-primary btn-compact'>close</div></div></div></div>");
+			$(dialog).find(".header").append(title);
+
+			if( title === "" ){
+				$(dialog).find(".header").addClass("hidden");
+			}
+
+			$(dialog).find(".message").append(html);
+			$(dialog).find(".action.close, .shader").off("click").on("click", (function(self){
+				return function(ev){
+					ev.preventDefault();
+					self.renderInlineDialog(false);
+					return false;
+				};
+			})(this));
+			$(this.dom).append(dialog);
+		}
+	};
+	this.renderLoading = function(enabled, text, classes){
+		enabled = (typeof enabled === "boolean")?enabled:false;
+		text = $.trim(text) || "Loading";
+		text = "..." + text;
+		classes = $.trim(classes);
+		$(this.dom).children(".actionloader").remove();
+		if( enabled ){
+			$(this.dom).append("<div class='actionloader "+classes+"'><div class='shader'/><div class='message icontext'><img src='/images/ajax-loader-trans-orange.gif' alt=''/><span>"+text+"</span></div></div>");
+		}
+	};
+	this.load = function(){
+		this.load.attempts = ( (typeof this.load.attempts === "undefined")?200:this.load.attempts ) << 0;
+		if( appdb.model.StaticList.VAProviders.length === 0 && this.load.attempts > 0){
+			this.load.attempts -= 1;
+			this.renderLoading(true, "Loading sites");
+			setTimeout((function(self){
+				return function(){
+					if( self && $(self.dom).length > 0 ){
+						self.load();
+					}
+				};
+			})(this),100);
+			return;
+		}
+		this.load.attempts = 10;
+		if( this._model ){
+			this._model.unsubscribeAll();
+			this._model = null;
+		}
+		this._model = new appdb.model.VapplianceSites({id: appdb.pages.application.currentId()});
+		this._model.subscribe({event: "beforeselect", callback: function(v){
+			this.renderLoading(true, "Loading sites");
+		}, caller: this }).subscribe({event: "select", callback: function(v){
+			v.appid = appdb.pages.Application.currentId();
+			this.transformData(v);
+			this.renderLoading(false);
+			this.render();
+		}, caller: this });
+		this._model.get();
+	};
+	this._initContainer = function(){
+		if( $(this.dom).find(".list").length === 0 ){
+			$(this.dom).append($(this.options.dom.list));
+		}else{
+			this.options.dom.list = $(this.dom).find(".list");
+		}
+	};
+	this._init = function(){
+		this.dom = $(this.options.container);
+		this.parent = this.options.parent;
+		this._initContainer();
+		this.views.sitelist = new appdb.views.VapplianceResourceProvidersList({
+			container: $(this.options.dom.list),
+			parent: this,
+			application: appdb.pages.Application.currentData()
+		});
+	};
+	this._init();
+});
+
+appdb.components.VapplianceResourceProvidersGlue20 = appdb.ExtendClass(appdb.Component, "appdb.components.VapplianceResourceProvidersGlue20", function(o){
+	this.options = {
+		container: $(o.container),
+		parent: o.parent || null,
+		images: [],
+		availableVos: null,
+		selectedVoId: "-",
+		vos: [],
+		dom: {
+			list: $("<ul></ul>"),
+			vos: null
+		}
+	};
+	this.getImagesByVoId = function(id){
+		id = (typeof id === "undefined")?"-":($.trim(id) || "-");
+		var imgs = {};
+		$.each(this.getProvidersByVoId(id), function(i, e){
+			$.each(e.images, function(ii,ee){
+				imgs[ee.vmiinstanceid] = ee;
+			});
+		});
+		var res = [];
+		for(var i in imgs){
+			if( imgs.hasOwnProperty(i) === false ) continue;
+			res.push(imgs[i]);
+		}
+		return res;
+	};
+	this.loadAvailableVos = function(){
+		var appdata = appdb.pages.Application.currentData() || {};
+		var app = appdata.application || appdata;
+		var vos = [];
+		if( app.vo ){
+			app.vo = app.vo || [];
+			app.vo = $.isArray(app.vo)?app.vo:[app.vo];
+			var foundVOs = {};
+			$.each(app.vo, function(i,e){
+				foundVOs[e.id] = true;
+				vos.push($.extend(true,{},e));
+			});
+			$.each(this.options.vos, function(i,e){
+				if(typeof foundVOs[e.id] === 'undefined' && $.trim(e.name)!== '') {
+					vos.push({id: e.id, name: e.name});
+				}
+			});
+		}
+		vos.sort(function(a,b){
+			var aa = $.trim(a.name);
+			var bb = $.trim(b.name);
+			if( aa < bb ) return -1;
+			if( aa > bb ) return 1;
+			return 0;
+		});
+		if( this.getProvidersByVoId("-").length > 0 ){
+			vos.push(this.getEmptyVoData());
+		}
+		var res = [];
+		for( var i=0;  i< vos.length; i+=1){
+			vos[i].count = this.getImagesByVoId(vos[i].id).length;
+			if( vos[i].count > 0 ){
+				res.push(vos[i]);
+			}
+		}
+
 		this.options.availableVos = res;
 	};
 	this.getAvailableVos = function(){
@@ -9827,7 +10351,7 @@ appdb.components.VapplianceResourceProviders = appdb.ExtendClass(appdb.Component
 		for(var i in uniq){
 			if( uniq.hasOwnProperty(i) === false ) continue;
 			res.push(uniq[i]);
-		} 
+		}
 		
 		return this.groupProviderImages(res);
 	};
