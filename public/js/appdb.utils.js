@@ -9485,25 +9485,25 @@ appdb.utils.CloudInfo.getVApplianceCloudContentsPerVappliance = function(vapp, s
 }
 appdb.utils.CloudInfo.getVApplianceCloudContentsPerVO = function(vapp, serviceTypes) {
 	function getVAppliance(vapp) {
-	    var res = Object.assign({}, vapp);
-	    delete res.provider;
+		var res = Object.assign({}, vapp);
+		delete res.provider;
 
-	    res.hypervisor = res.hypervisor || [];
-	    res.hypervisor = $.isArray(res.hypervisor) ? res.hypervisor : [res.hypervisor];
-	    res.hypervisors = res.hypervisor.map(function(hypervisor) {
-		if (hypervisor.name) {
-		    return hypervisor.name;
-		} else if ($.isFunction(hypervisor.val)) {
-		    return hypervisor.val();
-		}
-		return '';
-	    }).filter(function(hypervisor) {
-		return hypervisor && $.trim(hypervisor);
-	    }).join(', ');
+		res.hypervisor = res.hypervisor || [];
+		res.hypervisor = $.isArray(res.hypervisor) ? res.hypervisor : [res.hypervisor];
+		res.hypervisors = res.hypervisor.map(function(hypervisor) {
+			    if (hypervisor.name) {
+				    return hypervisor.name;
+			    } else if ($.isFunction(hypervisor.val)) {
+				    return hypervisor.val();
+			    }
+			    return '';
+		    }).filter(function(hypervisor) {
+			    return hypervisor && $.trim(hypervisor);
+		    }).join(', ');
 
-	    delete res.hypervisor;
+		delete res.hypervisor;
 
-	    return res;
+		return res;
 	}
 	function start() {
 		var vappProviders = vapp.provider || [];
@@ -9604,17 +9604,17 @@ appdb.utils.CloudInfo.getVApplianceCloudContentsPerVO = function(vapp, serviceTy
 
 				imgtemplates = templatesPerVO[imgvoname].reduce(function(acc, template) {
 					var group_hash = template.group_hash;
+					var resourceUniqID = [resource.endpointUrl, resource.occi_id, resource.provider_authn, resource.provider_id, resource.service_type].join('/');
+					acc[group_hash] = acc[group_hash] || Object.assign({}, template, {values: {}});
 
-					acc[group_hash] = acc[group_hash] || Object.assign({}, template, {values: []});
-
-					acc[group_hash].values.push(
+					acc[group_hash].values[resourceUniqID] =
+						acc[group_hash].values[resourceUniqID] ||
 						Object.assign(
 							{},
 							resource,
 							{endpointUrl: providerEndpointUrl},
 							{ template: Object.assign({}, template) }
-						)
-					);
+						);
 
 					return acc;
 				}, {});
@@ -9627,7 +9627,7 @@ appdb.utils.CloudInfo.getVApplianceCloudContentsPerVO = function(vapp, serviceTy
 			return acc;
 		}, {});
 
-		VOs = appdb.utils.objectToArray(VOs, ['templates', 'versions', 'sites']);
+		VOs = appdb.utils.objectToArray(VOs, ['values', 'templates', 'versions', 'sites']);
 		VOs = VOs.map(function(vo) {
 		    vo.count = Object.keys(vo.versions || {}).length;
 		    delete vo.versions;
