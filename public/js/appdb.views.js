@@ -21543,6 +21543,7 @@ appdb.views.SiteVMUsageList = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 			this.options.usageitem.reset();
 			this.options.usageitem = null;
 		}
+
 		this.options.usageitem = new appdb.views.SiteVMUsageItem({
 			container: $(this.dom).find(".usageitem"),
 			parent: this,
@@ -21552,13 +21553,18 @@ appdb.views.SiteVMUsageList = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 		this.options.usageitem.render(this.options.data, data);
 	};
 
-	this.addItem = function(d) {
+	this.addItem = function(d, isSelected) {
 		var li = $("<li></li>");
 		var a = $("<a href='#' title='Select to view usage'><span class='name'></span></a>");
 		var voname = d.name || "none";
 
 		$(li).append(a);
-		$(a).find(".name").text(voname);
+		if (isSelected) {
+		    $(a).find(".name").html($('<b></b>').text(voname));
+		} else {
+		    $(a).find(".name").text(voname);
+		}
+
 		$(a).off("click").on("click", (function(self, data) {
 			return function(ev) {
 				ev.preventDefault();
@@ -21595,20 +21601,29 @@ appdb.views.SiteVMUsageList = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 		this.options.data = d || this.options.data;
 		this.orderEndorsements();
 		$(this.dom).find("ul.usagelist").empty();
+		var selectedLi = null;
 
 		$.each(this.options.data.vos, (function(self, dom) {
 			return function(i, e) {
-				var voname = e.name || "none";
-				if (voname === self.options.selectedVO) {
-				    var li = self.addItem(e);
-				    if (li) {
-					    $(dom).append(li);
-				    }
+				var voname = e.name || "<none>";
+				var isSelected = (voname === self.options.selectedVO);
+				if (isSelected) {
+					var li = self.addItem(e, isSelected);
+					if (li) {
+						$(dom).append(li);
+						if (isSelected) {
+							selectedLi = li;
+						}
+					}
 				}
 			};
 		})(this, $(this.dom).find("ul.usagelist")));
 
-		$(this.dom).find("ul.usagelist > li:first > a").trigger("click");
+		if (selectedLi) {
+			$(selectedLi).children('a').trigger('click');
+		} else {
+			$(this.dom).find("ul.usagelist > li:first > a").trigger("click");
+		}
 	};
 	this._initContainer = function() {
 		$(this.dom).empty();
