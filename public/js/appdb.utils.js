@@ -9600,7 +9600,7 @@ appdb.utils.CloudInfo.getVApplianceCloudContentsPerVO = function(vapp, serviceTy
 					acc[imgvoname].versions[image.vmiinstanceid] = true;
 				}
 
-				var imgtemplates = acc[imgvoname].sites[site.name].versions[image.vmiinstanceid].templates;
+				var imgtemplates = acc[imgvoname].sites[site.name].versions[image.vmiinstanceid].templates || {};
 
 				imgtemplates = templatesPerVO[imgvoname].reduce(function(acc, template) {
 					var group_hash = template.group_hash;
@@ -9617,7 +9617,7 @@ appdb.utils.CloudInfo.getVApplianceCloudContentsPerVO = function(vapp, serviceTy
 						);
 
 					return acc;
-				}, {});
+				}, imgtemplates);
 
 				acc[imgvoname].sites[site.name].versions[image.vmiinstanceid].templates = imgtemplates;
 
