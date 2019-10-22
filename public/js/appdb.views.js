@@ -18849,9 +18849,9 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 		}
 	};
 	this.getAvailableContextScripts = function(cntxtscripts){
-		contextscripts = cntxtscripts ||[];
-		contextscripts = $.isArray(contextscripts)?contextscripts:[contextscripts];
-		var res = $.grep(contextscripts, (function(allowed){
+		cntxtscripts = cntxtscripts ||[];
+		cntxtscripts = $.isArray(cntxtscripts)?cntxtscripts:[cntxtscripts];
+		var res = $.grep(cntxtscripts, (function(allowed){
 			return function(e){
 				if( !e ) return false;
 				if( e.application && e.application.id ){
@@ -19046,7 +19046,8 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 			};
 		})(this));
 	};
-	this.renderTemplateOld = function(dom, d, data) {
+	//TODO: Remove function renderTemplateGlue20
+	this.renderTemplateGlue20 = function(dom, d, data) {
 		d = d || {};
 		var memory = $("<div class='template-cell memory'></div>");
 		var cpus = $("<div class='template-cell cpus'></div>");
@@ -19417,7 +19418,8 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 	};
 	this._init();
 });
-appdb.views.VapplianceResourceProvidersListGLUE20 = appdb.ExtendClass(appdb.View, "appdb.views.VapplianceResourceProvidersListGLUE20", function(o) {
+//TODO: Remove old component appdb.views.VapplicanceResourceProvidersListGlue20
+appdb.views.VapplianceResourceProvidersListGlue20 = appdb.ExtendClass(appdb.View, "appdb.views.VapplianceResourceProvidersListGlue20", function(o) {
 	/*Allowed is an array of policies to filter context scripts. Policies are: 
 	 * "swappliance": Allow contextscripts provided by software appliances 
 	 * "contexstscript": Allow contextscripts provided by images (explicit by users)
@@ -20022,8 +20024,8 @@ appdb.views.SwapplianceResourceProvidersList = appdb.ExtendClass(appdb.views.Vap
 		this.renderState(li,d);
 	};
 });
-
-appdb.views.SiteVMUsageItemOld = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMUsageItem", function(o) {
+//TODO: Remove old component appdb.views.SiteVMUsageItemGlue20
+appdb.views.SiteVMUsageItemGlue20 = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMUsageItemGlue20", function(o) {
 	this.options = {
 		container: $(o.container),
 		parent: o.parent || null,
@@ -21330,6 +21332,8 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 			var endpoint_url_html = $("<div class='fieldvalue endpoint'><div class='field'></div><div class='value'></div></div>");
 			var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>" + appdb.utils.CloudInfo.getTemplateTitle(serviceType) + ":</div><div class='value'></div></div>");
 			var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>" + appdb.utils.CloudInfo.getResourceTitle(serviceType) + ":</div><div class='value'></div></div>");
+			var authn_html = $("<div class='fieldvalue authn'><div class='field'>Authentication:</div><div class='value'></div></div>");
+			var projectid_html = null;
 
 			if ((service.occi_endpoint_url || {}).val) {
 			    occi_endpoint_url = service.occi_endpoint_url.val();
@@ -21341,12 +21345,23 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 			    endpoint_title = '<div class="icontext"><img src="/images/opennebula.png" alt="Opennebula"/><span> endpoint:</span></div>';
 			}
 
+			$(authn_html).find('.value').text(service.authn);
+
+			if ($.trim(service.authn).toLowerCase() === 'oidc' ) {
+				projectid_html = $("<div class='fieldvalue projectid'><div class='field'>Project ID:</div><div class='value'></div></div>");
+				if ($.trim(image.projectid)) {
+					$(projectid_html).find('.value').text($.trim(image.projectid))
+				} else {
+					$(projectid_html).find('.value').html('<i>n/a</i>');
+				}
+			}
+
 			$(endpoint_url_html).find(".field").append(endpoint_title);
 			$(endpoint_url_html).find(".value").text(occi_endpoint_url);
 			$(template_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(serviceType, image.template.resource_name));
 			$(occi_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(serviceType, image.id));
 
-			$(li).append(endpoint_url_html).append(template_id_html).append(occi_id_html);
+			$(li).append(endpoint_url_html).append(template_id_html).append(occi_id_html).append(authn_html).append(projectid_html);
 			$(ul).append(li);
 		});
 
