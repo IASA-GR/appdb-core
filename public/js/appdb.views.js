@@ -19109,7 +19109,19 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 			var endpoint_url_html = $("<div class='fieldvalue endpoint'><div class='field'></div><div class='value'></div></div>");
 			var template_id_html = $("<div class='fieldvalue templateid'><div class='field'>" + appdb.utils.CloudInfo.getTemplateTitle(serviceType) + ":</div><div class='value'></div></div>");
 			var occi_id_html = $("<div class='fieldvalue occi_id'><div class='field'>" + appdb.utils.CloudInfo.getResourceTitle(serviceType) + ":</div><div class='value'></div></div>");
+			var authn_html = $("<div class='fieldvalue authn'><div class='field'>Authentication:</div><div class='value'></div></div>");
+			var projectid_html = null;
 
+			$(authn_html).find('.value').text(image.provider_authn);
+
+			if ($.trim(image.provider_authn).toLowerCase() === 'oidc' ) {
+				projectid_html = $("<div class='fieldvalue projectid'><div class='field'>Project ID:</div><div class='value'></div></div>");
+				if ($.trim(image.projectid)) {
+					$(projectid_html).find('.value').text($.trim(image.projectid))
+				} else {
+					$(projectid_html).find('.value').html('<i>n/a</i>');
+				}
+			}
 			if (serviceType === 'openstack') {
 			    endpoint_title = '<div class="icontext"><img src="/images/openstack.png" alt="Openstack"/><span> endpoint:</span></div>';
 			} else  if (serviceType === 'opennebula') {
@@ -19121,7 +19133,7 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 			$(template_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(serviceType, image.template.resource_name));
 			$(occi_id_html).find(".value").text(appdb.utils.CloudInfo.getResourceID(serviceType, image.occi_id));
 
-			$(li).append(endpoint_url_html).append(template_id_html).append(occi_id_html);
+			$(li).append(endpoint_url_html).append(template_id_html).append(occi_id_html).append(authn_html).append(projectid_html);
 			$(ul).append(li);
 		});
 
