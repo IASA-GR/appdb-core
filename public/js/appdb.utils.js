@@ -9483,50 +9483,88 @@ appdb.utils.CloudInfo.getVApplianceCloudContentsPerVappliance = function(vapp, s
 
     return start();
 }
-appdb.utils.CloudInfo.getVApplianceCloudContentsPerVO = function(vapp, serviceTypes) {
-	function getVAppliance(vapp) {
-		var res = Object.assign({}, vapp);
-		delete res.provider;
+appdb.utils.CloudInfo.getVApplianceCloudContentsPerVO = function(vapps, serviceTypes) {
+	function getVAppliances(vapps) {
+		return vapps.reduce(function(acc, vapp) {
+			var res = Object.assign({}, vapp);
+			delete res.provider;
 
-		res.hypervisor = res.hypervisor || [];
-		res.hypervisor = $.isArray(res.hypervisor) ? res.hypervisor : [res.hypervisor];
-		res.hypervisors = res.hypervisor.map(function(hypervisor) {
-			    if (hypervisor.name) {
-				    return hypervisor.name;
-			    } else if ($.isFunction(hypervisor.val)) {
-				    return hypervisor.val();
-			    }
-			    return '';
-		    }).filter(function(hypervisor) {
-			    return hypervisor && $.trim(hypervisor);
-		    }).join(', ');
+			res.hypervisor = res.hypervisor || [];
+			res.hypervisor = $.isArray(res.hypervisor) ? res.hypervisor : [res.hypervisor];
+			res.hypervisors = res.hypervisor.map(function(hypervisor) {
+				    if (hypervisor.name) {
+					    return hypervisor.name;
+				    } else if ($.isFunction(hypervisor.val)) {
+					    return hypervisor.val();
+				    }
+				    return '';
+			    }).filter(function(hypervisor) {
+				    return hypervisor && $.trim(hypervisor);
+			    }).join(', ');
 
-		delete res.hypervisor;
+			delete res.hypervisor;
 
-		return res;
-	}
-	function start() {
-		var vappProviders = vapp.provider || [];
-		var vappliance = getVAppliance(vapp);
-		var availableVOs = vappProviders.reduce(function(acc, vappProvider) {
-			var voname = vappProvider.voname || '<none>';
-
-			acc[voname] = acc[voname] || {
-			    id: (vappProvider.voname) ? vappProvider.void : '-1',
-			    name: voname
-			};
-
-			return acc;
-		    },{});
-		var availableProviderIds = vappProviders.map(function(vappProvider) { return vappProvider.provider_id; });
-		var availableProviders = (appdb.model.StaticList.VAProviders || []).filter(function(provider) { return (availableProviderIds.indexOf(provider.id) > -1); });
-		var resourceIds = vappProviders.reduce(function(acc, vappProvider) {
-			var voname = vappProvider.voname || '<none>';
-			var id = voname + '/' + vappProvider.provider_id + '/' + vappProvider.vmiinstanceid;
-			acc[id] = acc[id] || Object.assign({}, vappProvider);
+			acc[res.vmiinstanceid] = res;
 
 			return acc;
 		}, {});
+	}
+	function getAvailableProviderIds(vapps) {
+		var providerIds = vapps.reduce(function(acc, vapp) {
+			var providers = vapp.provider || [];
+			providers = $.isArray(providers) ? providers : [providers];
+
+			return providers.reduce(function(acc, provider) {
+			    acc[provider.provider_id] = true;
+
+			    return acc;
+			}, acc);
+		}, {});
+		
+		return Object.keys(providerIds);
+	}
+	
+	function getAvailableVOs(vapps) {
+		return vapps.reduce(function(acc, vapp) {
+			var providers = vapp.provider || [];
+			providers = $.isArray(providers) ? providers : [providers];
+
+			return providers.reduce(function(acc, provider) {
+				var name = provider.voname || '<none>';
+				var id = provider.void || '-1';
+
+				acc[name] = acc[name] || {
+					id: id,
+					name: name
+				};
+
+				return acc;
+			}, acc);
+		}, {});
+	}
+	function getAvailableResourceIds(vapps) {
+	    return vapps.reduce(function(acc, vapp) {
+			var providers = vapp.provider || [];
+			providers = $.isArray(providers) ? providers : [providers];
+
+			return providers.reduce(function(acc, vappProvider) {
+				var voname = vappProvider.voname || '<none>';
+				var id = voname + '/' + vappProvider.provider_id + '/' + vappProvider.vmiinstanceid;
+
+				acc[id] = acc[id] || Object.assign({}, vappProvider);
+				return acc;
+			}, acc);
+		}, {});
+	}
+	function start() {
+		vapps = vapps || [];
+		vapps = $.isArray(vapps) ? vapps : [vapps];
+
+		var vappliances = getVAppliances(vapps);
+		var availableVOs = getAvailableVOs(vapps);
+		var availableProviderIds = getAvailableProviderIds(vapps);
+		var availableProviders = (appdb.model.StaticList.VAProviders || []).filter(function(provider) { return (availableProviderIds.indexOf(provider.id) > -1); });
+		var resourceIds = getAvailableResourceIds(vapps);
 
 		var VOs = availableProviders.reduce(function(acc, provider) {
 			var images = provider.image || [];
@@ -9574,20 +9612,21 @@ appdb.utils.CloudInfo.getVApplianceCloudContentsPerVO = function(vapp, serviceTy
 				}
 
 				if(!acc[imgvoname].sites[site.name].versions[image.vmiinstanceid]) {
+					var vid = image.vmiinstanceid;
 					var version = Object.assign(
 						{},
 						image,
 						{
 						    templates: {},
-						    os: vappliance.os,
-						    arch: vappliance.arch,
-						    hypervisors: vappliance.hypervisors,
-						    vmiinstance: vappliance.vmiinstance,
-						    archived: vappliance.archived,
-						    isexpired: vappliance.isexpired,
-						    enabled: vappliance.enabled,
-						    good_vmiinstanceid: vappliance.good_vmiinstanceid,
-						    identifier: vappliance.identifier
+						    os: vappliances[vid].os,
+						    arch: vappliances[vid].arch,
+						    hypervisors: vappliances[vid].hypervisors,
+						    vmiinstance: vappliances[vid].vmiinstance,
+						    archived: vappliances[vid].archived,
+						    isexpired: vappliances[vid].isexpired,
+						    enabled: vappliances[vid].enabled,
+						    good_vmiinstanceid: vappliances[vid].good_vmiinstanceid,
+						    identifier: vappliances[vid].identifier
 						});
 					delete version.mp_uri;
 					delete version.va_provider_image_id;
