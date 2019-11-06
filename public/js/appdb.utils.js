@@ -9158,6 +9158,26 @@ appdb.utils.objectToArray = function (obj, props) {
        return res;
 }
 /**
+ * Generates an unique string based on a common set of properties
+ *
+ * @param {object} template   A site service template object
+ * @returns {String}	    A unique string representing the set of property values
+ */
+appdb.utils.CloudInfo.getTemplateGroupHash = function(template) {
+	if (template && $.isPlainObject(template)) {
+		return JSON.stringify({
+			disc_size: template.disc_size,
+			logical_cpus: template.logical_cpus,
+			main_memory_size: template.main_memory_size,
+			os_family: template.os_family,
+			physical_cpus: template.physical_cpus,
+			connectivity_in: template.connectivity_in,
+			connectivity_out: template.connectivity_out
+		    });
+	}
+	return template.group_hash || '';
+};
+/**
  * Generates an aggregated cloud information list of vappliance versions that 
  * a site supports based on the response data of a site rest API call.
  *
@@ -9280,13 +9300,13 @@ appdb.utils.CloudInfo.getSiteCloudContents = function _getCoudContentsOfSite(dat
 			.reduce(function(acc, template) {
 				var templ = Object.assign({}, template);
 				var img = Object.assign({}, occi);
-
+				var group_hash = appdb.utils.CloudInfo.getTemplateGroupHash(template); //templ.group_hash
 				img.service = Object.assign({}, service);
 				img.template = Object.assign({}, template);
 
-				acc[templ.group_hash] = acc[templ.group_hash] || templ;
-				acc[templ.group_hash].values = acc[templ.group_hash].values || [];
-				acc[templ.group_hash].values.push(img);
+				acc[group_hash] = acc[group_hash] || templ;
+				acc[group_hash].values = acc[group_hash].values || [];
+				acc[group_hash].values.push(img);
 
 				return acc;
 			}, {});
@@ -9642,7 +9662,7 @@ appdb.utils.CloudInfo.getVApplianceCloudContentsPerVO = function(vapps, serviceT
 				var imgtemplates = acc[imgvoname].sites[site.name].versions[image.vmiinstanceid].templates || {};
 
 				imgtemplates = templatesPerVO[imgvoname].reduce(function(acc, template) {
-					var group_hash = template.group_hash;
+					var group_hash = appdb.utils.CloudInfo.getTemplateGroupHash(template);//template.group_hash;
 					var resourceUniqID = [resource.endpointUrl, resource.occi_id, resource.provider_authn, resource.provider_id, resource.service_type].join('/');
 					acc[group_hash] = acc[group_hash] || Object.assign({}, template, {values: {}});
 
@@ -9683,4 +9703,4 @@ appdb.utils.CloudInfo.getVApplianceCloudContentsPerVO = function(vapps, serviceT
 	}
 
     return start();
-}
+};
