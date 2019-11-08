@@ -874,24 +874,33 @@ class SamlController extends Zend_Controller_Action
 		$this->_helper->layout->disableLayout();
 		$this->_helper->viewRenderer->setNoRender();
 		$res = "0";
+                $source = false;
+                $attrs = null;
+                $userIsGuest = ($this->session && $this->session->userIsGuest && $this->session->userid);
 		header('Access-Control-Allow-Origin: *');
-		if ( $this->session && isset($this->session->developsession) && $this->session->developsession === true ) {
-			if( $this->session->userid ){
-				$res = "1";
-			}
-		}
-                if( $this->session && $this->session->userIsGuest && $this->session->userid) {
-                    $res = "1";
-                    $source = false;
+
+		if ( $this->session && isset($this->session->developsession) && $this->session->developsession === true && $this->session->userid) {
+                        $res = "1";
+                        $source = true;
+		} else if( $userIsGuest ) {
+                        $res = "1";
+                        $source = true;
+                } else {
+                        $source = SamlAuth::isAuthenticated();
                 }
-		if( $res === "0" ) {
-			$source = SamlAuth::isAuthenticated();
-		}
+
 		if( $source !== false ){
-			$res = "1";
+                        $res = "1";
 			if( isset($_GET['profile']) && $_GET['profile'] === 'attributes' && $this->isAllowedProfileDataDomain()) {
 				header('Content-type: application/json');
-				$attrs = $source->getAttributes();
+                                if ($userIsGuest) {
+                                    $attrs = array(
+                                        "idp:sourceIdentifier" => array(ApplicationConfiguration::saml("guest.source")),
+                                        "idp:uid" => array(ApplicationConfiguration::saml("guest.uid"))
+                                    );
+                                } else {
+                                    $attrs = $source->getAttributes();
+                                }
 				if ($attrs && count($attrs) > 0) {
 					$sourceIdentifier = false;
 					$uid = false;
@@ -911,7 +920,8 @@ class SamlController extends Zend_Controller_Action
 						}
 
 						if ($userAccount) {
-                                                        if ($sourceIdentifier === 'egi-aai' || ($sourceIdentifier === 'egi-sso-ldap' && ApplicationConfiguration::isEnviroment('production') === false)) {
+                                                        // Check is SP is used for authentication in order to retrieve entitlements from appropriate sources
+                                                        if (($sourceIdentifier === 'egi-aai' && !$userIsGuest) || ($sourceIdentifier === 'egi-sso-ldap' && ApplicationConfiguration::isEnviroment('production') === false)) {
                                                             $attrs['entitlements'] = array('vo' => array('contacts' => $this->getUserVOInfo($uid, 'contacts') ,'memberships' => $this->getUserVOInfo($uid, 'memberships')));
                                                         } else {
                                                             $attrs['entitlements'] = array('vo' => array('contacts' => VoAdmin::getVOContacts($userAccount->researcherid) ,'memberships' => VoAdmin::getUserMembership($userAccount->researcherid)));
@@ -925,6 +935,13 @@ class SamlController extends Zend_Controller_Action
 							$researcher = $userAccount->getResearcher();
 							if ($researcher) {
                                                                 $currentHostName = 'https://'.$_SERVER['HTTP_HOST'];
+
+                                                                if ($userIsGuest) {
+                                                                        // This value is auto generated from local and it won't be available in guest mode
+                                                                        // So instead we use the current researcher id as a urid.
+                                                                        $attrs['appdb:urid'] = "p" . $researcher->id;
+                                                                }
+
                                                                 $attrs['appdb:cname'] = $researcher->cname;
                                                                 $attrs['appdb:firstName'] = $researcher->firstname;
                                                                 $attrs['appdb:lastName'] = $researcher->lastname;
@@ -978,22 +995,24 @@ class SamlController extends Zend_Controller_Action
 	private function isAllowedProfileDataDomain() {
 		$ref = (isset($_SERVER['HTTP_REFERER']) && trim($_SERVER['HTTP_REFERER'])!=='')?trim($_SERVER['HTTP_REFERER']):'';
 
-		if( $ref === '' ) {
+		/*if( $ref === '' ) {
 			return false;
-		}
+		}*/
 		
 		$allowed = explode(';', ApplicationConfiguration::saml('profile.allow', ''));
 		if( count($allowed) === 0 ) {
 			return false;
 		}
-		
+
 		if( count($allowed) === 1 ) {
 			if( $allowed[0] === '' ) {
 				return false;
 			} else if($allowed[0] === '*') {
 				return true;
 			}
-		}
+		} else if ($ref === '') {
+                    return false;
+                }
 		
 		$url = parse_url($ref);
 		$domain = $url['scheme'] . '://' . $url['host'];
