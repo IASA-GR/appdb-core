@@ -19242,7 +19242,7 @@ appdb.views.VapplianceResourceProvidersList = appdb.ExtendClass(appdb.View, "app
 		var d = data.templates || [];
 		var ul = $("<ul class='cancollapse'></ul>");
 		var liheader = $("<li class='va-template va-template-header'></li>");
-		this.renderTemplate(liheader, {main_memory_size: "Memory", disc_size: "Disk", logical_cpus: "Logical", physical_cpus: "/Physical CPUs", connectivity_in: "Connectivity In", connectivity_out: "/Out", os_family: "OS Family", noaction: "true"}, data);
+		this.renderTemplate(liheader, {main_memory_size: "Memory", disc_size: "Disk", logical_cpus: "Logical", physical_cpus: "Physical CPUs", connectivity_in: "Connectivity In", connectivity_out: "Out", os_family: "OS Family", noaction: "true"}, data);
 		$(ul).append(liheader);
 		if (d.length > 0) {
 			$.each(d, (function(self, container) {
@@ -19757,7 +19757,7 @@ appdb.views.VapplianceResourceProvidersListGlue20 = appdb.ExtendClass(appdb.View
 		var d = data.templates || [];
 		var ul = $("<ul class='cancollapse'></ul>");
 		var liheader = $("<li class='va-template va-template-header'></li>");
-		this.renderTemplate(liheader, {main_memory_size: "Memory", disc_size: "Disk", logical_cpus: "Logical", physical_cpus: "/Physical CPUs", connectivity_in: "Connectivity In", connectivity_out: "/Out", os_family: "OS Family", noaction: "true"}, data);
+		this.renderTemplate(liheader, {main_memory_size: "Memory", disc_size: "Disk", logical_cpus: "Logical", physical_cpus: "/Physical CPUs", connectivity_in: "Connectivity In", connectivity_out: "Out", os_family: "OS Family", noaction: "true"}, data);
 		$(ul).append(liheader);
 		if (d.length > 0) {
 			$.each(d, (function(self, container) {
@@ -20320,7 +20320,7 @@ appdb.views.SiteVMUsageItemGlue20 = appdb.ExtendClass(appdb.View, "appdb.views.S
 		var d = this.options.instanceData.template || [];
 		var ul = $("<ul class='cancollapse'></ul>");
 		var liheader = $("<li class='va-template va-template-header'></li>");
-		this.renderTemplate(liheader, {main_memory_size: "Memory", disc_size: "Disk", logical_cpus: "Logical", physical_cpus: "/Physical CPUs", connectivity_in: "Connectivity In", connectivity_out: "/Out", os_family: "OS Family", noaction: "true"}, data);
+		this.renderTemplate(liheader, {main_memory_size: "Memory", disc_size: "Disk", logical_cpus: "Logical", physical_cpus: "/Physical CPUs", connectivity_in: "Connectivity In", connectivity_out: "Out", os_family: "OS Family", noaction: "true"}, data);
 		$(ul).append(liheader);
 		if (d.length > 0) {
 			$.each(d, (function(self, container) {
@@ -21508,7 +21508,7 @@ appdb.views.SiteVMUsageItem = appdb.ExtendClass(appdb.View, "appdb.views.SiteVMU
 		var ul = $("<ul class='cancollapse'></ul>");
 		var liheader = $("<li class='va-template va-template-header'></li>");
 
-		this.renderTemplate(liheader, {main_memory_size: "Memory", disc_size: "Disk", logical_cpus: "Logical", physical_cpus: "/Physical CPUs", connectivity_in: "Connectivity In", connectivity_out: "/Out", os_family: "OS Family", noaction: "true"}, data);
+		this.renderTemplate(liheader, {main_memory_size: "Memory", disc_size: "Disk", logical_cpus: "Logical", physical_cpus: "Physical CPUs", connectivity_in: "Connectivity In", connectivity_out: "Out", os_family: "OS Family", noaction: "true"}, data);
 
 		$(ul).append(liheader);
 		d = this.sortTemplates(d);
