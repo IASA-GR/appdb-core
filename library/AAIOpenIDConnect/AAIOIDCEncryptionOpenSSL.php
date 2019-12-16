@@ -42,7 +42,7 @@ class AAIOIDCEncryptionOpenSSL extends AAIOIDCEncryption {
         $iv = $this->getParameter('iv');
         if (!$iv) {
             $cfg = new AAIOIDCConfiguration();
-            $iv = $cfg->getApplicationGUID();
+            $iv = $cfg->getApplicationApiKey();
         }
 
         if ($iv !== null) {
