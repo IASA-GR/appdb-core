@@ -27,6 +27,9 @@ abstract class AAIOIDCToken {
     private $_user = null;
     private $_service = null;
 
+    private $_tokenExpiration = null;
+    private $_issuedAt = null;
+
     public function __construct($data) {
         if(is_array($data)) {
             $data = (object) $data;
@@ -66,6 +69,14 @@ abstract class AAIOIDCToken {
 
         if (isset($data->issuer) && trim($data->issuer)) {
             $this->_issuer = trim($data->issuer);
+        }
+
+        if(isset($data->tokenExpiration) && trim($data->tokenExpiration)) {
+            $this->_tokenExpiration = $data->tokenExpiration;
+        }
+
+        if (isset($data->issuedAt) && trim($data->issuedAt)) {
+            $this->_issuedAt = $data->issuedAt;
         }
     }
 
@@ -219,6 +230,8 @@ abstract class AAIOIDCToken {
             "service" => trim($this->_service),
             "user" => trim($this->_user),
             "issuer" => $this->_issuer,
+            "issuedAt" => $this->_issuedAt,
+            "tokenExpiration" => $this->_tokenExpiration
         );
     }
 
