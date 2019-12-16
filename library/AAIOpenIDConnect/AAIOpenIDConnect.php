@@ -50,6 +50,7 @@ class AAIOpenIDConnect {
     private $_serviceConfig = null;
     private $_error = null;
     private $_errorDescription = null;
+    private $_errorDetails = null;
 
     public function __construct($service, $uid)  {
         //Get generic AAIOIDC configuration
@@ -141,12 +142,18 @@ class AAIOpenIDConnect {
          * AAIOIDCEncryption class located at ./base/AAIOIDCEncryption.php
          */
         $encryptionType = strtolower(trim($this->_config->getItem('storage.encryption', null)));
+        $encryptionParameterGetter = trim($this->_config->getItem('storage.encryptionParameterGetter', null));
+        $encryptionParameterGetterName = trim($this->_config->getItem('storage.encryptionParameterGetterName', null));
         switch ($encryptionType) {
             case 'openssl':
-                $encryption = new AAIOIDCEncryptionOpenSSL(array(
-                    "secret" => $this->_uid,
-                    "iv" => $this->_config->getApplicationApiKey()
-                ));
+                if (!$encryptionParameterGetter) {
+                    throw new Exception("OIODC client encryption is not configured properly");
+                }
+
+                require_once($encryptionParameterGetter);
+
+                $params = $encryptionParameterGetterName($this);
+                $encryption = new AAIOIDCEncryptionOpenSSL($params);
                 $storage->setEncryption($encryption);
                 break;
             default:
@@ -181,7 +188,7 @@ class AAIOpenIDConnect {
         //Do not try to get a new access token if stored refresh token is invalid (expired etc)
         $refreshTokenValidation = $refreshToken->validate();
         if ($refreshTokenValidation !== true) {
-            $result['error'] = 'Invalid refresh token';
+            $result['error'] = 'Invalid refresh token.' . $refreshTokenValidation;
             $result['errorDescription'] = $refreshTokenValidation;
             return (object) $result;
         }
@@ -200,8 +207,13 @@ class AAIOpenIDConnect {
             }
 
             $result['response'] = $oidc->refreshToken($refreshToken->get('token'));
+            $result['userid'] = $oidc->requestUserInfo('sub');
+
+            if ($result['userid'] !== $this->getUserUID()) {
+                throw new Exception('The authenticated account do not match with current user information');
+            }
         } catch(Exception $error) {
-            $result['error'] = 'Could not retrieve refresh token';
+            $result['error'] = 'Could not refresh access token';
             $result['errorDescription'] = $this->sanitize($error->getMessage());
         }
 
@@ -248,6 +260,13 @@ class AAIOpenIDConnect {
             $result['refreshToken']  = $oidc->getRefreshToken();
             $result['accessToken']   = $oidc->getAccessToken();
             $result['tokenResponse'] = $oidc->getTokenResponse();
+            $result['userid'] = $oidc->requestUserInfo('sub');
+
+            if ($result['userid'] !== $this->getUserUID()) {
+                $result['error'] = 'Could not retrieve refresh token';
+                $result['errorDescription'] = 'The authenticated account do not match with current user information';
+                $result['errorDetails'] = "You authenticated with an account of user ID \n\n" . $result['userid'] . "\n\nbut the request is made for user ID\n\n" . $this->getUserUID()  . "\n\nPlease retry with an account of the requested user ID.";
+            }
         } catch(Exception $error) {
             $result['error'] = 'Could not retrieve refresh token';
             $result['errorDescription'] = $error->getMessage();
@@ -281,6 +300,15 @@ class AAIOpenIDConnect {
      */
     public function getErrorDescription() {
         return $this->_errorDescription;
+    }
+
+    /**
+     * Get last error details
+     *
+     * @return string
+     */
+    public function getErrorDetails() {
+        return $this->_errorDetails;
     }
 
     /**
@@ -324,6 +352,14 @@ class AAIOpenIDConnect {
     }
 
     /**
+     * Get configuration object of this instance
+     *
+     * @return AAIOIDConfiguration
+     */
+    public function getConfig() {
+        return $this->_config;
+    }
+    /**
      * Get raw access token.
      * 
      * @param boolean $refreshToken If true, the method tries to issue a new one if no valid access token is found
@@ -344,19 +380,29 @@ class AAIOpenIDConnect {
             $response = $this->refreshAccessToken();
 
             if ($response->error) {
-                debug_log('[AAIOIDConnect::getUserAccessToken][ERROR] Could not refresh access token. (service: ' . $this->getServiceCode() . ', UID: ' .$this->getUserUID() . ')\nReason: ' . $response->error );
+                debug_log('[AAIOpenIDConnect::getUserAccessToken][ERROR] Could not refresh access token. (service: ' . $this->getServiceCode() . ', UID: ' .$this->getUserUID() . ')\nReason: ' . $response->error . '.' . $response->errorDescription );
                 return null;
             }
 
             $response = (isset($response->response) ? $response->response : null); 
             if ($response  && isset($response->access_token) && trim($response->access_token) !== '') {
-                debug_log('[AAIOIDConnect::getUserAccessToken] Issued new access token. Trying to store it (service: ' . $this->getServiceCode() . ', UID: ' .$this->getUserUID() . ')');
+                debug_log('[AAIOpenIDConnect::getUserAccessToken] Issued new access token. Trying to store it (service: ' . $this->getServiceCode() . ', UID: ' .$this->getUserUID() . ')');
 
                 $accessTokenExpiration = $this->_accessTokenExpiration;
                 if (isset($response->expires_in) && trim($response->expires_in) !== '') {
                     $accessTokenExpiration = trim($response->expires_in);
                 }
-
+                debug_log('[AAIOpenIDConnect::getUserAccessTokenInfo] ====> ' . var_export(array(
+                    "type" => "access",
+                    "token" => $response->access_token,
+                    "issued" => time(),
+                    "accessTokenExpiration" => $accessTokenExpiration,
+                    "accessTokenExpirationIntVal" => intval($accessTokenExpiration),
+                    "expires" => time() + intval($accessTokenExpiration),
+                    "user" => $this->_uid,
+                    "service" => $this->_service,
+                    "issuer" => $this->_issuer
+                ), true));
                 $atoken = new AAIOIDCAccessToken(array(
                     "type" => "access",
                     "token" => $response->access_token,
@@ -370,7 +416,7 @@ class AAIOpenIDConnect {
                 $success = $this->_storage->setUserAccessToken($atoken, $this->_uid);
 
                 if ($success !== true) {
-                    debug_log('[AAIOIDConnect::getUserAccessToken][ERROR] Could not store access token (service: ' . $this->getServiceCode() . ', UID: ' .$this->getUserUID() . ') ' .$success);
+                    debug_log('[AAIOpenIDConnect::getUserAccessToken][ERROR] Could not store access token (service: ' . $this->getServiceCode() . ', UID: ' .$this->getUserUID() . ') ' .$success);
                     return null;
                 } else {
                     return $this->getUserAccessTokenInfo(false);
@@ -411,6 +457,7 @@ class AAIOpenIDConnect {
 
             $this->_error = trim($response->error);
             $this->_errorDescription = trim($response->errorDescription);
+            $this->_errorDetails = $response->errorDetails;
 
             return false;
         }
@@ -423,8 +470,10 @@ class AAIOpenIDConnect {
                 "token" => $response->refreshToken,
                 "issued" => time(),
                 "issuer" => $this->_issuer,
+                "tokenExpiration" => intval($this->_refreshTokenExpiration),
+                "issuedAt" => time(),
                 "expires" => time() + intval($this->_refreshTokenExpiration),
-                "user" => $this->_uid,
+                "user" => $this->getUserUID(),
                 "service" => $this->_service
             ));
 
@@ -451,6 +500,8 @@ class AAIOpenIDConnect {
                 "token" => $response->accessToken,
                 "issued" => time(),
                 "issuer" => $this->_issuer,
+                "tokenExpiration" => intval($accessTokenExpiration),
+                "issuedAt" => time(),
                 "expires" => time() + intval($accessTokenExpiration),
                 "user" => $this->_uid,
                 "service" => $this->_service
