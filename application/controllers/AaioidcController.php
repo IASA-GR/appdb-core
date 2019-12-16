@@ -19,7 +19,7 @@ include('../library/AAIOpenIDConnect/clients/AAIOIDCClient.php');
 
 function getGuestUser() {
     return array(
-      "idp:uid" => array("7dec9e27b58a2d54a2a96a538813e805058cb792ed68e744a68d87708e39628c@egi.eu")  
+      "idp:uid" => array(ApplicationConfiguration::saml('guest.uid'))  
     );
 }
 
@@ -151,7 +151,7 @@ class AaioidcController extends Zend_Controller_Action
             if ($this->_client->getError()) {
                 $this->_error = $this->sanitize($this->_client->getError());
                 $this->_errorDescription = $this->sanitize($this->_client->getErrorDescription());
-
+                $this->_errorDetails = $this->sanitize($this->_client->getErrorDetails());
                 return true;
             }
 
@@ -221,6 +221,7 @@ class AaioidcController extends Zend_Controller_Action
         $this->view->isAuthenticated = $this->_isAuthenticated;
         $this->view->error = null;
         $this->view->errorDescription = null;
+        $this->view->errorDetails = null;
         $this->view->scopesDescription = $this->_client->getScopesDescription();
         $this->view->serviceName = $this->_client->getServiceName();
         $this->view->serviceLogo = $this->_client->getServiceLogo();
@@ -242,9 +243,12 @@ class AaioidcController extends Zend_Controller_Action
             $this->view->accessToken = $this->sanitize($accessToken);
         } else {
             debug_log('[AaioidcController::serviceHandler]: code=' . $this->getQueryParam('code') . ' service=' . $this->getQueryParam('service'));
-
+            debug_log('[AaioidcController::serviceHandler][ERROR] ' . $this->_client->getError());
+            debug_log('[AaioidcController::serviceHandler][ERROR][DESCRIPTION] ' . $this->_client->getErrorDescription());
+            debug_log('[AaioidcController::serviceHandler][ERROR][DETAILS] ' . $this->_client->getErrorDetails());
             $this->view->error = $this->sanitize($this->_client->getError());
             $this->view->errorDescription = $this->sanitize($this->_client->getErrorDescription());
+            $this->view->errorDetails = $this->_client->getErrorDetails();
         }
     }
 
