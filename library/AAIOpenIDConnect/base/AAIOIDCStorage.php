@@ -24,6 +24,7 @@ require_once(__DIR__ . '/AAIOIDCEncryption.php');
 abstract class AAIOIDCStorage {
     protected $_service = null;
     private $_encryption = null;
+    private $_encryptedFields = array('token');
 
     /**
      * @param string    $service    The name of the service this instance will handle.
@@ -45,6 +46,67 @@ abstract class AAIOIDCStorage {
         }
 
         return $hasEncryption;
+    }
+
+    /**
+     * Decrypt sensitive fields in the given content.
+     * This will only work if the current instance has previously
+     * been set with an encryption mechanism ($this->setEncryption)
+     *
+     * @param  string|array  $content   The hash array with content
+     * @return array                    The same content with some fields decrypted
+     */
+    private function decrypt($content) {
+        if ($this->hasEncryption() === false) {
+            return $content;
+        }
+
+        $content = (array) $content;
+
+        if ($content && is_array($content)) {
+            $encContent = $content;
+            foreach($this->_encryptedFields as $field) {
+                if (isset($content[$field]) && trim($content[$field]) !== '') {
+                    $encContent[$field] = $this->_encryption->decrypt($content[$field]);
+                } else {
+                    $encContent[$field] = $content[$field];
+                }
+            }
+
+            return $encContent;
+        }
+
+        return $content;
+    }
+
+    /**
+     * Encrypt sensitive fields in the given content.
+     * This will only work if the current instance has previously
+     * been set with an encryption mechanism ($this->setEncryption)
+     *
+     * @param  string|array  $content   The raw data content or hash array with content
+     * @return array                    The same content with some encrypted fields
+     */
+    private function encrypt($content) {
+        if ($this->hasEncryption() === false) {
+            return $content;
+        }
+
+        if ($content && is_array($content)) {
+            $encContent = $content;
+
+            foreach($this->_encryptedFields as $field) {
+                if (isset($content[$field]) && trim($content[$field]) !== '') {
+                    $encContent[$field] = $this->_encryption->encrypt($content[$field]);
+                } else {
+                    $encContent[$field] = $content[$field];
+                }
+            }
+
+            return $encContent;
+        }
+
+        return $content;
     }
 
     /**
@@ -162,11 +224,10 @@ abstract class AAIOIDCStorage {
             return null;
         }
 
-        if ($this->hasEncryption()) {
-            $content = $this->_encryption->decrypt($content);
-        }
+        $decodedContent = json_decode($content);
+        $decodedContent = $this->decrypt($decodedContent);
 
-        return json_decode($content);
+        return $decodedContent;
     }
 
     /**
@@ -181,12 +242,15 @@ abstract class AAIOIDCStorage {
      */
     protected function set($storageType, $uid, $content) {
         try {
-            if (is_array($content)) {
-                $content = json_encode($content);
+            if (is_string($content)) {
+                $content = (array) json_decode($content);
+            } else {
+                $content = (array) $content;
             }
 
-            if ($this->hasEncryption()) {
-                $content = $this->_encryption->encrypt($content);
+            if (is_array($content)) {
+                $content = $this->encrypt($content);
+                $content = json_encode($content);
             }
 
             $this->_set($storageType, $uid, $content);
