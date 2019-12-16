@@ -94,6 +94,16 @@ class AAIOIDCFileSystemStorage extends AAIOIDCStorage{
             $data = '';
         }
 
+        if (!is_string($content)) {
+            $data = (array) $content;
+            if (is_array($data) && count($data) === 0) {
+                $data = '';
+            } else {
+                $data = json_encode($data);
+                $data = trim($data);
+            }
+        }
+
         fwrite($fd, $data) or die('Could not write to storage');
         fflush($fd);
         fclose($fd);
