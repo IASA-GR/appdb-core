@@ -9366,7 +9366,7 @@ appdb.utils.CloudInfo.getVApplianceVOCloudContents = function(vapp, serviceTypes
 	providers = $.isArray(providers) ? providers : [providers];
 
 	var VOs = providers.reduce(function(acc, provider) {
-		var voId = provider.void;
+		var voId = provider['void'];
 		var voName = provider.voname;
 
 		if (!acc[voName]) {
@@ -9392,7 +9392,7 @@ appdb.utils.CloudInfo.getVApplianceCloudContentsPerVappliance = function(vapp, s
 		    return acc;
 	    }, {});
 	    var VOs = vappProviders.reduce(function(acc, vappProvider) {
-		    var voId = vappProvider.void;
+		    var voId = vappProvider['void'];
 		    var voName = vappProvider.voname;
 
 		    acc[voName] = {
@@ -9551,7 +9551,7 @@ appdb.utils.CloudInfo.getVApplianceCloudContentsPerVO = function(vapps, serviceT
 
 			return providers.reduce(function(acc, provider) {
 				var name = provider.voname || '<none>';
-				var id = provider.void || '-1';
+				var id = provider['void'] || '-1';
 
 				acc[name] = acc[name] || {
 					id: id,
@@ -9650,7 +9650,7 @@ appdb.utils.CloudInfo.getVApplianceCloudContentsPerVO = function(vapps, serviceT
 						});
 					delete version.mp_uri;
 					delete version.va_provider_image_id;
-					delete version.void;
+					delete version['void'];
 					delete version.voname;
 					delete version.vowide_vmiinstanceid;
 
