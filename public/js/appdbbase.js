@@ -9892,13 +9892,16 @@ appdb.components.VapplianceResourceProviders = appdb.ExtendClass(appdb.Component
 	    this.options.compactVaProviders = result;
 
 	    return this.options.compactVaProviders;
-	}
+	};
+
 	this.transformData = function(d){
 		this.options.vos = appdb.utils.CloudInfo.getVApplianceCloudContentsPerVO(d);
 
 		return data;
-
-		//TODO: Remove code bellow.
+	};
+	
+	this.transformOCCIData = function(d) {
+		//TODO: Code bellow is obsolete. Should be removed in future release.
 		var vos = appdb.utils.CloudInfo.getVApplianceVOCloudContents(d);
 		d = d || this.options.images || [];
 		d = $.isArray(d)?d:[d];

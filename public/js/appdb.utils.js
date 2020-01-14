@@ -9682,8 +9682,6 @@ appdb.utils.CloudInfo.getVApplianceCloudContentsPerVO = function(vapps, serviceT
 
 				return acc;
 			}, acc);
-
-			return acc;
 		}, {});
 
 		VOs = appdb.utils.objectToArray(VOs, ['values', 'templates', 'versions', 'sites']);
