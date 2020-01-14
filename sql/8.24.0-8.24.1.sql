@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2015 - 2019 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
+ Copyright (C) 2015 - 2020 IASA - Institute of Accelerating Systems and Applications (http://www.iasa.gr)
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ Author: wvkarag@lovecraft.priv.iasa.gr
 */
 
 START TRANSACTION;
+
 DROP FUNCTION group_hash;
 
 DROP MATERIALIZED VIEW public.va_provider_templates;
@@ -109,8 +110,8 @@ AS SELECT xx.id,
                     jsonb_array_elements((((t.j ->> 'info'::text)::jsonb) ->> 'images'::text)::jsonb) ->> 'ManagerName'::text AS manager_name
                    FROM egiis.vapj g
                      LEFT JOIN egiis.tvapj t ON g.pkey = t.pkey
-                  WHERE lower(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointInterfaceName'::text) ~ '(occi|openstack|opennebula|synnefo|wnodes|cloudstack|vcloud)'::text AND
-                  COALESCE(btrim(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointServiceForeignKey'::text), ''::text) <> ''::text /*AND
+                  WHERE lower(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointInterfaceName'::text) ~ '(occi|openstack|opennebula|synnefo|wnodes|cloudstack|vcloud)'::text AND 
+                  COALESCE(btrim(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointServiceForeignKey'::text), ''::text) <> ''::text /*AND 
                   COALESCE(((g.j ->> 'info'::text)::jsonb) ->> 'SiteEndpointInProduction'::text, 'FALSE'::text)::boolean IS DISTINCT FROM false*/
              ) x
              LEFT JOIN va_provider_managers m ON m.va_provider_id = x.va_provider_id AND lower(m.product_name) = lower(x.manager_name)
@@ -142,7 +143,7 @@ AS $function$
                         SELECT max(t1.id) as goodid FROM public.vmiinstances AS t1
                         INNER JOIN public.vmiinstances AS t2 ON t1.checksum = t2.checksum AND t1.guid = t2.guid AND t2.id = $1.vmiinstanceid
                         INNER JOIN public.vapplists ON t1.id = vapplists.vmiinstanceid
-                        INNER JOIN public.vapp_versions ON vapplists.vappversionid = vapp_versions.id
+                        INNER JOIN public.vapp_versions ON vapplists.vappversionid = vapp_versions.id 
                         WHERE vapp_versions.published
         ) AS t
 $function$
@@ -272,8 +273,8 @@ AS SELECT q.id,
             jsonb_array_elements((((t.j ->> 'info'::text)::jsonb) ->> 'templates'::text)::jsonb) ->> 'ManagerName'::text AS manager_name
            FROM egiis.vapj g
              LEFT JOIN egiis.tvapj t ON t.pkey = g.pkey
-          WHERE lower(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointInterfaceName'::text) ~ '(occi|openstack|opennebula|synnefo|wnodes|cloudstack|vcloud)'::text AND
-          COALESCE(btrim(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointServiceForeignKey'::text), ''::text) <> ''::text
+          WHERE lower(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointInterfaceName'::text) ~ '(occi|openstack|opennebula|synnefo|wnodes|cloudstack|vcloud)'::text AND 
+          COALESCE(btrim(((t.j ->> 'info'::text)::jsonb) ->> 'GLUE2EndpointServiceForeignKey'::text), ''::text) <> ''::text 
           /*AND COALESCE(((g.j ->> 'info'::text)::jsonb) ->> 'SiteEndpointInProduction'::text, 'FALSE'::text)::boolean IS DISTINCT FROM false*/
      ) q
      LEFT JOIN va_provider_managers ON va_provider_managers.va_provider_id = q.va_provider_id AND lower(va_provider_managers.product_name) = lower(q.manager_name)
@@ -291,14 +292,14 @@ CREATE OR REPLACE FUNCTION public.group_hash(v va_provider_templates)
  STABLE
 AS $function$
 SELECT md5(
-	COALESCE(v.memsize, '') || '_' ||
-	COALESCE(v.logical_cpus, '') || '_' ||
-	COALESCE(v.physical_cpus,'') || '_' ||
-	COALESCE(v.cpu_multiplicity, '') || '_' ||
-	COALESCE(v.os_family, '') || '_' ||
-	COALESCE(v.connectivity_in, '') || '_' ||
-	COALESCE(v.connectivity_out, '') || '_' ||
-	COALESCE(v.cpu_model, '') || '_' ||
+	COALESCE(v.memsize, '') || '_' || 
+	COALESCE(v.logical_cpus, '') || '_' || 
+	COALESCE(v.physical_cpus,'') || '_' || 
+	COALESCE(v.cpu_multiplicity, '') || '_' || 
+	COALESCE(v.os_family, '') || '_' || 
+	COALESCE(v.connectivity_in, '') || '_' || 
+	COALESCE(v.connectivity_out, '') || '_' || 
+	COALESCE(v.cpu_model, '') || '_' || 
 	COALESCE(v.disc_size, '') || '_' ||
 	COALESCE(v.tmp_storage_size, '') || '_' ||
 	COALESCE(v.connectivity_ports_in, '') || '_' ||
@@ -306,10 +307,55 @@ SELECT md5(
 	COALESCE(v.managerid, 0) || '_' ||
 	COALESCE(v.shareid, 0) || '_' ||
 	COALESCE(e.deployment_type, '')
-)
-FROM va_provider_endpoints e
+)	
+FROM va_provider_endpoints e 
 WHERE e.va_provider_id = v.va_provider_id
 LIMIT 1;
+$function$
+;
+
+CREATE OR REPLACE FUNCTION public.site_service_to_xml(sitename text)
+ RETURNS xml
+ LANGUAGE sql
+ STABLE
+AS $function$
+SELECT 
+	xmlagg(services.x)
+FROM (
+	SELECT 
+		XMLELEMENT(
+			name "site:service", 
+			XMLATTRIBUTES(
+				-- 'occi' AS type,
+				(SELECT LOWER(deployment_type) FROM va_provider_endpoints WHERE va_provider_endpoints.va_provider_id = va_providers.id) AS type, 
+				va_providers.id AS id,
+				va_providers.authn,
+				hostname AS host, 
+				COUNT(DISTINCT va_provider_images.good_vmiinstanceid) AS instances, 
+				va_providers.beta AS beta, 
+				va_providers.in_production AS in_production 
+			),
+			xmlagg(
+				XMLELEMENT(NAME "siteservice:image", XMLATTRIBUTES(
+					va_provider_images.vmiinstanceid AS id,
+					va_provider_images.good_vmiinstanceid AS goodid
+				))
+			)
+		)AS x
+	FROM va_providers 
+	LEFT JOIN va_provider_images ON va_provider_images.va_provider_id = va_providers.id
+	LEFT JOIN vaviews ON vaviews.vmiinstanceid = va_provider_images.vmiinstanceid
+	WHERE va_providers.sitename = $1::TEXT 
+	AND	vaviews.appid NOT IN (SELECT appid FROM app_order_hack)
+	GROUP BY 
+		va_providers.id, 
+		hostname, 
+		va_providers.id, 
+		va_providers.authn,
+		hostname, 
+		beta, 
+		in_production
+) AS services 
 $function$
 ;
 
@@ -320,7 +366,7 @@ CREATE OR REPLACE FUNCTION public.site_service_to_xml_ext(sitename text)
 AS $function$
 SELECT xmlagg(services.x) FROM (SELECT XMLELEMENT(NAME "site:service",
     XMLATTRIBUTES(
-    	COALESCE((SELECT LOWER(deployment_type) FROM va_provider_endpoints WHERE va_provider_endpoints.va_provider_id = va_providers.id), cloud_service_name_from_type(va_providers.service_type)) AS type,
+    	COALESCE((SELECT LOWER(deployment_type) FROM va_provider_endpoints WHERE va_provider_endpoints.va_provider_id = va_providers.id), cloud_service_name_from_type(va_providers.service_type)) AS type,     	    		
     	va_providers.id as id,
     	va_providers.authn,
     	hostname as host,
@@ -345,7 +391,7 @@ SELECT xmlagg(services.x) FROM (SELECT XMLELEMENT(NAME "site:service",
 			DISTINCT xmlelement(name "siteservice:occi_endpoint_url",
 				XMLATTRIBUTES(
 					cloud_service_name_from_type(va_providers.service_type) AS type
-
+				
 				),
 				endpoint_url
 			)::text
@@ -361,9 +407,9 @@ SELECT xmlagg(services.x) FROM (SELECT XMLELEMENT(NAME "site:service",
 		(SELECT vo FROM va_provider_shares s WHERE s.id = va_provider_templates.shareid)
 	),
 	xmlelement(name "virtualization:hypervisor",
-	 	XMLATTRIBUTES(COALESCE((SELECT id FROM hypervisors WHERE value = (SELECT hypervisor FROM va_provider_managers m WHERE m.id = va_provider_templates.managerid)), 0) AS id),
+	 	XMLATTRIBUTES(COALESCE((SELECT id FROM hypervisors WHERE value = (SELECT hypervisor FROM va_provider_managers m WHERE m.id = va_provider_templates.managerid)), 0) AS id),  
 	 	(SELECT COALESCE(hypervisor::text, 'unknown') FROM va_provider_managers m WHERE m.id = va_provider_templates.managerid)
-	),
+	),		
 	xmlelement(name "provider_template:resource_name", resource_name),
 	xmlelement(name "provider_template:main_memory_size", memsize),
 	xmlelement(name "provider_template:logical_cpus", logical_cpus),
@@ -376,10 +422,10 @@ SELECT xmlagg(services.x) FROM (SELECT XMLELEMENT(NAME "site:service",
 	xmlelement(name "provider_template:connectivity_out", connectivity_out),
 	xmlelement(name "provider_template:connectivity_ports_in", connectivity_ports_in),
 	xmlelement(name "provider_template:connectivity_ports_out", connectivity_ports_out),
-	xmlelement(name "provider_template:connectivity_info", connectivity_info),
+	xmlelement(name "provider_template:connectivity_info", connectivity_info),	
 	xmlelement(name "provider_template:cpu_model", cpu_model),
 	xmlelement(name "provider_template:disc_size", disc_size),
-	xmlelement(name "provider_template:tmp_storage_size", tmp_storage_size),
+	xmlelement(name "provider_template:tmp_storage_size", tmp_storage_size),	
 	xmlelement(name "provider_template:resource_id", resource_id)
 	)::text
     ), '')::xml,
@@ -422,15 +468,15 @@ AS $function$
 	      	va_provider_images.va_provider_image_id AS id, va_provider_images.id AS providerimageid, vowide_image_list_images.id AS voimageid , vowide_image_lists.state AS voimagestate,
 	      	va_provider_shares.projectid
 	      ),
-	      public.vo_to_xml(vowide_image_lists.void)
-	  ) as x
-	  FROM public.va_providers
+	      public.vo_to_xml(vowide_image_lists.void)                                                                                                                                          
+	  ) as x                                                                                                                                                                          
+	  FROM public.va_providers                                                                                                                                                               
 	  INNER JOIN public.va_provider_images ON va_provider_images.va_provider_id = va_providers.id
-	  INNER JOIN public.va_provider_shares ON va_provider_shares.id = va_provider_images.shareid
-	  LEFT OUTER JOIN public.vowide_image_list_images ON vowide_image_list_images.id = va_provider_images.vowide_vmiinstanceid
-	  LEFT OUTER JOIN public.vowide_image_lists ON vowide_image_lists.id = vowide_image_list_images.vowide_image_list_id
-	  WHERE va_providers.id = $1 AND va_provider_images.vmiinstanceid = $2 AND NOT $3 IS DISTINCT FROM vowide_vmiinstanceid
-  ) as siteimageoccids
+	  INNER JOIN public.va_provider_shares ON va_provider_shares.id = va_provider_images.shareid   
+	  LEFT OUTER JOIN public.vowide_image_list_images ON vowide_image_list_images.id = va_provider_images.vowide_vmiinstanceid                                                               
+	  LEFT OUTER JOIN public.vowide_image_lists ON vowide_image_lists.id = vowide_image_list_images.vowide_image_list_id                                                                     
+	  WHERE va_providers.id = $1 AND va_provider_images.vmiinstanceid = $2 AND NOT $3 IS DISTINCT FROM vowide_vmiinstanceid                                                           
+  ) as siteimageoccids                                                                                                                                                            
   $function$
 ;
 
@@ -456,12 +502,541 @@ AS $function$
   $function$
 ;
 
+--------------------------
 
--- ROLLBACK;
-COMMIT;
+CREATE OR REPLACE FUNCTION public.va_provider_to_xml(mid text)
+ RETURNS SETOF xml
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+RETURN QUERY
+SELECT 
+	xmlelement(
+		name "virtualization:provider", 
+		xmlattributes(
+			va_providers.id,
+			va_providers.authn,
+			beta,
+			in_production,
+			node_monitored,
+			service_downtime::int AS service_downtime,
+			service_type AS service_type,			
+			service_status AS service_status,
+			service_status_date AS service_status_date
+		),
+		xmlelement(name "provider:name", sitename),
+		xmlelement(name "provider:shares",
+			(SELECT 
+				xmlagg(
+					xmlelement(name "vo:vo", XMLATTRIBUTES(s.void AS id), s.vo)
+					-- vo_to_xml(s.void)
+				)
+			FROM va_provider_shares s
+			WHERE s.va_provider_id = mid
+			)
+		)
+	)
+FROM
+	va_providers
+WHERE id = mid;
+END;
+$function$
+;
 
-REFRESH MATERIALIZED VIEW va_provider_images;
+CREATE OR REPLACE FUNCTION public.va_provider_to_xml_ext(mid text)
+ RETURNS SETOF xml
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+RETURN QUERY
+SELECT 
+	xmlelement(
+		name "virtualization:provider", 
+		xmlattributes(
+			va_providers.id,
+			va_providers.authn,			
+			beta,
+			in_production,
+			node_monitored,
+			service_type AS service_type,			
+			service_downtime::int AS service_downtime,
+			service_status AS service_status,
+			service_status_date AS service_status_date
+		),
+		xmlelement(name "provider:name", sitename),
+		xmlelement(name "provider:shares",
+			(SELECT 
+				xmlagg(
+					xmlelement(name "vo:vo", XMLATTRIBUTES(s.void AS id, s.projectid), s.vo)
+					-- vo_to_xml(s.void)
+				)
+			FROM va_provider_shares s
+			WHERE s.va_provider_id = mid
+			)
+		),
+		CASE WHEN NOT sites.id IS NULL THEN
+		XMLELEMENT(
+			name "appdb:site", 
+			XMLATTRIBUTES(
+				sites.id as id,
+				sites.name as name,
+				sites.productioninfrastructure as infrastructure, 
+				sites.certificationstatus as status,
+				sites.deleted as deleted,
+				sites.datasource as source
+			),
+			XMLELEMENT(
+				name "site:officialname", 
+				sites.officialname
+			), 
+			XMLELEMENT(
+				name "site:url", 
+				XMLATTRIBUTES('portal' as type),
+				sites.portalurl
+			), 
+			XMLELEMENT(
+				name "site:url", 
+				XMLATTRIBUTES('home' as type), 
+				sites.homeurl
+			)
+		)
+		END,
+		xmlelement(name "provider:url", url),
+		CASE WHEN EXISTS (SELECT * FROM va_provider_endpoints WHERE va_provider_endpoints.va_provider_id = va_providers.id) THEN 
+			array_to_string(array_agg(DISTINCT
+				xmlelement(name "provider:endpoint_url", endpoint_url)::text ||
+				xmlelement(name "provider:deployment_type", deployment_type)::text
+			),'')::xml 
+		END,
+		xmlelement(name "provider:gocdb_url", gocdb_url),
+		CASE WHEN COALESCE(host_dn, '') <> '' THEN xmlelement(name "provider:dn", host_dn) END,
+		CASE WHEN COALESCE(host_ip, '') <> '' THEN xmlelement(name "provider:ip", host_ip) END,
+		CASE WHEN COALESCE(host_os_id, 0) <> 0 THEN xmlelement(
+			name "provider:os", 
+			xmlattributes(host_os_id AS id),
+			oses.name
+		) END,
+		CASE WHEN COALESCE(host_arch_id, 0) <> 0 THEN xmlelement(
+			name "provider:arch", 
+			xmlattributes(host_arch_id AS id),
+			archs.name
+		) END,
+		country_to_xml(country_id),
+		CASE WHEN EXISTS(SELECT * FROM va_provider_templates WHERE va_provider_templates.va_provider_id = va_providers.id) THEN
+		array_to_string(array_agg(DISTINCT
+			xmlelement(name "provider:template",
+				 xmlattributes(
+					va_provider_templates.group_hash AS group_hash
+				 ),
+				 xmlelement(name "vo:vo",
+				 	XMLATTRIBUTES((SELECT void FROM va_provider_shares s WHERE s.id = va_provider_templates.shareid) AS id),
+				 	(SELECT vo FROM va_provider_shares s WHERE s.id = va_provider_templates.shareid)
+				 ),
+				 xmlelement(name "virtualization:hypervisor",
+				 	XMLATTRIBUTES(COALESCE((SELECT id FROM hypervisors WHERE value = (SELECT hypervisor FROM va_provider_managers m WHERE m.id = va_provider_templates.managerid)), 0) AS id),  
+				 	(SELECT COALESCE(hypervisor::text, 'unknown') FROM va_provider_managers m WHERE m.id = va_provider_templates.managerid)
+				 ),
+				 xmlelement(name "provider_template:resource_name", resource_name),
+				 xmlelement(name "provider_template:main_memory_size", memsize),
+				 xmlelement(name "provider_template:logical_cpus", logical_cpus),
+				 xmlelement(name "provider_template:physical_cpus", physical_cpus),
+				 xmlelement(name "provider_template:cpu_multiplicity", cpu_multiplicity),
+				 xmlelement(name "provider_template:resource_manager", resource_manager),
+				 xmlelement(name "provider_template:computing_manager", computing_manager),
+				 xmlelement(name "provider_template:os_family", os_family),
+				 xmlelement(name "provider_template:connectivity_in", connectivity_in),
+				 xmlelement(name "provider_template:connectivity_out", connectivity_out),
+				 xmlelement(name "provider_template:connectivity_ports_in", connectivity_ports_in),
+				 xmlelement(name "provider_template:connectivity_ports_out", connectivity_ports_out),
+				 xmlelement(name "provider_template:connectivity_info", connectivity_info),
+				 xmlelement(name "provider_template:cpu_model", cpu_model),
+				 xmlelement(name "provider_template:disc_size", disc_size),
+				 xmlelement(name "provider_template:tmp_storage_size", tmp_storage_size),
+				 xmlelement(name "provider_template:resource_id", resource_id)
+			)::text
+		), '')::xml
+		END,
+		CASE WHEN EXISTS(SELECT * FROM va_provider_images WHERE va_provider_images.va_provider_id = va_providers.id) THEN
+		(
+			SELECT (array_to_string(array_agg(DISTINCT
+				xmlelement(name "provider:image",
+					xmlattributes(
+						content_type,
+						mp_uri,
+						'https://appdb.egi.eu/store/vm/image/' || vmiinstances.guid::text || ':' || va_provider_images.vmiinstanceid::text AS base_mp_uri,
+						vmiinstances.version AS "vmiversion",
+						va_provider_image_id,
+						va_provider_images.vmiinstanceid,
+						va_provider_images.vowide_vmiinstanceid,	
+						va_provider_images.good_vmiinstanceid,
+						applications.id as "appid", 
+						applications.name as "appname", 
+						applications.cname as "appcname", 
+						vos.id as "void", 
+						vos.name as "voname",
+						va_provider_shares.projectid,
+						(SELECT COALESCE(hypervisor::text, 'unknown') FROM va_provider_managers m WHERE m.id = va_provider_images.managerid) AS hypervisor,
+						vapp_versions.archived
+					)
+				)::text), '')::XML
+			) FROM va_provider_images
+			INNER JOIN va_provider_shares ON va_provider_shares.id = va_provider_images.shareid
+			INNER JOIN vmiinstances ON vmiinstances.id = va_provider_images.vmiinstanceid
+			INNER JOIN vmiflavours ON vmiflavours.id = vmiinstances.vmiflavourid
+			INNER JOIN vmis ON vmis.id = vmiflavours.vmiid
+			INNER JOIN vapplications ON vapplications.id = vmis.vappid
+			INNER JOIN vapplists ON vapplists.vmiinstanceid = va_provider_images.vmiinstanceid
+			INNER JOIN vapp_versions ON vapp_versions.id = vapplists.vappversionid
+			INNER JOIN applications ON applications.id = vapplications.appid
+			--LEFT OUTER JOIN vowide_image_list_images ON vowide_image_list_images.id = va_provider_images.vowide_vmiinstanceid
+			--LEFT OUTER JOIN vowide_image_lists ON vowide_image_lists.id = vowide_image_list_images.vowide_image_list_id
+			LEFT OUTER JOIN vos ON vos.id = (SELECT void FROM va_provider_shares WHERE id = va_provider_images.shareid) --vowide_image_lists.void			
+			WHERE va_provider_images.va_provider_id = va_providers.id /*AND ((
+				vowide_image_lists.state IN ('published'::e_vowide_image_state, 'obsolete'::e_vowide_image_state)
+			) OR (
+				vowide_image_lists.state IS NULL
+			)) */ 
+			
+		)
+		END
+	)
+FROM
+	va_providers 
+	LEFT JOIN oses ON oses.id = host_os_id
+	LEFT JOIN archs ON archs.id = host_arch_id
+	LEFT JOIN va_provider_endpoints ON va_provider_endpoints.va_provider_id = va_providers.id
+	LEFT JOIN va_provider_templates ON va_provider_templates.va_provider_id = va_providers.id
+	LEFT OUTER JOIN sites ON sites.name = va_providers.sitename
+WHERE va_providers.id = mid
+	GROUP BY 
+		va_providers.id,
+		va_providers.authn,		
+		va_providers.beta,
+		va_providers.in_production,
+		va_providers.node_monitored,
+		va_providers.service_downtime,
+		va_providers.service_type,		
+		va_providers.service_status,
+		va_providers.service_status_date,
+		va_providers.sitename,
+		va_providers.url,
+		va_providers.gocdb_url,
+		va_providers.host_dn,
+		va_providers.host_ip,
+		va_providers.host_os_id,
+		va_providers.host_arch_id,
+		oses.name,
+		archs.name,
+		country_id,
+		sites.id,
+		sites.name,
+		sites.productioninfrastructure,
+		sites.certificationstatus,
+		sites.deleted,
+		sites.datasource,
+		sites.officialname,
+		sites.portalurl,
+		sites.homeurl
+;
+END;
+$function$
+;
+
+CREATE OR REPLACE FUNCTION public.swapp_image_providers_to_xml(_appid integer)
+ RETURNS SETOF xml
+ LANGUAGE sql
+AS $function$
+SELECT
+	xmlelement(
+		name "virtualization:image",
+		xmlattributes(
+			vaviews.vmiinstanceid,
+			vaviews.vmiinstance_guid AS identifier,
+			vaviews.vmiinstance_version,
+			vaviews.va_version_archived AS archived,
+			vaviews.va_version_enabled AS enabled,
+			CASE WHEN vaviews.va_version_expireson >= NOW() THEN FALSE ELSE TRUE END AS isexpired
+		),
+		XMLELEMENT(NAME "application:application",
+			XMLATTRIBUTES(applications.id AS id, applications.cname AS cname, applications.guid AS guid, applications.deleted, applications.moderated),
+			XMLELEMENT(NAME "application:name", applications.name)
+		),
+		hypervisors.hypervisor::text::xml,
+		XMLELEMENT(NAME "virtualization:os", XMLATTRIBUTES(oses.id AS id, vaviews.osversion AS version, oses.os_family_id as family_id), oses.name), 
+		XMLELEMENT(NAME "virtualization:arch", XMLATTRIBUTES(archs.id AS id), archs.name),
+		vmiinst_cntxscripts_to_xml(vaviews.vmiinstanceid),
+		array_to_string(array_agg(DISTINCT 
+			xmlelement(name "virtualization:provider",
+				xmlattributes(
+					va_provider_images.va_provider_id as provider_id,
+					(SELECT va_providers.authn FROM va_providers WHERE id = va_provider_images.va_provider_id) as provider_authn,
+					va_provider_images.va_provider_image_id as occi_id,
+					vowide_image_lists.void,
+					vos.name as voname,
+					va_provider_shares.projectid,
+					va_provider_images.vmiinstanceid as vmiinstanceid					
+				)
+			)::text
+		),'')::xml
+)
+FROM contexts
+	INNER JOIN context_script_assocs ON context_script_assocs.contextid = contexts.id
+	INNER JOIN contextscripts AS cs ON cs.id = context_script_assocs.scriptid
+	INNER JOIN vmiinstance_contextscripts AS vcs ON vcs.contextscriptid = cs.id
+	INNER JOIN va_provider_images ON va_provider_images.good_vmiinstanceid = vcs.vmiinstanceid
+	INNER JOIN va_provider_shares ON va_provider_shares.id = va_provider_images.shareid
+	INNER JOIN vaviews ON vaviews.vmiinstanceid = vcs.vmiinstanceid
+	INNER JOIN applications ON applications.id = vaviews.appid
+	LEFT OUTER JOIN vmiflavor_hypervisor_xml AS hypervisors ON hypervisors.vmiflavourid = vaviews.vmiflavourid
+	LEFT OUTER JOIN archs ON archs.id = vaviews.archid
+	LEFT OUTER JOIN oses ON oses.id = vaviews.osid
+	-- LEFT OUTER JOIN vmiformats ON vmiformats.name = vaviews.format
+	LEFT OUTER JOIN app_vos ON app_vos.appid = applications.id
+	LEFT OUTER JOIN vowide_image_list_images ON vowide_image_list_images.id = va_provider_images.vowide_vmiinstanceid
+	LEFT OUTER JOIN vowide_image_lists ON vowide_image_lists.id = vowide_image_list_images.vowide_image_list_id AND (vowide_image_lists.state = 'published' OR vowide_image_lists.state = 'obsolete')
+	LEFT OUTER JOIN vos ON vos.id = vowide_image_lists.void
+WHERE  
+	vaviews.va_version_published 
+	-- AND contexts.appid = $1
+GROUP BY 
+	applications.id,
+	vaviews.osversion,
+	hypervisors.hypervisor::text,
+	vaviews.vmiinstanceid, 
+	vaviews.vmiflavourid, 
+	vaviews.vmiinstance_guid,
+	vaviews.vmiinstance_version,
+	vaviews.va_version_archived,
+	vaviews.va_version_enabled,
+	vaviews.va_version_expireson,
+	archs.id, 
+	oses.id,
+	-- vmiformats.id,
+	app_vos.appid
+$function$
+;
+
+CREATE OR REPLACE FUNCTION public.vapp_image_providers_to_xml(_appid integer)
+ RETURNS SETOF xml
+ LANGUAGE sql
+AS $function$
+ WITH hypervisors AS (
+	 WITH x AS (
+		 SELECT vmiflavours_2.id,
+		    unnest(vmiflavours_2.hypervisors) AS y
+		   FROM vmiflavours vmiflavours_2
+		)
+	 SELECT vmiflavours_1.id AS vmiflavourid,
+	    xmlagg(XMLELEMENT(NAME "virtualization:hypervisor", XMLATTRIBUTES(( SELECT hypervisors_1.id
+		   FROM public.hypervisors hypervisors_1
+		  WHERE hypervisors_1.name::text = x.y::text) AS id), x.y)) AS hypervisor
+	   FROM vmiflavours vmiflavours_1
+	JOIN x ON x.id = vmiflavours_1.id
+	GROUP BY vmiflavours_1.id
+)
+SELECT
+	xmlelement(
+		name "virtualization:image",
+		xmlattributes(
+			vaviews.vmiinstanceid,
+			va_provider_images.good_vmiinstanceid,
+			vaviews.vmiinstance_guid AS identifier,
+			vaviews.vmiinstance_version,
+			vaviews.va_version_archived AS archived,
+			vaviews.va_version_enabled AS enabled,
+			CASE WHEN vaviews.va_version_expireson >= NOW() THEN FALSE ELSE TRUE END AS isexpired
+		),
+		hypervisors.hypervisor::text::xml,
+--		XMLELEMENT(NAME "virtualization:hypervisors", array_to_string(vaviews.hypervisors, ',')::xml),
+		XMLELEMENT(NAME "virtualization:os", XMLATTRIBUTES(oses.id AS id, vaviews.osversion AS version, oses.os_family_id as family_id), oses.name),
+		XMLELEMENT(NAME "virtualization:arch", XMLATTRIBUTES(archs.id AS id), archs.name),
+		vmiinst_cntxscripts_to_xml(vaviews.vmiinstanceid),
+--		XMLELEMENT(NAME "virtualization:location", vaviews.uri),
+--		XMLELEMENT(NAME "virtualization:checksum", XMLATTRIBUTES(vaviews.checksumfunc AS checkfunc), vaviews.checksum),
+--		XMLELEMENT(NAME "virtualization:osversion", vaviews.osversion),
+		array_to_string(array_agg(DISTINCT
+			xmlelement(name "virtualization:provider",
+				xmlattributes(
+					va_provider_images.va_provider_id as provider_id,
+					va_providers.authn as provider_authn,					
+					va_providers.sitename as name,
+					va_providers.service_type,
+					va_provider_images.va_provider_image_id as occi_id, --FIXME: this should be renamed to endpoint_id
+					vowide_image_lists.void,
+					vos.name as voname,
+					va_provider_shares.projectid,
+					va_provider_images.vmiinstanceid as vmiinstanceid
+				)
+			)::text
+		),'')::xml
+)
+FROM
+	applications
+	INNER JOIN vaviews ON vaviews.appid = applications.id
+	INNER JOIN va_provider_images AS va_provider_images ON va_provider_images.vmiinstanceid = vaviews.vmiinstanceid
+	INNER JOIN va_provider_shares ON va_provider_shares.id = va_provider_images.shareid   
+	INNER JOIN va_providers ON va_providers.id = va_provider_images.va_provider_id
+	LEFT OUTER JOIN hypervisors ON hypervisors.vmiflavourid = vaviews.vmiflavourid
+	LEFT OUTER JOIN archs ON archs.id = vaviews.archid
+	LEFT OUTER JOIN oses ON oses.id = vaviews.osid
+	LEFT OUTER JOIN vmiformats ON vmiformats.name::text = vaviews.format
+	LEFT OUTER JOIN app_vos ON app_vos.appid = applications.id
+	LEFT OUTER JOIN vowide_image_list_images ON vowide_image_list_images.id = va_provider_images.vowide_vmiinstanceid
+	LEFT OUTER JOIN vowide_image_lists ON vowide_image_lists.id = vowide_image_list_images.vowide_image_list_id AND (vowide_image_lists.state::text = 'published' OR vowide_image_lists.state::text = 'obsolete')
+	LEFT OUTER JOIN vos ON vos.id = vowide_image_lists.void
+WHERE
+	-- vaviews.vmiinstanceid = va_provider_images.good_vmiinstanceid AND
+	vaviews.va_version_published AND
+--	NOT vaviews.va_version_archived AND
+	applications.id = $1
+GROUP BY
+	applications.id,
+	--vaviews.uri,
+	--vaviews.checksumfunc,
+	--vaviews.checksum,
+	vaviews.osversion,
+	--vaviews.hypervisors,
+	hypervisors.hypervisor::text,
+	--vaviews.va_id,
+	--vaviews.vappversionid,
+	vaviews.vmiinstanceid,
+	va_provider_images.good_vmiinstanceid,
+	vaviews.vmiflavourid,
+	vaviews.vmiinstance_guid,
+	vaviews.vmiinstance_version,
+	vaviews.va_version_archived,
+	vaviews.va_version_enabled,
+	vaviews.va_version_expireson,
+	archs.id,
+	oses.id,
+	vmiformats.id;
+$function$
+;
+
+CREATE OR REPLACE FUNCTION public.vapp_image_providers_to_xml2(_appid integer)
+ RETURNS SETOF xml
+ LANGUAGE sql
+AS $function$
+ WITH hypervisors AS (
+	 WITH x AS (
+		 SELECT vmiflavours_2.id,
+		    unnest(vmiflavours_2.hypervisors) AS y
+		   FROM vmiflavours vmiflavours_2
+		)
+	 SELECT vmiflavours_1.id AS vmiflavourid,
+	    xmlagg(XMLELEMENT(NAME "virtualization:hypervisor", XMLATTRIBUTES(( SELECT hypervisors_1.id
+		   FROM public.hypervisors hypervisors_1
+		  WHERE hypervisors_1.name::text = x.y::text) AS id), x.y)) AS hypervisor
+	   FROM vmiflavours vmiflavours_1
+	JOIN x ON x.id = vmiflavours_1.id
+	GROUP BY vmiflavours_1.id
+)
+SELECT
+	xmlelement(
+		name "virtualization:image",
+		xmlattributes(
+			vaviews.vmiinstanceid,
+			vaviews.vmiinstance_guid AS identifier,
+			vaviews.vmiinstance_version,
+			vaviews.va_version_archived AS archived,
+			vaviews.va_version_enabled AS enabled,
+			CASE WHEN vaviews.va_version_expireson >= NOW() THEN FALSE ELSE TRUE END AS isexpired
+		),
+		hypervisors.hypervisor::text::xml,
+--		XMLELEMENT(NAME "virtualization:hypervisors", array_to_string(vaviews.hypervisors, ',')::xml), 
+		XMLELEMENT(NAME "virtualization:os", XMLATTRIBUTES(oses.id AS id, vaviews.osversion AS version, oses.os_family_id as family_id), oses.name), 
+		XMLELEMENT(NAME "virtualization:arch", XMLATTRIBUTES(archs.id AS id), archs.name),
+		vmiinst_cntxscripts_to_xml(vaviews.vmiinstanceid),
+--		XMLELEMENT(NAME "virtualization:location", vaviews.uri),
+--		XMLELEMENT(NAME "virtualization:checksum", XMLATTRIBUTES(vaviews.checksumfunc AS checkfunc), vaviews.checksum),
+--		XMLELEMENT(NAME "virtualization:osversion", vaviews.osversion), 
+		array_to_string(array_agg(DISTINCT 
+			xmlelement(name "virtualization:provider",
+				xmlattributes(
+					va_provider_images.va_provider_id as provider_id,
+					(SELECT va_providers.authn FROM va_providers WHERE id = va_provider_images.va_provider_id) as provider_authn,					
+					va_provider_images.va_provider_image_id as occi_id,
+					vowide_image_lists.void,
+					vos.name as voname,
+					va_provider_shares.projectid,
+					va_provider_images.vmiinstanceid as vmiinstanceid
+				)
+			)::text
+		),'')::xml
+)
+FROM 
+	applications
+	INNER JOIN vaviews ON vaviews.appid = applications.id
+	INNER JOIN va_provider_images AS va_provider_images ON va_provider_images.vmiinstanceid = vaviews.vmiinstanceid
+	INNER JOIN va_provider_shares ON va_provider_shares.id = va_provider_images.shareid   
+	LEFT OUTER JOIN hypervisors ON hypervisors.vmiflavourid = vaviews.vmiflavourid
+	LEFT OUTER JOIN archs ON archs.id = vaviews.archid
+	LEFT OUTER JOIN oses ON oses.id = vaviews.osid
+	LEFT OUTER JOIN vmiformats ON vmiformats.name::text = vaviews.format
+	LEFT OUTER JOIN app_vos ON app_vos.appid = applications.id
+	LEFT OUTER JOIN vowide_image_list_images ON vowide_image_list_images.id = va_provider_images.vowide_vmiinstanceid
+	LEFT OUTER JOIN vowide_image_lists ON vowide_image_lists.id = vowide_image_list_images.vowide_image_list_id AND (vowide_image_lists.state::text = 'published' OR vowide_image_lists.state::text = 'obsolete')
+	LEFT OUTER JOIN vos ON vos.id = vowide_image_lists.void
+WHERE  
+	-- vaviews.vmiinstanceid = va_provider_images.good_vmiinstanceid AND
+	vaviews.va_version_published AND 
+--	NOT vaviews.va_version_archived AND
+	applications.id = $1
+GROUP BY 
+	applications.id, 
+	--vaviews.uri,
+	--vaviews.checksumfunc,
+	--vaviews.checksum,
+	vaviews.osversion,
+	--vaviews.hypervisors,
+	hypervisors.hypervisor::text,
+	--vaviews.va_id,
+	--vaviews.vappversionid,
+	vaviews.vmiinstanceid, 
+	vaviews.vmiflavourid, 
+	vaviews.vmiinstance_guid,
+	vaviews.vmiinstance_version,
+	vaviews.va_version_archived,
+	vaviews.va_version_enabled,
+	vaviews.va_version_expireson,
+	archs.id, 
+	oses.id,
+	vmiformats.id;
+$function$
+;
+
+CREATE OR REPLACE FUNCTION public.authn(va_providers)
+ RETURNS text
+ LANGUAGE sql
+ STABLE
+AS $function$
+SELECT
+	UPPER((j->>'info')::jsonb->>'GLUE2EndpointAuthentication')
+/*	
+    --- OLDER GLUE2.0 convention ---
+	UPPER(ARRAY_TO_STRING(REGEXP_MATCHES(
+		(j->>'info')::jsonb->>'GLUE2EntityOtherInfo',
+		E'AUTHN=([0-9A-Za-z-]+)',
+		'i'
+	), ', '))
+*/
+FROM egiis.tvapj
+WHERE pkey = $1.id
+$function$
+;
 
 INSERT INTO version (major,minor,revision,notes) 
-	SELECT 8, 24, 1, E'More modifications for GLUE2.1'
-	WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=24 AND revision=1);
+        SELECT 8, 24, 1, E'Bugfixes after move to GLUE2.1 schema w/ proper support for Cloud Computing information'
+        WHERE NOT EXISTS (SELECT * FROM version WHERE major=8 AND minor=24 AND revision=1);
+
+COMMIT;
+
+REFRESH MATERIALIZED VIEW vaviews;
+REFRESH MATERIALIZED VIEW va_providers;
+REFRESH MATERIALIZED VIEW va_provider_images;
+REFRESH MATERIALIZED VIEW va_provider_endpoints;
+REFRESH MATERIALIZED VIEW va_provider_shares;
+REFRESH MATERIALIZED VIEW va_provider_templates;
+REFRESH MATERIALIZED VIEW va_provider_managers;
+REFRESH MATERIALIZED VIEW site_services_xml;
+REFRESH MATERIALIZED VIEW site_service_images_xml;
