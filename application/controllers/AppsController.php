@@ -1341,7 +1341,7 @@ class AppsController extends Zend_Controller_Action
             }
 
             if ($appid <= 0) {
-                $result = array("sattus" => "error", "error" => "Invalid parameters given");
+                $result = array("status" => "error", "message" => "Invalid parameters given");
             } else {
                 $vaviews = new Default_Model_VAviews();
                 $f1 = new Default_Model_VAviewsFilter();
@@ -1355,7 +1355,7 @@ class AppsController extends Zend_Controller_Action
                 $vaviews->filter->chain($f3, "AND");
 
                 if (count($vaviews->items) === 0) {
-                    $result = array("status" => "error", "error" => "Could not find image location for virtual appliance latest version");
+                    $result = array("status" => "error", "message" => "Could not find image location for virtual appliance latest version");
                 } else {
                     $vmiinstance = $vaviews->items[0];
                     $result = isValidVAimageURL($vmiinstance->uri);
