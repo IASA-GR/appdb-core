@@ -4696,20 +4696,29 @@ function isValidVAimageURL($url) {
 			if (array_key_exists("http_code", $info)) {
                             $responseCode = $info["http_code"];
 			}
-			if (array_key_exists("content_type", $info)) {
+
+                        if (array_key_exists("content_type", $info)) {
                             $contentType = $info["content_type"];
 			}
-			if ($responseCode == "200") {
+
+                        if ($responseCode == "200") {
                             $isOK = true;
 			}
-			if (
-                            (strpos($contentType, "binary") !== false) || 
-                            (strpos($contentType, "application") !== false) ||
-                            (strpos($contentType, "octet-stream") !== false)
-			) {
-                            $isBinary = true;
-			} else {
-                            $message = "Image location is accessible but does not seem to return binary content";
+
+                        if ($responseCode == "404") {
+                            $message = "Image not found in registered location (HTTP 404)";
+                        }
+
+                        if (! $message ) {
+                            if (
+                                (strpos($contentType, "binary") !== false) || 
+                                (strpos($contentType, "application") !== false) ||
+                                (strpos($contentType, "octet-stream") !== false)
+                            ) {
+                                $isBinary = true;
+                            } else {
+                                $message = "Image location is accessible but does not seem to return binary content";
+                            }
                         }
 		} else {
                     $message = "Could not retrieve information from VA image location";
@@ -4717,7 +4726,7 @@ function isValidVAimageURL($url) {
 	} else {
                 $message = curl_error($curl_handle);
 	}
-	
+
         curl_close($curl_handle);
 
         $ret = array();
