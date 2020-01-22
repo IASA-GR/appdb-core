@@ -4766,6 +4766,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f2f6f8', end
 	border-radius: 5px;
 }
 
+.maincontent > .contents > .sectioncontainer .property > .value pre {
+    white-space: pre-line;
+}
+
 .gridtreecell.tip .tip{
 	padding: 0px 3px;
 	color: #555;
