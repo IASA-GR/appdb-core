@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+include('nagios.php');
+
 class VoController extends Zend_Controller_Action
 {
     protected $vofile;
@@ -331,6 +333,7 @@ class VoController extends Zend_Controller_Action
 	}
 
 	private function syncEBIVOs() {
+		Nagios::clear("sync-ebi-vos");
 		db()->setFetchMode(Zend_Db::FETCH_OBJ);
 		$rs = db()->query("SELECT id,name, url, enabled FROM vo_sources WHERE name = 'EBI-Perun'")->fetchAll();
 		$enabled = false;
@@ -343,6 +346,7 @@ class VoController extends Zend_Controller_Action
 		if (! $enabled) {
 			error_log("EBI-Perun VO source is disabled; will not sync");
 			ExternalDataNotification::sendNotification('VO::syncEBIVOs', "EBI-Perun VO source is disabled; will not sync", ExternalDataNotification::MESSAGE_TYPE_ERROR);
+			Nagios::warning("sync-ebi-vos", "EBI-Perun VO source is disabled;\n will not sync");
 			return false;
 		}
 		$inTransaction = false;
@@ -469,14 +473,17 @@ class VoController extends Zend_Controller_Action
 			db()->query("SELECT request_permissions_refresh()");
 			error_log('Error while syncing EBI VOs: '.$e);
 			ExternalDataNotification::sendNotification('VO::syncEBIVOs', $e->getMessage(), ExternalDataNotification::MESSAGE_TYPE_ERROR);
+			Nagios::critical("sync-ebi-vos", $e->getMessage());
 		}
 		return $xml;
 	}
 
 	private function syncEGIVOs() {
+		Nagios::clear("sync-egi-vos");
 		if ($this->gridops_is_down()) {
 			error_log("EGI Operations portal is in downtime. EGI VO sync aborted");
 			ExternalDataNotification::sendNotification('VO::syncEGIVOs', "EGI Operations portal is in downtime. EGI VO sync aborted", ExternalDataNotification::MESSAGE_TYPE_ERROR);
+			Nagios::warning("sync-egi-vos", "EGI Operations portal is in downtime.\n EGI VO sync aborted");
 			return false;
 		}
 		db()->setFetchMode(Zend_Db::FETCH_OBJ);
@@ -491,6 +498,7 @@ class VoController extends Zend_Controller_Action
 		if (! $enabled) {
 			error_log("EGI Operations Portal VO source is disabled; will not sync");
 			ExternalDataNotification::sendNotification('VO::syncEGIVOs', "EGI Operations Portal VO source is disabled; will not sync", ExternalDataNotification::MESSAGE_TYPE_ERROR);
+			Nagios::warning("sync-egi-vos", "EGI Operations Portal VO source is disabled;\n will not sync");
 			return false;
 		};
 		$inTransaction = false;
@@ -514,6 +522,7 @@ class VoController extends Zend_Controller_Action
 			if ( $xml === false ) {
 				error_log("error in syncEGIVOs: " . var_export(curl_error($ch), true));
 				ExternalDataNotification::sendNotification('VO::syncEGIVOs', var_export(curl_error($ch), true), ExternalDataNotification::MESSAGE_TYPE_ERROR);
+				Nagios::critical("sync-egi-vos", var_export(curl_error($ch), true));
 				return false;
 			}
 			@curl_close($ch);
@@ -530,7 +539,8 @@ class VoController extends Zend_Controller_Action
 				fclose($f);
 			} else {
 				error_log("error in syncEGIVOs: Error while transforming XML data with stylesheet 'sort_vos.xsl'");
-				ExternalDataNotification::sendNotification('VO::syncEGIVOs', "Error while transforming XML data with stylesheet 'sort_vos.xsl'", ExternalDataNotification::MESSAGE_TYPE_ERROR);
+			    ExternalDataNotification::sendNotification('VO::syncEGIVOs', "Error while transforming XML data with stylesheet 'sort_vos.xsl'", ExternalDataNotification::MESSAGE_TYPE_ERROR);
+				Nagios::critical("sync-egi-vos", "Error while transforming XML data with stylesheet 'sort_vos.xsl'");
 				return false;
 			}
 			// update database
@@ -667,6 +677,7 @@ class VoController extends Zend_Controller_Action
 			@exec("mv -f " . $this->vofile . ".old.bak " . $this->vofile . ".old");
 			error_log('Error while syncing EGI VOs: '.$e);
 			ExternalDataNotification::sendNotification('VO::syncEGIVOs', $e->getMessage(), ExternalDataNotification::MESSAGE_TYPE_ERROR);
+			Nagios::critical("sync-egi-vos","Error while syncing EGI VOs:\n" $e->getMessage());
 		}
 		@exec("rm -f " . $this->vofile . ".old.bak");
 		return $xml;
@@ -798,6 +809,7 @@ class VoController extends Zend_Controller_Action
 	}
 
 	public function syncEBIVOMembers() {
+		Nagios::clear("sync-ebi-vo-members");
 		db()->setFetchMode(Zend_Db::FETCH_OBJ);
 		$rs = db()->query("SELECT id, name, enabled, members_url FROM vo_sources WHERE name = 'EBI-Perun'")->fetchAll();
 		$enabled = false;
@@ -810,6 +822,7 @@ class VoController extends Zend_Controller_Action
 		if (! $enabled) {
 			error_log("EBI-Perun VO source is disabled; will not sync VO members");
 			ExternalDataNotification::sendNotification('VO::syncEBIVOMembers', "EBI-Perun VO source is disabled; will not sync VO members", ExternalDataNotification::MESSAGE_TYPE_ERROR);
+			Nagios::warning("sync-ebi-vo-members", "EBI-Perun VO source is disabled;\n will not sync VO members");
 			return false;
 		}
 		$inTransaction = false;
@@ -834,6 +847,7 @@ class VoController extends Zend_Controller_Action
 					$err = var_export(curl_error($ch), true);
 					error_log("error in syncEBIVOMembers: " . $err);
 					ExternalDataNotification::sendNotification('VO::syncEBIVOMembers', 'Could not sync VO members from EBI-Perun. Error was:\n\n' . $err);
+					Nagios::critical("sync-ebi-vo-members", "Could not sync VO members from EBI-Perun.\nError was:\n\n' . $err");
 					return;
 				} else {
 					$xml = "<results>$xml</results>";
@@ -896,6 +910,7 @@ class VoController extends Zend_Controller_Action
 					error_log("EBI VO members sync'ed");
 				} else {
 					ExternalDataNotification::sendNotification('VO::syncEBIVOMembers', 'Could not sync VO members from EBI-Perun. Probably got currupt or empty data');
+					Nagios::critical("sync-ebi-vo-members", "Could not sync VO members from EBI-Perun.\nProbably got currupt or empty data");
 				}
 			} else {
 				error_log("Sync EBI VO members: nothing to do (MD5 unchanged)");
@@ -910,10 +925,12 @@ class VoController extends Zend_Controller_Action
 			db()->query("SELECT request_permissions_refresh();");
 			error_log("error in syncEBIVOMembers: $e");
 			ExternalDataNotification::sendNotification('VO::syncEBIVOMembers', 'Could not sync VO members from EBI-Perun. Error was:\n\n' . $e->getMessage());
+			Nagios::critical("sync-ebi-vo-members", "Could not sync VO members from EBI-Perun.\n Error was:\n\n" . $e->getMessage());
 		}
 	}
 
 	public function syncEGIVOMembers() {
+		Nagios::clear("sync-egi-vo-members");
 		if ($this->gridops_is_down()) {
 			error_log("EGI Operations portal is in downtime. EGI VO members sync aborted");
 			return;
@@ -929,6 +946,7 @@ class VoController extends Zend_Controller_Action
 		if (! $enabled) {
 			error_log("EGI Operations Portal VO source is disabled; will not sync VO members");
 			ExternalDataNotification::sendNotification('VO::syncEGIVOMembers', "EGI Operations Portal VO source is disabled; will not sync VO members", ExternalDataNotification::MESSAGE_TYPE_ERROR);
+			Nagios::warning("sync-egi-vo-members", "EGI Operations Portal VO source is disabled;\n will not sync VO members");
 			return false;
 		}
 		$inTransaction = false;
@@ -977,6 +995,7 @@ class VoController extends Zend_Controller_Action
 				$err = var_export(curl_error($ch), true);
 				error_log("error in syncEGIVOMembers: " . $err);
 				ExternalDataNotification::sendNotification('VO::syncEGIVOMembers', "Could not sync VO members from EGI operations portal. Error was:\n\n" . $err); 
+				Nagios::critical("sync-egi-vo-members", "Could not sync VO members from EGI operations portal.\n Error was:\n\n" . $err);
 				return;
 			}
 			@curl_close($ch);
@@ -1029,6 +1048,7 @@ class VoController extends Zend_Controller_Action
 					error_log("VO members sync'ed");
 				} else {
 					ExternalDataNotification::sendNotification('VO::syncEGIVOMembers', 'Could not sync VO members from EGI operations portal. Probably got currupt or empty data');
+					Nagios::critical("sync-egi-vo-members", "Could not sync VO members from EGI operations portal.\n Probably got currupt or empty data");
 				}
 			} else {
 				error_log("Sync EGI VO members: nothing to do (MD5 unchanged)");
@@ -1043,6 +1063,7 @@ class VoController extends Zend_Controller_Action
 			db()->query("SELECT request_permissions_refresh();");
 			error_log("error in syncVOMembers: $e");
 			ExternalDataNotification::sendNotification('VO::syncEGIVOMembers', 'Could not sync VO members from EGI operations portal. Error was:\n\n' . $e->getMessage());
+			Nagios::critical("sync-egi-vo-members", "Could not sync VO members from EGI operations portal.\n Error was:\n\n" . $e->getMessage());
 		}
 	}
 	
