@@ -459,6 +459,7 @@ class VoController extends Zend_Controller_Action
 				error_log("EBI VOs sync'ed");
 			} else {
 				// no need to sync
+				Nagios::ok("sync-ebi-vos", "OK, No need to sync");
 				return false;
 			}
 		} catch (Exception $e) {
@@ -475,6 +476,7 @@ class VoController extends Zend_Controller_Action
 			ExternalDataNotification::sendNotification('VO::syncEBIVOs', $e->getMessage(), ExternalDataNotification::MESSAGE_TYPE_ERROR);
 			Nagios::critical("sync-ebi-vos", $e->getMessage());
 		}
+		Nagios::ok("sync-ebi-vos", "OK, EBI VOs Synchronized");
 		return $xml;
 	}
 
@@ -660,6 +662,7 @@ class VoController extends Zend_Controller_Action
 			} else {
 				// no need to sync
 				@exec("rm -f " . $this->vofile . ".old.bak");
+				Nagios::ok("sync-egi-vos", "OK, No need to sync");
 				return false;
 			}
 		} catch (Exception $e) {
@@ -680,6 +683,7 @@ class VoController extends Zend_Controller_Action
 			Nagios::critical("sync-egi-vos","Error while syncing EGI VOs:\n" $e->getMessage());
 		}
 		@exec("rm -f " . $this->vofile . ".old.bak");
+		Nagios::ok("sync-egi-vos", "OK, EGI VOs Synchronized");
 		return $xml;
 	}
 
@@ -914,6 +918,7 @@ class VoController extends Zend_Controller_Action
 				}
 			} else {
 				error_log("Sync EBI VO members: nothing to do (MD5 unchanged)");
+				Nagios::ok("sync-ebi-vos", "ebi_vo_members_synced");
 				db()->query("UPDATE config SET data = NOW()::text WHERE var = 'ebi_vo_members_synced'");
 			}
 		} catch (Exception $e) {
@@ -933,6 +938,7 @@ class VoController extends Zend_Controller_Action
 		Nagios::clear("sync-egi-vo-members");
 		if ($this->gridops_is_down()) {
 			error_log("EGI Operations portal is in downtime. EGI VO members sync aborted");
+			Nagios::warning("sync-egi-vo-members", "EGI Operations portal is in downtime.\n EGI VO members sync aborted");
 			return;
 		}
 		db()->setFetchMode(Zend_Db::FETCH_OBJ);
@@ -1052,6 +1058,7 @@ class VoController extends Zend_Controller_Action
 				}
 			} else {
 				error_log("Sync EGI VO members: nothing to do (MD5 unchanged)");
+				Nagios::ok("sync-egi-vos", "egi_vo_members_synced");
 				db()->query("UPDATE config SET data = NOW()::text WHERE var = 'egi_vo_members_synced'");
 			}
 		} catch (Exception $e) {
