@@ -14,11 +14,13 @@ class Nagios {
 	private static function set($test, $state, $msg) {
 		$f = @fopen(APPLICATION_PATH . "/../cache/nagios-" . $test, "w");
 		$e = error_get_last();
+		$date = date(DATE_ISO8601, strtotime(date('m/d/Y H:i:s', time())));
 		if($e['message']!==''){
 			// An error occurred
 			error_log("[nagios::set]". $e)
 		}
 		@fwrite($f, $state . "\n");
+		@fwrite($date . "\n");
 		@fwrite($f, $msg . "\n");
 		@fclose($f);
 	}
