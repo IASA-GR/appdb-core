@@ -117,7 +117,7 @@ class RepositoryUtils {
 	}
 	
 	public static function toXML($data=array(), $datatype="item", $schema = array()){
-		$res = '<?xml version="1.0" encoding="UTF-16" standalone="yes"?><response></response>';
+		$res = '<'. '?xml version="1.0" encoding="UTF-16" standalone="yes"?' . '><response></response>';
 		return $res;
 	}
 }
@@ -874,7 +874,8 @@ class Repository{
 		}
 		$pkgs = new Repository_Model_MetaPoaReleasePackages();
 		$pkgs->filter->id->equals($pkg->id);
-		if( count($pkgs) === 0){
+		$pkgs->refresh();
+		if( count($pkgs->items) === 0){
 			$output = "Could not retrieve new package release";
 			return false;
 		}
@@ -891,7 +892,7 @@ class Repository{
 	public static function getPOAPackage($id){
 		$pckgs = new Repository_Model_MetaPoaReleasePackages();
 		$pckgs->filter->id->equals($id);
-		if( count($pckgs) === 0 ){
+		if( count($pckgs->items) === 0 ){
 			return null;
 		}
 		return $pckgs->items[0];
@@ -998,7 +999,7 @@ class Repository{
                 for($i=0; $i<count($poastocheck); $i+=1){
                     $poas = new Repository_Model_MetaPoaReleases();
                     $poas->filter->id->equals($poastocheck[$i]);
-                    if(count($poas)>0){
+                    if(count($poas->items)>0){
                         $poa = $poas->items[0];
                         $pckgs = $poa->getPackages();
                         if(count($pckgs) == 0 ){
@@ -1299,6 +1300,7 @@ class RepositoryConfiguration{
 	const STORAGE_KEY = "storage.root.path";
 	const DATABANK_KEY = "databank.root.path";
 	const SCRATCHSPACE_KEY = "scratch.root.path";
+	const DPKG_CMD = 'PERL5LIB=/opt/ubuntu/bionic/share/perl5/vendor_perl PATH=/opt/ubuntu/bionic/bin:$PATH LD_LIBRARY_PATH=/opt/ubuntu/bionic/lib:$LD_LIBRARY_PATH /opt/ubuntu/bionic/bin/dpkg';
 	private static $_config = array();
 	
 	public static function getValueByName($name){
@@ -1385,7 +1387,7 @@ class RepositoryPackage{
 		$info = array();
 		$output = "";
 		$status = "";
-		$cmd ="dpkg -I " .escapeshellarg($filename) . " | sed -e 's/^\\ //' -e 's/\\ *[Dd]escription\\ *\\:/Description\\:\\n/' -e 's/^\\ *size\\ [0-9]\\{1,\\}.*$/\\n/' -e 's/^\\ *[0-9]\\{1,\\}.*$/\\n/' -e 's/^new\\ debian.*$/\\n/'";
+		$cmd = RepositoryConfiguration::DPKG_CMD . " -I " .escapeshellarg($filename) . " | sed -e 's/^\\ //' -e 's/\\ *[Dd]escription\\ *\\:/Description\\:\\n/' -e 's/^\\ *size\\ [0-9]\\{1,\\}.*$/\\n/' -e 's/^\\ *[0-9]\\{1,\\}.*$/\\n/' -e 's/^new\\ debian.*$/\\n/'";
 		exec($cmd,$output, $status);
 		$output = implode("\n", $output);
 		
@@ -1564,6 +1566,7 @@ class RepositoryFS{
 			case "application/x-rpm":
 				return "rpm";
 			case "application/x-debian-package":
+			case "application/vnd.debian.binary-package":
 				return "deb";
 			case "application/x-gzip":
 			case "application/x-tar":
@@ -1780,11 +1783,21 @@ class RepositoryBackend{
 		return $app["commrepoBackendUrl"];
 	}
 	public static function checkSuccessfulResponse($response){
-		$res = simplexml_load_string($response);
+		$prev = libxml_use_internal_errors(true);
+		$res = @simplexml_load_string($response);
 		if ($res === false) {
-			error_log("[RepositoryBackend::checkSuccessfulResponse] Cannot parse response data as XML");
+			$err = libxml_get_errors();
+			if (count($err) > 0) {
+				$err = $err[0];
+				$err = $err->message;
+			} else {
+				$err = "Unknown error";
+			}
+			error_log("[RepositoryBackend::checkSuccessfulResponse] Cannot parse response data as XML: $err");
+			libxml_use_internal_errors($prev);
 			return false;
 		}
+		libxml_use_internal_errors($prev);
 		$statuses = $res->xpath("//entry/status");
 		
 		foreach($statuses as $status){
@@ -1840,7 +1853,8 @@ class RepositoryBackend{
 		//Find given release
 		$releases = new Repository_Model_MetaProductReleases();
 		$releases->filter->id->equals($id);
-		if( count($releases) === 0 ){
+		$releases->refresh();
+		if( count($releases->items) === 0 ){
 			return "Could not retrieve release.";
 		}
 		$release = $releases->items[0];
@@ -1919,7 +1933,7 @@ class RepositoryBackend{
 		//Find given release
 		$releases = new Repository_Model_MetaProductReleases();
 		$releases->filter->id->equals($releaseid);
-		if( count($releases) === 0 ){
+		if( count($releases->items) === 0 ){
 			return self::createErrorResponse("Could not retrieve release.", $output);
 		}
 		$release = $releases->items[0];
@@ -1998,7 +2012,7 @@ class RepositoryBackend{
 		//Find given release
 		$releases = new Repository_Model_MetaProductReleases();
 		$releases->filter->id->equals($releaseid);
-		if( count($releases) === 0 ){
+		if( count($releases->items) === 0 ){
 			return self::createErrorResponse("Could not retrieve release.", $output);
 		}
 		$release = $releases->items[0];
