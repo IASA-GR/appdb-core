@@ -16,10 +16,10 @@
  */
    
 /** Needed for Site / VA-provider sync'ing */ 
-require_once "PHPCouch/PHPOnCouch/Couch.php";
-require_once "PHPCouch/PHPOnCouch/CouchClient.php";
-require_once "PHPCouch/PHPOnCouch/CouchDocument.php";
-require_once "PHPCouch/PHPOnCouch/Config.php";
+require_once "PHPOnCouch/Couch.php";
+require_once "PHPOnCouch/CouchClient.php";
+require_once "PHPOnCouch/CouchDocument.php";
+require_once "PHPOnCouch/Config.php";
 use PHPOnCouch\CouchClient;
 use PHPOnCouch\Exceptions; 
 /***************************/
