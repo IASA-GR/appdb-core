@@ -36,7 +36,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Properly handle site images that are not provided under a VO wide image list
 
-## [6.1.13] - 2018-01-10
+## [6.1.13] - 2019-01-10
 ### Fixed
 - Fixed invalid report of expired VM versions in site details page
 

@@ -1224,7 +1224,7 @@ class VoController extends Zend_Controller_Action
                 }
 
                 if ($res !== '') {
-                    $res = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $res);
+                    $res = str_replace('<' . '?xml version="1.0" encoding="UTF-8"?' . '>', '', $res);
                     $res = trim($res);
                 }
 
@@ -1330,7 +1330,7 @@ class VoController extends Zend_Controller_Action
             ORDER BY vaviews.appid, vaviews.vapplistid";
 
             $rs = db()->query($sql)->fetchAll();
-            $res = '<?xml version="1.0" encoding="UTF-8"?>';
+            $res = '<' . '?xml version="1.0" encoding="UTF-8"?' . '>';
             $res .= "\n<result count='" . count($rs) . "'>\n";
             if (count($rs) > 0) {
                 foreach ($rs as $r) {

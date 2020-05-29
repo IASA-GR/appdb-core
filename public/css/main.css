@@ -900,7 +900,7 @@ html:not([ie8andbelow]) .mainheader .menucontainer.bottom {
 	line-height: 12px;
 }
 .egiacknowledge img {
-	width: 30px;
+	height: 30px;
 }
 
 .egiacknowledge > span {
