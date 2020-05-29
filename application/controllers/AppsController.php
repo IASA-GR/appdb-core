@@ -1340,6 +1340,12 @@ class AppsController extends Zend_Controller_Action
 			return;
 		}
 		
+                $accessible = isURLAccessible($url);
+                if ($accessible !== true) {
+                    echo "<response result='error' message='" . htmlspecialchars($accessible, ENT_XML1 | ENT_QUOTES, 'UTF-8') . "' ></response>";
+                    return;
+                }
+
 		$file_headers = @get_headers($url,1);
 		
 		if(  count($file_headers) === 0  || !isset($file_headers[0]) || trim( $file_headers[0] ) === ""  ) {

@@ -94,7 +94,7 @@ class IndexController extends Zend_Controller_Action
 			//do nothing. It's local development instance where no SImpleSaml installed
 		}else{
 			$auth = SamlAuth::isAuthenticated();
-			if( $auth === false ){
+                        if( $auth === false && !$this->session->userIsGuest){
 				//if logged in but not authdicated the clear session
 				if( isset($this->session->userid) && is_numeric($this->session->userid)  ){
 					SamlAuth::logout($this->session);

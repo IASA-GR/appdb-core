@@ -1593,7 +1593,51 @@ function validateAppCName($cname, $id = null) {
 	}
 	return $valid;
 }
+/**
+ * Checks if given URL is accessible and returns status 200
+ * NOTE: It does not ignore self-signed sertificates.
+ *
+ * @param string        $url                    The url to check
+ * @param string        $defaultErrorPrefix     Prefix connection error.
+ * @return string|bool                          On sucess returns true, else the error message.
+ */
+function isURLAccessible($url, $defaultErrorPrefix = "") {
+    $parsed = parse_url($url);
+    $scheme = (isset($parsed['scheme']) ? strtolower($parsed['scheme']) : '');
+    if (!$scheme || ($scheme !== 'https' && $scheme !== 'http')) {
+        return $defaultErrorPrefix . 'Invalid URL scheme';
+    }
 
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_NOBODY, true);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HEADER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+    $headers = curl_exec($ch);
+    $error = null;
+
+    if($headers === false) {
+        $error = $defaultErrorPrefix . curl_error($ch);
+    } else {
+        $info = curl_getinfo($ch);
+        if ($info['http_code'] !== 200) {
+            $error = explode("\r\n", $headers);
+            $error = $error[0];
+            $error = trim($error, '\r');
+        }
+    }
+
+    curl_close($ch);
+
+    if (!$error) {
+        return true;
+    }
+
+    return $error;
+};
 /**
  * Retrieve textual representation of an item's metatype
  *
@@ -8769,8 +8813,8 @@ class SamlAuth{
 	  }
 	  return $res;
 	}
-	
-	//Reject VM Operator if account is not entitled with VO membership
+
+        //Reject VM Operator if account is not entitled with VO membership
 	private static function validateEntitlements($user, $entitlements = array()) {
 			$vos = ((isset($entitlements['vos'])) ? $entitlements['vos'] : array());
 			$vmops = ((isset($vos['vmops'])) ? $vos['vmops'] : array());
@@ -8873,7 +8917,7 @@ class SamlAuth{
 	public static function setupSamlAuth($session){
 		$attrs = $session->samlattrs;
 		$source = strtolower(trim($session->samlauthsource));
-		$uid = ( isset($attrs["idp:uid"])?$attrs["idp:uid"][0]:"");
+                $uid = ( isset($attrs["idp:uid"])?$attrs["idp:uid"][0]:"");
 
 		if( trim($uid) == "" ) return false;
 		$accounttype = str_replace("-sp","",$source);
@@ -8941,7 +8985,7 @@ class SamlAuth{
 
 		//Check if user account is blocked and updates session
 		self::setupUserAccountStatus($session, $useraccount);
-		
+
 		$session->authSource = $source;
 		$session->authUid = $uid;
 		$session->logoutUrl = 'https://' . $_SERVER['HTTP_HOST'] . '/saml/logout?source=' . $source;
