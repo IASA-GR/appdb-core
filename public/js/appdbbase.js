@@ -12784,7 +12784,7 @@ appdb.views.Main = (function(){
 			componentArgs:[{pagelength:optQueryLen,flt:""}],
 			href: "/browse/cloud"
 		};
-		_showSites({flt:''},{filterDisplay:'Search Sites/Resource Providers...',mainTitle : 'Supported OCCI Sites', systemQuery: ['+=&site.supports:1'], content: 'vappliance',prepend: siteprepend, callerName: "CloudSites", href: '/browse/sites/cloud'});
+		_showSites({flt:''},{filterDisplay:'Search Sites/Resource Providers...',mainTitle : 'Supported Sites', systemQuery: ['+=&site.supports:1'], content: 'vappliance',prepend: siteprepend, callerName: "CloudSites", href: '/browse/sites/cloud'});
 	};
 	var _showSite = function(o,e){
 		_currentState = {callback : _showSite,query:o,ext:e};
