@@ -37,10 +37,10 @@ The OpenSSL encryption module has a fixed way of encrypting the information and 
 ##  Service module
 |  Name | Type | Optional | Description |
 | ------------ | ------------ | ------------ | ------------ |
-|  enabled |  boolean  | false  | If false the service is ignored. |
-|  service | string  |  false | The short name of the service. |
-|  service_name | string  |  false | The long name (title) of the service. |
-|  service_logo | url  | true | The URL of the service logo. |
+| enabled |  boolean  | false  | If false the service is ignored. |
+| service | string  |  false | The short name of the service. |
+| service_name | string  |  false | The long name (title) of the service. |
+| service_logo | url  | true | The URL of the service logo. |
 | scopes | string[] | false | The list of scopes under which the service will request a new access token (eg. openid,offline_access,email,profile) |
 | client_id | string  |  false | The client id as given by the issuer (eg EGI AAI) |
 | client_secret | string | false | The client secret as given by the issuer (eg EGI AAI) |
@@ -50,7 +50,7 @@ The OpenSSL encryption module has a fixed way of encrypting the information and 
 | refresh_token_expiration | integer | false | The offset in seconds to be used as the refresh token expiration date |
 | actions | string[] |  false | A list of actions descriptions that the service will be used for (eg manage VMs) |
 | allowed_referrers | string[] | true | A list of allowed domains that the service allows as source of requests (eg https://*.egi.eu) |
-|
+| account_epuid | string | true | If given then the specific service will publish and provide access tokens only for the given account epuid. This option is given primary for service accounts |
 
 
 ## Client module
@@ -71,7 +71,7 @@ If no client is valid the request will return an error.
 
 This module performs checks that a request is valid. It is used by the Client module.
 
-### BearerToken AUthorization module parameters
+### BearerToken Authorization module parameters
 
 This module checks for specific token in the HTTP header in order to report the request as valid. In case
 a list of valid ips is provided then these are also checked against the IP that the request originated from.
