@@ -132,6 +132,14 @@ class AaioidcController extends Zend_Controller_Action
      */
     private function initRequest($service = 'appdb', $uid = null) {
         if ($service) {
+            //Get the dedicate user account for the service if exists
+            $dedicatedUserEPUID = ApplicationConfiguration::service('aaioidc.service.' . $service . '.account_epuid');
+
+            //if the service is of a dedicated user account, override the given one
+            if ($dedicatedUserEPUID) {
+                $uid = $dedicatedUserEPUID;
+            }
+
             try {
                 $uid = ($uid ? $uid : $this->_uid);
                 
@@ -270,8 +278,10 @@ class AaioidcController extends Zend_Controller_Action
     public function fedcloudAction() {
         $this->serviceHandler('fedcloud');
     }
+
     /**
-     * Retrieve an access token for the given user, if any exist
+     * Retrieve an access token for the given user, if any exist.
+     * This endpoint is accessible only by configured AAI OIDC Clients.
      * 
      * @return void
      */
@@ -279,6 +289,7 @@ class AaioidcController extends Zend_Controller_Action
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender();
         $service = $this->getQueryParam('service');
+        $userExists = false;
 
         if (!$service) {
             return $this->sendResponse(403, array(
@@ -304,16 +315,28 @@ class AaioidcController extends Zend_Controller_Action
                 ));
             }
 
-            //Check if the given UID corresponds to an AppDB user
-            $researcher = $this->getResearcherByUID($requestUID);
-            if (!$researcher) {
+            //Check if the request is for a service account
+            if ($requestUID === ApplicationConfiguration::service('aaioidc.service.' . $service . '.account_epuid')) {
+                $userExists = true;
+            } else {
+                $userExists = true;
+                //Check if the given UID corresponds to an AppDB user
+                $researcher = $this->getResearcherByUID($requestUID);
+
+                if ($researcher) {
+                    $userExists = true;
+                }
+            }
+
+            //If user doesn't exsist, return with error message
+            if (!$userExists) {
                 return $this->sendResponse(404, array(
                     "result" => "error",
                     "error" => "No user found with given UID"
                 ));
             }
 
-            //Initializa an OIDC client request for the given service and user
+            //Initialize an OIDC client request for the given service and user
             $success = $this->initRequest($service, $requestUID);
 
             if ($this->_error) {
