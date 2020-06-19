@@ -138,21 +138,21 @@ class AaioidcController extends Zend_Controller_Action
                 if (!trim($uid)) {
                     $this->_error = 1000;
                     $this->_errorDescription = "invalid UID provided";
-                    return true;
+                    return false;
                 }
                 
                 $this->_client = new AAIOpenIDConnect($service, $uid);
             } catch(Exception $ex) {
                 $this->_error = 'Cannot use OIDC service';
                 $this->_errorDescription = $ex->getMessage();
-                return true;
+                return false;
             }
 
             if ($this->_client->getError()) {
                 $this->_error = $this->sanitize($this->_client->getError());
                 $this->_errorDescription = $this->sanitize($this->_client->getErrorDescription());
                 $this->_errorDetails = $this->sanitize($this->_client->getErrorDetails());
-                return true;
+                return false;
             }
 
             if ($this->_isAuthenticated && $this->_client->isEnabled() === false) {
