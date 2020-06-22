@@ -46,7 +46,8 @@ class Repository_ReleaseController extends Zend_Controller_Action {
 			($view=="html" &&  is_numeric($this->session->userid) == false ) || 
 			(is_numeric($swid) == false && is_numeric($id) == false )
 			) {
-			header("Status: 404 Not Found");
+                        header("HTTP/1.1 404 Not Found");
+                        header("Status: 404 Not Found");
 			return;
 		}
 	
@@ -64,7 +65,8 @@ class Repository_ReleaseController extends Zend_Controller_Action {
 					case RestErrorEnum::RE_ACCESS_DENIED:
 						break;
 				}
-				header("Status: 404 Not Found");
+                                header("HTTP/1.1 404 Not Found");
+                                header("Status: 404 Not Found");
 				echo $rl->getError() ;
 				return;
 			}else{
@@ -88,6 +90,7 @@ class Repository_ReleaseController extends Zend_Controller_Action {
 			$_SERVER["Repository_Enabled"] !== 'true' ||
 			is_numeric($swid) == false
 			) {
+                        header("HTTP/1.1 404 Not Found");
 			header("Status: 404 Not Found");
 			return;
 		}
@@ -115,6 +118,7 @@ class Repository_ReleaseController extends Zend_Controller_Action {
 	public function managerAction(){
 		if ( $_SERVER["Repository_Enabled"] !== 'true') {
 			$this->_helper->viewRenderer->setNoRender();
+                        header("HTTP/1.1 404 Not Found");
 			header("Status: 404 Not Found");
 			return;
 		}
@@ -195,6 +199,7 @@ class Repository_ReleaseController extends Zend_Controller_Action {
 		$userid = $this->session->userid;
 		if( is_numeric($userid) == false || $_SERVER["Repository_Enabled"] !== 'true'){
 			$this->_helper->viewRenderer->setNoRender();
+                        header("HTTP/1.1 404 Not Found");
 			header("Status: 404 Not Found");
 			return;
 		}
@@ -205,6 +210,7 @@ class Repository_ReleaseController extends Zend_Controller_Action {
 			$swname = ( ( isset($_POST["swname"]) )?$_POST["swname"]:null );
 			$repoareaid = ( ( isset($_POST["repoareaname"]) )?$_POST["repoareaname"]:null );
 			if( Repository::canManageRelease($swid,$userid) === false){
+                                header("HTTP/1.1 404 Not Found");
 				header("Status: 404 Not Found");
 				return;
 			}
@@ -270,6 +276,7 @@ class Repository_ReleaseController extends Zend_Controller_Action {
 			$this->view->type = $rtype;
 		} else {
 			$this->_helper->viewRenderer->setNoRender();
+                        header("HTTP/1.1 404 Not Found");
 			header("Status: 404 Not Found");
 			return;
 		}
@@ -279,6 +286,7 @@ class Repository_ReleaseController extends Zend_Controller_Action {
 		$this->_helper->layout->disableLayout();
 		if( is_numeric($this->session->userid) == false || $_SERVER["Repository_Enabled"] !== 'true'){
 			$this->_helper->viewRenderer->setNoRender();
+                        header("HTTP/1.1 404 Not Found");
 			header("Status: 404 Not Found");
 			return;
 		}
@@ -349,6 +357,7 @@ class Repository_ReleaseController extends Zend_Controller_Action {
 			$this->view->type = $rtype;
 		} else {
 			$this->_helper->viewRenderer->setNoRender();
+                        header("HTTP/1.1 404 Not Found");
 			header("Status: 404 Not Found");
 			return;
 		}
@@ -367,6 +376,7 @@ class Repository_ReleaseController extends Zend_Controller_Action {
 			trim($pname) == "" ||
 			Repository::canManageEntity($this->session->userid, $id, "release") == false
 			) {
+                        header("HTTP/1.1 404 Not Found");
 			header("Status: 404 Not Found");
 			echo RepositoryError::toXML("Not allowed");
 			return;
@@ -389,6 +399,7 @@ class Repository_ReleaseController extends Zend_Controller_Action {
 			$rl = new RestProductReleasePropertyItem( array("id" => $id, "name" => $name, "value" => $value));
 			$res = $rl->post();
 		} else {
+                        header("HTTP/1.1 404 Not Found");
 			header("Status: 404 Not Found");
 			echo RepositoryError::toXML("Invalid method");
 			return;
@@ -409,6 +420,7 @@ class Repository_ReleaseController extends Zend_Controller_Action {
 		$xml = '<?xml version="1.0" encoding="UTF-16" standalone="yes"?>';
 
 		if ( $errs === false ){
+                        header("HTTP/1.1 404 Not Found");
 			header("Status: 404 Not found");
 			echo "<response error='No access'>OK</response>";
 			return;
