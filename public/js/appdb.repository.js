@@ -115,8 +115,14 @@ appdb.repository.utils.CreateAjaxSingleton = function(cntx, url, data, timeout){
 					success: function(d){
 						after.call(self,d);
 					},
-					error: function(st,err){
-						after.call(self,"<respone error='"+err+"'></response>");
+					error: function(st, err, errStatus){
+						var response = errStatus || err;
+						if (st && st.responseText && $.trim(st.responseText) !== "") {
+						    response = $.trim(st.responseText);
+						} else {
+						    response = "<respone error='"+response+"'></response>"
+						}
+						after.call(self, response);
 					}
 				});
 				clearTimeout(_timer);
