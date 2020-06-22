@@ -35,7 +35,7 @@
     <xsl:template name="cast-type" >
         <xsl:param name="val" />
         <xsl:choose>
-            <xsl:when test="$castImplicitTypes=1">
+            <xsl:when test="$castImplicitTypes=3">
                 <xsl:choose>
                     <xsl:when test="$val='true'">
                         <xsl:text>true</xsl:text>
