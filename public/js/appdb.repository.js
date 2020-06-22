@@ -271,6 +271,10 @@ appdb.repository.ui.NewReleaseForm = appdb.ExtendClass(appdb.Component, "appdb.r
 							d.repoarea.error = $.isArray(d.repoarea.error)?d.repoarea.error:[d.repoarea.error];
 							rareaIndicator(false, d.repoarea.error);
 						}
+						if (!d.displayVersion && !d.repoarea) {
+							rtagIndicator(false, {value: d.error || 'An error occured'});
+							rareaIndicator(false, {value: d.error || 'An error occured'});
+						}
 					} else {
 						self.options.displayVersion = rtag;
 						self.options.parentid = 0;
