@@ -18,12 +18,43 @@
 class SamlController extends Zend_Controller_Action
 {
 
-    public function init()
-    {
-		$this->_helper->layout->disableLayout();
-        $this->session = new Zend_Session_Namespace('default');
-    }
+        public function init()
+        {
+                $this->_helper->layout->disableLayout();
+                $this->session = new Zend_Session_Namespace('default');
+                $this->getGuestUserEntitlements();
+        }
 
+        // Return configured VO membership for guest user
+        private function getGuestUserEntitlements() {
+                $result = array("contacts" => array(), "memberships" => array());
+
+                if ( ApplicationConfiguration::isProductionInstance() === FALSE ) {
+                        $userVOs = explode(';', ApplicationConfiguration::saml('guest.vos', ''));
+                        $vos = new Default_Model_VOs();
+                        $vos->filter->name->in($userVOs);
+
+                        if (count($vos->items) > 0) {
+                            foreach($vos->items as $vo) {
+                                    $result["contacts"][] = array(
+                                            "id"=> $vo->id,
+                                            "discipline"=> "Infrastructure",
+                                            "name"=> $vo->name,
+                                            "role"=> "VM OPERATOR"
+                                    );
+
+                                    $result["memberships"][] = array(
+                                            "id" => $vo->id,
+                                            "discipline"=> "Infrastructure",
+                                            "name" => $vo->name,
+                                            "role" => "VM OPERATOR"
+                                    );
+                            }
+                        }
+                }
+
+                return array("vo" => $result);
+        }
 	
 	public function logoutAction() {
 			$referer = "https://" . $_SERVER["HTTP_HOST"] . "/saml/logout";
@@ -923,6 +954,8 @@ class SamlController extends Zend_Controller_Action
                                                         // Check is SP is used for authentication in order to retrieve entitlements from appropriate sources
                                                         if (($sourceIdentifier === 'egi-aai' && !$userIsGuest) || ($sourceIdentifier === 'egi-sso-ldap' && ApplicationConfiguration::isEnviroment('production') === false)) {
                                                             $attrs['entitlements'] = array('vo' => array('contacts' => $this->getUserVOInfo($uid, 'contacts') ,'memberships' => $this->getUserVOInfo($uid, 'memberships')));
+                                                        } elseif ($userIsGuest) {
+                                                            $attrs['entitlements'] = $this->getGuestUserEntitlements();
                                                         } else {
                                                             $attrs['entitlements'] = array('vo' => array('contacts' => VoAdmin::getVOContacts($userAccount->researcherid) ,'memberships' => VoAdmin::getUserMembership($userAccount->researcherid)));
                                                         }

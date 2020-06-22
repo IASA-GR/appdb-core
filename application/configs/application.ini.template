@@ -34,6 +34,11 @@ app.voroles = 'manager,expert,deputy,shifter'
 saml.profile.allow='https://appdb.egi.eu'
 saml.egiaai.entitlements.site='administrator=Site+Administrator;Site+Security+Officer;Site+Operations+Manager;Site+Operations+Deputy+Manager'
 saml.egiaai.entitlements.vo='VO MANAGER=admin\nVM OPERATOR=vm_operator\nmember=user'
+saml.profile.allow='*'; //Domains to access the profile information
+;saml.support.sources='all'//Only allow for debuging
+saml.guest.uid='<Provide guest user's EPUID>'
+saml.guest.source='<Provide authentication source of guest user>'
+saml.guest.vos='<Provide semicolon separated VO names for guest user membership>';
 vouser_sync.mode = "zip"
 support.singlevmipolicy='<boolean: Enable single vmi policy for vappliances'
 email.enable='<boolean: Enable email service>'
