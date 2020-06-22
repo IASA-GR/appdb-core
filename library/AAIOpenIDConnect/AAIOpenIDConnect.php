@@ -176,18 +176,22 @@ class AAIOpenIDConnect {
             'response' => null
         );
 
+        debug_log('[AAIOpenIDConnect::refreshAccessToken] Getting refresh token for user '. $this->_uid);
         $refreshToken = $this->_storage->getUserRefreshToken($this->_uid);
 
         //Check if no refresh token information is stored
         if (!$refreshToken) {
+            debug_log('[AAIOpenIDConnect::refreshAccessToken] ===> Not found refresh token for user '. $this->_uid);
             $result['error'] = 'Not found';
             $result['errorDescription'] = 'No refresh token found';
             return (object) $result;
         }
 
+        debug_log('[AAIOpenIDConnect::refreshAccessToken] Validating refresh token for user '. $this->_uid);
         //Do not try to get a new access token if stored refresh token is invalid (expired etc)
         $refreshTokenValidation = $refreshToken->validate();
         if ($refreshTokenValidation !== true) {
+            debug_log('[AAIOpenIDConnect::refreshAccessToken][ERROR] Invalid stored refresh token for user '. $this->_uid);
             $result['error'] = 'Invalid refresh token.' . $refreshTokenValidation;
             $result['errorDescription'] = $refreshTokenValidation;
             return (object) $result;
@@ -200,6 +204,8 @@ class AAIOpenIDConnect {
                 $this->_clientSecret
             );
 
+            debug_log('[AAIOpenIDConnect::refreshAccessToken][SUCCESS] Found valid refresh token for user '. $this->getUserUID());
+
             if (ApplicationConfiguration::isProductionInstance() === false) {
                 //The certificate verification is disabled in development
                 $oidc->setVerifyPeer(false);
@@ -208,13 +214,14 @@ class AAIOpenIDConnect {
 
             $result['response'] = $oidc->refreshToken($refreshToken->get('token'));
             $result['userid'] = $oidc->requestUserInfo('sub');
+            // debug_log('[AAIOpenIDConnect::refreshAccessToken] Retrieved: ' . var_export($result['response'], true));
 
             if ($result['userid'] !== $this->getUserUID()) {
                 throw new Exception('The authenticated account do not match with current user information');
             }
         } catch(Exception $error) {
             $result['error'] = 'Could not refresh access token';
-            $result['errorDescription'] = $this->sanitize($error->getMessage());
+            $result['errorDescription'] = $error->getMessage();
         }
 
         return (object) $result;
@@ -230,6 +237,7 @@ class AAIOpenIDConnect {
             'errorDescription' => null
         );
 
+        debug_log('[AAIOpenIDConnect::authenticateUser] Authenticating user '. $this->_uid);
         $redirectUrl = trim($redirectUrl);
 
         if ($redirectUrl === '') {
