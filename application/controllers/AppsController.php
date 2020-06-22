@@ -1269,6 +1269,7 @@ class AppsController extends Zend_Controller_Action
 			is_numeric($uid) == false ||
 			is_numeric($id) == false 
 		){
+                        header('HTTP/1.1 404 Not Found');
 			header("Status: 404 Not Found");
 			return;
 		}
