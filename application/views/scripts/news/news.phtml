@@ -60,7 +60,11 @@
 				$fields = explode(",", $entry->fields);
 				foreach($fields as $field) {
 					$fieldarray = explode(":", $field);
-					$fieldname = trim($fieldarray[1]);
+					if (is_array($fieldarray) && count($fieldarray) > 1) {
+						$fieldname = trim($fieldarray[1]);
+					} else {
+						$fieldname = "";
+					}
 					$fieldid = $fieldarray[0];
 					$fieldstr[] = '<a href="#" onclick="appdb.views.Main.showPerson({id: '.$fieldid.'}, {mainTitle: \''.str_replace("'","\\'",$fieldname).'\'});">'.$fieldname.'</a>';
 				}				
@@ -141,9 +145,13 @@
 					$line.='A publication entitled '.$docurl.' has been updated under the <a href="#" onclick="appdb.views.Main.showApplication({id: '.$this->docs->item($entry->subjectID)->appID.'}, {mainTitle: \''.str_replace("'","\\'",$this->apps->item($this->docs->item($entry->subjectID)->appID)->name).'\'});">'.$this->apps->item($this->docs->item($entry->subjectID)->appID)->name.'</a> software</li>'; 
 				} else $line = '';
 			}
-        }  elseif ($entry->action == "delete") {
-                $line = '';
-        }
+        } elseif ($entry->action == "delete") {
+			$line = '';
+		} elseif ($entry->action == "updatevav") {
+			$line.= "A new " . ucwords($cat) . ' version has been published for <a href="#" onclick="appdb.views.Main.showApplication({id: '.$entry->subjectID.'},{mainTitle: \''.str_replace("'","\\'",$this->apps->item($entry->subjectId)->name).'\'});">'.$this->apps->item($entry->subjectId)->name.'</a><span class="newsfields">'.($entry->fields!=''?'('.$entry->fields.')':'').'</span></li>';
+		} elseif ($entry->action == "updaterel") {
+			$line.= "A new Software Release has been published for " . ucwords($cat) . '<a href="#" onclick="appdb.views.Main.showApplication({id: '.$entry->subjectID.'},{mainTitle: \''.str_replace("'","\\'",$this->apps->item($entry->subjectId)->name).'\'});">'.$this->apps->item($entry->subjectId)->name.'</a><span class="newsfields">'.($entry->fields!=''?'('.$entry->fields.')':'').'</span></li>';
+		}
 		if ( $line !== '' ) {
 			$line.="<i class='newstimestamp'>".date('Y-m-d H:i',strtotime($entry->timestamp))."</i>";
 	        $line.='</div></td></tr></table>';

@@ -9,3 +9,7 @@ Reusing software products, registered in the AppDB, means that scientists and de
 The EGI Applications Database **is open to every scientist**, interested on publishing and therefore sharing, his/her software solution. The only prerequisite, is to be owner of a valid [account](https://wiki.appdb.egi.eu/main:faq:how_to_get_access_to_the_appdb). After that, you will be able to take advantage of the authenticated write-enabled features of the AppDB service and more specific to register your [software](https://wiki.appdb.egi.eu/main:faq:how_to_register_a_software) products and [virtual appliances](https://wiki.appdb.egi.eu/main:faq:how_to_register_a_virtual_appliance).
 
 For more information, please refer to the [AppDB Wiki](https://wiki.appdb.egi.eu/start)
+
+This work is co-funded by the [EOSC-hub project](http://eosc-hub.eu/) (Horizon 2020) under Grant number 777536.
+<img src="https://wiki.eosc-hub.eu/download/attachments/1867786/eu%20logo.jpeg?version=1&modificationDate=1459256840098&api=v2" height="24">
+<img src="https://wiki.eosc-hub.eu/download/attachments/18973612/eosc-hub-web.png?version=1&modificationDate=1516099993132&api=v2" height="24">

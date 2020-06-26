@@ -113,9 +113,18 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 	$vappcount=0;
 	$appcount2=0;
 	$vappcount2=0;
+	$uappcount=0;
+	$uvappcount=0;
+	$uvappcount=0;
+	$_uappcount=0;
 	$pplcount=0;
 	$pplcount2=0;
+	$upplcount=0;
 	$doccount=0;
+	$appids=array();
+	$vappids=array();
+	$_appids=array();
+	$pplids=array();
 	if ($this->entries->count() == 0) {
 		echo "No results";
 	} else {
@@ -146,6 +155,10 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 			$l.='<td>'.$timestamp."</td>";
 			switch( $entry->subjectType ) {
 			case "app":
+				if (! in_array($entry->getSubjectGUID(), $_appids)) {
+					$_appids[] = $entry->getSubjectGUID();
+					$_uappcount++;
+				}
 				if ( $this->apps->item($entry->subjectId) !== null ) {
 					$e = $this->apps->item($entry->subjectId);
 					if( $itemType === "vapp" ){
@@ -162,11 +175,22 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 						}
 						$l.="<td >" . $appcontenttype . "</td><td >New</td><td>".elink($itemType,$e->id,$this->escape($e->name),$this->escape($e->cname))."</td>";
 						break;
+					case "updatevav":
+					case "updaterel":
+					case "insertcnt":
 					case "update":
 						if( $itemType === "vapp" ){
 							$vappcount2++;
+							if (! in_array($entry->getSubjectGUID(), $vappids)) {
+								$uvappcount++;
+								$vappids[] = $entry->getSubjectGUID();
+							}
 						}else{
 							$appcount2++;
+							if (! in_array($entry->getSubjectGUID(), $appids)) {
+								$uappcount++;
+								$appids[] = $entry->getSubjectGUID();
+							}
 						}
 						$l.="<td >" . $appcontenttype . "</td><td >Update</td><td>".elink($itemType,$e->id,$this->escape($e->name),$this->escape($e->cname))."</td>";
 						break;
@@ -184,6 +208,10 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 						break;
 					case "update":
 						$pplcount2++;
+						if (! in_array($entry->getSubjectGUID(), $pplids)) {
+							$upplcount++;
+							$pplids[] = $entry->getSubjectGUID();
+						}
 						$l.="<td >Person</td><td >Update</td><td>".elink("ppl",$e->id,$this->escape($e->firstname." ".$e->lastname), $this->escape($e->cname))."</td>";
 						break; 
 					default: $e=null; break;
@@ -222,7 +250,7 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 			}
 
 			if( $appcount2 > 0 ){
-				echo "$appcount2 updated software item" . (($appcount2>1)?"s":"") . "<br/>";
+				echo "$appcount2 software item update" . (($appcount2>1)?"s":"") . " ($uappcount unique in selected period)<br/>";
 			}else{
 				echo "No software has been updated<br/>";
 			}
@@ -236,12 +264,23 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 			}
 
 			if( $vappcount2 > 0 ){
-				echo "$vappcount2 updated virtual appliance" . (($vappcount2>1)?"s":"") . "<br/>";
+				echo "$vappcount2 virtual appliance update" . (($vappcount2>1)?"s":"") . " ($uvappcount unique in selected period)<br/>";
 			}else{
 				echo "No virtual appliance has been updated<br/>";
 			}
 			echo "<br/>";
 		}
+
+		if (trim($this->filter) === "") {
+			if ($_uappcount > 0) {
+				echo "$_uappcount SW / VA unique insertions / updates in requested period";
+			} else {
+				echo "$No SW / VA insertions / updates in requested period";
+			}
+			echo "<br/>";
+			echo "<br/>";
+		}
+
 		if(trim($this->filter) === "ppl" || trim($this->filter) === ""){
 			if( $pplcount > 0 ){
 				echo "$pplcount new people profile" . (($pplcount>1)?"s have":" has") . " been registered<br/>";
@@ -250,9 +289,9 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 			}
 
 			if( $pplcount2 > 0 ){
-				echo "$pplcount2 updated person profile" . (($pplcount2>1)?"s":"") . "<br/>";
+				echo "$pplcount2 person profile update" . (($pplcount2>1)?"s":"") . " ($upplcount unique in selected period)<br/>";
 			}else{
-				echo "No person profile has updated<br/>";
+				echo "No person profile has been updated<br/>";
 			}
 			echo "<br/>";
 		}
