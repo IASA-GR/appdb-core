@@ -16701,6 +16701,64 @@ appdb.views.VoSecantReport = appdb.ExtendClass(appdb.View, "appdb.views.VoSecant
 }, {
     popup: null
 });
+
+appdb.views.VOEndorsementReport = appdb.ExtendClass(appdb.View, "appdb.views.VOEndorsementReport", function(o) {
+	this.options = {
+		container: $(o.container),
+		parent: o.parent || null
+	};
+
+	this.render = function(data) {
+		data = data || {};
+
+		$(this.dom).find('.endorsement.badge').remove();
+
+		if (!data.id) {
+			return null;
+		}
+
+		var report = (data.endorsements || []).reduce(function(acc, e) {
+			acc[e.scope] = parseInt(e.count)
+			acc.totalCount += acc[e.scope];
+
+			return acc;
+		}, {totalCount: 0});
+
+		if (report.totalCount === 0) {
+			return null;
+		}
+
+		var targetHref = appdb.config.endpoint.dashboard + 'endorsements/targetDetails/' + data.id;
+		var badge = $('<a class="endorsement secant badge success" title="" target="_blank"><span class="header">ENDORSED BY</span><span class="status"></span></a>');
+		var userText = 'user' + ((report.totalCount > 1) ? 's' : '');
+		var overallText = 'user' + ((report.overall > 1) ? 's' : '');
+		var securityText = 'security officer' + ((report.security > 1) ? 's' : '');
+		var title = '';
+
+		if (report.security > 0) {
+			title += report.security + ' ' + securityText;
+		}
+
+		if (report.overall > 0) {
+			title = title ? ' and ' :  '';
+			title += report.overall + ' ' + overallText;
+		}
+
+		title = 'This version is endorsed by ' + title + '. Click to view endorsement details';
+
+		$(badge).attr('href', targetHref);
+		$(badge).attr('title', title);
+		$(badge).find('.status').text(report.totalCount + ' ' + userText);
+
+		$(this.dom).append(badge);
+	};
+	this._init = function() {
+		this.dom = $(this.options.container);
+		this.parent = this.options.parent;
+	};
+	this._init();
+});
+
 appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImageListItem", function(o) {
 	this.options = {
 		container: $(o.container),
@@ -16834,6 +16892,8 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 		if (this.options.data.secant && this.options.data.secant.length > 0) {
 		    this.renderSecant(this.options.data);
 		}
+
+		this.renderEndorsements(this.options.data);
 	};
 	this.getUsedImageExpirationDate = function() {
 		if (this.options && this.options.data && this.options.data.data && this.options.data.data.voimagelist && this.options.data.data.voimagelist.images && this.options.data.data.voimagelist.images.length > 0 && this.options.data.data.voimagelist.images[0] && $.trim(this.options.data.data.voimagelist.images[0].expireson)) {
@@ -16895,7 +16955,7 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 		    var vappliance = (data.data || {}).appliance || {};
 		    if (vowideimagelist.isPublished === false && voimagelistimages.length === 0) {
 			    $.each(secants, function(i, s) {
-				    if (vappliance.versionid === s.vaversion_id) {
+				    if ($.trim(vappliance.versionid) === $.trim(s.vaversion_id)) {
 					    currentSecant = s;
 				    }
 			    });
@@ -16970,6 +17030,24 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 			}
 		}
 		this.renderCurrentSecant(data);
+	};
+	this.renderEndorsements = function (data) {
+	    this.renderCurrentEndorsements(data);
+	};
+	this.renderCurrentEndorsements = function(data) {
+		data = (data || this.options.data || {});
+
+		var endorsements = ((data || {}).data || {}).endorsements || {};
+
+		if (endorsements.id) {
+			var dom = $(this.dom).find("td[data-name='name'] .customcellwrap");
+			var voendorsements = new appdb.views.VOEndorsementReport({
+				container: $(dom),
+				parent: this
+			});
+
+			voendorsements.render(endorsements);
+		}
 	};
 	this.isAdded = function() {
 		return (this.getStateData().isAdded || false) && (this.getStateData().isPublished === false);

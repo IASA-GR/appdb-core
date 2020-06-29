@@ -26,13 +26,14 @@ appdb.config = {
 		maxnetfilters: '<?php echo $apiconf->maxnetfilters; ?>'
 	},
         endpoint : {
-                base : '<?php echo ApplicationConfiguration::uiUrl();?>',
+		base : '<?php echo ApplicationConfiguration::uiUrl();?>',
 		baseapi : '<?php echo ApplicationConfiguration::apiUrl(true);?>',
 		proxyapi: '<?php echo ApplicationConfiguration::url('/api/proxy');?>', 
 		vmcaster: '<?php echo $appconf->vmcasterUrl; ?>/',
+		dashboard: '<?php echo $appconf->dashboardUrl; ?>',
 		wiki: 'https://wiki.appdb.egi.eu/',
 		drafts: '<?php echo ApplicationConfiguration::url('/storage/drafts/');?>',
-                hdl: 'http://hdl.handle.net/'
+		hdl: 'http://hdl.handle.net/'
         },
 	authBackend: "<?php echo ( (trim($appconf->authbackend) !== '')?strtolower(trim($appconf->authbackend)):""); ?>",
         images : {
