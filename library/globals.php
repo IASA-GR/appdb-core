@@ -8689,6 +8689,50 @@ class SamlAuth{
 				break;
 		}
 	}
+
+        //In case of local guest user is configured for development instance
+        //setup the session for proxy rest api interaction.
+        public function setupLocalGuestAccount($session, $user) {
+                if ( ApplicationConfiguration::isProductionInstance() ) {
+                        return null;
+                }
+
+                if ( $session->userIsGuest !== true || is_null($user) === true) {
+                        return null;
+                }
+
+                try {
+                        $usercreds = new Default_Model_UserCredentials();
+                        $f1 = new Default_Model_UserCredentialsFilter();
+                        $f2 = new Default_Model_UserCredentialsFilter();
+                        $f1->researcherid->eq($user->id);
+                        $f2->token->eq($user->guid);
+                        $f1->researcherID->numequals(intval($user->id));
+                        $f2->token->equals($user->guid);
+                        $usercreds->filter->chain($f1, "AND");
+                        $usercreds->filter->chain($f2, "AND");
+
+                        if (count($usercreds->items) > 0) {
+                                $c = 0;
+                                foreach($usercreds->items as $item) {
+                                        debug_log('Removing user credential with ID: ' . $item->id);
+                                        $usercreds->remove($item);
+                                }
+                        }
+
+                        $usercred = new Default_Model_UserCredential();
+                        $usercred->researcherid = $user->id;
+                        $usercred->sessionid = session_id();
+                        $usercred->token = 'DEVTOKEN_' . $user->guid;
+
+                        $usercred->save();
+
+                        setcookie('SimpleSAMLAuthToken', $usercred->token, time()+60*60*24*30 , '/', 'iasa.gr' , true, true);
+                } catch (Exception $ex) {
+                        error_log('Could not save Local Guest User credentials' . var_export($ex, true));
+                }
+        }
+
 	//Helper function to create entitlement role mappings
 	//based on appdb ini configuration file
 	public static function getEGIAAIRoleMappings($key) {
@@ -8999,6 +9043,7 @@ class SamlAuth{
 
 		//Check if user account is blocked and updates session
 		self::setupUserAccountStatus($session, $useraccount);
+                self::setupLocalGuestAccount($session, $user, $useraccount);
 
 		$session->authSource = $source;
 		$session->authUid = $uid;
