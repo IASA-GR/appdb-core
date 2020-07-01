@@ -17012,7 +17012,7 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 	this.renderSecant = function(data) {
 		data = data || {};
 		if (this.shouldRenderSecantLatestVersion(data)) {
-			var dom = $(this.dom).find("td[data-name='newversion'] .securitycheck .value");
+			var dom = $(this.dom).find("td[data-name='newversion'] .customcellwrap");
 			var secant = new appdb.views.VoSecantReport({
 				container: $(dom),
 				parent: this,
@@ -17032,6 +17032,16 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 		this.renderCurrentSecant(data);
 	};
 	this.renderEndorsements = function (data) {
+	    data = data || {};
+	    if (data.newversion === true && ((data.data || {}).endorsements || {}).id) {
+		    var dom = $(this.dom).find("td[data-name='newversion'] .customcellwrap");
+		    var voendorsements = new appdb.views.VOEndorsementReport({
+			    container: $(dom),
+			    parent: this
+		    });
+
+		    voendorsements.render(data.data.endorsements);
+	    }
 	    this.renderCurrentEndorsements(data);
 	};
 	this.renderCurrentEndorsements = function(data) {
@@ -17039,7 +17049,20 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 
 		var endorsements = ((data || {}).data || {}).endorsements || {};
 
-		if (endorsements.id) {
+		if (data.newversion && data.data && data.data.voimagelist && data.data.voimagelist.images && data.data.voimagelist.images.length) {
+			$.each(data.data.voimagelist.images, function(index, image) {
+			    if (image.endorsements) {
+				var vid = image.endorsements.source.id;
+				var dom = $(this.dom).find("td[data-name='name'] .customcellwrap .vappinfo[data-versionid='" + vid + "']").parent();
+				var voendorsements = new appdb.views.VOEndorsementReport({
+					container: $(dom),
+					parent: this
+				});
+
+				voendorsements.render(image.endorsements);
+			    }
+			}.bind(this));
+		} else if (endorsements.id) {
 			var dom = $(this.dom).find("td[data-name='name'] .customcellwrap");
 			var voendorsements = new appdb.views.VOEndorsementReport({
 				container: $(dom),
@@ -17237,14 +17260,16 @@ appdb.views.VoImageListItemCell.VapplianceInfo = function(dom, row, col, data) {
 			var prevversion = $("<div class='prevversion fieldvalue'><div class='field'>Used version</div><div class='seperator'>:</div><div class='value'></div></div>");
 
 			var prevval = [];
+			var currentVersionId = '';
 			for (var o in d.voimagelist.previousVersions) {
 				if (d.voimagelist.previousVersions.hasOwnProperty(o) === false)
 					continue;
 				prevval.push("<a href='" + appdb.config.endpoint.base + "store/vappliance/" + d.cname + "/vaversion/previous/" + o + "' title='View virtual appliance published version in new window' target='_blank' class='icontext'><span>" + d.voimagelist.previousVersions[o] + "</span></a>");
+				currentVersionId = o;
 			}
 			$(prevversion).find(".value").html(prevval.join("<span class='seperator'>,</span>"));
 			$(html).append(prevversion);
-			
+			$(html).attr('data-versionid', currentVersionId);
 			$.each(d.voimagelist.images,  function(index, value) {
 				if (d.voimagelist.previousVersions.hasOwnProperty(parseInt(value.va_versionid))) {
 					currentVersionExpirationDate = value.expireson;
@@ -17468,30 +17493,28 @@ appdb.views.VoImageListItemCell.NewVersionInfo = function(dom, row, col, data) {
 	var html = $("<div class='newversion vappinfo'></div>");
 	var newversion = data.newversiondata || null;
 	if (newversion) {
-	    var version = $("<div class='version fieldvalue'><div class='field'>New version</div><div class='seperator'>:</div><div class='value icontext warningmessage'></div></div>");
-	    var verlink = $("<a href='' title='View virtual appliance latest version in new window' target='_blank' class='icontext'><span></span></a>");
-	    var created =$("<div class='createdon fieldvalue'><div class='field'>Created on</div><div class='seperator'>:</div><div class='value'></div></div>");
-	    var expiration = $("<div class='expireson fieldvalue'><div class='field'>Expires in</div><div class='seperator'>:</div><div class='value'></div></div>");
-	    var securityCheck = $("<div class='securitycheck fieldvalue'><div class='value'></div></div>");
-	    
-	    $(verlink).attr('href', newversion.url);
-	    $(verlink).children('span').text(newversion.version);
-	    $(version).find('.value').append(verlink);
-	    
-	    if (newversion.expired === true) {
-		$(expiration).find('.field').remove();
-		$(expiration).find('.seperator').remove();
-		$(expiration).find('.value').append('<div class="expireson fieldvalue hasexpired"><div class="field">Expired since</div><div class="seperator">:</div><div class="value">' + newversion.expireson + '</div></div>');
-	    } else {
-		$(expiration).find('.value').append(appdb.vappliance.utils.getLexicalDateDiff(newversion.expireson) + ' ('  + newversion.expireson + ')');
-	    }
-	    
-	    $(created).find('.value').text(newversion.createdon);
-	    
-	    $(html).append(version);
-	    $(html).append(created);
-	    $(html).append(expiration);
-	    $(html).append(securityCheck);
+		var version = $("<div class='version fieldvalue'><div class='field'>New version</div><div class='seperator'>:</div><div class='value icontext warningmessage'></div></div>");
+		var verlink = $("<a href='' title='View virtual appliance latest version in new window' target='_blank' class='icontext'><span></span></a>");
+		var created =$("<div class='createdon fieldvalue'><div class='field'>Created on</div><div class='seperator'>:</div><div class='value'></div></div>");
+		var expiration = $("<div class='expireson fieldvalue'><div class='field'>Expires in</div><div class='seperator'>:</div><div class='value'></div></div>");
+
+		$(verlink).attr('href', newversion.url);
+		$(verlink).children('span').text(newversion.version);
+		$(version).find('.value').append(verlink);
+
+		if (newversion.expired === true) {
+		    $(expiration).find('.field').remove();
+		    $(expiration).find('.seperator').remove();
+		    $(expiration).find('.value').append('<div class="expireson fieldvalue hasexpired"><div class="field">Expired since</div><div class="seperator">:</div><div class="value">' + newversion.expireson + '</div></div>');
+		} else {
+		    $(expiration).find('.value').append(appdb.vappliance.utils.getLexicalDateDiff(newversion.expireson) + ' ('  + newversion.expireson + ')');
+		}
+
+		$(created).find('.value').text(newversion.createdon);
+
+		$(html).append(version);
+		$(html).append(created);
+		$(html).append(expiration);
 	}
 	return $(html);
 };
@@ -17871,7 +17894,8 @@ appdb.views.VoImageList = appdb.ExtendClass(appdb.View, "appdb.views.VoImageList
 					expired: ['true', true].indexOf(e.appliance.expired) > -1,
 					expireson: (e.appliance.expiresOn || '').split('T')[0] || '',
 					createdon: (e.appliance.createdOn || '').split('T')[0] || '',
-					url: appdb.config.endpoint.base + 'store/vappliance/' + e.cname + '/vaversion/latest'
+					url: appdb.config.endpoint.base + 'store/vappliance/' + e.cname + '/vaversion/latest',
+					endorsements: e.endorsements || {}
 				};
 			} else {
 				row.newversion = false;

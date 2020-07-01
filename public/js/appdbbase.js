@@ -9379,7 +9379,14 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 
 		var versionid = '' + ((entry.appliance || {}).versionid || '');
 		if (endorsementReports[versionid] && endorsementReports[versionid].endorsements && endorsementReports[versionid].endorsements.length) {
-		    entry.endorsements = Object.assign({}, endorsementReports[versionid]);
+			entry.endorsements = Object.assign({}, endorsementReports[versionid]);
+		}
+
+		if (entry.voimagelist && entry.voimagelist.images.length > 0) {
+			entry.voimagelist.images = entry.voimagelist.images.map(function(img) {
+				img.endorsements = endorsementReports[img.va_versionid] || null;
+				return img;
+			});
 		}
 
 		return entry;
