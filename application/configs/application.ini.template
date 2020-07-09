@@ -48,6 +48,7 @@ email.smtp.port=465
 email.smtp.auth='PLAIN'
 email.list.ucst='mail1;mail2'
 email.list.debug='devmail1;devmail2'
+email.list.excluded='invalid@email.com;doesnotexist@email.com'
 service.egi.ldap.host='<EGI LDAP Host domain>'
 service.egi.ldap.username='<EGI LDAP username>'
 service.egi.ldap.password='<EGI LDAP password>'

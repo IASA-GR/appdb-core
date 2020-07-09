@@ -1477,45 +1477,47 @@ function sendMail($subject, $to, $body = '', $username, $password) {
 }
 
 function sendMultipartMail($subject, $to, $txtbody='', $htmlbody='', $username, $password, $replyto = false, $attachment = null, $cc=false, $ext = null) {
-		error_log("[sendMultipartMail] Subject: $subject, To: " . var_export($to, true) . "CC: " . var_export($cc, true));
-		if ( ApplicationConfiguration::isProductionInstance() === FALSE ) return;
+	error_log("[sendMultipartMail] Subject: $subject, To: " . var_export($to, true) . "CC: " . var_export($cc, true));
+	if ( ApplicationConfiguration::isProductionInstance() === FALSE ) return;
 
-		$message = new Mail_mime();
-		$message->setTXTBody($txtbody);
+	$message = new Mail_mime();
+	$message->setTXTBody($txtbody);
         $message->setHTMLBody($htmlbody);
-        if ( $attachment !== null ) {
+
+	if ( $attachment !== null ) {
             if ( isset($attachment['data']) ) {
                 if ( isset($attachment['type']) ) $type = $attachment['type']; else $type='application/octem-stream';
                 if ( isset($attachment['name']) ) $name = $attachment['name']; else $name='attachment.dat';
                 $message->addAttachment($attachment['data'], $type, $name, false);
             }
         }
-		$body = $message->get();
-		$recipients = array();
-		$extheaders = array('From' => $username, 'Subject' => $subject, 'Date' => date("r"));
-		if( is_array($ext) && isset($ext["From"]) ){
-			$extheaders["From"] = $ext["From"];
+
+	$body = $message->get();
+	$recipients = array();
+	$extheaders = array('From' => $username, 'Subject' => $subject, 'Date' => date("r"));
+	if( is_array($ext) && isset($ext["From"]) ){
+		$extheaders["From"] = $ext["From"];
+	}
+	if( is_array($ext) && isset($ext["Precedence"]) ){
+		$extheaders["Precedence"] = $ext["Precedence"];
+	}
+	if($replyto!==false && trim($replyto)!=''){
+		$extheaders["Reply-To"] = $replyto;
+		$extheaders["Bcc"] = $replyto;
+		$recipients[] = $replyto;
+		$headers["Bcc"] = $replyto;
+	}
+	if( $cc!==false && $cc !== null && is_numeric($cc) == false ) {
+		if(is_array($cc) && count($cc)>0){
+			$extCc = implode(",", $cc);
+			$extheaders["Cc"] = $extCc;
+			$recipients = array_merge($recipients,$cc);
+		} else if(trim($cc) !== ""){
+			$extheaders["Cc"] = $cc;
+			$recipients[] = $cc;
 		}
-		if( is_array($ext) && isset($ext["Precedence"]) ){
-			$extheaders["Precedence"] = $ext["Precedence"];
-		}
-		if($replyto!==false && trim($replyto)!=''){
-			$extheaders["Reply-To"] = $replyto;
-			$extheaders["Bcc"] = $replyto;
-            $recipients[] = $replyto;
-			$headers["Bcc"] = $replyto;
-		}
-		if( $cc!==false && $cc !== null && is_numeric($cc) == false ) {
-			if(is_array($cc) && count($cc)>0){
-				$extCc = implode(",", $cc);
-				$extheaders["Cc"] = $extCc;
-				$recipients = array_merge($recipients,$cc);
-			} else if(trim($cc) !== ""){
-				$extheaders["Cc"] = $cc;
-				$recipients[] = $cc;
-			}
-		}
-	        $headers = $message->headers($extheaders);
+	}
+	$headers = $message->headers($extheaders);
 
         if ( is_array( $to ) ) {
             foreach( $to as $_to ) {
@@ -1528,26 +1530,32 @@ function sendMultipartMail($subject, $to, $txtbody='', $htmlbody='', $username, 
         $params['auth'] = EmailConfiguration::getSmtpAuth();
         $params['username'] = $username;
         $params['password'] = $password;
-		
 
         // Create the mail object using the Mail::factory method
         $mail_object = Mail::factory('smtp', $params);
-		// Split mail sending operations in bunches of 10 recipients at a time
-		$rec = array();
-		$recipients2 = array_unique($recipients);
-		$recipients = array();
-		foreach($recipients2 as $recipient) {
-				$recipients[] = $recipient;
-		}    
-		error_log("sendMultipartMail recipients: " . var_export($recipients, true));
-		for($i=0; $i<count($recipients); $i++) {
-			$rec[] = $recipients[$i];
-			if ((($i % 10) === 0) && ($i > 0)) {
-		        $mail_object->send($rec, $headers, $body);
-				$rec = array();
-			} 
+	// Split mail sending operations in bunches of 10 recipients at a time
+	$rec = array();
+	// Get excluded email recipients from configuration
+	$excluded = EmailConfiguration::getList('excluded');
+	$recipients2 = array_unique($recipients);
+	$recipients = array();
+
+	foreach($recipients2 as $recipient) {
+	    if (!in_array($recipient, $excluded)) {
+		$recipients[] = $recipient;
+	    }
+	}
+
+	error_log("sendMultipartMail recipients: " . var_export($recipients, true));
+
+	for($i=0; $i<count($recipients); $i++) {
+		$rec[] = $recipients[$i];
+		if ((($i % 10) === 0) && ($i > 0)) {
+		$mail_object->send($rec, $headers, $body);
+			$rec = array();
 		}
-		if ( count($rec) > 0 ) $mail_object->send($rec, $headers, $body);
+	}
+	if ( count($rec) > 0 ) $mail_object->send($rec, $headers, $body);
 }
 
 
