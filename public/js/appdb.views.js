@@ -16890,7 +16890,7 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 		}
 
 		if (this.options.data.secant && this.options.data.secant.length > 0) {
-		    this.renderSecant(this.options.data);
+			this.renderSecant(this.options.data);
 		}
 
 		this.renderEndorsements(this.options.data);
@@ -17012,7 +17012,7 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 	this.renderSecant = function(data) {
 		data = data || {};
 		if (this.shouldRenderSecantLatestVersion(data)) {
-			var dom = $(this.dom).find("td[data-name='newversion'] .customcellwrap");
+			var dom = $(this.dom).find("td[data-name='newversion'] > .customcellwrap > .newversion[data-version]").parent();
 			var secant = new appdb.views.VoSecantReport({
 				container: $(dom),
 				parent: this,
@@ -17032,44 +17032,48 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 		this.renderCurrentSecant(data);
 	};
 	this.renderEndorsements = function (data) {
-	    data = data || {};
-	    if (data.newversion === true && ((data.data || {}).endorsements || {}).id) {
-		    var dom = $(this.dom).find("td[data-name='newversion'] .customcellwrap");
-		    var voendorsements = new appdb.views.VOEndorsementReport({
-			    container: $(dom),
-			    parent: this
-		    });
+		if (appdb.config.features.endorsements.voimagelist) {
+		    data = data || {};
+		    if (data.newversion === true && ((data.data || {}).endorsements || {}).id) {
+			    var dom = $(this.dom).find("td[data-name='newversion'] > .customcellwrap > .newversion[data-version]").parent();
+			    var voendorsements = new appdb.views.VOEndorsementReport({
+				    container: $(dom),
+				    parent: this
+			    });
 
-		    voendorsements.render(data.data.endorsements);
-	    }
-	    this.renderCurrentEndorsements(data);
+			    voendorsements.render(data.data.endorsements);
+		    }
+		    this.renderCurrentEndorsements(data);
+		}
 	};
 	this.renderCurrentEndorsements = function(data) {
-		data = (data || this.options.data || {});
+		if (appdb.config.features.endorsements.voimagelist) {
+			data = (data || this.options.data || {});
 
-		var endorsements = ((data || {}).data || {}).endorsements || {};
+			var endorsements = ((data || {}).data || {}).endorsements || {};
 
-		if (data.newversion && data.data && data.data.voimagelist && data.data.voimagelist.images && data.data.voimagelist.images.length) {
-			$.each(data.data.voimagelist.images, function(index, image) {
-			    if (image.endorsements) {
-				var vid = image.endorsements.source.id;
-				var dom = $(this.dom).find("td[data-name='name'] .customcellwrap .vappinfo[data-versionid='" + vid + "']").parent();
+			if (data.newversion && data.data && data.data.voimagelist && data.data.voimagelist.images && data.data.voimagelist.images.length) {
+				$.each(data.data.voimagelist.images, function(index, image) {
+				    if (image.endorsements) {
+					var vid = image.endorsements.source.id;
+					var dom = $(this.dom).find("td[data-name='name'] .customcellwrap .vappinfo[data-versionid='" + vid + "']").parent();
+					var voendorsements = new appdb.views.VOEndorsementReport({
+						container: $(dom),
+						parent: this
+					});
+
+					voendorsements.render(image.endorsements);
+				    }
+				}.bind(this));
+			} else if (endorsements.id) {
+				var dom = $(this.dom).find("td[data-name='name'] .customcellwrap");
 				var voendorsements = new appdb.views.VOEndorsementReport({
 					container: $(dom),
 					parent: this
 				});
 
-				voendorsements.render(image.endorsements);
-			    }
-			}.bind(this));
-		} else if (endorsements.id) {
-			var dom = $(this.dom).find("td[data-name='name'] .customcellwrap");
-			var voendorsements = new appdb.views.VOEndorsementReport({
-				container: $(dom),
-				parent: this
-			});
-
-			voendorsements.render(endorsements);
+				voendorsements.render(endorsements);
+			}
 		}
 	};
 	this.isAdded = function() {
@@ -17490,7 +17494,7 @@ appdb.views.VoImageListItemCell.ActionList = function(dom, row, col, data) {
 	return $(html);
 };
 appdb.views.VoImageListItemCell.NewVersionInfo = function(dom, row, col, data) {
-	var html = $("<div class='newversion vappinfo'></div>");
+	var html = $("<div class='newversion vappinfo'></div>");;
 	var newversion = data.newversiondata || null;
 	if (newversion) {
 		var version = $("<div class='version fieldvalue'><div class='field'>New version</div><div class='seperator'>:</div><div class='value icontext warningmessage'></div></div>");
@@ -17515,6 +17519,7 @@ appdb.views.VoImageListItemCell.NewVersionInfo = function(dom, row, col, data) {
 		$(html).append(version);
 		$(html).append(created);
 		$(html).append(expiration);
+		$(html).attr('data-version', newversion.version);
 	}
 	return $(html);
 };

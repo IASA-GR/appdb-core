@@ -9205,6 +9205,7 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 		}.bind(this));
 	};
 	this.loadEndorsementReports = function(callback) {
+	    if (appdb.config.features.endorsements.voimagelist) {
 		$.get(appdb.config.endpoint.dashboard + 'api/endorsements/reports/vappliance_versions').done(function(data) {
 			this.options.endorsements = (data || []).reduce(function (acc, d) {
 				acc['' + d.source.id] = d;
@@ -9216,6 +9217,10 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 			this.options.endorsements = {};
 			callback.apply(this);
 		}.bind(this));
+	    } else {
+		this.options.endorsements = {};
+		callback.apply(this);
+	    }
 	};
 	//Update available vappliance data with related vo image list information
 	this.mergeDraftToAvailableVApps = function(){
@@ -9360,6 +9365,7 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 		return entry;
 	};
 	this.getEndorsementReportsForVappliance = function(vappid, endorsementReports) {
+	    if (appdb.config.features.endorsements.voimagelist) {
 		var entry = null;
 		if (vappid && vappid.id) {
 			entry = vappid;
@@ -9386,6 +9392,9 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 		}
 
 		return entry;
+	    } else {
+		return vappid;
+	    }
 	};
 	//Create vapp property with grouped images based on the vappliance container
 	this.groupVApps = function(imagelist){

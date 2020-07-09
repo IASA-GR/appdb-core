@@ -42,6 +42,7 @@ saml.guest.source='<Provide authentication source of guest user>'
 saml.guest.vos='<Provide semicolon separated VO names for guest user membership>';
 vouser_sync.mode = "zip"
 support.singlevmipolicy='<boolean: Enable single vmi policy for vappliances'
+support.endorsements.voimagelist='<boolean: Enable fetching VM version endorsements in VO image list editor>'
 email.enable='<boolean: Enable email service>'
 email.accounts.support.address='<AppDB support email address>'
 email.accounts.support.password='<AppDB support email password>'
