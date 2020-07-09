@@ -37,6 +37,7 @@ saml.egiaai.entitlements.site='administrator=Site+Administrator;Site+Security+Of
 saml.egiaai.entitlements.vo='VO MANAGER=admin\nVM OPERATOR=vm_operator\nmember=user'
 vouser_sync.mode = "zip"
 support.singlevmipolicy='<boolean: Enable single vmi policy for vappliances'
+support.endorsements.voimagelist='<boolean: Enable fetching VM version endorsements in VO image list editor>'
 email.enable='<boolean: Enable email service>'
 email.accounts.support.address='<AppDB support email address>'
 email.accounts.support.password='<AppDB support email password>'
