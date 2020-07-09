@@ -9196,14 +9196,27 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 		this.mergeDraftToAvailableVApps();
 	};
 	this.loadSecantReports = function(callback) {
-	    $.get(appdb.config.endpoint.base + "vo/secantreport", {id: this.options.id, format: 'js'}).done(function(data) {
-		this.options.secant = (((data || {}).result || {}).report || []);
-		callback.apply(this);
-	    }.bind(this)).fail(function(err) {
-		this.options.secant = [];
-		callback.apply(this);
-	    }.bind(this));
-	}
+		$.get(appdb.config.endpoint.base + "vo/secantreport", {id: this.options.id, format: 'js'}).done(function(data) {
+			this.options.secant = (((data || {}).result || {}).report || []);
+			callback.apply(this);
+		}.bind(this)).fail(function(err) {
+			this.options.secant = [];
+			callback.apply(this);
+		}.bind(this));
+	};
+	this.loadEndorsementReports = function(callback) {
+		$.get(appdb.config.endpoint.dashboard + 'api/endorsements/reports/vappliance_versions').done(function(data) {
+			this.options.endorsements = (data || []).reduce(function (acc, d) {
+				acc['' + d.source.id] = d;
+				return acc;
+			}, {});
+			callback.apply(this);
+		}.bind(this)).fail(function(err, a,b ) {
+			console.log('Could not load endorsement reports from dashboard' , err);
+			this.options.endorsements = {};
+			callback.apply(this);
+		}.bind(this));
+	};
 	//Update available vappliance data with related vo image list information
 	this.mergeDraftToAvailableVApps = function(){
 		var draft = this.getDraftImageList();
@@ -9221,7 +9234,8 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 		
 		var res = [];
 		var secantReports = this.options.secant || [];
-		
+		var endrosementReports = this.options.endorsements || {};
+
 		$.each(vapps, function(i, e){
 			var curid = $.trim(e.id);
 			var da = draft.vapps[curid];
@@ -9303,7 +9317,7 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 				e.voimagelist.previousVersions = previousversions;
 			}
 			e = this.getSecantReportsForVAppliance(e, secantReports);
-
+			e = this.getEndorsementReportsForVappliance(e, endrosementReports);
 			res.push(e);
 		}.bind(this));
 		this.options.vapps = res;
@@ -9329,7 +9343,7 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 			if (typeof r.vmiinstance_archived === 'string') {
 			    r.vmiinstance_archived = (r.vmiinstance_archived  === 'true') ? true : false;
 			}
-			if (r.app_id === $.trim(entry.id)) {
+			if ($.trim(r.app_id) === $.trim(entry.id)) {
 			    if (!r.vaversion_type) {
 				    r.vaversion_type = (r.vmiinstance_archived) ? 'previous' : 'latest';
 			    }
@@ -9342,6 +9356,34 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 		 });
 
 		this.addSecantWatcher(entry);
+
+		return entry;
+	};
+	this.getEndorsementReportsForVappliance = function(vappid, endorsementReports) {
+		var entry = null;
+		if (vappid && vappid.id) {
+			entry = vappid;
+		} else {
+			$.each(this.options.vapps || [], function(i, e) {
+			    if (!entry && $.trim(e.id) === $.trim(vappid)) {
+				entry = e;
+			    }
+			});
+		}
+
+		if (!entry) return [];
+
+		var versionid = '' + ((entry.appliance || {}).versionid || '');
+		if (endorsementReports[versionid] && endorsementReports[versionid].endorsements && endorsementReports[versionid].endorsements.length) {
+			entry.endorsements = Object.assign({}, endorsementReports[versionid]);
+		}
+
+		if (entry.voimagelist && entry.voimagelist.images.length > 0) {
+			entry.voimagelist.images = entry.voimagelist.images.map(function(img) {
+				img.endorsements = endorsementReports[img.va_versionid] || null;
+				return img;
+			});
+		}
 
 		return entry;
 	};
@@ -9582,8 +9624,10 @@ appdb.components.VoImageListManager = appdb.ExtendClass(appdb.Component, "appdb.
 				appdb.model.StaticList.SwapplianceReport = self.options.swapps;
 				appdb.model.StaticList.SwapplianceReportUnique = self.getAllAvailableSWAppliances(self.options.swapps);
 				self.loadSecantReports(function(data) {
-					self.extractVApps();
-					this.render();
+					self.loadEndorsementReports(function(data) {
+						self.extractVApps();
+						this.render();
+					})
 				});
 			};
 		})(this));

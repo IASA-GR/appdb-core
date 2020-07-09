@@ -24876,8 +24876,8 @@ a.helperlink.wikilink:hover{
     max-width: 224px;
 }
 .voimagelistcontainer td.customcell[data-name='name'] > .customcellwrap > .secant.badge {
-    position: absolute;
-    margin: 0 -5px 0 -5px;
+    position: relative;
+    margin: 3px -5px 0 -5px;
     bottom: 5px;
 }
 .voimagelistcontainer td.customcell > .customcellwrap .secant.badge {
@@ -25047,6 +25047,8 @@ a.helperlink.wikilink:hover{
     color: #555 !important;
     border: 1px solid #c5c5c5;
     border-right: none;
+    display: inlin-block;
+    width: 90px;
 }
 .secant.badge > span:last-child {
     border-radius: 0px 2px 2px 0px;
