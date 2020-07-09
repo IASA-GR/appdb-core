@@ -190,11 +190,11 @@ class EmailConfiguration {
 			return array();
 		}
 		
-		if( strpos(';',$recipients) !== FALSE )
+		if( strpos($recipients, ';') !== FALSE )
 		{
 			$recipients = explode(';', $recipients);
 		}
-		else if( strpos(',', $recipients) !== FALSE )
+		else if( strpos($recipients, ',') !== FALSE )
 		{
 			$recipients = explode(',', $recipients);
 		}
