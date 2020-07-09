@@ -17012,7 +17012,7 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 	this.renderSecant = function(data) {
 		data = data || {};
 		if (this.shouldRenderSecantLatestVersion(data)) {
-			var dom = $(this.dom).find("td[data-name='newversion'] .customcellwrap");
+			var dom = $(this.dom).find("td[data-name='newversion'] > .customcellwrap > .newversion[data-version]").parent();
 			var secant = new appdb.views.VoSecantReport({
 				container: $(dom),
 				parent: this,
@@ -17035,7 +17035,7 @@ appdb.views.VoImageListItem = appdb.ExtendClass(appdb.View, "appdb.views.VoImage
 		if (appdb.config.features.endorsements.voimagelist) {
 		    data = data || {};
 		    if (data.newversion === true && ((data.data || {}).endorsements || {}).id) {
-			    var dom = $(this.dom).find("td[data-name='newversion'] .customcellwrap");
+			    var dom = $(this.dom).find("td[data-name='newversion'] > .customcellwrap > .newversion[data-version]").parent();
 			    var voendorsements = new appdb.views.VOEndorsementReport({
 				    container: $(dom),
 				    parent: this
@@ -17494,7 +17494,7 @@ appdb.views.VoImageListItemCell.ActionList = function(dom, row, col, data) {
 	return $(html);
 };
 appdb.views.VoImageListItemCell.NewVersionInfo = function(dom, row, col, data) {
-	var html = $("<div class='newversion vappinfo'></div>");
+	var html = $("<div class='newversion vappinfo'></div>");;
 	var newversion = data.newversiondata || null;
 	if (newversion) {
 		var version = $("<div class='version fieldvalue'><div class='field'>New version</div><div class='seperator'>:</div><div class='value icontext warningmessage'></div></div>");
@@ -17519,6 +17519,7 @@ appdb.views.VoImageListItemCell.NewVersionInfo = function(dom, row, col, data) {
 		$(html).append(version);
 		$(html).append(created);
 		$(html).append(expiration);
+		$(html).attr('data-version', newversion.version);
 	}
 	return $(html);
 };
